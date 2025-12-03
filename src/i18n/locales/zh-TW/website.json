@@ -1,0 +1,323 @@
+{
+  "site": {
+    "title": "RiceCall - 有趣的語音聊天平台",
+    "description": "不僅僅是一個優秀的語音工具，還是一個有趣的遊戲社區。",
+    "keywords": "RC語音,RiceCall,RC官網下載,RC軟體,語音軟體,語音聊天,公會語音,團隊管理,團隊聊天,副本語音,多人語聊,語音聊天,團隊語音,遊戲語音,在線K歌,網路K歌,遊戲公會,網路教育"
+  },
+  "common": {
+    "all": "全部"
+  },
+  "nav": {
+    "home": "首頁",
+    "announcement": "官方公告",
+    "contact": "聯繫我們",
+    "status": "伺服器狀態",
+    "login": "登入",
+    "logout": "登出",
+    "register": "註冊",
+    "account": "我的帳戶",
+    "closeMenu": "關閉菜單",
+    "openMenu": "開啟選單"
+  },
+  "footer": {
+    "partners": "合作夥伴",
+    "sections": {
+      "about": "相關資訊",
+      "more": "其他資訊",
+      "social": "社群平台"
+    },
+    "links": {
+      "status": "伺服器狀態",
+      "announcement": "官方公告",
+      "contact": "聯繫我們",
+      "privacy": "隱私權政策",
+      "terms": "服務條款"
+    }
+  },
+  "pages": {
+    "home": {
+      "heroTitle": "不僅是多人語音工具",
+      "heroSubtitle": "還是有趣的遊戲社區",
+      "download": {
+        "loading": "載入中...",
+        "now": "立即下載",
+        "unsupported": "您的平台目前不受支援"
+      },
+      "features": {
+        "title": "特色功能",
+        "subtitle": "豐富功能",
+        "items": {
+          "multiCall": {
+            "title": "多人連麥",
+            "desc": "低延遲、穩定連線，支援多人同時發言"
+          },
+          "voiceChat": {
+            "title": "語音聊天",
+            "desc": "降噪、回音消除、自動增益，清晰傳聲"
+          },
+          "screenShare": {
+            "title": "分享畫面（即將推出）",
+            "desc": "支援視窗/整個畫面分享，720p/1080p"
+          },
+          "roomPerms": {
+            "title": "房間與權限管理",
+            "desc": "主持人控制、發言權限、靜音與踢出"
+          },
+          "crossPlatform": {
+            "title": "跨平台支援",
+            "desc": "Windows / macOS / Linux，一鍵安裝"
+          },
+          "lightweight": {
+            "title": "輕量高效能",
+            "desc": "低 CPU 與記憶體佔用，遊戲中也順暢"
+          }
+        }
+      },
+      "interface": {
+        "title": "為遊戲而生的多人語音",
+        "desc": "RiceCall 提供低延遲、清晰語音與多人連麥",
+        "imageAlt": "RiceCall 介面截圖",
+        "close": "關閉",
+        "prev": "上一張圖片",
+        "next": "下一張圖片",
+        "toggle": "切換圖片"
+      },
+      "faq": {
+        "title": "常見問題",
+        "subtitle": "FAQs",
+        "items": {
+          "q1": {
+            "question": "如何增加個人的經驗值？",
+            "answer": "個人的經驗值是根據在線時長來計算的。\n登入 RC 後，每在線一個小時增加一個積分，每天增加的積分最高上限為 24，\n不足一小時的部分會累積到下一次的計算。\n系統每天更新一次積分，時間為每日的上午 8 時。\n如遇突發情況導致在當日的 8 時積分未更新，未加的積分會累積到第二天的更新。"
+          },
+          "q2": {
+            "question": "聽不到別人講話 / 別人聽不到我講話？",
+            "answer": "若您聽不到別人講話，請依序檢查：\n\n◎ 先確認耳麥是否插好，且可正常使用（可用 RC 的語音檢測功能測試）。\n  位置：視窗左上方 RC 語音 → 系統設定 → 音頻音效 → 語音設備調節設定\n\n◎ 檢查選擇的設備是否正確：\n  ◆ 聽不到聲音：請在 RC 語音 → 系統設定 → 音頻音效，調整輸出裝置\n  ◆ 別人聽不到您：請在同頁面調整輸入裝置",
+            "image": "/img/faqs/1.png"
+          },
+          "q3": {
+            "question": "這裡是原本的RC語音官方嗎？",
+            "answer": "不是，我們是一群由熱忱組成的團隊，跟原官方無任何關係。"
+          },
+          "q4": {
+            "question": "為什麼沒有語音群？",
+            "answer": "目前沒有推薦語音群，無聊沒事可以去 10 或 2000000 逛逛喔。"
+          },
+          "q5": {
+            "question": "怎麼樣獲得 VIP？",
+            "answer": "目前未開放購買，將會在正式版開放時提供管道。"
+          },
+          "q6": {
+            "question": "我要多久才能升一次等級？",
+            "html": "請在 <a href=\"https://docs.google.com/spreadsheets/d/1HjZ9RMpSRFCDJiukbqbZWLg0OdOn-XnpVQQZM6JoCEs/edit?usp=sharing\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-blue-600 underline\">這裡</a> 查看。"
+          },
+          "q7": {
+            "question": "登入後轉圈圈怎麼辦？",
+            "answer": "登出重新登入，若頻繁觸發請至 Discord 群「問題及建議」回報。"
+          },
+          "q8": {
+            "question": "彈出錯誤視窗怎麼辦？",
+            "answer": "請截圖並附上觸發方式至 Discord 群「問題及建議」回報。"
+          },
+          "q9": {
+            "question": "我無法登入怎麼辦？",
+            "answer": "請先確定自己下載的是最新版本，對照版本號，若持續發生請至 Discord 群「問題及建議」回報。"
+          }
+        }
+      }
+    },
+    "announcement": {
+      "title": "官方公告",
+      "empty": "暫無公告",
+      "error": "取得公告失敗",
+      "backToList": "返回公告列表",
+      "notFound": "找不到此公告",
+      "emptyDesc": "此公告目前沒有可顯示的內容。",
+      "notFoundDesc": "您所查看的公告不存在或已被移除，請返回列表查看最新公告。",
+      "gotoLink": "前往相關連結"
+    },
+    "contact": {
+      "title": "聯繫我們",
+      "empty": "暫無資訊",
+      "jobs": {
+        "CEO": "總執行長",
+        "CTO": "技術長",
+        "COO-taiwan": "台灣營運長",
+        "COO-russia": "俄羅斯營運長",
+        "COO-brazil": "巴西營運長",
+        "COO-iran": "伊朗營運長",
+        "COO-turkey": "土耳其營運長",
+        "COO-spain": "西班牙營運長",
+        "customer-service": "客服",
+        "developer": "開發",
+        "machine-network": "機器網路",
+        "technical-support": "技術支援"
+      }
+    },
+    "privacy": {
+      "title": "隱私權政策",
+      "lastUpdated": "最後更新"
+    },
+    "terms": {
+      "title": "服務條款"
+    },
+    "register": {
+      "title": "建立帳號",
+      "subtitle": "填寫以下資訊以開始使用 RiceCall。",
+      "fields": {
+        "username": "暱稱",
+        "account": "帳號",
+        "password": "密碼",
+        "confirm": "確認密碼",
+        "email": "信箱"
+      },
+      "submit": "建立帳號",
+      "submitting": "註冊中...",
+      "errors": {
+        "passwordNotMatch": "兩次輸入的密碼不一致",
+        "registerFailed": "註冊失敗",
+        "networkError": "網路或伺服器異常，請稍後重試"
+      }
+    },
+    "login": {
+      "backHome": "返回首頁",
+      "title": "登入",
+      "subtitle": "請輸入你的資料以繼續。",
+      "fields": {
+        "account": "帳號",
+        "password": "密碼"
+      },
+      "submit": "登入",
+      "submitting": "登入中...",
+      "forgetPassword": "忘記密碼",
+      "errors": {
+        "loginFailed": "登入失敗，請再試一次",
+        "networkError": "網路或伺服器異常，請稍後重試",
+        "invalid-account-or-password": "帳號或密碼不正確"
+      }
+    },
+    "profile": {
+      "title": "個人檔案",
+      "level": "等級",
+      "badgesTitle": "徽章牆",
+      "groupsTitle": "語音群",
+      "tabs": {
+        "recent": "最近訪問",
+        "joined": "加入的群",
+        "managed": "管理的群"
+      },
+      "editOpen": "編輯",
+      "editClose": "關閉編輯",
+      "cancel": "取消",
+      "save": "儲存",
+      "empty": "沒有資料",
+      "noData": "無資料",
+      "clickChangeAvatar": "點擊更換頭像",
+      "badgeShowTime": "展示至:",
+      "permanent": "永久",
+      "close": "關閉",
+      "displayName": "顯示名稱",
+      "birthDate": "出生日期",
+      "gender": "性別",
+      "genderMale": "男",
+      "genderFemale": "女",
+      "country": "國家",
+      "select": "請選擇",
+      "signature": "簽名",
+      "about": "關於我",
+      "displayId": "使用者名稱",
+      "email": "信箱",
+      "error": "取得個人檔案失敗",
+      "permission": "權限",
+      "uploadCancel": "取消",
+      "uploadApplyNoCrop": "不裁切直接套用",
+      "uploading": "上傳中...",
+      "uploadApply": "套用",
+      "uploadFailed": "上傳失敗",
+      "emailTitle": "電子信箱",
+      "newEmailTitle": "新電子信箱",
+      "emailNotBound": "尚未綁定信箱",
+      "emailBound": "已綁定信箱",
+      "emailAction": "綁定/修改信箱",
+      "emailBindAction": "綁定信箱",
+      "emailChangeAction": "修改信箱",
+      "emailInputPlaceholder": "請輸入信箱",
+      "emailCode": "驗證碼",
+      "emailSendCode": "發送驗證碼",
+      "emailSending": "發送中...",
+      "emailBindConfirm": "確認綁定",
+      "emailBinding": "綁定中...",
+      "emailSendLink": "寄送驗證連結",
+      "emailSendingLink": "寄送中...",
+      "emailOld": "原信箱",
+      "emailOldPlaceholder": "請輸入目前已綁定的信箱",
+      "emailOldMismatch": "原信箱不正確",
+      "emailVerifyTitle": "驗證信箱",
+      "emailBindTitle": "綁定信箱",
+      "emailChangeTitle": "修改信箱",
+      "emailSendSuccess": "發送成功！請至信箱點擊完成綁定。",
+      "emailPageSubmit": "送出",
+      "emailChangeSuccess": "修改信箱成功！",
+      "emailBindFailed": "綁定失敗或連結已失效，請重新請求綁定連結",
+      "emailGoProfile": "返回個人檔案",
+      "emailVerifying": "驗證中...",
+      "requestFailed": "請求時發生錯誤",
+      "passwordReset": "修改密碼",
+      "passwordBindAction": "綁定密碼",
+      "recaptchaFailed": "reCAPTCHA 驗證失敗，請稍後再試"
+    },
+    "forget": {
+      "forgetTitle": "忘記密碼",
+      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
+      "account": "帳號",
+      "sendEmail": "寄送重設連結",
+      "sendingEmail": "寄送中...",
+      "backLogin": "返回登入"
+    },
+    "password": {
+      "resetTitle": "重設密碼",
+      "verifyProcessing": "驗證中...",
+      "verifyFailed": "驗證失敗或連結已失效，請重新請求。",
+      "fields": {
+        "newPassword": "新密碼",
+        "confirmPassword": "確認新密碼"
+      },
+      "submit": "送出",
+      "submitting": "送出中...",
+      "errors": {
+        "passwordMismatch": "兩次輸入的密碼不一致",
+        "passwordTooShort": "密碼長度至少 8 碼"
+      }
+    },
+    "valid": {
+      "accountRequired": "帳號不能為空",
+      "accountMinLength": "帳號長度至少 4 碼",
+      "accountMaxLength": "帳號長度最多 16 碼",
+      "accountInvalidFormat": "帳號只能包含英文、數字、底線與點號",
+      "passwordRequired": "密碼不能為空",
+      "passwordMinLength": "密碼長度至少 8 碼",
+      "passwordMaxLength": "密碼長度最多 20 碼",
+      "passwordInvalidFormat": "密碼只能包含英文、數字、特殊符號",
+      "usernameInvalidFormat": "暱稱只能包含中文、英文、數字",
+      "usernameMinLength": "使用者名稱長度至少 4 碼",
+      "usernameMaxLength": "使用者名稱長度最多 16 碼"
+    },
+    "join": {
+      "joinTitle": "進入語音群",
+      "readyingOpen": "準備開啟RiceCall...",
+      "invalidSid": "無效的sid",
+      "opening": "正在開啟 RiceCall...",
+      "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
+      "tryConnect": "嘗試連線至語音群 ID：",
+      "retryOpen": "重新嘗試開啟RiceCall",
+      "loading": "正在開啟...",
+      "unsupported": "您的平台目前不受支援"
+    }
+  },
+  "announcementCategory": {
+    "update": "更新",
+    "general": "一般",
+    "system": "系統",
+    "event": "活動"
+  }
+}

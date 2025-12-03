@@ -1,0 +1,82 @@
+{
+  "intro": "This Privacy Policy explains how we collect, use, share and protect your information when using RiceCall.",
+  "sections": [
+    {
+      "title": "1. Scope",
+      "paragraph": "This policy applies to the RiceCall website, apps and features (real-time voice, voice messages, notifications, support)."
+    },
+    {
+      "title": "2. Data We Collect",
+      "items": [
+        "Account data (display name, id, avatar, country/region, birthday if provided, contact email)",
+        "Usage data (sign-in/out, feature clicks, error logs, reports/support requests)",
+        "Device & connection (device/OS/browser, language, time zone, IP, ISP, approximate location)",
+        "Voice data (encrypted media streams; recordings/messages while retained; quality metrics)",
+        "Cookies & similar tech (session, preferences, analytics, protection)"
+      ]
+    },
+    {
+      "title": "3. How We Use Data",
+      "items": [
+        "Provide, operate and improve voice/community features",
+        "Authentication, security and abuse prevention",
+        "Performance monitoring, debugging and analytics",
+        "User support and handling reports",
+        "Legal compliance"
+      ]
+    },
+    {
+      "title": "4. Sharing",
+      "items": [
+        "Vendors/Processors (cloud, CDN, RTC, analytics, monitoring) under contracts",
+        "Legal requests",
+        "Business transactions",
+        "We do not sell personal data"
+      ]
+    },
+    {
+      "title": "5. Voice Data",
+      "items": [
+        "Transport encryption for calls; no default storage",
+        "Recordings/messages stored while retained",
+        "Transcription requires opt-in and trusted processors",
+        "Quality metrics are aggregated/anonymous"
+      ]
+    },
+    {
+      "title": "6. Storage & Retention",
+      "items": [
+        "Data centers in various countries/regions",
+        "Retention based on necessity and legal obligations"
+      ]
+    },
+    {
+      "title": "7. Your Rights",
+      "paragraph": "Depending on law, rights may include access, rectification, deletion, restriction/objection, portability, and consent withdrawal. Contact us; identity verification may be required."
+    },
+    {
+      "title": "8. Minors",
+      "paragraph": "If under the legal age, use with guardian consent and guidance."
+    },
+    {
+      "title": "9. Security",
+      "paragraph": "Industry-standard measures; no system is perfectly secure."
+    },
+    {
+      "title": "10. Third Parties",
+      "paragraph": "Third-party services are governed by their own policies."
+    },
+    {
+      "title": "11. Cross-Border",
+      "paragraph": "Appropriate safeguards such as SCCs where applicable."
+    },
+    {
+      "title": "12. Changes",
+      "paragraph": "We may update this policy; material changes will be notified."
+    },
+    {
+      "title": "13. Contact",
+      "paragraph": "support@ricecall.com"
+    }
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "site": {
+    "title": "RiceCall - پلتفرم چت صوتی جالب",
+    "description": "فراتر از گفت‌وگوی صوتی همچنین جامعه‌ای سرگرم‌کننده برای بازی",
+    "keywords": "صدای RC، RaidCall, RC, RiceCall، دانلود وب‌سایت رسمی RC، نرم‌افزار RC، نرم‌افزار صوتی، چت صوتی، صدای گیلد، مدیریت تیم، چت تیمی، صدای سیاه‌چال، چت صوتی چند نفره، چت صوتی، صدای تیم، صدای بازی، کارائوکه آنلاین، کارائوکه آنلاین، گیلد بازی، آموزش آنلاین"
+  },
+  "common": {
+    "all": "همه"
+  },
+  "nav": {
+    "features": "ویژگی‌ها",
+    "faq": "سوالات متداول",
+    "announcement": "اطلاعیه‌ها",
+    "contact": "تماس",
+    "status": "وضعیت",
+    "login": "ورود",
+    "logout": "خروج",
+    "register": "ثبت‌نام",
+    "account": "حساب من"
+  },
+  "footer": {
+    "partners": "همکاران",
+    "sections": {
+      "about": "درباره",
+      "more": "بیشتر",
+      "social": "شبکه‌های اجتماعی"
+    },
+    "links": {
+      "status": "وضعیت",
+      "announcement": "اطلاعیه‌ها",
+      "contact": "تماس",
+      "privacy": "سیاست حریم خصوصی",
+      "terms": "شرایط استفاده"
+    }
+  },
+  "pages": {
+    "home": {
+      "heroTitle": "فراتر از گفت‌وگوی صوتی",
+      "heroSubtitle": "همچنین جامعه‌ای سرگرم‌کننده برای بازی",
+      "download": {
+        "loading": "در حال بارگذاری...",
+        "now": "اکنون دانلود کنید",
+        "unsupported": "پلتفرم شما پشتیبانی نمی‌شود"
+      },
+      "features": {
+        "title": "ویژگی‌ها",
+        "subtitle": "قابلیت‌ها",
+        "items": {
+          "multiCall": {
+            "title": "تماس‌های گروهی",
+            "desc": "تاخیر کم و اتصال پایدار برای چند گوینده"
+          },
+          "voiceChat": {
+            "title": "گفت‌وگوی صوتی",
+            "desc": "کاهش نویز، حذف اکو و تقویت خودکار برای وضوح بیشتر"
+          },
+          "screenShare": {
+            "title": "اشتراک‌گذاری صفحه (به‌زودی)",
+            "desc": "اشتراک پنجره یا کل صفحه با کیفیت 720p/1080p"
+          },
+          "roomPerms": {
+            "title": "اتاق‌ها و مجوزها",
+            "desc": "کنترل‌های میزبان، مجوز صحبت، بی‌صدا و اخراج"
+          },
+          "crossPlatform": {
+            "title": "چندسکویی",
+            "desc": "Windows / macOS / Linux، نصب با یک کلیک"
+          },
+          "lightweight": {
+            "title": "سبک و سریع",
+            "desc": "مصرف کم CPU و حافظه، روان در حین بازی"
+          }
+        }
+      },
+      "interface": {
+        "title": "صدا برای بازی ساخته شده",
+        "desc": "RiceCall صدای شفاف با تاخیر کم و تماس‌های گروهی ارائه می‌دهد",
+        "imageAlt": "تصویر رابط RiceCall"
+      },
+      "faq": {
+        "title": "سوالات متداول",
+        "subtitle": "سوالات متداول",
+        "items": {
+          "q1": {
+            "question": "چگونه امتیاز تجربه کسب کنم؟",
+            "answer": "تجربه بر اساس زمان آنلاین بودن محاسبه می‌شود.\nپس از ورود، هر ساعت آنلاین 1 امتیاز می‌دهد، حداکثر 24 در روز.\nکسری ساعت به محاسبه بعدی منتقل می‌شود.\nسیستم هر روز ساعت ۸:۰۰ صبح به‌روزرسانی می‌شود.\nاگر مشکلی غیرمنتظره مانع به‌روزرسانی شود، امتیازها روز بعد افزوده می‌شوند."
+          },
+          "q2": {
+            "question": "دیگران را نمی‌شنوم / دیگران صدای من را نمی‌شنوند؟",
+            "answer": "اگر صدای دیگران را نمی‌شنوید، موارد زیر را بررسی کنید:\n\n◎ مطمئن شوید هدست متصل و سالم است (از تست RiceCall استفاده کنید).\n  مسیر: RC Voice → تنظیمات → صوت → تنظیمات دستگاه\n\n◎ انتخاب دستگاه را بررسی کنید:\n  ◆ نمی‌شنوید: دستگاه خروجی را در همان صفحه تغییر دهید\n  ◆ دیگران صدای شما را نمی‌شنوند: دستگاه ورودی را در همان صفحه تغییر دهید",
+            "image": "/img/faqs/1.png"
+          },
+          "q3": {
+            "question": "آیا این RC Voice رسمیِ اصلی است؟",
+            "answer": "خیر. ما تیمی مستقل هستیم و ارتباطی با نسخه اصلی نداریم."
+          },
+          "q4": {
+            "question": "چرا گروه‌های صوتی نیست؟",
+            "answer": "هنوز گروه پیشنهادی وجود ندارد. می‌توانید برای سرگرمی به 10 یا 2000000 سر بزنید."
+          },
+          "q5": {
+            "question": "چطور VIP بگیرم؟",
+            "answer": "هنوز در دسترس نیست. در نسخه رسمی ارائه خواهد شد."
+          },
+          "q6": {
+            "question": "ارتقاء سطح چقدر طول می‌کشد؟",
+            "html": "لطفاً <a href=\"https://docs.google.com/spreadsheets/d/1HjZ9RMpSRFCDJiukbqbZWLg0OdOn-XnpVQQZM6JoCEs/edit?usp=sharing\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-blue-600 underline\">اینجا</a> را بررسی کنید."
+          },
+          "q7": {
+            "question": "اگر بعد از ورود همچنان در حال بارگذاری بود چه کنم؟",
+            "answer": "خروج و دوباره ورود کنید. اگر زیاد رخ می‌دهد، در دیسکورد 'Issues' گزارش دهید."
+          },
+          "q8": {
+            "question": "پیام‌های خطا؟",
+            "answer": "اسکرین‌شات بگیرید و مراحل بازتولید را در دیسکورد 'Issues' توضیح دهید."
+          },
+          "q9": {
+            "question": "نمی‌توانید وارد شوید؟",
+            "answer": "از داشتن آخرین نسخه مطمئن شوید. اگر ادامه داشت، در دیسکورد گزارش کنید."
+          }
+        }
+      }
+    },
+    "announcement": {
+      "title": "اطلاعیه‌ها",
+      "empty": "بدون اطلاعیه",
+      "error": "بارگیری اطلاعیه‌ها ناموفق بود",
+      "backToList": "بازگشت به فهرست اطلاعیه‌ها",
+      "notFound": "اطلاعیه پیدا نشد",
+      "emptyDesc": "این اطلاعیه محتوایی برای نمایش ندارد.",
+      "notFoundDesc": "اطلاعیه مورد نظر وجود ندارد یا حذف شده است. برای مشاهده آخرین اطلاعیه‌ها به فهرست برگردید.",
+      "gotoLink": "رفتن به لینک مرتبط"
+    },
+    "contact": {
+      "title": "تماس",
+      "jobs": {
+        "CEO": "مدیرعامل",
+        "CTO": "مدیر ارشد فنی",
+        "CFO": "مدیر ارشد مالی",
+        "COO": "مدیر عامل",
+        "COO-taiwan": "COO, Taiwan",
+        "COO-russia": "COO, Russia",
+        "COO-brazil": "COO, Brazil",
+        "customer-service": "خدمات مشتریان",
+        "developer": "توسعه‌دهنده",
+        "machine-network": "شبکه ماشین",
+        "technical-support": "پشتیبانی فنی"
+      }
+    },
+    "privacy": {
+      "title": "سیاست حریم خصوصی",
+      "lastUpdated": "آخرین به‌روزرسانی"
+    },
+    "terms": {
+      "title": "شرایط استفاده"
+    },
+    "register": {
+      "title": "ثبت‌نام",
+      "subtitle": "برای شروع استفاده از RiceCall اطلاعات زیر را تکمیل کنید.",
+      "fields": {
+        "username": "نام مستعار",
+        "account": "حساب",
+        "password": "گذرواژه",
+        "confirm": "تأیید گذرواژه",
+        "email": "ایمیل"
+      },
+      "submit": "ایجاد حساب",
+      "submitting": "در حال ثبت‌نام...",
+      "hasAccount": "قبلاً حساب دارید؟",
+      "gotoLogin": "رفتن به ورود",
+      "errors": {
+        "passwordNotMatch": "گذرواژه‌ها یکسان نیستند",
+        "registerFailed": "ثبت‌نام ناموفق بود",
+        "networkError": "خطای شبکه یا سرور، بعداً دوباره تلاش کنید"
+      }
+    },
+    "login": {
+      "backHome": "بازگشت به خانه",
+      "title": "ورود",
+      "subtitle": "برای ادامه، اطلاعات خود را وارد کنید.",
+      "fields": {
+        "account": "ایمیل",
+        "password": "گذرواژه"
+      },
+      "submit": "ورود",
+      "submitting": "در حال ورود...",
+      "forgetPassword": "忘記密碼",
+      "noAccount": "還沒有帳號嗎？",
+      "gotoRegister": "ثبت‌نام کنید",
+      "errors": {
+        "loginFailed": "ورود ناموفق بود، دوباره تلاش کنید",
+        "networkError": "خطای شبکه یا سرور، بعداً دوباره تلاش کنید",
+        "invalid-account-or-password": "شماره حساب یا رمز عبور نادرست"
+      }
+    },
+    "profile": {
+      "title": "مشخصات",
+      "level": "سطح",
+      "badgesTitle": "نشان‌ها",
+      "groupsTitle": "گروه‌ها",
+      "tabs": {
+        "recent": "اخیر",
+        "joined": "پیوسته",
+        "managed": "مدیریت‌شده"
+      },
+      "editOpen": "ویرایش",
+      "editClose": "بستن ویرایش",
+      "cancel": "انصراف",
+      "save": "ذخیره",
+      "empty": "بدون داده",
+      "noData": "بدون داده",
+      "clickChangeAvatar": "برای تغییر آواتار کلیک کنید",
+      "badgeShowTime": "نمایش تا:",
+      "permanent": "دائمی",
+      "close": "بستن",
+      "displayName": "نام نمایشی",
+      "birthDate": "تاریخ تولد",
+      "gender": "جنسیت",
+      "genderMale": "مرد",
+      "genderFemale": "زن",
+      "country": "کشور",
+      "select": "انتخاب",
+      "signature": "امضا",
+      "about": "درباره",
+      "displayId": "نام کاربری",
+      "email": "ایمیل",
+      "error": "دریافت پروفایل ناموفق بود",
+      "permission": "مجوز",
+      "uploadCancel": "انصراف",
+      "uploadApplyNoCrop": "اعمال بدون برش",
+      "uploading": "در حال بارگذاری...",
+      "uploadApply": "اعمال",
+      "uploadFailed": "بارگذاری ناموفق بود",
+      "emailTitle": "ایمیل",
+      "newEmailTitle": "ایمیل جدید",
+      "emailNotBound": "ایمیل متصل نشده",
+      "emailBound": "ایمیل متصل است",
+      "emailAction": "اتصال/تغییر ایمیل",
+      "emailBindAction": "اتصال ایمیل",
+      "emailChangeAction": "تغییر",
+      "emailInputPlaceholder": "ایمیل خود را وارد کنید",
+      "emailCode": "کد تأیید",
+      "emailSendCode": "ارسال کد",
+      "emailSending": "در حال ارسال...",
+      "emailBindConfirm": "تأیید اتصال",
+      "emailBinding": "در حال اتصال...",
+      "emailSendLink": "ارسال لینک تأیید",
+      "emailSendingLink": "در حال ارسال...",
+      "emailOld": "ایمیل فعلی",
+      "emailOldPlaceholder": "ایمیل متصل فعلی خود را وارد کنید",
+      "emailOldMismatch": "ایمیل فعلی نادرست است",
+      "emailVerifyTitle": "تأیید ایمیل",
+      "emailBindTitle": "اتصال ایمیل",
+      "emailChangeTitle": "تغییر ایمیل",
+      "emailSendSuccess": "موفقیت! برای تکمیل تأیید، ایمیل خود را بررسی کنید.",
+      "emailPageSubmit": "ارسال",
+      "emailChangeSuccess": "ایمیل با موفقیت تغییر کرد!",
+      "emailBindFailed": "اتصال ایمیل ناموفق بود یا لینک منقضی شده است. دوباره درخواست کنید.",
+      "emailGoProfile": "بازگشت به پروفایل",
+      "emailVerifying": "در حال بررسی...",
+      "requestFailed": "درخواست ناموفق بود",
+      "passwordReset": "بازنشانی",
+      "passwordBindAction": "اتصال گذرواژه"
+    },
+    "forget": {
+      "forgetTitle": "忘記密碼",
+      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
+      "account": "帳號",
+      "sendEmail": "寄送重設連結",
+      "sendingEmail": "寄送中...",
+      "remember": "想起來了嗎？",
+      "backLogin": "返回登入"
+    },
+    "password": {
+      "resetTitle": "بازنشانی گذرواژه",
+      "verifyProcessing": "در حال بررسی...",
+      "verifyFailed": "بررسی ناموفق بود یا لینک منقضی شده است. دوباره درخواست کنید.",
+      "fields": {
+        "newPassword": "گذرواژه جدید",
+        "confirmPassword": "تأیید گذرواژه جدید"
+      },
+      "submit": "ارسال",
+      "submitting": "در حال ارسال...",
+      "errors": {
+        "passwordMismatch": "گذرواژه‌ها یکسان نیستند",
+        "passwordTooShort": "گذرواژه باید حداقل ۸ کاراکتر باشد"
+      }
+    },
+    "valid": {
+      "accountRequired": "حساب الزامی است",
+      "accountMinLength": "حساب باید حداقل ۴ کاراکتر باشد",
+      "accountMaxLength": "حساب باید حداکثر ۱۶ کاراکتر باشد",
+      "accountInvalidFormat": "حساب باید فقط شامل حروف انگلیسی، اعداد، زیرخط و نقطه باشد",
+      "passwordRequired": "گذرواژه الزامی است",
+      "passwordMinLength": "گذرواژه باید حداقل ۸ کاراکتر باشد",
+      "passwordMaxLength": "گذرواژه باید حداکثر ۲۰ کاراکتر باشد",
+      "passwordInvalidFormat": "گذرواژه باید فقط شامل حروف انگلیسی، اعداد و نویسه‌های ویژه باشد",
+      "usernameInvalidFormat": "نام مستعار باید فقط شامل حروف انگلیسی، اعداد و نویسه‌های ویژه باشد"
+    }
+  },
+  "announcementCategory": {
+    "update": "به‌روزرسانی",
+    "general": "عمومی",
+    "system": "سیستم",
+    "event": "رویداد"
+  },
+  "join": {
+    "readyingOpen": "準備開啟RiceCall...",
+    "invalidSid": "無效的sid",
+    "opening": "正在開啟 RiceCall...",
+    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
+    "tryConnect": "嘗試連線至語音群 ID：",
+    "retryOpen": "重新嘗試開啟RiceCall"
+  }
+}

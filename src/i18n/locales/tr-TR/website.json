@@ -1,0 +1,315 @@
+{
+  "site": {
+    "title": "RiceCall - sesli sohbet platformu",
+    "description": "Sesli sohbetten daha fazlası, ayrıca eğlenceli bir oyun topluluğu",
+    "keywords": "RC Voice, RiceCall, RC Voice İndirme, RC Yazılımı, Ses Yazılımı, Sesli Sohbet, Lonca Sesi, Ekip Yönetimi, Ekip Sohbeti, Zindan Sesi, Çok Kişilik Sesli Sohbet, Sesli Sohbet, Ekip Sesi, Oyun Sesi, Çevrimiçi Karaoke, Çevrimiçi Ağ Karaoke, Oyun Loncası, Çevrimiçi Eğitim, RC, RaidCall"
+  },
+  "common": {
+    "all": "Tümü"
+  },
+  "nav": {
+    "features": "Özellikler",
+    "faq": "SSS",
+    "announcement": "Duyurular",
+    "contact": "İletişim",
+    "status": "Durum",
+    "login": "Giriş yap",
+    "logout": "Çıkış yap",
+    "register": "Kayıt ol",
+    "account": "Hesabım"
+  },
+  "footer": {
+    "partners": "Ortaklar",
+    "sections": {
+      "about": "Hakkında",
+      "more": "Daha fazla",
+      "social": "Sosyal"
+    },
+    "links": {
+      "status": "Durum",
+      "announcement": "Duyurular",
+      "contact": "İletişim",
+      "privacy": "Gizlilik Politikası",
+      "terms": "Hizmet Şartları"
+    }
+  },
+  "pages": {
+    "home": {
+      "heroTitle": "Sesli sohbetten daha fazlası",
+      "heroSubtitle": "Ayrıca eğlenceli bir oyun topluluğu",
+      "download": {
+        "loading": "Yükleniyor...",
+        "now": "Şimdi indir",
+        "unsupported": "Platformunuz desteklenmiyor"
+      },
+      "features": {
+        "title": "Özellikler",
+        "subtitle": "Kabiliyetler",
+        "items": {
+          "multiCall": {
+            "title": "Grup aramaları",
+            "desc": "Birden fazla konuşmacı için düşük gecikme ve kararlı bağlantılar"
+          },
+          "voiceChat": {
+            "title": "Sesli sohbet",
+            "desc": "Netlik için gürültü azaltma, yankı engelleme ve otomatik kazanç"
+          },
+          "screenShare": {
+            "title": "Ekran paylaşımı (yakında)",
+            "desc": "Pencereyi veya tüm ekranı 720p/1080p paylaşın"
+          },
+          "roomPerms": {
+            "title": "Odalar ve izinler",
+            "desc": "Sunucu kontrolleri, konuşma izinleri, susturma ve atma"
+          },
+          "crossPlatform": {
+            "title": "Çoklu platform",
+            "desc": "Windows / macOS / Linux, tek tıkla kurulum"
+          },
+          "lightweight": {
+            "title": "Hafif ve hızlı",
+            "desc": "Düşük CPU ve bellek kullanımı, oyun içinde akıcı"
+          }
+        }
+      },
+      "interface": {
+        "title": "Oyun için tasarlanmış ses",
+        "desc": "RiceCall düşük gecikmeli, net ses ve grup aramaları sunar",
+        "imageAlt": "RiceCall arayüzü ekran görüntüsü"
+      },
+      "faq": {
+        "title": "SSS",
+        "subtitle": "SSS",
+        "items": {
+          "q1": {
+            "question": "Deneyim puanlarını nasıl kazanırım?",
+            "answer": "Deneyim çevrimiçi kalma süresine göre verilir.\nGiriş yaptıktan sonra çevrimiçi geçirilen her saat 1 puan kazandırır, günde en fazla 24.\nTamamlanmayan saatler bir sonraki hesaplamaya eklenir.\nSistem her gün 08:00'de güncellenir.\nBeklenmeyen bir sorun güncellemeyi engellerse, puanlar ertesi gün eklenir."
+          },
+          "q2": {
+            "question": "Başkalarını duyamıyorum / başkaları beni duyamıyor mu?",
+            "answer": "Başkalarını duyamıyorsanız, şunları kontrol edin:\n\n◎ Kulaklığın bağlı ve çalışır olduğundan emin olun (RiceCall testini kullanın).\n  Yol: RC Voice → Ayarlar → Ses → Cihaz Ayarları\n\n◎ Cihaz seçimini doğrulayın:\n  ◆ Duyamıyorsanız: aynı sayfada çıkış cihazını ayarlayın\n  ◆ Başkaları sizi duymuyorsa: aynı sayfada giriş cihazını ayarlayın",
+            "image": "/img/faqs/1.png"
+          },
+          "q3": {
+            "question": "Bu orijinal RC Voice resmi mi?",
+            "answer": "Hayır. Orijinaliyle bağlantısı olmayan bağımsız bir ekibiz."
+          },
+          "q4": {
+            "question": "Neden ses grupları yok?",
+            "answer": "Henüz önerilen grup yok. Eğlence için 10 veya 2000000'ı ziyaret edebilirsiniz."
+          },
+          "q5": {
+            "question": "VIP nasıl alınır?",
+            "answer": "Henüz mevcut değil. Resmi sürümde sunulacak."
+          },
+          "q6": {
+            "question": "Seviye atlamak ne kadar sürer?",
+            "html": "Lütfen <a href=\"https://docs.google.com/spreadsheets/d/1HjZ9RMpSRFCDJiukbqbZWLg0OdOn-XnpVQQZM6JoCEs/edit?usp=sharing\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-blue-600 underline\">burayı</a> kontrol edin."
+          },
+          "q7": {
+            "question": "Girişten sonra yükleme sürerse ne yapmalıyım?",
+            "answer": "Çıkış yapıp tekrar giriş yapın. Sık olursa Discord 'Issues' bölümünde bildirin."
+          },
+          "q8": {
+            "question": "Hata açılır pencereleri mi?",
+            "answer": "Ekran görüntüsü alın ve çoğaltma adımlarını Discord 'Issues' bölümünde açıklayın."
+          },
+          "q9": {
+            "question": "Giriş yapamıyor musunuz?",
+            "answer": "En son sürüme sahip olduğunuzdan emin olun. Devam ederse, Discord'da bildirin."
+          }
+        }
+      }
+    },
+    "announcement": {
+      "title": "Duyurular",
+      "empty": "Duyuru yok",
+      "error": "Duyurular yüklenemedi",
+      "backToList": "Duyuru listesine dön",
+      "notFound": "Duyuru bulunamadı",
+      "emptyDesc": "Bu duyuruda gösterilecek içerik yok.",
+      "notFoundDesc": "Aradığınız duyuru mevcut değil veya kaldırılmış. Lütfen en son duyuruları görmek için listeye dönün.",
+      "gotoLink": "İlgili bağlantıya git"
+    },
+    "contact": {
+      "title": "İletişim",
+      "jobs": {
+        "CEO": "Genel Müdür",
+        "CTO": "Teknoloji Direktörü",
+        "CFO": "Finans Direktörü",
+        "COO": "Operasyon Direktörü",
+        "COO-taiwan": "COO, Tayvan",
+        "COO-russia": "COO, Rusya",
+        "COO-brazil": "COO, Brezilya",
+        "customer-service": "Müşteri Hizmetleri",
+        "developer": "Geliştirici",
+        "machine-network": "Makine Ağı",
+        "technical-support": "Teknik Destek"
+      }
+    },
+    "privacy": {
+      "title": "Gizlilik Politikası",
+      "lastUpdated": "Son güncelleme"
+    },
+    "terms": {
+      "title": "Hizmet Şartları"
+    },
+    "register": {
+      "title": "Kayıt ol",
+      "subtitle": "RiceCall'ı kullanmaya başlamak için aşağıdaki bilgileri doldurun.",
+      "fields": {
+        "username": "Takma ad",
+        "account": "Hesap",
+        "password": "Parola",
+        "confirm": "Parolayı onayla",
+        "email": "E-posta"
+      },
+      "submit": "Hesap oluştur",
+      "submitting": "Kayıt yapılıyor...",
+      "hasAccount": "Zaten bir hesabınız var mı?",
+      "gotoLogin": "Girişe git",
+      "errors": {
+        "passwordNotMatch": "Parolalar eşleşmiyor",
+        "registerFailed": "Kayıt başarısız",
+        "networkError": "Ağ veya sunucu hatası, lütfen daha sonra tekrar deneyin"
+      }
+    },
+    "login": {
+      "backHome": "Ana sayfaya dön",
+      "title": "Giriş yap",
+      "subtitle": "Devam etmek için bilgilerinizi girin.",
+      "fields": {
+        "account": "Hesap",
+        "password": "Parola"
+      },
+      "submit": "Giriş yap",
+      "submitting": "Giriş yapılıyor...",
+      "forgetPassword": "忘記密碼",
+      "noAccount": "還沒有帳號嗎？",
+      "gotoRegister": "Kayıt ol",
+      "errors": {
+        "loginFailed": "Giriş başarısız, lütfen tekrar deneyin",
+        "networkError": "Ağ veya sunucu hatası, lütfen daha sonra tekrar deneyin",
+        "invalid-account-or-password": "Yanlış kullanıcı adı veya şifre"
+      }
+    },
+    "profile": {
+      "title": "Profil",
+      "level": "Seviye",
+      "badgesTitle": "Rozetler",
+      "groupsTitle": "Gruplar",
+      "tabs": {
+        "recent": "Son",
+        "joined": "Katıldıklarım",
+        "managed": "Yönetilen"
+      },
+      "editOpen": "Düzenle",
+      "editClose": "Düzenlemeyi kapat",
+      "cancel": "İptal",
+      "save": "Kaydet",
+      "empty": "Veri yok",
+      "noData": "Veri yok",
+      "clickChangeAvatar": "Avatarı değiştirmek için tıklayın",
+      "badgeShowTime": "Şuna kadar göster:",
+      "permanent": "Kalıcı",
+      "close": "Kapat",
+      "displayName": "Görünen Ad",
+      "birthDate": "Doğum Tarihi",
+      "gender": "Cinsiyet",
+      "genderMale": "Erkek",
+      "genderFemale": "Kadın",
+      "country": "Ülke",
+      "select": "Seç",
+      "signature": "İmza",
+      "about": "Hakkında",
+      "displayId": "Kullanıcı Adı",
+      "email": "E-posta",
+      "error": "Profil alınamadı",
+      "permission": "İzin",
+      "uploadCancel": "İptal",
+      "uploadApplyNoCrop": "Kırpmadan uygula",
+      "uploading": "Yükleniyor...",
+      "uploadApply": "Uygula",
+      "uploadFailed": "Yükleme başarısız",
+      "emailTitle": "E-posta",
+      "newEmailTitle": "Yeni e-posta",
+      "emailNotBound": "E-posta bağlı değil",
+      "emailBound": "E-posta bağlı",
+      "emailAction": "E-postayı bağla/değiştir",
+      "emailBindAction": "E-postayı bağla",
+      "emailChangeAction": "Değiştir",
+      "emailInputPlaceholder": "E-postanızı girin",
+      "emailCode": "Doğrulama kodu",
+      "emailSendCode": "Kod gönder",
+      "emailSending": "Gönderiliyor...",
+      "emailBindConfirm": "Bağlamayı onayla",
+      "emailBinding": "Bağlanıyor...",
+      "emailSendLink": "Doğrulama bağlantısı gönder",
+      "emailSendingLink": "Gönderiliyor...",
+      "emailOld": "Geçerli e-posta",
+      "emailOldPlaceholder": "Şu anda bağlı e-postanızı girin",
+      "emailOldMismatch": "Geçerli e-posta yanlış",
+      "emailVerifyTitle": "E-postayı doğrula",
+      "emailBindTitle": "E-postayı bağla",
+      "emailChangeTitle": "E-postayı değiştir",
+      "emailSendSuccess": "Başarılı! Doğrulamayı tamamlamak için e-postanızı kontrol edin.",
+      "emailPageSubmit": "Gönder",
+      "emailChangeSuccess": "E-posta başarıyla değiştirildi!",
+      "emailBindFailed": "E-posta bağlama başarısız veya bağlantı süresi doldu. Lütfen yeniden isteyin.",
+      "emailGoProfile": "Profile dön",
+      "emailVerifying": "Doğrulanıyor...",
+      "requestFailed": "İstek başarısız",
+      "passwordReset": "Sıfırla",
+      "passwordBindAction": "Parolayı bağla"
+    },
+    "forget": {
+      "forgetTitle": "忘記密碼",
+      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
+      "account": "帳號",
+      "sendEmail": "寄送重設連結",
+      "sendingEmail": "寄送中...",
+      "remember": "想起來了嗎？",
+      "backLogin": "返回登入"
+    },
+    "password": {
+      "resetTitle": "Parolayı sıfırla",
+      "verifyProcessing": "Doğrulanıyor...",
+      "verifyFailed": "Doğrulama başarısız veya bağlantının süresi doldu. Lütfen yeniden isteyin.",
+      "fields": {
+        "newPassword": "Yeni parola",
+        "confirmPassword": "Yeni parolayı onayla"
+      },
+      "submit": "Gönder",
+      "submitting": "Gönderiliyor...",
+      "errors": {
+        "passwordMismatch": "Parolalar eşleşmiyor",
+        "passwordTooShort": "Parola en az 8 karakter olmalıdır"
+      }
+    },
+    "valid": {
+      "accountRequired": "Hesap zorunludur",
+      "accountMinLength": "Hesap en az 4 karakter olmalıdır",
+      "accountMaxLength": "Hesap en fazla 16 karakter olmalıdır",
+      "accountInvalidFormat": "Hesap yalnızca İngilizce harfler, sayılar, alt çizgi ve nokta içermelidir",
+      "passwordRequired": "Parola zorunludur",
+      "passwordMinLength": "Parola en az 8 karakter olmalıdır",
+      "passwordMaxLength": "Parola en fazla 20 karakter olmalıdır",
+      "passwordInvalidFormat": "Parola yalnızca İngilizce harfler, sayılar ve özel karakterler içermelidir",
+      "usernameInvalidFormat": "Takma ad yalnızca İngilizce harfler, sayılar ve özel karakterler içermelidir"
+    }
+  },
+  "announcementCategory": {
+    "update": "Güncelleme",
+    "general": "Genel",
+    "system": "Sistem",
+    "event": "Etkinlik"
+  },
+  "join": {
+    "readyingOpen": "準備開啟RiceCall...",
+    "invalidSid": "無效的sid",
+    "opening": "正在開啟 RiceCall...",
+    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
+    "tryConnect": "嘗試連線至語音群 ID：",
+    "retryOpen": "重新嘗試開啟RiceCall"
+  }
+}

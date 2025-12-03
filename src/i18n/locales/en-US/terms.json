@@ -1,0 +1,90 @@
+{
+  "intro": "These Terms of Service govern your access to and use of RiceCall.",
+  "sections": [
+    {
+      "title": "1. Acceptance & Changes",
+      "items": [
+        "Installing, logging in or using the Service means you accept these Terms",
+        "We may update these Terms; material changes will be notified"
+      ]
+    },
+    {
+      "title": "2. Service",
+      "items": [
+        "Real-time voice, voice messages, communities and related features",
+        "Features may be added/changed/suspended for operational or security needs"
+      ]
+    },
+    {
+      "title": "3. Account & Security",
+      "items": [
+        "Provide accurate information and keep credentials confidential",
+        "Notify us of unauthorized use; you are responsible for poor management"
+      ]
+    },
+    {
+      "title": "4. Acceptable Use",
+      "items": [
+        "No illegal/infringing content (harassment, fraud, hate, sexual/child abuse)",
+        "No malware, attacks, unauthorized access or disruption",
+        "No scraping/unauthorized collection or distribution of others' data",
+        "No impersonation, spam or unauthorized ads"
+      ]
+    },
+    {
+      "title": "5. Voice-Specific Terms",
+      "items": [
+        "Calls use transport encryption; content is not stored by default",
+        "Recordings/messages stored while retained",
+        "Transcription requires opt-in and may use trusted processors",
+        "Quality metrics may be collected for diagnostics"
+      ]
+    },
+    {
+      "title": "6. Payments & Subscriptions (if any)",
+      "items": [
+        "Plan fees and renewal rules are shown at purchase",
+        "Fees are non-refundable unless required by law"
+      ]
+    },
+    {
+      "title": "7. User Content & License",
+      "items": [
+        "You are responsible for your content",
+        "You grant us a non-exclusive, worldwide, revocable license to operate the Service (backup, transmit, display)"
+      ]
+    },
+    {
+      "title": "8. IP Rights",
+      "paragraph": "Software, logos, design are owned by RiceCall or licensors."
+    },
+    {
+      "title": "9. Third-Party Services",
+      "paragraph": "Third-party services are governed by their own terms/policies."
+    },
+    {
+      "title": "10. Disclaimer",
+      "paragraph": "Service is provided as-is and as-available; no warranties."
+    },
+    {
+      "title": "11. Liability Limit",
+      "paragraph": "No liability for indirect/special damages; direct damages capped as specified or by a nominal cap for free services."
+    },
+    {
+      "title": "12. Suspension/Termination",
+      "paragraph": "We may suspend/terminate for violations or risks."
+    },
+    {
+      "title": "13. Governing Law",
+      "paragraph": "See local addendum for your jurisdiction if applicable."
+    },
+    {
+      "title": "14. Changes",
+      "paragraph": "Updates may occur; continued use means acceptance."
+    },
+    {
+      "title": "15. Contact",
+      "paragraph": "support@ricecall.com"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "intro": "Estos Términos del Servicio regulan su acceso y uso de RiceCall.",
+  "sections": [
+    {
+      "title": "1. Aceptación y cambios",
+      "items": [
+        "Instalar, iniciar sesión o usar el Servicio implica que acepta estos Términos",
+        "Podemos actualizar estos Términos; los cambios materiales serán notificados"
+      ]
+    },
+    {
+      "title": "2. Servicio",
+      "items": [
+        "Voz en tiempo real, mensajes de voz, comunidades y funciones relacionadas",
+        "Las funciones pueden añadirse/cambiarse/suspenderse por necesidades operativas o de seguridad"
+      ]
+    },
+    {
+      "title": "3. Cuenta y seguridad",
+      "items": [
+        "Proporcione información precisa y mantenga sus credenciales confidenciales",
+        "Infórmenos sobre el uso no autorizado; usted es responsable por la mala gestión"
+      ]
+    },
+    {
+      "title": "4. Uso aceptable",
+      "items": [
+        "Prohibido contenido ilegal/infractor (acoso, fraude, odio, abuso sexual/infantil)",
+        "Prohibido malware, ataques, acceso no autorizado o interrupciones",
+        "Prohibido el scraping/la recopilación o distribución no autorizada de datos de terceros",
+        "Prohibida la suplantación de identidad, el spam o la publicidad no autorizada"
+      ]
+    },
+    {
+      "title": "5. Términos específicos de voz",
+      "items": [
+        "Las llamadas usan cifrado en tránsito; el contenido no se almacena por defecto",
+        "Las grabaciones/mensajes se almacenan mientras se conserven",
+        "La transcripción requiere consentimiento expreso y puede utilizar procesadores de confianza",
+        "Las métricas de calidad pueden recopilarse con fines de diagnóstico"
+      ]
+    },
+    {
+      "title": "6. Pagos y suscripciones (si las hubiera)",
+      "items": [
+        "Las tarifas del plan y las reglas de renovación se muestran en la compra",
+        "Las tarifas no son reembolsables salvo que lo exija la ley"
+      ]
+    },
+    {
+      "title": "7. Contenido del usuario y licencia",
+      "items": [
+        "Usted es responsable de su contenido",
+        "Usted nos otorga una licencia no exclusiva, mundial y revocable para operar el Servicio (copia de seguridad, transmisión, visualización)"
+      ]
+    },
+    {
+      "title": "8. Derechos de propiedad intelectual",
+      "paragraph": "El software, los logotipos y el diseño son propiedad de RiceCall o de sus licenciantes."
+    },
+    {
+      "title": "9. Servicios de terceros",
+      "paragraph": "Los servicios de terceros se rigen por sus propios términos y políticas."
+    },
+    {
+      "title": "10. Descargo de responsabilidad",
+      "paragraph": "El Servicio se proporciona «tal cual» y «según disponibilidad»; sin garantías."
+    },
+    {
+      "title": "11. Limitación de responsabilidad",
+      "paragraph": "No hay responsabilidad por daños indirectos/especiales; los daños directos se limitan según lo especificado o por un tope nominal para servicios gratuitos."
+    },
+    {
+      "title": "12. Suspensión/terminación",
+      "paragraph": "Podemos suspender/terminar por infracciones o riesgos."
+    },
+    {
+      "title": "13. Ley aplicable",
+      "paragraph": "Consulte el anexo local de su jurisdicción, si corresponde."
+    },
+    {
+      "title": "14. Cambios",
+      "paragraph": "Pueden producirse actualizaciones; el uso continuado implica aceptación."
+    },
+    {
+      "title": "15. Contacto",
+      "paragraph": "support@ricecall.com"
+    }
+  ]
+}

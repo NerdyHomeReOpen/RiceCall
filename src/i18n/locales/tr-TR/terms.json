@@ -1,0 +1,90 @@
+{
+  "intro": "Bu Hizmet Şartları, RiceCall'a erişiminizi ve kullanımınızı düzenler.",
+  "sections": [
+    {
+      "title": "1. Kabul ve değişiklikler",
+      "items": [
+        "Hizmeti yüklemek, giriş yapmak veya kullanmak bu Şartları kabul ettiğiniz anlamına gelir",
+        "Bu Şartları güncelleyebiliriz; önemli değişiklikler bildirilecektir"
+      ]
+    },
+    {
+      "title": "2. Hizmet",
+      "items": [
+        "Gerçek zamanlı ses, sesli mesajlar, topluluklar ve ilgili özellikler",
+        "Özellikler operasyonel veya güvenlik ihtiyaçları için eklenebilir/değiştirilebilir/askıya alınabilir"
+      ]
+    },
+    {
+      "title": "3. Hesap ve güvenlik",
+      "items": [
+        "Doğru bilgi sağlayın ve kimlik bilgilerinizi gizli tutun",
+        "İzinsiz kullanımı bize bildirin; yetersiz yönetimden siz sorumlusunuz"
+      ]
+    },
+    {
+      "title": "4. Kabul edilebilir kullanım",
+      "items": [
+        "Yasadışı/ihlâl içeriği yasaktır (taciz, dolandırıcılık, nefret, cinsel/çocuk istismarı)",
+        "Kötü amaçlı yazılım, saldırı, izinsiz erişim veya hizmet kesintisi yasaktır",
+        "Başkasının verilerini kazıma/izinsiz toplama veya dağıtma yasaktır",
+        "Kimliğe bürünme, spam veya izinsiz reklam yasaktır"
+      ]
+    },
+    {
+      "title": "5. Sese özel şartlar",
+      "items": [
+        "Aramalar aktarımda şifreleme kullanır; içerik varsayılan olarak saklanmaz",
+        "Kayıtlar/mesajlar tutuldukları sürece saklanır",
+        "Transkripsiyon açık rıza gerektirir ve güvenilir işlemciler kullanılabilir",
+        "Kalite metrikleri teşhis için toplanabilir"
+      ]
+    },
+    {
+      "title": "6. Ödemeler ve abonelikler (varsa)",
+      "items": [
+        "Plan ücretleri ve yenileme kuralları satın alma sırasında gösterilir",
+        "Ücretler, yasa gerektirmedikçe iade edilmez"
+      ]
+    },
+    {
+      "title": "7. Kullanıcı içeriği ve lisans",
+      "items": [
+        "İçeriğinizden siz sorumlusunuz",
+        "Hizmeti işletmek için bize münhasır olmayan, dünya çapında ve feshedilebilir bir lisans verirsiniz (yedekleme, iletim, gösterim)"
+      ]
+    },
+    {
+      "title": "8. Fikri mülkiyet hakları",
+      "paragraph": "Yazılım, logolar ve tasarım RiceCall'a veya lisans verenlerine aittir."
+    },
+    {
+      "title": "9. Üçüncü taraf hizmetler",
+      "paragraph": "Üçüncü taraf hizmetler kendi şart/politikalarına tabidir."
+    },
+    {
+      "title": "10. Feragatname",
+      "paragraph": "Hizmet olduğu gibi ve mevcut olduğu kadarıyla sunulur; hiçbir garanti verilmez."
+    },
+    {
+      "title": "11. Sorumluluk sınırlaması",
+      "paragraph": "Dolaylı/özel zararlardan sorumluluk yoktur; doğrudan zararlar belirtilen şekilde veya ücretsiz hizmetler için nominal bir üst sınır ile sınırlıdır."
+    },
+    {
+      "title": "12. Askıya alma/sonlandırma",
+      "paragraph": "İhlaller veya riskler nedeniyle askıya alabilir/sonlandırabiliriz."
+    },
+    {
+      "title": "13. Uygulanacak hukuk",
+      "paragraph": "Geçerliyse, yetki alanınıza ilişkin yerel eki inceleyin."
+    },
+    {
+      "title": "14. Değişiklikler",
+      "paragraph": "Güncellemeler olabilir; kullanmaya devam etmek kabul ettiğiniz anlamına gelir."
+    },
+    {
+      "title": "15. İletişim",
+      "paragraph": "support@ricecall.com"
+    }
+  ]
+}

@@ -1,0 +1,315 @@
+{
+  "site": {
+    "title": "RiceCall ― 楽しいボイスチャットプラットフォーム",
+    "description": "ただのボイスツールじゃなく、楽しいゲームコミュニティでもあるんです。",
+    "keywords": "RCボイス, RiceCall, RC公式サイト, RCダウンロード, ボイスチャット, 音声ソフト, ギルドボイス, チーム管理, チームチャット, レイドボイス, マルチ音声通話, 音声チャット, チームボイス, ゲームボイス, オンラインカラオケ, ネットカラオケ, ゲームギルド, オンライン教育"
+  },
+  "common": {
+    "all": "すべて"
+  },
+  "nav": {
+    "features": "ユニーク機能",
+    "faq": "FAQ",
+    "announcement": "公式お知らせ",
+    "contact": "お問い合わせ",
+    "status": "サーバーステータス",
+    "login": "ログイン",
+    "logout": "ログアウト",
+    "register": "新規登録",
+    "account": "アカウント情報"
+  },
+  "footer": {
+    "partners": "パートナー",
+    "sections": {
+      "about": "関連情報",
+      "more": "その他の情報",
+      "social": "コミュニティプラットフォーム"
+    },
+    "links": {
+      "status": "サーバー状態",
+      "announcement": "公式お知らせ",
+      "contact": "お問い合わせ",
+      "privacy": "プライバシーポリシー",
+      "terms": "利用規約"
+    }
+  },
+  "pages": {
+    "home": {
+      "heroTitle": "ただのボイスツールじゃなく",
+      "heroSubtitle": "楽しいゲームコミュニティでもあるんです",
+      "download": {
+        "loading": "読み込み中...",
+        "now": "今すぐダウンロード",
+        "unsupported": "お使いのプラットフォームは現在サポートされていません"
+      },
+      "features": {
+        "title": "ユニーク機能",
+        "subtitle": "充実した機能",
+        "items": {
+          "multiCall": {
+            "title": "マルチ通話",
+            "desc": "低遅延で安定した接続、複数人の同時発言に対応"
+          },
+          "voiceChat": {
+            "title": "ボイスチャット",
+            "desc": "ノイズ除去、エコーキャンセル、自動ゲイン調整で、クリアな音声伝達"
+          },
+          "screenShare": {
+            "title": "画面共有（もうすぐ対応予定！）",
+            "desc": "ウィンドウ／全画面共有に対応、720p／1080pをサポート"
+          },
+          "roomPerms": {
+            "title": "ルームと権限の管理",
+            "desc": "ホストコントロール、発言権限、ミュートとキック"
+          },
+          "crossPlatform": {
+            "title": "クロスプラットフォーム対応",
+            "desc": "Windows / macOS / Linuxワンクリックでインストール"
+          },
+          "lightweight": {
+            "title": "軽量＆高性能",
+            "desc": "低CPU・低メモリで、ゲーム中もスムーズにプレイ可能"
+          }
+        }
+      },
+      "interface": {
+        "title": "ゲームのために生まれたマルチボイス",
+        "desc": "RiceCall は低遅延でクリアな音声、複数人でも同時に通話可能",
+        "imageAlt": "RiceCall のスクリーンショット"
+      },
+      "faq": {
+        "title": "よくある質問",
+        "subtitle": "FAQs",
+        "items": {
+          "q1": {
+            "question": "個人の経験値を増やすにはどうすればよいですか？",
+            "answer": "個人の経験値はオンライン時間に応じて計算されます。\nRC にログイン後、1 時間ごとに 1 ポイントが加算され、1 日の最大加算ポイントは 24 です。\n1 時間未満の時間は次回に繰り越されます。\nポイントは毎日 8 時にシステムで更新されます。\nもし当日の 8 時に更新されなかった場合、未加算のポイントは翌日に繰り越されます。"
+          },
+          "q2": {
+            "question": "他の人の声が聞こえない / 自分の声が他の人に聞こえない",
+            "answer": "他の人の声が聞こえない場合は、次の手順で確認してください。\n\n◎ まず、ヘッドセットが正しく接続され、正常に動作するか確認します（RC の音声テスト機能で確認可能）。\n場所：画面左上 RC ボイス → システム設定 → オーディオ → 音声デバイス設定\n\n◎ 使用するデバイスが正しいか確認します：\n◆ 音が聞こえない場合：RC ボイス → システム設定 → オーディオで出力デバイスを調整\n◆ 他の人があなたの声を聞けない場合：同じ画面で入力デバイスを調整",
+            "image": "/img/faqs/1.png"
+          },
+          "q3": {
+            "question": "ここは元のRCボイスの公式サイトですか？",
+            "answer": "いいえ、私たちは熱意あるチームであり、元の公式とは一切関係ありません。"
+          },
+          "q4": {
+            "question": "なぜボイスチャットグループがないのですか？",
+            "answer": "現在おすすめのボイスチャットグループはありません。暇なときは、10番や2000000番のグループを覗いてみてください。"
+          },
+          "q5": {
+            "question": "VIP はどうすれば取得できますか？",
+            "answer": "現在は購入できません。正式版リリース時に入手方法を提供する予定です。"
+          },
+          "q6": {
+            "question": "レベルはどのくらいの頻度で上がりますか？",
+            "html": "<a href=\"https://docs.google.com/spreadsheets/d/1HjZ9RMpSRFCDJiukbqbZWLg0OdOn-XnpVQQZM6JoCEs/edit?usp=sharing\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-blue-600 underline\">こちら</a> をご覧ください。"
+          },
+          "q7": {
+            "question": "ログイン後にくるくる回る場合はどうすればよいですか？",
+            "answer": "ログアウトして再度ログインしてください。頻繁に発生する場合は、Discord の「問題と提案」グループで報告してください。"
+          },
+          "q8": {
+            "question": "エラーウィンドウが表示された場合はどうすればよいですか？",
+            "answer": "スクリーンショットを撮り、発生手順を添えて Discord の「問題と提案」グループで報告してください。"
+          },
+          "q9": {
+            "question": "ログインできない場合はどうすればよいですか？",
+            "answer": "まず最新版をダウンロードしているか、バージョン番号を確認してください。問題が続く場合は、Discord の「問題と提案」グループで報告してください。"
+          }
+        }
+      }
+    },
+    "announcement": {
+      "title": "公式お知らせ",
+      "empty": "現在お知らせはありません",
+      "error": "お知らせの取得に失敗しました",
+      "backToList": "お知らせ一覧に戻る",
+      "notFound": "このお知らせは見つかりません",
+      "emptyDesc": "このお知らせには、現在表示できる内容がありません。",
+      "notFoundDesc": "ご覧の通知は存在しないか、削除されています。お知らせ一覧に戻って最新の通知をご確認ください。",
+      "gotoLink": "関連リンクへ移動"
+    },
+    "contact": {
+      "title": "お問い合わせ",
+      "jobs": {
+        "CEO": "CEO",
+        "CTO": "CTO",
+        "CFO": "CFO",
+        "COO": "COO",
+        "COO-taiwan": "COO-台湾",
+        "COO-russia": "COO-ロシア",
+        "COO-brazil": "COO-ブラジル",
+        "customer-service": "公式お知らせ",
+        "developer": "開発者",
+        "machine-network": "機器ネットワークの管理",
+        "technical-support": "技術サポート"
+      }
+    },
+    "privacy": {
+      "title": "プライバシーポリシー",
+      "lastUpdated": "最終更新"
+    },
+    "terms": {
+      "title": "利用規約"
+    },
+    "register": {
+      "title": "新規登録",
+      "subtitle": "以下の情報を入力して、RiceCall の利用を開始してください。",
+      "fields": {
+        "username": "ニックネーム",
+        "account": "アカウント名",
+        "password": "パスワード",
+        "confirm": "パスワード確認",
+        "email": "メールアドレス"
+      },
+      "submit": "アカウント作成",
+      "submitting": "登録中...",
+      "hasAccount": "すでにアカウントをお持ちですか？",
+      "gotoLogin": "ログインへ進む",
+      "errors": {
+        "passwordNotMatch": "パスワードが一致しません",
+        "registerFailed": "登録に失敗しました",
+        "networkError": "ネットワークまたはサーバーエラーです。しばらくしてからもう一度お試しください"
+      }
+    },
+    "login": {
+      "backHome": "ホームに戻る",
+      "title": "ログイン",
+      "subtitle": "続行するには詳細を入力してください。",
+      "fields": {
+        "account": "アカウント名",
+        "password": "パスワード"
+      },
+      "submit": "ログイン",
+      "submitting": "読み込み中...",
+      "forgetPassword": "忘記密碼",
+      "noAccount": "還沒有帳號嗎？",
+      "gotoRegister": "サインアップ",
+      "errors": {
+        "loginFailed": "ログインに失敗しました。もう一度お試しください",
+        "networkError": "ネットワークまたはサーバーエラーです。しばらくしてからもう一度お試しください",
+        "invalid-account-or-password": "ユーザー名またはパスワードが無効です"
+      }
+    },
+    "profile": {
+      "title": "プロフィール",
+      "level": "レベル",
+      "badgesTitle": "バッジ",
+      "groupsTitle": "サーバー",
+      "tabs": {
+        "recent": "最近の",
+        "joined": "参加",
+        "managed": "管理された"
+      },
+      "editOpen": "作成日",
+      "editClose": "編集を閉じる",
+      "cancel": "キャンセル",
+      "save": "保存",
+      "empty": "データなし",
+      "noData": "データなし",
+      "clickChangeAvatar": "クリックしてアバターを変更",
+      "badgeShowTime": "表示期限:",
+      "permanent": "永遠",
+      "close": "閉じる",
+      "displayName": "表示名",
+      "birthDate": "生年月日",
+      "gender": "性別",
+      "genderMale": "男",
+      "genderFemale": "女性",
+      "country": "国/地域",
+      "select": "選択",
+      "signature": "署名",
+      "about": "自己紹介",
+      "displayId": "ユーザー名",
+      "email": "メールアドレス",
+      "error": "プロフィールを取得できませんでした",
+      "permission": "許可",
+      "uploadCancel": "キャンセル",
+      "uploadApplyNoCrop": "切り取らずに適用",
+      "uploading": "アップロード中...",
+      "uploadApply": "適用",
+      "uploadFailed": "アップロードに失敗しました",
+      "emailTitle": "メール",
+      "newEmailTitle": "新しいメール",
+      "emailNotBound": "メールはバインドされていません",
+      "emailBound": "メールバインド",
+      "emailAction": "メールのバインド/変更",
+      "emailBindAction": "メールをバインド",
+      "emailChangeAction": "変化",
+      "emailInputPlaceholder": "メールアドレスを入力してください",
+      "emailCode": "検証コード",
+      "emailSendCode": "コードを送信",
+      "emailSending": "送信中...",
+      "emailBindConfirm": "バインドを確認",
+      "emailBinding": "バインディング...",
+      "emailSendLink": "確認リンクを送信",
+      "emailSendingLink": "寄送中...",
+      "emailOld": "原信箱",
+      "emailOldPlaceholder": "請輸入目前已綁定的信箱",
+      "emailOldMismatch": "原信箱不正確",
+      "emailVerifyTitle": "驗證信箱",
+      "emailBindTitle": "綁定信箱",
+      "emailChangeTitle": "修改信箱",
+      "emailSendSuccess": "發送成功！請至信箱點擊完成綁定。",
+      "emailPageSubmit": "送出",
+      "emailChangeSuccess": "修改信箱成功！",
+      "emailBindFailed": "綁定失敗或連結已失效，請重新請求綁定連結",
+      "emailGoProfile": "返回個人檔案",
+      "emailVerifying": "驗證中...",
+      "requestFailed": "請求時發生錯誤",
+      "passwordReset": "修改密碼",
+      "passwordBindAction": "綁定密碼"
+    },
+    "forget": {
+      "forgetTitle": "忘記密碼",
+      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
+      "account": "帳號",
+      "sendEmail": "寄送重設連結",
+      "sendingEmail": "寄送中...",
+      "remember": "想起來了嗎？",
+      "backLogin": "返回登入"
+    },
+    "password": {
+      "resetTitle": "重設密碼",
+      "verifyProcessing": "驗證中...",
+      "verifyFailed": "驗證失敗或連結已失效，請重新請求。",
+      "fields": {
+        "newPassword": "新密碼",
+        "confirmPassword": "確認新密碼"
+      },
+      "submit": "送出",
+      "submitting": "送出中...",
+      "errors": {
+        "passwordMismatch": "兩次輸入的密碼不一致",
+        "passwordTooShort": "密碼長度至少 8 碼"
+      }
+    },
+    "valid": {
+      "accountRequired": "帳號不能為空",
+      "accountMinLength": "帳號長度至少 4 碼",
+      "accountMaxLength": "帳號長度最多 16 碼",
+      "accountInvalidFormat": "帳號只能包含英文、數字、底線與點號",
+      "passwordRequired": "密碼不能為空",
+      "passwordMinLength": "密碼長度至少 8 碼",
+      "passwordMaxLength": "密碼長度最多 20 碼",
+      "passwordInvalidFormat": "密碼只能包含英文、數字、特殊符號",
+      "usernameInvalidFormat": "ユーザー名には中国語、英語、数字のみ使用できます"
+    }
+  },
+  "announcementCategory": {
+    "update": "関連製品の新規追加",
+    "general": "一般",
+    "system": "システム",
+    "event": "イベント"
+  },
+  "join": {
+    "readyingOpen": "準備開啟RiceCall...",
+    "invalidSid": "無效的sid",
+    "opening": "正在開啟 RiceCall...",
+    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
+    "tryConnect": "嘗試連線至語音群 ID：",
+    "retryOpen": "重新嘗試開啟RiceCall"
+  }
+}

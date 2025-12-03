@@ -1,0 +1,82 @@
+{
+  "intro": "Esta Política de Privacidad explica cómo recopilamos, utilizamos, compartimos y protegemos su información cuando utiliza RiceCall.",
+  "sections": [
+    {
+      "title": "1. Alcance",
+      "paragraph": "Esta política se aplica al sitio web, las aplicaciones y las funciones de RiceCall (voz en tiempo real, mensajes de voz, notificaciones, soporte)."
+    },
+    {
+      "title": "2. Datos que recopilamos",
+      "items": [
+        "Datos de la cuenta (nombre para mostrar, id, avatar, país/región, fecha de nacimiento si se proporciona, correo electrónico de contacto)",
+        "Datos de uso (inicios/cierres de sesión, clics en funciones, registros de errores, informes/solicitudes de soporte)",
+        "Dispositivo y conexión (dispositivo/SO/navegador, idioma, zona horaria, IP, ISP, ubicación aproximada)",
+        "Datos de voz (flujos de medios cifrados; grabaciones/mensajes mientras se conserven; métricas de calidad)",
+        "Cookies y tecnologías similares (sesión, preferencias, analítica, protección)"
+      ]
+    },
+    {
+      "title": "3. Cómo utilizamos los datos",
+      "items": [
+        "Proporcionar, operar y mejorar las funciones de voz y comunidad",
+        "Autenticación, seguridad y prevención de abusos",
+        "Supervisión del rendimiento, depuración y analítica",
+        "Atención al usuario y gestión de reportes",
+        "Cumplimiento legal"
+      ]
+    },
+    {
+      "title": "4. Compartir",
+      "items": [
+        "Proveedores/encargados (nube, CDN, RTC, analítica, monitorización) bajo contratos",
+        "Solicitudes legales",
+        "Operaciones corporativas",
+        "No vendemos datos personales"
+      ]
+    },
+    {
+      "title": "5. Datos de voz",
+      "items": [
+        "Cifrado en tránsito para llamadas; sin almacenamiento por defecto",
+        "Las grabaciones/mensajes se almacenan mientras se conserven",
+        "La transcripción requiere consentimiento expreso y procesadores de confianza",
+        "Las métricas de calidad se agregan/anonimizan"
+      ]
+    },
+    {
+      "title": "6. Almacenamiento y conservación",
+      "items": [
+        "Centros de datos en varios países/regiones",
+        "Conservación basada en la necesidad y en obligaciones legales"
+      ]
+    },
+    {
+      "title": "7. Sus derechos",
+      "paragraph": "Según la ley aplicable, sus derechos pueden incluir acceso, rectificación, supresión, restricción/oposición, portabilidad y retirada del consentimiento. Póngase en contacto con nosotros; puede requerirse verificación de identidad."
+    },
+    {
+      "title": "8. Menores",
+      "paragraph": "Si es menor de la edad legal, utilice el servicio con el consentimiento y la guía de su tutor."
+    },
+    {
+      "title": "9. Seguridad",
+      "paragraph": "Medidas estándar del sector; ningún sistema es perfectamente seguro."
+    },
+    {
+      "title": "10. Terceros",
+      "paragraph": "Los servicios de terceros se rigen por sus propias políticas."
+    },
+    {
+      "title": "11. Transferencias internacionales",
+      "paragraph": "Garantías adecuadas, como las Cláusulas Contractuales Tipo (SCC), cuando corresponda."
+    },
+    {
+      "title": "12. Cambios",
+      "paragraph": "Podemos actualizar esta política; los cambios materiales serán notificados."
+    },
+    {
+      "title": "13. Contacto",
+      "paragraph": "support@ricecall.com"
+    }
+  ]
+}

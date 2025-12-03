@@ -1,0 +1,315 @@
+{
+  "site": {
+    "title": "RiceCall - Plataforma de bate-papo por voz interessante",
+    "description": "Mais do que chat de voz, é uma comunidade de jogos divertida",
+    "keywords": "RC Voice, RiceCall, Download de RC Voice, Software RC, Software de voz, Bate-papo por voz, Voz de guilda, Gerenciamento de equipe, Bate-papo em equipe, Voz de masmorra, Bate-papo por voz para várias pessoas, Bate-papo por voz, Voz de equipe, Voz de jogo, Karaokê online, Karaokê de rede online, Guilda de jogos, Educação online, RaidCall, RC"
+  },
+  "common": {
+    "all": "Todos"
+  },
+  "nav": {
+    "features": "Recursos",
+    "faq": "Perguntas frequentes",
+    "announcement": "Anúncios",
+    "contact": "Contato",
+    "status": "Status",
+    "login": "Entrar",
+    "logout": "Sair",
+    "register": "Cadastrar-se",
+    "account": "Minha conta"
+  },
+  "footer": {
+    "partners": "Parceiros",
+    "sections": {
+      "about": "Sobre",
+      "more": "Mais",
+      "social": "Redes sociais"
+    },
+    "links": {
+      "status": "Status",
+      "announcement": "Anúncios",
+      "contact": "Contato",
+      "privacy": "Política de privacidade",
+      "terms": "Termos de serviço"
+    }
+  },
+  "pages": {
+    "home": {
+      "heroTitle": "Mais do que chat de voz",
+      "heroSubtitle": "Também é uma comunidade de jogos divertida",
+      "download": {
+        "loading": "Carregando...",
+        "now": "Baixar agora",
+        "unsupported": "Sua plataforma não é compatível"
+      },
+      "features": {
+        "title": "Recursos",
+        "subtitle": "Capacidades",
+        "items": {
+          "multiCall": {
+            "title": "Chamadas em grupo",
+            "desc": "Baixa latência e conexões estáveis para vários interlocutores"
+          },
+          "voiceChat": {
+            "title": "Bate-papo por voz",
+            "desc": "Redução de ruído, cancelamento de eco e ganho automático para maior clareza"
+          },
+          "screenShare": {
+            "title": "Compartilhamento de tela (em breve)",
+            "desc": "Compartilhe janela ou a tela inteira em 720p/1080p"
+          },
+          "roomPerms": {
+            "title": "Salas e permissões",
+            "desc": "Controles do anfitrião, permissões para falar, silenciar e expulsar"
+          },
+          "crossPlatform": {
+            "title": "Multiplataforma",
+            "desc": "Windows / macOS / Linux, instalação com um clique"
+          },
+          "lightweight": {
+            "title": "Leve e rápido",
+            "desc": "Baixo uso de CPU e memória, fluido durante os jogos"
+          }
+        }
+      },
+      "interface": {
+        "title": "Voz pensada para jogos",
+        "desc": "RiceCall oferece áudio claro e de baixa latência e chamadas em grupo",
+        "imageAlt": "Captura da interface do RiceCall"
+      },
+      "faq": {
+        "title": "Perguntas frequentes",
+        "subtitle": "Perguntas frequentes",
+        "items": {
+          "q1": {
+            "question": "Como ganho pontos de experiência?",
+            "answer": "A experiência é baseada no tempo online.\nApós entrar, cada hora online concede 1 ponto, até 24 por dia.\nAs frações de hora acumulam para o próximo cálculo.\nO sistema é atualizado diariamente às 8:00.\nSe um problema inesperado impedir a atualização, os pontos serão adicionados no dia seguinte."
+          },
+          "q2": {
+            "question": "Não ouço os outros / os outros não me ouvem?",
+            "answer": "Se você não ouve os outros, verifique:\n\n◎ Certifique-se de que o headset está conectado e funcionando (use o teste do RiceCall).\n  Caminho: RC Voice → Configurações → Áudio → Configurações de dispositivo\n\n◎ Verifique a seleção do dispositivo:\n  ◆ Não ouve: ajuste o dispositivo de saída na mesma página\n  ◆ Os outros não ouvem você: ajuste o dispositivo de entrada na mesma página",
+            "image": "/img/faqs/1.png"
+          },
+          "q3": {
+            "question": "Este é o RC Voice oficial original?",
+            "answer": "Não. Somos uma equipe independente sem vínculo com o original."
+          },
+          "q4": {
+            "question": "Por que não há grupos de voz?",
+            "answer": "Ainda não há grupos recomendados. Você pode visitar 10 ou 2000000 para se divertir."
+          },
+          "q5": {
+            "question": "Como obter VIP?",
+            "answer": "Ainda não disponível. Será oferecido na versão oficial."
+          },
+          "q6": {
+            "question": "Quanto tempo para subir de nível?",
+            "html": "Consulte <a href=\"https://docs.google.com/spreadsheets/d/1HjZ9RMpSRFCDJiukbqbZWLg0OdOn-XnpVQQZM6JoCEs/edit?usp=sharing\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-blue-600 underline\">aqui</a>."
+          },
+          "q7": {
+            "question": "E se continuar carregando após o login?",
+            "answer": "Saia e entre novamente. Se for frequente, relate no Discord 'Issues'."
+          },
+          "q8": {
+            "question": "Pop-ups de erro?",
+            "answer": "Faça uma captura de tela e descreva os passos para reproduzir no Discord 'Issues'."
+          },
+          "q9": {
+            "question": "Não consegue entrar?",
+            "answer": "Certifique-se de ter a versão mais recente. Se persistir, relate no Discord."
+          }
+        }
+      }
+    },
+    "announcement": {
+      "title": "Anúncios",
+      "empty": "Sem anúncios",
+      "error": "Falha ao carregar anúncios",
+      "backToList": "Voltar à lista de anúncios",
+      "notFound": "Anúncio não encontrado",
+      "emptyDesc": "Este anúncio não tem conteúdo para exibir.",
+      "notFoundDesc": "O anúncio que você procura não existe ou foi removido. Volte à lista para ver os últimos anúncios.",
+      "gotoLink": "Ir para o link relacionado"
+    },
+    "contact": {
+      "title": "Contato",
+      "jobs": {
+        "CEO": "Diretor executivo",
+        "CTO": "Diretor de Tecnologia",
+        "CFO": "Diretor financeiro",
+        "COO": "Diretor de Operações",
+        "COO-taiwan": "COO, Taiwan",
+        "COO-russia": "COO, Rússia",
+        "COO-brazil": "COO, Brasil",
+        "customer-service": "Atendimento ao cliente",
+        "developer": "Desenvolvedor",
+        "machine-network": "Rede de máquinas",
+        "technical-support": "Suporte técnico"
+      }
+    },
+    "privacy": {
+      "title": "Política de privacidade",
+      "lastUpdated": "Última atualização"
+    },
+    "terms": {
+      "title": "Termos de serviço"
+    },
+    "register": {
+      "title": "Cadastrar-se",
+      "subtitle": "Preencha as informações abaixo para começar a usar o RiceCall.",
+      "fields": {
+        "username": "Apelido",
+        "account": "Conta",
+        "password": "Senha",
+        "confirm": "Confirmar senha",
+        "email": "E-mail"
+      },
+      "submit": "Criar conta",
+      "submitting": "Cadastrando...",
+      "hasAccount": "Já tem uma conta?",
+      "gotoLogin": "Ir para login",
+      "errors": {
+        "passwordNotMatch": "As senhas não coincidem",
+        "registerFailed": "Falha no cadastro",
+        "networkError": "Erro de rede ou servidor, tente novamente mais tarde"
+      }
+    },
+    "login": {
+      "backHome": "Voltar ao início",
+      "title": "Entrar",
+      "subtitle": "Insira seus dados para continuar.",
+      "fields": {
+        "account": "E-mail",
+        "password": "Senha"
+      },
+      "submit": "Entrar",
+      "submitting": "Entrando...",
+      "forgetPassword": "忘記密碼",
+      "noAccount": "還沒有帳號嗎？",
+      "gotoRegister": "Cadastre-se",
+      "errors": {
+        "loginFailed": "Falha no login, tente novamente",
+        "networkError": "Erro de rede ou servidor, tente novamente mais tarde",
+        "invalid-account-or-password": "Nome de usuário ou senha incorreto"
+      }
+    },
+    "profile": {
+      "title": "Perfil",
+      "level": "Nível",
+      "badgesTitle": "Insígnias",
+      "groupsTitle": "Grupos",
+      "tabs": {
+        "recent": "Recentes",
+        "joined": "Ingressos",
+        "managed": "Gerenciados"
+      },
+      "editOpen": "Editar",
+      "editClose": "Fechar edição",
+      "cancel": "Cancelar",
+      "save": "Salvar",
+      "empty": "Sem dados",
+      "noData": "Sem dados",
+      "clickChangeAvatar": "Clique para alterar o avatar",
+      "badgeShowTime": "Exibir até:",
+      "permanent": "Permanente",
+      "close": "Fechar",
+      "displayName": "Nome de exibição",
+      "birthDate": "Data de nascimento",
+      "gender": "Gênero",
+      "genderMale": "Masculino",
+      "genderFemale": "Feminino",
+      "country": "País",
+      "select": "Selecionar",
+      "signature": "Assinatura",
+      "about": "Sobre",
+      "displayId": "Nome de usuário",
+      "email": "E-mail",
+      "error": "Falha ao obter o perfil",
+      "permission": "Permissão",
+      "uploadCancel": "Cancelar",
+      "uploadApplyNoCrop": "Aplicar sem recortar",
+      "uploading": "Enviando...",
+      "uploadApply": "Aplicar",
+      "uploadFailed": "Falha no envio",
+      "emailTitle": "E-mail",
+      "newEmailTitle": "Novo e-mail",
+      "emailNotBound": "E-mail não vinculado",
+      "emailBound": "E-mail vinculado",
+      "emailAction": "Vincular/Alterar e-mail",
+      "emailBindAction": "Vincular e-mail",
+      "emailChangeAction": "Alterar",
+      "emailInputPlaceholder": "Insira seu e-mail",
+      "emailCode": "Código de verificação",
+      "emailSendCode": "Enviar código",
+      "emailSending": "Enviando...",
+      "emailBindConfirm": "Confirmar vinculação",
+      "emailBinding": "Vinculando...",
+      "emailSendLink": "Enviar link de verificação",
+      "emailSendingLink": "Enviando...",
+      "emailOld": "E-mail atual",
+      "emailOldPlaceholder": "Insira o e-mail atualmente vinculado",
+      "emailOldMismatch": "O e-mail atual está incorreto",
+      "emailVerifyTitle": "Verificar e-mail",
+      "emailBindTitle": "Vincular e-mail",
+      "emailChangeTitle": "Alterar e-mail",
+      "emailSendSuccess": "Sucesso! Verifique seu e-mail para concluir a verificação.",
+      "emailPageSubmit": "Enviar",
+      "emailChangeSuccess": "E-mail alterado com sucesso!",
+      "emailBindFailed": "Falha ao vincular o e-mail ou link expirado. Solicite novamente.",
+      "emailGoProfile": "Voltar ao perfil",
+      "emailVerifying": "Verificando...",
+      "requestFailed": "Falha na solicitação",
+      "passwordReset": "Redefinir",
+      "passwordBindAction": "Vincular senha"
+    },
+    "forget": {
+      "forgetTitle": "忘記密碼",
+      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
+      "account": "帳號",
+      "sendEmail": "寄送重設連結",
+      "sendingEmail": "寄送中...",
+      "remember": "想起來了嗎？",
+      "backLogin": "返回登入"
+    },
+    "password": {
+      "resetTitle": "Redefinir senha",
+      "verifyProcessing": "Verificando...",
+      "verifyFailed": "A verificação falhou ou o link expirou. Solicite novamente.",
+      "fields": {
+        "newPassword": "Nova senha",
+        "confirmPassword": "Confirmar nova senha"
+      },
+      "submit": "Enviar",
+      "submitting": "Enviando...",
+      "errors": {
+        "passwordMismatch": "As senhas não coincidem",
+        "passwordTooShort": "A senha deve ter pelo menos 8 caracteres"
+      }
+    },
+    "valid": {
+      "accountRequired": "Conta é obrigatória",
+      "accountMinLength": "A conta deve ter pelo menos 4 caracteres",
+      "accountMaxLength": "A conta deve ter no máximo 16 caracteres",
+      "accountInvalidFormat": "A conta deve conter apenas letras inglesas, números, sublinhado e pontos",
+      "passwordRequired": "Senha é obrigatória",
+      "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
+      "passwordMaxLength": "A senha deve ter no máximo 20 caracteres",
+      "passwordInvalidFormat": "A senha deve conter apenas letras inglesas, números e caracteres especiais",
+      "usernameInvalidFormat": "暱稱只能包含中文、英文、數字"
+    }
+  },
+  "announcementCategory": {
+    "update": "Atualização",
+    "general": "Geral",
+    "system": "Sistema",
+    "event": "Evento"
+  },
+  "join": {
+    "readyingOpen": "準備開啟RiceCall...",
+    "invalidSid": "無效的sid",
+    "opening": "正在開啟 RiceCall...",
+    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
+    "tryConnect": "嘗試連線至語音群 ID：",
+    "retryOpen": "重新嘗試開啟RiceCall"
+  }
+}

@@ -1,0 +1,315 @@
+{
+  "site": {
+    "title": "RiceCall - voice chat platform",
+    "description": "RiceCall is more than just a voice chat; it's also a fun gaming community.",
+    "keywords": "RC Voice, RiceCall, RC Voice Download, RC Software, Voice Software, Voice Chat, Guild Voice, Team Management, Team Chat, Dungeon Voice, Multi-person Voice Chat, Voice Chat, Team Voice, Game Voice, Online Karaoke, Online Network Karaoke, Game Guild, Online Education, RaidCall, РК, RC, download RaidCall, download RC"
+  },
+  "common": {
+    "all": "All"
+  },
+  "nav": {
+    "features": "Features",
+    "faq": "FAQs",
+    "announcement": "Announcements",
+    "contact": "Contact",
+    "status": "Status",
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "account": "My Account"
+  },
+  "footer": {
+    "partners": "Partners",
+    "sections": {
+      "about": "About",
+      "more": "More",
+      "social": "Social"
+    },
+    "links": {
+      "status": "Status",
+      "announcement": "Announcements",
+      "contact": "Contact",
+      "privacy": "Privacy Policy",
+      "terms": "Terms of Service"
+    }
+  },
+  "pages": {
+    "home": {
+      "heroTitle": "More than voice chat",
+      "heroSubtitle": "It's also a fun gaming community",
+      "download": {
+        "loading": "Loading...",
+        "now": "Download now",
+        "unsupported": "Your platform is not supported"
+      },
+      "features": {
+        "title": "Features",
+        "subtitle": "Capabilities",
+        "items": {
+          "multiCall": {
+            "title": "Group calls",
+            "desc": "Low latency and stable connections for multiple speakers"
+          },
+          "voiceChat": {
+            "title": "Voice chat",
+            "desc": "Noise reduction, echo cancellation, and auto gain for clarity"
+          },
+          "screenShare": {
+            "title": "Screen sharing (coming soon)",
+            "desc": "Share window or entire screen at 720p/1080p"
+          },
+          "roomPerms": {
+            "title": "Rooms & permissions",
+            "desc": "Host controls, speaking permissions, mute and kick"
+          },
+          "crossPlatform": {
+            "title": "Cross-platform",
+            "desc": "Windows / macOS / Linux, one-click install"
+          },
+          "lightweight": {
+            "title": "Lightweight & fast",
+            "desc": "Low CPU and memory usage, smooth in-game"
+          }
+        }
+      },
+      "interface": {
+        "title": "Voice built for gaming",
+        "desc": "RiceCall provides low-latency, clear audio and group calls",
+        "imageAlt": "RiceCall interface screenshot"
+      },
+      "faq": {
+        "title": "FAQs",
+        "subtitle": "FAQs",
+        "items": {
+          "q1": {
+            "question": "How do I gain experience points?",
+            "answer": "Experience is based on online time.\nAfter logging in, each hour online grants 1 point, up to 24 per day.\nPartial hours accumulate to the next calculation.\nThe system updates daily at 8:00 AM.\nIf an unexpected issue prevents the update, points will be added on the next day."
+          },
+          "q2": {
+            "question": "Can't hear others / others can't hear me?",
+            "answer": "If you can't hear others, check:\n\n◎ Ensure the headset is connected and working (use RiceCall's test).\n  Path: RC Voice → Settings → Audio → Device Settings\n\n◎ Verify device selection:\n  ◆ Can't hear: adjust output device in the same page\n  ◆ Others can't hear you: adjust input device in the same page",
+            "image": "/img/faqs/1.png"
+          },
+          "q3": {
+            "question": "Is this the original RC Voice official?",
+            "answer": "No. We are an independent team with no affiliation to the original."
+          },
+          "q4": {
+            "question": "Why no voice groups?",
+            "answer": "No recommended groups yet. You can visit 10 or 2000000 for fun."
+          },
+          "q5": {
+            "question": "How to get VIP?",
+            "answer": "Not available yet. It will be offered in the official release."
+          },
+          "q6": {
+            "question": "How long to level up?",
+            "html": "Please check <a href=\"https://docs.google.com/spreadsheets/d/1HjZ9RMpSRFCDJiukbqbZWLg0OdOn-XnpVQQZM6JoCEs/edit?usp=sharing\" target=\"_blank\" rel=\"noopener noreferrer\" class=\"text-blue-600 underline\">here</a>."
+          },
+          "q7": {
+            "question": "What if it keeps loading after login?",
+            "answer": "Log out and log in again. If frequent, report in Discord 'Issues'."
+          },
+          "q8": {
+            "question": "Error popups?",
+            "answer": "Screenshot and describe steps to reproduce in Discord 'Issues'."
+          },
+          "q9": {
+            "question": "Can't log in?",
+            "answer": "Ensure you have the latest version. If it persists, report in Discord."
+          }
+        }
+      }
+    },
+    "announcement": {
+      "title": "Announcements",
+      "empty": "No announcements",
+      "error": "Failed to load announcements",
+      "backToList": "Back to announcement list",
+      "notFound": "Announcement not found",
+      "emptyDesc": "This announcement has no content to display.",
+      "notFoundDesc": "The announcement you are looking for does not exist or has been removed. Please return to the list to view the latest announcements.",
+      "gotoLink": "Go to related link"
+    },
+    "contact": {
+      "title": "Contact",
+      "jobs": {
+        "CEO": "CEO",
+        "CTO": "CTO",
+        "CFO": "CFO",
+        "COO": "COO, Global",
+        "COO-taiwan": "COO, Taiwan",
+        "COO-russia": "COO, Russia",
+        "COO-brazil": "COO, Brazil",
+        "customer-service": "Customer Service",
+        "developer": "Developer",
+        "machine-network": "Machine Network",
+        "technical-support": "Technical Support"
+      }
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "lastUpdated": "Last updated"
+    },
+    "terms": {
+      "title": "Terms of Service"
+    },
+    "register": {
+      "title": "Register",
+      "subtitle": "Fill in the information below to start using RiceCall.",
+      "fields": {
+        "username": "Nickname",
+        "account": "Account",
+        "password": "Password",
+        "confirm": "Confirm password",
+        "email": "Email"
+      },
+      "submit": "Create account",
+      "submitting": "Registering...",
+      "hasAccount": "Already have an account?",
+      "gotoLogin": "Go to login",
+      "errors": {
+        "passwordNotMatch": "Passwords do not match",
+        "registerFailed": "Registration failed",
+        "networkError": "Network or server error, please try again later"
+      }
+    },
+    "login": {
+      "backHome": "Back to Home",
+      "title": "Login",
+      "subtitle": "Enter your details to continue.",
+      "fields": {
+        "account": "Email",
+        "password": "Password"
+      },
+      "submit": "Log in",
+      "submitting": "Logging in...",
+      "forgetPassword": "忘記密碼",
+      "noAccount": "還沒有帳號嗎？",
+      "gotoRegister": "Sign up",
+      "errors": {
+        "loginFailed": "Login failed, please try again",
+        "networkError": "Network or server error, please try again later",
+        "invalid-account-or-password": "Invalid username or password"
+      }
+    },
+    "profile": {
+      "title": "Profile",
+      "level": "Level",
+      "badgesTitle": "Badges",
+      "groupsTitle": "Groups",
+      "tabs": {
+        "recent": "Recent",
+        "joined": "Joined",
+        "managed": "Managed"
+      },
+      "editOpen": "Edit",
+      "editClose": "Close Edit",
+      "cancel": "Cancel",
+      "save": "Save",
+      "empty": "No data",
+      "noData": "No data",
+      "clickChangeAvatar": "Click to change avatar",
+      "badgeShowTime": "Show to:",
+      "permanent": "Permanent",
+      "close": "Close",
+      "displayName": "Display Name",
+      "birthDate": "Birth Date",
+      "gender": "Gender",
+      "genderMale": "Male",
+      "genderFemale": "Female",
+      "country": "Country",
+      "select": "Select",
+      "signature": "Signature",
+      "about": "About",
+      "displayId": "User Name",
+      "email": "Email",
+      "error": "Failed to get profile",
+      "permission": "Permission",
+      "uploadCancel": "Cancel",
+      "uploadApplyNoCrop": "Apply without cropping",
+      "uploading": "Uploading...",
+      "uploadApply": "Apply",
+      "uploadFailed": "Upload failed",
+      "emailTitle": "Email",
+      "newEmailTitle": "New email",
+      "emailNotBound": "Email not bound",
+      "emailBound": "Email bound",
+      "emailAction": "Bind/Change email",
+      "emailBindAction": "Bind email",
+      "emailChangeAction": "Change",
+      "emailInputPlaceholder": "Enter your email",
+      "emailCode": "Verification code",
+      "emailSendCode": "Send code",
+      "emailSending": "Sending...",
+      "emailBindConfirm": "Confirm bind",
+      "emailBinding": "Binding...",
+      "emailSendLink": "Send verification link",
+      "emailSendingLink": "Sending...",
+      "emailOld": "Current email",
+      "emailOldPlaceholder": "Enter your currently bound email",
+      "emailOldMismatch": "Current email is incorrect",
+      "emailVerifyTitle": "Verify Email",
+      "emailBindTitle": "Bind Email",
+      "emailChangeTitle": "Change Email",
+      "emailSendSuccess": "Success! Please check your email to complete the verification.",
+      "emailPageSubmit": "Submit",
+      "emailChangeSuccess": "Email changed successfully!",
+      "emailBindFailed": "Email bound failed or link expired. Please request again.",
+      "emailGoProfile": "Back to Profile",
+      "emailVerifying": "Verifying...",
+      "requestFailed": "Request failed",
+      "passwordReset": "Reset",
+      "passwordBindAction": "Bind Password"
+    },
+    "forget": {
+      "forgetTitle": "忘記密碼",
+      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
+      "account": "帳號",
+      "sendEmail": "寄送重設連結",
+      "sendingEmail": "寄送中...",
+      "remember": "想起來了嗎？",
+      "backLogin": "返回登入"
+    },
+    "password": {
+      "resetTitle": "Reset Password",
+      "verifyProcessing": "Verifying...",
+      "verifyFailed": "Verification failed or link expired. Please request again.",
+      "fields": {
+        "newPassword": "New password",
+        "confirmPassword": "Confirm new password"
+      },
+      "submit": "Submit",
+      "submitting": "Submitting...",
+      "errors": {
+        "passwordMismatch": "Passwords do not match",
+        "passwordTooShort": "Password must be at least 8 characters"
+      }
+    },
+    "valid": {
+      "accountRequired": "Account is required",
+      "accountMinLength": "Account must be at least 4 characters",
+      "accountMaxLength": "Account must be at most 16 characters",
+      "accountInvalidFormat": "Account must contain only English, numbers, underscores, and dots",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 8 characters",
+      "passwordMaxLength": "Password must be at most 20 characters",
+      "passwordInvalidFormat": "Password must contain only English, numbers, and special characters",
+      "usernameInvalidFormat": "暱稱只能包含中文、英文、數字"
+    }
+  },
+  "announcementCategory": {
+    "update": "Update",
+    "general": "General",
+    "system": "System",
+    "event": "Event"
+  },
+  "join": {
+    "readyingOpen": "準備開啟RiceCall...",
+    "invalidSid": "無效的sid",
+    "opening": "正在開啟 RiceCall...",
+    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
+    "tryConnect": "嘗試連線至語音群 ID：",
+    "retryOpen": "重新嘗試開啟RiceCall"
+  }
+}
