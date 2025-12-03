@@ -6,7 +6,7 @@ import styles from '@/styles/home.module.css';
 
 // Components
 import ServerList from '@/components/ServerList';
-import RecommendServerList from '@/components/RecommendServerList';
+// import RecommendServerList from '@/components/RecommendServerList';
 import MarkdownContent from '@/components/MarkdownContent';
 import RecommendServerCard from '@/components/RecommendServerCard';
 
@@ -65,15 +65,17 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const searchInputRef = useRef<HTMLInputElement>(null);
   const searchQueryRef = useRef<string>('');
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const timerRef = useRef<NodeJS.Timeout | number | null>(null);
 
   // States
   const [exactMatch, setExactMatch] = useState<Server | null>(null);
   const [personalResults, setPersonalResults] = useState<Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Server[]>([]);
   const [section, setSection] = useState<number>(0);
-  const [selectedAnnCategory, setSelectedAnnCategory] = useState<Announcement['category']>('all');
+  const [selectIndex, setSelectIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
-
+  const [selectedAnnouncementCategory, setSelectedAnnouncementCategory] = useState<string>('all');
   const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
 
   // Variables
@@ -82,10 +84,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
+
   const filteredAnnouncements = useMemo(
-    () => announcements.filter((a) => a.category === selectedAnnCategory || selectedAnnCategory === 'all').sort((a, b) => b.timestamp - a.timestamp),
-    [announcements, selectedAnnCategory],
+    () => announcements.filter((a) => a.category === selectedAnnouncementCategory || selectedAnnouncementCategory === 'all').sort((a, b) => b.timestamp - a.timestamp),
+    [announcements, selectedAnnouncementCategory],
   );
+
+  const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]).slice(0, 10);
+
   const categoryTabs = useMemo(
     () => [
       { key: 'all', label: t('all') },
@@ -101,14 +107,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     () => recommendServers.filter((server) => selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)),
     [recommendServers, selectReommendServerCategory],
   );
-
-  const announcementCategoryTabs = [
-    { key: 'all', label: t('all') },
-    { key: 'general', label: t('general') },
-    { key: 'event', label: t('event') },
-    { key: 'update', label: t('update') },
-    { key: 'system', label: t('system') },
-  ];
 
   const recommendServerCategoryTabs = [
     { key: 'all', label: t('all') },
@@ -165,7 +163,39 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     [currentServerId, mainTab, loadingBox],
   );
 
+  // Banner Controllor //
+  const scrollToIndex = useCallback(
+    (i: number) => {
+      if (!containerRef.current) return;
+      const number = i % filteredAnns.length;
+      setSelectIndex(number);
+
+      const width = containerRef.current.clientWidth;
+      containerRef.current.scrollTo({
+        left: width * number,
+        behavior: 'smooth',
+      });
+    },
+    [filteredAnns],
+  );
+
+  const next = () => {
+    scrollToIndex(selectIndex + 1);
+  };
+
+  const prev = () => {
+    scrollToIndex(selectIndex - 1);
+  };
+
   // Effects
+  useEffect(() => {
+    timerRef.current = setTimeout(() => scrollToIndex(selectIndex + 1), 5000);
+
+    return () => {
+      if (timerRef.current) clearTimeout(timerRef.current);
+    };
+  }, [selectIndex, scrollToIndex]);
+
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
@@ -288,7 +318,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             {t('home')}
           </div>
           {/* <div className={`${styles['navegate-tab']} ${section === 1 ? styles['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
-            {t('recommend')}
+            {t('announcement')}
           </div> */}
           {/* <div className={`${styles['navegate-tab']} ${section === 2 ? styles['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
             {t('game')}
@@ -310,45 +340,32 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* HomePage */}
       <main className={styles['home-body']} style={section === 0 ? {} : { display: 'none' }}>
-        {/* Announcement */}
-        {/* <div className={styles['announcement-wrapper']}>
-          <div className={styles['announcement-header']}>
-            {announcementCategoryTabs.map((categoryTab) => (
-              <div
-                key={categoryTab.key}
-                className={`${styles['announcement-tab']} ${selectedAnnouncementCategory === categoryTab.key ? styles['active'] : ''}`}
-                onClick={() => setSelectedAnnouncementCategory(categoryTab.key)}
-              >
-                {t(categoryTab.label)}
-              </div>
-            ))}
-          </div>
-          <div className={styles['announcement-list']}>
-            {filteredAnnouncements.map((announcement) => (
-              <div key={announcement.announcementId} className={styles['announcement-item']} onClick={() => setSelectedAnnouncement(announcement)}>
-                <div className={styles['announcement-type']} data-category={announcement.category}>
-                  {t(`${announcement.category}`)}
-                </div>
-                <div className={styles['announcement-title']}>{announcement.title}</div>
-                <div className={styles['announcement-date']}>{getFormatDate(announcement.timestamp)}</div>
-              </div>
-            ))}
-          </div>
-          <div className={styles['announcement-detail-wrapper']} style={selectedAnnouncement ? {} : { display: 'none' }} onClick={() => setSelectedAnnouncement(null)}>
-            <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
-              <div className={styles['announcement-detail-header']}>
-                <div className={styles['announcement-type']} data-category={selectedAnnouncement?.category}>
-                  {t(`${selectedAnnouncement?.category}`)}
-                </div>
-                <div className={styles['announcement-detail-title']}>{selectedAnnouncement?.title}</div>
-                <div className={styles['announcement-datail-date']}>{selectedAnnouncement && getFormatDate(selectedAnnouncement.timestamp)}</div>
-              </div>
-              <div className={styles['announcement-detail-content']}>
-                <MarkdownContent markdownText={selectedAnnouncement?.content ?? ''} />
-              </div>
+        {/* Banner */}
+        <div className={styles['banner-wrapper']}>
+          <div className={styles['banner-container']}>
+            <div ref={containerRef} className={styles['banners']}>
+              {filteredAnns.map((a, index) => {
+                return (
+                  <div key={index} className={styles['banner']} onClick={() => setSelectedAnn(a)}>
+                    <span>3:1</span>
+                  </div>
+                );
+              })}
             </div>
+            <div className={styles['number-list']}>
+              {filteredAnns.map((a, index) => (
+                <nav key={index} className={`${index === selectIndex ? styles['active'] : ''}`} onClick={() => scrollToIndex(index)}></nav>
+              ))}
+            </div>
+            <nav className={`${styles['nav']} ${styles['prev-btn']}`} style={selectIndex === 0 ? { display: 'none' } : {}} onClick={() => prev()}>
+              {'◀'}
+            </nav>
+            <nav className={`${styles['nav']} ${styles['next-btn']}`} style={selectIndex === filteredAnns.length - 1 ? { display: 'none' } : {}} onClick={() => next()}>
+              {'▶'}
+            </nav>
           </div>
-        </div> */}
+        </div>
+
         {/* Recommend Server */}
         <div className={styles['home-wrapper']}>
           <div className={styles['label']}>{t('recommend-server')}</div>
@@ -373,12 +390,53 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             )}
           </section>
         </div>
+        <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
+          <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
+            <div className={styles['announcement-detail-header']}>
+              <div className={styles['announcement-type']} data-category={selectedAnn?.category}>
+                {t(`${selectedAnn?.category}`)}
+              </div>
+              <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
+              <div className={styles['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.timestamp)}</div>
+            </div>
+            <div className={styles['announcement-detail-content']}>
+              <MarkdownContent markdownText={selectedAnn?.content ?? ''} />
+            </div>
+          </div>
+        </div>
       </main>
 
-      {/* Recommended servers */}
-      <main className={styles['recommended-servers-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
-        <RecommendServerList recommendServers={recommendServers} user={user} />
+      {/* Announcement */}
+      <main className={styles['home-body']} style={section === 1 ? {} : { display: 'none' }}>
+        <div className={styles['announcement-wrapper']}>
+          <div className={styles['announcement-header']}>
+            {categoryTabs.map((categoryTab) => (
+              <div
+                key={categoryTab.key}
+                className={`${styles['announcement-tab']} ${selectedAnnouncementCategory === categoryTab.key ? styles['active'] : ''}`}
+                onClick={() => setSelectedAnnouncementCategory(categoryTab.key)}
+              >
+                {t(categoryTab.label)}
+              </div>
+            ))}
+          </div>
+          <div className={styles['announcement-list']}>
+            {filteredAnnouncements.map((announcement) => (
+              <div key={announcement.announcementId} className={styles['announcement-item']} onClick={() => setSelectedAnn(announcement)}>
+                <div className={styles['announcement-type']} data-category={announcement.category}>
+                  {t(`${announcement.category}`)}
+                </div>
+                <div className={styles['announcement-title']}>{announcement.title}</div>
+                <div className={styles['announcement-date']}>{getFormatDate(announcement.timestamp)}</div>
+              </div>
+            ))}
+          </div>
+        </div>
       </main>
+      {/* Recommended servers */}
+      {/* <main className={styles['recommended-servers-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
+        <RecommendServerList recommendServers={recommendServers} user={user} />
+      </main> */}
 
       {/* Personal Exclusive */}
       <main className={styles['home-body']} style={section === 4 ? {} : { display: 'none' }}>
