@@ -207,10 +207,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, []);
 
   useEffect(() => {
-    if (announcements.length > 0) setSelectedAnn(announcements[announcements.length - 1]);
-  }, [announcements]);
-
-  useEffect(() => {
     const unsub = ipc.socket.on('serverSearch', (...args: Server[]) => {
       const q = searchQueryRef.current;
 
@@ -436,9 +432,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* Personal Exclusive */}
       <main className={styles['home-body']} style={section === 4 ? {} : { display: 'none' }}>
-        <ServerList title={t('recent-servers')} servers={recentServers} user={user} />
-        <ServerList title={t('my-servers')} servers={ownedServers} user={user} />
-        <ServerList title={t('favorited-servers')} servers={favoriteServers} user={user} />
+        <div className={styles['home-wrapper']}>
+          <ServerList title={t('recent-servers')} servers={recentServers} user={user} />
+          <ServerList title={t('my-servers')} servers={ownedServers} user={user} />
+          <ServerList title={t('favorited-servers')} servers={favoriteServers} user={user} />
+        </div>
       </main>
 
       {/* Not Available */}

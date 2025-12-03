@@ -30,19 +30,21 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers
   const canExpand = servers.length > 6;
 
   return (
-    <div>
+    <>
       <div className={homePage['server-list-title']}>{title}</div>
-      <div className={homePage['server-list']}>
-        {displayedServers.map((server) => (
-          <ServerCard key={server.serverId} user={user} server={server} />
-        ))}
-      </div>
-      {canExpand && (
-        <div className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`} onClick={() => setExpanded((prev) => !prev)}>
-          {expanded ? t('view-less') : t('view-more')}
+      <div className={homePage['servers-container']}>
+        <div className={homePage['server-list']}>
+          {displayedServers.map((server) => (
+            <ServerCard key={server.serverId} user={user} server={server} />
+          ))}
         </div>
-      )}
-    </div>
+        {canExpand && (
+          <div className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`} onClick={() => setExpanded((prev) => !prev)}>
+            {expanded ? t('view-less') : t('view-more')}
+          </div>
+        )}
+      </div>
+    </>
   );
 });
 
