@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -25,6 +25,9 @@ import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isChannelMod, isServerOwner, isChannelAdmin } from '@/utils/permission';
 import { objDiff } from '@/utils/objDiff';
 
+// Constants
+import { MEMBER_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constant';
+
 interface ChannelSettingPopupProps {
   userId: User['userId'];
   user: User;
@@ -38,6 +41,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
 
+  // Refs
+  const startXRef = useRef<number>(0);
+  const startWidthRef = useRef<number>(0);
+  const isResizingMemberColumn = useRef<boolean>(false);
+  const isResizingBlockMemberColumn = useRef<boolean>(false);
+
   // States
   const [channel, setChannel] = useState<Channel>(channelData);
   const [channelMembers, setChannelMembers] = useState<Member[]>(channelMembersData);
@@ -47,8 +56,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [sortField, setSortField] = useState<string>('contribution');
   const [searchText, setSearchText] = useState('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
-  const [memberColumnWidths, setMemberColumnWidths] = useState<number[]>([150, 90, 80, 90]);
-  const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>([150, 150]);
+  const [memberColumnWidths, setMemberColumnWidths] = useState<number[]>(MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
+  const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
   // Variables
   const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
@@ -103,65 +112,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   const settingPages = isChannelMod(permissionLevel)
     ? [
-      t('channel-info'),
-      t('channel-announcement'),
-      t('access-permission'),
-      t('speaking-permission'),
-      t('text-permission'),
-      `${t('channel-management')} (${totalModerators})`,
-      `${t('blacklist-management')} (${totalBlockMembers})`,
-    ]
+        t('channel-info'),
+        t('channel-announcement'),
+        t('access-permission'),
+        t('speaking-permission'),
+        t('text-permission'),
+        `${t('channel-management')} (${totalModerators})`,
+        `${t('blacklist-management')} (${totalBlockMembers})`,
+      ]
     : [t('channel-info'), t('channel-announcement')];
-
-  const memberTableFields = [
-    { name: t('name'), field: 'name' },
-    { name: t('permission'), field: 'permissionLevel' },
-    { name: t('contribution'), field: 'contribution' },
-    { name: t('join-date'), field: 'createdAt' },
-  ];
-
-  const blockMemberTableFields = [
-    { name: t('name'), field: 'name' },
-    { name: t('unblock-date'), field: 'isBlocked' },
-  ];
-
-  const formatDate = (value: number | string) => {
-    const date = new Date(value);
-    if (Number.isNaN(date.getTime())) return '';
-    const year = date.getFullYear();
-    const month = `${date.getMonth() + 1}`.padStart(2, '0');
-    const day = `${date.getDate()}`.padStart(2, '0');
-    return `${year}-${month}-${day}`;
-  };
-
-  const handleColumnResize =
-    (index: number, columnWidths: number[], setColumnWidths: React.Dispatch<React.SetStateAction<number[]>>, defaultWidths: number[]) =>
-      (e: React.MouseEvent<HTMLDivElement>) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const startX = e.clientX;
-        const startWidths = [...columnWidths];
-        const minWidth = defaultWidths[index] ?? 60;
-
-        const onMouseMove = (moveEvent: MouseEvent) => {
-          const deltaX = moveEvent.clientX - startX;
-          setColumnWidths((prev) => {
-            const next = [...prev];
-            const base = startWidths[index] ?? prev[index] ?? minWidth;
-            const maxWidth = minWidth * 2.5;
-            next[index] = Math.max(minWidth, Math.min(maxWidth, base + deltaX));
-            return next;
-          });
-        };
-
-        const onMouseUp = () => {
-          window.removeEventListener('mousemove', onMouseMove);
-          window.removeEventListener('mouseup', onMouseUp);
-        };
-
-        window.addEventListener('mousemove', onMouseMove);
-        window.addEventListener('mouseup', onMouseUp);
-      };
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
@@ -197,6 +156,54 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const handleMemberSort = (field: keyof Member) => {
     handleSort(field);
   };
+
+  const handleMemberColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isResizingMemberColumn.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = memberColumnWidths[index];
+  };
+
+  const handleMemberColumnHandleMove = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    if (!isResizingMemberColumn.current) return;
+    const deltaX = e.clientX - startXRef.current;
+    const minWidth = MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
+    const maxWidth = minWidth * 2.5;
+    setMemberColumnWidths((prev) => {
+      const next = [...prev];
+      next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+      return next;
+    });
+  };
+
+  const handleBlockMemberColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isResizingBlockMemberColumn.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = blockMemberColumnWidths[index];
+  };
+
+  const handleBlockMemberColumnHandleMove = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    if (!isResizingBlockMemberColumn.current) return;
+    const deltaX = e.clientX - startXRef.current;
+    const minWidth = BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
+    const maxWidth = minWidth * 2.5;
+    setBlockMemberColumnWidths((prev) => {
+      const next = [...prev];
+      next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+      return next;
+    });
+  };
+
+  // Effects
+  useEffect(() => {
+    const onPointerup = () => {
+      isResizingMemberColumn.current = false;
+      isResizingBlockMemberColumn.current = false;
+    };
+    window.addEventListener('pointerup', onPointerup);
+    return () => window.removeEventListener('pointerup', onPointerup);
+  }, []);
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Channel> }[]) => {
@@ -560,21 +567,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
-                    {memberTableFields.map((field, index) => (
-                      <th
-                        key={field.field}
-                        style={{ flex: `0 0 ${memberColumnWidths[index] ?? [150, 90, 80, 90][index]}px` }}
-                      >
-                        <div
-                          className={setting['th-content']}
-                          onClick={() => handleMemberSort(field.field as keyof Member)}
-                        >
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                    {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
+                      <th key={field.key} style={memberColumnWidths[index] ? { flex: `0 0 ${memberColumnWidths[index]}px` } : {}}>
+                        <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                         </div>
-                        <div
-                          className={setting['col-resizer']}
-                          onMouseDown={handleColumnResize(index, memberColumnWidths, setMemberColumnWidths, [150, 90, 80, 90])}
-                        />
+                        <div className={popup['resizer']} onPointerDown={(e) => handleMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
@@ -684,7 +682,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         </td>
                         <td style={{ flex: `0 0 ${memberColumnWidths[1] ?? 90}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
                         <td style={{ flex: `0 0 ${memberColumnWidths[2] ?? 80}px` }}>{moderator.contribution}</td>
-                        <td style={{ flex: `0 0 ${memberColumnWidths[3] ?? 90}px` }}>{formatDate(moderator.createdAt)}</td>
+                        <td style={{ flex: `0 0 ${memberColumnWidths[3] ?? 90}px` }}>{new Date(moderator.createdAt).toLocaleDateString()}</td>
                       </tr>
                     );
                   })}
@@ -709,21 +707,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
-                    {blockMemberTableFields.map((field, index) => (
-                      <th
-                        key={field.field}
-                        style={{ flex: `0 0 ${blockMemberColumnWidths[index] ?? [150, 150][index]}px` }}
-                      >
-                        <div
-                          className={setting['th-content']}
-                          onClick={() => handleMemberSort(field.field as keyof Member)}
-                        >
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                    {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
+                      <th key={field.key} style={blockMemberColumnWidths[index] ? { flex: `0 0 ${blockMemberColumnWidths[index]}px` } : {}}>
+                        <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
                         </div>
-                        <div
-                          className={setting['col-resizer']}
-                          onMouseDown={handleColumnResize(index, blockMemberColumnWidths, setBlockMemberColumnWidths, [150, 150])}
-                        />
+                        <div className={popup['resizer']} onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
@@ -765,7 +754,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         }}
                       >
                         <td style={{ flex: `0 0 ${blockMemberColumnWidths[0] ?? 150}px` }}>{member.nickname || member.name}</td>
-                        <td style={{ flex: `0 0 ${blockMemberColumnWidths[1] ?? 150}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
+                        <td style={{ flex: `0 0 ${blockMemberColumnWidths[1] ?? 150}px` }}>
+                          {member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}
+                        </td>
                       </tr>
                     );
                   })}

@@ -140,24 +140,6 @@
   margin-top: 3px;
 }
 
-.th-content {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  width: 100%;
-}
-
-.col-resizer {
-  width: 4px;
-  align-self: stretch;
-  cursor: col-resize;
-  margin-right: -2px;
-}
-
-.col-resizer:hover {
-  background-color: var(--border);
-}
-
 .search-box {
   width: max-content;
   display: flex;
