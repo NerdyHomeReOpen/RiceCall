@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useRef } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -25,6 +25,9 @@ import { getPermissionText } from '@/utils/language';
 import { isMember, isServerAdmin, isChannelMod, isServerOwner, isChannelAdmin } from '@/utils/permission';
 import { objDiff } from '@/utils/objDiff';
 
+// Constants
+import { MEMBER_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constant';
+
 interface ChannelSettingPopupProps {
   userId: User['userId'];
   user: User;
@@ -38,6 +41,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
 
+  // Refs
+  const startXRef = useRef<number>(0);
+  const startWidthRef = useRef<number>(0);
+  const isResizingMemberColumn = useRef<boolean>(false);
+  const isResizingBlockMemberColumn = useRef<boolean>(false);
+
   // States
   const [channel, setChannel] = useState<Channel>(channelData);
   const [channelMembers, setChannelMembers] = useState<Member[]>(channelMembersData);
@@ -47,6 +56,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const [sortField, setSortField] = useState<string>('contribution');
   const [searchText, setSearchText] = useState('');
   const [selectedItemId, setSelectedItemId] = useState<string>('');
+  const [memberColumnWidths, setMemberColumnWidths] = useState<number[]>(MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
+  const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
   // Variables
   const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
@@ -111,18 +122,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
       ]
     : [t('channel-info'), t('channel-announcement')];
 
-  const memberTableFields = [
-    { name: t('name'), field: 'name' },
-    { name: t('permission'), field: 'permissionLevel' },
-    { name: t('contribution'), field: 'contribution' },
-    { name: t('join-date'), field: 'createdAt' },
-  ];
-
-  const blockMemberTableFields = [
-    { name: t('name'), field: 'name' },
-    { name: t('unblock-date'), field: 'isBlocked' },
-  ];
-
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
     ipc.socket.send('editChannel', { serverId, channelId, update });
@@ -157,6 +156,54 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
   const handleMemberSort = (field: keyof Member) => {
     handleSort(field);
   };
+
+  const handleMemberColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isResizingMemberColumn.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = memberColumnWidths[index];
+  };
+
+  const handleMemberColumnHandleMove = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    if (!isResizingMemberColumn.current) return;
+    const deltaX = e.clientX - startXRef.current;
+    const minWidth = MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
+    const maxWidth = minWidth * 2.5;
+    setMemberColumnWidths((prev) => {
+      const next = [...prev];
+      next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+      return next;
+    });
+  };
+
+  const handleBlockMemberColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    e.currentTarget.setPointerCapture(e.pointerId);
+    isResizingBlockMemberColumn.current = true;
+    startXRef.current = e.clientX;
+    startWidthRef.current = blockMemberColumnWidths[index];
+  };
+
+  const handleBlockMemberColumnHandleMove = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+    if (!isResizingBlockMemberColumn.current) return;
+    const deltaX = e.clientX - startXRef.current;
+    const minWidth = BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
+    const maxWidth = minWidth * 2.5;
+    setBlockMemberColumnWidths((prev) => {
+      const next = [...prev];
+      next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+      return next;
+    });
+  };
+
+  // Effects
+  useEffect(() => {
+    const onPointerup = () => {
+      isResizingMemberColumn.current = false;
+      isResizingBlockMemberColumn.current = false;
+    };
+    window.addEventListener('pointerup', onPointerup);
+    return () => window.removeEventListener('pointerup', onPointerup);
+  }, []);
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Channel> }[]) => {
@@ -520,9 +567,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
-                    {memberTableFields.map((field) => (
-                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                    {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
+                      <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }}>
+                        <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        </div>
+                        <div className={popup['resizer']} onPointerDown={(e) => handleMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
@@ -626,13 +676,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                         }}
                       >
-                        <td>
+                        <td style={{ width: `${memberColumnWidths[0]}px` }}>
                           <div className={`${permission[moderator.gender]} ${permission[`lv-${moderator.permissionLevel}`]}`} />
                           <div className={`${popup['name']} ${moderator.nickname ? popup['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
                         </td>
-                        <td>{getPermissionText(t, moderator.permissionLevel)}</td>
-                        <td>{moderator.contribution}</td>
-                        <td>{new Date(moderator.createdAt).toLocaleString()}</td>
+                        <td style={{ width: `${memberColumnWidths[1]}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
+                        <td style={{ width: `${memberColumnWidths[2]}px` }}>{moderator.contribution}</td>
+                        <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(moderator.createdAt).toLocaleDateString()}</td>
                       </tr>
                     );
                   })}
@@ -657,9 +707,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
-                    {blockMemberTableFields.map((field) => (
-                      <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                        {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                    {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
+                      <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }}>
+                        <div className={popup['label']} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        </div>
+                        <div className={popup['resizer']} onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
@@ -700,8 +753,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                         }}
                       >
-                        <td>{member.nickname || member.name}</td>
-                        <td>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
+                        <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
+                        <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
                       </tr>
                     );
                   })}

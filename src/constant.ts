@@ -123,3 +123,49 @@ export const CATEGORIES: RecommendServerCategory[] = [
   },
 ];
 export const STATUS_OPTIONS: User['status'][] = ['online', 'dnd', 'idle', 'gn'];
+export const MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
+  {
+    tKey: 'name',
+    key: 'name',
+    minWidth: 150,
+  },
+  {
+    tKey: 'permission',
+    key: 'permissionLevel',
+    minWidth: 100,
+  },
+  {
+    tKey: 'contribution',
+    key: 'contribution',
+    minWidth: 100,
+  },
+  {
+    tKey: 'join-date',
+    key: 'createdAt',
+    minWidth: 100,
+  },
+];
+export const MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
+  {
+    tKey: 'name',
+    key: 'name',
+    minWidth: 150,
+  },
+  {
+    tKey: 'description',
+    key: 'description',
+    minWidth: 200,
+  },
+];
+export const BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
+  {
+    tKey: 'name',
+    key: 'name',
+    minWidth: 150,
+  },
+  {
+    tKey: 'unblock-date',
+    key: 'isBlocked',
+    minWidth: 150,
+  },
+];
