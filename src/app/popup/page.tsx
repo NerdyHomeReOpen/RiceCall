@@ -46,6 +46,7 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 import ChatHistory from '@/popups/chatHistory';
+import GroupApplied from '@/popups/GroupApplied';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -294,6 +295,11 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
+  groupApplied: {
+    type: 'groupApplied',
+    buttons: ['close'],
+    hideHeader: false,
+  }
 };
 
 type Popup = {
@@ -357,6 +363,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       userInfo: t('user-info'),
       userSetting: t('user-setting'),
       chatHistory: t('chat-history'),
+      groupApplied: t('group-applied'),
     };
 
     const node = {
@@ -398,6 +405,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       userInfo: () => <UserInfo id={id} {...initialData} />,
       userSetting: () => <UserInfo id={id} {...initialData} />,
       chatHistory: () => <ChatHistory id={id} {...initialData} />,
+      groupApplied: () => <GroupApplied id={id} {...initialData} />,
     };
 
     return {
@@ -425,9 +433,9 @@ const PopupPageComponent: React.FC = React.memo(() => {
   }, [id]);
 
   useEffect(() => {
-    history.pushState = () => {};
-    history.back = () => {};
-    history.forward = () => {};
+    history.pushState = () => { };
+    history.back = () => { };
+    history.forward = () => { };
   }, []);
 
   return (

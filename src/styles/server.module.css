@@ -520,6 +520,116 @@
   background-color: var(--background-secondary);
 }
 
+.widget-bar {
+  width: auto;
+  max-width: 260px;
+  height: 23px;
+  border-bottom-left-radius: 5px;
+  border-bottom-right-radius: 5px;
+  position: absolute;
+  overflow: hidden;
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  right: 0;
+  z-index: 1000;
+  background: #fff;
+  margin-right: 1rem;
+  border-top: unset;
+}
+
+.widget-close {
+  height: 16px;
+}
+
+.widget-bar-content {
+  height: 23px;
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  padding: 0 4px;
+  gap: 4px;
+}
+
+.widget-close .widget-bar-content {
+  height: 16px;
+}
+
+.widget-bar-spliter {
+  width: 2px;
+  height: 16px;
+  background: url("/channel/widgetbar_spliter.png") no-repeat center;
+}
+
+.widget-bar-item {
+  display: flex;
+  cursor: pointer;
+  padding-left: 1rem;
+  padding-right: 1rem;
+}
+
+.widget-close .widget-bar-item {
+  padding: unset;
+}
+
+.widget-bar-item:hover .widget-bar-item-icon {
+  background-position: -12px 0;
+}
+
+.widget-bar-item-active .widget-bar-item-icon,
+.widget-bar-item:active .widget-bar-item-icon {
+  background-position: -24px 0;
+}
+
+.widget-close .widget-bar-item:hover .widget-bar-item-icon {
+  background-position: -20px 0;
+}
+
+.widget-close .widget-bar-item:active .widget-bar-item-icon {
+  background-position: -20px 0;
+}
+
+.widget-bar-item-icon {
+  width: 12px;
+  height: 12px;
+  background-size: auto;
+  background-position: 0 0;
+  display: flex;
+  margin-right: 5px;
+}
+
+.widget-close .widget-bar-item-icon {
+  width: 16px;
+  height: 16px;
+  background-position: 0 0px;
+}
+
+.widget-bar-item-icon.announcement-icon {
+  background-image: url("/channel/widgetbar_bullet.png");
+}
+
+.widget-bar-item-icon.rcshow-icon {
+  background-image: url("/channel/widgetbar_rcshow.png");
+}
+
+.widget-bar-item-icon.more-icon {
+  background-image: url("/channel/widgetbar_more.png");
+}
+
+.widget-bar-item-icon.arrow-down-icon {
+  background-image: url("/channel/widgetBar_Stretch.png");
+}
+
+.widget-bar-item-text {
+  font-size: 12px;
+  white-space: nowrap;
+  user-select: none;
+  color: #333;
+}
+
+.widget-bar-item-active .widget-bar-item-text {
+  color: #000;
+  font-weight: bold;
+}
+
 .message-area {
   display: flex;
   flex-direction: column;

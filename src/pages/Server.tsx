@@ -26,7 +26,7 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
-import { handleOpenChannelEvent } from '@/utils/popup';
+import { handleOpenChannelEvent, handleOpenGroupApplied } from '@/utils/popup';
 
 const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
 const MESSAGE_VIERER_DEVIATION = 100;
@@ -186,6 +186,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
+    const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
 
     // Variables
     const { userId } = user;
@@ -622,6 +623,46 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
+
+              {/* Widget Bar */}
+              <div className={`${styles['widget-bar']} ${!isWidgetExpanded ? styles['widget-close'] : ''}`}>
+                <div className={styles['widget-bar-content']}>
+                  {isWidgetExpanded ? (
+                    <>
+                      <div
+                        className={`${styles['widget-bar-item']} ${isAnnouncementVisible ? styles['widget-bar-item-active'] : ''}`}
+                        onClick={() => {
+                          setIsAnnouncementVisible((v) => !v);
+                          setIsWidgetExpanded(false);
+                        }}
+                      >
+                        <span className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`}></span>
+                        <span className={styles['widget-bar-item-text']}>公告</span>
+                      </div>
+                      <div className={styles['widget-bar-spliter']}></div>
+                      <div className={styles['widget-bar-item']}>
+                        <span className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></span>
+                        <span className={styles['widget-bar-item-text']}>送花</span>
+                      </div>
+                      <div className={styles['widget-bar-spliter']}></div>
+                      <div
+                        className={styles['widget-bar-item']}
+                        onClick={() => {
+                          handleOpenGroupApplied(userId, currentServerId);
+                          setIsWidgetExpanded(false);
+                        }}
+                      >
+                        <span className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`}></span>
+                        <span className={styles['widget-bar-item-text']}>更多</span>
+                      </div>
+                    </>
+                  ) : (
+                    <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(!isWidgetExpanded)}>
+                      <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`}></span>
+                    </div>
+                  )}
+                </div>
+              </div>
 
               {/* Bottom Area */}
               <div className={styles['bottom-area']}>

@@ -272,7 +272,8 @@ export type PopupType =
   | 'serverSetting'
   | 'systemSetting'
   | 'userInfo'
-  | 'userSetting';
+  | 'userSetting'
+  | 'groupApplied';
 
 export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 

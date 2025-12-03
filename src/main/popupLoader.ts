@@ -176,6 +176,12 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
 
     return { userId, targetId, friend, target, targetServers };
   },
+
+  groupApplied: async ({ userId, serverId }: { userId: string; serverId: string }) => {
+    const [member] = await Promise.all([data.member({ userId, serverId })]);
+
+    return { userId, serverId, member };
+  },
 };
 
 export default popupLoaders;
