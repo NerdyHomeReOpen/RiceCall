@@ -2,8 +2,8 @@
   <img width="1920" height="1080" alt="discord_banner" src="https://github.com/user-attachments/assets/488a1f4c-4e03-463a-85c7-a1eef22cc505" />
   <div height="20px">　</div>
   <div>
-    <img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord&link=https%3A%2F%2Fdiscord.gg%2FadCWzv6wwS"/>
-    <img src="https://img.shields.io/badge/Latest-0.3.9-green"/>
+    <a title="Crowdin" target="_blank" href="https://discord.gg/adCWzv6wwS"><img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord"/></a>
+    <a title="Crowdin" target="_blank"><img src="https://img.shields.io/badge/Latest-0.3.9-green"/></a>
     <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/ricecall/localized.svg"></a>
   </div>
 </div>
