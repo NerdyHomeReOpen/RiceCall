@@ -176,9 +176,9 @@ export const BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; 
 ];
 export const RECOMMEND_SERVER_CATEGORY_TABS = [
   { key: 'all', tKey: 'all' },
-  { key: 'official', tKey: 'official-server' },
-  { key: 'entertainment', tKey: 'entertainment-server' },
-  { key: 'game', tKey: 'game-server' },
-  { key: 'community', tKey: 'community-server' },
-  { key: 'education', tKey: 'education-server' },
+  { key: 'radio', tKey: 'radio'},
+  { key: 'entertainment', tKey: 'entertainment' },
+  { key: 'sing', tKey: 'sing' },
+  { key: 'game', tKey: 'game' },
+  { key: 'community', tKey: 'community' },
 ];

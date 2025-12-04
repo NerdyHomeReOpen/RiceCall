@@ -580,9 +580,9 @@
   "year": "年",
   "yesterday": "昨天",
   "recommend-server": "推薦語音群",
-  "entertainment-server": "娛樂語音群",
-  "community-server": "社群語音群",
-  "game-server": "遊戲語音群",
-  "education-server": "教育語音群",
+  "community": "綜合",
+  "music": "音樂",
+  "sing": "歌唱",
+  "radio": "電台",
   "announcement": "公告"
 }
