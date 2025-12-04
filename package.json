@@ -48,6 +48,7 @@
     "@tiptap/react": "^3.2.0",
     "@tiptap/starter-kit": "^3.2.0",
     "@types/react-color": "^3.0.13",
+    "better-sqlite3": "^12.5.0",
     "discord-rpc": "^4.0.1",
     "dompurify": "^3.2.7",
     "dotenv": "^16.5.0",
@@ -79,6 +80,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/discord-rpc": "^4.0.9",
     "@types/fluent-ffmpeg": "^2.1.28",
     "@types/node": "^20",
