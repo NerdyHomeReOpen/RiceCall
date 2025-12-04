@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <a title="Crowdin" target="_blank" href="https://discord.gg/adCWzv6wwS"><img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord"/></a>
-    <a title="Crowdin" target="_blank"><img src="https://img.shields.io/badge/Latest-0.3.9-green"/></a>
+    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.9-green"/></a>
     <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/ricecall/localized.svg"></a>
   </div>
 </div>
