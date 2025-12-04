@@ -943,17 +943,67 @@
 .recommend-server-tab {
   padding: 5px 10px;
   border-radius: 5px;
-  border: 2px solid var(--border);
-  background-color: var(--text-color-quinary);
-  color: #ffffff;
+  border: 2px solid var(--main-color);
+  background-color: var(--main-color);
+  color: #e7f3ff;
   font-weight: bold;
   cursor: pointer;
   transition: all 0.2s ease;
 
   &.active {
-    background-color: #ffffff;
+    background-color: #e7f3ff;
     color: var(--main-color);
     border-color: var(--main-color);
+  }
+
+  &[data-category='sing'] {
+    border-color: #005cbf;
+    background-color: #005cbf;
+    color: #e7f3ff;
+    &.active {
+      background-color: #e7f3ff;
+      color: #005cbf;
+    }
+  }
+
+  &[data-category='entertainment'] {
+    border-color: #791bec;
+    background-color: #791bec;
+    color: #e7f3ff;
+    &.active {
+      background-color: #e7f3ff;
+      color: #791bec;
+    }
+  }
+
+  &[data-category='radio'] {
+    border-color: #c85a17;
+    background-color: #c85a17;
+    color: #fff0e6;
+    &.active {
+      background-color: #fff0e6;
+      color: #c85a17;
+    }
+  }
+
+  &[data-category='game'] {
+    border-color: #e72525;
+    background-color: #e72525;
+    color: #fae6e6;
+    &.active {
+      background-color: #fae6e6;
+      color: #e72525;
+    }
+  }
+
+  &[data-category='community'] {
+    border-color: #1e7e34;
+    background-color: #1e7e34;
+    color: #e6ffed;
+    &.active {
+      background-color: #e6ffed;
+      color: #1e7e34;
+    }
   }
 }
 

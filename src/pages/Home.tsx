@@ -90,6 +90,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     () => recommendServers.filter((server) => (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(i18n.language)),
     [recommendServers, selectReommendServerCategory, i18n.language],
   );
+  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(i18n.language)), [recommendServers, i18n.language]);
 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -350,6 +351,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             {RECOMMEND_SERVER_CATEGORY_TABS.map((tab) => (
               <div
                 key={tab.key}
+                data-category={tab.key}
                 className={`${styles['recommend-server-tab']} ${selectReommendServerCategory === tab.key ? styles['active'] : ''}`}
                 onClick={() => setSelectRecommendServerCategory(tab.key)}
               >
@@ -361,6 +363,20 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             {filteredRecommendServers.length > 0 && (
               <div className={styles['server-list']}>
                 {filteredRecommendServers.map((server) => (
+                  <RecommendServerCard key={server.serverId} user={user} recommendServer={server} />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+
+        {/* Official Server */}
+        <div className={styles['home-wrapper']}>
+          <div className={styles['server-list-title']}>{t('official-server')}</div>
+          <section className={styles['servers-container']}>
+            {filteredOfficialServers.length > 0 && (
+              <div className={styles['server-list']}>
+                {filteredOfficialServers.map((server) => (
                   <RecommendServerCard key={server.serverId} user={user} recommendServer={server} />
                 ))}
               </div>
