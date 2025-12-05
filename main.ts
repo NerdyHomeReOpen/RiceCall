@@ -8,15 +8,14 @@ initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
-import { initMainI18n, getLanguage, t } from './i18n.js';
-import { connectSocket, disconnectSocket } from './socket.js';
-import { env, loadEnv } from './env.js';
-import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
-import authService from './auth.service.js';
-import dataService from './data.service.js';
-import popupLoaders from './popupLoader.js';
-
-import type { StoreType, PopupType } from '../src/types';
+import { initMainI18n, getLanguage, t } from './src/main/i18n.js';
+import { connectSocket, disconnectSocket } from './src/main/socket.js';
+import { env, loadEnv } from './src/main/env.js';
+import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/main/discord.js';
+import authService from './src/main/auth.service.js';
+import dataService from './src/main/data.service.js';
+import popupLoaders from './src/main/popupLoader.js';
+import type { StoreType, PopupType } from './src/types';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');

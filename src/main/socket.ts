@@ -1,8 +1,6 @@
 import { io, Socket } from 'socket.io-client';
-import { ipcMain } from 'electron';
-import { BrowserWindow } from 'electron';
-import { createPopup } from './main.js';
-import { MAIN_TITLE, VERSION_TITLE } from './main.js';
+import { BrowserWindow, ipcMain } from 'electron';
+import { createPopup } from '../../main.js';
 import { env } from './env.js';
 
 // Types
@@ -204,16 +202,14 @@ export function connectSocket(token: string) {
         if (event === 'shakeWindow') {
           const initialData: Record<string, unknown> | undefined = args[0].initialData;
           if (!initialData) return;
-          const title = initialData.name;
-          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
+          const title = initialData.name as string;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, title);
         }
         if (event === 'directMessage') {
           const initialData: Record<string, unknown> | undefined = args[0].initialData;
           if (!initialData) return;
-          const title = initialData.name;
-          const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, fullTitle);
+          const title = initialData.name as string;
+          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, title);
         }
       });
     });
