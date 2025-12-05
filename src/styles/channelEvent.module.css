@@ -61,11 +61,12 @@
 .current-channel {
   position: sticky;
   top: 0;
-  padding: 5px;
+  padding: 5px 15px;
   color: var(--text-color-quaternary);
   background-color: var(--popup-background);
   display: flex;
   justify-content: flex-start;
+  align-items: center;
   border-bottom: 1px solid var(--text-color-octonary);
 }
 
