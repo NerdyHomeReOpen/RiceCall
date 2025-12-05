@@ -8,15 +8,16 @@
     "all": "همه"
   },
   "nav": {
-    "features": "ویژگی‌ها",
-    "faq": "سوالات متداول",
+    "home": "صفحه اول",
     "announcement": "اطلاعیه‌ها",
     "contact": "تماس",
     "status": "وضعیت",
     "login": "ورود",
     "logout": "خروج",
     "register": "ثبت‌نام",
-    "account": "حساب من"
+    "account": "حساب من",
+    "closeMenu": "بستن منو",
+    "openMenu": "منوی باز"
   },
   "footer": {
     "partners": "همکاران",
@@ -75,7 +76,11 @@
       "interface": {
         "title": "صدا برای بازی ساخته شده",
         "desc": "RiceCall صدای شفاف با تاخیر کم و تماس‌های گروهی ارائه می‌دهد",
-        "imageAlt": "تصویر رابط RiceCall"
+        "imageAlt": "تصویر رابط RiceCall",
+        "close": "بسته شدن",
+        "prev": "تصویر قبلی",
+        "next": "تصویر بعدی",
+        "toggle": "تغییر تصاویر"
       },
       "faq": {
         "title": "سوالات متداول",
@@ -133,14 +138,16 @@
     },
     "contact": {
       "title": "تماس",
+      "empty": "اطلاعاتی در دسترس نیست.",
       "jobs": {
         "CEO": "مدیرعامل",
         "CTO": "مدیر ارشد فنی",
-        "CFO": "مدیر ارشد مالی",
-        "COO": "مدیر عامل",
         "COO-taiwan": "COO, Taiwan",
         "COO-russia": "COO, Russia",
         "COO-brazil": "COO, Brazil",
+        "COO-iran": "مدیر ارشد عملیاتی ایرانی",
+        "COO-turkey": "مدیر ارشد عملیات ترکیه",
+        "COO-spain": "مدیر ارشد عملیاتی اسپانیایی",
         "customer-service": "خدمات مشتریان",
         "developer": "توسعه‌دهنده",
         "machine-network": "شبکه ماشین",
@@ -166,8 +173,6 @@
       },
       "submit": "ایجاد حساب",
       "submitting": "در حال ثبت‌نام...",
-      "hasAccount": "قبلاً حساب دارید؟",
-      "gotoLogin": "رفتن به ورود",
       "errors": {
         "passwordNotMatch": "گذرواژه‌ها یکسان نیستند",
         "registerFailed": "ثبت‌نام ناموفق بود",
@@ -184,9 +189,7 @@
       },
       "submit": "ورود",
       "submitting": "در حال ورود...",
-      "forgetPassword": "忘記密碼",
-      "noAccount": "還沒有帳號嗎？",
-      "gotoRegister": "ثبت‌نام کنید",
+      "forgetPassword": "رمز عبور را فراموش کنید",
       "errors": {
         "loginFailed": "ورود ناموفق بود، دوباره تلاش کنید",
         "networkError": "خطای شبکه یا سرور، بعداً دوباره تلاش کنید",
@@ -260,16 +263,16 @@
       "emailVerifying": "در حال بررسی...",
       "requestFailed": "درخواست ناموفق بود",
       "passwordReset": "بازنشانی",
-      "passwordBindAction": "اتصال گذرواژه"
+      "passwordBindAction": "اتصال گذرواژه",
+      "recaptchaFailed": "تأیید reCAPTCHA ناموفق بود، لطفاً بعداً دوباره امتحان کنید."
     },
     "forget": {
-      "forgetTitle": "忘記密碼",
-      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
-      "account": "帳號",
-      "sendEmail": "寄送重設連結",
-      "sendingEmail": "寄送中...",
-      "remember": "想起來了嗎？",
-      "backLogin": "返回登入"
+      "forgetTitle": "رمز عبور را فراموش کنید",
+      "enterAccount": "لطفاً شماره حساب خود را وارد کنید، ما یک لینک بازنشانی رمز عبور به آدرس ایمیل شما ارسال خواهیم کرد.",
+      "account": "شماره حساب",
+      "sendEmail": "ارسال لینک بازیابی",
+      "sendingEmail": "در حال ارسال...",
+      "backLogin": "بازگشت به ورود"
     },
     "password": {
       "resetTitle": "بازنشانی گذرواژه",
@@ -295,7 +298,20 @@
       "passwordMinLength": "گذرواژه باید حداقل ۸ کاراکتر باشد",
       "passwordMaxLength": "گذرواژه باید حداکثر ۲۰ کاراکتر باشد",
       "passwordInvalidFormat": "گذرواژه باید فقط شامل حروف انگلیسی، اعداد و نویسه‌های ویژه باشد",
-      "usernameInvalidFormat": "نام مستعار باید فقط شامل حروف انگلیسی، اعداد و نویسه‌های ویژه باشد"
+      "usernameInvalidFormat": "نام مستعار باید فقط شامل حروف انگلیسی، اعداد و نویسه‌های ویژه باشد",
+      "usernameMinLength": "نام‌های کاربری باید حداقل ۴ کاراکتر داشته باشند.",
+      "usernameMaxLength": "نام‌های کاربری می‌توانند تا ۱۶ کاراکتر باشند."
+    },
+    "join": {
+      "joinTitle": "به گروه صدای ما بپیوندید",
+      "readyingOpen": "آماده شدن برای شروع RiceCall...",
+      "invalidSid": "SID نامعتبر",
+      "opening": "آغاز رایس کال...",
+      "warning": "اگر به طور خودکار به صفحه دیگری منتقل نشدید، لطفاً بررسی کنید که آیا RiceCall نصب شده است یا خیر.",
+      "tryConnect": "سعی کنید به شناسه گروه صوتی متصل شوید:",
+      "retryOpen": "RiceCall را دوباره راه‌اندازی کنید",
+      "loading": "شروع ...",
+      "unsupported": "پلتفرم شما در حال حاضر پشتیبانی نمی‌شود."
     }
   },
   "announcementCategory": {
@@ -303,13 +319,5 @@
     "general": "عمومی",
     "system": "سیستم",
     "event": "رویداد"
-  },
-  "join": {
-    "readyingOpen": "準備開啟RiceCall...",
-    "invalidSid": "無效的sid",
-    "opening": "正在開啟 RiceCall...",
-    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
-    "tryConnect": "嘗試連線至語音群 ID：",
-    "retryOpen": "重新嘗試開啟RiceCall"
   }
 }

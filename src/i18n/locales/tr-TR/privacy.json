@@ -27,7 +27,12 @@
     },
     {
       "title": "4. Paylaşım",
-      "items": ["Sözleşmeli satıcılar/işleyiciler (bulut, CDN, RTC, analiz, izleme)", "Yasal talepler", "Ticari işlemler", "Kişisel verileri satmayız"]
+      "items": [
+        "Sözleşmeli satıcılar/işleyiciler (bulut, CDN, RTC, analiz, izleme)",
+        "Yasal talepler",
+        "Ticari işlemler",
+        "Kişisel verileri satmayız"
+      ]
     },
     {
       "title": "5. Ses verileri",
@@ -40,7 +45,10 @@
     },
     {
       "title": "6. Saklama ve muhafaza",
-      "items": ["Çeşitli ülke/bölgelerde veri merkezleri", "Muhafaza, gereklilik ve yasal yükümlülüklere göre belirlenir"]
+      "items": [
+        "Çeşitli ülke/bölgelerde veri merkezleri",
+        "Muhafaza, gereklilik ve yasal yükümlülüklere göre belirlenir"
+      ]
     },
     {
       "title": "7. Haklarınız",

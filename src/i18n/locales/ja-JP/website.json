@@ -8,15 +8,16 @@
     "all": "すべて"
   },
   "nav": {
-    "features": "ユニーク機能",
-    "faq": "FAQ",
+    "home": "表紙",
     "announcement": "公式お知らせ",
     "contact": "お問い合わせ",
     "status": "サーバーステータス",
     "login": "ログイン",
     "logout": "ログアウト",
     "register": "新規登録",
-    "account": "アカウント情報"
+    "account": "アカウント情報",
+    "closeMenu": "メニューを閉じる",
+    "openMenu": "メニューを開く"
   },
   "footer": {
     "partners": "パートナー",
@@ -75,11 +76,15 @@
       "interface": {
         "title": "ゲームのために生まれたマルチボイス",
         "desc": "RiceCall は低遅延でクリアな音声、複数人でも同時に通話可能",
-        "imageAlt": "RiceCall のスクリーンショット"
+        "imageAlt": "RiceCall のスクリーンショット",
+        "close": "閉鎖",
+        "prev": "前の画像",
+        "next": "次の写真",
+        "toggle": "画像を切り替える"
       },
       "faq": {
         "title": "よくある質問",
-        "subtitle": "FAQs",
+        "subtitle": "よくある質問",
         "items": {
           "q1": {
             "question": "個人の経験値を増やすにはどうすればよいですか？",
@@ -133,14 +138,16 @@
     },
     "contact": {
       "title": "お問い合わせ",
+      "empty": "情報はありません。",
       "jobs": {
         "CEO": "CEO",
         "CTO": "CTO",
-        "CFO": "CFO",
-        "COO": "COO",
         "COO-taiwan": "COO-台湾",
         "COO-russia": "COO-ロシア",
         "COO-brazil": "COO-ブラジル",
+        "COO-iran": "イラン最高執行責任者",
+        "COO-turkey": "トルコ最高執行責任者",
+        "COO-spain": "スペイン最高執行責任者",
         "customer-service": "公式お知らせ",
         "developer": "開発者",
         "machine-network": "機器ネットワークの管理",
@@ -166,8 +173,6 @@
       },
       "submit": "アカウント作成",
       "submitting": "登録中...",
-      "hasAccount": "すでにアカウントをお持ちですか？",
-      "gotoLogin": "ログインへ進む",
       "errors": {
         "passwordNotMatch": "パスワードが一致しません",
         "registerFailed": "登録に失敗しました",
@@ -184,9 +189,7 @@
       },
       "submit": "ログイン",
       "submitting": "読み込み中...",
-      "forgetPassword": "忘記密碼",
-      "noAccount": "還沒有帳號嗎？",
-      "gotoRegister": "サインアップ",
+      "forgetPassword": "パスワードを忘れた",
       "errors": {
         "loginFailed": "ログインに失敗しました。もう一度お試しください",
         "networkError": "ネットワークまたはサーバーエラーです。しばらくしてからもう一度お試しください",
@@ -245,71 +248,76 @@
       "emailBindConfirm": "バインドを確認",
       "emailBinding": "バインディング...",
       "emailSendLink": "確認リンクを送信",
-      "emailSendingLink": "寄送中...",
-      "emailOld": "原信箱",
-      "emailOldPlaceholder": "請輸入目前已綁定的信箱",
-      "emailOldMismatch": "原信箱不正確",
-      "emailVerifyTitle": "驗證信箱",
-      "emailBindTitle": "綁定信箱",
-      "emailChangeTitle": "修改信箱",
-      "emailSendSuccess": "發送成功！請至信箱點擊完成綁定。",
-      "emailPageSubmit": "送出",
-      "emailChangeSuccess": "修改信箱成功！",
-      "emailBindFailed": "綁定失敗或連結已失效，請重新請求綁定連結",
-      "emailGoProfile": "返回個人檔案",
-      "emailVerifying": "驗證中...",
-      "requestFailed": "請求時發生錯誤",
-      "passwordReset": "修改密碼",
-      "passwordBindAction": "綁定密碼"
+      "emailSendingLink": "男性のメール送信中...",
+      "emailOld": "元のメールボックス",
+      "emailOldPlaceholder": "現在リンクされているメールアドレスを入力してください。",
+      "emailOldMismatch": "元のメールアドレスが間違っています。",
+      "emailVerifyTitle": "確認メール",
+      "emailBindTitle": "メールをバインド",
+      "emailChangeTitle": "メールアドレスを変更する",
+      "emailSendSuccess": "送信に成功しました。メールボックスに移動してクリックし、バインドを完了してください。",
+      "emailPageSubmit": "送信",
+      "emailChangeSuccess": "メールアドレスが正常に変更されました。",
+      "emailBindFailed": "バインドに失敗したか、リンクが無効です。新しいバインドリンクをリクエストしてください。",
+      "emailGoProfile": "個人プロフィールに戻る",
+      "emailVerifying": "検証中です...",
+      "requestFailed": "リクエスト中にエラーが発生しました。",
+      "passwordReset": "パスワードを変更する",
+      "passwordBindAction": "パスワードをバインドする",
+      "recaptchaFailed": "reCAPTCHA 検証に失敗しました。しばらくしてからもう一度お試しください。"
     },
     "forget": {
-      "forgetTitle": "忘記密碼",
-      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
-      "account": "帳號",
-      "sendEmail": "寄送重設連結",
-      "sendingEmail": "寄送中...",
-      "remember": "想起來了嗎？",
-      "backLogin": "返回登入"
+      "forgetTitle": "パスワードを忘れた",
+      "enterAccount": "アカウント番号を入力すると、リンクされたメールアドレスにパスワードリセットリンクが送信されます。",
+      "account": "口座番号",
+      "sendEmail": "リセットリンクを送信",
+      "sendingEmail": "送信中...",
+      "backLogin": "ログインに戻る"
     },
     "password": {
-      "resetTitle": "重設密碼",
-      "verifyProcessing": "驗證中...",
-      "verifyFailed": "驗證失敗或連結已失效，請重新請求。",
+      "resetTitle": "パスワードをリセットする",
+      "verifyProcessing": "検証中です...",
+      "verifyFailed": "検証に失敗したか、リンクが無効です。再度リクエストしてください。",
       "fields": {
-        "newPassword": "新密碼",
-        "confirmPassword": "確認新密碼"
+        "newPassword": "新しいパスワード",
+        "confirmPassword": "新しいパスワードを確認"
       },
-      "submit": "送出",
-      "submitting": "送出中...",
+      "submit": "送信",
+      "submitting": "送信中...",
       "errors": {
-        "passwordMismatch": "兩次輸入的密碼不一致",
-        "passwordTooShort": "密碼長度至少 8 碼"
+        "passwordMismatch": "2つのパスワードが一致しませんでした。",
+        "passwordTooShort": "パスワードは 8 文字以上である必要があります。"
       }
     },
     "valid": {
-      "accountRequired": "帳號不能為空",
-      "accountMinLength": "帳號長度至少 4 碼",
-      "accountMaxLength": "帳號長度最多 16 碼",
-      "accountInvalidFormat": "帳號只能包含英文、數字、底線與點號",
-      "passwordRequired": "密碼不能為空",
-      "passwordMinLength": "密碼長度至少 8 碼",
-      "passwordMaxLength": "密碼長度最多 20 碼",
-      "passwordInvalidFormat": "密碼只能包含英文、數字、特殊符號",
-      "usernameInvalidFormat": "ユーザー名には中国語、英語、数字のみ使用できます"
+      "accountRequired": "アカウントは空にできません",
+      "accountMinLength": "アカウントの長さは 4 文字以上である必要があります。",
+      "accountMaxLength": "アカウントの長さは最大16文字です",
+      "accountInvalidFormat": "アカウントには文字、数字、アンダースコア、ピリオドのみを含めることができます。",
+      "passwordRequired": "パスワードは空欄にできません",
+      "passwordMinLength": "パスワードは 8 文字以上である必要があります。",
+      "passwordMaxLength": "パスワードの長さは最大 20 文字です。",
+      "passwordInvalidFormat": "パスワードには、英数字、数字、特殊記号のみを含めることができます。",
+      "usernameInvalidFormat": "ユーザー名には中国語、英語、数字のみ使用できます",
+      "usernameMinLength": "ユーザー名は 4 文字以上である必要があります。",
+      "usernameMaxLength": "ユーザー名は最大 16 文字まで使用できます。"
+    },
+    "join": {
+      "joinTitle": "ボイスグループに参加する",
+      "readyingOpen": "RiceCall を開始する準備をしています...",
+      "invalidSid": "無効なSID",
+      "opening": "RiceCall を開始しています...",
+      "warning": "自動的にリダイレクトされない場合は、RiceCall がインストールされているかどうかを確認してください。",
+      "tryConnect": "音声グループ ID に接続してみます:",
+      "retryOpen": "RiceCallを再起動してみてください",
+      "loading": "起動...",
+      "unsupported": "お使いのプラットフォームは現在サポートされていません。"
     }
   },
   "announcementCategory": {
     "update": "関連製品の新規追加",
-    "general": "一般",
+    "general": "一般的に",
     "system": "システム",
     "event": "イベント"
-  },
-  "join": {
-    "readyingOpen": "準備開啟RiceCall...",
-    "invalidSid": "無效的sid",
-    "opening": "正在開啟 RiceCall...",
-    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
-    "tryConnect": "嘗試連線至語音群 ID：",
-    "retryOpen": "重新嘗試開啟RiceCall"
   }
 }

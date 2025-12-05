@@ -8,15 +8,16 @@
     "all": "Tümü"
   },
   "nav": {
-    "features": "Özellikler",
-    "faq": "SSS",
+    "home": "ön sayfa",
     "announcement": "Duyurular",
     "contact": "İletişim",
     "status": "Durum",
     "login": "Giriş yap",
     "logout": "Çıkış yap",
     "register": "Kayıt ol",
-    "account": "Hesabım"
+    "account": "Hesabım",
+    "closeMenu": "Menüyü Kapat",
+    "openMenu": "Menüyü aç"
   },
   "footer": {
     "partners": "Ortaklar",
@@ -75,7 +76,11 @@
       "interface": {
         "title": "Oyun için tasarlanmış ses",
         "desc": "RiceCall düşük gecikmeli, net ses ve grup aramaları sunar",
-        "imageAlt": "RiceCall arayüzü ekran görüntüsü"
+        "imageAlt": "RiceCall arayüzü ekran görüntüsü",
+        "close": "kapanış",
+        "prev": "Önceki görüntü",
+        "next": "Sonraki resim",
+        "toggle": "Görüntüleri değiştir"
       },
       "faq": {
         "title": "SSS",
@@ -133,14 +138,16 @@
     },
     "contact": {
       "title": "İletişim",
+      "empty": "Herhangi bir bilgi bulunmamaktadır.",
       "jobs": {
         "CEO": "Genel Müdür",
         "CTO": "Teknoloji Direktörü",
-        "CFO": "Finans Direktörü",
-        "COO": "Operasyon Direktörü",
         "COO-taiwan": "COO, Tayvan",
         "COO-russia": "COO, Rusya",
         "COO-brazil": "COO, Brezilya",
+        "COO-iran": "İran Baş Operasyon Sorumlusu",
+        "COO-turkey": "Türkiye Baş Operasyon Sorumlusu",
+        "COO-spain": "İspanyol Baş İşletme Sorumlusu",
         "customer-service": "Müşteri Hizmetleri",
         "developer": "Geliştirici",
         "machine-network": "Makine Ağı",
@@ -166,8 +173,6 @@
       },
       "submit": "Hesap oluştur",
       "submitting": "Kayıt yapılıyor...",
-      "hasAccount": "Zaten bir hesabınız var mı?",
-      "gotoLogin": "Girişe git",
       "errors": {
         "passwordNotMatch": "Parolalar eşleşmiyor",
         "registerFailed": "Kayıt başarısız",
@@ -184,9 +189,7 @@
       },
       "submit": "Giriş yap",
       "submitting": "Giriş yapılıyor...",
-      "forgetPassword": "忘記密碼",
-      "noAccount": "還沒有帳號嗎？",
-      "gotoRegister": "Kayıt ol",
+      "forgetPassword": "şifreyi unuttum",
       "errors": {
         "loginFailed": "Giriş başarısız, lütfen tekrar deneyin",
         "networkError": "Ağ veya sunucu hatası, lütfen daha sonra tekrar deneyin",
@@ -260,16 +263,16 @@
       "emailVerifying": "Doğrulanıyor...",
       "requestFailed": "İstek başarısız",
       "passwordReset": "Sıfırla",
-      "passwordBindAction": "Parolayı bağla"
+      "passwordBindAction": "Parolayı bağla",
+      "recaptchaFailed": "reCAPTCHA doğrulaması başarısız oldu, lütfen daha sonra tekrar deneyin."
     },
     "forget": {
-      "forgetTitle": "忘記密碼",
-      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
-      "account": "帳號",
-      "sendEmail": "寄送重設連結",
-      "sendingEmail": "寄送中...",
-      "remember": "想起來了嗎？",
-      "backLogin": "返回登入"
+      "forgetTitle": "şifreyi unuttum",
+      "enterAccount": "Lütfen hesap numaranızı girin, bağlı e-posta adresinize bir şifre sıfırlama bağlantısı göndereceğiz.",
+      "account": "hesap numarası",
+      "sendEmail": "Sıfırlama Bağlantısını Gönder",
+      "sendingEmail": "Gönderiliyor...",
+      "backLogin": "Girişe Dön"
     },
     "password": {
       "resetTitle": "Parolayı sıfırla",
@@ -295,7 +298,20 @@
       "passwordMinLength": "Parola en az 8 karakter olmalıdır",
       "passwordMaxLength": "Parola en fazla 20 karakter olmalıdır",
       "passwordInvalidFormat": "Parola yalnızca İngilizce harfler, sayılar ve özel karakterler içermelidir",
-      "usernameInvalidFormat": "Takma ad yalnızca İngilizce harfler, sayılar ve özel karakterler içermelidir"
+      "usernameInvalidFormat": "Takma ad yalnızca İngilizce harfler, sayılar ve özel karakterler içermelidir",
+      "usernameMinLength": "Kullanıcı adları en az 4 karakter uzunluğunda olmalıdır.",
+      "usernameMaxLength": "Kullanıcı adları en fazla 16 karakter uzunluğunda olabilir."
+    },
+    "join": {
+      "joinTitle": "Ses grubuna katılın",
+      "readyingOpen": "RiceCall'ı başlatmaya hazırlanıyor...",
+      "invalidSid": "Geçersiz SID",
+      "opening": "RiceCall başlatılıyor...",
+      "warning": "Otomatik olarak yönlendirilmezseniz lütfen RiceCall'ın yüklü olup olmadığını kontrol edin.",
+      "tryConnect": "Ses grubu kimliğine bağlanmayı deneyin:",
+      "retryOpen": "RiceCall'ı yeniden başlatmayı deneyin",
+      "loading": "Başlangıç...",
+      "unsupported": "Platformunuz şu anda desteklenmiyor."
     }
   },
   "announcementCategory": {
@@ -303,13 +319,5 @@
     "general": "Genel",
     "system": "Sistem",
     "event": "Etkinlik"
-  },
-  "join": {
-    "readyingOpen": "準備開啟RiceCall...",
-    "invalidSid": "無效的sid",
-    "opening": "正在開啟 RiceCall...",
-    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
-    "tryConnect": "嘗試連線至語音群 ID：",
-    "retryOpen": "重新嘗試開啟RiceCall"
   }
 }

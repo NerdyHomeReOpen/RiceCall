@@ -8,15 +8,16 @@
     "all": "Todos"
   },
   "nav": {
-    "features": "Recursos",
-    "faq": "Perguntas frequentes",
+    "home": "primeira página",
     "announcement": "Anúncios",
     "contact": "Contato",
     "status": "Status",
     "login": "Entrar",
     "logout": "Sair",
     "register": "Cadastrar-se",
-    "account": "Minha conta"
+    "account": "Minha conta",
+    "closeMenu": "Fechar menu",
+    "openMenu": "Abrir menu"
   },
   "footer": {
     "partners": "Parceiros",
@@ -75,7 +76,11 @@
       "interface": {
         "title": "Voz pensada para jogos",
         "desc": "RiceCall oferece áudio claro e de baixa latência e chamadas em grupo",
-        "imageAlt": "Captura da interface do RiceCall"
+        "imageAlt": "Captura da interface do RiceCall",
+        "close": "encerramento",
+        "prev": "Imagem anterior",
+        "next": "Próxima imagem",
+        "toggle": "Trocar imagens"
       },
       "faq": {
         "title": "Perguntas frequentes",
@@ -133,14 +138,16 @@
     },
     "contact": {
       "title": "Contato",
+      "empty": "Nenhuma informação disponível.",
       "jobs": {
         "CEO": "Diretor executivo",
         "CTO": "Diretor de Tecnologia",
-        "CFO": "Diretor financeiro",
-        "COO": "Diretor de Operações",
         "COO-taiwan": "COO, Taiwan",
         "COO-russia": "COO, Rússia",
         "COO-brazil": "COO, Brasil",
+        "COO-iran": "Diretor de Operações Iraniano",
+        "COO-turkey": "Diretor de Operações Turco",
+        "COO-spain": "Diretor de Operações Espanhol",
         "customer-service": "Atendimento ao cliente",
         "developer": "Desenvolvedor",
         "machine-network": "Rede de máquinas",
@@ -166,8 +173,6 @@
       },
       "submit": "Criar conta",
       "submitting": "Cadastrando...",
-      "hasAccount": "Já tem uma conta?",
-      "gotoLogin": "Ir para login",
       "errors": {
         "passwordNotMatch": "As senhas não coincidem",
         "registerFailed": "Falha no cadastro",
@@ -184,9 +189,7 @@
       },
       "submit": "Entrar",
       "submitting": "Entrando...",
-      "forgetPassword": "忘記密碼",
-      "noAccount": "還沒有帳號嗎？",
-      "gotoRegister": "Cadastre-se",
+      "forgetPassword": "Esqueci minha senha",
       "errors": {
         "loginFailed": "Falha no login, tente novamente",
         "networkError": "Erro de rede ou servidor, tente novamente mais tarde",
@@ -260,16 +263,16 @@
       "emailVerifying": "Verificando...",
       "requestFailed": "Falha na solicitação",
       "passwordReset": "Redefinir",
-      "passwordBindAction": "Vincular senha"
+      "passwordBindAction": "Vincular senha",
+      "recaptchaFailed": "A verificação do reCAPTCHA falhou. Tente novamente mais tarde."
     },
     "forget": {
-      "forgetTitle": "忘記密碼",
-      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
-      "account": "帳號",
-      "sendEmail": "寄送重設連結",
-      "sendingEmail": "寄送中...",
-      "remember": "想起來了嗎？",
-      "backLogin": "返回登入"
+      "forgetTitle": "Esqueci minha senha",
+      "enterAccount": "Por favor, insira o número da sua conta e enviaremos um link para redefinir a senha para o endereço de e-mail cadastrado.",
+      "account": "número de conta",
+      "sendEmail": "Enviar link de redefinição",
+      "sendingEmail": "Enviando...",
+      "backLogin": "Voltar ao login"
     },
     "password": {
       "resetTitle": "Redefinir senha",
@@ -295,7 +298,20 @@
       "passwordMinLength": "A senha deve ter pelo menos 8 caracteres",
       "passwordMaxLength": "A senha deve ter no máximo 20 caracteres",
       "passwordInvalidFormat": "A senha deve conter apenas letras inglesas, números e caracteres especiais",
-      "usernameInvalidFormat": "暱稱只能包含中文、英文、數字"
+      "usernameInvalidFormat": "Os apelidos só podem conter caracteres chineses, letras do alfabeto inglês e números.",
+      "usernameMinLength": "Os nomes de usuário devem ter pelo menos 4 caracteres.",
+      "usernameMaxLength": "Os nomes de usuário podem ter até 16 caracteres."
+    },
+    "join": {
+      "joinTitle": "Junte-se ao grupo de voz",
+      "readyingOpen": "Preparando-se para iniciar o RiceCall...",
+      "invalidSid": "SID inválido",
+      "opening": "Iniciando o RiceCall...",
+      "warning": "Se você não for redirecionado automaticamente, verifique se o RiceCall está instalado.",
+      "tryConnect": "Tente conectar-se ao ID do grupo de voz:",
+      "retryOpen": "Tente reiniciar o RiceCall.",
+      "loading": "Começando...",
+      "unsupported": "Sua plataforma não é compatível no momento."
     }
   },
   "announcementCategory": {
@@ -303,13 +319,5 @@
     "general": "Geral",
     "system": "Sistema",
     "event": "Evento"
-  },
-  "join": {
-    "readyingOpen": "準備開啟RiceCall...",
-    "invalidSid": "無效的sid",
-    "opening": "正在開啟 RiceCall...",
-    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
-    "tryConnect": "嘗試連線至語音群 ID：",
-    "retryOpen": "重新嘗試開啟RiceCall"
   }
 }

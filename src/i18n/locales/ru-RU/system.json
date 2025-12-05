@@ -1,14 +1,14 @@
 {
   "cancel": "Отменить",
-  "download-update": "下載更新",
+  "download-update": "Загрузить обновление",
   "exit": "Выйти",
   "install-update": "Установить",
-  "install-after-quit": "關閉時安裝",
-  "is-latest-version": "已經是最新版本",
+  "install-after-quit": "Устанавливать в закрытом виде",
+  "is-latest-version": "Это уже последняя версия.",
   "logout": "Отключиться",
   "open-main-window": "Показать/скрыть главное меню",
   "update-available": "Доступна новая версия",
-  "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，點擊「下載更新」按鈕開始下載",
+  "update-available-message": "Новая версия {{version}} вышла {{releaseDate}}. Нажмите кнопку «Загрузить обновление», чтобы начать загрузку.",
   "update-downloaded": "Установите обновление",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」"
+  "update-downloaded-message": "Версия {{version}} загружена. Выберите «Установить сейчас» или «Установить при закрытии»."
 }

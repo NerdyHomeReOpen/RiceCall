@@ -10,6 +10,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import ChannelMessageContent from '@/components/ChannelMessageContent';
 import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
+import MicModeMenu from '@/components/MicModeMenu';
 
 // Types
 import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueUser, ChannelUIMode, MemberApplication, ChannelEvent } from '@/types';
@@ -26,7 +27,6 @@ import ipc from '@/services/ipc.service';
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
 import { handleOpenChannelEvent } from '@/utils/popup';
-import MicModeMenu from '@/components/MicModeMenu';
 
 const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
 const MESSAGE_VIERER_DEVIATION = 100;

@@ -3,15 +3,24 @@
   "sections": [
     {
       "title": "1. Acceptance & Changes",
-      "items": ["Installing, logging in or using the Service means you accept these Terms", "We may update these Terms; material changes will be notified"]
+      "items": [
+        "Installing, logging in or using the Service means you accept these Terms",
+        "We may update these Terms; material changes will be notified"
+      ]
     },
     {
       "title": "2. Service",
-      "items": ["Real-time voice, voice messages, communities and related features", "Features may be added/changed/suspended for operational or security needs"]
+      "items": [
+        "Real-time voice, voice messages, communities and related features",
+        "Features may be added/changed/suspended for operational or security needs"
+      ]
     },
     {
       "title": "3. Account & Security",
-      "items": ["Provide accurate information and keep credentials confidential", "Notify us of unauthorized use; you are responsible for poor management"]
+      "items": [
+        "Provide accurate information and keep credentials confidential",
+        "Notify us of unauthorized use; you are responsible for poor management"
+      ]
     },
     {
       "title": "4. Acceptable Use",
@@ -33,11 +42,17 @@
     },
     {
       "title": "6. Payments & Subscriptions (if any)",
-      "items": ["Plan fees and renewal rules are shown at purchase", "Fees are non-refundable unless required by law"]
+      "items": [
+        "Plan fees and renewal rules are shown at purchase",
+        "Fees are non-refundable unless required by law"
+      ]
     },
     {
       "title": "7. User Content & License",
-      "items": ["You are responsible for your content", "You grant us a non-exclusive, worldwide, revocable license to operate the Service (backup, transmit, display)"]
+      "items": [
+        "You are responsible for your content",
+        "You grant us a non-exclusive, worldwide, revocable license to operate the Service (backup, transmit, display)"
+      ]
     },
     {
       "title": "8. IP Rights",

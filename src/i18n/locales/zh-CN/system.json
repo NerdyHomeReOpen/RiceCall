@@ -9,6 +9,6 @@
   "open-main-window": "打开主视窗",
   "update-available": "有新版本可用",
   "update-available-message": "新版本 {{version}} 发布于 {{releaseDate}}，点击「下载更新」按钮开始下载",
-  "update-downloaded": "安裝更新",
+  "update-downloaded": "安装更新",
   "update-downloaded-message": "版本 {{version}} 已下载完成，请选择「立即安装」或「关闭时安装」"
 }

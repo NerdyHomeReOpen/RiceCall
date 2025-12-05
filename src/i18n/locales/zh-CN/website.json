@@ -8,15 +8,16 @@
     "all": "全部"
   },
   "nav": {
-    "features": "特色功能",
-    "faq": "常见问题",
+    "home": "首页",
     "announcement": "官方公告",
     "contact": "联系我们",
     "status": "服务器状态",
     "login": "登录",
     "logout": "退出登录",
     "register": "注册",
-    "account": "我的账户"
+    "account": "我的账户",
+    "closeMenu": "关闭菜单",
+    "openMenu": "开启选单"
   },
   "footer": {
     "partners": "合作伙伴",
@@ -75,7 +76,11 @@
       "interface": {
         "title": "为游戏而生的多人语音",
         "desc": "RiceCall 提供低延迟、清晰语音与多人连麦",
-        "imageAlt": "RiceCall 界面截图"
+        "imageAlt": "RiceCall 界面截图",
+        "close": "关闭",
+        "prev": "上一张图片",
+        "next": "下一张图片",
+        "toggle": "切换图片"
       },
       "faq": {
         "title": "常见问题",
@@ -133,14 +138,16 @@
     },
     "contact": {
       "title": "联系我们",
+      "empty": "暂无资讯",
       "jobs": {
         "CEO": "CEO",
         "CTO": "CTO",
-        "CFO": "CFO",
-        "COO": "COO",
         "COO-taiwan": "COO-台湾",
         "COO-russia": "COO-俄罗斯",
         "COO-brazil": "COO-巴西",
+        "COO-iran": "伊朗营运长",
+        "COO-turkey": "土耳其营运长",
+        "COO-spain": "西班牙营运长",
         "customer-service": "客服",
         "developer": "开发",
         "machine-network": "机器网络",
@@ -166,8 +173,6 @@
       },
       "submit": "创建账号",
       "submitting": "注册中...",
-      "hasAccount": "已经有账号？",
-      "gotoLogin": "前往登录",
       "errors": {
         "passwordNotMatch": "两次输入的密码不一致",
         "registerFailed": "注册失败",
@@ -184,9 +189,7 @@
       },
       "submit": "登录",
       "submitting": "登录中...",
-      "forgetPassword": "忘記密碼",
-      "noAccount": "還沒有帳號嗎？",
-      "gotoRegister": "立即注册",
+      "forgetPassword": "忘记密码",
       "errors": {
         "loginFailed": "登录失败，请再试一次",
         "networkError": "网络或服务器异常，请稍后重试",
@@ -260,15 +263,15 @@
       "emailVerifying": "验证中...",
       "requestFailed": "请求时发生错误",
       "passwordReset": "修改密码",
-      "passwordBindAction": "绑定密码"
+      "passwordBindAction": "绑定密码",
+      "recaptchaFailed": "reCAPTCHA 验证失败，请稍后再试"
     },
     "forget": {
-      "forgetTitle": "忘記密碼",
-      "enterAccount": "請輸入您的帳號，我們會寄送重設密碼連結至您綁定的信箱。",
-      "account": "帳號",
-      "sendEmail": "寄送重設連結",
+      "forgetTitle": "忘记密码",
+      "enterAccount": "请输入您的帐号，我们会寄送重设密码连结至您绑定的信箱。",
+      "account": "帐号",
+      "sendEmail": "帐号寄送重设连结",
       "sendingEmail": "寄送中...",
-      "remember": "想起來了嗎？",
       "backLogin": "返回登入"
     },
     "password": {
@@ -295,7 +298,20 @@
       "passwordMinLength": "密码长度至少 8 位",
       "passwordMaxLength": "密码长度最多 20 位",
       "passwordInvalidFormat": "密码只能包含英文、数字、特殊符号",
-      "usernameInvalidFormat": "昵称只能包含中文、英文、数字"
+      "usernameInvalidFormat": "昵称只能包含中文、英文、数字",
+      "usernameMinLength": "使用者名称长度至少 4 码",
+      "usernameMaxLength": "使用者名称长度最多 16 码"
+    },
+    "join": {
+      "joinTitle": "进入语音群",
+      "readyingOpen": "准备开启RiceCall...",
+      "invalidSid": "无效的sid",
+      "opening": "正在开启 RiceCall...",
+      "warning": "如果未自动跳转，请确认是否已安装 RiceCall",
+      "tryConnect": "尝试连线至语音群 ID：",
+      "retryOpen": "重新尝试开启RiceCall",
+      "loading": "正在开启...",
+      "unsupported": "您的平台目前不受支援"
     }
   },
   "announcementCategory": {
@@ -303,13 +319,5 @@
     "general": "一般",
     "system": "系统",
     "event": "活动"
-  },
-  "join": {
-    "readyingOpen": "準備開啟RiceCall...",
-    "invalidSid": "無效的sid",
-    "opening": "正在開啟 RiceCall...",
-    "warning": "如果未自動跳轉，請確認是否已安裝 RiceCall",
-    "tryConnect": "嘗試連線至語音群 ID：",
-    "retryOpen": "重新嘗試開啟RiceCall"
   }
 }
