@@ -35,6 +35,17 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
     return { serverId, member };
   },
 
+  channelEvent: async ({ userId, serverId, channelEvents }: { userId: string, serverId: string, channelEvents: Record<string, string>[] }) => {
+    const [user, server, channels, serverMembers] = await Promise.all([
+      data.user({ userId }),
+      data.server({ userId, serverId }),
+      data.channels({ userId, serverId }),
+      data.serverOnlineMembers({ serverId }),
+    ]);
+
+    return { user, server, channels, serverMembers, channelEvents };
+  },
+
   channelSetting: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) => {
     const [user, server, channel, channelMembers] = await Promise.all([
       data.user({ userId }),

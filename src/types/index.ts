@@ -67,6 +67,13 @@ export type Channel = table_channels &
     type: 'channel';
   };
 
+export type ChannelEvent = OnlineMember & {
+  type: 'join' | 'move' | 'leave'
+  prevChannelId: string | null;
+  nextChannelId: string | null;
+  timestamp: number,
+}
+
 export type OnlineMember = table_members & table_users & table_channel_muted_users & table_server_permissions & BadgeList;
 
 export type QueueUser = {
@@ -231,6 +238,7 @@ export type PopupType =
   | 'applyMember'
   | 'approveFriend'
   | 'blockMember'
+  | 'channelEvent'
   | 'changeTheme'
   | 'channelPassword'
   | 'channelSetting'

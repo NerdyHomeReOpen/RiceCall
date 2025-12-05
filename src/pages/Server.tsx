@@ -12,7 +12,7 @@ import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 
 // Types
-import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueUser, ChannelUIMode, MemberApplication } from '@/types';
+import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueUser, ChannelUIMode, MemberApplication, ChannelEvent } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -25,6 +25,7 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
+import { handleOpenChannelEvent } from '@/utils/popup';
 import MicModeMenu from '@/components/MicModeMenu';
 
 const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
@@ -137,13 +138,29 @@ interface ServerPageProps {
   channels: Channel[];
   channelMessages: (ChannelMessage | PromptMessage)[];
   actionMessages: PromptMessage[];
+  channelEvents: ChannelEvent[];
   onClearMessages: () => void;
   display: boolean;
   latency: number;
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, serverMemberApplications, channels, channelMessages, actionMessages, onClearMessages, display, latency }) => {
+  ({
+    user,
+    currentServer,
+    currentChannel,
+    friends,
+    queueUsers,
+    serverOnlineMembers,
+    serverMemberApplications,
+    channels,
+    channelMessages,
+    actionMessages,
+    channelEvents,
+    onClearMessages,
+    display,
+    latency,
+  }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -259,6 +276,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         id: 'clean-up-message',
         label: t('clean-up-message'),
         onClick: onClearMessages,
+      },
+      {
+        id: 'open-channel-event',
+        label: t('channel-event'),
+        onClick: () => handleOpenChannelEvent(userId, currentServer.serverId, channelEvents),
       },
       {
         id: 'open-announcement',
