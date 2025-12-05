@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
@@ -9,7 +8,7 @@ initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
-import { initMainI18n, LanguageKey, getLanguage, t } from './i18n.js';
+import { initMainI18n, getLanguage, t } from './i18n.js';
 import { connectSocket, disconnectSocket } from './socket.js';
 import { env, loadEnv } from './env.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
@@ -17,100 +16,11 @@ import authService from './auth.service.js';
 import dataService from './data.service.js';
 import popupLoaders from './popupLoader.js';
 
+import type { StoreType, PopupType } from '../src/types';
+
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
 }
-
-// Store
-type StoreType = {
-  accounts: Record<string, any>;
-  language: LanguageKey;
-  customThemes: Record<string, any>[];
-  currentTheme: string | null;
-  autoLogin: boolean;
-  autoLaunch: boolean;
-  alwaysOnTop: boolean;
-  closeToTray: boolean;
-  statusAutoIdle: boolean;
-  statusAutoIdleMinutes: number;
-  statusAutoDnd: boolean;
-  channelUIMode: string;
-  font: string;
-  fontSize: number;
-  inputAudioDevice: string;
-  outputAudioDevice: string;
-  recordFormat: 'wav' | 'mp3';
-  mixEffect: boolean;
-  mixEffectType: string;
-  autoMixSetting: boolean;
-  echoCancellation: boolean;
-  noiseCancellation: boolean;
-  microphoneAmplification: boolean;
-  manualMixMode: boolean;
-  mixMode: string;
-  speakingMode: string;
-  defaultSpeakingKey: string;
-  notSaveMessageHistory: boolean;
-  hotKeyOpenMainWindow: string;
-  hotKeyScreenshot: string;
-  hotKeyIncreaseVolume: string;
-  hotKeyDecreaseVolume: string;
-  hotKeyToggleSpeaker: string;
-  hotKeyToggleMicrophone: string;
-  disableAllSoundEffect: boolean;
-  enterVoiceChannelSound: boolean;
-  leaveVoiceChannelSound: boolean;
-  startSpeakingSound: boolean;
-  stopSpeakingSound: boolean;
-  receiveDirectMessageSound: boolean;
-  receiveChannelMessageSound: boolean;
-  dontShowDisclaimer: boolean;
-  autoCheckForUpdates: boolean;
-  updateCheckInterval: number;
-  updateChannel: string;
-  server: 'prod' | 'dev';
-};
-
-// Popup
-type PopupType =
-  | 'aboutus'
-  | 'applyFriend'
-  | 'approveFriend'
-  | 'applyMember'
-  | 'blockMember'
-  | 'changeTheme'
-  | 'channelEvent'
-  | 'channelPassword'
-  | 'channelSetting'
-  | 'createChannel'
-  | 'createFriendGroup'
-  | 'createServer'
-  | 'dialogAlert'
-  | 'dialogAlert2'
-  | 'dialogError'
-  | 'dialogInfo'
-  | 'dialogSuccess'
-  | 'dialogWarning'
-  | 'directMessage'
-  | 'editChannelName'
-  | 'editChannelOrder'
-  | 'editFriendNote'
-  | 'editFriendGroupName'
-  | 'editNickname'
-  | 'friendVerification'
-  | 'imageCropper'
-  | 'inviteMember'
-  | 'kickMemberFromChannel'
-  | 'kickMemberFromServer'
-  | 'memberApplicationSetting'
-  | 'memberInvitation'
-  | 'searchUser'
-  | 'serverBroadcast'
-  | 'serverSetting'
-  | 'systemSetting'
-  | 'userInfo'
-  | 'userSetting'
-  | 'chatHistory';
 
 const store = new Store<StoreType>({
   defaults: {

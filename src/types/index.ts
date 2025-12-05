@@ -24,7 +24,7 @@ import {
   table_channel_muted_users,
   table_announcements,
   table_notifies,
-} from '@/types/database';
+} from './database';
 
 export type Announcement = table_announcements;
 
@@ -68,11 +68,11 @@ export type Channel = table_channels &
   };
 
 export type ChannelEvent = OnlineMember & {
-  type: 'join' | 'move' | 'leave'
+  type: 'join' | 'move' | 'leave';
   prevChannelId: string | null;
   nextChannelId: string | null;
-  timestamp: number,
-}
+  timestamp: number;
+};
 
 export type OnlineMember = table_members & table_users & table_channel_muted_users & table_server_permissions & BadgeList;
 
@@ -231,6 +231,8 @@ export type SpeakingMode = 'key' | 'auto';
 export type MixMode = 'all' | 'app';
 
 export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
+
+export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
 
 export type PopupType =
   | 'aboutus'
@@ -424,6 +426,55 @@ export type ServerToClientEvents = {
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
   // Error
   error: (error: Error) => void;
+};
+
+export type StoreType = {
+  accounts: Record<string, any>;
+  language: LanguageKey;
+  customThemes: Theme[];
+  currentTheme: Theme | null;
+  autoLogin: boolean;
+  autoLaunch: boolean;
+  alwaysOnTop: boolean;
+  closeToTray: boolean;
+  statusAutoIdle: boolean;
+  statusAutoIdleMinutes: number;
+  statusAutoDnd: boolean;
+  channelUIMode: ChannelUIMode;
+  font: string;
+  fontSize: number;
+  inputAudioDevice: string;
+  outputAudioDevice: string;
+  recordFormat: 'wav' | 'mp3';
+  mixEffect: boolean;
+  mixEffectType: string;
+  autoMixSetting: boolean;
+  echoCancellation: boolean;
+  noiseCancellation: boolean;
+  microphoneAmplification: boolean;
+  manualMixMode: boolean;
+  mixMode: MixMode;
+  speakingMode: SpeakingMode;
+  defaultSpeakingKey: string;
+  notSaveMessageHistory: boolean;
+  hotKeyOpenMainWindow: string;
+  hotKeyScreenshot: string;
+  hotKeyIncreaseVolume: string;
+  hotKeyDecreaseVolume: string;
+  hotKeyToggleSpeaker: string;
+  hotKeyToggleMicrophone: string;
+  disableAllSoundEffect: boolean;
+  enterVoiceChannelSound: boolean;
+  leaveVoiceChannelSound: boolean;
+  startSpeakingSound: boolean;
+  stopSpeakingSound: boolean;
+  receiveDirectMessageSound: boolean;
+  receiveChannelMessageSound: boolean;
+  dontShowDisclaimer: boolean;
+  autoCheckForUpdates: boolean;
+  updateCheckInterval: number;
+  updateChannel: string;
+  server: 'prod' | 'dev';
 };
 
 export type SFUCreateTransportParams = {

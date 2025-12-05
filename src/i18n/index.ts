@@ -3,6 +3,8 @@ import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import type { LanguageKey } from '@/types';
+
 // en-US
 import enUS_app from './locales/en-US/app.json';
 import enUS_message from './locales/en-US/message.json';
@@ -59,7 +61,6 @@ import zhTW_rpc from './locales/zh-TW/rpc.json';
 import zhTW_country from './locales/zh-TW/country.json';
 import zhTW_badge from './locales/zh-TW/badge.json';
 
-export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
 export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
   { code: 'zh-CN', label: '简体中文' },

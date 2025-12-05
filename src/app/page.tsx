@@ -26,10 +26,11 @@ import type {
   RecommendServer,
   FriendActivity,
   ChannelEvent,
+  LanguageKey,
 } from '@/types';
 
 // i18n
-import { LanguageKey, LANGUAGES } from '@/i18n';
+import { LANGUAGES } from '@/i18n';
 
 // Pages
 import FriendPage from '@/pages/Friend';

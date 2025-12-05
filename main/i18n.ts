@@ -1,31 +1,31 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+import type { LanguageKey } from '../src/types';
+
 // en-US
-import enUS_system from './src/i18n/locales/en-US/system.json' with { type: 'json' };
+import enUS_system from '../src/i18n/locales/en-US/system.json' with { type: 'json' };
 
 // es-ES
-import esES_system from './src/i18n/locales/es-ES/system.json' with { type: 'json' };
+import esES_system from '../src/i18n/locales/es-ES/system.json' with { type: 'json' };
 
 // fa-IR
-import faIR_system from './src/i18n/locales/fa-IR/system.json' with { type: 'json' };
+import faIR_system from '../src/i18n/locales/fa-IR/system.json' with { type: 'json' };
 
 // pt-BR
-import ptBR_system from './src/i18n/locales/pt-BR/system.json' with { type: 'json' };
+import ptBR_system from '../src/i18n/locales/pt-BR/system.json' with { type: 'json' };
 
 // ru-RU
-import ruRU_system from './src/i18n/locales/ru-RU/system.json' with { type: 'json' };
+import ruRU_system from '../src/i18n/locales/ru-RU/system.json' with { type: 'json' };
 
 // tr-TR
-import trTR_system from './src/i18n/locales/tr-TR/system.json' with { type: 'json' };
+import trTR_system from '../src/i18n/locales/tr-TR/system.json' with { type: 'json' };
 
 // zh-CN
-import zhCN_system from './src/i18n/locales/zh-CN/system.json' with { type: 'json' };
+import zhCN_system from '../src/i18n/locales/zh-CN/system.json' with { type: 'json' };
 
 // zh-TW
-import zhTW_system from './src/i18n/locales/zh-TW/system.json' with { type: 'json' };
-
-export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
+import zhTW_system from '../src/i18n/locales/zh-TW/system.json' with { type: 'json' };
 
 export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
