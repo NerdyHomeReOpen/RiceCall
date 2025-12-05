@@ -156,16 +156,21 @@ export const MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: st
     key: 'description',
     minWidth: 200,
   },
+  {
+    tKey: 'create-at',
+    key: 'createdAt',
+    minWidth: 90,
+  },
 ];
 export const BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
   {
     tKey: 'name',
     key: 'name',
-    minWidth: 150,
+    minWidth: 220,
   },
   {
     tKey: 'unblock-date',
     key: 'isBlocked',
-    minWidth: 150,
+    minWidth: 220,
   },
 ];
