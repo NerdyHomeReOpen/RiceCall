@@ -374,6 +374,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const loadingBoxRef = useRef(loadingBox);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const serverOnlineMembersRef = useRef<OnlineMember[]>([]);
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -396,9 +397,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
   const [latency, setLatency] = useState<number>(0);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-
-  // Channel Event Refs
-  const serverMembersRef = useRef(serverOnlineMembers);
 
   // Variables
   const currentServer = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
@@ -473,7 +471,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [mainTab.selectedTabId]);
 
   useEffect(() => {
-    serverMembersRef.current = serverOnlineMembers;
+    serverOnlineMembersRef.current = serverOnlineMembers;
   }, [serverOnlineMembers]);
 
   useEffect(() => {
@@ -722,7 +720,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       args.map((m) => {
-        const originMember = serverMembersRef.current.find((om) => om.userId === m.userId);
+        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
         if (originMember) {
           const originChannelId = originMember.currentChannelId;
           const newMember = { ...originMember, ...m.update };
@@ -747,7 +745,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
       const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
       args.map((m) => {
-        const originMember = serverMembersRef.current.find((om) => om.userId === m.userId);
+        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
         if (originMember) {
           setChannelEvents((prev) => [
             ...prev,
