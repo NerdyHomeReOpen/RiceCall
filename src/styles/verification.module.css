@@ -88,12 +88,8 @@
   display: flex;
   justify-content: flex-end;
   align-items: center;
-}
-
-.action-buttons {
-  display: flex;
-  cursor: pointer;
   min-width: max-content;
+  cursor: pointer;
 }
 
 .action-buttons .button {

@@ -206,7 +206,7 @@
 
 .toolbar .button:focus {
   outline: none;
-  box-shadow: 0 0 0 2px rgba(100, 150, 250, 0.3);
+  box-shadow: 0 0 0 2px #6496fa4d;
 }
 
 .input-dropdown {

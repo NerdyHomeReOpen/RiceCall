@@ -7,8 +7,7 @@
 .header-box {
   gap: 0.77rem;
   display: flex;
-  justify-items: center;
-  align-items: center;
+  place-items: center;
   width: 100%;
   background-color: #f7f7f7;
   height: 50px;
@@ -25,8 +24,7 @@
 .search-wrapper {
   display: flex;
   flex-direction: row;
-  justify-items: center;
-  align-items: center;
+  place-items: center;
 }
 
 .search-title {
@@ -107,7 +105,7 @@
   justify-content: flex-start;
   align-items: center;
   gap: 5px;
-  padding: 5 10 5 50;
+  padding: 5px 10px 5px 50px;
   display: flex;
   position: relative;
 }
@@ -177,7 +175,6 @@
   display: flex;
   align-items: center;
   border: 1px solid #b1b1b1;
-  margin-right: 0.8rem;
   padding: 2px;
   cursor: pointer;
   margin-right: 0.5rem;
@@ -197,7 +194,7 @@
 }
 
 .message-date {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(244, 247, 252, 1) 100%);
+  background: linear-gradient(180deg, #fff 0%, #f4f7fc 100%);
   border-bottom: 1px solid #b6cedc;
   height: 32px;
   width: 95%;

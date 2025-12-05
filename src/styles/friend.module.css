@@ -495,6 +495,7 @@
   flex-direction: row;
   align-items: center;
   width: 100%;
+  gap: 10px;
 }
 
 .user-avatar {
@@ -513,8 +514,7 @@
   justify-content: space-between;
   width: 100%;
   display: flex;
-  cursor: text;
-  user-select: text;
+  overflow: hidden;
 }
 
 .user-activity-top {
@@ -537,10 +537,6 @@
   margin-left: auto;
 }
 
-.user-activity {
-  gap: 10px;
-}
-
 .vip-icon {
   width: 14px;
 }
@@ -551,19 +547,16 @@
   overflow: hidden;
   text-overflow: ellipsis;
   cursor: pointer;
+  color: var(--text-username);
 }
 
 .signature {
   color: var(--text-color-quaternary);
-  word-wrap: break-word;
-  word-break: break-word;
-  white-space: normal;
-  overflow-wrap: break-word;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   max-width: 100%;
-}
-
-.user-name {
-  color: var(--text-username);
+  user-select: text;
 }
 
 .timestamp {

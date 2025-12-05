@@ -57,7 +57,7 @@
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  box-shadow: 0px 2px 2px var(--shadow);
+  box-shadow: 0 2px 2px var(--shadow);
 }
 
 .avatar-picture::before {
@@ -105,7 +105,7 @@
   line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  word-break: break-word;
+  overflow-wrap: break-word;
   color: var(--text-color-quaternary);
 }
 
@@ -115,7 +115,7 @@
   align-items: center;
   min-width: 75px;
   color: var(--text-color-quaternary);
-  text-shadow: 0 1px 0 #ffffff;
+  text-shadow: 0 1px 0 #fff;
 }
 
 .member-text {
@@ -124,7 +124,7 @@
   align-items: center;
   min-width: 55px;
   color: var(--text-color-quaternary);
-  text-shadow: 0 1px 0 #ffffff;
+  text-shadow: 0 1px 0 #fff;
 }
 
 .id-text::before {
@@ -306,13 +306,10 @@
   min-width: 14px;
   min-height: 14px;
   cursor: pointer;
+  background-position: 0 0;
   background-image: url('/channel/channelIcon.png');
   background-repeat: no-repeat;
   background-size: auto;
-}
-
-.channel-tab .tab-icon {
-  background-position: 0 0;
 }
 
 .channel-tab .tab-icon.expanded {
@@ -528,7 +525,7 @@
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
-  padding: 10px 10px 0 10px;
+  padding: 10px 10px 0;
 }
 
 .broadcast-area {
@@ -551,7 +548,7 @@
   display: flex;
   min-height: 70px;
   max-height: 50%;
-  padding: 0 10px 10px 10px;
+  padding: 0 10px 10px;
 }
 
 .button-area {
@@ -615,6 +612,10 @@
   background-position: -24px 0;
 }
 
+.mic-button.muted .mic-icon {
+  background-position: -72px 0;
+}
+
 .mic-button.speaking:not(.muted) .mic-icon {
   background-image: url('/channel/icon_speaking_vol.png');
   background-repeat: no-repeat;
@@ -655,10 +656,6 @@
 
 .mic-button.speaking:not(.muted) .mic-icon.level9 {
   background-position: -216px 0;
-}
-
-.mic-button.muted .mic-icon {
-  background-position: -72px 0;
 }
 
 .mic-text {
@@ -958,17 +955,15 @@
 .mic-mode-menu .voice-threshold-input {
   flex: 1;
   position: relative;
-  -webkit-appearance: none;
   appearance: none;
   height: 8px;
   border-radius: 5px;
-  box-shadow: inset 0 2px 2px -2px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 2px 2px -2px #0000001f;
   outline: none;
   border: 1px solid var(--border);
   cursor: pointer;
 
   &::-webkit-slider-thumb {
-    -webkit-appearance: none;
     appearance: none;
     width: 8px;
     height: 20px;
@@ -1170,6 +1165,18 @@
   transform: translateY(-1px);
 }
 
+.sidebar-footer .navegate-tab::before {
+  content: '';
+  display: inline-block;
+  height: 15px;
+  width: 15px;
+  min-height: 15px;
+  min-width: 15px;
+  background-repeat: no-repeat;
+  background-size: auto;
+  margin-right: 4px;
+}
+
 .sidebar-footer .navegate-tab:first-child::before {
   background-image: url('/channel/rdb_cur_channel.png');
   background-position: 0 0;
@@ -1184,18 +1191,6 @@
   background-size: auto;
   min-height: 18px;
   min-width: 18px;
-}
-
-.sidebar-footer .navegate-tab::before {
-  content: '';
-  display: inline-block;
-  height: 15px;
-  width: 15px;
-  min-height: 15px;
-  min-width: 15px;
-  background-repeat: no-repeat;
-  background-size: auto;
-  margin-right: 4px;
 }
 
 .sidebar-footer .navegate-tab.active::before {

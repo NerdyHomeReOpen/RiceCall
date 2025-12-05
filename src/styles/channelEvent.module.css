@@ -107,9 +107,6 @@
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-}
-
-.user-detail .name {
   color: var(--text-color-quaternary);
   padding-left: 5px;
 }

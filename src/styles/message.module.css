@@ -24,7 +24,7 @@
   background-color: #ff3b3b;
   text-align: center;
   line-height: 24px;
-  color: #ffffff;
+  color: #fff;
   font-size: 0.9em;
   transition:
     color 0.2s ease,
@@ -138,5 +138,5 @@
 .content {
   color: var(--text-color);
   user-select: text;
-  word-break: break-word;
+  overflow-wrap: break-word;
 }

@@ -221,7 +221,6 @@
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   line-clamp: 2;
-  box-orient: vertical;
   text-align: center;
   color: #fff;
   cursor: text;
@@ -297,8 +296,6 @@
 }
 
 .server-card {
-  background-color: var(--background-secondary);
-  border: 1px solid #fff0;
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -306,6 +303,7 @@
   padding: 5px;
   align-items: center;
   border: 1px solid var(--border);
+  background-color: var(--background-secondary);
   cursor: pointer;
 }
 

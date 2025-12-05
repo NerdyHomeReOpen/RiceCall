@@ -78,7 +78,7 @@
   position: relative;
   display: flex;
   border: 1px solid var(--border);
-  box-shadow: inset 1px 1px 3px rgb(0 0 0 / 10%) inset;
+  box-shadow: inset 1px 1px 3px #0000001f;
 }
 
 .input-box:hover {

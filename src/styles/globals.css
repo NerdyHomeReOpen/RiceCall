@@ -19,7 +19,7 @@
   --text-color-senary: #a8a8a8;
   --text-color-septenary: #ccc;
   --text-color-octonary: #eee;
-  --text-warning: #ff0000;
+  --text-warning: #f00;
   --text-link: #0059a1;
   --text-link-hover: #0059a1;
   --text-username: #2f94db;
@@ -83,13 +83,14 @@ body {
   height: 100%;
   margin: 0;
   padding: 0;
-  font-family: Arial, sans-serif;
+  font-family: arial, sans-serif;
   font-size: 13px;
-  --font-family: Arial, sans-serif;
   overflow: clip;
   color: var(--text-color);
   background-color: var(--background);
   user-select: none;
+
+  --font-family: arial, sans-serif;
 }
 
 /* Scrollbar */
@@ -223,17 +224,6 @@ button {
 
 /* Hover Text */
 
-.has-hover-text {
-  position: relative;
-  cursor: pointer;
-
-  &:hover {
-    .hover-text {
-      opacity: 1;
-    }
-  }
-}
-
 .hover-text {
   z-index: 1;
   position: absolute;
@@ -250,6 +240,15 @@ button {
   white-space: nowrap;
   color: var(--text-color-quinary);
   opacity: 0;
+}
+
+.has-hover-text {
+  position: relative;
+  cursor: pointer;
+}
+
+.has-hover-text:hover .hover-text {
+  opacity: 1;
 }
 
 input,
