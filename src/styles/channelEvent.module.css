@@ -85,14 +85,16 @@
 .event-box {
   display: flex;
   flex-direction: row;
-  padding: 5px 15px;
+  align-items: center;
   justify-content: space-between;
+  padding: 5px 15px;
+  gap: 5px;
   border-bottom: 1px solid var(--text-color-octonary);
 }
 
 .user-detail {
   display: flex;
-  width: 300px;
+  min-width: 200px;
   flex-direction: row;
   align-items: center;
   overflow: hidden;
@@ -116,12 +118,11 @@
 }
 
 .action-content {
-  text-align: center;
-  width: 250px;
+  flex: 1;
   overflow: hidden;
   white-space: nowrap;
+  text-align: left;
   text-overflow: ellipsis;
-  overflow-y: auto;
 
   &::-webkit-scrollbar {
     height: 2px;
@@ -132,10 +133,10 @@
   color: var(--text-color-quaternary);
 }
 
-.action-content .green {
+.green {
   color: #0f8318;
 }
 
-.action-content .red {
+.red {
   color: #cc2121;
 }

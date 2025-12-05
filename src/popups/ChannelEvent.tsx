@@ -187,21 +187,41 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
 
   const getActionContent = (e: ChannelEvent) => {
     if (e.type === 'join') {
-      return <span className={styles['green']} title={t('join-current-server')}>{t('join-current-server')}</span>;
+      return (
+        <div className={`${styles['action-content']} ${styles['green']}`} title={t('join-current-server')}>
+          {t('join-current-server')}
+        </div>
+      );
     } else if (e.type === 'leave') {
-      return <span className={styles['red']} title={t('leave-current-server')}>{t('leave-current-server')}</span>;
+      return (
+        <div className={`${styles['action-content']} ${styles['red']}`} title={t('leave-current-server')}>
+          {t('leave-current-server')}
+        </div>
+      );
     } else {
       const prevChannelName = e.prevChannelId ? channelsMap.get(e.prevChannelId) : '';
       const nextChannelName = e.nextChannelId ? channelsMap.get(e.nextChannelId) : '';
-      return <span className={styles['green']} title={t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}>{t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}</span>;
+      return (
+        <div className={`${styles['action-content']} ${styles['green']}`} title={t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}>
+          {t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}
+        </div>
+      );
     }
   };
 
   const getCurrentActionContent = (e: ChannelEvent) => {
     if (e.type === 'join' || (e.type === 'move' && e.nextChannelId === currentChannelId)) {
-      return <span className={styles['green']} title={t('join-current-channel')}>{t('join-current-channel')}</span>;
+      return (
+        <div className={`${styles['action-content']} ${styles['green']}`} title={t('join-current-channel')}>
+          {t('join-current-channel')}
+        </div>
+      );
     } else if (e.type === 'leave' || (e.type === 'move' && e.prevChannelId === currentChannelId)) {
-      return <span className={styles['red']} title={t('leave-current-channel')}>{t('leave-current-channel')}</span>;
+      return (
+        <div className={`${styles['action-content']} ${styles['red']}`} title={t('leave-current-channel')}>
+          {t('leave-current-channel')}
+        </div>
+      );
     }
   };
 
@@ -221,7 +241,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
       <div className={popup['popup-body']}>
         <div className={styles['event-list']} style={selectMode === 'current' ? {} : { display: 'none' }}>
           <div className={styles['current-channel']}>{currentChannelName}</div>
-          {[...currentChannelEvents].reverse().map((e, index) => {
+          {currentChannelEvents.reverse().map((e, index) => {
             // Variables
             const isUser = e.userId === userId;
             const isSuperior = permissionLevel > e.permissionLevel;
@@ -257,7 +277,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
                   <div className={`${permission[e.gender]} ${permission[`lv-${e.permissionLevel}`]}`} />
                   <div className={`${styles['name']} ${e.nickname ? styles['highlight'] : ''}`}>{e.nickname || e.name}</div>
                 </div>
-                <div className={styles['action-content']}>{getCurrentActionContent(e)}</div>
+                {getCurrentActionContent(e)}
                 <div className={styles['time']} title={getFormatDate(e.timestamp, 'all')}>
                   {getFormatDate(e.timestamp, 't')}
                 </div>
@@ -302,7 +322,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ user, 
                   <div className={`${permission[e.gender]} ${permission[`lv-${e.permissionLevel}`]}`} />
                   <div className={`${styles['name']} ${e.nickname ? styles['highlight'] : ''}`}>{e.nickname || e.name}</div>
                 </div>
-                <div className={styles['action-content']}>{getActionContent(e)}</div>
+                {getActionContent(e)}
                 <div className={styles['time']} title={getFormatDate(e.timestamp, 'all')}>
                   {getFormatDate(e.timestamp, 't')}
                 </div>
