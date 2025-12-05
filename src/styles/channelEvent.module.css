@@ -43,7 +43,7 @@
 }
 
 .spliter {
-  background-image: url(/icon_v_split.png);
+  background-image: url('/icon_v_split.png');
   background-position: 0 0;
   background-repeat: no-repeat;
   background-size: auto;

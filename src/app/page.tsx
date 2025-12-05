@@ -701,7 +701,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: OnlineMember }[]) => {
-      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
       setChannelEvents((prev) => [
         ...prev,
         ...args.map((m) => ({
@@ -712,6 +711,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           timestamp: Date.now(),
         })),
       ]);
+      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
       setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
     });
     return () => unsub();
@@ -719,7 +719,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
-      const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       args.map((m) => {
         const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
         if (originMember) {
@@ -737,6 +736,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           ]);
         }
       });
+      const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
     });
     return () => unsub();
@@ -744,7 +744,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
       args.map((m) => {
         const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
         if (originMember) {
@@ -760,6 +759,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           ]);
         }
       });
+      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
       setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
     });
     return () => unsub();
