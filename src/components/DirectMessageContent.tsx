@@ -48,6 +48,7 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
           {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab user={user} messageGroup={messageGroup} messageType={messageGroup.type} />}
         </div>
       ))}
+      <div style={{ minHeight: '10px' }}></div>
     </div>
   );
 });
