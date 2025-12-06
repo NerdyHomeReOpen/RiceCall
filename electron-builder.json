@@ -1,7 +1,7 @@
 {
   "appId": "com.null.rcvoice",
   "productName": "RiceCall",
-  "copyright": "Copyright © 2025 null",
+  "copyright": "Copyright © 2025 RiceCall",
   "directories": {
     "output": "dist"
   },
@@ -9,14 +9,8 @@
   "asar": true,
   "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
   "extraResources": [
-    {
-      "from": ".env",
-      "to": "app.env"
-    },
-    {
-      "from": ".env.dev",
-      "to": "app.env.dev"
-    }
+    { "from": ".env", "to": "app.env" },
+    { "from": ".env.dev", "to": "app.env.dev" }
   ],
   "nsis": {
     "oneClick": false,
@@ -26,17 +20,27 @@
   },
   "win": {
     "icon": "./resources/icon.ico",
-    "target": ["nsis", "portable"]
+    "target": [
+      { "target": "nsis", "arch": ["x64", "ia32"] },
+      { "target": "portable", "arch": ["x64", "ia32"] }
+    ]
   },
   "mac": {
     "icon": "./resources/icon.icns",
     "category": "public.app-category.social-networking",
-    "target": ["dmg", "zip"]
+    "target": [
+      { "target": "dmg", "arch": ["arm64", "x64"] },
+      { "target": "zip", "arch": ["arm64", "x64"] }
+    ]
   },
   "linux": {
     "icon": "./resources/icon.png",
     "category": "Network",
-    "target": ["AppImage", "rpm", "zip"]
+    "target": [
+      { "target": "AppImage", "arch": ["x64"] },
+      { "target": "rpm", "arch": ["x64"] },
+      { "target": "zip", "arch": ["x64"] }
+    ]
   },
   "deb": {
     "desktop": {
