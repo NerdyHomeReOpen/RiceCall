@@ -49,9 +49,10 @@ const AboutPopup: React.FC = React.memo(() => {
   };
 
   const getTitleColorClass = (title: string) => {
-    if (['CEO'].some((t) => title.includes(t))) return styles['color-1'];
-    if (['CTO', 'CFO', 'COO', 'CIO', 'CMO', 'CHRO'].some((t) => title.includes(t))) return styles['color-2'];
-    if (['developer', 'machine-network', 'technical-support'].some((t) => title.includes(t))) return styles['color-3'];
+    if (['project-owner'].some((t) => title.includes(t))) return styles['color-1'];
+    if (['official-staff'].some((t) => title.includes(t))) return styles['color-2'];
+    if (['developer', 'technical-support'].some((t) => title.includes(t))) return styles['color-3'];
+    if (['machine-network'].some((t) => title.includes(t))) return styles['color-4'];
     return styles['color-5'];
   };
 
@@ -94,10 +95,15 @@ const AboutPopup: React.FC = React.memo(() => {
             {staffs.map((staff, index) => (
               <div key={index} className={styles['team-member-card']}>
                 <div className={styles['name-wrapper']}>
-                  <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title)}</span>
+                  <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title, { ns: 'position' })}</span>
                   <span>{staff.contact}</span>
                 </div>
                 <div className={styles['icon-wrapper']}>
+                  {staff.ricecall && (
+                    <div className={styles['ricecall-id']} title="RiceCall" onClick={() => navigator.clipboard.writeText(staff.ricecall)}>
+                      @{staff.ricecall}
+                    </div>
+                  )}
                   {staff.github && (
                     <div className={styles['github-icon-link']} title="GitHub" onClick={() => window.open(`https://github.com/${staff.github}`, '_blank')}>
                       <FaGithub size={20} />

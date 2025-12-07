@@ -107,6 +107,20 @@
   transition: color 0.3s ease;
 }
 
+.ricecall-id {
+  color: var(--text-link);
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-right: 8px;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
 .github-icon-link:hover svg {
   color: rgb(70 70 70);
 }
