@@ -941,6 +941,8 @@
 }
 
 .recommend-server-tab {
+  display: flex;
+  align-items: center;
   padding: 2px 10px;
   border-radius: 5px;
   border: 2px solid var(--main-color);
