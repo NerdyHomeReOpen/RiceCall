@@ -137,7 +137,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
       const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
         args.map((m) => {
           const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
-          if (originMember) {
+          if (originMember && m.update.currentChannelId) {
             const originChannelId = originMember.currentChannelId;
             const newMember = { ...originMember, ...m.update };
             setChannelEvents((prev) => [
