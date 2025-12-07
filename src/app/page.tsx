@@ -29,9 +29,6 @@ import type {
   LanguageKey,
 } from '@/types';
 
-// i18n
-import { LANGUAGES } from '@/i18n';
-
 // Pages
 import FriendPage from '@/pages/Friend';
 import HomePage from '@/pages/Home';
@@ -57,6 +54,9 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
 import ipc from '@/services/ipc.service';
+
+// Constants
+import { LANGUAGES } from '@/constant';
 
 interface HeaderProps {
   user: User;

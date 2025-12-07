@@ -37,6 +37,7 @@
   "auto-login": "自動登入",
   "auto-login-label": "啟動 RC 自動登入",
   "avatar": "頭像",
+  "back": "返回",
   "back-to-login": "返回登入",
   "basic-setting": "基本設定",
   "birthdate": "生日",
@@ -577,5 +578,11 @@
   "week": "週",
   "xp": "積分",
   "year": "年",
-  "yesterday": "昨天"
+  "yesterday": "昨天",
+  "recommend-server": "推薦語音群",
+  "community": "綜合",
+  "music": "音樂",
+  "sing": "歌唱",
+  "radio": "電台",
+  "announcement": "公告"
 }
