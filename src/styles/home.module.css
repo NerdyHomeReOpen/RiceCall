@@ -374,8 +374,7 @@
 .servers-container {
   display: flex;
   flex-direction: column;
-  justify-items: center;
-  align-items: center;
+  place-items: center;
   width: 100%;
   padding: 10px;
   background-color: var(--background-secondary);
@@ -625,7 +624,7 @@
 
   &:hover {
     transform: scale(1.01);
-    box-shadow: 0 0 5px 0 rgba(0, 0, 0, 0.2);
+    box-shadow: 0 0 5px 0 #0000003f;
   }
 }
 
@@ -672,7 +671,7 @@
 
 .number-list {
   position: absolute;
-  bottom: 5;
+  bottom: 5px;
   left: 50%;
   transform: translateX(-50%);
   display: flex;
@@ -689,16 +688,19 @@
   height: 8px;
   border-radius: 4px;
   aspect-ratio: 1 / 1;
-  background: rgba(0, 0, 0, 0.8);
+  background: #0006;
   border: none;
   color: white;
   transition: all 0.2s ease-in-out;
-  box-shadow: var(--box-shadow);
 
   &.active {
     background: white;
-    color: black;
     width: 16px;
+    box-shadow: 0 0 5px 0 #0000003f;
+  }
+
+  &:hover:not(.active) {
+    background: #000000b3;
   }
 }
 
@@ -712,7 +714,7 @@
   top: 50%;
   font-size: 10px;
   transform: translateY(-50%);
-  background: rgba(0, 0, 0, 0.4);
+  background: #0006;
   border: none;
   color: white;
   padding: 10px;
@@ -720,10 +722,9 @@
   border-radius: 10px;
   z-index: 10;
   transition: background 0.2s ease-in-out;
-  box-shadow: var(--box-shadow);
 
   &:hover {
-    background: rgba(0, 0, 0, 0.7);
+    background: #000000b3;
   }
 }
 
@@ -887,7 +888,7 @@
   background-color: var(--background);
   box-shadow: 0 1px 1px #00000080;
   overflow-y: auto;
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fade-in 0.2s ease-in-out;
 }
 
 @keyframes visibility {
@@ -900,7 +901,7 @@
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: scale(0.95);

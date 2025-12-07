@@ -5,7 +5,7 @@ import { initReactI18next } from 'react-i18next';
 import type { LanguageKey } from '../types';
 
 // Constants
-import { LANGUAGES } from '../constant';
+import { LANGUAGES } from '../constant.js';
 
 // en-US
 import enUS_system from '../i18n/locales/en-US/system.json' with { type: 'json' };

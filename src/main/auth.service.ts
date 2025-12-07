@@ -1,5 +1,5 @@
 // Package
-import packageJson from '../../package.json';
+import packageJson from '../../package.json' with { type: 'json' };
 const version = packageJson.version;
 
 // Services
