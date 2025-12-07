@@ -70,17 +70,6 @@ import zhTW_country from './locales/zh-TW/country.json';
 import zhTW_badge from './locales/zh-TW/badge.json';
 import zhTW_position from './locales/zh-TW/position.json';
 
-export const LANGUAGES: { code: LanguageKey; label: string }[] = [
-  { code: 'zh-TW', label: '繁體中文' },
-  { code: 'zh-CN', label: '简体中文' },
-  { code: 'en-US', label: 'English' },
-  { code: 'ru-RU', label: 'Русский' },
-  { code: 'pt-BR', label: 'Português' },
-  { code: 'es-ES', label: 'Español' },
-  { code: 'fa-IR', label: 'فارسی' },
-  { code: 'tr-TR', label: 'Türkçe' },
-];
-
 const APP_TO_CROWDIN: Record<LanguageKey, string> = {
   'zh-TW': 'zh-TW',
   'zh-CN': 'zh-CN',

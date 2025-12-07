@@ -4,9 +4,6 @@ import { initReactI18next } from 'react-i18next';
 // Types
 import type { LanguageKey } from '../types';
 
-// Constants
-import { LANGUAGES } from '../constant.js';
-
 // en-US
 import enUS_system from '../i18n/locales/en-US/system.json' with { type: 'json' };
 
@@ -31,7 +28,7 @@ import zhCN_system from '../i18n/locales/zh-CN/system.json' with { type: 'json' 
 // zh-TW
 import zhTW_system from '../i18n/locales/zh-TW/system.json' with { type: 'json' };
 
-export async function initMainI18n(language: string) {
+export async function initMainI18n(language: LanguageKey) {
   i18next.use(initReactI18next).init({
     lng: language,
     fallbackLng: 'zh-TW',
@@ -58,13 +55,4 @@ export async function initMainI18n(language: string) {
 
 export function t(key: string, params?: Record<string, string>) {
   return i18next.t(key, params);
-}
-
-export function getLanguage(): LanguageKey {
-  const language = Intl.DateTimeFormat().resolvedOptions().locale;
-
-  const match = LANGUAGES.find(({ code }) => code.includes(language));
-  if (!match) return 'en-US';
-
-  return match.code;
 }

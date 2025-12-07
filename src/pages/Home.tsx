@@ -162,7 +162,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     const language = navigator.language;
 
     const match = LANGUAGES.find(({ code }) => code.includes(language));
-    if (!match) return;
+    if (!match) return setRegion('en-US');
 
     setRegion(match.code);
   }, []);

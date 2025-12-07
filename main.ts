@@ -8,17 +8,27 @@ initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
-import { initMainI18n, getLanguage, t } from './src/main/i18n.js';
+import { initMainI18n, t } from './src/main/i18n.js';
 import { connectSocket, disconnectSocket } from './src/main/socket.js';
 import { env, loadEnv } from './src/main/env.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/main/discord.js';
 import authService from './src/main/auth.service.js';
 import dataService from './src/main/data.service.js';
 import popupLoaders from './src/main/popupLoader.js';
-import type { StoreType, PopupType } from './src/types';
+import type { StoreType, PopupType, LanguageKey } from './src/types';
+import { LANGUAGES } from './src/constant.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
+}
+
+export function getLanguage(): LanguageKey {
+  const language = app.getLocale();
+
+  const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
+  if (!match) return 'en-US';
+
+  return match.code;
 }
 
 const store = new Store<StoreType>({
