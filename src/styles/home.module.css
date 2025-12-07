@@ -645,18 +645,29 @@
 
 .banner {
   width: 100%;
-  background: #333;
   aspect-ratio: 3 / 1;
-  background: #333;
-  color: #eee;
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
-  font-size: 38px;
-  font-weight: bold;
+  font-family: arial, sans-serif;
+  font-size: 36px;
+  font-weight: bolder;
+  text-align: center;
+  color: var(--text-color-tertiary);
+  background-color: #e6f1f9;
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center center;
+}
+
+.logo {
+  height: 100px;
+  background-image: url('/ricecall_logo.png');
+  background-size: auto;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-color: #e6f1f9;
 }
 
 .number-list {
@@ -682,6 +693,7 @@
   border: none;
   color: white;
   transition: all 0.2s ease-in-out;
+  box-shadow: var(--box-shadow);
 
   &.active {
     background: white;
@@ -708,6 +720,7 @@
   border-radius: 10px;
   z-index: 10;
   transition: background 0.2s ease-in-out;
+  box-shadow: var(--box-shadow);
 
   &:hover {
     background: rgba(0, 0, 0, 0.7);
@@ -804,7 +817,7 @@
 }
 
 .announcement-type {
-  padding: 2px 10px;
+  padding: 5px 10px;
   border-radius: 5px;
   border: 2px solid var(--border);
   background-color: var(--hover);
@@ -943,7 +956,7 @@
 .recommend-server-tab {
   display: flex;
   align-items: center;
-  padding: 2px 10px;
+  padding: 5px 10px;
   border-radius: 5px;
   border: 2px solid var(--main-color);
   background-color: var(--main-color);

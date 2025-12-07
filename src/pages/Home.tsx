@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import Image from 'next/image';
 
 // CSS
 import styles from '@/styles/home.module.css';
@@ -161,6 +162,15 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     },
     [filteredAnns],
   );
+
+  const defaultAnnouncement = (ann: Announcement) => {
+    return (
+      <div className={styles['banner']}>
+        <Image src="/ricecall_logo.png" alt="ricecall logo" height={80} width={-1} />
+        <span>{ann.title}</span>
+      </div>
+    );
+  };
 
   // Effects
   useEffect(() => {
@@ -332,16 +342,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         <div className={styles['banner-wrapper']}>
           <div className={styles['banner-container']}>
             <div ref={containerRef} className={styles['banners']}>
-              {filteredAnns.map((a, index) => {
-                return (
-                  <div key={index} className={styles['banner']} onClick={() => setSelectedAnn(a)}>
-                    <span>3:1</span>
-                  </div>
-                );
-              })}
+              {filteredAnns.map((ann) => (
+                <div key={ann.announcementId} className={styles['banner']} onClick={() => setSelectedAnn(ann)}>
+                  {defaultAnnouncement(ann)}
+                </div>
+              ))}
             </div>
             <div className={styles['number-list']}>
-              {filteredAnns.map((a, index) => (
+              {filteredAnns.map((_, index) => (
                 <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => scrollToIndex(index)}></nav>
               ))}
             </div>
@@ -397,21 +405,21 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
       {/* Announcement */}
       <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
-        <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
-          <div className={styles['announcement-detail-header']}>
-            <div className={styles['announcement-type']} data-category={selectedAnn?.category}>
-              {t(`${selectedAnn?.category}`)}
+        {selectedAnn && (
+          <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
+            <div className={styles['announcement-detail-header']}>
+              <div className={styles['announcement-type']} data-category={selectedAnn?.category}>
+                {t(`${selectedAnn?.category}`)}
+              </div>
+              <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
+              <div className={styles['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.timestamp)}</div>
             </div>
-            <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
-            <div className={styles['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.timestamp)}</div>
+            <div className={styles['banner']}>{defaultAnnouncement(selectedAnn)}</div>
+            <div className={styles['announcement-detail-content']}>
+              <MarkdownContent markdownText={selectedAnn?.content ?? ''} />
+            </div>
           </div>
-          <div className={styles['banner']}>
-            <span>3:1</span>
-          </div>
-          <div className={styles['announcement-detail-content']}>
-            <MarkdownContent markdownText={selectedAnn?.content ?? ''} />
-          </div>
-        </div>
+        )}
       </div>
 
       {/* Personal Exclusive */}
