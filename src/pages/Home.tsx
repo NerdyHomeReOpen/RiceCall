@@ -79,7 +79,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
-  const [language, setLanguage] = useState<LanguageKey>(i18n.language as LanguageKey);
+  const [region, setRegion] = useState<LanguageKey>(i18n.language as LanguageKey);
 
   // Variables
   const { userId, currentServerId } = user;
@@ -89,10 +89,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
   const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]).slice(0, 10);
   const filteredRecommendServers = useMemo(
-    () => recommendServers.filter((server) => (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(language)),
-    [recommendServers, selectReommendServerCategory, language],
+    () => recommendServers.filter((server) => (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(region)),
+    [recommendServers, selectReommendServerCategory, region],
   );
-  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(i18n.language)), [recommendServers, i18n.language]);
+  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(region)), [recommendServers, region]);
 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -164,7 +164,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     const match = LANGUAGES.find(({ code }) => code.includes(language));
     if (!match) return;
 
-    setLanguage(match.code);
+    setRegion(match.code);
   }, []);
 
   useEffect(() => {
