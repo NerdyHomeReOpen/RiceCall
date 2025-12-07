@@ -346,7 +346,7 @@
   height: 2em;
   width: 25px;
   z-index: 1;
-  background-image: url('/channel/spliter.png');
+  background-image: url('/channel/spliter.webp');
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
@@ -359,7 +359,7 @@
   right: 0;
   width: 26px;
   height: 12px;
-  background-image: url('/login_combobox_triangle.png');
+  background-image: url('/login_combobox_triangle.webp');
   background-repeat: no-repeat;
   background-size: cover;
   pointer-events: none;
@@ -385,34 +385,34 @@
   display: inline-block;
   width: 36px;
   height: 36px;
-  background-image: url('/pic_alert.png');
+  background-image: url('/pic_alert.webp');
   background-repeat: no-repeat;
   background-size: contain;
   min-width: 36px;
 }
 
 .dialog-icon.alert {
-  background-image: url('/pic_alert.png');
+  background-image: url('/pic_alert.webp');
 }
 
 .dialog-icon.alert2 {
-  background-image: url('/pic_alert2.png');
+  background-image: url('/pic_alert2.webp');
 }
 
 .dialog-icon.error {
-  background-image: url('/pic_error.png');
+  background-image: url('/pic_error.webp');
 }
 
 .dialog-icon.warning {
-  background-image: url('/pic_warning.png');
+  background-image: url('/pic_warning.webp');
 }
 
 .dialog-icon.info {
-  background-image: url('/pic_information.png');
+  background-image: url('/pic_information.webp');
 }
 
 .dialog-icon.success {
-  background-image: url('/pic_ok.png');
+  background-image: url('/pic_ok.webp');
 }
 
 .dialog-message {
@@ -450,7 +450,7 @@
   align-self: center;
   min-width: 40px;
   min-height: 40px;
-  background-image: url('/logo_server_def.png');
+  background-image: url('/logo_server_def.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -464,7 +464,7 @@
   z-index: 1;
   min-width: 42px;
   min-height: 42px;
-  background-image: url('/channel/server_logo_border.png');
+  background-image: url('/channel/server_logo_border.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -487,7 +487,7 @@
 .sound-effect-preview {
   min-height: 17px;
   min-width: 17px;
-  background-image: url('/playback.png');
+  background-image: url('/playback.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0;

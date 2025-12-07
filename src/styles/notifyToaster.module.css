@@ -29,7 +29,7 @@
   height: 18px;
   border: none;
   cursor: pointer;
-  background-image: url('/loading_close.png');
+  background-image: url('/loading_close.webp');
   background-size: cover;
   background-position: 0 0;
 }

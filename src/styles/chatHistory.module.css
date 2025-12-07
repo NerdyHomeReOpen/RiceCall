@@ -51,7 +51,7 @@
 }
 
 .search-icon {
-  background-image: url('/icon_search.png');
+  background-image: url('/icon_search.webp');
   background-repeat: no-repeat;
   background-size: auto;
   width: 16px;
@@ -123,7 +123,7 @@
 }
 
 .avatar-border {
-  background-image: url('/win_border.png');
+  background-image: url('/win_border.webp');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -135,7 +135,7 @@
 
 .avatar {
   object-fit: cover;
-  background-image: url('/im/SecretaryLogo.png');
+  background-image: url('/im/SecretaryLogo.webp');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -182,7 +182,7 @@
 }
 
 .delete-button-icon {
-  background-image: url('/Delete_ico.png');
+  background-image: url('/Delete_ico.webp');
   background-size: auto;
   height: 16px;
   width: 16px;

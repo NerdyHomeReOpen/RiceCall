@@ -12,7 +12,7 @@
 }
 
 .user-recent-visits-private {
-  background-image: url('/card/bg_list_tips.png');
+  background-image: url('/card/bg_list_tips.webp');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
@@ -48,14 +48,14 @@
 }
 
 .user-about-me::before {
-  background-image: url('/card/bg_left_quote.png');
+  background-image: url('/card/bg_left_quote.webp');
   background-repeat: no-repeat;
   align-self: flex-start;
   margin-right: 10px;
 }
 
 .user-about-me::after {
-  background-image: url('/card/bg_right_quote.png');
+  background-image: url('/card/bg_right_quote.webp');
   background-repeat: no-repeat;
   align-self: flex-end;
   margin-left: 10px;
@@ -100,7 +100,7 @@
 .header {
   color: #fff;
   -webkit-app-region: drag;
-  background-image: url('/im/wallpaper.png');
+  background-image: url('/im/wallpaper.webp');
   background-size: cover;
   flex-direction: column;
   justify-content: center;
@@ -135,12 +135,12 @@
 }
 
 .minimize-btn {
-  background-image: url('/im/btn-min.png');
+  background-image: url('/im/btn-min.webp');
   background-repeat: no-repeat;
 }
 
 .close-btn {
-  background-image: url('/im/btn-close.png');
+  background-image: url('/im/btn-close.webp');
   background-repeat: no-repeat;
 }
 
@@ -160,7 +160,7 @@
   min-height: 74px;
   object-fit: cover;
   display: inline-block;
-  background-image: url('/im/IMLogo.png');
+  background-image: url('/im/IMLogo.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -174,7 +174,7 @@
   left: -7px;
   width: 88px;
   height: 88px;
-  background-image: url('/im/avatar_border.png');
+  background-image: url('/im/avatar_border.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   z-index: 1;
@@ -250,7 +250,7 @@
   padding-bottom: 6px;
   gap: 5px;
   cursor: pointer;
-  background-image: url('/im/userpage_tab.png');
+  background-image: url('/im/userpage_tab.webp');
   background-size: auto;
   background-repeat: repeat;
   background-position: 0 0;
@@ -268,7 +268,7 @@
   content: '';
   min-height: 14px;
   min-width: 13px;
-  background-image: url('/im/icon-about.png');
+  background-image: url('/im/icon-about.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -278,7 +278,7 @@
   content: '';
   min-height: 14px;
   min-width: 18px;
-  background-image: url('/im/icon-group.png');
+  background-image: url('/im/icon-group.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -355,7 +355,7 @@
   min-width: 12px;
   min-height: 12px;
   margin-right: 2px;
-  background-image: url('/card/icon_contribu.png');
+  background-image: url('/card/icon_contribu.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -373,7 +373,7 @@
   width: 12px;
   height: 12px;
   margin-right: 2px;
-  background-image: url('/card/icon_id.jpg');
+  background-image: url('/card/icon_id.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
@@ -385,7 +385,7 @@
   width: 13px;
   height: 15px;
   margin-right: 5px;
-  background-image: url('/icon_creator.png');
+  background-image: url('/icon_creator.webp');
   background-size: contain;
   background-position: 0 0;
 }

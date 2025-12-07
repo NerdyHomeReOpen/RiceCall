@@ -6,7 +6,7 @@
   justify-content: space-between;
   padding: 8px 5px;
   border-bottom: 1px solid var(--border);
-  background-image: url('/channel/chn_toolbar_bg.png');
+  background-image: url('/channel/chn_toolbar_bg.webp');
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
@@ -71,37 +71,37 @@
 }
 
 .add-channel-btn::before {
-  background-image: url('/channel/channel_add.png');
+  background-image: url('/channel/channel_add.webp');
   background-repeat: no-repeat;
 }
 
 .change-channel-name-btn::before {
-  background-image: url('/channel/channel_rename.png');
+  background-image: url('/channel/channel_rename.webp');
   background-repeat: no-repeat;
 }
 
 .delete-channel-btn::before {
-  background-image: url('/channel/channel_delete.png');
+  background-image: url('/channel/channel_delete.webp');
   background-repeat: no-repeat;
 }
 
 .up-channel-order-btn::before {
-  background-image: url('/channel/channel_up.png');
+  background-image: url('/channel/channel_up.webp');
   background-repeat: no-repeat;
 }
 
 .down-channel-order-btn::before {
-  background-image: url('/channel/channel_down.png');
+  background-image: url('/channel/channel_down.webp');
   background-repeat: no-repeat;
 }
 
 .top-channel-order-btn::before {
-  background-image: url('/channel/channel_head.png');
+  background-image: url('/channel/channel_head.webp');
   background-repeat: no-repeat;
 }
 
 .bottom-channel-order-btn::before {
-  background-image: url('/channel/channel_end.png');
+  background-image: url('/channel/channel_end.webp');
   background-repeat: no-repeat;
 }
 

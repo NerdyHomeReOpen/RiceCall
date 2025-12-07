@@ -28,7 +28,7 @@
   object-fit: cover;
   min-width: 40px;
   min-height: 40px;
-  background-image: url('/im/SecretaryLogo.png');
+  background-image: url('/im/SecretaryLogo.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -42,7 +42,7 @@
   z-index: 1;
   min-width: 42px;
   min-height: 42px;
-  background-image: url('/win_border.png');
+  background-image: url('/win_border.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -56,7 +56,7 @@
   right: 0;
   min-width: 13px;
   min-height: 13px;
-  background-image: url('/user_state.png');
+  background-image: url('/user_state.webp');
   background-repeat: no-repeat;
   background-position: 0 0 !important;
 }
@@ -102,7 +102,7 @@
 .level-icon {
   min-width: 16px;
   min-height: 16px;
-  background-image: url('/im/LV.png');
+  background-image: url('/im/LV.webp');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -113,7 +113,7 @@
   margin-left: 20px;
   min-width: 16px;
   min-height: 16px;
-  background-image: url('/silver_pea.png');
+  background-image: url('/silver_pea.webp');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -202,7 +202,7 @@
   flex: 1;
   text-align: center;
   cursor: pointer;
-  background-image: url('/friend_tab_item_bg.png');
+  background-image: url('/friend_tab_item_bg.webp');
   background-size: 100% 72px;
   background-position: 0 0;
   min-height: 36px;
@@ -217,7 +217,7 @@
 .friend-list-icon {
   min-width: 16px;
   min-height: 16px;
-  background-image: url('/im/friend_list_page.png');
+  background-image: url('/im/friend_list_page.webp');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -226,7 +226,7 @@
 .recent-icon {
   min-width: 16px;
   min-height: 16px;
-  background-image: url('/im/recently_list_page.png');
+  background-image: url('/im/recently_list_page.webp');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -268,7 +268,7 @@
 .search-bar .search-icon {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('/channel/channel_search.png');
+  background-image: url('/channel/channel_search.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -280,7 +280,7 @@
 .prev-icon {
   min-width: 29px;
   min-height: 30px;
-  background-image: url('/channel/search_pre.png');
+  background-image: url('/channel/search_pre.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   cursor: pointer;
@@ -289,7 +289,7 @@
 .next-icon {
   min-width: 29px;
   min-height: 30px;
-  background-image: url('/channel/search_next.png');
+  background-image: url('/channel/search_next.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   cursor: pointer;
@@ -338,7 +338,7 @@
   min-height: 16px;
   min-width: 16px;
   margin-right: 5px;
-  background-image: url('/im/add_group.png');
+  background-image: url('/im/add_group.webp');
   background-repeat: no-repeat;
 }
 
@@ -347,7 +347,7 @@
   min-height: 16px;
   min-width: 16px;
   margin-right: 5px;
-  background-image: url('/im/add_friend.png');
+  background-image: url('/im/add_friend.webp');
   background-repeat: no-repeat;
 }
 
@@ -377,7 +377,7 @@
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
-  background-image: url('/channel/channelIcon.png');
+  background-image: url('/channel/channelIcon.webp');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;
@@ -437,7 +437,7 @@
   content: '';
   min-height: 18px;
   min-width: 16px;
-  background-image: url('/mylocation.png');
+  background-image: url('/mylocation.webp');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
@@ -499,7 +499,7 @@
 }
 
 .user-avatar {
-  background-image: url('/im/IMLogo.png');
+  background-image: url('/im/IMLogo.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;

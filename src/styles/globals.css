@@ -145,11 +145,11 @@ body {
 /* Radio & Checkbox */
 
 input[type='radio'] {
-  background-image: url('/ctrl/radiobox_icon.png');
+  background-image: url('/ctrl/radiobox_icon.webp');
 }
 
 input[type='checkbox'] {
-  background-image: url('/ctrl/checkbox_icon.png');
+  background-image: url('/ctrl/checkbox_icon.webp');
 }
 
 input[type='radio'],

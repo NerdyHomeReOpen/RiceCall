@@ -23,7 +23,7 @@
   display: block;
   min-width: 226px;
   min-height: 54px;
-  background-image: url('/login_logo.png');
+  background-image: url('/login_logo.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
@@ -98,7 +98,7 @@
   content: '';
   width: 2px;
   height: 20px;
-  background-image: url('/channel/icon_v_split.png');
+  background-image: url('/channel/icon_v_split.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   margin-right: 3px;
@@ -108,7 +108,7 @@
   content: '';
   width: 20px;
   height: 12px;
-  background-image: url('/login_combobox_triangle.png');
+  background-image: url('/login_combobox_triangle.webp');
   background-repeat: no-repeat;
   background-position: -7px 0;
 }
@@ -163,7 +163,7 @@
 .account-select-delete-btn {
   min-height: 18px;
   min-width: 18px;
-  background-image: url('/loading_close.png');
+  background-image: url('/loading_close.webp');
   background-size: cover;
   background-position: 0 0;
   cursor: pointer;
@@ -202,7 +202,7 @@
   content: '';
   min-height: 18px;
   min-width: 18px;
-  background-image: url('/ctrl/checkbox_icon.png');
+  background-image: url('/ctrl/checkbox_icon.webp');
   background-size: auto;
   background-position: 0 0;
 }
@@ -285,13 +285,13 @@
 }
 
 .create-account::before {
-  background-image: url('/icon_createaccount.png');
+  background-image: url('/icon_createaccount.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
 .forget-password::before {
-  background-image: url('/icon_getpass.png');
+  background-image: url('/icon_getpass.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }

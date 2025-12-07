@@ -11,7 +11,7 @@
   display: flex;
   height: 100%;
   min-height: 0;
-  background-image: url('/setting_left_bg.png');
+  background-image: url('/setting_left_bg.webp');
   background-size: cover;
   border-right: 1px solid #b4dbec;
   background-repeat: no-repeat;
@@ -103,7 +103,7 @@
   object-fit: cover;
   min-width: 100px;
   min-height: 100px;
-  background-image: url('/logo_server_def.png');
+  background-image: url('/logo_server_def.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
@@ -124,7 +124,7 @@
   display: block;
   height: 16px;
   width: 16px;
-  background-image: url('/golden_pea.png');
+  background-image: url('/golden_pea.webp');
   background-size: cover;
 }
 
@@ -152,7 +152,7 @@
   min-height: 17px;
   min-width: 17px;
   margin: 5px;
-  background-image: url('/channel/channel_search.png');
+  background-image: url('/channel/channel_search.webp');
   background-size: cover;
   background-position: 0 0;
 }

@@ -59,7 +59,7 @@
   cursor: pointer;
   width: 45px;
   height: 45px;
-  background-image: url('/im/SecretaryLogo.png');
+  background-image: url('/im/SecretaryLogo.webp');
   background-size: cover;
   background-position: center;
   border: 1px solid var(--border);
@@ -123,7 +123,7 @@
 }
 
 .direct-message-icon {
-  background-image: url('/icon_notice_chat.png');
+  background-image: url('/icon_notice_chat.webp');
   background-size: auto;
   background-position: center;
   background-position: 0 0;

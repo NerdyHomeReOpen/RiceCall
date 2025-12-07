@@ -10,7 +10,7 @@
   content: '';
   min-width: 18px;
   min-height: 18px;
-  background-image: url('/channel/FaceButton.png');
+  background-image: url('/channel/FaceButton.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   cursor: pointer;
@@ -103,7 +103,7 @@
   flex: 0 0 12px;
   margin-left: 10px;
   margin-right: 8px;
-  background-image: url('/channel/FontButton.png');
+  background-image: url('/channel/FontButton.webp');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -134,7 +134,7 @@
   height: 2em;
   width: 25px;
   z-index: 1;
-  background-image: url('/channel/spliter.png');
+  background-image: url('/channel/spliter.webp');
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
@@ -147,7 +147,7 @@
   right: 0;
   width: 26px;
   height: 12px;
-  background-image: url('/login_combobox_triangle.png');
+  background-image: url('/login_combobox_triangle.webp');
   background-repeat: no-repeat;
   background-size: cover;
   pointer-events: none;
@@ -284,15 +284,15 @@
 }
 
 .tab-def::before {
-  background-image: url('/im/deftab.png');
+  background-image: url('/im/deftab.webp');
 }
 
 .tab-other::before {
-  background-image: url('/im/vipEm_Sign.png');
+  background-image: url('/im/vipEm_Sign.webp');
 }
 
 .tab-vip::before {
-  background-image: url('/im/viptab.png');
+  background-image: url('/im/viptab.webp');
 }
 
 .tab-def:hover::before,
