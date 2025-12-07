@@ -2,7 +2,6 @@ import DiscordRPC from 'discord-rpc';
 
 export const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
 
-// Discord RPC
 let rpc: DiscordRPC.Client | null = null;
 
 export async function configureDiscordRPC() {

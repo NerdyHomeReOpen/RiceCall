@@ -166,7 +166,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const defaultAnnouncement = (ann: Announcement) => {
     return (
       <div className={styles['banner']}>
-        <Image src="/ricecall_logo.png" alt="ricecall logo" height={80} width={-1} />
+        <Image src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
         <span>{ann.title}</span>
       </div>
     );

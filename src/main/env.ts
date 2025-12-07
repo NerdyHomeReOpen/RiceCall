@@ -5,7 +5,6 @@ import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { app } from 'electron';
 
-// Env
 export let env: Record<string, string> = {};
 
 const EnvSchema = z

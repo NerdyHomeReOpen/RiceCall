@@ -284,7 +284,7 @@
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
-  background-image: url('/back.png');
+  background-image: url('/back.webp');
   background-position: 0 0;
 }
 
@@ -663,7 +663,7 @@
 
 .logo {
   height: 100px;
-  background-image: url('/ricecall_logo.png');
+  background-image: url('/ricecall_logo.webp');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { env } from './env.js';
 import { token } from '../../main.js';
+import { env } from './env.js';
 
 type RequestOptions = {
   headers?: Record<string, string>;

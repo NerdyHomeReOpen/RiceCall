@@ -1,6 +1,9 @@
-import api from './api.service.js';
-import packageJson from '../../package.json' with { type: 'json' };
+// Package
+import packageJson from '../../package.json';
 const version = packageJson.version;
+
+// Services
+import api from './api.service.js';
 
 interface RegisterFormData {
   account: string;

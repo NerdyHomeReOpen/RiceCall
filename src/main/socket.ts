@@ -119,7 +119,6 @@ const ServerToClientEventNames = [
   'userUpdate',
 ];
 
-// Socket
 export let socket: Socket | null = null;
 export let seq: number = 0;
 export let interval: NodeJS.Timeout | null = null;
