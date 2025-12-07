@@ -4,9 +4,9 @@ import { createPopup } from '../../main.js';
 import { env } from './env.js';
 
 // Types
-type ACK<T> = { ok: true; data: T } | { ok: false; error: string };
+import type { ACK } from '../types';
 
-// Event
+// Events
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
 
 const ClientToServerEventNames = [

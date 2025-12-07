@@ -3,6 +3,7 @@ import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
+// Types
 import type { LanguageKey } from '@/types';
 
 // en-US

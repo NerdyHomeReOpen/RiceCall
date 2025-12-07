@@ -10,7 +10,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import RecommendServerCard from '@/components/RecommendServerCard';
 
 // Type
-import type { User, Server, Announcement, RecommendServer } from '@/types';
+import type { User, Server, Announcement, RecommendServer, LanguageKey } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -25,7 +25,7 @@ import { handleOpenCreateServer } from '@/utils/popup';
 import { getFormatDate } from '@/utils/language';
 
 // Constants
-import { RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
+import { LANGUAGES, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
 
 interface SearchResultItemProps {
   server: Server;
@@ -78,6 +78,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
+  const [language, setLanguage] = useState<LanguageKey>(i18n.language as LanguageKey);
 
   // Variables
   const { userId, currentServerId } = user;
@@ -87,8 +88,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
   const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]).slice(0, 10);
   const filteredRecommendServers = useMemo(
-    () => recommendServers.filter((server) => (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(i18n.language)),
-    [recommendServers, selectReommendServerCategory, i18n.language],
+    () => recommendServers.filter((server) => (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(language)),
+    [recommendServers, selectReommendServerCategory, language],
   );
   const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(i18n.language)), [recommendServers, i18n.language]);
 
@@ -162,6 +163,15 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   );
 
   // Effects
+  useEffect(() => {
+    const language = navigator.language;
+
+    const match = LANGUAGES.find(({ code }) => code.includes(language));
+    if (!match) return;
+
+    setLanguage(match.code);
+  }, [i18n.language]);
+
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
     timerRef.current = setTimeout(() => scrollToIndex(selectedAnnIndex + 1), 5000);

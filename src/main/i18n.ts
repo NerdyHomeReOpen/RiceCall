@@ -1,6 +1,11 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
+
+// Types
 import type { LanguageKey } from '../types';
+
+// Constants
+import { LANGUAGES } from '../constant';
 
 // en-US
 import enUS_system from '../i18n/locales/en-US/system.json' with { type: 'json' };
@@ -25,17 +30,6 @@ import zhCN_system from '../i18n/locales/zh-CN/system.json' with { type: 'json' 
 
 // zh-TW
 import zhTW_system from '../i18n/locales/zh-TW/system.json' with { type: 'json' };
-
-export const LANGUAGES: { code: LanguageKey; label: string }[] = [
-  { code: 'zh-TW', label: '繁體中文' },
-  { code: 'zh-CN', label: '简体中文' },
-  { code: 'en-US', label: 'English' },
-  { code: 'ru-RU', label: 'Русский' },
-  { code: 'pt-BR', label: 'Português' },
-  { code: 'es-ES', label: 'Español' },
-  { code: 'fa-IR', label: 'فارسی' },
-  { code: 'tr-TR', label: 'Türkçe' },
-];
 
 export async function initMainI18n(language: string) {
   i18next.use(initReactI18next).init({
