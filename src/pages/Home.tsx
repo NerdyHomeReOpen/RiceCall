@@ -141,27 +141,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   );
 
   const handleNextAnn = () => {
-    scrollToIndex(selectedAnnIndex === filteredAnns.length - 1 ? 0 : selectedAnnIndex + 1);
+    setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length);
   };
 
   const handlePrevAnn = () => {
-    scrollToIndex(selectedAnnIndex === 0 ? filteredAnns.length - 1 : selectedAnnIndex - 1);
+    setSelectedAnnIndex((prev) => (prev === 0 ? filteredAnns.length - 1 : prev - 1));
   };
-
-  const scrollToIndex = useCallback(
-    (i: number) => {
-      if (!containerRef.current) return;
-      const number = i % filteredAnns.length;
-      setSelectedAnnIndex(number);
-
-      const width = containerRef.current.clientWidth;
-      containerRef.current.scrollTo({
-        left: width * number,
-        behavior: 'smooth',
-      });
-    },
-    [filteredAnns],
-  );
 
   const defaultAnnouncement = (ann: Announcement) => {
     return (
@@ -180,16 +165,26 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     if (!match) return;
 
     setLanguage(match.code);
-  }, [i18n.language]);
+  }, []);
+
+  useEffect(() => {
+    if (!containerRef.current) return;
+    const number = selectedAnnIndex % filteredAnns.length;
+    const width = containerRef.current.clientWidth;
+    containerRef.current.scrollTo({
+      left: width * number,
+      behavior: 'smooth',
+    });
+  }, [selectedAnnIndex, filteredAnns]);
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => scrollToIndex(selectedAnnIndex + 1), 5000);
+    timerRef.current = setTimeout(() => setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length), 5000);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = null;
     };
-  }, [selectedAnnIndex, scrollToIndex]);
+  }, [filteredAnns]);
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
@@ -250,6 +245,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     });
     return () => unsub();
   }, [userId, handleConnectServer]);
+
+  useEffect(() => {
+    const unsub = ipc.language.onUpdate(() => {
+      setSelectRecommendServerCategory('all');
+      setSelectedAnnIndex(0);
+    });
+    return () => unsub();
+  }, []);
 
   return (
     <main className={styles['home']} style={display ? {} : { display: 'none' }}>
@@ -343,14 +346,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={styles['banner-container']}>
             <div ref={containerRef} className={styles['banners']}>
               {filteredAnns.map((ann) => (
-                <div key={ann.announcementId} className={styles['banner']} onClick={() => setSelectedAnn(ann)}>
-                  {defaultAnnouncement(ann)}
+                <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => setSelectedAnn(ann)}>
+                  {!ann.attachmentUrl ? defaultAnnouncement(ann) : null}
                 </div>
               ))}
             </div>
             <div className={styles['number-list']}>
               {filteredAnns.map((_, index) => (
-                <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => scrollToIndex(index)}></nav>
+                <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)}></nav>
               ))}
             </div>
             <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnn}>
@@ -414,7 +417,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
               <div className={styles['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.timestamp)}</div>
             </div>
-            <div className={styles['banner']}>{defaultAnnouncement(selectedAnn)}</div>
+            {selectedAnn.attachmentUrl && <div className={styles['banner']} style={{ backgroundImage: `url(${selectedAnn.attachmentUrl})` }} />}
             <div className={styles['announcement-detail-content']}>
               <MarkdownContent markdownText={selectedAnn?.content ?? ''} />
             </div>

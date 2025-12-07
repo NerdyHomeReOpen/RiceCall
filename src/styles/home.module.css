@@ -655,7 +655,7 @@
   text-align: center;
   color: var(--text-color-tertiary);
   background-color: #e6f1f9;
-  background-size: cover;
+  background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
 }
