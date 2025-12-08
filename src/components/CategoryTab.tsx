@@ -45,21 +45,24 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const findMe = useFindMeContext();
 
     // Variables
-    const { userId, currentChannelId: userCurrentChannelId } = user;
-    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit } = category;
+    const { userId } = user;
     const { serverId: currentServerId, receptionLobbyId: currentServerReceptionLobbyId } = currentServer;
-    const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, category.permissionLevel);
+    const { channelId: currentChannelId } = currentChannel;
+    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit } = category;
     const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-    const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
+    const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, category.permissionLevel);
     const categoryChannels = useMemo(() => channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [channels, categoryId]);
     const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
-    const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
-    const movableUserIds = useMemo(
-      () => categoryMembers.filter((m) => m.userId !== userId && m.permissionLevel <= currentPermissionLevel).map((m) => m.userId),
-      [userId, categoryMembers, currentPermissionLevel],
+    const movableServerUserIds = useMemo(
+      () => serverOnlineMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId),
+      [userId, serverOnlineMembers, permissionLevel],
     );
-    const isInChannel = userCurrentChannelId === categoryId;
-    const isInCategory = useMemo(() => categoryMembers.some((m) => m.currentChannelId === userCurrentChannelId), [categoryMembers, userCurrentChannelId]);
+    const movableCategoryUserIds = useMemo(
+      () => categoryMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId),
+      [userId, categoryMembers, permissionLevel],
+    );
+    const isInChannel = currentChannelId === categoryId;
+    const isInCategory = useMemo(() => categoryMembers.some((m) => m.currentChannelId === currentChannelId), [categoryMembers, currentChannelId]);
     const isReceptionLobby = currentServerReceptionLobbyId === categoryId;
     const isMemberChannel = categoryVisibility === 'member';
     const isPrivateChannel = categoryVisibility === 'private';
@@ -122,8 +125,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       {
         id: 'move-all-user-to-channel',
         label: t('move-all-user-to-channel'),
-        show: !isInChannel && isServerAdmin(permissionLevel) && movableUserIds.length > 0,
-        onClick: () => handleMoveAllUsersToChannel(movableUserIds, currentServerId, categoryId),
+        show: !isInChannel && isChannelMod(currentPermissionLevel) && isChannelMod(permissionLevel) && movableCategoryUserIds.length > 0,
+        onClick: () => handleMoveAllUsersToChannel(movableCategoryUserIds, currentServerId, categoryId),
       },
       {
         id: 'edit-channel-order',
@@ -140,14 +143,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
         label: t('kick-channel-users-from-server'),
         disabled: categoryMembers.length === 0,
         show: isStaff(permissionLevel),
-        onClick: () => handleKickUsersFromServer(categoryUserIds, currentServerId),
+        onClick: () => handleKickUsersFromServer(movableCategoryUserIds, currentServerId),
       },
       {
         id: 'kick-all-users-from-server',
         label: t('kick-all-users-from-server'),
         disabled: serverOnlineMembers.length === 0,
         show: isStaff(permissionLevel),
-        onClick: () => handleKickUsersFromServer(serverUserIds, currentServerId),
+        onClick: () => handleKickUsersFromServer(movableServerUserIds, currentServerId),
       },
       {
         id: 'separator',
@@ -232,8 +235,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
             else setSelectedItemId(`category-${categoryId}`);
           }}
           onDoubleClick={() => handleConnectChannel(currentServerId, categoryId)}
-          draggable={isChannelMod(permissionLevel) && movableUserIds.length > 0}
-          onDragStart={(e) => handleDragStart(e, movableUserIds, categoryId)}
+          draggable={isChannelMod(permissionLevel) && movableCategoryUserIds.length > 0}
+          onDragStart={(e) => handleDragStart(e, movableCategoryUserIds, categoryId)}
           onDragOver={(e) => {
             if (isChannelMod(permissionLevel) && !isReadonlyChannel) {
               e.preventDefault();

@@ -43,19 +43,22 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const findMe = useFindMeContext();
 
     // Variables
-    const { userId, currentChannelId: userCurrentChannelId } = user;
+    const { userId } = user;
     const { serverId: currentServerId, lobbyId: currentServerLobbyId, receptionLobbyId: currentServerReceptionLobbyId } = currentServer;
+    const { channelId: currentChannelId } = currentChannel;
     const { channelId, name: channelName, visibility: channelVisibility, userLimit: channelUserLimit, categoryId: channelCategoryId } = channel;
     const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
     const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-    const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
     const channelMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === channelId), [serverOnlineMembers, channelId]);
-    const channelUserIds = useMemo(() => channelMembers.map((m) => m.userId), [channelMembers]);
-    const movableUserIds = useMemo(
-      () => channelMembers.filter((m) => m.userId !== userId && m.permissionLevel <= currentPermissionLevel).map((m) => m.userId),
-      [userId, channelMembers, currentPermissionLevel],
+    const movableServerUserIds = useMemo(
+      () => serverOnlineMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId),
+      [userId, serverOnlineMembers, permissionLevel],
     );
-    const isInChannel = userCurrentChannelId === channelId;
+    const movableChannelUserIds = useMemo(
+      () => channelMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId),
+      [userId, channelMembers, permissionLevel],
+    );
+    const isInChannel = currentChannelId === channelId;
     const isLobby = currentServerLobbyId === channelId;
     const isReceptionLobby = currentServerReceptionLobbyId === channelId;
     const isMemberChannel = channelVisibility === 'member';
@@ -118,8 +121,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       {
         id: 'move-all-user-to-channel',
         label: t('move-all-user-to-channel'),
-        show: !isInChannel && isChannelMod(permissionLevel) && movableUserIds.length > 0,
-        onClick: () => handleMoveAllUsersToChannel(movableUserIds, currentServerId, userCurrentChannelId || ''),
+        show: !isInChannel && isChannelMod(currentPermissionLevel) && isChannelMod(permissionLevel) && movableChannelUserIds.length > 0,
+        onClick: () => handleMoveAllUsersToChannel(movableChannelUserIds, currentServerId, currentChannelId),
       },
       {
         id: 'edit-channel-order',
@@ -134,16 +137,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
       {
         id: 'kick-channel-users-from-server',
         label: t('kick-channel-users-from-server'),
-        disabled: channelMembers.length === 0,
-        show: isStaff(permissionLevel),
-        onClick: () => handleKickUsersFromServer(channelUserIds, currentServerId),
+        show: isStaff(permissionLevel) && movableChannelUserIds.length > 0,
+        onClick: () => handleKickUsersFromServer(movableChannelUserIds, currentServerId),
       },
       {
         id: 'kick-all-users-from-server',
         label: t('kick-all-users-from-server'),
-        disabled: serverOnlineMembers.length === 0,
-        show: isStaff(permissionLevel),
-        onClick: () => handleKickUsersFromServer(serverUserIds, currentServerId),
+        show: isStaff(permissionLevel) && movableServerUserIds.length > 0,
+        onClick: () => handleKickUsersFromServer(movableServerUserIds, currentServerId),
       },
       {
         id: 'separator',
@@ -228,8 +229,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             else setSelectedItemId(`channel-${channelId}`);
           }}
           onDoubleClick={() => handleConnectChannel(currentServerId, channelId)}
-          draggable={isChannelMod(permissionLevel) && movableUserIds.length > 0}
-          onDragStart={(e) => handleDragStart(e, movableUserIds, channelId)}
+          draggable={isChannelMod(permissionLevel) && movableChannelUserIds.length > 0}
+          onDragStart={(e) => handleDragStart(e, movableChannelUserIds, channelId)}
           onDragOver={(e) => {
             if (isChannelMod(permissionLevel) && !isReadonlyChannel) {
               e.preventDefault();
