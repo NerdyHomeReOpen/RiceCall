@@ -643,6 +643,7 @@
 }
 
 .banner {
+  position: relative;
   width: 100%;
   aspect-ratio: 3 / 1;
   display: flex;
@@ -660,6 +661,18 @@
   background-position: center center;
 }
 
+.banner-detail {
+  position: absolute;
+  top: 10px;
+  display: flex;
+  flex-direction: row;
+  width: 80%;
+  padding: 10px 20px;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid var(--border);
+}
+
 .logo {
   height: 100px;
   background-image: url('/ricecall_logo.webp');
@@ -673,11 +686,12 @@
   position: absolute;
   bottom: 5px;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%);
   display: flex;
   gap: 8px;
   padding: 5px 10px;
   border-radius: 10px;
+  transition: all 0.2s ease-in-out;
 }
 
 .number-list nav {
@@ -721,7 +735,7 @@
   cursor: pointer;
   border-radius: 10px;
   z-index: 10;
-  transition: background 0.2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 
   &:hover {
     background: #000000b3;
@@ -729,11 +743,18 @@
 }
 
 .nav.prev-btn {
+  transform: translateX(-100px);
   left: 10px;
 }
 
 .nav.next-btn {
+  transform: translateX(100px);
   right: 10px;
+}
+
+.banner-container:hover .nav.prev-btn,
+.banner-container:hover .nav.next-btn {
+  transform: translateX(0);
 }
 
 /* Announcement */
