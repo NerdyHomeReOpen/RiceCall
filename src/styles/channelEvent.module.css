@@ -53,7 +53,7 @@
 
 .event-list {
   display: flex;
-  overflow-y: scroll;
+  overflow-y: auto;
   width: 100%;
   flex-direction: column;
 }
@@ -84,6 +84,7 @@
 }
 
 .event-box {
+  cursor: pointer;
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -91,6 +92,10 @@
   padding: 5px 15px;
   gap: 5px;
   border-bottom: 1px solid var(--text-color-octonary);
+
+  &:hover {
+    background-color: #ddd;
+  }
 }
 
 .user-detail {
@@ -137,4 +142,9 @@
 
 .red {
   color: #cc2121;
+}
+
+.space-between {
+  align-items: center;
+  justify-content: space-between;
 }

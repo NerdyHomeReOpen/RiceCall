@@ -17,7 +17,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import ipc from '@/services/ipc.service';
 
 // Utils
-import { handleOpenUserInfo, handleOpenBlockMember } from '@/utils/popup';
+import { handleOpenUserInfo, handleOpenBlockMember, handleOpenKickMemberFromServer } from '@/utils/popup';
 import { isServerAdmin } from '@/utils/permission';
 import { getFormatDate } from '@/utils/language';
 import Default from '@/utils/default';
@@ -233,6 +233,12 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                   label: t('view-profile'),
                   show: true,
                   onClick: () => handleOpenUserInfo(userId, e.userId),
+                },
+                {
+                  id: 'kick-server',
+                  label: t('kick-server'),
+                  show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
+                  onClick: () => handleOpenKickMemberFromServer(e.userId, serverId),
                 },
                 {
                   id: 'block',
