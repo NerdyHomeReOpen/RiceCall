@@ -120,7 +120,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
         `${t('channel-management')} (${totalModerators})`,
         `${t('blacklist-management')} (${totalBlockMembers})`,
       ]
-    : [t('channel-info'), t('channel-announcement')];
+    : user.currentChannelId === channelId || (channelVisibility !== 'private' && channelVisibility !== 'readonly')
+      ? [t('channel-info'), t('channel-announcement')]
+      : [t('channel-info')];
 
   // Handlers
   const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
