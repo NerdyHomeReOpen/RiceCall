@@ -54,7 +54,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const categoryChannels = useMemo(() => channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId), [channels, categoryId]);
     const categoryMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === categoryId), [serverOnlineMembers, categoryId]);
     const categoryUserIds = useMemo(() => categoryMembers.map((m) => m.userId), [categoryMembers]);
-    const movableUserIds = useMemo(() => categoryMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [categoryMembers, currentPermissionLevel]);
+    const movableUserIds = useMemo(
+      () => categoryMembers.filter((m) => m.userId !== userId && m.permissionLevel <= currentPermissionLevel).map((m) => m.userId),
+      [userId, categoryMembers, currentPermissionLevel],
+    );
     const isInChannel = userCurrentChannelId === categoryId;
     const isInCategory = useMemo(() => categoryMembers.some((m) => m.currentChannelId === userCurrentChannelId), [categoryMembers, userCurrentChannelId]);
     const isReceptionLobby = currentServerReceptionLobbyId === categoryId;
@@ -170,11 +173,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     };
 
     const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
+      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
     };
 
     const handleMoveAllUsersToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': userIds.length }), () => ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId }))));
     };
 
     const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {

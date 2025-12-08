@@ -51,7 +51,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
     const channelMembers = useMemo(() => serverOnlineMembers.filter((m) => m.currentChannelId === channelId), [serverOnlineMembers, channelId]);
     const channelUserIds = useMemo(() => channelMembers.map((m) => m.userId), [channelMembers]);
-    const movableUserIds = useMemo(() => channelMembers.filter((m) => m.permissionLevel <= currentPermissionLevel).map((m) => m.userId), [channelMembers, currentPermissionLevel]);
+    const movableUserIds = useMemo(
+      () => channelMembers.filter((m) => m.userId !== userId && m.permissionLevel <= currentPermissionLevel).map((m) => m.userId),
+      [userId, channelMembers, currentPermissionLevel],
+    );
     const isInChannel = userCurrentChannelId === channelId;
     const isLobby = currentServerLobbyId === channelId;
     const isReceptionLobby = currentServerReceptionLobbyId === channelId;
@@ -166,11 +169,11 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     };
 
     const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
+      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
     };
 
     const handleMoveAllUsersToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': userIds.length }), () => ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId }))));
     };
 
     const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {

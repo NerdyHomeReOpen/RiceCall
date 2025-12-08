@@ -106,6 +106,7 @@
   "confirm-kick-user-from-channel": "您確定要將 {{0}} 踢出 {{1}} 嗎？",
   "confirm-kick-user-from-server": "您確定要將 {{0}} 踢出此群嗎？",
   "confirm-kick-users-from-server": "確定踢出 {{0}} 個使用者？",
+  "confirm-move-members-to-channel": "確定要移動 {{0}} 位成員至指定頻道嗎？",
   "confirm-password": "確認密碼",
   "confirm-reject-all-friend-application": "確定要拒絕所有好友申請嗎？",
   "confirm-reject-all-member-invitation": "確定拒絕所有會員邀請嗎？",
