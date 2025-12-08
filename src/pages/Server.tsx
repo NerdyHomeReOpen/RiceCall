@@ -640,6 +640,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   }}
                 >
                   <ChannelMessageContent user={user} currentServer={currentServer} currentChannel={currentChannel} messages={channelMessages} />
+                  <div style={{ minHeight: '10px' }}></div>
                   {unreadMessageCount > 0 && (
                     <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
                       {t('has-new-message', { 0: unreadMessageCount })}
@@ -656,6 +657,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       currentChannel={currentChannel}
                       messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []}
                     />
+                    <div className={styles['close-button']} onClick={() => setShowActionMessage(false)}></div>
                   </div>
                   <MessageInputBoxGuard
                     lastJoinChannelTime={lastJoinChannelTime}

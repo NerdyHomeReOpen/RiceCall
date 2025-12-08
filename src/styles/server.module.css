@@ -522,6 +522,7 @@
 
 .message-area {
   display: flex;
+  flex-direction: column;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
@@ -535,12 +536,31 @@
   width: calc(100% - 20px);
   min-height: 25px;
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: 3px;
   border: 1.5px solid var(--notify-toaster-border);
   border-radius: 2px;
   background-color: var(--notify-toaster-background);
+}
+
+.broadcast-area .close-button {
+  min-width: 18px;
+  min-height: 18px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  cursor: pointer;
+  background-image: url('/loading_close.webp');
+  background-size: cover;
+  background-position: 0 0;
+}
+
+.close-button:hover {
+  background-position: -18px 0;
+}
+
+.close-button:active {
+  background-position: -36px 0;
 }
 
 .input-area {

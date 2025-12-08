@@ -51,7 +51,6 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
           )}
         </div>
       ))}
-      <div style={{ minHeight: '10px' }}></div>
     </div>
   );
 });
