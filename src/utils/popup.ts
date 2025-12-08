@@ -60,6 +60,10 @@ export function handleOpenKickMemberFromChannel(userId: Types.User['userId'], se
   ipc.popup.open('kickMemberFromChannel', `kickMemberFromChannel`, { userId, serverId, channelId });
 }
 
+export function handleOpenInviteFriend(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+  ipc.popup.open('inviteFriend', `inviteFriend`, { userId, serverId });
+}
+
 export function handleOpenInviteMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
   ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
 }

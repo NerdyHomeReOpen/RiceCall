@@ -34,6 +34,7 @@ import KickMemberFromServer from '@/popups/KickMemberFromServer';
 import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
 import MemberInvitation from '@/popups/MemberInvitation';
 import ImageCropper from '@/popups/ImageCropper';
+import InviteFriend from '@/popups/InviteFriend';
 import InviteMember from '@/popups/InviteMember';
 import SearchUser from '@/popups/SearchUser';
 import ServerAnnouncement from '@/popups/ServerAnnouncement';
@@ -241,6 +242,11 @@ const defaultPopup: Record<Types.PopupType, Omit<Popup, 'id' | 'node' | 'title'>
     buttons: ['close'],
     hideHeader: false,
   },
+  inviteFriend: {
+    type: 'inviteFriend',
+    buttons: ['close'],
+    hideHeader: false,
+  },
   inviteMember: {
     type: 'inviteMember',
     buttons: ['close'],
@@ -358,6 +364,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       editNickname: t('edit-nickname'),
       friendVerification: t('friend-verification'),
       imageCropper: t('image-cropper'),
+      inviteFriend: t('invite-friend'),
       inviteMember: t('invite-member'),
       kickMemberFromChannel: t('kick-channel'),
       kickMemberFromServer: t('kick-server'),
@@ -401,6 +408,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       editNickname: () => <EditNickname id={id} {...initialData} />,
       friendVerification: () => <FriendVerification id={id} {...initialData} />,
       imageCropper: () => <ImageCropper id={id} {...initialData} />,
+      inviteFriend: () => <InviteFriend id={id} {...initialData} />,
       inviteMember: () => <InviteMember id={id} {...initialData} />,
       kickMemberFromChannel: () => <KickMemberFromChannel id={id} {...initialData} />,
       kickMemberFromServer: () => <KickMemberFromServer id={id} {...initialData} />,
