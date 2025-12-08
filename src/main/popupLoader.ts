@@ -123,6 +123,17 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
     return { userId, friendApplications };
   },
 
+  inviteFriend : async ({ userId, serverId }: { userId: string; serverId: string }) => {
+    const [user, server, friends, friendGroups] = await Promise.all([
+      data.user({ userId }),
+      data.server({ userId, serverId }),
+      data.friends({ userId }),
+      data.friendGroups({ userId }),
+    ]);
+
+    return { user, server, friends, friendGroups };
+  },
+
   inviteMember: async ({ userId, serverId }: { userId: string; serverId: string }) => {
     const [target, memberInvitation] = await Promise.all([data.member({ userId, serverId }), data.memberInvitation({ serverId, receiverId: userId })]);
 

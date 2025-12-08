@@ -29,6 +29,7 @@ import {
   handleOpenEditChannelOrder,
   handleOpenApplyMember,
   handleOpenServerBroadcast,
+  handleOpenInviteFriend,
 } from '@/utils/popup';
 import { isMember, isServerAdmin, isStaff } from '@/utils/permission';
 
@@ -242,12 +243,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
             <div className={styles['id-text']}>{currentServerSpecialId || currentServerDisplayId}</div>
             <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
             <div className={styles['options']}>
-              <div
-                className={styles['invitation-icon']}
-                onClick={() => {
-                  // Handle invite friends
-                }}
-              />
+              <div className={styles['invitation-icon']} onClick={() => handleOpenInviteFriend(userId, currentServerId)} />
               <div className={styles['saperator-1']} />
               <div
                 className={styles['setting-icon']}
