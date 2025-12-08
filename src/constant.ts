@@ -192,3 +192,4 @@ export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'fa-IR', label: 'فارسی' },
   { code: 'tr-TR', label: 'Türkçe' },
 ];
+export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds

@@ -26,7 +26,7 @@ import { handleOpenCreateServer } from '@/utils/popup';
 import { getFormatDate } from '@/utils/language';
 
 // Constants
-import { LANGUAGES, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
+import { ANNOUNCEMENT_SLIDE_INTERVAL, LANGUAGES, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
 
 interface SearchResultItemProps {
   server: Server;
@@ -89,7 +89,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
   const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]).slice(0, 10);
   const filteredRecommendServers = useMemo(
-    () => recommendServers.filter((server) => (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(region)),
+    () =>
+      recommendServers
+        .filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(region))
+        .sort((a, b) => a.online - b.online),
     [recommendServers, selectReommendServerCategory, region],
   );
   const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(region)), [recommendServers, region]);
@@ -148,14 +151,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     setSelectedAnnIndex((prev) => (prev === 0 ? filteredAnns.length - 1 : prev - 1));
   };
 
-  const defaultAnnouncement = (ann: Announcement) => {
-    return (
-      <div className={styles['banner']}>
-        <Image src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
-        <span>{ann.title}</span>
-      </div>
-    );
-  };
+  const defaultAnnouncement = (ann: Announcement) => (
+    <>
+      <Image src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
+      <span>{ann.title}</span>
+    </>
+  );
 
   // Effects
   useEffect(() => {
@@ -179,7 +180,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   useEffect(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length), 5000);
+    timerRef.current = setTimeout(() => setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length), ANNOUNCEMENT_SLIDE_INTERVAL);
     return () => {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = null;
