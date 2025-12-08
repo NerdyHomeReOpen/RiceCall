@@ -141,15 +141,13 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
       {
         id: 'kick-channel-users-from-server',
         label: t('kick-channel-users-from-server'),
-        disabled: categoryMembers.length === 0,
-        show: isStaff(permissionLevel),
+        show: isStaff(permissionLevel) && movableCategoryUserIds.length > 0,
         onClick: () => handleKickUsersFromServer(movableCategoryUserIds, currentServerId),
       },
       {
         id: 'kick-all-users-from-server',
         label: t('kick-all-users-from-server'),
-        disabled: serverOnlineMembers.length === 0,
-        show: isStaff(permissionLevel),
+        show: isStaff(permissionLevel) && movableServerUserIds.length > 0,
         onClick: () => handleKickUsersFromServer(movableServerUserIds, currentServerId),
       },
       {
