@@ -215,11 +215,12 @@
 }
 
 .message-area {
-  display: flex;
   flex: 5;
-  padding: 10px;
-  margin-bottom: 10px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 10px 10px 0;
 }
 
 .input-area {
