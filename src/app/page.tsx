@@ -376,6 +376,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const serverOnlineMembersRef = useRef<OnlineMember[]>([]);
+  const friendsRef = useRef<Friend[]>([]);
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -411,6 +412,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   // Effects
+  useEffect(() => {
+    friendsRef.current = friends;
+  }, [friends]);
+
   useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
@@ -597,6 +602,10 @@ const RootPageComponent: React.FC = React.memo(() => {
         setServerOnlineMembers([]);
         setChannelEvents([]);
       }
+      // if (args[0].update.signature && args[0].update.signature !== user.signature) {
+      //   const newActive = Default.friendActivity({ ...user, content: args[0].update.signature, createdAt: Date.now() });
+      //   setFriendActivities((prev) => [newActive, ...prev]);
+      // }
       setUser((prev) => ({ ...prev, ...args[0].update }));
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
     });
@@ -613,6 +622,16 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Friend> }[]) => {
+      // args.map((a) => {
+      //   // friend activity update
+      //   const targetFriend = friendsRef.current.find((f) => f.targetId === a.targetId);
+      //   if (a.update.signature) {
+      //     const newActive = Default.friendActivity({ ...targetFriend, ...a.update, userId: a.targetId, content: a.update.signature, createdAt: Date.now() });
+      //     if (targetFriend && targetFriend.relationStatus === 2 && targetFriend.signature !== newActive.signature) {
+      //       setFriendActivities((prev) => [newActive, ...prev]);
+      //     }
+      //   }
+      // });
       const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
       setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
     });
