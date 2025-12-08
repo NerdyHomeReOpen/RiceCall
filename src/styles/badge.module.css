@@ -1,6 +1,7 @@
 .badge-viewer-wrapper {
   display: flex;
   gap: 2px;
+
   &.grid {
     display: grid;
     width: 100%;

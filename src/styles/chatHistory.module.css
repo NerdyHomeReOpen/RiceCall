@@ -7,8 +7,7 @@
 .header-box {
   gap: 0.77rem;
   display: flex;
-  justify-items: center;
-  align-items: center;
+  place-items: center;
   width: 100%;
   background-color: #f7f7f7;
   height: 50px;
@@ -25,8 +24,7 @@
 .search-wrapper {
   display: flex;
   flex-direction: row;
-  justify-items: center;
-  align-items: center;
+  place-items: center;
 }
 
 .search-title {
@@ -53,7 +51,7 @@
 }
 
 .search-icon {
-  background-image: url('/icon_search.png');
+  background-image: url('/icon_search.webp');
   background-repeat: no-repeat;
   background-size: auto;
   width: 16px;
@@ -107,7 +105,7 @@
   justify-content: flex-start;
   align-items: center;
   gap: 5px;
-  padding: 5 10 5 50;
+  padding: 5px 10px 5px 50px;
   display: flex;
   position: relative;
 }
@@ -115,7 +113,6 @@
 .friend-info-box.selected {
   background-color: var(--selected);
 }
-
 
 .friend-info-box:hover {
   background-color: var(--hover);
@@ -126,7 +123,7 @@
 }
 
 .avatar-border {
-  background-image: url('/win_border.png');
+  background-image: url('/win_border.webp');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -138,7 +135,7 @@
 
 .avatar {
   object-fit: cover;
-  background-image: url('/im/SecretaryLogo.png');
+  background-image: url('/im/SecretaryLogo.webp');
   background-position: center;
   background-repeat: no-repeat;
   background-size: cover;
@@ -178,7 +175,6 @@
   display: flex;
   align-items: center;
   border: 1px solid #b1b1b1;
-  margin-right: 0.8rem;
   padding: 2px;
   cursor: pointer;
   margin-right: 0.5rem;
@@ -186,7 +182,7 @@
 }
 
 .delete-button-icon {
-  background-image: url('/Delete_ico.png');
+  background-image: url('/Delete_ico.webp');
   background-size: auto;
   height: 16px;
   width: 16px;
@@ -198,7 +194,7 @@
 }
 
 .message-date {
-  background: linear-gradient(180deg, rgba(255, 255, 255, 1) 0%, rgba(244, 247, 252, 1) 100%);
+  background: linear-gradient(180deg, #fff 0%, #f4f7fc 100%);
   border-bottom: 1px solid #b6cedc;
   height: 32px;
   width: 95%;

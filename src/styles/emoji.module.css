@@ -10,7 +10,7 @@
   content: '';
   min-width: 18px;
   min-height: 18px;
-  background-image: url('/channel/FaceButton.png');
+  background-image: url('/channel/FaceButton.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   cursor: pointer;
@@ -38,12 +38,18 @@
   overflow: auto;
   gap: 0;
   padding: 0;
-  border-top: 1px solid rgba(0, 0, 0, 0.15);
-  border-left: 1px solid rgba(0, 0, 0, 0.15);
+  border-top: 1px solid #0000001f;
+  border-left: 1px solid #0000001f;
   background-color: var(--background);
   width: 100%;
   height: 100%;
   grid-auto-rows: 24px;
+  scrollbar-width: none;
+}
+
+.emoji-grid::-webkit-scrollbar {
+  width: 0;
+  height: 0;
 }
 
 .emoji {
@@ -52,8 +58,8 @@
   width: 100%;
   height: 100%;
   cursor: pointer;
-  border-right: 1px solid rgba(0, 0, 0, 0.15);
-  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  border-right: 1px solid #0000001f;
+  border-bottom: 1px solid #0000001f;
   background-position: center;
   background-repeat: no-repeat;
   background-size: 19px;
@@ -97,7 +103,7 @@
   flex: 0 0 12px;
   margin-left: 10px;
   margin-right: 8px;
-  background-image: url('/channel/FontButton.png');
+  background-image: url('/channel/FontButton.webp');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -110,30 +116,14 @@
 .color-select-box {
   display: flex;
   min-width: max-content;
-  width: 100px;
+  width: 90px;
   max-width: 100%;
   position: relative;
   border: 1px solid var(--border);
   height: 28px;
-  width: 90px;
   align-items: center;
   margin-left: 8px;
   overflow: visible;
-}
-
-.color-select-box .color-panel {
-  z-index: 10001;
-  position: absolute;
-  top: calc(100%);
-  left: 0;
-  display: grid;
-  grid-template-columns: repeat(4, 20px);
-  gap: 6px;
-  padding: 8px;
-  width: max-content;
-  height: auto;
-  border: 1px solid var(--border);
-  box-shadow: 0 8px 16px var(--shadow);
 }
 
 .color-select-box::before {
@@ -144,7 +134,7 @@
   height: 2em;
   width: 25px;
   z-index: 1;
-  background-image: url('/channel/spliter.png');
+  background-image: url('/channel/spliter.webp');
   background-repeat: no-repeat;
   background-size: contain;
   pointer-events: none;
@@ -157,7 +147,7 @@
   right: 0;
   width: 26px;
   height: 12px;
-  background-image: url('/login_combobox_triangle.png');
+  background-image: url('/login_combobox_triangle.webp');
   background-repeat: no-repeat;
   background-size: cover;
   pointer-events: none;
@@ -190,13 +180,13 @@
   padding: 8px;
   background-color: var(--background);
   border: 1px solid var(--border);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15), inset 0 1px 5px rgb(0 0 0 / 10%);
+  box-shadow: 0 8px 16px var(--shadow);
 }
 
 .color-option {
   width: 20px;
   height: 20px;
-  border: 1px solid rgba(0, 0, 0, 0.25);
+  border: 1px solid #0000003f;
   border-radius: 3px;
   cursor: pointer;
 }
@@ -234,15 +224,6 @@
   height: 0;
 }
 
-.emoji-grid::-webkit-scrollbar {
-  width: 0;
-  height: 0;
-}
-
-.emoji-grid {
-  scrollbar-width: none;
-}
-
 .emoji-tabs {
   height: 32px;
   display: flex;
@@ -262,7 +243,7 @@
   cursor: pointer;
 }
 
-.emoji-tab-btn+.emoji-tab-btn {
+.emoji-tab-btn + .emoji-tab-btn {
   margin-left: 0;
 }
 
@@ -303,20 +284,20 @@
 }
 
 .tab-def::before {
-  background-image: url('/im/deftab.png');
+  background-image: url('/im/deftab.webp');
 }
 
 .tab-other::before {
-  background-image: url('/im/vipEm_Sign.png');
+  background-image: url('/im/vipEm_Sign.webp');
 }
 
 .tab-vip::before {
-  background-image: url('/im/viptab.png');
+  background-image: url('/im/viptab.webp');
 }
 
 .tab-def:hover::before,
 .tab-other:hover::before,
-.tab-vip:hover:before {
+.tab-vip:hover::before {
   background-position: -42px -1px;
 }
 

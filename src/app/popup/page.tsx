@@ -19,6 +19,7 @@ import ApplyFriend from '@/popups/ApplyFriend';
 import ApproveFriend from '@/popups/ApproveFriend';
 import ApplyMember from '@/popups/ApplyMember';
 import BlockMember from '@/popups/BlockMember';
+import ChannelEvent from '@/popups/ChannelEvent';
 import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
@@ -125,6 +126,11 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
   },
   blockMember: {
     type: 'blockMember',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+  channelEvent: {
+    type: 'channelEvent',
     buttons: ['close'],
     hideHeader: false,
   },
@@ -318,6 +324,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       applyMember: t('apply-member'),
       approveFriend: t('approve-friend'),
       blockMember: t('block'),
+      channelEvent: t('channel-event'),
       changeTheme: t('change-theme'),
       channelPassword: t('please-enter-the-channel-password'),
       channelSetting: initialData?.channel?.name || t('edit-channel'),
@@ -359,6 +366,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       approveFriend: () => <ApproveFriend id={id} {...initialData} />,
       blockMember: () => <BlockMember id={id} {...initialData} />,
       changeTheme: () => <ChangeTheme id={id} {...initialData} />,
+      channelEvent: () => <ChannelEvent id={id} {...initialData} />,
       channelPassword: () => <ChannelPassword id={id} {...initialData} />,
       channelSetting: () => <ChannelSetting id={id} {...initialData} />,
       createChannel: () => <CreateChannel id={id} {...initialData} />,

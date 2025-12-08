@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useMemo, useRef } from 'react';
 
 // CSS
 import setting from '@/styles/setting.module.css';
@@ -34,7 +34,7 @@ import { objDiff } from '@/utils/objDiff';
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 // Constants
-import { MAX_FILE_SIZE } from '@/constant';
+import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constant';
 
 interface ServerSettingPopupProps {
   userId: User['userId'];
@@ -51,6 +51,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
 
+    // Refs
+    const startXRef = useRef<number>(0);
+    const startWidthRef = useRef<number>(0);
+    const isResizingMemberColumn = useRef<boolean>(false);
+    const isResizingApplicationColumn = useRef<boolean>(false);
+    const isResizingBlockMemberColumn = useRef<boolean>(false);
+
     // States
     const [server, setServer] = useState<Server>(serverData);
     const [serverMembers, setServerMembers] = useState<Member[]>(serverMembersData);
@@ -61,6 +68,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const [searchText, setSearchText] = useState('');
     const [showPreview, setShowPreview] = useState(false);
     const [selectedItemId, setSelectedItemId] = useState<string>('');
+    const [memberColumnWidths, setMemberColumnWidths] = useState<number[]>(MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
+    const [applicationColumnWidths, setApplicationColumnWidths] = useState<number[]>(MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
+    const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
     // Variables
     const {
@@ -107,21 +117,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           .sort(Sorter(sortField as keyof MemberApplication, sortDirection)),
       [memberApplications, searchText, sortField, sortDirection],
     );
-    const memberTableFields = [
-      { name: t('name'), field: 'name' },
-      { name: t('permission'), field: 'permissionLevel' },
-      { name: t('contribution'), field: 'contribution' },
-      { name: t('join-date'), field: 'createdAt' },
-    ];
-    const applicationTableFields = [
-      { name: t('name'), field: 'name' },
-      { name: t('description'), field: 'description' },
-      { name: t('create-at'), field: 'createdAt' },
-    ];
-    const blockMemberTableFields = [
-      { name: t('name'), field: 'name' },
-      { name: t('unblock-date'), field: 'isBlocked' },
-    ];
     const settingPages = isServerAdmin(permissionLevel)
       ? [
           t('server-info'),
@@ -178,7 +173,74 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       handleSort(field);
     };
 
+    const handleMemberColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      isResizingMemberColumn.current = true;
+      startXRef.current = e.clientX;
+      startWidthRef.current = memberColumnWidths[index];
+    };
+
+    const handleMemberColumnHandleMove = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+      if (!isResizingMemberColumn.current) return;
+      const deltaX = e.clientX - startXRef.current;
+      const minWidth = MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
+      const maxWidth = minWidth * 2.5;
+      setMemberColumnWidths((prev) => {
+        const next = [...prev];
+        next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+        return next;
+      });
+    };
+
+    const handleApplicationColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      isResizingApplicationColumn.current = true;
+      startXRef.current = e.clientX;
+      startWidthRef.current = applicationColumnWidths[index];
+    };
+
+    const handleApplicationColumnHandleMove = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+      if (!isResizingApplicationColumn.current) return;
+      const deltaX = e.clientX - startXRef.current;
+      const minWidth = MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS[index].minWidth;
+      const maxWidth = minWidth * 2.5;
+      setApplicationColumnWidths((prev) => {
+        const next = [...prev];
+        next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+        return next;
+      });
+    };
+
+    const handleBlockMemberColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+      e.currentTarget.setPointerCapture(e.pointerId);
+      isResizingBlockMemberColumn.current = true;
+      startXRef.current = e.clientX;
+      startWidthRef.current = blockMemberColumnWidths[index];
+    };
+
+    const handleBlockMemberColumnHandleMove = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
+      if (!isResizingBlockMemberColumn.current) return;
+      const deltaX = e.clientX - startXRef.current;
+      const minWidth = BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
+      const maxWidth = minWidth * 2.5;
+      setBlockMemberColumnWidths((prev) => {
+        const next = [...prev];
+        next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
+        return next;
+      });
+    };
+
     // Effects
+    useEffect(() => {
+      const onPointerup = () => {
+        isResizingMemberColumn.current = false;
+        isResizingApplicationColumn.current = false;
+        isResizingBlockMemberColumn.current = false;
+      };
+      window.addEventListener('pointerup', onPointerup);
+      return () => window.removeEventListener('pointerup', onPointerup);
+    }, []);
+
     useEffect(() => {
       const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Server> }[]) => {
         const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
@@ -398,9 +460,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <table style={{ height: '330px' }}>
                   <thead>
                     <tr>
-                      {memberTableFields.map((field) => (
-                        <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
+                        <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                          <div className={popup['resizer']} onPointerDown={(e) => handleMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleMemberColumnHandleMove(e, index)} />
                         </th>
                       ))}
                     </tr>
@@ -486,13 +549,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td title={member.nickname || member.name}>
+                          <td title={member.nickname || member.name} style={{ width: `${memberColumnWidths[0]}px` }}>
                             <div className={`${permission[member.gender]} ${permission[`lv-${member.permissionLevel}`]}`} />
                             <div className={`${popup['name']} ${member.nickname ? popup['highlight'] : ''}`}>{member.nickname || member.name}</div>
                           </td>
-                          <td>{getPermissionText(t, member.permissionLevel)}</td>
-                          <td>{member.contribution}</td>
-                          <td>{new Date(member.createdAt).toLocaleString()}</td>
+                          <td style={{ width: `${memberColumnWidths[1]}px` }}>{getPermissionText(t, member.permissionLevel)}</td>
+                          <td style={{ width: `${memberColumnWidths[2]}px` }}>{member.contribution}</td>
+                          <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(member.createdAt).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
@@ -579,9 +642,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <table style={{ height: '330px' }}>
                   <thead>
                     <tr>
-                      {applicationTableFields.map((field) => (
-                        <th key={field.field} onClick={() => handleApplicationSort(field.field as keyof MemberApplication)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      {MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
+                        <th key={field.key} style={{ width: `${applicationColumnWidths[index]}px` }} onClick={() => handleApplicationSort(field.key as keyof MemberApplication)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                          <div className={popup['resizer']} onPointerDown={(e) => handleApplicationColumnHandleDown(e, index)} onPointerMove={(e) => handleApplicationColumnHandleMove(e, index)} />
                         </th>
                       ))}
                     </tr>
@@ -632,9 +696,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td>{application.name}</td>
-                          <td>{application.description}</td>
-                          <td>{new Date(application.createdAt).toLocaleString()}</td>
+                          <td style={{ width: `${applicationColumnWidths[0]}px` }}>{application.name}</td>
+                          <td style={{ width: `${applicationColumnWidths[1]}px` }}>{application.description}</td>
+                          <td style={{ width: `${applicationColumnWidths[2]}px` }}>{new Date(application.createdAt).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
@@ -659,9 +723,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 <table style={{ height: '330px' }}>
                   <thead>
                     <tr>
-                      {blockMemberTableFields.map((field) => (
-                        <th key={field.field} onClick={() => handleMemberSort(field.field as keyof Member)}>
-                          {`${field.name} ${sortField === field.field ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                      {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
+                        <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }} onClick={() => handleMemberSort(field.key as keyof Member)}>
+                          {`${t(field.tKey)} ${sortField === field.key ? (sortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                          <div className={popup['resizer']} onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                         </th>
                       ))}
                     </tr>
@@ -702,8 +767,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td>{member.nickname || member.name}</td>
-                          <td>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
+                          <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
+                          <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>
+                            {member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}
+                          </td>
                         </tr>
                       );
                     })}

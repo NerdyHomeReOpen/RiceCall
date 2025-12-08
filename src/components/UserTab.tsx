@@ -88,7 +88,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
-  const isSuperior = permissionLevel > memberPermission;
+  const isSuperior = permissionLevel >= memberPermission;
   const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
   // Handlers
@@ -148,8 +148,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     {
       id: 'move-to-channel',
       label: t('move-to-channel'),
-      show: !isUser && isChannelMod(currentPermissionLevel) && isChannelMod(permissionLevel) && !isSameChannel && permissionLevel >= memberPermission,
-      onClick: () => handleMoveUserToChannel(memberUserId, currentServerId, currentChannelId || ''),
+      show: !isUser && isChannelMod(currentPermissionLevel) && isChannelMod(permissionLevel) && !isSameChannel && isSuperior,
+      onClick: () => handleMoveUserToChannel(memberUserId, currentServerId, currentChannelId),
     },
     {
       id: 'separator',
@@ -262,7 +262,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   };
 
   const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
+    handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
   };
 
   const handleAddUserToQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {

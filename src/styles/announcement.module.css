@@ -147,7 +147,7 @@
   background-color: var(--background);
   box-shadow: 0 1px 1px #00000080;
   overflow-y: auto;
-  animation: fadeIn 0.2s ease-in-out;
+  animation: fade-in 0.2s ease-in-out;
 }
 
 @keyframes visibility {
@@ -160,7 +160,7 @@
   }
 }
 
-@keyframes fadeIn {
+@keyframes fade-in {
   from {
     opacity: 0;
     transform: scale(0.95);

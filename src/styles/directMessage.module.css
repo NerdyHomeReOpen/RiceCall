@@ -41,42 +41,42 @@
 }
 
 .direct-option-buttons .file-share {
-  background-image: url('/im/Fileshare.png');
+  background-image: url('/im/Fileshare.webp');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .direct-option-buttons .apply-friend {
-  background-image: url('/im/AddContact.png');
+  background-image: url('/im/AddContact.webp');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .direct-option-buttons .block-user {
-  background-image: url('/im/BlockUser.png');
+  background-image: url('/im/BlockUser.webp');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .direct-option-buttons .un-block-user {
-  background-image: url('/im/UnblockUser.PNG');
+  background-image: url('/im/UnblockUser.webp');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .direct-option-buttons .invite-temp-group {
-  background-image: url('/im/InviteTempGroup.png');
+  background-image: url('/im/InviteTempGroup.webp');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
 }
 
 .direct-option-buttons .report {
-  background-image: url('/im/report.png');
+  background-image: url('/im/report.webp');
   background-size: contain;
   background-position: center;
   background-repeat: no-repeat;
@@ -112,7 +112,7 @@
   margin: 10px;
   position: relative;
   cursor: pointer;
-  background-image: url('/im/IMLogo.png');
+  background-image: url('/im/IMLogo.webp');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -130,7 +130,7 @@
   left: -10px;
   min-width: 120px;
   min-height: 120px;
-  background-image: url('/im/logoframe.png');
+  background-image: url('/im/logoframe.webp');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
@@ -142,7 +142,7 @@
 }
 
 .user-friend-split {
-  background-image: url('/mf_spliter.png');
+  background-image: url('/mf_spliter.webp');
   background-size: cover;
   height: 15px;
   width: 2px;
@@ -171,11 +171,11 @@
   content: '';
   position: absolute;
   left: 50%;
-  bottom: -1;
+  bottom: -1px;
   transform: translateX(-50%);
   width: 100%;
   height: 22px;
-  background-image: url('/im/serverin_bkg.png');
+  background-image: url('/im/serverin_bkg.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
@@ -198,7 +198,7 @@
 }
 
 .action-icon.in-server {
-  background-image: url('/im/server_in.png');
+  background-image: url('/im/server_in.webp');
 }
 
 .action-title {
@@ -208,17 +208,19 @@
 
 .action-area.clickable {
   cursor: pointer;
+
   &:hover .action-title {
     text-decoration: underline;
   }
 }
 
 .message-area {
-  display: flex;
   flex: 5;
-  padding: 10px;
-  margin-bottom: 10px;
-  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  padding: 10px 10px 0;
 }
 
 .input-area {
@@ -233,7 +235,7 @@
   min-height: 30px;
   min-width: 100%;
   display: flex;
-  background-image: url('/tool_bkg.png');
+  background-image: url('/tool_bkg.webp');
   background-size: 100%;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -257,19 +259,19 @@
 }
 
 .input-area .top-bar .buttons .button.font {
-  background-image: url('/FontButton.png');
+  background-image: url('/FontButton.webp');
 }
 
 .input-area .top-bar .buttons .button.emoji {
-  background-image: url('/FaceButton.png');
+  background-image: url('/FaceButton.webp');
 }
 
 .input-area .top-bar .buttons .button.screen-shot {
-  background-image: url('/ScreenShot.png');
+  background-image: url('/ScreenShot.webp');
 }
 
 .input-area .top-bar .buttons .button.nudge {
-  background-image: url('/im/Nudge.png');
+  background-image: url('/im/Nudge.webp');
 }
 
 .input-area .top-bar .history-message {
@@ -286,7 +288,7 @@
   min-height: 18px;
   min-width: 18px;
   margin-right: 3px;
-  background-image: url('/im/history.png');
+  background-image: url('/im/history.webp');
   background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -295,7 +297,6 @@
 .input {
   flex: 1;
   display: block;
-  border: none;
   padding: 8px;
   resize: none;
   overflow: auto;
@@ -311,8 +312,7 @@
 }
 
 @keyframes shake {
-  0%,
-  100% {
+  0% {
     transform: translate(0, 0);
   }
 
@@ -329,6 +329,10 @@
   60%,
   80% {
     transform: translate(2px, 2px);
+  }
+
+  100% {
+    transform: translate(0, 0);
   }
 }
 
@@ -351,7 +355,7 @@
 }
 
 .is-official-icon {
-  background-image: url(https://api.ricecall.com/images/badgeIcons/official.webp);
+  background-image: url('/official.webp');
   width: 17px;
   height: 16px;
   background-size: cover;

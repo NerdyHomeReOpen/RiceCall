@@ -73,7 +73,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
   const connectStatus = 4 - Math.floor(Number(latency) / 50);
-  const serverUserIds = useMemo(() => serverOnlineMembers.map((m) => m.userId), [serverOnlineMembers]);
+  const movableServerUserIds = useMemo(
+    () => serverOnlineMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId),
+    [userId, serverOnlineMembers, permissionLevel],
+  );
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
   const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
@@ -158,8 +161,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     {
       id: 'kick-all-users-from-server',
       label: t('kick-all-users-from-server'),
-      show: isStaff(permissionLevel) && serverUserIds.length > 0,
-      onClick: () => handleKickUsersFromServer(serverUserIds, currentServerId),
+      show: isStaff(permissionLevel) && movableServerUserIds.length > 0,
+      onClick: () => handleKickUsersFromServer(movableServerUserIds, currentServerId),
     },
     {
       id: 'separator',

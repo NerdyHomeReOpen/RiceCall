@@ -43,7 +43,7 @@
 }
 
 .notify-menu .option[data-type='notify']::before {
-  background-image: url('/icon_notice_friend.png');
+  background-image: url('/icon_notice_friend.webp');
 }
 
 .notify-menu .contents {

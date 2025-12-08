@@ -334,7 +334,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['main-content']}>
           <div className={styles['action-body']}>
             {isFriend && isOnline && targetCurrentServer ? (
-              <div className={`${styles['action-area']} ${styles['clickable']}`} onClick={() => handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId)}>
+              <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId)}>
                 <div className={`${styles['action-icon']} ${styles['in-server']}`} />
                 <div className={styles['action-title']}>{targetCurrentServerName}</div>
               </div>
@@ -345,7 +345,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               </div>
             ) : null}
             {targetIsVerified ? (
-              <div className={`${styles['action-area']}`}>
+              <div className={styles['action-area']}>
                 <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
                 <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
                   <span className={styles['is-official-title']}>{t('official-title')}</span>
@@ -356,6 +356,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
           </div>
           <div ref={messageAreaRef} onScroll={handleScroll} className={styles['message-area']}>
             <DirectMessageContent messages={directMessages} user={user} />
+            <div style={{ minHeight: '10px' }}></div>
             {unreadMessageCount > 0 && (
               <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
                 {t('has-new-message', { 0: unreadMessageCount })}

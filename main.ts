@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
@@ -9,107 +8,28 @@ initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
-import { initMainI18n, LanguageKey, getLanguage, t } from './i18n.js';
-import { connectSocket, disconnectSocket } from './socket.js';
-import { env, loadEnv } from './env.js';
-import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
-import authService from './auth.service.js';
-import dataService from './data.service.js';
-import popupLoaders from './popupLoader.js';
+import { initMainI18n, t } from './src/main/i18n.js';
+import { connectSocket, disconnectSocket } from './src/main/socket.js';
+import { env, loadEnv } from './src/main/env.js';
+import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/main/discord.js';
+import authService from './src/main/auth.service.js';
+import dataService from './src/main/data.service.js';
+import popupLoaders from './src/main/popupLoader.js';
+import type { StoreType, PopupType, LanguageKey } from './src/types';
+import { LANGUAGES } from './src/constant.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
 }
 
-// Store
-type StoreType = {
-  accounts: Record<string, any>;
-  language: LanguageKey;
-  customThemes: Record<string, any>[];
-  currentTheme: string | null;
-  autoLogin: boolean;
-  autoLaunch: boolean;
-  alwaysOnTop: boolean;
-  closeToTray: boolean;
-  statusAutoIdle: boolean;
-  statusAutoIdleMinutes: number;
-  statusAutoDnd: boolean;
-  channelUIMode: string;
-  font: string;
-  fontSize: number;
-  inputAudioDevice: string;
-  outputAudioDevice: string;
-  recordFormat: 'wav' | 'mp3';
-  mixEffect: boolean;
-  mixEffectType: string;
-  autoMixSetting: boolean;
-  echoCancellation: boolean;
-  noiseCancellation: boolean;
-  microphoneAmplification: boolean;
-  manualMixMode: boolean;
-  mixMode: string;
-  speakingMode: string;
-  defaultSpeakingKey: string;
-  notSaveMessageHistory: boolean;
-  hotKeyOpenMainWindow: string;
-  hotKeyScreenshot: string;
-  hotKeyIncreaseVolume: string;
-  hotKeyDecreaseVolume: string;
-  hotKeyToggleSpeaker: string;
-  hotKeyToggleMicrophone: string;
-  disableAllSoundEffect: boolean;
-  enterVoiceChannelSound: boolean;
-  leaveVoiceChannelSound: boolean;
-  startSpeakingSound: boolean;
-  stopSpeakingSound: boolean;
-  receiveDirectMessageSound: boolean;
-  receiveChannelMessageSound: boolean;
-  dontShowDisclaimer: boolean;
-  autoCheckForUpdates: boolean;
-  updateCheckInterval: number;
-  updateChannel: string;
-  server: 'prod' | 'dev';
-};
+export function getLanguage(): LanguageKey {
+  const language = app.getLocale();
 
-// Popup
-type PopupType =
-  | 'aboutus'
-  | 'applyFriend'
-  | 'approveFriend'
-  | 'applyMember'
-  | 'blockMember'
-  | 'changeTheme'
-  | 'channelPassword'
-  | 'channelSetting'
-  | 'createChannel'
-  | 'createFriendGroup'
-  | 'createServer'
-  | 'dialogAlert'
-  | 'dialogAlert2'
-  | 'dialogError'
-  | 'dialogInfo'
-  | 'dialogSuccess'
-  | 'dialogWarning'
-  | 'directMessage'
-  | 'editChannelName'
-  | 'editChannelOrder'
-  | 'editFriendNote'
-  | 'editFriendGroupName'
-  | 'editNickname'
-  | 'friendVerification'
-  | 'imageCropper'
-  | 'inviteMember'
-  | 'kickMemberFromChannel'
-  | 'kickMemberFromServer'
-  | 'memberApplicationSetting'
-  | 'memberInvitation'
-  | 'searchUser'
-  | 'serverBroadcast'
-  | 'serverSetting'
-  | 'systemSetting'
-  | 'userInfo'
-  | 'userSetting'
-  | 'chatHistory';
+  const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
+  if (!match) return 'en-US';
+
+  return match.code;
+}
 
 const store = new Store<StoreType>({
   defaults: {
@@ -180,6 +100,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   approveFriend: { height: 250, width: 400 },
   applyMember: { height: 300, width: 490 },
   blockMember: { height: 250, width: 400 },
+  channelEvent: { height: 400, width: 500 },
   channelSetting: { height: 520, width: 600 },
   channelPassword: { height: 200, width: 380 },
   changeTheme: { height: 335, width: 480 },

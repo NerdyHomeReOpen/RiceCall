@@ -1,16 +1,19 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowSyntheticDefaultImports": true,
     "strict": true,
     "sourceMap": true,
     "outDir": "build",
-    "skipLibCheck": true
+    "skipLibCheck": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": ["main.ts", "i18n.ts", "socket.ts", "env.ts", "discord.ts", "data.service.ts", "api.service.ts", "auth.service.ts", "popupLoader.ts"],
+  "include": ["main.ts", "main/**/*"],
   "exclude": ["node_modules"]
 }

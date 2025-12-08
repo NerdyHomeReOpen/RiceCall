@@ -32,7 +32,7 @@
   display: inline-block;
   min-width: 60px;
   min-height: 24px;
-  background-image: url('/login_logo_title.png');
+  background-image: url('/login_logo_title.webp');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -60,7 +60,7 @@
 .gift {
   min-width: 28px;
   min-height: 28px;
-  background-image: url('/gift.png');
+  background-image: url('/gift.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -71,7 +71,7 @@
 .game {
   min-width: 28px;
   min-height: 28px;
-  background-image: url('/game.png');
+  background-image: url('/game.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -82,7 +82,7 @@
 .notice {
   min-width: 24px;
   min-height: 24px;
-  background-image: url('/icon_notice.png');
+  background-image: url('/icon_notice.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -94,7 +94,7 @@
   position: absolute;
   min-width: 24px;
   min-height: 24px;
-  background-image: url('/icon_notice_overlay.png');
+  background-image: url('/icon_notice_overlay.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -105,7 +105,7 @@
 .spliter {
   min-width: 2px;
   min-height: 19px;
-  background-image: url('/mf_spliter.png');
+  background-image: url('/mf_spliter.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -116,7 +116,7 @@
 .menu {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('/BtnMenu.png');
+  background-image: url('/BtnMenu.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -127,7 +127,7 @@
 .minimize {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('/Button_Minsize.png');
+  background-image: url('/Button_Minsize.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -138,7 +138,7 @@
 .restore {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('/Button_Restore.png');
+  background-image: url('/Button_Restore.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -149,7 +149,7 @@
 .maxsize {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('/Button_Maxsize.png');
+  background-image: url('/Button_Maxsize.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -160,7 +160,7 @@
 .close {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('/Button_Close.png');
+  background-image: url('/Button_Close.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -215,7 +215,7 @@
 .selected::before {
   width: 13px;
   height: 13px;
-  background-image: url('/user_state.png');
+  background-image: url('/user_state.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -251,7 +251,7 @@
   left: 0;
   min-width: 10px;
   min-height: 31px;
-  background-image: url('/tab_item_mainframe.png');
+  background-image: url('/tab_item_mainframe.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -264,7 +264,7 @@
   right: 0;
   min-width: 10px;
   min-height: 31px;
-  background-image: url('/tab_item_mainframe.png');
+  background-image: url('/tab_item_mainframe.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -353,15 +353,15 @@
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
-  background-image: url('/rc_logo_small.png');
+  background-image: url('/rc_logo_small.webp');
 }
 
 .title-box-skin-icon::before {
-  background-image: url('/icon_skin.png');
+  background-image: url('/icon_skin.webp');
 }
 
 .title-box-direct-message-icon::before {
-  background-image: url('/im/chat.png');
+  background-image: url('/im/chat.webp');
 }
 
 .name-box {
@@ -411,7 +411,7 @@
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
-  background-image: url('/user_state.png');
+  background-image: url('/user_state.webp');
   background-repeat: no-repeat;
   background-position: 0 0 !important;
 }
@@ -437,7 +437,7 @@
   min-width: 8px;
   min-height: 13px;
   margin-left: 5px;
-  background-image: url('/state_triangle.png');
+  background-image: url('/state_triangle.webp');
   background-repeat: no-repeat;
   background-position: 0 4px;
 }
@@ -489,7 +489,7 @@
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
-  background-image: url('/user_state.png');
+  background-image: url('/user_state.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }

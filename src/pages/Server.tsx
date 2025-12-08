@@ -10,9 +10,10 @@ import MarkdownContent from '@/components/MarkdownContent';
 import ChannelMessageContent from '@/components/ChannelMessageContent';
 import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
+import MicModeMenu from '@/components/MicModeMenu';
 
 // Types
-import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueUser, ChannelUIMode, MemberApplication } from '@/types';
+import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage, SpeakingMode, Friend, QueueUser, ChannelUIMode, MemberApplication, ChannelEvent } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -25,7 +26,10 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
-import MicModeMenu from '@/components/MicModeMenu';
+import { handleOpenChannelEvent } from '@/utils/popup';
+
+const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
+const MESSAGE_VIERER_DEVIATION = 100;
 
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
@@ -134,13 +138,29 @@ interface ServerPageProps {
   channels: Channel[];
   channelMessages: (ChannelMessage | PromptMessage)[];
   actionMessages: PromptMessage[];
+  channelEvents: ChannelEvent[];
   onClearMessages: () => void;
   display: boolean;
   latency: number;
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
-  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, serverMemberApplications, channels, channelMessages, actionMessages, onClearMessages, display, latency }) => {
+  ({
+    user,
+    currentServer,
+    currentChannel,
+    friends,
+    queueUsers,
+    serverOnlineMembers,
+    serverMemberApplications,
+    channels,
+    channelMessages,
+    actionMessages,
+    channelEvents,
+    onClearMessages,
+    display,
+    latency,
+  }) => {
     // Hooks
     const { t } = useTranslation();
     const webRTC = useWebRTC();
@@ -258,6 +278,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         onClick: onClearMessages,
       },
       {
+        id: 'open-channel-event',
+        label: t('channel-event'),
+        onClick: () => handleOpenChannelEvent(userId, currentServer.serverId, channelEvents),
+      },
+      {
         id: 'open-announcement',
         label: t('open-announcement'),
         show: !isAnnouncementVisible,
@@ -341,6 +366,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     };
 
     const handleToggleMixingMode = async () => {
+      if (!webRTC.isMicTaken) return;
       webRTC.toggleMixMode();
     };
 
@@ -420,7 +446,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     const handleScroll = () => {
       if (!messageAreaRef.current) return;
-      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
       setIsAtBottom(isBottom);
     };
 
@@ -447,8 +473,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         return;
       }
       if (actionMessageTimer.current) clearTimeout(actionMessageTimer.current);
+      const seconeds = actionMessages[actionMessages.length - 1].displaySeconds ?? DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS;
       setShowActionMessage(true);
-      actionMessageTimer.current = setTimeout(() => setShowActionMessage(false), 8000);
+      actionMessageTimer.current = setTimeout(() => setShowActionMessage(false), seconeds * 1000);
       return () => {
         if (actionMessageTimer.current) {
           clearTimeout(actionMessageTimer.current);
@@ -487,11 +514,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       if (!messageAreaRef.current || channelMessages.length === 0) return;
 
       const lastMessage = channelMessages[channelMessages.length - 1];
-      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
+      const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
 
-      if (lastMessage.type !== 'general' || lastMessage.userId === userId) {
-        setTimeout(() => handleScrollToBottom(), 50);
-      } else if (isBottom) {
+      if (isBottom || lastMessage.type !== 'general' || lastMessage.userId === userId) {
         setTimeout(() => handleScrollToBottom(), 50);
       } else {
         setUnreadMessageCount((prev) => prev + 1);
@@ -615,6 +640,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   }}
                 >
                   <ChannelMessageContent user={user} currentServer={currentServer} currentChannel={currentChannel} messages={channelMessages} />
+                  <div style={{ minHeight: '10px' }}></div>
                   {unreadMessageCount > 0 && (
                     <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
                       {t('has-new-message', { 0: unreadMessageCount })}
@@ -631,6 +657,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       currentChannel={currentChannel}
                       messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []}
                     />
+                    <div className={styles['close-button']} onClick={() => setShowActionMessage(false)}></div>
                   </div>
                   <MessageInputBoxGuard
                     lastJoinChannelTime={lastJoinChannelTime}

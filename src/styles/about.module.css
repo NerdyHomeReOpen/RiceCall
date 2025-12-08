@@ -1,5 +1,5 @@
 .app-logo {
-  background-image: url('/login_logo.png');
+  background-image: url('/login_logo.webp');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -48,7 +48,7 @@
   min-height: fit-content;
   padding: 10px;
   border: 1px solid var(--border);
-  box-shadow: inset 0 1px 5px rgb(0 0 0 / 10%);
+  box-shadow: inset 0 1px 5px var(--shadow);
 }
 
 .team-member-card {
@@ -105,6 +105,20 @@
 .icon-wrapper svg {
   vertical-align: middle;
   transition: color 0.3s ease;
+}
+
+.ricecall-id {
+  color: var(--text-link);
+  font-size: 0.9em;
+  font-weight: bold;
+  margin-right: 8px;
+  display: inline-block;
+  text-align: center;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }
 
 .github-icon-link:hover svg {

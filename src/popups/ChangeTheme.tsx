@@ -78,7 +78,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const rect = colorSelectorRef.current.getBoundingClientRect();
     const offsetX = event.clientX - rect.left;
     const offsetY = event.clientY - rect.top;
-    const imgSrc = '/skin_palette.png';
+    const imgSrc = '/skin_palette.webp';
     const img = new Image();
     img.crossOrigin = 'Anonymous';
     img.src = imgSrc;

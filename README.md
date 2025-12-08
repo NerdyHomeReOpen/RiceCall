@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <a title="Crowdin" target="_blank" href="https://discord.gg/adCWzv6wwS"><img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord"/></a>
-    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.9-green"/></a>
+    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.10-green"/></a>
     <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/ricecall/localized.svg"></a>
   </div>
 </div>
@@ -56,38 +56,36 @@ Please read the documentation before downloading.
 
 ```bash
 RiceCall
+├── .github/                  # CI/CD workflows and issue templates
+├── build/                    # Electron build artifacts (local)
 ├── build_deb/                # Linux post-install scripts
 ├── public/                   # Static assets (images, icons, fonts, etc.)
 ├── resources/                # Electron packaging resources
 ├── scripts/                  # Development and maintenance scripts
 ├── src/
-│   ├── app/                  # Entry pages for the Next.js App Router
-│   ├── components/           # Reusable React components
+│   ├── app/                  # Next.js App Router entry pages/layout
+│   ├── components/           # Reusable UI components
 │   ├── extensions/           # TipTap editor extensions
-│   ├── i18n/                 # i18n initialization and translations
-│   ├── pages/                # Legacy pages integrated with Electron
+│   ├── i18n/                 # Client i18n setup and translations
+│   ├── main/                 # Electron main-process helpers/services
+│   ├── pages/                # Legacy renderer pages integrated with Electron
 │   ├── popups/               # Popup view components
 │   ├── providers/            # React context providers
-│   ├── services/             # API and IPC service layer
-│   ├── styles/               # CSS and styling assets
+│   ├── services/             # IPC bridge for renderer
+│   ├── styles/               # Global styles and CSS modules
 │   ├── types/                # Shared TypeScript types
 │   ├── utils/                # Utility functions
+│   ├── constant.ts           # Shared constants
 │   ├── emojis.ts             # Emoji definitions
 │   └── next-env.d.ts         # Next.js environment type declarations
-├── crowdin.yml               # Crowdin localization configuration
 ├── dev-app-update.yml        # Electron auto-update configuration
-├── discord.ts                # Discord Rich Presence integration
-├── Dockerfile                # Docker deployment configuration
 ├── electron-builder.json     # Electron packaging configuration
 ├── electron-builder-dev.json # Electron packaging configuration for dev builds
-├── env.ts                    # Environment variable loader
 ├── eslint.config.mjs         # ESLint configuration
-├── i18n.ts                   # i18n bootstrap for CLI/scripts
 ├── LICENSE                   # Project license
 ├── main.ts                   # Electron main-process entry point
 ├── next.config.ts            # Next.js configuration
 ├── package.json              # Dependencies and npm/yarn scripts
-├── socket.ts                 # Socket bootstrap
 ├── tsconfig.electron.json    # TypeScript config for the Electron main process
 ├── tsconfig.json             # TypeScript config for the renderer
 └── yarn.lock                 # Dependency lockfile

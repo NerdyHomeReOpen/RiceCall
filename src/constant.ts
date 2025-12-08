@@ -1,4 +1,4 @@
-import { User } from '@/types';
+import { LanguageKey, User } from '@/types';
 
 export type RecommendServerCategory = {
   id: string;
@@ -123,3 +123,73 @@ export const CATEGORIES: RecommendServerCategory[] = [
   },
 ];
 export const STATUS_OPTIONS: User['status'][] = ['online', 'dnd', 'idle', 'gn'];
+export const MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
+  {
+    tKey: 'name',
+    key: 'name',
+    minWidth: 150,
+  },
+  {
+    tKey: 'permission',
+    key: 'permissionLevel',
+    minWidth: 120,
+  },
+  {
+    tKey: 'contribution',
+    key: 'contribution',
+    minWidth: 70,
+  },
+  {
+    tKey: 'join-date',
+    key: 'createdAt',
+    minWidth: 100,
+  },
+];
+export const MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
+  {
+    tKey: 'name',
+    key: 'name',
+    minWidth: 150,
+  },
+  {
+    tKey: 'description',
+    key: 'description',
+    minWidth: 200,
+  },
+  {
+    tKey: 'create-at',
+    key: 'createdAt',
+    minWidth: 90,
+  },
+];
+export const BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
+  {
+    tKey: 'name',
+    key: 'name',
+    minWidth: 220,
+  },
+  {
+    tKey: 'unblock-date',
+    key: 'isBlocked',
+    minWidth: 220,
+  },
+];
+export const RECOMMEND_SERVER_CATEGORY_TABS = [
+  { key: 'all', tKey: 'all' },
+  { key: 'radio', tKey: 'radio' },
+  { key: 'entertainment', tKey: 'entertainment' },
+  { key: 'sing', tKey: 'sing' },
+  { key: 'game', tKey: 'game' },
+  { key: 'community', tKey: 'community' },
+];
+export const LANGUAGES: { code: LanguageKey; label: string }[] = [
+  { code: 'zh-TW', label: '繁體中文' },
+  { code: 'zh-CN', label: '简体中文' },
+  { code: 'en-US', label: 'English' },
+  { code: 'ru-RU', label: 'Русский' },
+  { code: 'pt-BR', label: 'Português' },
+  { code: 'es-ES', label: 'Español' },
+  { code: 'fa-IR', label: 'فارسی' },
+  { code: 'tr-TR', label: 'Türkçe' },
+];
+export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds

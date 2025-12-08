@@ -7,7 +7,7 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background-image: url('/dialog_body_bg.png');
+  background-image: url('/dialog_body_bg.webp');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -52,10 +52,6 @@
   background-repeat: no-repeat;
 }
 
-.theme-slots-big div:hover {
-  border: 1px solid #20a5d8;
-}
-
 .theme-slots-small {
   display: grid;
   grid-template-columns: repeat(8, 1fr);
@@ -74,6 +70,11 @@
   background-repeat: no-repeat;
 }
 
+.theme-slots-small div:hover,
+.theme-slots-big div:hover {
+  border: 1px solid #20a5d8;
+}
+
 .theme-slots-small div::before {
   content: '';
   position: absolute;
@@ -86,14 +87,10 @@
   background-repeat: no-repeat;
 }
 
-.theme-slots-small div:hover {
-  border: 1px solid #20a5d8;
-}
-
 .image-selector {
   min-width: 60px;
   min-height: 60px;
-  background-image: url('/user_defined.png');
+  background-image: url('/user_defined.webp');
 }
 
 .image-selector:hover {
@@ -105,7 +102,7 @@
 }
 
 .color-selector {
-  background-image: url('/palette.png');
+  background-image: url('/palette.webp');
 }
 
 .color-selector-box {
@@ -118,7 +115,7 @@
 }
 
 .color-selector-image {
-  background-image: url('/skin_palette.png');
+  background-image: url('/skin_palette.webp');
   background-size: cover;
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -153,13 +150,8 @@
   cursor: pointer;
 }
 
-.color-selected-save:hover,
-.color-selected-cancel:hover {
-  background-color: var(--hover);
-}
-
 .color-selected-save {
-  background-image: url('/palette_ok.png');
+  background-image: url('/palette_ok.webp');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
@@ -167,116 +159,121 @@
 }
 
 .color-selected-cancel {
-  background-image: url('/palette_cancel.png');
+  background-image: url('/palette_cancel.webp');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
 }
 
+.color-selected-save:hover,
+.color-selected-cancel:hover {
+  background-color: var(--hover);
+}
+
 .theme[data-theme-index='0'] {
-  background-image: url('/skin/57KJ57SF5Zue5oa2_preview.jpg');
+  background-image: url('/skin/57KJ57SF5Zue5oa2_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/57KJ57SF5Zue5oa2.jpg');
+  --header-image: url('/skin/57KJ57SF5Zue5oa2.webp');
   --main-color: #f6e6d7;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='1'] {
-  background-image: url('/skin/57SU55yf56ul5bm0_preview.jpg');
+  background-image: url('/skin/57SU55yf56ul5bm0_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/57SU55yf56ul5bm0.jpg');
+  --header-image: url('/skin/57SU55yf56ul5bm0.webp');
   --main-color: #1b71ac;
   --secondary-color: #fff;
 }
 
 .theme[data-theme-index='2'] {
-  background-image: url('/skin/5Y+v5oSb6LKT5ZKq_preview.jpg');
+  background-image: url('/skin/5Y+v5oSb6LKT5ZKq_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/5Y+v5oSb6LKT5ZKq.jpg');
+  --header-image: url('/skin/5Y+v5oSb6LKT5ZKq.webp');
   --main-color: #efd1ab;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='3'] {
-  background-image: url('/skin/6YKj5LiA5bm0_preview.jpg');
+  background-image: url('/skin/6YKj5LiA5bm0_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/6YKj5LiA5bm0.jpg');
+  --header-image: url('/skin/6YKj5LiA5bm0.webp');
   --main-color: #d4be99;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='4'] {
-  background-image: url('/skin/img_greenmood_preview.jpg');
+  background-image: url('/skin/img_greenmood_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_greenmood.jpg');
+  --header-image: url('/skin/img_greenmood.webp');
   --main-color: #89c68b;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='5'] {
-  background-image: url('/skin/img_sunflower_preview.jpg');
+  background-image: url('/skin/img_sunflower_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_sunflower.jpg');
+  --header-image: url('/skin/img_sunflower.webp');
   --main-color: #edd569;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='6'] {
-  background-image: url('/skin/img_sunset_preview.jpg');
+  background-image: url('/skin/img_sunset_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_sunset.jpg');
+  --header-image: url('/skin/img_sunset.webp');
   --main-color: #7464ad;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='7'] {
-  background-image: url('/skin/img_colddrink_preview.jpg');
+  background-image: url('/skin/img_colddrink_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_colddrink.jpg');
+  --header-image: url('/skin/img_colddrink.webp');
   --main-color: #e3908f;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='8'] {
-  background-image: url('/skin/img_pebble_preview.jpg');
+  background-image: url('/skin/img_pebble_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_pebble.jpg');
+  --header-image: url('/skin/img_pebble.webp');
   --main-color: #a4cfd5;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='9'] {
-  background-image: url('/skin/img_love_preview.jpg');
+  background-image: url('/skin/img_love_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_love.jpg');
+  --header-image: url('/skin/img_love.webp');
   --main-color: #aa7a52;
   --secondary-color: #000;
 }
 
 .theme[data-theme-index='10'] {
-  background-image: url('/skin/img_hamburger_preview.jpg');
+  background-image: url('/skin/img_hamburger_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_hamburger.jpg');
+  --header-image: url('/skin/img_hamburger.webp');
   --main-color: #591234;
   --secondary-color: #fff;
 }
 
 .theme[data-theme-index='11'] {
-  background-image: url('/skin/img_coastline_preview.jpg');
+  background-image: url('/skin/img_coastline_preview.webp');
   background-color: #000;
 
-  --header-image: url('/skin/img_coastline.jpg');
+  --header-image: url('/skin/img_coastline.webp');
   --main-color: #313131;
   --secondary-color: #fff;
 }

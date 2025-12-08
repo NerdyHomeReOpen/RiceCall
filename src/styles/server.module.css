@@ -53,11 +53,11 @@
   object-fit: cover;
   min-height: 50px;
   min-width: 50px;
-  background-image: url('/logo_server_def.png');
+  background-image: url('/logo_server_def.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: center center;
-  box-shadow: 0px 2px 2px var(--shadow);
+  box-shadow: 0 2px 2px var(--shadow);
 }
 
 .avatar-picture::before {
@@ -68,7 +68,7 @@
   z-index: 1;
   min-width: 52px;
   min-height: 52px;
-  background-image: url('/channel/server_logo_border.png');
+  background-image: url('/channel/server_logo_border.webp');
   background-repeat: no-repeat;
   background-size: cover;
   background-position: 0 0;
@@ -93,7 +93,7 @@
 .verify-icon {
   min-width: 12px;
   min-height: 12px;
-  background-image: url('/icon_verify.png');
+  background-image: url('/icon_verify.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -105,7 +105,7 @@
   line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  word-break: break-word;
+  overflow-wrap: break-word;
   color: var(--text-color-quaternary);
 }
 
@@ -115,7 +115,7 @@
   align-items: center;
   min-width: 75px;
   color: var(--text-color-quaternary);
-  text-shadow: 0 1px 0 #ffffff;
+  text-shadow: 0 1px 0 #fff;
 }
 
 .member-text {
@@ -124,7 +124,7 @@
   align-items: center;
   min-width: 55px;
   color: var(--text-color-quaternary);
-  text-shadow: 0 1px 0 #ffffff;
+  text-shadow: 0 1px 0 #fff;
 }
 
 .id-text::before {
@@ -132,7 +132,7 @@
   min-height: 12px;
   min-width: 12px;
   position: relative;
-  background-image: url('/channel/ID.png');
+  background-image: url('/channel/ID.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   margin-right: 2px;
@@ -143,7 +143,7 @@
   min-height: 12px;
   min-width: 12px;
   position: relative;
-  background-image: url('/channel/member.png');
+  background-image: url('/channel/member.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   margin-right: 2px;
@@ -166,7 +166,7 @@
   min-height: 16px;
   min-width: 20px;
   cursor: pointer;
-  background-image: url('/channel/icon_invite_friend.png');
+  background-image: url('/channel/icon_invite_friend.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -184,7 +184,7 @@
   min-width: 24px;
   cursor: pointer;
   position: relative;
-  background-image: url('/channel/icon_group_option.png');
+  background-image: url('/channel/icon_group_option.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -201,14 +201,14 @@
   min-height: 16px;
   min-width: 2px;
   background-size: auto;
-  background-image: url('/icon_v_split.png');
+  background-image: url('/icon_v_split.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
 .saperator-2 {
   min-height: 8px;
-  background-image: url('/channel/chn_tree_split.png');
+  background-image: url('/channel/chn_tree_split.webp');
   background-repeat: no-repeat;
   background-position: 50% 0;
   cursor: ns-resize;
@@ -216,7 +216,7 @@
 
 .saperator-3 {
   min-height: 1px;
-  background-image: url('/channel/spliter_SpecialMenu.png');
+  background-image: url('/channel/spliter_SpecialMenu.webp');
   background-repeat: no-repeat;
   background-position: 50% 0;
 }
@@ -239,7 +239,7 @@
   min-height: 20px;
   min-width: 20px;
   margin-left: 8px;
-  background-image: url('/channel/NetworkStatus.png');
+  background-image: url('/channel/NetworkStatus.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -306,13 +306,10 @@
   min-width: 14px;
   min-height: 14px;
   cursor: pointer;
-  background-image: url('/channel/channelIcon.png');
+  background-position: 0 0;
+  background-image: url('/channel/channelIcon.webp');
   background-repeat: no-repeat;
   background-size: auto;
-}
-
-.channel-tab .tab-icon {
-  background-position: 0 0;
 }
 
 .channel-tab .tab-icon.expanded {
@@ -415,7 +412,7 @@
 .user-audio-state {
   min-height: 12px;
   min-width: 12px;
-  background-image: url('/channel/audioState.png');
+  background-image: url('/channel/audioState.webp');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: -36px 0;
@@ -425,7 +422,7 @@
 .user-text-state {
   min-height: 12px;
   min-width: 12px;
-  background-image: url('/channel/audioState.png');
+  background-image: url('/channel/audioState.webp');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: -36px 0;
@@ -474,7 +471,7 @@
   min-width: 15px;
   right: 2px;
   cursor: pointer;
-  background-image: url('/mylocation.png');
+  background-image: url('/mylocation.webp');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -525,10 +522,11 @@
 
 .message-area {
   display: flex;
+  flex-direction: column;
   overflow-y: scroll;
   overflow-x: hidden;
   height: 100%;
-  padding: 10px 10px 0 10px;
+  padding: 10px 10px 0;
 }
 
 .broadcast-area {
@@ -538,7 +536,6 @@
   width: calc(100% - 20px);
   min-height: 25px;
   display: flex;
-  align-items: center;
   justify-content: center;
   padding: 3px;
   border: 1.5px solid var(--notify-toaster-border);
@@ -546,12 +543,32 @@
   background-color: var(--notify-toaster-background);
 }
 
+.broadcast-area .close-button {
+  min-width: 18px;
+  min-height: 18px;
+  width: 18px;
+  height: 18px;
+  border: none;
+  cursor: pointer;
+  background-image: url('/loading_close.webp');
+  background-size: cover;
+  background-position: 0 0;
+}
+
+.close-button:hover {
+  background-position: -18px 0;
+}
+
+.close-button:active {
+  background-position: -36px 0;
+}
+
 .input-area {
   position: relative;
   display: flex;
   min-height: 70px;
   max-height: 50%;
-  padding: 0 10px 10px 10px;
+  padding: 0 10px 10px;
 }
 
 .button-area {
@@ -560,9 +577,9 @@
   justify-content: space-between;
   flex: none;
   padding: 4px 10px;
-  background-image: url('/channel/chn_toolbar_bg.png');
+  background-image: url('/channel/chn_toolbar_bg.webp');
   background-repeat: no-repeat;
-  background-size: 100% 100%;
+  background-size: 100% 105%;
   background-color: var(--background-secondary);
 }
 
@@ -575,7 +592,7 @@
   align-items: center;
   justify-content: space-between;
   padding: 0 10px;
-  background-image: url('/channel/mic_state_menu.png');
+  background-image: url('/channel/mic_state_menu.webp');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 2px;
@@ -584,15 +601,15 @@
 }
 
 .mic-button.normal {
-  background-image: url('/channel/mic_state_normal.png');
+  background-image: url('/channel/mic_state_normal.webp');
 }
 
 .mic-button.queuing {
-  background-image: url('/channel/mic_state_queuing.png');
+  background-image: url('/channel/mic_state_queuing.webp');
 }
 
 .mic-button.speaking {
-  background-image: url('/channel/mic_state_speaking.png');
+  background-image: url('/channel/mic_state_speaking.webp');
 }
 
 .mic-button:hover {
@@ -606,7 +623,7 @@
 .mic-button .mic-icon {
   min-width: 24px;
   min-height: 30px;
-  background-image: url('/channel/icon_mic_state.png');
+  background-image: url('/channel/icon_mic_state.webp');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -615,8 +632,12 @@
   background-position: -24px 0;
 }
 
+.mic-button.muted .mic-icon {
+  background-position: -72px 0;
+}
+
 .mic-button.speaking:not(.muted) .mic-icon {
-  background-image: url('/channel/icon_speaking_vol.png');
+  background-image: url('/channel/icon_speaking_vol.webp');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -657,10 +678,6 @@
   background-position: -216px 0;
 }
 
-.mic-button.muted .mic-icon {
-  background-position: -72px 0;
-}
-
 .mic-text {
   font-size: 1.1rem;
   color: #2594ca;
@@ -685,7 +702,7 @@
   min-height: 7px;
   min-width: 11px;
   cursor: pointer;
-  background-image: url('/channel/icon_mic_triangle.png');
+  background-image: url('/channel/icon_mic_triangle.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -728,7 +745,7 @@
     min-width: 8px;
     cursor: pointer;
     transform: rotate(180deg);
-    background-image: url('/channel/triangle.png');
+    background-image: url('/channel/triangle.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
   }
@@ -752,7 +769,7 @@
     content: '';
     min-height: 18px;
     min-width: 18px;
-    background-image: url('/channel/music_bkg.png');
+    background-image: url('/channel/music_bkg.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
   }
@@ -884,7 +901,7 @@
   min-height: 18px;
   height: 18px;
   cursor: pointer;
-  background-image: url('/channel/Mic.png');
+  background-image: url('/channel/Mic.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 
@@ -894,7 +911,7 @@
     min-height: 18px;
     min-width: 18px;
     opacity: 0;
-    background-image: url('/channel/Mic.png');
+    background-image: url('/channel/Mic.webp');
     background-repeat: no-repeat;
     background-position: -16px 0;
   }
@@ -917,7 +934,7 @@
     position: absolute;
     min-height: 8px;
     min-width: 8px;
-    background-image: url('/channel/triangle.png');
+    background-image: url('/channel/triangle.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
     transform: rotate(180deg);
@@ -958,22 +975,20 @@
 .mic-mode-menu .voice-threshold-input {
   flex: 1;
   position: relative;
-  -webkit-appearance: none;
   appearance: none;
   height: 8px;
   border-radius: 5px;
-  box-shadow: inset 0 2px 2px -2px rgba(0, 0, 0, 0.1);
+  box-shadow: inset 0 2px 2px -2px #0000001f;
   outline: none;
   border: 1px solid var(--border);
   cursor: pointer;
 
   &::-webkit-slider-thumb {
-    -webkit-appearance: none;
     appearance: none;
     width: 8px;
     height: 20px;
     margin-top: -10px;
-    background-image: url('/channel/Thresholdslider.png');
+    background-image: url('/channel/Thresholdslider.webp');
     cursor: pointer;
   }
 
@@ -982,7 +997,7 @@
     position: absolute;
     height: 100%;
     width: 100%;
-    background-image: url('/channel/ThresholdLine.png');
+    background-image: url('/channel/ThresholdLine.webp');
     background-repeat: repeat-x;
     background-position: 50% 0;
   }
@@ -992,7 +1007,7 @@
   opacity: 0;
   min-height: 12px;
   min-width: 12px;
-  background-image: url('/channel/audioState.png');
+  background-image: url('/channel/audioState.webp');
   background-size: auto;
   background-repeat: no-repeat;
   background-position: -24px 0;
@@ -1009,7 +1024,7 @@
   min-height: 18px;
   height: 18px;
   cursor: pointer;
-  background-image: url('/channel/speaker.png');
+  background-image: url('/channel/speaker.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 
@@ -1019,7 +1034,7 @@
     min-height: 18px;
     min-width: 18px;
     opacity: 0;
-    background-image: url('/channel/speaker.png');
+    background-image: url('/channel/speaker.webp');
     background-repeat: no-repeat;
     background-position: -18px 0;
   }
@@ -1050,7 +1065,7 @@
   min-height: 18px;
   min-width: 18px;
   cursor: pointer;
-  background-image: url('/channel/recorder.png');
+  background-image: url('/channel/recorder.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 
@@ -1066,7 +1081,7 @@
     position: absolute;
     min-height: 28px;
     min-width: 28px;
-    background-image: url('/channel/recorder_bg.png');
+    background-image: url('/channel/recorder_bg.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
   }
@@ -1170,22 +1185,6 @@
   transform: translateY(-1px);
 }
 
-.sidebar-footer .navegate-tab:first-child::before {
-  background-image: url('/channel/rdb_cur_channel.png');
-  background-position: 0 0;
-  background-size: auto;
-  min-height: 18px;
-  min-width: 18px;
-}
-
-.sidebar-footer .navegate-tab:last-child::before {
-  background-image: url('/channel/rdb_all_channel.png');
-  background-position: 0 0;
-  background-size: auto;
-  min-height: 18px;
-  min-width: 18px;
-}
-
 .sidebar-footer .navegate-tab::before {
   content: '';
   display: inline-block;
@@ -1196,6 +1195,22 @@
   background-repeat: no-repeat;
   background-size: auto;
   margin-right: 4px;
+}
+
+.sidebar-footer .navegate-tab:first-child::before {
+  background-image: url('/channel/rdb_cur_channel.webp');
+  background-position: 0 0;
+  background-size: auto;
+  min-height: 18px;
+  min-width: 18px;
+}
+
+.sidebar-footer .navegate-tab:last-child::before {
+  background-image: url('/channel/rdb_all_channel.webp');
+  background-position: 0 0;
+  background-size: auto;
+  min-height: 18px;
+  min-width: 18px;
 }
 
 .sidebar-footer .navegate-tab.active::before {
@@ -1209,7 +1224,7 @@
   min-width: 70px;
   top: -15px;
   transition: left 0.2s ease;
-  background-image: url('/channel/switch_arrow.png');
+  background-image: url('/channel/switch_arrow.webp');
   background-repeat: no-repeat;
   background-size: auto;
   background-position: 0 0;

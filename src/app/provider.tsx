@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import i18n, { LanguageKey } from '@/i18n';
+import i18n from '@/i18n';
 
 // Providers
 import ContextMenuProvider from '@/providers/ContextMenu';
@@ -14,7 +14,7 @@ import ImageViewerProvider from '@/providers/ImageViewer';
 import ipc from '@/services/ipc.service';
 
 // Types
-import { Theme } from '@/types';
+import { Theme, LanguageKey } from '@/types';
 
 interface ProvidersProps {
   children: React.ReactNode;

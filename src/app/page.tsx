@@ -25,10 +25,9 @@ import type {
   Notify,
   RecommendServer,
   FriendActivity,
+  ChannelEvent,
+  LanguageKey,
 } from '@/types';
-
-// i18n
-import { LanguageKey, LANGUAGES } from '@/i18n';
 
 // Pages
 import FriendPage from '@/pages/Friend';
@@ -55,6 +54,9 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
 import ipc from '@/services/ipc.service';
+
+// Constants
+import { LANGUAGES } from '@/constant';
 
 interface HeaderProps {
   user: User;
@@ -373,6 +375,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   const loadingBoxRef = useRef(loadingBox);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const serverOnlineMembersRef = useRef<OnlineMember[]>([]);
+  const friendsRef = useRef<Friend[]>([]);
 
   // States
   const [user, setUser] = useState<User>(Default.user());
@@ -385,6 +389,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
   const [serverMemberApplications, setServerMemberApplications] = useState<MemberApplication[]>([]);
   const [channels, setChannels] = useState<Channel[]>([]);
+  const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
   const [systemNotify, setSystemNotify] = useState<string[]>([]);
@@ -407,6 +412,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   // Effects
+  useEffect(() => {
+    friendsRef.current = friends;
+  }, [friends]);
+
   useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
@@ -466,6 +475,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     selectedTabIdRef.current = mainTab.selectedTabId;
   }, [mainTab.selectedTabId]);
+
+  useEffect(() => {
+    serverOnlineMembersRef.current = serverOnlineMembers;
+  }, [serverOnlineMembers]);
 
   useEffect(() => {
     if (user.currentServerId && selectedTabIdRef.current !== 'server') setSelectedTabIdRef.current('server');
@@ -587,7 +600,12 @@ const RootPageComponent: React.FC = React.memo(() => {
         setQueueUsers([]);
         setChannels([]);
         setServerOnlineMembers([]);
+        setChannelEvents([]);
       }
+      // if (args[0].update.signature && args[0].update.signature !== user.signature) {
+      //   const newActive = Default.friendActivity({ ...user, content: args[0].update.signature, createdAt: Date.now() });
+      //   setFriendActivities((prev) => [newActive, ...prev]);
+      // }
       setUser((prev) => ({ ...prev, ...args[0].update }));
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
     });
@@ -604,6 +622,16 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Friend> }[]) => {
+      // args.map((a) => {
+      //   // friend activity update
+      //   const targetFriend = friendsRef.current.find((f) => f.targetId === a.targetId);
+      //   if (a.update.signature) {
+      //     const newActive = Default.friendActivity({ ...targetFriend, ...a.update, userId: a.targetId, content: a.update.signature, createdAt: Date.now() });
+      //     if (targetFriend && targetFriend.relationStatus === 2 && targetFriend.signature !== newActive.signature) {
+      //       setFriendActivities((prev) => [newActive, ...prev]);
+      //     }
+      //   }
+      // });
       const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
       setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
     });
@@ -692,6 +720,16 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: OnlineMember }[]) => {
+      setChannelEvents((prev) => [
+        ...prev,
+        ...args.map((m) => ({
+          ...m.data,
+          type: 'join' as ChannelEvent['type'],
+          prevChannelId: null,
+          nextChannelId: m.data.currentChannelId,
+          timestamp: Date.now(),
+        })),
+      ]);
       const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
       setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
     });
@@ -700,6 +738,23 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
+      args.map((m) => {
+        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
+        if (originMember && m.update.currentChannelId) {
+          const originChannelId = originMember.currentChannelId;
+          const newMember = { ...originMember, ...m.update };
+          setChannelEvents((prev) => [
+            ...prev,
+            {
+              ...newMember,
+              type: 'move' as ChannelEvent['type'],
+              prevChannelId: originChannelId,
+              nextChannelId: newMember.currentChannelId,
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
     });
@@ -708,6 +763,21 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
+      args.map((m) => {
+        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
+        if (originMember) {
+          setChannelEvents((prev) => [
+            ...prev,
+            {
+              ...originMember,
+              type: 'leave' as ChannelEvent['type'],
+              prevChannelId: originMember.currentChannelId,
+              nextChannelId: null,
+              timestamp: Date.now(),
+            },
+          ]);
+        }
+      });
       const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
       setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
     });
@@ -860,6 +930,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 channels={channels}
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
+                channelEvents={channelEvents}
                 onClearMessages={handleClearMessages}
                 display={mainTab.selectedTabId === 'server'}
                 latency={latency}

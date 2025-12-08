@@ -1,0 +1,82 @@
+{
+  "intro": "Bu Gizlilik Politikası, RiceCall'ı kullanırken bilgilerinizi nasıl topladığımızı, kullandığımızı, paylaştığımızı ve koruduğumuzu açıklar.",
+  "sections": [
+    {
+      "title": "1. Kapsam",
+      "paragraph": "Bu politika RiceCall web sitesi, uygulamaları ve özellikleri (gerçek zamanlı ses, sesli mesajlar, bildirimler, destek) için geçerlidir."
+    },
+    {
+      "title": "2. Topladığımız veriler",
+      "items": [
+        "Hesap verileri (görünen ad, id, avatar, ülke/bölge, sağlanmışsa doğum tarihi, iletişim e-postası)",
+        "Kullanım verileri (giriş/çıkış, özellik tıklamaları, hata günlükleri, raporlar/destek talepleri)",
+        "Cihaz ve bağlantı (cihaz/OS/tarayıcı, dil, saat dilimi, IP, ISS, yaklaşık konum)",
+        "Ses verileri (şifrelenmiş medya akışları; tutuldukları süre boyunca kayıtlar/mesajlar; kalite metrikleri)",
+        "Çerezler ve benzer teknolojiler (oturum, tercihler, analiz, koruma)"
+      ]
+    },
+    {
+      "title": "3. Verileri nasıl kullanıyoruz",
+      "items": [
+        "Ses ve topluluk özelliklerini sağlamak, işletmek ve geliştirmek",
+        "Kimlik doğrulama, güvenlik ve kötüye kullanımı önleme",
+        "Performans izleme, hata ayıklama ve analiz",
+        "Kullanıcı desteği ve raporların ele alınması",
+        "Yasal uyumluluk"
+      ]
+    },
+    {
+      "title": "4. Paylaşım",
+      "items": [
+        "Sözleşmeli satıcılar/işleyiciler (bulut, CDN, RTC, analiz, izleme)",
+        "Yasal talepler",
+        "Ticari işlemler",
+        "Kişisel verileri satmayız"
+      ]
+    },
+    {
+      "title": "5. Ses verileri",
+      "items": [
+        "Aramalar için aktarımda şifreleme; varsayılan olarak depolama yoktur",
+        "Kayıtlar/mesajlar tutuldukları süre boyunca saklanır",
+        "Transkripsiyon açık rıza gerektirir ve güvenilir işlemciler kullanılabilir",
+        "Kalite metrikleri toplu/anonimdir"
+      ]
+    },
+    {
+      "title": "6. Saklama ve muhafaza",
+      "items": [
+        "Çeşitli ülke/bölgelerde veri merkezleri",
+        "Muhafaza, gereklilik ve yasal yükümlülüklere göre belirlenir"
+      ]
+    },
+    {
+      "title": "7. Haklarınız",
+      "paragraph": "Uygulanabilir hukuka bağlı olarak haklarınız erişim, düzeltme, silme, kısıtlama/itiraz, taşınabilirlik ve rızayı geri çekmeyi içerebilir. Bizimle iletişime geçin; kimlik doğrulaması gerekebilir."
+    },
+    {
+      "title": "8. Reşit olmayanlar",
+      "paragraph": "Yasal yaştan küçükseniz, veli onayı ve rehberliği ile kullanın."
+    },
+    {
+      "title": "9. Güvenlik",
+      "paragraph": "Sektör standardı önlemler; hiçbir sistem tamamen güvenli değildir."
+    },
+    {
+      "title": "10. Üçüncü taraflar",
+      "paragraph": "Üçüncü taraf hizmetleri kendi politikalarına tabidir."
+    },
+    {
+      "title": "11. Sınır ötesi aktarım",
+      "paragraph": "Gerekli olduğunda Standart Sözleşme Maddeleri (SCC) gibi uygun güvenceler."
+    },
+    {
+      "title": "12. Değişiklikler",
+      "paragraph": "Bu politikayı güncelleyebiliriz; önemli değişiklikler bildirilecektir."
+    },
+    {
+      "title": "13. İletişim",
+      "paragraph": "support@ricecall.com"
+    }
+  ]
+}

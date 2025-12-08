@@ -24,8 +24,8 @@ import {
   Notify,
   Announcement,
   RecommendServer,
+  LanguageKey,
 } from '@/types';
-import { LanguageKey } from '@/i18n';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
