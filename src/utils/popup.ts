@@ -62,6 +62,10 @@ export const handleOpenKickMemberFromChannel = (userId: User['userId'], serverId
   ipc.popup.open('kickMemberFromChannel', `kickMemberFromChannel`, { userId, serverId, channelId });
 };
 
+export const handleOpenInviteFriend = (userId: User['userId'], serverId: Server['serverId']) => {
+  ipc.popup.open('inviteFriend', `inviteFriend`, { userId, serverId });
+};
+
 export const handleOpenInviteMember = (userId: User['userId'], serverId: Server['serverId']) => {
   ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
 };
