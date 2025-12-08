@@ -1,4 +1,5 @@
 import React, { useContext, createContext, ReactNode, useState } from 'react';
+import Image from 'next/image';
 
 // Styles
 import styles from '@/styles/imageViewer.module.css';
@@ -32,7 +33,7 @@ const ImageViewerProvider = ({ children }: ImageViewerProviderProps) => {
     <ImageViewerContext.Provider value={{ selectImage: handleSelectImage }}>
       {children}
       <div className={`${styles['image-viewer']} ${selectedImage ? styles['visible'] : styles['hidden']}`} onClick={() => setSelectedImage(null)}>
-        {selectedImage && <img src={selectedImage} alt="Selected Image" onClick={(e) => e.stopPropagation()} />}
+        {selectedImage && <Image src={selectedImage} alt="image" onClick={(e) => e.stopPropagation()} width={-1} height={-1} />}
       </div>
     </ImageViewerContext.Provider>
   );
