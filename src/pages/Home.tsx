@@ -90,9 +90,9 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]).slice(0, 10);
   const filteredRecommendServers = useMemo(
     () =>
-      recommendServers
-        .filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(region))
-        .sort((a, b) => a.online - b.online),
+      recommendServers.filter(
+        (server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(region),
+      ),
     [recommendServers, selectReommendServerCategory, region],
   );
   const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(region)), [recommendServers, region]);
