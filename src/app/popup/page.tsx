@@ -364,7 +364,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       editNickname: t('edit-nickname'),
       friendVerification: t('friend-verification'),
       imageCropper: t('image-cropper'),
-      inviteFriend: t('invite-friend'),
+      inviteFriend: t('invite-friend-to-server'),
       inviteMember: t('invite-member'),
       kickMemberFromChannel: t('kick-channel'),
       kickMemberFromServer: t('kick-server'),
