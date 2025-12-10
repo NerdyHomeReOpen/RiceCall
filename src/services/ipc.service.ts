@@ -1213,6 +1213,13 @@ const ipcService = {
     },
   },
 
+  notification: {
+    show: (title: string, body: string) => {
+      if (!isElectron) return;
+      ipcRenderer.send('show-notification', title, body);
+    }
+  },
+
   dontShowDisclaimerNextTime: () => {
     if (!isElectron) return;
     ipcRenderer.send('dont-show-disclaimer-next-time');

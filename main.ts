@@ -7,10 +7,10 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, Notification } from 'electron';
 import { initMainI18n, t } from './src/main/i18n.js';
 import { connectSocket, disconnectSocket } from './src/main/socket.js';
-import { env, loadEnv } from './src/main/env.js';
+import { env, loadEnv } from './src/main/env.js'; 
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/main/discord.js';
 import authService from './src/main/auth.service.js';
 import dataService from './src/main/data.service.js';
@@ -662,6 +662,21 @@ export function configureTray() {
   setTrayDetail();
 }
 
+export function showSystemNotification(title: string, body: string , icon?: string, onClick?: () => void) {
+  const notification = new Notification({
+    title,
+    body,
+    icon: icon || undefined,
+    silent: false, 
+  });
+
+  notification.show();
+
+  notification.on('click', () => {
+    if (onClick) onClick();
+  });
+}
+
 app.on('ready', async () => {
   // Load env
   loadEnv(store.get('server', 'prod'));
@@ -680,6 +695,11 @@ app.on('ready', async () => {
 
   ipcMain.on('exit', () => {
     app.exit();
+  });
+
+  // Notifications
+  ipcMain.on('show-notification', (_, title, body ) => {
+    showSystemNotification(title, body);
   });
 
   // Auth handlers
@@ -1564,6 +1584,7 @@ app.whenReady().then(() => {
   const protocolClient = process.execPath;
   const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
 
+  app.setAppUserModelId('RiceCall');
   app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
 });
 
