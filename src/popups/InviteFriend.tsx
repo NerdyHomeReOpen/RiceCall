@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState, useEffect } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 // CSS
 import popup from '@/styles/popup.module.css';
@@ -6,81 +6,47 @@ import styles from '@/styles/inviteFriend.module.css';
 import vip from '@/styles/vip.module.css';
 
 // Types
-import type { User, Server, Friend, FriendGroup } from '@/types';
+import type { Server, Friend, FriendGroup } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
-import { useContextMenu } from '@/providers/ContextMenu';
 
 // Services
 import ipc from '@/services/ipc.service';
 
 // Utils
-import { handleOpenUserInfo, handleOpenAlertDialog } from '@/utils/popup';
+import { handleOpenAlertDialog } from '@/utils/popup';
 import Default from '@/utils/default';
 
 interface FriendTabProps {
-  user: User;
   server: Server;
   friend: Friend;
   selectedUserIdSet: Set<string>;
   onSelected: (id: string) => void;
 }
 
-const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, server, friend, selectedUserIdSet, onSelected }) => {
+const FriendTab: React.FC<FriendTabProps> = React.memo(({ server, friend, selectedUserIdSet, onSelected }) => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
 
   // Variables
-  const { userId } = user;
   const { serverId } = server;
-  const {
-    targetId,
-    name: friendName,
-    note: friendNote,
-    avatarUrl: friendAvatarUrl,
-    vip: friendVip,
-    status: friendStatus,
-    relationStatus: friendRelationStatus,
-    isBlocked: friendIsBlocked,
-    currentServerId: friendCurrentServerId,
-    shareCurrentServer: friendShareCurrentServer,
-  } = friend;
-  const isUser = targetId === userId;
+  const { targetId, name: friendName, note: friendNote, avatarUrl: friendAvatarUrl, vip: friendVip, currentServerId: friendCurrentServerId, shareCurrentServer: friendShareCurrentServer } = friend;
   const isSameCurrentServer = !!friendShareCurrentServer && serverId === friendCurrentServerId;
-  const isOnline = friendStatus !== 'offline';
-  const isFriend = friendRelationStatus === 2;
-
-  // Handlers
-  const getContextMenuItems = () => [
-    {
-      id: 'view-profile',
-      label: t('view-profile'),
-      show: !isUser,
-      onClick: () => handleOpenUserInfo(userId, targetId),
-    },
-  ];
 
   // Effects
 
   return (
     <div
       key={targetId}
-      className={`${styles['friend-tab']} ${selectedUserIdSet.has(targetId) && !isSameCurrentServer ? styles['selected'] : ''}`}
+      className={`${styles['friend-tab']} ${isSameCurrentServer ? styles['disabled'] : ''} ${selectedUserIdSet.has(targetId) && !isSameCurrentServer ? styles['selected'] : ''}`}
       onClick={() => {
         if (isSameCurrentServer) return;
         onSelected(targetId);
       }}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        const x = e.clientX;
-        const y = e.clientY;
-        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-      }}
     >
       <input type="checkbox" className={`${isSameCurrentServer ? styles['disabled'] : ''}`} disabled={isSameCurrentServer} checked={selectedUserIdSet.has(targetId)} readOnly />
-      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: isOnline && isFriend && !friendIsBlocked ? '' : 'grayscale(100%)' }} />
+      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friendAvatarUrl})` }} />
       <div className={styles['friend-info']}>
         {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
         <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>
@@ -95,7 +61,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, server, friend, 
 FriendTab.displayName = 'FriendTab';
 
 interface FriendGroupTabProps {
-  user: User;
   server: Server;
   friends: Friend[];
   searchQuery: string;
@@ -104,10 +69,7 @@ interface FriendGroupTabProps {
   onSelected: (id: string) => void;
 }
 
-const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, server, friendGroup, friends, searchQuery, selectedUserIdSet, onSelected }) => {
-  // Hooks
-  const contextMenu = useContextMenu();
-
+const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ server, friendGroup, friends, searchQuery, selectedUserIdSet, onSelected }) => {
   // Refs
   const groupCheckboxRef = useRef<HTMLInputElement>(null);
 
@@ -117,30 +79,19 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, server
   // Variables
   const { friendGroupId, name: friendGroupName } = friendGroup;
   const { serverId } = server;
-  const filteredFriends = friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.status !== 'offline');
   const friendGroupFriends = useMemo(() => {
     switch (friendGroupId) {
       case '':
-        return filteredFriends.filter((f) => !f.friendGroupId);
+        return friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.status !== 'offline' && !f.friendGroupId);
       default:
-        return filteredFriends.filter((f) => f.friendGroupId === friendGroupId);
+        return friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.status !== 'offline' && f.friendGroupId === friendGroupId);
     }
-  }, [friendGroupId, filteredFriends]);
-  const filteredFriendsByName = friendGroupFriends.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase()));
+  }, [friendGroupId, friends]);
+
+  const filteredFriendsByName = friendGroupFriends.filter((f) => f.name.toLowerCase().includes(searchQuery.toLowerCase())); // using for display
+  // using for all selection
   const filteredFriendsNotInServer = friendGroupFriends.filter((f) => !f.shareCurrentServer || f.currentServerId !== serverId);
-
   const allSelectedInGroup = filteredFriendsNotInServer.every((f) => selectedUserIdSet.has(f.targetId));
-  const someSelectedInGroup = filteredFriendsNotInServer.some((f) => selectedUserIdSet.has(f.targetId));
-
-  // Handlers
-  const getContextMenuItems = () => [];
-
-  // Effects
-  useEffect(() => {
-    if (groupCheckboxRef.current) {
-      groupCheckboxRef.current.indeterminate = someSelectedInGroup && !allSelectedInGroup;
-    }
-  }, [allSelectedInGroup, someSelectedInGroup]);
 
   return (
     <div key={friendGroupId}>
@@ -158,18 +109,8 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, server
               }
             });
           }}
-          readOnly
         />
-        <div
-          className={`${styles['friend-group-details']} ${selectedUserIdSet.has(friendGroupId) ? styles['selected'] : ''}`}
-          onClick={() => setExpanded((prev) => !prev)}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            const x = e.clientX;
-            const y = e.clientY;
-            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-          }}
-        >
+        <div className={`${styles['friend-group-details']} ${selectedUserIdSet.has(friendGroupId) ? styles['selected'] : ''}`} onClick={() => setExpanded((prev) => !prev)}>
           <div className={`${styles['toggle-icon']} ${expanded ? styles['expanded'] : ''}`} />
           <div className={styles['tab-label']}>{friendGroupName}</div>
           <div className={styles['tab-count']}>{`(${friendGroupFriends.length})`}</div>
@@ -179,7 +120,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, server
       {/* Expanded Sections */}
       <div className={styles['tab-content']} style={expanded ? {} : { display: 'none' }}>
         {filteredFriendsByName.map((friend) => (
-          <FriendTab user={user} server={server} key={friend.targetId} friend={friend} selectedUserIdSet={selectedUserIdSet} onSelected={onSelected} />
+          <FriendTab server={server} key={friend.targetId} friend={friend} selectedUserIdSet={selectedUserIdSet} onSelected={onSelected} />
         ))}
       </div>
     </div>
@@ -189,13 +130,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, server
 FriendGroupTab.displayName = 'FriendGroupTab';
 
 interface InviteFriendPopupProps {
-  user: User;
+  userId: string;
   server: Server;
   friends: Friend[];
   friendGroups: FriendGroup[];
 }
 
-const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ user, server, friends, friendGroups }) => {
+const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId, server, friends, friendGroups }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -207,7 +148,6 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ user, 
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
   // Variables
-  const { userId } = user;
   const { serverId } = server;
 
   const selectedUserIdSet = useMemo(() => new Set(selectedUserIds), [selectedUserIds]);
@@ -215,11 +155,9 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ user, 
   const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: 0, userId });
   const filteredFriendGroups = [defaultFriendGroup, ...friendGroups].sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt));
 
-  const filteredFriends = friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.status !== 'offline');
-  const filteredFriendsNotInServer = filteredFriends.filter((f) => !f.shareCurrentServer || f.currentServerId !== serverId);
-
+  // using for all selection
+  const filteredFriendsNotInServer = friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.status !== 'offline' && (!f.shareCurrentServer || f.currentServerId !== serverId));
   const allUsersSelected = filteredFriendsNotInServer.every((f) => selectedUserIdSet.has(f.targetId));
-  const someUsersSelected = filteredFriendsNotInServer.some((f) => selectedUserIdSet.has(f.targetId));
 
   // Handlers
   const handleUpdateSelectedUserIds = (id: string) => {
@@ -232,7 +170,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ user, 
 
   const handleInviteFriend = () => {
     if (selectedUserIds.length === 0) return;
-    handleOpenAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length }), () => {
+    handleOpenAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
       // ipc.socket.emit('inviteFriendsToServer', { serverId, targetIds: selectedUserIds });
       handleClose();
     });
@@ -241,14 +179,6 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ user, 
   const handleClose = () => {
     ipc.window.close();
   };
-
-  // Effects
-  useEffect(() => {
-    if (allSelectRef.current) {
-      allSelectRef.current.indeterminate = someUsersSelected && !allUsersSelected;
-      console.log(someUsersSelected, allUsersSelected);
-    }
-  }, [allUsersSelected, someUsersSelected]);
 
   return (
     <div className={popup['popup-wrapper']}>
@@ -286,7 +216,6 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ user, 
             {filteredFriendGroups.map((friendGroup) => (
               <FriendGroupTab
                 key={friendGroup.friendGroupId}
-                user={user}
                 server={server}
                 friendGroup={friendGroup}
                 friends={friends}

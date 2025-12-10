@@ -254,7 +254,7 @@
   "input-message": "輸入訊息",
   "invite": "邀請",
   "invite-friend-to-server": "邀請好友進群",
-  "invite-friend-to-server-confirm": "您確定要邀請 {{0}} 位好友進入語音群嗎？",
+  "invite-friend-to-server-confirm": "您確定要邀請 {{0}} 位好友進入 {{1}} 語音群嗎？",
   "invite-member": "邀請會員",
   "invite-member-label": "您將邀請以下使用者",
   "invite-to-be-member": "邀請成為會員",
