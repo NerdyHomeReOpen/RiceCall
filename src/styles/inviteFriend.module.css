@@ -141,6 +141,11 @@ input.disabled {
   padding: 5px;
   gap: 5px;
   border-radius: 3px;
+
+  &.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
 }
 
 .friend-tab.selected {
