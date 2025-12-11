@@ -53,12 +53,13 @@ interface HomePageProps {
   servers: Server[];
   announcements: Announcement[];
   recommendServers: RecommendServer[];
+  region: LanguageKey;
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, region, display }) => {
   // Hooks
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
 
@@ -79,7 +80,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
-  const [region, setRegion] = useState<LanguageKey>(i18n.language as LanguageKey);
 
   // Variables
   const { userId, currentServerId } = user;
@@ -159,15 +159,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   );
 
   // Effects
-  useEffect(() => {
-    const language = navigator.language;
-
-    const match = LANGUAGES.find(({ code }) => code.includes(language));
-    if (!match) return setRegion('en-US');
-
-    setRegion(match.code);
-  }, []);
-
   useEffect(() => {
     if (!containerRef.current) return;
     const number = selectedAnnIndex % filteredAnns.length;

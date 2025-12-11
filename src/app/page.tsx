@@ -400,6 +400,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
   const [latency, setLatency] = useState<number>(0);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [region, setRegion] = useState<LanguageKey>('en-US');
 
   // Variables
   const currentServer = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
@@ -414,9 +415,21 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
-    userRef.current = user;
+    const language = navigator.language;
+
+    const match = LANGUAGES.find(({ code }) => code.includes(language));
+    if (!match) return setRegion('en-US');
+
+    setRegion(match.code);
+  }, []);
+
+  useEffect(() => {
     friendsRef.current = friends;
-  }, [user, friends]);
+  }, [friends]);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   useEffect(() => {
     ipc.tray.title.set(user.name);
@@ -927,7 +940,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} display={mainTab.selectedTabId === 'home'} />
+              <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} region={region} display={mainTab.selectedTabId === 'home'} />
               <FriendPage user={user} friends={friends} friendActivities={friendActivities} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}
