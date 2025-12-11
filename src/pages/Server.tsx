@@ -606,7 +606,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
                   }}
                 >
-                  <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} />
+                  <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} imageSize={'big'} />
                 </div>
               )}
 

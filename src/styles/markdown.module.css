@@ -171,7 +171,7 @@
 }
 
 .markdown-content img:not(.emoji) {
-  max-width: calc(min(90%, 1024px));
+  max-width: calc(min(90%, 256px));
   margin: 5px;
   transition:
     transform 0.3s ease-in-out,
@@ -181,6 +181,14 @@
     box-shadow: 0 0 5px 0 #0000003f;
     transform: scale(1.01);
   }
+}
+
+.markdown-content .image-size-medium {
+  max-width: calc(min(90%, 512px));
+}
+
+.markdown-content .image-size-big {
+  max-width: calc(min(90%, 1024px));
 }
 
 .container {
