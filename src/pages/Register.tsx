@@ -140,7 +140,6 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
   return (
     <main className={styles['register']} style={display ? {} : { display: 'none' }}>
-      {/* Body */}
       <main className={styles['register-body']}>
         <div className={styles['app-logo']} />
         <div className={styles['form-wrapper']}>
@@ -252,8 +251,6 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
           )}
         </div>
       </main>
-
-      {/* Footer */}
       <div className={styles['register-footer']}>
         <div className={styles['back-to-login']} onClick={() => setSection('login')}>
           {t('back-to-login')}

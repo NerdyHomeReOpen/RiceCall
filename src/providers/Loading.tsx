@@ -49,7 +49,6 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
         loadingTimeStamp,
       }}
     >
-      {/* Loading */}
       {isLoading && (
         <div className={homePage['loading-wrapper']}>
           <div className={homePage['loading-box']}>

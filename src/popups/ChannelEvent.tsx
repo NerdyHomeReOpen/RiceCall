@@ -207,7 +207,6 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
 
     return (
       <div className={popup['popup-wrapper']}>
-        {/* Header */}
         <div className={styles['options-viewer']}>
           <div className={`${styles['option-tab']} ${selectMode === 'current' ? styles['active'] : ''}`} onClick={() => setSelectMode('current')}>
             {t('current-channel')}
@@ -217,7 +216,6 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
             {t('all-channel')}
           </div>
         </div>
-        {/* Body */}
         <div className={popup['popup-body']}>
           <div className={styles['event-list']} style={selectMode === 'current' ? {} : { display: 'none' }}>
             <div className={styles['current-channel']}>{currentChannelName}</div>
@@ -317,7 +315,6 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
             })}
           </div>
         </div>
-        {/* Footer */}
         <div className={popup['popup-footer']}>
           <div className={setting['search-box']}>
             <div className={setting['search-icon']}></div>

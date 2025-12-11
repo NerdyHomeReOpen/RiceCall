@@ -45,7 +45,6 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${popup['content']} ${popup['col']}`}>
           <div className={popup['row']}>
@@ -75,8 +74,6 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
         <div className={popup['button']} onClick={() => handleSendMemberApplication(serverId, { description: applicationDesc })}>
           {t('submit')}

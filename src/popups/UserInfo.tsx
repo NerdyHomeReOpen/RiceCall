@@ -156,46 +156,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     }
   }, [targetBirthYear, targetBirthMonth, targetBirthDay, currentYear, currentMonth, currentDay, isFutureDate]);
 
-  const RecentServerNotPublicElement = () => {
-    return (
-      <div className={styles['user-recent-visits-private']}>
-        {t('not-public-recent-servers.top')}
-        <br />
-        {t('not-public-recent-servers.bottom')}
-      </div>
-    );
-  };
-
-  const FavoriteServerNotPublicElement = () => {
-    return (
-      <div className={styles['user-recent-visits-private']}>
-        {t('not-public-favorite-servers.top')}
-        <br />
-        {t('not-public-favorite-servers.bottom')}
-      </div>
-    );
-  };
-
-  const JoinServerNotPublicElement = () => {
-    return (
-      <div className={styles['user-recent-visits-private']}>
-        {t('not-public-joined-servers.top')}
-        <br />
-        {t('not-public-joined-servers.bottom')}
-      </div>
-    );
-  };
-
   return (
     <div className={`${popup['popup-wrapper']} ${styles['user-profile']}`}>
       <div className={styles['profile-box']}>
-        {/* Header */}
         <div className={styles['header']}>
           <div className={styles['window-action-buttons']}>
             <div className={styles['minimize-btn']} onClick={() => handleMinimize()} />
             <div className={styles['close-btn']} onClick={() => handleClose()} />
           </div>
-
           <div
             className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`}
             style={{ backgroundImage: `url(${targetAvatarUrl})` }}
@@ -225,7 +193,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               fileInput.click();
             }}
           />
-
           <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
             <p className={styles['user-name-text']}>{targetName}</p>
             {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
@@ -238,7 +205,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             {t(targetGender === 'Male' ? 'male' : 'female')} · {getUserAge()} · {t(targetCountry, { ns: 'country' })}
           </p>
           <p className={styles['user-signature']}>{targetSignature}</p>
-
           <div className={styles['tabs']}>
             <div
               className={`${styles['tab']} ${styles['about']} ${
@@ -256,20 +222,16 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
           </div>
         </div>
-
-        {/* Action Buttons */}
         <div className={styles['edit-tab-bar']} style={isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }}>
           {selectedTabId === 'userSetting' ? (
             <>
               <div
                 className={`${popup['button']} ${popup['blue']} ${!canSubmit ? 'disabled' : ''}`}
                 onClick={() => {
-                  // extra country validation
                   if (!countries.includes(targetCountry)) {
                     handleOpenErrorDialog(t('invalid-country'), () => {});
                     return;
                   }
-
                   handleEditUser(objDiff(target, targetData));
                   setSelectedTabId('about');
                 }}
@@ -286,8 +248,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
           )}
         </div>
-
-        {/* About */}
         <div className={styles['content']} style={selectedTabId === 'about' ? {} : { display: 'none' }}>
           {targetAbout && (
             <div className={styles['user-about-me']}>
@@ -298,7 +258,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             <div className={popup['label']}>{t('recent-servers')}</div>
             <div className={styles['server-list']}>
               {!isSelf && !targetShareRecentServers ? (
-                <RecentServerNotPublicElement />
+                <div className={styles['user-recent-visits-private']}>
+                  {t('not-public-recent-servers.top')}
+                  <br />
+                  {t('not-public-recent-servers.bottom')}
+                </div>
               ) : recentServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
               ) : (
@@ -328,8 +292,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
           </div>
         </div>
-
-        {/* Groups */}
         <div className={styles['content']} style={selectedTabId === 'groups' ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
             <div className={popup['select-box']}>
@@ -340,7 +302,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
             <div className={styles['server-list']} style={serversView === 'joined' ? {} : { display: 'none' }}>
               {!isSelf && !targetShareJoinedServers ? (
-                <JoinServerNotPublicElement />
+                <div className={styles['user-recent-visits-private']}>
+                  {t('not-public-joined-servers.top')}
+                  <br />
+                  {t('not-public-joined-servers.bottom')}
+                </div>
               ) : joinedServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
               ) : (
@@ -360,7 +326,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
             <div className={styles['server-list']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
               {!isSelf && !targetShareFavoriteServers ? (
-                <FavoriteServerNotPublicElement />
+                <div className={styles['user-recent-visits-private']}>
+                  {t('not-public-favorite-servers.top')}
+                  <br />
+                  {t('not-public-favorite-servers.bottom')}
+                </div>
               ) : favoriteServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
               ) : (
@@ -383,8 +353,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
           </div>
         </div>
-
-        {/* User Setting */}
         <div className={styles['content']} style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
             <div className={popup['col']}>
@@ -403,7 +371,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                   </div>
                 </div>
               </div>
-
               <div className={popup['row']}>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('country')}</div>
@@ -452,7 +419,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                   </div>
                 </div>
               </div>
-
               <div className={`${popup['input-box']} ${popup['col']}`}>
                 <div className={popup['label']}>{t('signature')}</div>
                 <div style={{ position: 'relative', width: '100%' }}>
@@ -487,8 +453,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         {!isFriend && !isSelf && (
           <div className={`${popup['button']} ${popup['green']}`} onClick={() => handleOpenApplyFriend(userId, targetId)}>

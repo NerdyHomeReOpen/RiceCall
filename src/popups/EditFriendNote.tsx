@@ -38,7 +38,6 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -47,8 +46,6 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         <div className={popup['button']} onClick={() => handleEditFriend(targetId, { note: friendNote })}>
           {t('confirm')}

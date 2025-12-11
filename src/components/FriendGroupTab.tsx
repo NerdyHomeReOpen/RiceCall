@@ -75,7 +75,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
 
   return (
     <div key={friendGroupId}>
-      {/* Tab View */}
       <div
         className={`${styles['friend-group-tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
         onClick={() => setExpanded((prev) => !prev)}
@@ -92,8 +91,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
           {friendGroupId !== 'blacklist' && friendGroupId !== 'stranger' ? `(${friendsOnlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}
         </div>
       </div>
-
-      {/* Expanded Sections */}
       <div className={styles['tab-content']} style={expanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
           <FriendTab user={user} key={friend.targetId} friend={friend} friendGroups={friendGroups} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />

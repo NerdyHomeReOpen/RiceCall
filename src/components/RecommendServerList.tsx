@@ -74,7 +74,6 @@ const RecommendServerList: React.FC<RecommendServerListProps> = React.memo(({ us
           </div>
         </div>
       </aside>
-
       <section className={homePage['servers-container']}>
         <div>
           <div className={homePage['server-list-title']}>{activeCategory.label.map((label) => t(label)).join(' > ')}</div>

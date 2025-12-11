@@ -242,7 +242,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 
   return (
     <header className={`${header['header']} ${header['big']}`}>
-      {/* Title */}
       <div className={header['title-box']}>
         <div className={header['name-box']} onClick={() => handleOpenUserInfo(userId, userId)}>
           {userName}
@@ -261,8 +260,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           <div className={header['status-triangle']} />
         </div>
       </div>
-
-      {/* Main Tabs */}
       <div className={header['main-tabs']}>
         {mainTabs.map((tab) =>
           tab.id === 'server' && !currentServerId ? null : (
@@ -294,8 +291,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           ),
         )}
       </div>
-
-      {/* Buttons */}
       <div className={header['buttons']}>
         <div className={header['gift']} />
         <div className={header['game']} />

@@ -46,7 +46,6 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${popup['content']} ${popup['col']}`}>
           <div className={popup['label']}>{t('invite-member-label')}</div>
@@ -77,8 +76,6 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
         <div className={popup['button']} onClick={() => handleSendMemberInvitation(targetId, serverId, { description: invitationDesc })}>
           {t('submit')}

@@ -291,7 +291,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Header */}
       <div className={styles['header']}>
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
@@ -307,10 +306,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
           <div className={`${styles['report']} disabled`} />
         </div>
       </div>
-
-      {/* Body */}
       <div className={popup['popup-body']}>
-        {/* Sidebar */}
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
             <div
@@ -329,8 +325,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, userId)} />
           </div>
         </div>
-
-        {/* Main Content */}
         <div className={styles['main-content']}>
           <div className={styles['action-body']}>
             {isFriend && isOnline && targetCurrentServer ? (

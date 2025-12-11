@@ -237,7 +237,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Header */}
       <div className={styles['header']} onClick={handleUnselect}>
         <div
           className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`}
@@ -303,8 +302,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('move-bottom')}
         </div>
       </div>
-
-      {/* Body */}
       <div className={popup['popup-body']} onClick={handleUnselect}>
         <div className={styles['body']}>
           <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
@@ -315,8 +312,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannels(serverId, editedChannels) : null)}>
           {t('confirm')}

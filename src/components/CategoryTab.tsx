@@ -224,7 +224,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
 
     return (
       <>
-        {/* Category View */}
         <div
           key={categoryId}
           className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`}
@@ -262,8 +261,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
           {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length}${categoryUserLimit > 0 ? `/${categoryUserLimit}` : ''})`}</div>}
           {!expanded[categoryId] && isInCategory && <div className={styles['my-location-icon']} />}
         </div>
-
-        {/* Expanded Sections */}
         <div className={styles['user-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
           {filteredCategoryMembers.map((member) => (
             <UserTab

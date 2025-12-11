@@ -147,7 +147,6 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
           );
         }}
       />
-
       <EditorContent
         editor={editor}
         className={`${messageInputBox['textarea']} ${markdown['markdown-content']}`}

@@ -78,7 +78,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
 
   return (
     <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
-      {/* Header */}
       <header className={friendPage['friend-header']}>
         <div className={friendPage['avatar-picture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} datatype={''} />
         <div className={friendPage['base-info-wrapper']}>
@@ -124,18 +123,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
           />
         </div>
       </header>
-
-      {/* Body */}
       <main className={friendPage['friend-body']}>
-        {/* Left Sidebar */}
         <aside ref={sidebarRef} className={friendPage['sidebar']}>
           <FriendList friendGroups={friendGroups} friends={friends} user={user} />
         </aside>
-
-        {/* Resize Handle */}
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
-
-        {/* Friend Active Content */}
         <main className={friendPage['content']}>
           <header className={friendPage['header']}>{t('friend-active')}</header>
           <div className={`${friendPage['scroll-view']} ${friendPage['friend-active-wrapper']}`}>
