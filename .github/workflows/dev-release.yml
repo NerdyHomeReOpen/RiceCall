@@ -21,7 +21,7 @@ jobs:
             build_name: win-ia32
             args: '--win --ia32 --publish never -c electron-builder-dev.json'
 
-          - os: macos-13
+          - os: macos-14
             build_name: mac-x64
             args: '--mac --x64 --publish never -c electron-builder-dev.json'
           - os: macos-14
