@@ -26,7 +26,7 @@ import { handleOpenCreateServer } from '@/utils/popup';
 import { getFormatDate } from '@/utils/language';
 
 // Constants
-import { ANNOUNCEMENT_SLIDE_INTERVAL, LANGUAGES, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
+import { ANNOUNCEMENT_SLIDE_INTERVAL, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
 
 interface SearchResultItemProps {
   server: Server;

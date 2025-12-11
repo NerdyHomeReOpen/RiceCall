@@ -353,9 +353,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               <div className={popup['select-box']}>
                 <select value={recordFormat} onChange={(e) => setSystemSettings((prev) => ({ ...prev, recordFormat: e.target.value as 'wav' | 'mp3' }))}>
                   <option value="wav">{'WAV'}</option>
-                  <option value="mp3" disabled>
-                    {'MP3' + t('soon')}
-                  </option>
+                  <option value="mp3">{'MP3'}</option>
                 </select>
               </div>
             </div>

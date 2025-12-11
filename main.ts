@@ -1,6 +1,11 @@
+import fs from 'fs';
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
+import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from 'ffmpeg-static';
+let binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath) : '';
+ffmpeg.setFfmpegPath(binaryPath);
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import { initMain } from 'electron-audio-loopback-josh';
@@ -17,6 +22,7 @@ import dataService from './src/main/data.service.js';
 import popupLoaders from './src/main/popupLoader.js';
 import type { StoreType, PopupType, LanguageKey } from './src/types';
 import { LANGUAGES } from './src/constant.js';
+import { Readable } from 'stream';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -29,6 +35,19 @@ export function getLanguage(): LanguageKey {
   if (!match) return 'en-US';
 
   return match.code;
+}
+
+function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
+  const buffer = Buffer.from(inputWav);
+  const inputStream = Readable.from(buffer);
+
+  ffmpeg(inputStream)
+    .audioCodec('libmp3lame')
+    .audioBitrate('320k')
+    .save(outputMp3)
+    .on('error', () => {
+      createPopup('dialogError', 'dialogError', { message: t('convert-wav-to-mp3-failed'), timestamp: Date.now() }, true);
+    });
 }
 
 const store = new Store<StoreType>({
@@ -751,6 +770,32 @@ app.on('ready', async () => {
         createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
         return { success: false };
       });
+  });
+
+  ipcMain.on('save-audio', (_, audio: ArrayBuffer) => {
+    try {
+      const baseDir = app.getPath('documents');
+      const outputDir = path.join(baseDir, 'RiceCall');
+
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+
+      const format = store.get('recordFormat') === 'mp3' ? 'mp3' : 'wav';
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const fileName = `recording-${timestamp}.${format}`;
+      const outputPath = path.join(outputDir, fileName);
+
+      if (format === 'mp3') {
+        convertWavToMp3AndSave(audio, outputPath);
+      } else {
+        const buffer = Buffer.from(audio);
+        fs.writeFileSync(outputPath, buffer);
+      }
+    } catch (error: any) {
+      console.error(`${new Date().toLocaleString()} | Save audio error:`, error.message);
+    }
   });
 
   // Data handlers

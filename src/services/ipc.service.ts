@@ -413,6 +413,13 @@ const ipcService = {
     },
   },
 
+  audio: {
+    save: (audio: ArrayBuffer) => {
+      if (!isElectron) return;
+      ipcRenderer.send('save-audio', audio);
+    },
+  },
+
   systemSettings: {
     set: (settings: Partial<SystemSettings>) => {
       if (!isElectron) return;

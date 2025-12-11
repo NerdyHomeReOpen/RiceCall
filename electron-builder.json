@@ -7,6 +7,7 @@
   },
   "files": ["build/**/*", "out/**/*", "resources/**/*", "package.json"],
   "asar": true,
+  "asarUnpack": ["**/node_modules/ffmpeg-static/*"],
   "artifactName": "${productName}-${version}-${os}-${arch}.${ext}",
   "extraResources": [
     { "from": ".env", "to": "app.env" },
