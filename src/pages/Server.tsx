@@ -650,25 +650,24 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 </div>
               )}
               {/* RC Show Area */}
-              {isShowFrameVisible && (
+              <div
+                ref={annAreaRef}
+                className={styles['rcshow-area']}
+                style={isShowFrameVisible ? {} : { display: 'none' }}
+              >
                 <div
-                  ref={annAreaRef}
-                  className={styles['rcshow-area']}
+                  className={styles['rcshow-box']}
                 >
-                  <div
-                    className={styles['rcshow-box']}
-                  >
-                    <iframe
-                      ref={showFrame.showFrameRef}
-                      id="showFrame"
-                      src="https://show.ricecall.com/"
-                      height="100%"
-                      width="100%"
-                      onLoad={showFrame.handleShowFrameLoad}
-                    ></iframe>
-                  </div>
+                  <iframe
+                    ref={showFrame.showFrameRef}
+                    id="showFrame"
+                    src="https://show.ricecall.com/"
+                    height="100%"
+                    width="100%"
+                    onLoad={showFrame.handleShowFrameLoad}
+                  ></iframe>
                 </div>
-              )}
+              </div>
 
               {/* Resize Handle */}
               <div
