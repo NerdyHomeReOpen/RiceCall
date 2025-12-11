@@ -7,13 +7,13 @@
 }
 
 .vip-icon {
-  min-height: 14px;
   min-width: 14px;
+  min-height: 14px;
   margin-right: 2px;
   background-image: url('/channel/vip_icons.webp');
-  background-size: auto;
   background-repeat: no-repeat;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .vip-icon.vip-1 {
@@ -37,8 +37,8 @@
 }
 
 .vip-icon-big {
-  min-height: 14px;
   min-width: 55px;
+  min-height: 14px;
   margin-right: 2px;
   background-repeat: no-repeat;
   background-position: 0 0;

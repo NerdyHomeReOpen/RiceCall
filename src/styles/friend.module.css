@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
   min-width: 0;
+  height: 100%;
   min-height: 0;
 }
 
@@ -11,10 +11,10 @@
 
 .friend-header {
   display: flex;
+  gap: 5px;
   align-items: center;
   height: 50px;
   padding: 4px 10px;
-  gap: 5px;
 }
 
 .avatar-box {
@@ -25,37 +25,37 @@
 
 .avatar-picture {
   position: relative;
-  object-fit: cover;
   min-width: 40px;
   min-height: 40px;
+  object-fit: cover;
   background-image: url('/im/SecretaryLogo.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .avatar-picture::before {
-  content: '';
   position: absolute;
   top: -1px;
   left: -1px;
   z-index: 1;
   min-width: 42px;
   min-height: 42px;
+  content: '';
   background-image: url('/win_border.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: 0 0;
+  background-size: cover;
 }
 
 .avatar-picture::after {
-  content: '';
   position: absolute;
-  display: inline-block;
-  bottom: 0;
   right: 0;
+  bottom: 0;
+  display: inline-block;
   min-width: 13px;
   min-height: 13px;
+  content: '';
   background-image: url('/user_state.webp');
   background-repeat: no-repeat;
   background-position: 0 0 !important;
@@ -85,14 +85,14 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
   height: 40px;
+  overflow: hidden;
 }
 
 .base-info-wrapper .box {
   display: flex;
-  align-items: center;
   gap: 2px;
+  align-items: center;
 }
 
 .base-info-wrapper .box.has-server {
@@ -104,18 +104,18 @@
   min-height: 16px;
   background-image: url('/im/LV.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .wealth-icon {
-  border: none;
-  margin-left: 20px;
   min-width: 16px;
   min-height: 16px;
+  margin-left: 20px;
   background-image: url('/silver_pea.webp');
   background-repeat: no-repeat;
   background-size: cover;
+  border: none;
 }
 
 .wealth-value-text {
@@ -125,13 +125,13 @@
 
 .signature-wrapper {
   display: flex;
+  gap: 5px;
+  align-items: center;
   width: 60%;
   height: 40px;
-  align-items: center;
-  border: 1px solid #fff0;
-  margin-left: 100px;
   padding: 2px 5px;
-  gap: 5px;
+  margin-left: 100px;
+  border: 1px solid #fff0;
 }
 
 .signature-input {
@@ -146,9 +146,9 @@
 }
 
 .signature-input:empty::before {
-  content: attr(data-placeholder-text);
-  pointer-events: none;
   display: block;
+  pointer-events: none;
+  content: attr(data-placeholder-text);
 }
 
 .signature-wrapper:focus-within {
@@ -166,9 +166,9 @@
 
 .badge-box {
   display: flex;
-  height: 20px;
   gap: 1px;
   align-items: center;
+  height: 20px;
 }
 
 /* Content */
@@ -182,9 +182,9 @@
 .sidebar {
   display: flex;
   flex-direction: column;
-  min-height: 0;
   width: 280px;
   min-width: 280px;
+  min-height: 0;
   background-color: var(--sidebar);
 }
 
@@ -200,14 +200,14 @@
 .sidebar .navigate-tabs .tab {
   display: flex;
   flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
   text-align: center;
   cursor: pointer;
   background-image: url('/friend_tab_item_bg.webp');
-  background-size: 100% 72px;
   background-position: 0 0;
-  min-height: 36px;
-  justify-content: center;
-  align-items: center;
+  background-size: 100% 72px;
 }
 
 .sidebar .navigate-tabs .tab.selected {
@@ -219,8 +219,8 @@
   min-height: 16px;
   background-image: url('/im/friend_list_page.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .recent-icon {
@@ -228,8 +228,8 @@
   min-height: 16px;
   background-image: url('/im/recently_list_page.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .selected .friend-list-icon,
@@ -239,10 +239,10 @@
 
 .scroll-view {
   display: flex;
-  flex-direction: column;
   flex: 1;
-  min-height: 0;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
   padding: 10px;
   overflow-y: auto;
 }
@@ -252,17 +252,17 @@
   align-items: center;
   padding: 10px;
   padding-top: 0;
-  padding-bottom: 0;
   padding-right: 0;
+  padding-bottom: 0;
+  background-color: var(--background);
   border-top: 1px solid var(--border);
   border-bottom: 1px solid var(--border);
-  background-color: var(--background);
 }
 
 .search-bar .search-input {
   flex: 1;
-  padding: 5px;
   width: 125px;
+  padding: 5px;
 }
 
 .search-bar .search-icon {
@@ -280,19 +280,19 @@
 .prev-icon {
   min-width: 29px;
   min-height: 30px;
+  cursor: pointer;
   background-image: url('/channel/search_pre.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
-  cursor: pointer;
 }
 
 .next-icon {
   min-width: 29px;
   min-height: 30px;
+  cursor: pointer;
   background-image: url('/channel/search_next.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
-  cursor: pointer;
 }
 
 .prev-icon:hover,
@@ -307,9 +307,9 @@
 
 .sidebar-footer {
   display: flex;
-  justify-content: center;
-  align-items: center;
   gap: 10px;
+  align-items: center;
+  justify-content: center;
   padding: 6px;
   background-color: var(--sidebar);
   border-top: 1px solid var(--border);
@@ -318,15 +318,15 @@
 
 .sidebar-footer .button {
   display: flex;
-  text-align: left;
   align-items: center;
   justify-content: center;
   padding: 4px 20px;
+  color: var(--text-color-quaternary);
+  text-align: left;
+  cursor: pointer;
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 5px;
-  cursor: pointer;
-  color: var(--text-color-quaternary);
 }
 
 .sidebar-footer .button:hover {
@@ -334,19 +334,19 @@
 }
 
 .sidebar-footer .button[datatype='addGroup']::before {
-  content: '';
-  min-height: 16px;
   min-width: 16px;
+  min-height: 16px;
   margin-right: 5px;
+  content: '';
   background-image: url('/im/add_group.webp');
   background-repeat: no-repeat;
 }
 
 .sidebar-footer .button[datatype='addFriend']::before {
-  content: '';
-  min-height: 16px;
   min-width: 16px;
+  min-height: 16px;
   margin-right: 5px;
+  content: '';
   background-image: url('/im/add_friend.webp');
   background-repeat: no-repeat;
 }
@@ -357,11 +357,11 @@
 
 .friend-group-list .friend-group-tab {
   display: flex;
+  gap: 2px;
   align-items: center;
-  border-radius: 3px;
   height: 25px;
   padding: 5px;
-  gap: 2px;
+  border-radius: 3px;
 }
 
 .friend-group-list .friend-group-tab.selected {
@@ -373,14 +373,14 @@
 }
 
 .friend-group-list .friend-group-tab .toggle-icon {
-  content: '';
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
+  content: '';
   background-image: url('/channel/channelIcon.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .friend-group-list .friend-group-tab .toggle-icon.expanded {
@@ -392,12 +392,12 @@
 }
 
 .friend-tab {
+  position: relative;
   display: flex;
+  gap: 5px;
   align-items: center;
   justify-content: flex-start;
-  position: relative;
   padding: 5px;
-  gap: 5px;
   border-radius: 3px;
 }
 
@@ -410,69 +410,69 @@
 }
 
 .friend-tab .name-text {
-  font-weight: bold;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .friend-tab .signature {
-  color: var(--text-color-quaternary);
-  overflow: hidden;
   min-height: 18px;
-  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-color-quaternary);
+  white-space: nowrap;
 }
 
 .friend-tab .server-name-text {
+  min-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 18px;
   color: #3a9abe;
   white-space: nowrap;
-  overflow: hidden;
-  min-height: 18px;
-  line-height: 18px;
-  text-overflow: ellipsis;
 }
 
 .friend-tab .location-icon {
-  content: '';
-  min-height: 18px;
   min-width: 16px;
+  min-height: 18px;
+  content: '';
   background-image: url('/mylocation.webp');
-  background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
+  background-size: auto;
 }
 
 .recent-list {
   display: flex;
-  flex-direction: column;
   flex: 1;
+  flex-direction: column;
 }
 
 /* Main Content */
 
 .content {
   display: flex;
-  flex-direction: column;
   flex: 1;
+  flex-direction: column;
   min-width: 500px;
   min-height: 0;
-  border-top: 1px solid var(--border);
   background-color: var(--sidebar);
+  border-top: 1px solid var(--border);
 }
 
 .content .header {
-  font-size: 1em;
   padding: 10px;
+  font-size: 1em;
   font-weight: bold;
 }
 
 .content-layout {
   display: flex;
-  flex-direction: column;
   flex: 1;
-  min-height: 0;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
   padding: 10px;
   overflow-y: auto;
 }
@@ -485,46 +485,46 @@
 
 .friend-active-list {
   display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 15px;
-  flex: 1;
 }
 
 .user-activity {
   display: flex;
   flex-direction: row;
+  gap: 10px;
   align-items: center;
   width: 100%;
-  gap: 10px;
 }
 
 .user-avatar {
+  min-width: 30px;
+  min-height: 30px;
+  cursor: pointer;
   background-image: url('/im/IMLogo.webp');
-  background-size: contain;
   background-repeat: no-repeat;
   background-position: center center;
-  min-height: 30px;
-  min-width: 30px;
-  cursor: pointer;
+  background-size: contain;
 }
 
 .right-info {
-  flex-direction: column;
+  display: flex;
   flex: 1;
+  flex-direction: column;
   justify-content: space-between;
   width: 100%;
-  display: flex;
   overflow: hidden;
 }
 
 .user-activity-top {
-  flex-direction: row;
   display: flex;
+  flex-direction: row;
+  gap: 3px;
   align-items: center;
   justify-content: space-between;
   width: 100%;
   min-width: 0;
-  gap: 3px;
 }
 
 .user-activity-top > div:first-child,
@@ -543,24 +543,24 @@
 
 .user-name {
   flex-shrink: 0;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  cursor: pointer;
   color: var(--text-username);
+  white-space: nowrap;
+  cursor: pointer;
 }
 
 .signature {
-  color: var(--text-color-quaternary);
+  max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-color-quaternary);
   white-space: nowrap;
-  max-width: 100%;
   user-select: text;
 }
 
 .timestamp {
   align-self: flex-end;
-  color: var(--text-color-quinary);
   font-size: 0.9em;
+  color: var(--text-color-quinary);
 }

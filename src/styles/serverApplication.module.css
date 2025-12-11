@@ -3,30 +3,30 @@
 }
 
 .button-list-box {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
   width: 320px;
   height: 150px;
   background-image: url('/channel/BkgrdImageView.webp');
-  background-size: cover;
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
   border: 1px solid #777;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  box-sizing: border-box;
 }
 
 .middle-area {
-  height: 80px;
-  background-image: url('/channel/dialog_body_bg.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  display: flex;
   gap: 8px;
   align-items: center;
-  width: 100%;
-  display: flex;
   justify-content: space-evenly;
+  width: 100%;
+  height: 80px;
+  background-image: url('/channel/dialog_body_bg.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .button-item-box {
@@ -36,9 +36,17 @@
   width: 55px;
 }
 
+.button-item-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  border: none;
+}
+
 .button-item-box.active .button-item-icon {
-  background-position: -44px 0;
   cursor: pointer;
+  background-position: -44px 0;
 }
 
 .button-item-box:nth-child(1) .button-item-icon {
@@ -59,14 +67,6 @@
 
 .button-item-box:nth-child(5) .button-item-icon {
   background-image: url('/channel/widget_Show.webp');
-}
-
-.button-item-icon {
-  width: 44px;
-  height: 44px;
-  padding: 0;
-  border: none;
-  background: none;
 }
 
 .button-item-icon img {

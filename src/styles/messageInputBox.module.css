@@ -1,15 +1,15 @@
 .message-input-box {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: row;
+  gap: 5px;
   justify-content: flex-start;
   max-width: 100%;
+  padding: 5px;
+  background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 5px;
-  background-color: var(--background);
   box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
-  padding: 5px;
-  gap: 5px;
 }
 
 .message-input-box.warning {
@@ -18,15 +18,15 @@
 
 .message-input-box.disabled {
   color: var(--text-color-quaternary);
-  opacity: 0.5;
   pointer-events: none;
+  opacity: 0.5;
 }
 
 .message-input-box .textarea {
   flex: 1;
+  overflow: auto;
   resize: none;
   border: none !important;
-  overflow: auto;
 }
 
 .message-input-box .textarea div {
@@ -37,6 +37,6 @@
   position: absolute;
   right: 5px;
   bottom: 5px;
-  color: var(--text-color-senary);
   font-size: 0.9em;
+  color: var(--text-color-senary);
 }

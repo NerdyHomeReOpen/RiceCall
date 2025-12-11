@@ -1,22 +1,22 @@
 .options-viewer {
   display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   max-height: 45px;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
   border-bottom: 1px solid var(--border);
 }
 
 .options-viewer .option-tab {
-  padding: 8px;
-  text-align: center;
-  cursor: pointer;
-  color: var(--text-color-quinary);
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  padding: 8px;
+  color: var(--text-color-quinary);
+  text-align: center;
+  cursor: pointer;
   transition: transform 0.2s ease;
 }
 
@@ -30,67 +30,67 @@
 }
 
 .options-viewer .option-tab.active::after {
-  content: '';
   position: absolute;
-  min-height: 20px;
-  min-width: 70px;
   top: 24px;
-  transition: left 0.2s ease;
+  min-width: 70px;
+  min-height: 20px;
+  content: '';
   background-image: url('/channel/switch_arrow.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
+  background-size: auto;
+  transition: left 0.2s ease;
 }
 
 .spliter {
-  background-image: url('/icon_v_split.webp');
-  background-position: 0 0;
-  background-repeat: no-repeat;
-  background-size: auto;
   min-width: 2px;
   min-height: 16px;
+  background-image: url('/icon_v_split.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
 }
 
 .event-list {
   display: flex;
-  overflow-y: auto;
-  width: 100%;
   flex-direction: column;
+  width: 100%;
+  overflow-y: auto;
 }
 
 .current-channel {
   position: sticky;
   top: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   padding: 5px 15px;
   color: var(--text-color-quaternary);
   background-color: var(--popup-background);
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
   border-bottom: 1px solid var(--text-color-octonary);
 }
 
 .current-channel::before {
-  content: '';
   display: inline-block;
-  height: 16px;
   width: 16px;
-  min-height: 16px;
   min-width: 16px;
+  height: 16px;
+  min-height: 16px;
+  margin-right: 4px;
+  content: '';
   background-image: url('/mylocation.webp');
   background-repeat: no-repeat;
   background-size: auto;
-  margin-right: 4px;
 }
 
 .event-box {
-  cursor: pointer;
   display: flex;
   flex-direction: row;
+  gap: 5px;
   align-items: center;
   justify-content: space-between;
   padding: 5px 15px;
-  gap: 5px;
+  cursor: pointer;
   border-bottom: 1px solid var(--text-color-octonary);
 
   &:hover {
@@ -100,20 +100,20 @@
 
 .user-detail {
   display: flex;
-  min-width: 200px;
   flex-direction: row;
   align-items: center;
+  min-width: 200px;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .user-detail .name {
+  padding-left: 5px;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
-  padding-left: 5px;
+  white-space: nowrap;
 }
 
 .user-detail .name.highlight {
@@ -123,9 +123,9 @@
 .action-content {
   flex: 1;
   overflow: hidden;
-  white-space: nowrap;
-  text-align: left;
   text-overflow: ellipsis;
+  text-align: left;
+  white-space: nowrap;
 
   &::-webkit-scrollbar {
     height: 2px;

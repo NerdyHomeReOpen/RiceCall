@@ -1,43 +1,43 @@
 .app-logo {
-  background-image: url('/login_logo.webp');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
+  align-self: center;
   min-width: 226px;
   min-height: 54px;
-  align-self: center;
+  background-image: url('/login_logo.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
+  gap: 10px;
   align-items: flex-start;
+  justify-content: flex-start;
   width: 100%;
   padding: 20px;
   overflow: scroll;
-  gap: 10px;
 }
 
 .app-info {
-  flex-direction: column;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
   margin-bottom: 10px;
 }
 
 .app-version-text {
-  font-weight: bold;
-  padding-bottom: 5px;
   width: 100%;
+  padding-bottom: 5px;
+  font-weight: bold;
   text-align: center;
 }
 
 .copyright-text {
-  padding-bottom: 5px;
   width: 100%;
+  padding-bottom: 5px;
   text-align: center;
 }
 
@@ -52,16 +52,16 @@
 }
 
 .team-member-card {
+  box-sizing: border-box;
   display: flex;
   align-items: center;
-  margin-top: 3px;
   justify-content: space-between;
+  width: 100%;
+  padding: 3px;
+  margin-top: 3px;
   background-color: transparent;
   border: 1px solid var(--border);
   border-radius: 5px;
-  padding: 3px;
-  width: 100%;
-  box-sizing: border-box;
   backdrop-filter: blur(5px);
   transition: background-color 0.3s ease;
 }
@@ -72,8 +72,8 @@
 
 .icon-wrapper {
   display: flex;
-  align-items: center;
   gap: 10px;
+  align-items: center;
 }
 
 .name-wrapper {
@@ -85,21 +85,21 @@
 .team-list-textarea {
   width: 100% !important;
   height: 100% !important;
-  border: none;
   resize: none;
+  border: none;
 }
 
 .staff-title {
-  background-color: rgb(115 164 213 / 70%);
-  color: #fff;
-  padding: 4px;
-  border-radius: 4px;
-  font-size: 0.9em;
-  font-weight: bold;
-  margin-right: 8px;
   display: inline-block;
   min-width: 7em;
+  padding: 4px;
+  margin-right: 8px;
+  font-size: 0.9em;
+  font-weight: bold;
+  color: #fff;
   text-align: center;
+  background-color: rgb(115 164 213 / 70%);
+  border-radius: 4px;
 }
 
 .icon-wrapper svg {
@@ -108,11 +108,11 @@
 }
 
 .ricecall-id {
-  color: var(--text-link);
+  display: inline-block;
+  margin-right: 8px;
   font-size: 0.9em;
   font-weight: bold;
-  margin-right: 8px;
-  display: inline-block;
+  color: var(--text-link);
   text-align: center;
   cursor: pointer;
 

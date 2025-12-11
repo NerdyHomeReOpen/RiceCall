@@ -1,19 +1,19 @@
 .announcement-wrapper {
   display: flex;
   flex-direction: column;
+  width: 100%;
   max-width: 800px;
   height: 100%;
-  width: 100%;
 }
 
 .announcement-header {
   display: flex;
   flex-direction: row;
+  align-items: center;
   justify-content: space-around;
   background-color: var(--background);
-  align-items: center;
-  border-radius: 5px;
   border: 1px solid var(--border);
+  border-radius: 5px;
   box-shadow: 0 1px 1px #00000080;
 }
 
@@ -24,17 +24,17 @@
   width: 100%;
   height: 100%;
   padding: 10px 5px;
-  color: var(--text-color-quaternary);
   font-weight: bold;
+  color: var(--text-color-quaternary);
   transition: color 0.1s ease;
 
   &::after {
-    content: '';
     position: absolute;
     bottom: -1px;
     left: 50%;
     width: 0;
     height: 2px;
+    content: '';
     border-bottom: 2px solid #e72525;
     transition: all 0.1s ease;
   }
@@ -50,27 +50,27 @@
 }
 
 .announcement-list {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
-  font-weight: bold;
   margin-top: 10px;
-  background-color: var(--background);
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  box-shadow: 0 1px 1px #00000080;
   overflow-y: auto;
+  font-weight: bold;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  box-shadow: 0 1px 1px #00000080;
 }
 
 .announcement-item {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  padding: 10px;
   gap: 10px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px;
   color: var(--text-color-quaternary);
-  border-bottom: 1px solid var(--border);
   cursor: pointer;
+  border-bottom: 1px solid var(--border);
 
   &:hover {
     background-color: var(--hover);
@@ -78,37 +78,37 @@
 }
 
 .announcement-type {
-  padding: 5px;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  background-color: var(--hover);
-  color: var(--text-color-quaternary);
-  min-width: 50px;
   width: fit-content;
+  min-width: 50px;
+  padding: 5px;
+  color: var(--text-color-quaternary);
   text-align: center;
+  background-color: var(--hover);
+  border: 1px solid var(--border);
+  border-radius: 5px;
 
   &[data-category='general'] {
-    border-color: #005cbf;
-    background-color: #e7f3ff;
     color: #005cbf;
+    background-color: #e7f3ff;
+    border-color: #005cbf;
   }
 
   &[data-category='update'] {
-    border-color: #c85a17;
-    background-color: #fff0e6;
     color: #c85a17;
+    background-color: #fff0e6;
+    border-color: #c85a17;
   }
 
   &[data-category='system'] {
-    border-color: #e72525;
-    background-color: #fae6e6;
     color: #e72525;
+    background-color: #fae6e6;
+    border-color: #e72525;
   }
 
   &[data-category='event'] {
-    border-color: #1e7e34;
-    background-color: #e6ffed;
     color: #1e7e34;
+    background-color: #e6ffed;
+    border-color: #1e7e34;
   }
 }
 
@@ -127,11 +127,11 @@
   position: absolute;
   top: 0;
   left: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: #00000080;
   animation: visibility 0.2s ease-in-out;
 }
@@ -142,11 +142,11 @@
   width: 60%;
   height: 80%;
   padding: 10px;
-  border-radius: 5px;
-  border: 1px solid var(--border);
-  background-color: var(--background);
-  box-shadow: 0 1px 1px #00000080;
   overflow-y: auto;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  box-shadow: 0 1px 1px #00000080;
   animation: fade-in 0.2s ease-in-out;
 }
 
@@ -175,19 +175,19 @@
 .announcement-detail-header {
   display: flex;
   flex-direction: row;
-  justify-content: flex-start;
   gap: 10px;
   align-items: center;
+  justify-content: flex-start;
   padding: 10px;
-  border-bottom: 1px solid var(--border);
-  font-weight: bold;
   font-size: 1.2em;
+  font-weight: bold;
+  border-bottom: 1px solid var(--border);
 }
 
 .announcement-detail-title {
   flex: 5;
-  font-size: 1.2em;
   align-items: flex-start;
+  font-size: 1.2em;
 }
 
 .announcement-datail-date {

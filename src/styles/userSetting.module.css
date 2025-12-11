@@ -1,6 +1,6 @@
 .content {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: flex-start;
   width: 100%;
@@ -12,53 +12,53 @@
 }
 
 .user-recent-visits-private {
-  background-image: url('/card/bg_list_tips.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: auto;
-  height: 76px;
-  width: 100%;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 76px;
   font-family: 'Noto Sans TC', sans-serif;
   font-size: 16px;
   line-height: 1.2;
   color: #436da1;
   text-align: center;
+  background-image: url('/card/bg_list_tips.webp');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto;
 }
 
 .user-about-me {
-  height: 100%;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-color-quaternary);
+  justify-content: space-between;
+  height: 100%;
   padding: 10px 15px;
+  color: var(--text-color-quaternary);
+  border-bottom: 1px solid var(--border);
 }
 
 .user-about-me::before,
 .user-about-me::after {
-  content: '';
-  min-height: 19px;
-  min-width: 23px;
   display: block;
+  min-width: 23px;
+  min-height: 19px;
+  content: '';
   background-size: cover;
 }
 
 .user-about-me::before {
-  background-image: url('/card/bg_left_quote.webp');
-  background-repeat: no-repeat;
   align-self: flex-start;
   margin-right: 10px;
+  background-image: url('/card/bg_left_quote.webp');
+  background-repeat: no-repeat;
 }
 
 .user-about-me::after {
-  background-image: url('/card/bg_right_quote.webp');
-  background-repeat: no-repeat;
   align-self: flex-end;
   margin-left: 10px;
+  background-image: url('/card/bg_right_quote.webp');
+  background-repeat: no-repeat;
 }
 
 .user-about-me-text {
@@ -66,9 +66,9 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: flex-start;
-  user-select: text;
   word-break: break-all;
   cursor: text;
+  user-select: text;
 }
 
 .window-action-buttons,
@@ -85,43 +85,43 @@
 
 .user-profile {
   flex: unset;
-  height: 100%;
   justify-content: space-between;
+  height: 100%;
   background-image: unset !important;
 }
 
 .profile-box {
-  height: 100%;
-  min-height: 0;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  min-height: 0;
 }
 
 .header {
-  color: #fff;
-  -webkit-app-region: drag;
-  background-image: url('/im/wallpaper.webp');
-  background-size: cover;
+  position: relative;
+  display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
   gap: 5px;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   min-height: 225px;
-  padding-bottom: 60px;
-  display: flex;
-  position: relative;
   padding-top: 30px;
+  padding-bottom: 60px;
+  color: #fff;
+  background-image: url('/im/wallpaper.webp');
+  background-size: cover;
+  -webkit-app-region: drag;
 }
 
 .window-action-buttons {
-  width: 50px;
+  position: absolute;
+  top: 10px;
+  right: 0;
   display: flex;
   align-items: center;
   justify-content: space-evenly;
-  position: absolute;
-  right: 0;
-  top: 10px;
+  width: 50px;
 }
 
 .minimize-btn,
@@ -129,8 +129,8 @@
   display: inline-block;
   width: 14px;
   height: 14px;
-  background-position: 0 0;
   cursor: pointer;
+  background-position: 0 0;
   background-size: cover;
 }
 
@@ -156,28 +156,28 @@
 
 .avatar-picture {
   position: relative;
+  display: inline-block;
   min-width: 74px;
   min-height: 74px;
   object-fit: cover;
-  display: inline-block;
   background-image: url('/im/IMLogo.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
   transition: all 0.3s ease-in-out;
 }
 
 .avatar-picture::after {
   position: absolute;
-  content: '';
   top: -7px;
   left: -7px;
+  z-index: 1;
   width: 88px;
   height: 88px;
+  content: '';
   background-image: url('/im/avatar_border.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
-  z-index: 1;
 }
 
 .avatar-picture.editable {
@@ -185,20 +185,20 @@
 }
 
 .avatar-picture.editable:hover {
-  box-shadow: 0 0 3px 6px rgb(255 255 255 / 100%);
   border-radius: 3px;
+  box-shadow: 0 0 3px 6px rgb(255 255 255 / 100%);
 }
 
 .user-name-text {
-  color: #fff;
-  font-size: 1.5em;
-  font-weight: bold;
-  cursor: text;
-  user-select: text;
   max-width: 250px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #fff;
+  white-space: nowrap;
+  cursor: text;
+  user-select: text;
 }
 
 .user-account-text {
@@ -214,20 +214,20 @@
 }
 
 .user-signature {
+  display: flex;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   max-width: 75%;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  line-clamp: 2;
-  text-align: center;
-  color: #fff;
-  cursor: text;
-  user-select: text;
-  display: flex;
   max-height: 15px;
   overflow: auto;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  color: #fff;
+  text-align: center;
+  cursor: text;
+  user-select: text;
+  -webkit-box-orient: vertical;
 }
 
 .user-signature::-webkit-scrollbar-thumb {
@@ -236,24 +236,24 @@
 
 .tabs {
   position: absolute;
+  bottom: 0;
   display: flex;
   width: 100%;
-  bottom: 0;
 }
 
 .tabs .tab {
   display: flex;
+  gap: 5px;
   align-items: center;
   justify-content: center;
-  height: 38px;
   width: 50%;
+  height: 38px;
   padding-bottom: 6px;
-  gap: 5px;
   cursor: pointer;
   background-image: url('/im/userpage_tab.webp');
-  background-size: auto;
   background-repeat: repeat;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .tabs .tab.selected {
@@ -265,46 +265,46 @@
 }
 
 .tabs .tab.about::before {
-  content: '';
-  min-height: 14px;
   min-width: 13px;
+  min-height: 14px;
+  content: '';
   background-image: url('/im/icon-about.webp');
-  background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
+  background-size: contain;
 }
 
 .tabs .tab.groups::before {
-  content: '';
-  min-height: 14px;
   min-width: 18px;
+  min-height: 14px;
+  content: '';
   background-image: url('/im/icon-group.webp');
-  background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
+  background-size: contain;
 }
 
 /* Server List */
 
 .server-list {
-  padding: 5px 0;
   display: flex;
   flex-flow: row wrap;
-  justify-content: flex-start;
-  align-items: center;
   gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5px 0;
 }
 
 .server-card {
   display: flex;
   flex-direction: row;
   gap: 5px;
+  align-items: center;
   width: calc(50% - 2.5px);
   padding: 5px;
-  align-items: center;
-  border: 1px solid var(--border);
-  background-color: var(--background-secondary);
   cursor: pointer;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
 }
 
 .server-card:hover {
@@ -312,49 +312,49 @@
 }
 
 .server-avatar-picture {
+  flex-shrink: 0;
   width: 35px;
   height: 35px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  flex-shrink: 0;
   cursor: pointer;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .server-info-box {
-  flex-direction: column;
-  flex: 1;
-  gap: 5px;
   display: flex;
-  overflow: hidden;
-  min-height: 33px;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
   justify-content: space-between;
+  min-height: 33px;
+  overflow: hidden;
 }
 
 .server-name-text {
   display: flex;
   align-items: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 1em;
   line-height: 1em;
   color: var(--text-color-quaternary);
-  overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .contribution-value-text {
   display: flex;
   align-items: center;
-  color: var(--text-color-quaternary);
   min-width: 30px;
+  color: var(--text-color-quaternary);
 }
 
 .contribution-value-text::before {
   display: block;
-  content: '';
   min-width: 12px;
   min-height: 12px;
   margin-right: 2px;
+  content: '';
   background-image: url('/card/icon_contribu.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -369,10 +369,10 @@
 
 .display-id-text::before {
   display: block;
-  content: '';
   width: 12px;
   height: 12px;
   margin-right: 2px;
+  content: '';
   background-image: url('/card/icon_id.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -381,35 +381,35 @@
 
 .is-owner::before {
   display: block;
-  content: '';
   width: 13px;
   height: 15px;
   margin-right: 5px;
+  content: '';
   background-image: url('/icon_creator.webp');
-  background-size: contain;
   background-position: 0 0;
+  background-size: contain;
 }
 
 .edit-tab-bar {
   z-index: 1;
   display: flex;
+  gap: 10px;
   align-items: center;
   justify-content: flex-end;
   min-height: 45px;
   padding: 10px;
-  gap: 10px;
   background: linear-gradient(to bottom, var(--background), var(--sidebar));
   border-bottom: 1px solid var(--border);
 }
 
 .badge-viewer {
   display: flex;
+  gap: 2px;
   align-items: center;
   min-height: 30px;
-  gap: 2px;
   padding: 2px;
-  border: 1px solid var(--border);
   background-color: var(--background-secondary);
+  border: 1px solid var(--border);
 }
 
 .badge-item {
@@ -417,8 +417,8 @@
   border: 1px solid #fff0;
 
   &:hover {
-    border-radius: 2px;
-    border: 1px solid var(--border);
     background-color: var(--hover);
+    border: 1px solid var(--border);
+    border-radius: 2px;
   }
 }

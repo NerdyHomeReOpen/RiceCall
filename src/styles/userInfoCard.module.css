@@ -1,90 +1,90 @@
 .user-info-card {
-  z-index: 10000;
   position: absolute;
-  background-color: var(--background);
-  height: 190px;
-  width: 275px;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
+  width: 275px;
+  height: 190px;
+  background-color: var(--background);
 }
 
 .vip-0 {
   background-image: url('/channel/ucard_vip0_bg.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .vip-1 {
   background-image: url('/channel/ucard_vip1_bg.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .vip-2 {
   background-image: url('/channel/ucard_vip2_bg.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .vip-3 {
   background-image: url('/channel/ucard_vip3_bg.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .vip-4 {
   background-image: url('/channel/ucard_vip4_bg.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .vip-5 {
   background-image: url('/channel/ucard_vip5_bg.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .body {
+  display: flex;
   flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
   height: 164px;
   padding: 11px 12px;
   padding-bottom: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
 }
 
 .top {
-  height: 98px;
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  width: 100%;
+  height: 98px;
 }
 
 .avatar-picture {
-  min-height: 98px;
   min-width: 98px;
+  min-height: 98px;
   background-image: url('/im/IMLogo.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .user-info-wrapper {
-  flex: 1;
-  height: 100%;
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
+  height: 100%;
   padding-left: 10px;
+  overflow: hidden;
 }
 
 .bottom {
@@ -99,24 +99,24 @@
 }
 
 .nickname-row:not(:empty)::before {
-  content: '';
   display: block;
-  background-image: url('/channel/groupcard.webp');
-  background-repeat: no-repeat;
   min-width: 16px;
   min-height: 16px;
+  margin-right: 5px;
+  content: '';
   object-fit: cover;
+  background-image: url('/channel/groupcard.webp');
+  background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
-  margin-right: 5px;
 }
 
 .nickname-text {
-  white-space: nowrap;
-  line-clamp: 1;
   overflow: hidden;
   text-overflow: ellipsis;
+  line-clamp: 1;
   color: var(--text-username);
+  white-space: nowrap;
 }
 
 .info-row {
@@ -125,19 +125,19 @@
 }
 
 .footer {
-  height: 26px;
-  width: 100%;
   display: flex;
   align-items: center;
   justify-content: flex-start;
+  width: 100%;
+  height: 26px;
   padding: 0 5px;
 }
 
 .name-text {
-  color: var(--text-username);
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-username);
+  white-space: nowrap;
 }
 
 .vip-boost-text {
@@ -162,9 +162,9 @@
 }
 
 .saperator {
-  margin: 0 5px;
   min-width: 2px;
   min-height: 12px;
+  margin: 0 5px;
   background-image: url('/icon_v_split.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -190,14 +190,14 @@
 }
 
 .xp-progress-container {
-  background-color: #e5e7eb;
-  border-radius: 2.5px;
   height: 5px;
+  background-color: #e5e7eb;
   border: 1px solid #b6b6b6;
+  border-radius: 2.5px;
 }
 
 .xp-progress {
+  height: 100%;
   background-color: #f6b03b;
   border-radius: 2px;
-  height: 100%;
 }

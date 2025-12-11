@@ -1,15 +1,15 @@
 .header {
   display: flex;
-  -webkit-app-region: drag;
   justify-content: space-between;
-  border: none;
   min-height: 30px;
+  color: var(--secondary-color);
   background-color: var(--main-color);
   background-image: var(--header-image);
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  color: var(--secondary-color);
+  border: none;
+  -webkit-app-region: drag;
 }
 
 .header.popup {
@@ -18,8 +18,8 @@
 }
 
 .header.big {
-  min-height: 40px;
   display: flex;
+  min-height: 40px;
 }
 
 .title-wrapper {
@@ -49,123 +49,123 @@
 /* Buttons */
 
 .buttons {
-  min-width: fit-content;
   display: flex;
+  gap: 5px;
   align-items: center;
   justify-content: flex-end;
+  min-width: fit-content;
   margin-right: 10px;
-  gap: 5px;
 }
 
 .gift {
+  display: inline-block;
   min-width: 28px;
   min-height: 28px;
+  cursor: pointer;
   background-image: url('/gift.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .game {
+  display: inline-block;
   min-width: 28px;
   min-height: 28px;
+  cursor: pointer;
   background-image: url('/game.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .notice {
+  display: inline-block;
   min-width: 24px;
   min-height: 24px;
+  cursor: pointer;
   background-image: url('/icon_notice.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .overlay {
   position: absolute;
+  display: inline-block;
   min-width: 24px;
   min-height: 24px;
+  cursor: pointer;
   background-image: url('/icon_notice_overlay.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .spliter {
+  display: inline-block;
   min-width: 2px;
   min-height: 19px;
+  cursor: pointer;
   background-image: url('/mf_spliter.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .menu {
+  display: inline-block;
   min-width: 20px;
   min-height: 20px;
+  cursor: pointer;
   background-image: url('/BtnMenu.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .minimize {
+  display: inline-block;
   min-width: 20px;
   min-height: 20px;
+  cursor: pointer;
   background-image: url('/Button_Minsize.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .restore {
+  display: inline-block;
   min-width: 20px;
   min-height: 20px;
+  cursor: pointer;
   background-image: url('/Button_Restore.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .maxsize {
+  display: inline-block;
   min-width: 20px;
   min-height: 20px;
+  cursor: pointer;
   background-image: url('/Button_Maxsize.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .close {
+  display: inline-block;
   min-width: 20px;
   min-height: 20px;
+  cursor: pointer;
   background-image: url('/Button_Close.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
-  display: inline-block;
-  cursor: pointer;
 }
 
 .overlay.new {
@@ -184,7 +184,7 @@
 .minimize:hover,
 .maxsize:hover,
 .close:hover,
-.menu:hover:not(:has(.menuDropDown:hover)) {
+.menu:hover:not(:has(.menu-dropdown:hover)) {
   background-position: -20px 0;
 }
 
@@ -204,7 +204,7 @@
 .minimize:active,
 .close:active,
 .maxsize:active,
-.menu:active:not(:has(.menuDropDown:active)) {
+.menu:active:not(:has(.menu-dropdown:active)) {
   background-position: -40px 0;
 }
 
@@ -237,50 +237,50 @@
   width: max-content;
   max-width: 200px;
   height: 30px;
-  overflow: hidden;
-  white-space: nowrap;
   padding: 0 13px;
+  overflow: hidden;
   font-size: 1.06rem;
+  white-space: nowrap;
 }
 
 .main-tabs .tab::before {
-  content: '';
   position: absolute;
-  z-index: 2;
   top: 0;
   left: 0;
+  z-index: 2;
   min-width: 10px;
   min-height: 31px;
+  content: '';
   background-image: url('/tab_item_mainframe.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
 .main-tabs .tab::after {
-  content: '';
   position: absolute;
-  z-index: 2;
   top: 0;
   right: 0;
+  z-index: 2;
   min-width: 10px;
   min-height: 31px;
+  content: '';
   background-image: url('/tab_item_mainframe.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
 .main-tabs .tab-close {
-  z-index: 2;
-  min-width: 12px;
-  min-height: 12px;
   position: relative;
-  border-radius: 50%;
-  background-color: rgb(55 144 206);
-  box-shadow: 0 0 2px rgb(255 255 255 / 35%);
+  z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
+  min-width: 12px;
+  min-height: 12px;
   cursor: pointer;
+  background-color: rgb(55 144 206);
+  border-radius: 50%;
+  box-shadow: 0 0 2px rgb(255 255 255 / 35%);
 }
 
 .main-tabs .tab-close:hover {
@@ -293,11 +293,11 @@
 
 .main-tabs .tab .tab-bg {
   position: absolute;
-  overflow: hidden;
-  width: calc(100% - 20px);
-  height: 30px;
   bottom: 0;
   left: 10px;
+  width: calc(100% - 20px);
+  height: 30px;
+  overflow: hidden;
 }
 
 .main-tabs .tab.selected::before {
@@ -316,11 +316,11 @@
 
 .main-tabs .tab .tab-lable {
   z-index: 1;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  color: var(--secondary-color);
   width: 100%;
   margin: 0 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--secondary-color);
   text-align: center;
   white-space: nowrap;
 }
@@ -339,21 +339,21 @@
 .title-box-skin-icon {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0 10px;
   gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
 }
 
 .title-box::before {
-  content: '';
   display: inline-block;
   min-width: 18px;
   min-height: 18px;
+  content: '';
+  background-image: url('/rc_logo_small.webp');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
-  background-image: url('/rc_logo_small.webp');
 }
 
 .title-box-skin-icon::before {
@@ -365,17 +365,17 @@
 }
 
 .name-box {
-  text-shadow: 0 0 4px #fff9;
-  line-height: 16px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   max-width: 150px;
   max-height: 26px;
   padding: 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.9em;
   font-weight: bold;
+  line-height: 16px;
   color: var(--text-color);
+  white-space: nowrap;
+  text-shadow: 0 0 4px #fff9;
 }
 
 .name-box:hover {
@@ -392,17 +392,17 @@
 .status-box {
   position: relative;
   display: flex;
-  padding: 2px;
   height: fit-content;
+  padding: 2px;
 }
 
-.status-box:hover:not(:has(.statusDropdown:hover)) {
+.status-box:hover:not(:has(.status-dropdown:hover)) {
   text-shadow: 0 0 4px #fff;
   background-color: #ffffff1f;
   border-radius: 3px;
 }
 
-.status-box:active:not(:has(.statusDropdown:active)) {
+.status-box:active:not(:has(.status-dropdown:active)) {
   text-shadow: 0 0 4px #fff;
   background-color: #ffffff36;
 }
@@ -442,22 +442,22 @@
   background-position: 0 4px;
 }
 
-.status-box:hover:not(:has(.statusDropdown:hover)) .status-triangle {
+.status-box:hover:not(:has(.status-dropdown:hover)) .status-triangle {
   background-position: -9px 4px;
 }
 
-.status-box:active:not(:has(.statusDropdown:active)) .status-triangle {
+.status-box:active:not(:has(.status-dropdown:active)) .status-triangle {
   background-position: -18px 4px;
 }
 
 .status-dropdown {
-  z-index: 10000;
   position: absolute;
+  top: 20px;
+  z-index: 10000;
   display: flex;
   flex-flow: column wrap;
-  justify-content: space-between;
   align-items: center;
-  top: 20px;
+  justify-content: space-between;
   width: fit-content;
   height: fit-content;
   background-color: var(--background);
@@ -470,11 +470,11 @@
 }
 
 .status-dropdown .option {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
   box-sizing: unset;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   width: 13px;
   height: 13px;
   padding: 3px 5px;
@@ -485,10 +485,10 @@
 }
 
 .status-dropdown .option::before {
-  content: '';
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
+  content: '';
   background-image: url('/user_state.webp');
   background-repeat: no-repeat;
   background-position: 0 0;

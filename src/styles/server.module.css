@@ -2,8 +2,8 @@
   display: flex;
   flex-direction: column;
   width: 100%;
-  height: 100%;
   min-width: 0;
+  height: 100%;
   min-height: 0;
 }
 
@@ -17,29 +17,29 @@
 
 .scroll-view {
   display: flex;
-  flex-direction: column;
   flex: 1;
-  min-height: 0;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
   overflow-y: auto;
 }
 
 .sidebar {
   display: flex;
   flex-direction: column;
-  min-height: 0;
   width: 280px;
   min-width: 280px;
+  min-height: 0;
   background-color: var(--sidebar);
 }
 
 .sidebar-header {
   position: relative;
   display: flex;
-  align-items: center;
-  border-bottom: 1px solid var(--border);
-  padding: 5px;
   gap: 5px;
+  align-items: center;
+  padding: 5px;
+  border-bottom: 1px solid var(--border);
 }
 
 .avatar-box {
@@ -49,45 +49,45 @@
 
 .avatar-picture {
   position: relative;
+  min-width: 50px;
+  min-height: 50px;
   cursor: pointer;
   object-fit: cover;
-  min-height: 50px;
-  min-width: 50px;
   background-image: url('/logo_server_def.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
   box-shadow: 0 2px 2px var(--shadow);
 }
 
 .avatar-picture::before {
-  content: '';
   position: absolute;
   top: -1px;
   left: -1px;
   z-index: 1;
   min-width: 52px;
   min-height: 52px;
+  content: '';
   background-image: url('/channel/server_logo_border.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: 0 0;
+  background-size: cover;
 }
 
 .base-info-wrapper {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
-  justify-content: space-between;
   gap: 10px;
+  justify-content: space-between;
   overflow: hidden;
 }
 
 .base-info-wrapper .box {
   display: flex;
-  justify-content: flex-start;
-  align-items: center;
   gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
 }
 
 .verify-icon {
@@ -100,19 +100,19 @@
 
 .name-text {
   display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  overflow-wrap: break-word;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
   color: var(--text-color-quaternary);
+  overflow-wrap: break-word;
+  -webkit-box-orient: vertical;
 }
 
 .id-text {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
   min-width: 75px;
   color: var(--text-color-quaternary);
   text-shadow: 0 1px 0 #fff;
@@ -120,41 +120,41 @@
 
 .member-text {
   display: flex;
-  justify-content: flex-start;
   align-items: center;
+  justify-content: flex-start;
   min-width: 55px;
   color: var(--text-color-quaternary);
   text-shadow: 0 1px 0 #fff;
 }
 
 .id-text::before {
-  content: '';
-  min-height: 12px;
-  min-width: 12px;
   position: relative;
+  min-width: 12px;
+  min-height: 12px;
+  margin-right: 2px;
+  content: '';
   background-image: url('/channel/ID.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 2px;
 }
 
 .member-text::before {
-  content: '';
-  min-height: 12px;
-  min-width: 12px;
   position: relative;
+  min-width: 12px;
+  min-height: 12px;
+  margin-right: 2px;
+  content: '';
   background-image: url('/channel/member.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
-  margin-right: 2px;
 }
 
 .options {
-  flex: 1;
   display: flex;
+  flex: 1;
+  gap: 5px;
   align-items: center;
   justify-content: flex-end;
-  gap: 5px;
 }
 
 .options .option:first-child:hover::before,
@@ -163,8 +163,8 @@
 }
 
 .invitation-icon {
-  min-height: 16px;
   min-width: 20px;
+  min-height: 16px;
   cursor: pointer;
   background-image: url('/channel/icon_invite_friend.webp');
   background-repeat: no-repeat;
@@ -180,10 +180,10 @@
 }
 
 .setting-icon {
-  min-height: 16px;
-  min-width: 24px;
-  cursor: pointer;
   position: relative;
+  min-width: 24px;
+  min-height: 16px;
+  cursor: pointer;
   background-image: url('/channel/icon_group_option.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -198,20 +198,20 @@
 }
 
 .saperator-1 {
-  min-height: 16px;
   min-width: 2px;
-  background-size: auto;
+  min-height: 16px;
   background-image: url('/icon_v_split.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .saperator-2 {
   min-height: 8px;
+  cursor: ns-resize;
   background-image: url('/channel/chn_tree_split.webp');
   background-repeat: no-repeat;
   background-position: 50% 0;
-  cursor: ns-resize;
 }
 
 .saperator-3 {
@@ -222,22 +222,22 @@
 }
 
 .section-title-text {
-  color: var(--text-color-senary);
   padding: 5px 10px;
+  color: var(--text-color-senary);
   text-shadow: 0 1px #fff;
 }
 
 .current-channel-box {
-  height: 35px;
   display: flex;
   align-items: center;
   width: 100%;
+  height: 35px;
 }
 
 .current-channel-icon {
   position: relative;
-  min-height: 20px;
   min-width: 20px;
+  min-height: 20px;
   margin-left: 8px;
   background-image: url('/channel/NetworkStatus.webp');
   background-repeat: no-repeat;
@@ -266,11 +266,11 @@
 
 .current-channel-text {
   margin-left: 3px;
-  color: var(--text-color-quinary);
-  font-size: 1.1em;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 1.1em;
+  color: var(--text-color-quinary);
+  white-space: nowrap;
 }
 
 .queue-list {
@@ -286,10 +286,10 @@
 .channel-tab {
   position: relative;
   display: flex;
+  gap: 2px;
   align-items: center;
   height: 25px;
   padding: 2px 20px 2px 10px;
-  gap: 2px;
   margin-right: 5px;
 }
 
@@ -306,9 +306,9 @@
   min-width: 14px;
   min-height: 14px;
   cursor: pointer;
-  background-position: 0 0;
   background-image: url('/channel/channelIcon.webp');
   background-repeat: no-repeat;
+  background-position: 0 0;
   background-size: auto;
 }
 
@@ -349,10 +349,10 @@
 }
 
 .channel-tab .channel-tab-label {
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color-secondary);
+  white-space: nowrap;
 }
 
 .channel-tab .channel-tab-label.is-reception-lobby {
@@ -364,8 +364,8 @@
 }
 
 .user-list {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: column;
   text-shadow: 0 1px 0 #fff;
 }
@@ -373,12 +373,12 @@
 .user-tab {
   position: relative;
   display: flex;
+  gap: 2px;
   align-items: center;
   height: 25px;
   padding: 2px 20px 2px 10px;
-  gap: 2px;
-  text-shadow: 0 1px #fff;
   margin-right: 5px;
+  text-shadow: 0 1px #fff;
 }
 
 .user-tab:not(.selected):hover {
@@ -390,10 +390,10 @@
 }
 
 .user-tab .user-tab-name {
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
+  white-space: nowrap;
 }
 
 .user-tab .user-tab-name.member {
@@ -410,28 +410,28 @@
 }
 
 .user-audio-state {
-  min-height: 12px;
+  left: 0;
   min-width: 12px;
+  min-height: 12px;
   background-image: url('/channel/audioState.webp');
-  background-size: auto;
   background-repeat: no-repeat;
   background-position: -36px 0;
-  left: 0;
+  background-size: auto;
 }
 
 .user-text-state {
-  min-height: 12px;
   min-width: 12px;
+  min-height: 12px;
   background-image: url('/channel/audioState.webp');
-  background-size: auto;
   background-repeat: no-repeat;
   background-position: -36px 0;
+  background-size: auto;
 }
 
 .user-audio-state.loading {
   background-image: url('/loading.gif');
-  background-size: cover;
   background-position: 0 0;
+  background-size: cover;
 }
 
 .user-audio-state.play {
@@ -447,29 +447,29 @@
 }
 
 .queue-position {
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
+  white-space: nowrap;
 }
 
 .queue-seconds-remaining-box {
+  display: flex;
+  align-items: center;
+  padding-right: 3px;
+  padding-left: 3px;
+  margin-left: auto;
+  color: var(--text-color-quaternary);
   background-color: var(--notify-toaster-background);
   border: 1px solid var(--notify-toaster-border);
   border-radius: 3px;
-  padding-right: 3px;
-  padding-left: 3px;
-  display: flex;
-  align-items: center;
-  color: var(--text-color-quaternary);
-  margin-left: auto;
 }
 
 .my-location-icon {
   position: absolute;
-  min-height: 15px;
-  min-width: 15px;
   right: 2px;
+  min-width: 15px;
+  min-height: 15px;
   cursor: pointer;
   background-image: url('/mylocation.webp');
   background-repeat: no-repeat;
@@ -497,49 +497,45 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  min-height: 0;
   min-width: 500px;
+  min-height: 0;
 }
 
 .announcement-area {
-  overflow-y: auto;
-  padding: 10px;
-  height: 100%;
-  min-height: 60px;
   width: 100%;
   min-width: 200px;
+  height: 100%;
+  min-height: 60px;
+  padding: 10px;
+  overflow-y: auto;
 }
 
 .bottom-area {
-  flex: 5;
   display: flex;
+  flex: 5;
   flex-direction: column;
-  min-height: 200px;
   min-width: 260px;
+  min-height: 200px;
   overflow-y: hidden;
   background-color: var(--background-secondary);
 }
 
 .widget-bar {
-  z-index: 1000;
   position: absolute;
-  display: flex;
-  align-items: center;
   right: 10px;
+  z-index: 1000;
+  display: flex;
   gap: 5px;
-  background: #fff;
-  border-bottom-left-radius: 5px;
-  border-bottom-right-radius: 5px;
-  box-shadow: var(--box-shadow);
-  border-top: unset;
+  align-items: center;
   overflow: hidden;
+  background: #fff;
+  border-top: unset;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  box-shadow: var(--box-shadow);
 }
 
 .widget-close {
-  height: 16px;
-}
-
-.widget-close .widget-bar-content {
   height: 16px;
 }
 
@@ -553,23 +549,37 @@
 
 .widget-bar-item {
   display: flex;
-  cursor: pointer;
-  place-items: center;
   gap: 5px;
+  place-items: center;
   padding: 3px 25px;
+  cursor: pointer;
 }
 
 .widget-close .widget-bar-item {
   padding: unset;
 }
 
-.widget-bar-item:hover .widget-bar-item-icon {
-  background-position: -12px 0;
+.widget-bar-item-icon {
+  display: flex;
+  width: 12px;
+  height: 12px;
+  background-position: 0 0;
+  background-size: auto;
 }
 
 .widget-bar-item-active .widget-bar-item-icon,
 .widget-bar-item:active .widget-bar-item-icon {
   background-position: -24px 0;
+}
+
+.widget-close .widget-bar-item-icon {
+  width: 16px;
+  height: 16px;
+  background-position: 0 0;
+}
+
+.widget-bar-item:hover .widget-bar-item-icon {
+  background-position: -12px 0;
 }
 
 .widget-close .widget-bar-item:hover .widget-bar-item-icon {
@@ -578,20 +588,6 @@
 
 .widget-close .widget-bar-item:active .widget-bar-item-icon {
   background-position: -20px 0;
-}
-
-.widget-bar-item-icon {
-  width: 12px;
-  height: 12px;
-  background-size: auto;
-  background-position: 0 0;
-  display: flex;
-}
-
-.widget-close .widget-bar-item-icon {
-  width: 16px;
-  height: 16px;
-  background-position: 0 0px;
 }
 
 .widget-bar-item-icon.announcement-icon {
@@ -614,49 +610,48 @@
 
 .widget-bar-item-text {
   font-size: 12px;
+  color: #333;
   white-space: nowrap;
   user-select: none;
-  color: #333;
 }
 
 .widget-bar-item-active .widget-bar-item-text {
-  color: #000;
   font-weight: bold;
+  color: #000;
 }
 
 .message-area {
   display: flex;
   flex-direction: column;
-  overflow-y: scroll;
-  overflow-x: hidden;
   height: 100%;
   padding: 10px 10px 0;
+  overflow: hidden scroll;
 }
 
 .broadcast-area {
   position: absolute;
-  left: 10px;
   bottom: calc(100% + 10px);
-  width: calc(100% - 20px);
-  min-height: 25px;
+  left: 10px;
   display: flex;
   justify-content: center;
+  width: calc(100% - 20px);
+  min-height: 25px;
   padding: 3px;
+  background-color: var(--notify-toaster-background);
   border: 1.5px solid var(--notify-toaster-border);
   border-radius: 2px;
-  background-color: var(--notify-toaster-background);
 }
 
 .broadcast-area .close-button {
-  min-width: 18px;
-  min-height: 18px;
   width: 18px;
+  min-width: 18px;
   height: 18px;
-  border: none;
+  min-height: 18px;
   cursor: pointer;
   background-image: url('/loading_close.webp');
-  background-size: cover;
   background-position: 0 0;
+  background-size: cover;
+  border: none;
 }
 
 .close-button:hover {
@@ -677,31 +672,31 @@
 
 .button-area {
   display: flex;
+  flex: none;
   align-items: center;
   justify-content: space-between;
-  flex: none;
   padding: 4px 10px;
+  background-color: var(--background-secondary);
   background-image: url('/channel/chn_toolbar_bg.webp');
   background-repeat: no-repeat;
   background-size: 100% 105%;
-  background-color: var(--background-secondary);
 }
 
 .mic-button {
-  min-width: 154px;
-  min-height: 50px;
-  max-width: 154px;
-  max-height: 50px;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  min-width: 154px;
+  max-width: 154px;
+  min-height: 50px;
+  max-height: 50px;
   padding: 0 10px;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: pointer;
   background-image: url('/channel/mic_state_menu.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 2px;
-  cursor: pointer;
-  font-family: Arial, Helvetica, sans-serif;
+  background-size: auto;
 }
 
 .mic-button.normal {
@@ -802,10 +797,10 @@
 
 .mic-button::after {
   display: block;
-  content: '';
-  min-height: 7px;
   min-width: 11px;
+  min-height: 7px;
   cursor: pointer;
+  content: '';
   background-image: url('/channel/icon_mic_triangle.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
@@ -825,33 +820,33 @@
 
 .buttons {
   display: flex;
+  gap: 10px;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
 }
 
 .voice-mode-dropdown {
+  position: relative;
   display: flex;
-  align-items: center;
   gap: 5px;
-  cursor: pointer;
+  align-items: center;
   padding: 5px;
-  border-radius: 4px;
-  background: none;
   color: var(--text-color-quaternary);
   text-align: center;
-  position: relative;
+  cursor: pointer;
+  background: none;
+  border-radius: 4px;
 
   &::after {
     display: block;
-    content: '';
-    min-height: 8px;
     min-width: 8px;
+    min-height: 8px;
     cursor: pointer;
-    transform: rotate(180deg);
+    content: '';
     background-image: url('/channel/triangle.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
+    transform: rotate(180deg);
   }
 
   &:hover::after {
@@ -866,13 +861,13 @@
 .bkg-mode-btn {
   display: flex;
   align-items: center;
-  cursor: pointer;
   color: var(--text-color-secondary);
+  cursor: pointer;
 
   &::before {
-    content: '';
-    min-height: 18px;
     min-width: 18px;
+    min-height: 18px;
+    content: '';
     background-image: url('/channel/music_bkg.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
@@ -1000,24 +995,24 @@
 
 .mic-btn {
   position: relative;
-  min-width: 18px;
   width: 18px;
-  min-height: 18px;
+  min-width: 18px;
   height: 18px;
+  min-height: 18px;
   cursor: pointer;
   background-image: url('/channel/Mic.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 
   &::after {
-    content: '';
     position: absolute;
-    min-height: 18px;
     min-width: 18px;
-    opacity: 0;
+    min-height: 18px;
+    content: '';
     background-image: url('/channel/Mic.webp');
     background-repeat: no-repeat;
     background-position: -16px 0;
+    opacity: 0;
   }
 
   &.muted::after {
@@ -1027,17 +1022,17 @@
 
 .mic-mode-dropdown-btn {
   position: relative;
-  min-height: 8px;
-  height: 8px;
-  min-width: 8px;
   width: 8px;
+  min-width: 8px;
+  height: 8px;
+  min-height: 8px;
   cursor: pointer;
 
   &::after {
-    content: '';
     position: absolute;
-    min-height: 8px;
     min-width: 8px;
+    min-height: 8px;
+    content: '';
     background-image: url('/channel/triangle.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
@@ -1054,53 +1049,53 @@
 }
 
 .mic-mode-menu {
-  z-index: 10000;
   position: absolute;
   right: 0;
   bottom: 100%;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   width: 250px;
   padding: 10px;
+  overflow: hidden;
+  cursor: default;
   background-color: var(--background);
   border-radius: 3px;
   box-shadow: var(--box-shadow);
-  overflow: hidden;
-  cursor: default;
 }
 
 .mic-mode-menu .voice-threshold-input-wrapper {
   display: flex;
-  align-items: center;
   gap: 5px;
+  align-items: center;
 }
 
 .mic-mode-menu .voice-threshold-input {
-  flex: 1;
   position: relative;
-  appearance: none;
+  flex: 1;
   height: 8px;
-  border-radius: 5px;
-  box-shadow: inset 0 2px 2px -2px #0000001f;
+  appearance: none;
+  cursor: pointer;
   outline: none;
   border: 1px solid var(--border);
-  cursor: pointer;
+  border-radius: 5px;
+  box-shadow: inset 0 2px 2px -2px #0000001f;
 
   &::-webkit-slider-thumb {
-    appearance: none;
     width: 8px;
     height: 20px;
     margin-top: -10px;
-    background-image: url('/channel/Thresholdslider.webp');
+    appearance: none;
     cursor: pointer;
+    background-image: url('/channel/Thresholdslider.webp');
   }
 
   &::before {
-    content: '';
     position: absolute;
-    height: 100%;
     width: 100%;
+    height: 100%;
+    content: '';
     background-image: url('/channel/ThresholdLine.webp');
     background-repeat: repeat-x;
     background-position: 50% 0;
@@ -1108,13 +1103,13 @@
 }
 
 .mic-mode-menu .voice-state-icon {
-  opacity: 0;
-  min-height: 12px;
   min-width: 12px;
+  min-height: 12px;
   background-image: url('/channel/audioState.webp');
-  background-size: auto;
   background-repeat: no-repeat;
   background-position: -24px 0;
+  background-size: auto;
+  opacity: 0;
 
   &.active {
     opacity: 1;
@@ -1123,10 +1118,10 @@
 
 .speaker-btn {
   position: relative;
-  min-width: 18px;
   width: 18px;
-  min-height: 18px;
+  min-width: 18px;
   height: 18px;
+  min-height: 18px;
   cursor: pointer;
   background-image: url('/channel/speaker.webp');
   background-repeat: no-repeat;
@@ -1134,13 +1129,13 @@
 
   &::after {
     position: absolute;
-    content: '';
-    min-height: 18px;
     min-width: 18px;
-    opacity: 0;
+    min-height: 18px;
+    content: '';
     background-image: url('/channel/speaker.webp');
     background-repeat: no-repeat;
     background-position: -18px 0;
+    opacity: 0;
   }
 
   &.muted::after {
@@ -1166,8 +1161,8 @@
 
 .record-mode-btn {
   position: relative;
-  min-height: 18px;
   min-width: 18px;
+  min-height: 18px;
   cursor: pointer;
   background-image: url('/channel/recorder.webp');
   background-repeat: no-repeat;
@@ -1178,13 +1173,13 @@
   }
 
   &.active::after {
-    z-index: -1;
-    content: '';
+    position: absolute;
     top: -5px;
     left: -5px;
-    position: absolute;
-    min-height: 28px;
+    z-index: -1;
     min-width: 28px;
+    min-height: 28px;
+    content: '';
     background-image: url('/channel/recorder_bg.webp');
     background-repeat: no-repeat;
     background-position: 0 0;
@@ -1205,26 +1200,26 @@
 .speaker-volume-container {
   position: relative;
   display: flex;
-  align-items: center;
   gap: 5px;
+  align-items: center;
 }
 
 .mic-volume-container .volume-slider,
 .speaker-volume-container .volume-slider {
-  z-index: 10000;
   position: absolute;
   bottom: -3px;
   left: -3px;
+  z-index: 10000;
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  padding: 3px;
   width: 24px;
   height: fit-content;
+  padding: 3px;
+  background-color: var(--background);
   border-radius: 3px;
   box-shadow: var(--box-shadow);
-  background-color: var(--background);
 }
 
 .mic-volume-container:has(.mic-btn:hover) .volume-slider,
@@ -1235,52 +1230,52 @@
 }
 
 .slider-container {
-  display: flex;
   position: relative;
-  height: 120px;
+  display: flex;
   width: 4px;
+  height: 120px;
   margin: 10px;
   border-radius: 2px;
 }
 
 .slider {
-  appearance: none;
   position: absolute;
   top: calc(50% - 4px);
   left: -58px;
   width: 120px;
   height: 4px;
+  appearance: none;
   background-color: var(--border);
   border-radius: 2px;
   transform: rotate(-90deg);
 }
 
 .slider::-webkit-slider-thumb {
-  appearance: none;
   width: 14px;
   height: 14px;
+  appearance: none;
+  cursor: pointer;
   background-color: var(--background);
   border: 2px solid var(--border-secondary);
   border-radius: 50%;
-  cursor: pointer;
 }
 
 .sidebar-footer {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .sidebar-footer .navegate-tab {
-  padding: 8px;
-  text-align: center;
-  cursor: pointer;
-  color: var(--text-color-quinary);
+  z-index: 1;
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1;
+  padding: 8px;
+  color: var(--text-color-quinary);
+  text-align: center;
+  cursor: pointer;
   transition: transform 0.2s ease;
 }
 
@@ -1290,31 +1285,31 @@
 }
 
 .sidebar-footer .navegate-tab::before {
-  content: '';
   display: inline-block;
-  height: 15px;
   width: 15px;
-  min-height: 15px;
   min-width: 15px;
+  height: 15px;
+  min-height: 15px;
+  margin-right: 4px;
+  content: '';
   background-repeat: no-repeat;
   background-size: auto;
-  margin-right: 4px;
 }
 
 .sidebar-footer .navegate-tab:first-child::before {
+  min-width: 18px;
+  min-height: 18px;
   background-image: url('/channel/rdb_cur_channel.webp');
   background-position: 0 0;
   background-size: auto;
-  min-height: 18px;
-  min-width: 18px;
 }
 
 .sidebar-footer .navegate-tab:last-child::before {
+  min-width: 18px;
+  min-height: 18px;
   background-image: url('/channel/rdb_all_channel.webp');
   background-position: 0 0;
   background-size: auto;
-  min-height: 18px;
-  min-width: 18px;
 }
 
 .sidebar-footer .navegate-tab.active::before {
@@ -1322,41 +1317,41 @@
 }
 
 .sidebar-footer .navegate-tab.active::after {
-  content: '';
   position: absolute;
-  min-height: 20px;
-  min-width: 70px;
   top: -15px;
-  transition: left 0.2s ease;
+  min-width: 70px;
+  min-height: 20px;
+  content: '';
   background-image: url('/channel/switch_arrow.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
+  background-size: auto;
+  transition: left 0.2s ease;
 }
 
 .screen-preview {
   position: relative;
-  border: 1px solid var(--border-color, var(--text-color-secondary));
-  border-radius: 8px;
   padding: 8px;
   margin: 8px 0;
   background-color: var(--shadow);
+  border: 1px solid var(--border-color, var(--text-color-secondary));
+  border-radius: 8px;
 }
 
 .screen-preview-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-size: 0.9rem;
+  justify-content: space-between;
   margin-bottom: 6px;
+  font-size: 0.9rem;
 }
 
 .screen-preview-stop {
-  cursor: pointer;
   padding: 4px 8px;
-  border-radius: 6px;
-  border: 1px solid var(--border-secondary);
+  cursor: pointer;
   background: transparent;
+  border: 1px solid var(--border-secondary);
+  border-radius: 6px;
 }
 
 .screen-preview-video {

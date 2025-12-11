@@ -31,7 +31,8 @@
     "build:deb": "npm run next:build && npm run electron:prep && npm run electron:build:deb",
     "build:dmg": "npm run next:build && npm run electron:prep && npm run electron:build:dmg",
     "build:action": "npm run next:build && npm run electron:prep",
-    "format": "prettier --write src/**/*.{ts,tsx,js,jsx,css}"
+    "format": "prettier --write src/**/*.{ts,tsx,js,jsx,css}",
+    "format:css": "stylelint \"src/**/*.css\" --fix"
   },
   "dependencies": {
     "@crowdin/ota-client": "^2.0.1",
@@ -71,6 +72,8 @@
     "rehype-highlight": "^7.0.2",
     "rehype-raw": "^7.0.0",
     "socket.io-client": "^4.8.1",
+    "stylelint-config-recess-order": "^7.4.0",
+    "stylelint-order": "^7.0.0",
     "twemoji": "^14.0.2",
     "zod": "^4.1.5"
   },
@@ -87,8 +90,8 @@
     "eslint-config-next": "15.3.2",
     "postcss": "^8",
     "prettier": "^3.6.2",
-    "stylelint": "^16.17.0",
-    "stylelint-config-standard": "^37.0.0",
+    "stylelint": "^16.26.1",
+    "stylelint-config-standard": "^39.0.1",
     "tsx": "^4.19.4",
     "typescript": "5.8.3"
   },
