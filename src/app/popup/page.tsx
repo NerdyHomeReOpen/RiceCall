@@ -99,7 +99,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
         </div>
         <div className={header['buttons']}>
           {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimize} />}
-          {buttons.includes('maxsize') && isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />}
+          {buttons.includes('maxsize') && (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />)}
           {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
         </div>
       </div>
