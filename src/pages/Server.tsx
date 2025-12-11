@@ -475,17 +475,26 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       sidebarRef.current.style.width = `${e.clientX}px`;
     };
 
+    const getResizableAreaRef = () => {
+      if (mode === 'announcement') return annAreaRef;
+      if (mode === 'show') return showAreaRef;
+      return null;
+    };
+
     const handleAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+      const targetRef = getResizableAreaRef();
+      if (!targetRef?.current) return;
       e.currentTarget.setPointerCapture(e.pointerId);
       isResizingAnnAreaRef.current = true;
     };
 
     const handleAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!isResizingAnnAreaRef.current || !annAreaRef.current) return;
+      const targetRef = getResizableAreaRef();
+      if (!isResizingAnnAreaRef.current || !targetRef?.current) return;
       if (channelUIMode === 'classic') {
-        annAreaRef.current.style.height = `${e.clientY - annAreaRef.current.offsetTop}px`;
+        targetRef.current.style.height = `${e.clientY - targetRef.current.offsetTop}px`;
       } else if (channelUIMode === 'three-line') {
-        annAreaRef.current.style.width = `${e.clientX - annAreaRef.current.offsetLeft}px`;
+        targetRef.current.style.width = `${e.clientX - targetRef.current.offsetLeft}px`;
       }
     };
 
