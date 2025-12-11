@@ -130,16 +130,6 @@ const VolumeSlider = React.memo(
 
 VolumeSlider.displayName = 'VolumeSlider';
 
-interface StateSnapshot {
-  uid: string;
-  gid: string;
-  cid: string;
-  voiceMode: Channel['voiceMode'];
-  inQueue: boolean;
-  queueUsers: QueueUser[];
-  firstQueueUserId: string;
-}
-
 interface ServerPageProps {
   user: User;
   currentServer: Server;
@@ -188,8 +178,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const showAreaRef = useRef<HTMLIFrameElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const messageAreaRef = useRef<HTMLDivElement>(null);
-    const prevStateRef = useRef<StateSnapshot | null>(null);
-    const lastChannelSwitchTimeRef = useRef<number>(0);
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -249,14 +237,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       const isIdling = !isMicTaken && !isQueuing;
       return { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled };
     }, [queueUsers, userId, permissionLevel]);
-
-    const aid = useMemo(() => {
-      if (!isCurrentChannelQueueMode) return '';
-      const userInQueue = queueUsers.find((m) => m.userId === userId);
-      if (!userInQueue) return '';
-      if (userInQueue.position < 0) return '';
-      return userId;
-    }, [isCurrentChannelQueueMode, queueUsers, userId]);
 
     // Handlers
     const getMicText = () => {
@@ -490,149 +470,23 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, []);
 
     const handleShowFrameLoad = useCallback(() => {
-      if (!showAreaRef.current?.contentWindow || !prevStateRef.current) return;
-      const state = prevStateRef.current;
-      showAreaRef.current.contentWindow.postMessage(
-        {
-          uid: state.uid,
-          aid: state.firstQueueUserId,
-          micOff: state.voiceMode !== 'queue',
-          gid: state.gid,
-          cid: state.cid,
-        },
-        SHOW_FRAME_ORIGIN,
-      );
-      if (state.cid && state.voiceMode === 'queue') {
-        showAreaRef.current.contentWindow.postMessage(
-          {
-            uid: state.uid,
-            aid: state.firstQueueUserId,
-            gid: state.gid,
-            cid: state.cid,
-            action: 'checkSelf',
-            micOff: false,
-          },
-          SHOW_FRAME_ORIGIN,
-        );
-      }
-    }, []);
+      const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+      updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
+    }, [userId, queueUsers, currentChannelVoiceMode]);
 
     const updateShowFrameState = useCallback(
-      (params: {
-        userId: string;
-        currentServerId: string;
-        currentChannelId: string;
-        currentChannelVoiceMode: Channel['voiceMode'];
-        isCurrentChannelQueueMode: boolean;
-        queueUsers: QueueUser[];
-        isQueuing: boolean;
-        isMicTaken: boolean;
-        aid: string;
-      }) => {
+      (userId: string, anchorId: string | null, channelMode: Channel['voiceMode']) => {
         if (!showAreaRef.current?.contentWindow) return;
-
-        const { userId, currentServerId, currentChannelId, currentChannelVoiceMode, isCurrentChannelQueueMode, queueUsers, aid } = params;
-        const currentUserInQueue = queueUsers.find((u) => u.userId === userId);
-        const isActuallyInQueue = !!(currentUserInQueue && currentUserInQueue.position >= 0);
-        const firstQueueUserId = queueUsers.find((u) => u.position === 0)?.userId || '';
-
-        const currentState: StateSnapshot = {
-          uid: userId,
-          gid: currentServerId,
-          cid: currentChannelId,
-          voiceMode: currentChannelVoiceMode,
-          inQueue: isActuallyInQueue,
-          queueUsers: [...queueUsers],
-          firstQueueUserId,
-        };
-
-        const prevState = prevStateRef.current;
-        if (!prevState) {
-          prevStateRef.current = currentState;
-          return;
-        }
-
-        const postShowFrameMessage = (payload: Partial<{ uid: string; aid: string; micOff: boolean; gid: string; cid: string; action?: 'take' | 'release' | 'checkSelf' }>) => {
-          showAreaRef.current?.contentWindow?.postMessage(
-            {
-              uid: userId,
-              gid: currentServerId,
-              cid: currentChannelId,
-              micOff: !isCurrentChannelQueueMode,
-              aid: aid || '',
-              ...payload,
-            },
-            SHOW_FRAME_ORIGIN,
-          );
-        };
-
-        const isChannelChanged = currentState.cid !== prevState.cid;
-        const isServerChanged = currentState.gid !== prevState.gid;
-        const hasLeftChannel = (prevState.cid && !currentState.cid) || isChannelChanged || isServerChanged;
-        const hasEnteredChannel = (currentState.cid && !prevState.cid) || isChannelChanged;
-        const micStatusChanged = currentState.inQueue !== prevState.inQueue;
-        const prevQueueIds = new Set(prevState.queueUsers.map((u) => u.userId));
-        const currentQueueIds = new Set(currentState.queueUsers.map((u) => u.userId));
-        const isQueueChanged = prevQueueIds !== currentQueueIds;
-
-        if (hasLeftChannel && prevState.cid) {
-          const prevMicOff = prevState.voiceMode !== 'queue';
-          postShowFrameMessage({
-            action: 'release',
-            gid: prevState.gid,
-            cid: prevState.cid,
-            micOff: prevMicOff,
-            aid: '',
-          });
-
-          if (isChannelChanged) {
-            lastChannelSwitchTimeRef.current = Date.now();
-          }
-        }
-
-        if (currentState.cid) {
-          let shouldSendUpdate = false;
-          let action: 'take' | 'release' | undefined = undefined;
-
-          const isRecentSwitch = Date.now() - lastChannelSwitchTimeRef.current < 1000;
-          const ignoreMicChange = isRecentSwitch && micStatusChanged && !micStatusChanged && isCurrentChannelQueueMode;
-
-          if (hasEnteredChannel) {
-            shouldSendUpdate = true;
-            if (currentState.inQueue) action = 'take';
-          } else if (micStatusChanged && !ignoreMicChange) {
-            shouldSendUpdate = true;
-            action = currentState.inQueue ? 'take' : 'release';
-          } else if (currentState.voiceMode !== prevState.voiceMode) {
-            shouldSendUpdate = true;
-          }
-
-          if (shouldSendUpdate) {
-            postShowFrameMessage({
-              action,
-              aid: action === 'release' ? '' : aid,
-              micOff: currentState.voiceMode === 'queue' ? false : true,
-            });
-          }
-        }
-
-        if (isQueueChanged && currentState.cid && isCurrentChannelQueueMode && currentState.firstQueueUserId) {
-          postShowFrameMessage({
-            action: 'checkSelf',
-            aid: currentState.firstQueueUserId,
-            micOff: false,
-          });
-        }
-
-        prevStateRef.current = currentState;
+        showAreaRef.current.contentWindow.postMessage({ uid: userId, aid: anchorId, channelMode: channelMode }, SHOW_FRAME_ORIGIN);
       },
-      [],
+      [showAreaRef],
     );
 
     // Effects
     useEffect(() => {
-      updateShowFrameState({ userId, currentServerId, currentChannelId, currentChannelVoiceMode, isCurrentChannelQueueMode, queueUsers, isQueuing, isMicTaken, aid });
-    }, [userId, currentServerId, currentChannelId, currentChannelVoiceMode, isCurrentChannelQueueMode, queueUsers, isQueuing, isMicTaken, aid]);
+      const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+      updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
+    }, [userId, queueUsers, currentChannelVoiceMode]);
 
     useEffect(() => {
       webRTCRef.current.changeBitrate(currentChannelBitrate);
