@@ -190,6 +190,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
     const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
+    const [showFrameSrcKey, setShowFrameSrcKey] = useState<number>(() => Date.now());
 
     // Variables
     const { userId } = user;
@@ -566,6 +567,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [currentServerId]);
 
     useEffect(() => {
+      setShowFrameSrcKey(Date.now());
+    }, [currentServerId]);
+
+    useEffect(() => {
       const unsub = ipc.popup.onSubmit('serverApplication', (data: { action?: string }) => {
         if (data?.action === 'toggleShowFrame') {
           setIsShowFrameVisible((prev) => {
@@ -659,9 +664,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   className={styles['rcshow-box']}
                 >
                   <iframe
+                    key={showFrameSrcKey}
                     ref={showFrame.showFrameRef}
                     id="showFrame"
-                    src="https://show.ricecall.com/"
+                    src={`https://show.ricecall.com/?k=${showFrameSrcKey}`}
                     height="100%"
                     width="100%"
                     onLoad={showFrame.handleShowFrameLoad}
