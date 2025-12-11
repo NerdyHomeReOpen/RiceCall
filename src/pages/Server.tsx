@@ -471,7 +471,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const updateShowFrameState = useCallback(
       (userId: string, anchorId: string | null, channelMode: Channel['voiceMode']) => {
         if (!showAreaRef.current?.contentWindow) return;
-        if (prevStateRef.current.userId === userId && prevStateRef.current.anchorId === anchorId && prevStateRef.current.channelMode === channelMode) return;
         prevStateRef.current = { userId, anchorId, channelMode };
         showAreaRef.current.contentWindow.postMessage({ uid: userId, aid: anchorId, channelMode: channelMode }, SHOW_FRAME_ORIGIN);
       },
@@ -486,6 +485,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     // Effects
     useEffect(() => {
       const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+      if (prevStateRef.current.userId === userId && prevStateRef.current.anchorId === anchorId && prevStateRef.current.channelMode === currentChannelVoiceMode) return;
       updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
     }, [userId, queueUsers, currentChannelVoiceMode, updateShowFrameState]);
 
