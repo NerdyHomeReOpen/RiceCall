@@ -24,7 +24,7 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
     <div className={popup['popup-wrapper']}>
       <div className={popup['popup-body']}>
         <div className={styles['middle-area']}>
-          <div className={`${styles['button-item-box']} ${styles['active']}`}>
+          <div className={styles['button-item-box']}>
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('vote')}</div>
           </div>
