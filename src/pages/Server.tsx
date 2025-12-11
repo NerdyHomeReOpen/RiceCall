@@ -288,7 +288,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       {
         id: 'open-announcement',
         label: t('open-announcement'),
-        show: mode === 'none',
+        show: mode !== 'announcement',
         onClick: () => setMode('announcement'),
       },
     ];
