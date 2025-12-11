@@ -178,6 +178,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const showAreaRef = useRef<HTMLIFrameElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const messageAreaRef = useRef<HTMLDivElement>(null);
+    const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -187,12 +188,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
-    const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
     const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
-    const [mode, setMode] = useState<'announcement' | 'show'>('announcement');
-    const [showFrameSrcKey, setShowFrameSrcKey] = useState<number>(() => Date.now());
+    const [mode, setMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
     // Variables
     const { userId } = user;
@@ -271,7 +270,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       {
         id: 'close-announcement',
         label: t('close-announcement'),
-        onClick: () => setIsAnnouncementVisible(false),
+        onClick: () => setMode('none'),
       },
     ];
 
@@ -289,8 +288,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       {
         id: 'open-announcement',
         label: t('open-announcement'),
-        show: !isAnnouncementVisible,
-        onClick: () => setIsAnnouncementVisible(true),
+        show: mode === 'none',
+        onClick: () => setMode('announcement'),
       },
     ];
 
@@ -469,24 +468,26 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       setIsAtBottom(true);
     }, []);
 
-    const handleShowFrameLoad = useCallback(() => {
-      const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
-      updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
-    }, [userId, queueUsers, currentChannelVoiceMode]);
-
     const updateShowFrameState = useCallback(
       (userId: string, anchorId: string | null, channelMode: Channel['voiceMode']) => {
         if (!showAreaRef.current?.contentWindow) return;
+        if (prevStateRef.current.userId === userId && prevStateRef.current.anchorId === anchorId && prevStateRef.current.channelMode === channelMode) return;
+        prevStateRef.current = { userId, anchorId, channelMode };
         showAreaRef.current.contentWindow.postMessage({ uid: userId, aid: anchorId, channelMode: channelMode }, SHOW_FRAME_ORIGIN);
       },
       [showAreaRef],
     );
 
+    const handleShowFrameLoad = useCallback(() => {
+      const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+      updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
+    }, [userId, queueUsers, currentChannelVoiceMode, updateShowFrameState]);
+
     // Effects
     useEffect(() => {
       const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
       updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
-    }, [userId, queueUsers, currentChannelVoiceMode]);
+    }, [userId, queueUsers, currentChannelVoiceMode, updateShowFrameState]);
 
     useEffect(() => {
       webRTCRef.current.changeBitrate(currentChannelBitrate);
@@ -571,10 +572,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [currentServerId]);
 
     useEffect(() => {
-      setShowFrameSrcKey(Date.now());
-    }, [currentServerId]);
-
-    useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
         setSpeakingMode(speakingMode);
       };
@@ -627,7 +624,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           <main className={styles['content']}>
             {/* Message Area */}
             <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
-              {isAnnouncementVisible &&
+              {mode !== 'none' &&
                 (mode === 'announcement' ? (
                   <div
                     ref={annAreaRef}
@@ -644,12 +641,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   </div>
                 ) : mode === 'show' ? (
                   <iframe
-                    key={showFrameSrcKey}
                     ref={showAreaRef}
                     className={styles['rcshow-area']}
                     style={channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
                     id="showFrame"
-                    src={`${SHOW_FRAME_ORIGIN}/?k=${showFrameSrcKey}`}
+                    src={SHOW_FRAME_ORIGIN}
                     height="100%"
                     width="100%"
                     onLoad={handleShowFrameLoad}
@@ -659,13 +655,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               {/* Resize Handle */}
               <div
                 className="resize-handle-vertical"
-                style={channelUIMode === 'classic' && isAnnouncementVisible ? {} : { display: 'none' }}
+                style={channelUIMode === 'classic' && mode !== 'none' ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
               <div
                 className="resize-handle"
-                style={channelUIMode === 'three-line' && isAnnouncementVisible ? {} : { display: 'none' }}
+                style={channelUIMode === 'three-line' && mode !== 'none' ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
@@ -677,7 +673,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     <div
                       className={`${styles['widget-bar-item']} ${mode === 'announcement' ? styles['widget-bar-item-active'] : ''}`}
                       onClick={() => {
-                        setMode('announcement');
+                        if (mode === 'announcement') setMode('none');
+                        else setMode('announcement');
                         setIsWidgetExpanded(false);
                       }}
                     >
@@ -688,7 +685,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     <div
                       className={`${styles['widget-bar-item']} ${mode === 'show' ? styles['widget-bar-item-active'] : ''}`}
                       onClick={() => {
-                        setMode('show');
+                        if (mode === 'show') setMode('none');
+                        else setMode('show');
                         setIsWidgetExpanded(false);
                       }}
                     >
