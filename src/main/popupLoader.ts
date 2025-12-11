@@ -154,6 +154,12 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
     return { userId, memberInvitations };
   },
 
+  serverApplication: async ({ userId, serverId }: { userId: string; serverId: string }) => {
+    const [member] = await Promise.all([data.member({ userId, serverId })]);
+
+    return { userId, serverId, member };
+  },
+
   serverSetting: async ({ userId, serverId }: { userId: string; serverId: string }) => {
     const [user, server, serverMembers, memberApplications] = await Promise.all([
       data.user({ userId }),
@@ -175,12 +181,6 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
     const [friend, target, targetServers] = await Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]);
 
     return { userId, targetId, friend, target, targetServers };
-  },
-
-  groupApplied: async ({ userId, serverId }: { userId: string; serverId: string }) => {
-    const [member] = await Promise.all([data.member({ userId, serverId })]);
-
-    return { userId, serverId, member };
   },
 };
 

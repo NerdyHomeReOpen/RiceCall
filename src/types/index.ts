@@ -244,6 +244,7 @@ export type PopupType =
   | 'changeTheme'
   | 'channelPassword'
   | 'channelSetting'
+  | 'chatHistory'
   | 'createChannel'
   | 'createFriendGroup'
   | 'createServer'
@@ -254,7 +255,6 @@ export type PopupType =
   | 'dialogSuccess'
   | 'dialogWarning'
   | 'directMessage'
-  | 'chatHistory'
   | 'editChannelName'
   | 'editChannelOrder'
   | 'editFriendNote'
@@ -268,12 +268,12 @@ export type PopupType =
   | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'searchUser'
+  | 'serverApplication'
   | 'serverBroadcast'
   | 'serverSetting'
   | 'systemSetting'
   | 'userInfo'
-  | 'userSetting'
-  | 'groupApplied';
+  | 'userSetting';
 
 export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 

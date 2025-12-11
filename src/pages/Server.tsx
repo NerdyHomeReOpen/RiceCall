@@ -26,7 +26,7 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
-import { handleOpenChannelEvent, handleOpenGroupApplied } from '@/utils/popup';
+import { handleOpenChannelEvent, handleOpenServerApplication } from '@/utils/popup';
 
 const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
 const MESSAGE_VIERER_DEVIATION = 100;
@@ -648,7 +648,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       <div
                         className={styles['widget-bar-item']}
                         onClick={() => {
-                          handleOpenGroupApplied(userId, currentServerId);
+                          handleOpenServerApplication(userId, currentServerId);
                           setIsWidgetExpanded(false);
                         }}
                       >

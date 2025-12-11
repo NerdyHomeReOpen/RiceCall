@@ -23,6 +23,7 @@ import ChannelEvent from '@/popups/ChannelEvent';
 import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
+import ChatHistory from '@/popups/chatHistory';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
@@ -41,12 +42,11 @@ import MemberInvitation from '@/popups/MemberInvitation';
 import ImageCropper from '@/popups/ImageCropper';
 import InviteMember from '@/popups/InviteMember';
 import SearchUser from '@/popups/SearchUser';
+import ServerApplication from '@/popups/ServerApplication';
 import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
-import ChatHistory from '@/popups/chatHistory';
-import GroupApplied from '@/popups/GroupApplied';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -150,6 +150,12 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
+
+  chatHistory: {
+    type: 'chatHistory',
+    buttons: ['close'],
+    hideHeader: false,
+  },
   createServer: {
     type: 'createServer',
     buttons: ['close'],
@@ -230,6 +236,7 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
+
   imageCropper: {
     type: 'imageCropper',
     buttons: ['close'],
@@ -265,6 +272,11 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
+  serverApplication: {
+    type: 'serverApplication',
+    buttons: ['close'],
+    hideHeader: false,
+  },
   serverBroadcast: {
     type: 'serverBroadcast',
     buttons: ['close'],
@@ -290,16 +302,6 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
-  chatHistory: {
-    type: 'chatHistory',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  groupApplied: {
-    type: 'groupApplied',
-    buttons: ['close'],
-    hideHeader: false,
-  }
 };
 
 type Popup = {
@@ -334,6 +336,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       changeTheme: t('change-theme'),
       channelPassword: t('please-enter-the-channel-password'),
       channelSetting: initialData?.channel?.name || t('edit-channel'),
+      chatHistory: t('chat-history'),
       createServer: t('create-server'),
       createChannel: t('create-channel'),
       createFriendGroup: t('create-friend-group'),
@@ -357,13 +360,12 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: t('member-application-setting'),
       memberInvitation: t('member-invitation'),
       searchUser: t('search-user'),
+      serverApplication: t('server-application'),
       serverBroadcast: t('server-broadcast'),
       serverSetting: initialData?.server?.name || t('server-setting'),
       systemSetting: t('system-setting'),
       userInfo: t('user-info'),
       userSetting: t('user-setting'),
-      chatHistory: t('chat-history'),
-      groupApplied: t('group-applied'),
     };
 
     const node = {
@@ -376,6 +378,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       channelEvent: () => <ChannelEvent id={id} {...initialData} />,
       channelPassword: () => <ChannelPassword id={id} {...initialData} />,
       channelSetting: () => <ChannelSetting id={id} {...initialData} />,
+      chatHistory: () => <ChatHistory id={id} {...initialData} />,
       createChannel: () => <CreateChannel id={id} {...initialData} />,
       createFriendGroup: () => <CreateFriendGroup id={id} {...initialData} />,
       createServer: () => <CreateServer id={id} {...initialData} />,
@@ -399,13 +402,12 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
       memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
       searchUser: () => <SearchUser id={id} {...initialData} />,
+      serverApplication: () => <ServerApplication id={id} {...initialData} />,
       serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
       serverSetting: () => <ServerSetting id={id} {...initialData} />,
       systemSetting: () => <SystemSetting id={id} {...initialData} />,
       userInfo: () => <UserInfo id={id} {...initialData} />,
       userSetting: () => <UserInfo id={id} {...initialData} />,
-      chatHistory: () => <ChatHistory id={id} {...initialData} />,
-      groupApplied: () => <GroupApplied id={id} {...initialData} />,
     };
 
     return {
@@ -433,9 +435,9 @@ const PopupPageComponent: React.FC = React.memo(() => {
   }, [id]);
 
   useEffect(() => {
-    history.pushState = () => { };
-    history.back = () => { };
-    history.forward = () => { };
+    history.pushState = () => {};
+    history.back = () => {};
+    history.forward = () => {};
   }, []);
 
   return (
