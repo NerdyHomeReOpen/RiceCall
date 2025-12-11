@@ -45,7 +45,7 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('channel-event')}</div>
           </div>
-          <div className={`${styles['button-item-box']} disabled`} onClick={handleOpenShowFrame}>
+          <div className={styles['button-item-box']} onClick={handleOpenShowFrame}>
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('send-flower')}</div>
           </div>
