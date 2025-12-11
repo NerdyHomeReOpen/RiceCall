@@ -372,7 +372,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const mainTab = useMainTab();
   const loadingBox = useLoading();
   const soundPlayer = useSoundPlayer();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   // Refs
   const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
@@ -556,15 +556,15 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      ipc.data.announcements(i18n.language).then((announcements) => {
+      ipc.data.announcements(region).then((announcements) => {
         if (announcements) setAnnouncements(announcements);
       });
-      ipc.data.notifies(i18n.language).then((notifies) => {
+      ipc.data.notifies(region).then((notifies) => {
         if (notifies) setNotifies(notifies);
       });
     };
     refresh();
-  }, [i18n.language, userId]);
+  }, [region, userId]);
 
   useEffect(() => {
     if (!userId || !currentServerId) return;
