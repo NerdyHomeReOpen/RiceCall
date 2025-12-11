@@ -170,7 +170,7 @@ export type table_servers = {
   isVerified: boolean;
   isShowAvailable: boolean;
   type: 'game' | 'entertainment' | 'other';
-  visibility: 'public' | 'private' | 'blocked';
+  visibility: 'public' | 'private' | 'invisible' | 'blocked';
   lobbyId: string | null;
   receptionLobbyId: string | null;
   ownerId: string | null;
