@@ -530,7 +530,7 @@
   background: #fff;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--box-shadow);
   border-top: unset;
   overflow: hidden;
 }
