@@ -1,10 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs';
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
-let binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath) : '';
+const binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath) : '';
 ffmpeg.setFfmpegPath(binaryPath);
 import serve from 'electron-serve';
 import Store from 'electron-store';
@@ -970,8 +971,8 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.handle('data-recommendServers', async () => {
-    return await dataService.recommendServers().catch((error) => {
+  ipcMain.handle('data-recommendServers', async (_, region: string) => {
+    return await dataService.recommendServers({ region }).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });

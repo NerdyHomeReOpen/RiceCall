@@ -90,8 +90,8 @@ const dataService = {
     return await api.get(`/announcements?${new URLSearchParams(params).toString()}`);
   },
 
-  recommendServers: async () => {
-    return await api.get(`/recommendServers`);
+  recommendServers: async (params: { region: string }) => {
+    return await api.get(`/recommendServers?${new URLSearchParams(params).toString()}`);
   },
 
   upload: async (type: string, fileName: string, file: string): Promise<{ avatar: string; avatarUrl: string }> => {

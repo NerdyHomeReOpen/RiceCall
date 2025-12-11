@@ -11,7 +11,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import RecommendServerCard from '@/components/RecommendServerCard';
 
 // Type
-import type { User, Server, Announcement, RecommendServer, LanguageKey } from '@/types';
+import type { User, Server, Announcement, RecommendServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -53,11 +53,10 @@ interface HomePageProps {
   servers: Server[];
   announcements: Announcement[];
   recommendServers: RecommendServer[];
-  region: LanguageKey;
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, region, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, display }) => {
   // Hooks
   const { t } = useTranslation();
   const mainTab = useMainTab();
@@ -89,13 +88,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
   const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]).slice(0, 10);
   const filteredRecommendServers = useMemo(
-    () =>
-      recommendServers.filter(
-        (server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(region),
-      ),
-    [recommendServers, selectReommendServerCategory, region],
+    () => recommendServers.filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory))),
+    [recommendServers, selectReommendServerCategory],
   );
-  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(region)), [recommendServers, region]);
+  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official')), [recommendServers]);
 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {

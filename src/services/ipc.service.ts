@@ -198,19 +198,19 @@ const ipcService = {
       return await ipcRenderer.invoke('data-memberInvitations', receiverId);
     },
 
-    notifies: async (region: Notify['region']): Promise<Notify[]> => {
+    notifies: async (region: LanguageKey): Promise<Notify[]> => {
       if (!isElectron) return [];
       return await ipcRenderer.invoke('data-notifies', region);
     },
 
-    announcements: async (region: Announcement['region']): Promise<Announcement[]> => {
+    announcements: async (region: LanguageKey): Promise<Announcement[]> => {
       if (!isElectron) return [];
       return await ipcRenderer.invoke('data-announcements', region);
     },
 
-    recommendServers: async (): Promise<RecommendServer[]> => {
+    recommendServers: async (region: LanguageKey): Promise<RecommendServer[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-recommendServers');
+      return await ipcRenderer.invoke('data-recommendServers', region);
     },
 
     upload: async (type: string, fileName: string, file: string): Promise<any | null> => {

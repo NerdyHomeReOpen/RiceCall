@@ -56,7 +56,7 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 import ipc from '@/services/ipc.service';
 
 // Constants
-import { LANGUAGES } from '@/constant';
+import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
 interface HeaderProps {
   user: User;
@@ -545,9 +545,6 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.data.memberInvitations(userId).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
-      ipc.data.recommendServers().then((recommendServerList) => {
-        if (recommendServerList) setRecommendServers(recommendServerList);
-      });
       setSystemNotify([]); // TODO: Implement system notify
     };
     refresh();
@@ -562,8 +559,13 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.data.notifies(region).then((notifies) => {
         if (notifies) setNotifies(notifies);
       });
+      ipc.data.recommendServers(region).then((recommendServerList) => {
+        if (recommendServerList) setRecommendServers(recommendServerList);
+      });
     };
+    const interval = setInterval(() => refresh(), REFRESH_REGION_INFO_INTERVAL);
     refresh();
+    return () => clearInterval(interval);
   }, [region, userId]);
 
   useEffect(() => {
@@ -939,7 +941,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} region={region} display={mainTab.selectedTabId === 'home'} />
+              <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} display={mainTab.selectedTabId === 'home'} />
               <FriendPage user={user} friends={friends} friendActivities={friendActivities} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
               <ServerPage
                 user={user}
