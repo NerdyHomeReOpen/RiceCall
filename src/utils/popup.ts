@@ -139,3 +139,7 @@ export const handleOpenImageCropper = (imageData: string, onSubmit: (imageDataUr
   ipc.popup.open('imageCropper', 'imageCropper', { imageData });
   ipc.popup.onSubmit('imageCropper', onSubmit);
 };
+
+export const handleOpenServerApplication = (userId: User['userId'], serverId: Server['serverId']) => {
+  ipc.popup.open('serverApplication', 'serverApplication', { userId, serverId });
+};

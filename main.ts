@@ -104,6 +104,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   channelSetting: { height: 520, width: 600 },
   channelPassword: { height: 200, width: 380 },
   changeTheme: { height: 335, width: 480 },
+  chatHistory: { height: 547, width: 714 },
   createServer: { height: 436, width: 478 },
   createChannel: { height: 200, width: 380 },
   createFriendGroup: { height: 200, width: 380 },
@@ -127,12 +128,12 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   memberApplicationSetting: { height: 220, width: 380 },
   memberInvitation: { height: 550, width: 500 },
   searchUser: { height: 200, width: 380 },
+  serverApplication: { height: 150, width: 320 },
   serverSetting: { height: 520, width: 600 },
   serverBroadcast: { height: 300, width: 450 },
   systemSetting: { height: 520, width: 600 },
   userInfo: { height: 630, width: 440 },
   userSetting: { height: 700, width: 500 },
-  chatHistory: { height: 547, width: 714 },
 };
 
 // Constants
