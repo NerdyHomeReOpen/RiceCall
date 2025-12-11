@@ -193,3 +193,4 @@ export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'tr-TR', label: 'Türkçe' },
 ];
 export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds
+export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';

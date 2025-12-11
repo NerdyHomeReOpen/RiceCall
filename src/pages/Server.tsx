@@ -19,7 +19,6 @@ import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage
 import { useTranslation } from 'react-i18next';
 import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useShowFrame } from '@/providers/ShowFrame';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -28,6 +27,9 @@ import ipc from '@/services/ipc.service';
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
 import { handleOpenChannelEvent, handleOpenServerApplication } from '@/utils/popup';
+
+// Constants
+import { SHOW_FRAME_ORIGIN } from '@/constant';
 
 const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
 const MESSAGE_VIERER_DEVIATION = 100;
@@ -128,6 +130,37 @@ const VolumeSlider = React.memo(
 
 VolumeSlider.displayName = 'VolumeSlider';
 
+type PostMessagePayload = {
+  uid: string;
+  aid: string;
+  micOff: boolean;
+  gid: string;
+  cid: string;
+  action?: 'take' | 'release' | 'checkSelf';
+};
+
+type UpdateShowFrameStateParams = {
+  userId: string;
+  currentServerUuid: string;
+  currentChannelId: string;
+  currentChannelVoiceMode: Channel['voiceMode'];
+  isCurrentChannelQueueMode: boolean;
+  queueUsers: QueueUser[];
+  isQueuing: boolean;
+  isMicTaken: boolean;
+  aid: string;
+};
+
+interface StateSnapshot {
+  uid: string;
+  gid: string; // serverUuid
+  cid: string; // channelId
+  voiceMode: Channel['voiceMode'];
+  inQueue: boolean; // 是否在佇列中 (position >= 0)
+  queueUsers: QueueUser[];
+  firstQueueUserId: string;
+}
+
 interface ServerPageProps {
   user: User;
   currentServer: Server;
@@ -166,7 +199,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const { t } = useTranslation();
     const webRTC = useWebRTC();
     const contextMenu = useContextMenu();
-    const showFrame = useShowFrame();
 
     // Refs
     const webRTCRef = useRef(webRTC);
@@ -174,8 +206,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const sidebarRef = useRef<HTMLDivElement>(null);
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
+    const showAreaRef = useRef<HTMLIFrameElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const messageAreaRef = useRef<HTMLDivElement>(null);
+    const prevStateRef = useRef<StateSnapshot | null>(null);
+    const lastChannelSwitchTimeRef = useRef<number>(0);
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -186,10 +221,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
     const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
-    const [isShowFrameVisible, setIsShowFrameVisible] = useState<boolean>(false);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
     const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
+    const [mode, setMode] = useState<'announcement' | 'show'>('announcement');
     const [showFrameSrcKey, setShowFrameSrcKey] = useState<number>(() => Date.now());
 
     // Variables
@@ -296,10 +331,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         id: 'open-announcement',
         label: t('open-announcement'),
         show: !isAnnouncementVisible,
-        onClick: () => {
-          setIsAnnouncementVisible(true);
-          setIsShowFrameVisible(false);
-        },
+        onClick: () => setIsAnnouncementVisible(true),
       },
     ];
 
@@ -469,9 +501,139 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       setIsAtBottom(true);
     }, []);
 
+    const handleShowFrameLoad = useCallback(() => {
+      if (!showAreaRef.current?.contentWindow || !prevStateRef.current) return;
+      const state = prevStateRef.current;
+      showAreaRef.current.contentWindow.postMessage(
+        {
+          uid: state.uid,
+          aid: state.firstQueueUserId,
+          micOff: state.voiceMode !== 'queue',
+          gid: state.gid,
+          cid: state.cid,
+        },
+        SHOW_FRAME_ORIGIN,
+      );
+      if (state.cid && state.voiceMode === 'queue') {
+        showAreaRef.current.contentWindow.postMessage(
+          {
+            uid: state.uid,
+            aid: state.firstQueueUserId,
+            gid: state.gid,
+            cid: state.cid,
+            action: 'checkSelf',
+            micOff: false,
+          },
+          SHOW_FRAME_ORIGIN,
+        );
+      }
+    }, []);
+
+    const updateShowFrameState = useCallback((params: UpdateShowFrameStateParams) => {
+      if (!showAreaRef.current?.contentWindow) return;
+
+      const { userId, currentServerUuid, currentChannelId, currentChannelVoiceMode, isCurrentChannelQueueMode, queueUsers, aid } = params;
+
+      const currentUserInQueue = queueUsers.find((u) => u.userId === userId);
+      const isActuallyInQueue = !!(currentUserInQueue && currentUserInQueue.position >= 0);
+      const firstQueueUserId = queueUsers.find((u) => u.position === 0)?.userId || '';
+
+      const currentState: StateSnapshot = {
+        uid: userId,
+        gid: currentServerUuid,
+        cid: currentChannelId,
+        voiceMode: currentChannelVoiceMode,
+        inQueue: isActuallyInQueue,
+        queueUsers: [...queueUsers],
+        firstQueueUserId,
+      };
+
+      const prevState = prevStateRef.current;
+
+      const postMsg = (payload: Partial<PostMessagePayload>) => {
+        showAreaRef.current?.contentWindow?.postMessage(
+          {
+            uid: userId,
+            gid: currentServerUuid,
+            cid: currentChannelId,
+            micOff: !isCurrentChannelQueueMode,
+            aid: aid || '',
+            ...payload,
+          },
+          SHOW_FRAME_ORIGIN,
+        );
+      };
+
+      if (!prevState) {
+        prevStateRef.current = currentState;
+        return;
+      }
+
+      const isChannelChanged = currentState.cid !== prevState.cid;
+      const isServerChanged = currentState.gid !== prevState.gid;
+      const hasLeftChannel = (prevState.cid && !currentState.cid) || isChannelChanged || isServerChanged;
+      const hasEnteredChannel = (currentState.cid && !prevState.cid) || isChannelChanged;
+      const micStatusChanged = currentState.inQueue !== prevState.inQueue;
+
+      if (hasLeftChannel && prevState.cid) {
+        const prevMicOff = prevState.voiceMode !== 'queue';
+        postMsg({
+          action: 'release',
+          gid: prevState.gid,
+          cid: prevState.cid,
+          micOff: prevMicOff,
+          aid: '',
+        });
+
+        if (isChannelChanged) {
+          lastChannelSwitchTimeRef.current = Date.now();
+        }
+      }
+
+      if (currentState.cid) {
+        let shouldSendUpdate = false;
+        let action: 'take' | 'release' | undefined = undefined;
+
+        const isRecentSwitch = Date.now() - lastChannelSwitchTimeRef.current < 1000;
+        const ignoreMicChange = isRecentSwitch && micStatusChanged && !micStatusChanged && isCurrentChannelQueueMode;
+
+        if (hasEnteredChannel) {
+          shouldSendUpdate = true;
+          if (currentState.inQueue) action = 'take';
+        } else if (micStatusChanged && !ignoreMicChange) {
+          shouldSendUpdate = true;
+          action = currentState.inQueue ? 'take' : 'release';
+        } else if (currentState.voiceMode !== prevState.voiceMode) {
+          shouldSendUpdate = true;
+        }
+
+        if (shouldSendUpdate) {
+          postMsg({
+            action,
+            aid: action === 'release' ? '' : aid,
+            micOff: currentState.voiceMode === 'queue' ? false : true,
+          });
+        }
+      }
+
+      const prevQueueIds = new Set(prevState.queueUsers.map((u) => u.userId));
+      const currQueueIds = new Set(currentState.queueUsers.map((u) => u.userId));
+      const isQueueChanged = prevState.queueUsers.length !== currentState.queueUsers.length || currentState.queueUsers.some((u) => !prevQueueIds.has(u.userId));
+
+      if (isQueueChanged && currentState.cid && isCurrentChannelQueueMode && currentState.firstQueueUserId) {
+        postMsg({
+          action: 'checkSelf',
+          aid: currentState.firstQueueUserId,
+          micOff: false,
+        });
+      }
+
+      prevStateRef.current = currentState;
+    }, []);
+
     // Effects
     useEffect(() => {
-      showFrame.updateShowFrameState({
+      updateShowFrameState({
         userId,
         currentServerUuid: currentServerId,
         currentChannelId,
@@ -482,7 +644,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         isMicTaken,
         aid,
       });
-    }, [userId, aid, isCurrentChannelQueueMode, currentServerId, isQueuing, isMicTaken, currentChannelId, currentChannelVoiceMode, queueUsers, showFrame]);
+    }, [userId, aid, isCurrentChannelQueueMode, currentServerId, isQueuing, isMicTaken, currentChannelId, currentChannelVoiceMode, queueUsers]);
+
     useEffect(() => {
       webRTCRef.current.changeBitrate(currentChannelBitrate);
     }, [currentChannelBitrate]);
@@ -491,7 +654,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       if (isMicTaken && !isControlled) webRTCRef.current.takeMic(currentChannelId);
       else webRTCRef.current.releaseMic();
       webRTCRef.current.stopMixing();
-      console.log('[mic effect]', { isMicTaken, isControlled, currentChannelId });
     }, [isMicTaken, isControlled, currentChannelId]);
 
     useEffect(() => {
@@ -571,21 +733,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [currentServerId]);
 
     useEffect(() => {
-      const unsub = ipc.popup.onSubmit('serverApplication', (data: { action?: string }) => {
-        if (data?.action === 'toggleShowFrame') {
-          setIsShowFrameVisible((prev) => {
-            if (!prev) {
-              setIsAnnouncementVisible(false);
-              return true;
-            }
-            return false;
-          });
-        }
-      });
-      return () => unsub();
-    }, []);
-
-    useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
         setSpeakingMode(speakingMode);
       };
@@ -638,53 +785,44 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           <main className={styles['content']}>
             {/* Message Area */}
             <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
-              {/* Announcement Area */}
-              {isAnnouncementVisible && (
-                <div
-                  ref={annAreaRef}
-                  className={styles['announcement-area']}
-                  style={isAnnouncementVisible ? (channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }) : { display: 'none' }}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const { clientX: x, clientY: y } = e;
-                    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
-                  }}
-                >
-                  <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} imageSize={'big'} />
-                </div>
-              )}
-              {/* RC Show Area */}
-              <div
-                ref={annAreaRef}
-                className={styles['rcshow-area']}
-                style={isShowFrameVisible ? {} : { display: 'none' }}
-              >
-                <div
-                  className={styles['rcshow-box']}
-                >
+              {isAnnouncementVisible &&
+                (mode === 'announcement' ? (
+                  <div
+                    ref={annAreaRef}
+                    className={styles['announcement-area']}
+                    style={channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const { clientX: x, clientY: y } = e;
+                      contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
+                    }}
+                  >
+                    <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} imageSize={'big'} />
+                  </div>
+                ) : mode === 'show' ? (
                   <iframe
                     key={showFrameSrcKey}
-                    ref={showFrame.showFrameRef}
+                    ref={showAreaRef}
+                    className={styles['rcshow-area']}
                     id="showFrame"
-                    src={`https://show.ricecall.com/?k=${showFrameSrcKey}`}
+                    src={`${SHOW_FRAME_ORIGIN}/?k=${showFrameSrcKey}`}
                     height="100%"
                     width="100%"
-                    onLoad={showFrame.handleShowFrameLoad}
-                  ></iframe>
-                </div>
-              </div>
+                    onLoad={handleShowFrameLoad}
+                  />
+                ) : null)}
 
               {/* Resize Handle */}
               <div
                 className="resize-handle-vertical"
-                style={channelUIMode === 'classic' && (isAnnouncementVisible || isShowFrameVisible) ? {} : { display: 'none' }}
+                style={channelUIMode === 'classic' && isAnnouncementVisible ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
               <div
                 className="resize-handle"
-                style={channelUIMode === 'three-line' && (isAnnouncementVisible || isShowFrameVisible) ? {} : { display: 'none' }}
+                style={channelUIMode === 'three-line' && isAnnouncementVisible ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
@@ -694,15 +832,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 {isWidgetExpanded ? (
                   <>
                     <div
-                      className={`${styles['widget-bar-item']} ${isAnnouncementVisible ? styles['widget-bar-item-active'] : ''}`}
+                      className={`${styles['widget-bar-item']} ${mode === 'announcement' ? styles['widget-bar-item-active'] : ''}`}
                       onClick={() => {
-                        setIsAnnouncementVisible((prev) => {
-                          if (!prev) {
-                            setIsShowFrameVisible(false);
-                            return true;
-                          }
-                          return false;
-                        });
+                        setMode('announcement');
                         setIsWidgetExpanded(false);
                       }}
                     >
@@ -711,15 +843,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     </div>
                     <div className={styles['widget-bar-spliter']}></div>
                     <div
-                      className={`${styles['widget-bar-item']} ${isShowFrameVisible ? styles['widget-bar-item-active'] : ''}`}
+                      className={`${styles['widget-bar-item']} ${mode === 'show' ? styles['widget-bar-item-active'] : ''}`}
                       onClick={() => {
-                        setIsShowFrameVisible((prev) => {
-                          if (!prev) {
-                            setIsAnnouncementVisible(false);
-                            return true;
-                          }
-                          return false;
-                        });
+                        setMode('show');
                         setIsWidgetExpanded(false);
                       }}
                     >
@@ -730,7 +856,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     <div
                       className={styles['widget-bar-item']}
                       onClick={() => {
-                        handleOpenServerApplication(userId, currentServerId);
+                        handleOpenServerApplication(userId, currentServerId, (action: string) => {
+                          if (action === 'toggleShowFrame') setMode('show');
+                        });
                         setIsWidgetExpanded(false);
                       }}
                     >
