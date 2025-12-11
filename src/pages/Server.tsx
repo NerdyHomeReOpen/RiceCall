@@ -697,8 +697,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     <div
                       className={styles['widget-bar-item']}
                       onClick={() => {
-                        handleOpenServerApplication(userId, currentServerId, (action: string) => {
-                          if (action === 'toggleShowFrame') setMode('show');
+                        handleOpenServerApplication(userId, currentServerId, (action) => {
+                          if (action === 'openShowFrame') setMode('show');
+                          if (action === 'openChannelEvent') handleOpenChannelEvent(userId, currentServerId, channelEvents);
                         });
                         setIsWidgetExpanded(false);
                       }}

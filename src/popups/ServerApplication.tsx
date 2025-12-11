@@ -23,8 +23,14 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
   // Hooks
   const { t } = useTranslation();
 
-  const handleSendFlower = () => {
-    ipc.popup.submit('serverApplication', { action: 'toggleShowFrame' });
+  const handleOpenShowFrame = () => {
+    ipc.popup.submit('serverApplication', 'openShowFrame');
+    ipc.window.close();
+  };
+
+  const handleOpenChannelEvent = () => {
+    ipc.popup.submit('serverApplication', 'openChannelEvent');
+    ipc.window.close();
   };
 
   return (
@@ -35,11 +41,11 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('vote')}</div>
           </div>
-          <div className={styles['button-item-box']}>
+          <div className={`${styles['button-item-box']} ${styles['active']}`} onClick={handleOpenChannelEvent}>
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('channel-event')}</div>
           </div>
-          <div className={styles['button-item-box']} onClick={handleSendFlower}>
+          <div className={`${styles['button-item-box']} ${styles['active']}`} onClick={handleOpenShowFrame}>
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('send-flower')}</div>
           </div>
