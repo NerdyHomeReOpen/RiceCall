@@ -337,23 +337,31 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         <div className={styles['banner-wrapper']}>
           <div className={styles['banner-container']}>
             <div ref={containerRef} className={styles['banners']}>
-              {filteredAnns.map((ann) => (
-                <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => setSelectedAnn(ann)}>
-                  {!ann.attachmentUrl ? defaultAnnouncement(ann) : null}
+              {filteredAnns.length > 0 ? (
+                filteredAnns.map((ann) => (
+                  <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => setSelectedAnn(ann)}>
+                    {!ann.attachmentUrl ? defaultAnnouncement(ann) : null}
+                  </div>
+                ))
+              ) : (
+                <div className={styles['banner']}>{defaultAnnouncement({} as Announcement)}</div>
+              )}
+            </div>
+            {filteredAnns.length > 0 && (
+              <>
+                <div className={styles['number-list']}>
+                  {filteredAnns.map((_, index) => (
+                    <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)}></nav>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className={styles['number-list']}>
-              {filteredAnns.map((_, index) => (
-                <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)}></nav>
-              ))}
-            </div>
-            <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnn}>
-              {'◀'}
-            </nav>
-            <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnn}>
-              {'▶'}
-            </nav>
+                <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnn}>
+                  {'◀'}
+                </nav>
+                <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnn}>
+                  {'▶'}
+                </nav>
+              </>
+            )}
           </div>
         </div>
 
