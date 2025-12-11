@@ -174,6 +174,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const sidebarRef = useRef<HTMLDivElement>(null);
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
+    const rcshowAreaRef = useRef<HTMLDivElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const messageAreaRef = useRef<HTMLDivElement>(null);
 
@@ -443,17 +444,26 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       sidebarRef.current.style.width = `${e.clientX}px`;
     };
 
+    const getResizableAreaRef = () => {
+      if (isAnnouncementVisible) return annAreaRef;
+      if (isShowFrameVisible) return rcshowAreaRef;
+      return null;
+    };
+
     const handleAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+      const targetRef = getResizableAreaRef();
+      if (!targetRef?.current) return;
       e.currentTarget.setPointerCapture(e.pointerId);
       isResizingAnnAreaRef.current = true;
     };
 
     const handleAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!isResizingAnnAreaRef.current || !annAreaRef.current) return;
+      const targetRef = getResizableAreaRef();
+      if (!isResizingAnnAreaRef.current || !targetRef?.current) return;
       if (channelUIMode === 'classic') {
-        annAreaRef.current.style.height = `${e.clientY - annAreaRef.current.offsetTop}px`;
+        targetRef.current.style.height = `${e.clientY - targetRef.current.offsetTop}px`;
       } else if (channelUIMode === 'three-line') {
-        annAreaRef.current.style.width = `${e.clientX - annAreaRef.current.offsetLeft}px`;
+        targetRef.current.style.width = `${e.clientX - targetRef.current.offsetLeft}px`;
       }
     };
 
@@ -656,9 +666,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               )}
               {/* RC Show Area */}
               <div
-                ref={annAreaRef}
+                ref={rcshowAreaRef}
                 className={styles['rcshow-area']}
-                style={isShowFrameVisible ? {} : { display: 'none' }}
+                style={isShowFrameVisible
+                  ? (channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }) : { display: 'none' }}
               >
                 <div
                   className={styles['rcshow-box']}
