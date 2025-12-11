@@ -19,7 +19,6 @@ interface ChatHistoryPopupProps {
 const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(() => {
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${chatHistory['content']} ${popup['content']} ${popup['col']}`}>
           <div className={`${chatHistory['header-box']} ${popup['row']}`}>
@@ -54,7 +53,6 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(() => {
                   <div>黑名單</div>
                   <div>(0)</div>
                 </div>
-                {/* friend list */}
                 <div className={chatHistory['friend-group-list']}>
                   <div className={chatHistory['friend-info-box']}>
                     <div className={chatHistory['avatar-box']}>

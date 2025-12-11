@@ -51,12 +51,9 @@ const Header: React.FC = React.memo(() => {
 
   return (
     <header className={`${header['header']} ${header['big']}`}>
-      {/* Title */}
       <div className={header['title-box']}>
         <div className={header['app-icon']} />
       </div>
-
-      {/* Buttons */}
       <div className={header['buttons']}>
         <div className={header['minimize']} onClick={() => handleMinimize()} />
         <div className={header['close']} onClick={() => handleClose()} />

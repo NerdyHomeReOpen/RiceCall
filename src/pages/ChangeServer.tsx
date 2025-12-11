@@ -49,7 +49,6 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
 
   return (
     <main className={styles['change-server']} style={display ? {} : { display: 'none' }}>
-      {/* Body */}
       <main className={styles['change-server-body']}>
         <div className={styles['app-logo']} />
         <div className={styles['form-wrapper']}>
@@ -60,8 +59,6 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
           ))}
         </div>
       </main>
-
-      {/* Footer */}
       <div className={styles['change-server-footer']}>
         <div className={styles['back-to-login']} onClick={() => setSection('login')}>
           {t('back-to-login')}

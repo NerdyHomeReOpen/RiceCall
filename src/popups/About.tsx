@@ -68,11 +68,9 @@ const AboutPopup: React.FC = React.memo(() => {
 
   return (
     <div className={`${popup['popup-wrapper']}`}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['content']} style={{ justifyContent: 'flex-start' }}>
           <div className={styles['app-logo']}></div>
-
           <div className={styles['app-info']}>
             <div className={styles['app-version-text']}>RiceCall v{version}</div>
             <div className={styles['copyright-text']}>COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.</div>
@@ -89,7 +87,6 @@ const AboutPopup: React.FC = React.memo(() => {
             </div>
             <MarkdownContent markdownText={t('readme')} />
           </div>
-
           <div className={styles['team-members']}>
             <p>{t('team-members')}:</p>
             {staffs.map((staff, index) => (
@@ -120,8 +117,6 @@ const AboutPopup: React.FC = React.memo(() => {
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={`${popup['popup-footer']} aboutFooter`}>
         <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
           <input type="checkbox" name="showDisclaimer" onChange={(e) => setDontShowNextTime(e.target.checked)} />

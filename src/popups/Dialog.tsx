@@ -51,7 +51,6 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ id, iconType, message, parame
 
   return (
     <div className={popup['popup-wrapper']} tabIndex={0}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup[DIALOG_ICON[iconType]]}`} />
@@ -60,8 +59,6 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ id, iconType, message, parame
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         <div className={popup['button']} onClick={handleSubmit}>
           {t('confirm')}

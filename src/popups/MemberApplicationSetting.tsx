@@ -37,7 +37,6 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${popup['dialog-content']} ${popup['col']}`}>
           <div className={`${popup['input-box']} ${popup['row']}`}>
@@ -50,8 +49,6 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         <div className={popup['button']} onClick={() => handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote })}>
           {t('confirm')}

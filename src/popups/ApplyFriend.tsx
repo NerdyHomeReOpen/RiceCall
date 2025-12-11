@@ -78,7 +78,6 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${popup['content']} ${popup['col']}`}>
           <div className={popup['label']}>{t('apply-friend-label')}</div>
@@ -123,8 +122,6 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
         <div className={popup['button']} onClick={() => handleSendFriendApplication(targetId, { description: applicationDesc }, friendGroupId || null)}>
           {t('submit')}

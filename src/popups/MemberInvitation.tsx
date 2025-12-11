@@ -72,7 +72,6 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
   return (
     <div className={popup['popup-wrapper']} tabIndex={0}>
       <div className={popup['popup-body']} style={{ flexDirection: 'column' }}>
-        {/* Content Header */}
         <div className={styles['header']}>
           <div className={styles['processing-status']}>
             {t('unprocessed')}
@@ -82,8 +81,6 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
             {t('reject-all')}
           </div>
         </div>
-
-        {/* Content Body */}
         <div className={styles['content']}>
           {memberInvitations.map((memberInvitation) => (
             <div key={memberInvitation.serverId} className={styles['application']}>

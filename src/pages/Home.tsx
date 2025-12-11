@@ -224,7 +224,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   return (
     <main className={styles['home']} style={display ? {} : { display: 'none' }}>
-      {/* Header */}
       <header className={styles['home-header']}>
         <div className={styles['left']}>
           <div className={styles['back-btn']} />
@@ -274,7 +273,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             </div>
           </div>
         </div>
-
         <div className={styles['mid']}>
           <div className={`${styles['navegate-tab']} ${section === 0 ? styles['active'] : ''}`} data-key="60060" onClick={() => setSection(0)}>
             {t('home')}
@@ -289,7 +287,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             {t('live')}
           </div> */}
         </div>
-
         <div className={styles['right']}>
           <div className={styles['navegate-tab']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
             {t('create-server')}
@@ -306,10 +303,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           )}
         </div>
       </header>
-
-      {/* HomePage */}
       <main className={styles['home-body']} style={section === 0 ? {} : { display: 'none' }}>
-        {/* Banner */}
         <div className={styles['banner-wrapper']}>
           <div className={styles['banner-container']}>
             <div ref={containerRef} className={styles['banners']}>
@@ -340,8 +334,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             )}
           </div>
         </div>
-
-        {/* Recommend Server */}
         <div className={styles['home-wrapper']}>
           <div className={styles['server-list-title']}>{t('recommend-server')}</div>
           <div className={styles['recommend-server-tabs']}>
@@ -366,8 +358,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
             )}
           </section>
         </div>
-
-        {/* Official Server */}
         <div className={styles['home-wrapper']}>
           <div className={styles['server-list-title']}>{t('official-server')}</div>
           <section className={styles['servers-container']}>
@@ -381,8 +371,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           </section>
         </div>
       </main>
-
-      {/* Announcement */}
       <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
         {selectedAnn && (
           <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
@@ -400,8 +388,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           </div>
         )}
       </div>
-
-      {/* Personal Exclusive */}
       <main className={styles['home-body']} style={section === 4 ? {} : { display: 'none' }}>
         <div className={styles['home-wrapper']}>
           <ServerList title={t('recent-servers')} servers={recentServers} user={user} />
@@ -409,8 +395,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <ServerList title={t('favorited-servers')} servers={favoriteServers} user={user} />
         </div>
       </main>
-
-      {/* Not Available */}
       <main className={styles['home-body']} style={section === 2 || section === 3 ? {} : { display: 'none' }}>
         <div>{t('not-available-page')}</div>
       </main>

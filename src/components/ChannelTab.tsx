@@ -220,7 +220,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
 
     return (
       <>
-        {/* Channel View */}
         <div
           key={channelId}
           className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`}
@@ -257,8 +256,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
           {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${channelMembers.length}${channelUserLimit > 0 ? `/${channelUserLimit}` : ''})`}</div>}
           {isInChannel && !expanded[channelId] && <div className={styles['my-location-icon']} />}
         </div>
-
-        {/* Expanded Sections */}
         <div className={styles['user-list']} style={expanded[channelId] ? {} : { display: 'none' }}>
           {filteredChannelMembers.map((member) => (
             <UserTab

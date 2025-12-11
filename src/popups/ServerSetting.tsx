@@ -316,9 +316,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     return (
       <div className={popup['popup-wrapper']}>
-        {/* Body */}
         <div className={popup['popup-body']}>
-          {/* Sidebar */}
           <div className={setting['left']}>
             <div className={setting['tabs']}>
               {settingPages.map((title, index) => (
@@ -328,8 +326,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               ))}
             </div>
           </div>
-
-          {/* Basic Info*/}
           <div className={setting['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
             <div className={popup['col']}>
               <div className={popup['row']}>
@@ -432,11 +428,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               </div>
             </div>
           </div>
-
-          {/* Announcement */}
           <div className={setting['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
             <div className={popup['col']}>
-              {/* Header */}
               <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
                 <div className={popup['label']}>{t('input-announcement')}</div>
                 {isServerAdmin(permissionLevel) && (
@@ -452,8 +445,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               />
             </div>
           </div>
-
-          {/* Member Management */}
           <div className={setting['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
             <div className={popup['col']}>
               <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
@@ -572,8 +563,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               </div>
             </div>
           </div>
-
-          {/* Access Permission */}
           <div className={setting['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
             <div className={popup['col']}>
               <div className={popup['header']}>
@@ -622,8 +611,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               </div>
             </div>
           </div>
-
-          {/* Member Application Management */}
           <div className={setting['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
             <div className={popup['col']}>
               <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
@@ -715,8 +702,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
               </div>
             </div>
           </div>
-
-          {/* Blacklist Management */}
           <div className={setting['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
             <div className={popup['col']}>
               <div className={`${popup['input-box']} ${setting['header-bar']} ${popup['row']}`}>
@@ -788,8 +773,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
             </div>
           </div>
         </div>
-
-        {/* Footer */}
         <div className={popup['popup-footer']} style={isServerAdmin(permissionLevel) ? {} : { display: 'none' }}>
           <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => handleEditServer(serverId, objDiff(server, serverData))}>
             {t('save')}

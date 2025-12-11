@@ -71,7 +71,6 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   return (
     <div className={popup['popup-wrapper']} tabIndex={0}>
       <div className={popup['popup-body']} style={{ flexDirection: 'column' }}>
-        {/* Content Header */}
         <div className={styles['header']}>
           <div className={styles['processing-status']}>
             {t('unprocessed')}
@@ -81,8 +80,6 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
             {t('reject-all')}
           </div>
         </div>
-
-        {/* Content Body */}
         <div className={styles['content']}>
           {friendApplications.map((friendApplication) => (
             <div key={friendApplication.senderId} className={styles['application']}>

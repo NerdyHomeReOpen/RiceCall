@@ -83,13 +83,10 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   return (
     <>
       <div className={popup['popup-wrapper']} style={section === 0 ? {} : { display: 'none' }}>
-        {/* Tab */}
         <div className={popup['popup-tabs']}>
           <div className={`${popup['tab']} ${popup['active']}`}>{t('select-server-type')}</div>
           <div className={popup['tab']}>{t('fill-info')}</div>
         </div>
-
-        {/* Body */}
         <div className={popup['popup-body']}>
           <div className={setting['content']}>
             <div className={`${styles['message']}`}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
@@ -110,23 +107,17 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
             </div>
           </div>
         </div>
-
-        {/* Footer */}
         <div className={popup['popup-footer']}>
           <div className={popup['button']} onClick={handleClose}>
             {t('cancel')}
           </div>
         </div>
       </div>
-
       <div className={popup['popup-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
-        {/* Tab */}
         <div className={popup['popup-tabs']}>
           <div className={popup['tab']}>{t('select-server-type')}</div>
           <div className={`${popup['tab']}  ${popup['active']}`}>{t('fill-info')}</div>
         </div>
-
-        {/* Body */}
         <div className={popup['popup-body']}>
           <div className={`${setting['content']} ${popup['col']}`} style={{ justifyContent: 'space-evenly' }}>
             <div className={styles['avatar-wrapper']}>
@@ -171,8 +162,6 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
             </div>
           </div>
         </div>
-
-        {/* Footer */}
         <div className={popup['popup-footer']}>
           <div className={popup['button']} onClick={() => setSection(0)}>
             {t('previous')}

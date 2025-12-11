@@ -600,9 +600,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     return (
       <main className={styles['server']} style={display ? {} : { display: 'none' }}>
-        {/* Body */}
         <main className={styles['server-body']}>
-          {/* Left Sidebar */}
           <aside ref={sidebarRef} className={styles['sidebar']}>
             <ChannelList
               user={user}
@@ -616,13 +614,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               latency={latency}
             />
           </aside>
-
-          {/* Resize Handle */}
           <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
-
-          {/* Right Content */}
           <main className={styles['content']}>
-            {/* Message Area */}
             <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
               {mode !== 'none' &&
                 (mode === 'announcement' ? (
@@ -651,8 +644,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     onLoad={handleShowFrameLoad}
                   />
                 ) : null)}
-
-              {/* Resize Handle */}
               <div
                 className="resize-handle-vertical"
                 style={channelUIMode === 'classic' && mode !== 'none' ? {} : { display: 'none' }}
@@ -665,8 +656,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
-
-              {/* Widget Bar */}
               <div className={`${styles['widget-bar']} ${!isWidgetExpanded ? styles['widget-close'] : ''}`}>
                 {isWidgetExpanded ? (
                   <>
@@ -714,10 +703,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   </div>
                 )}
               </div>
-
-              {/* Bottom Area */}
               <div className={styles['bottom-area']}>
-                {/* Message Area */}
                 <div
                   ref={messageAreaRef}
                   className={styles['message-area']}
@@ -739,8 +725,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     </div>
                   )}
                 </div>
-
-                {/* Broadcast Area */}
                 <div className={styles['input-area']}>
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <ChannelMessageContent
@@ -766,8 +750,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 </div>
               </div>
             </div>
-
-            {/* Button Area */}
             <div className={styles['button-area']}>
               <div className={styles['buttons']}>
                 <div

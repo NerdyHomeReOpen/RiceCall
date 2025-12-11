@@ -95,7 +95,6 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
@@ -148,8 +147,6 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         <div className={popup['button']} onClick={() => handleBlockUserFromServer(userId, serverId, Date.now() + getBlockTime())}>
           {t('confirm')}

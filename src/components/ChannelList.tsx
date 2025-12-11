@@ -228,7 +228,6 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
 
   return (
     <>
-      {/* Header */}
       <div className={styles['sidebar-header']}>
         <div className={styles['avatar-box']} onClick={() => handleOpenServerSetting(userId, currentServerId)}>
           <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${currentServerAvatarUrl})` }} />
@@ -263,16 +262,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           </div>
         </div>
       </div>
-
-      {/* Current Channel */}
       <div className={styles['current-channel-box']}>
         <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
           <div className={'hover-text'}>{`${latency}ms`}</div>
         </div>
         <div className={styles['current-channel-text']}>{isCurrentChannelLobby ? t(currentChannelName) : currentChannelName}</div>
       </div>
-
-      {/* Mic Queue */}
       {currentChannelVoiceMode === 'queue' && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
@@ -295,11 +290,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           <div className={styles['saperator-2']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
         </>
       )}
-
-      {/* Channel List Title */}
       <div className={styles['section-title-text']}>{viewType === 'current' ? t('current-channel') : t('all-channel')}</div>
-
-      {/* Channel List */}
       <div
         className={styles['scroll-view']}
         onContextMenu={(e) => {
@@ -362,11 +353,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           )}
         </div>
       </div>
-
-      {/* Saperator */}
       <div className={styles['saperator-3']} />
-
-      {/* Footer */}
       <div className={styles['sidebar-footer']}>
         <div className={`${styles['navegate-tab']} ${viewType === 'current' ? styles['active'] : ''}`} onClick={() => setViewType('current')}>
           {t('current-channel')}

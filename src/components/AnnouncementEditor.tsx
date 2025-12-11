@@ -97,10 +97,8 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   return (
     <div className={popup['input-box']}>
-      {/* Editor / Preview */}
       {!showPreview ? (
         <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid #ccc', height: '380px' }}>
-          {/* Toolbar */}
           <div className={setting['toolbar']}>
             <div className={popup['select-box']}>
               <select
@@ -236,7 +234,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
             >
               <div style={{ backgroundColor: textColor || '#FFFFFF', width: '16px', height: '16px', borderRadius: '2px' }} />
             </div>
-
             <div
               className={setting['button']}
               onClick={(e) => {
@@ -254,7 +251,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 <path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
               </svg>
             </div>
-
             <div
               className={setting['button']}
               onClick={(e) => {
@@ -292,7 +288,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
           </div>
-
           <EditorContent
             editor={editor}
             className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`}

@@ -66,7 +66,6 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={`${popup['dialog-content']} ${popup['col']}`}>
           <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -93,8 +92,6 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         <div className={popup['button']} onClick={() => handleApproveFriendApplication(targetId, friendGroupId || null, friendNotes)}>
           {t('add')}

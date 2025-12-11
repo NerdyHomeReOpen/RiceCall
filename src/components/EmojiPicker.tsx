@@ -148,7 +148,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
                 </select>
               </div>
             </div>
-
             <div
               className={`${emoji['color-select-box']}`}
               onMouseDown={(e) => {
@@ -165,7 +164,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
             </div>
           </div>
         )}
-
         <div className={emoji['emoji-pages']}>
           <div className={`${emoji['emoji-page']} ${activeTab === 'def' ? emoji['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
             <div className={emoji['emoji-grid']}>
@@ -180,7 +178,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
               ))}
             </div>
           </div>
-
           <div className={`${emoji['emoji-page']} ${activeTab === 'other' ? emoji['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
             <div className={emoji['emoji-grid']}>
               {otherEmojis.map((e) => (
@@ -195,12 +192,10 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
               ))}
             </div>
           </div>
-
           <div className={`${emoji['emoji-page']} ${activeTab === 'vip' ? emoji['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
             <div className={emoji['emoji-vip-placeholder']}>即將推出...</div>
           </div>
         </div>
-
         <div className={emoji['emoji-tabs']} role="tablist">
           <button
             id="btn-def"

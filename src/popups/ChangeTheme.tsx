@@ -148,14 +148,12 @@ const ChangeThemePopup: React.FC = React.memo(() => {
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={styles['ct-wrapper']}>
           <div className={styles['ct-contain']}>
             <div className={styles['theme-selector']}>
               <div className={styles['theme-options']}>
                 <div className={styles['theme-slots-big']}>
-                  {/* Default Themes (Big) */}
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
@@ -176,17 +174,11 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                     </div>
                   ))}
                 </div>
-
                 <div className={styles['theme-slots-small']}>
-                  {/* Default Themes (Small) */}
                   {Array.from({ length: 15 }, (_, i) => (
                     <div key={i + 4} className={styles['theme']} data-theme-index={i + 4} onClick={handleSelectTheme} />
                   ))}
-
-                  {/* Color Selector */}
                   <div className={styles['color-selector']} onClick={() => setShowColorPicker((prev) => !prev)} />
-
-                  {/* Custom Colors */}
                   {customThemes.slice(0, 7).map((customTheme, i) => {
                     // Handlers
                     const getContextMenuItems = () => [
@@ -221,8 +213,6 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       <div key={`color-box-empty-${i}`} />
                     );
                   })}
-
-                  {/* Image Selector */}
                   <div className={styles['image-selector']} onClick={() => fileInputRef.current?.click()} />
                   <input
                     type="file"
@@ -238,7 +228,6 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                     }}
                   />
                 </div>
-
                 {showColorPicker && (
                   <div className={styles['color-selector-box']}>
                     <div ref={colorSelectorRef} className={styles['color-selector-image']} onMouseDown={handleColorSelect} onMouseMove={handleColorSelect} />

@@ -59,7 +59,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
 
   return (
     <div className={popup['popup-wrapper']}>
-      {/* Body */}
       <div className={popup['popup-body']}>
         <div className={popup['dialog-content']}>
           <div className={`${popup['input-box']} ${popup['col']}`} style={{ position: 'relative' }}>
@@ -73,8 +72,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
           </div>
         </div>
       </div>
-
-      {/* Footer */}
       <div className={popup['popup-footer']}>
         <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleSearchUser(searchQuery) : null)}>
           {t('confirm')}
