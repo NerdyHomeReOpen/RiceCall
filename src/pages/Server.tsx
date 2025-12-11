@@ -19,6 +19,7 @@ import type { User, Server, Channel, OnlineMember, ChannelMessage, PromptMessage
 import { useTranslation } from 'react-i18next';
 import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
+import { useShowFrame } from '@/providers/ShowFrame';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -165,6 +166,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const { t } = useTranslation();
     const webRTC = useWebRTC();
     const contextMenu = useContextMenu();
+    const showFrame = useShowFrame();
 
     // Refs
     const webRTCRef = useRef(webRTC);
@@ -184,6 +186,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
     const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
+    const [isShowFrameVisible, setIsShowFrameVisible] = useState<boolean>(false);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
     const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
@@ -216,7 +219,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       let isQueuing = false;
       let isControlled = false;
       let isCurrentChannelQueueControlled = false;
-
       for (const m of queueUsers) {
         if (m.isQueueControlled) isCurrentChannelQueueControlled = true;
         if (m.userId !== userId) continue;
@@ -229,11 +231,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           isQueuing = true;
         }
       }
-
       const isIdling = !isMicTaken && !isQueuing;
-
       return { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled };
     }, [queueUsers, userId, permissionLevel]);
+
+    const aid = useMemo(() => {
+      if (!isCurrentChannelQueueMode) return '';
+      const userInQueue = queueUsers.find((m) => m.userId === userId);
+      if (!userInQueue) return '';
+      if (userInQueue.position < 0) return '';
+      return userId;
+    }, [isCurrentChannelQueueMode, queueUsers, userId]);
 
     // Handlers
     const getMicText = () => {
@@ -287,7 +295,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         id: 'open-announcement',
         label: t('open-announcement'),
         show: !isAnnouncementVisible,
-        onClick: () => setIsAnnouncementVisible(true),
+        onClick: () => {
+          setIsAnnouncementVisible(true);
+          setIsShowFrameVisible(false);
+        },
       },
     ];
 
@@ -459,6 +470,19 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     // Effects
     useEffect(() => {
+      showFrame.updateShowFrameState({
+        userId,
+        currentServerUuid: currentServerId,
+        currentChannelId,
+        currentChannelVoiceMode,
+        isCurrentChannelQueueMode,
+        queueUsers,
+        isQueuing,
+        isMicTaken,
+        aid,
+      });
+    }, [userId, aid, isCurrentChannelQueueMode, currentServerId, isQueuing, isMicTaken, currentChannelId, currentChannelVoiceMode, queueUsers, showFrame]);
+    useEffect(() => {
       webRTCRef.current.changeBitrate(currentChannelBitrate);
     }, [currentChannelBitrate]);
 
@@ -466,6 +490,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       if (isMicTaken && !isControlled) webRTCRef.current.takeMic(currentChannelId);
       else webRTCRef.current.releaseMic();
       webRTCRef.current.stopMixing();
+      console.log('[mic effect]', { isMicTaken, isControlled, currentChannelId });
     }, [isMicTaken, isControlled, currentChannelId]);
 
     useEffect(() => {
@@ -541,6 +566,21 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [currentServerId]);
 
     useEffect(() => {
+      const unsub = ipc.popup.onSubmit('serverApplication', (data: { action?: string }) => {
+        if (data?.action === 'toggleShowFrame') {
+          setIsShowFrameVisible((prev) => {
+            if (!prev) {
+              setIsAnnouncementVisible(false);
+              return true;
+            }
+            return false;
+          });
+        }
+      });
+      return () => unsub();
+    }, []);
+
+    useEffect(() => {
       const changeSpeakingMode = (speakingMode: SpeakingMode) => {
         setSpeakingMode(speakingMode);
       };
@@ -609,17 +649,37 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} imageSize={'big'} />
                 </div>
               )}
+              {/* RC Show Area */}
+              {isShowFrameVisible && (
+                <div
+                  ref={annAreaRef}
+                  className={styles['rcshow-area']}
+                >
+                  <div
+                    className={styles['rcshow-box']}
+                  >
+                    <iframe
+                      ref={showFrame.showFrameRef}
+                      id="showFrame"
+                      src="https://show.ricecall.com/"
+                      height="100%"
+                      width="100%"
+                      onLoad={showFrame.handleShowFrameLoad}
+                    ></iframe>
+                  </div>
+                </div>
+              )}
 
               {/* Resize Handle */}
               <div
                 className="resize-handle-vertical"
-                style={channelUIMode === 'classic' && isAnnouncementVisible ? {} : { display: 'none' }}
+                style={channelUIMode === 'classic' && (isAnnouncementVisible || isShowFrameVisible) ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
               <div
                 className="resize-handle"
-                style={channelUIMode === 'three-line' && isAnnouncementVisible ? {} : { display: 'none' }}
+                style={channelUIMode === 'three-line' && (isAnnouncementVisible || isShowFrameVisible) ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
@@ -631,7 +691,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     <div
                       className={`${styles['widget-bar-item']} ${isAnnouncementVisible ? styles['widget-bar-item-active'] : ''}`}
                       onClick={() => {
-                        setIsAnnouncementVisible((prev) => !prev);
+                        setIsAnnouncementVisible((prev) => {
+                          if (!prev) {
+                            setIsShowFrameVisible(false);
+                            return true;
+                          }
+                          return false;
+                        });
                         setIsWidgetExpanded(false);
                       }}
                     >
@@ -639,7 +705,19 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
                     </div>
                     <div className={styles['widget-bar-spliter']}></div>
-                    <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(false)}>
+                    <div
+                      className={`${styles['widget-bar-item']} ${isShowFrameVisible ? styles['widget-bar-item-active'] : ''}`}
+                      onClick={() => {
+                        setIsShowFrameVisible((prev) => {
+                          if (!prev) {
+                            setIsAnnouncementVisible(false);
+                            return true;
+                          }
+                          return false;
+                        });
+                        setIsWidgetExpanded(false);
+                      }}
+                    >
                       <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></div>
                       <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
                     </div>

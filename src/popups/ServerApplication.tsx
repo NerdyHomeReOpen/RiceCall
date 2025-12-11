@@ -6,6 +6,9 @@ import type { Member, User, Server } from '@/types';
 // Providers
 import { useTranslation } from 'react-i18next';
 
+// Services
+import ipc from '@/services/ipc.service';
+
 // CSS
 import styles from '@/styles/serverApplication.module.css';
 import popup from '@/styles/popup.module.css';
@@ -20,6 +23,10 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
   // Hooks
   const { t } = useTranslation();
 
+  const handleSendFlower = () => {
+    ipc.popup.submit('serverApplication', { action: 'toggleShowFrame' });
+  };
+
   return (
     <div className={popup['popup-wrapper']}>
       <div className={popup['popup-body']}>
@@ -32,7 +39,7 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('channel-event')}</div>
           </div>
-          <div className={styles['button-item-box']}>
+          <div className={styles['button-item-box']} onClick={handleSendFlower}>
             <div className={styles['button-item-icon']}></div>
             <div className={styles['button-item-text']}>{t('send-flower')}</div>
           </div>

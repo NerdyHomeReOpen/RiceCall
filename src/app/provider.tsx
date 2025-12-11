@@ -9,6 +9,7 @@ import MainTabProvider from '@/providers/MainTab';
 import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
+import ShowFrameProvider from '@/providers/ShowFrame';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -74,7 +75,9 @@ const Providers = ({ children }: ProvidersProps) => {
       <LoadingProvider>
         <ContextMenuProvider>
           <SoundPlayerProvider>
-            <ImageViewerProvider>{children}</ImageViewerProvider>
+            <ImageViewerProvider>
+              <ShowFrameProvider>{children}</ShowFrameProvider>
+            </ImageViewerProvider>
           </SoundPlayerProvider>
         </ContextMenuProvider>
       </LoadingProvider>
