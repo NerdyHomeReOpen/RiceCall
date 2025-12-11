@@ -57,6 +57,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
     inputAudioDevice,
     outputAudioDevice,
     recordFormat,
+    recordSavePath,
     echoCancellation,
     noiseCancellation,
     microphoneAmplification,
@@ -355,6 +356,22 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                   <option value="wav">{'WAV'}</option>
                   <option value="mp3">{'MP3'}</option>
                 </select>
+              </div>
+              <div className={`${popup['input-box']} ${popup['col']}`}>
+                <div className={popup['label']}>{t('record-save-path')}</div>
+                <div className={popup['row']}>
+                  <input name="record-save-path" type="text" value={recordSavePath} style={{ maxWidth: '300px' }} readOnly />
+                  <button
+                    className={popup['button']}
+                    onClick={() => {
+                      ipc.record.savePath.select().then((path) => {
+                        if (path) setSystemSettings((prev) => ({ ...prev, recordSavePath: path }));
+                      });
+                    }}
+                  >
+                    {t('select-record-save-path')}
+                  </button>
+                </div>
               </div>
             </div>
 

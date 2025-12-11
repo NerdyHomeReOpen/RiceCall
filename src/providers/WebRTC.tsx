@@ -747,7 +747,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     if (timerRef.current) clearInterval(timerRef.current);
 
     const arrayBuffer = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate);
-    ipc.audio.save(arrayBuffer);
+    ipc.record.save(arrayBuffer);
 
     buffersRef.current = [];
 

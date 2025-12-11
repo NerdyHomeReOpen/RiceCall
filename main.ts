@@ -20,7 +20,7 @@ import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from
 import authService from './src/main/auth.service.js';
 import dataService from './src/main/data.service.js';
 import popupLoaders from './src/main/popupLoader.js';
-import type { StoreType, PopupType, LanguageKey } from './src/types';
+import type { StoreType, PopupType, LanguageKey, SystemSettings } from './src/types';
 import { LANGUAGES } from './src/constant.js';
 import { Readable } from 'stream';
 
@@ -74,6 +74,7 @@ const store = new Store<StoreType>({
     inputAudioDevice: '',
     outputAudioDevice: '',
     recordFormat: 'wav',
+    recordSavePath: app.getPath('documents'),
     mixEffect: false,
     mixEffectType: '',
     autoMixSetting: false,
@@ -225,7 +226,7 @@ function isAutoLaunchEnabled(): boolean {
   }
 }
 
-export function getSettings() {
+export function getSettings(): SystemSettings {
   return {
     autoLogin: store.get('autoLogin'),
     autoLaunch: isAutoLaunchEnabled(),
@@ -235,12 +236,12 @@ export function getSettings() {
     statusAutoDnd: store.get('statusAutoDnd'),
     channelUIMode: store.get('channelUIMode'),
     closeToTray: store.get('closeToTray'),
-    dontShowDisclaimer: store.get('dontShowDisclaimer'),
     font: store.get('font'),
     fontSize: store.get('fontSize'),
     inputAudioDevice: store.get('inputAudioDevice'),
     outputAudioDevice: store.get('outputAudioDevice'),
     recordFormat: store.get('recordFormat'),
+    recordSavePath: store.get('recordSavePath'),
     mixEffect: store.get('mixEffect'),
     mixEffectType: store.get('mixEffectType'),
     autoMixSetting: store.get('autoMixSetting'),
@@ -772,10 +773,9 @@ app.on('ready', async () => {
       });
   });
 
-  ipcMain.on('save-audio', (_, audio: ArrayBuffer) => {
+  ipcMain.on('save-record', (_, record: ArrayBuffer) => {
     try {
-      const baseDir = app.getPath('documents');
-      const outputDir = path.join(baseDir, 'RiceCall');
+      const outputDir = store.get('recordSavePath');
 
       if (!fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
@@ -788,14 +788,24 @@ app.on('ready', async () => {
       const outputPath = path.join(outputDir, fileName);
 
       if (format === 'mp3') {
-        convertWavToMp3AndSave(audio, outputPath);
+        convertWavToMp3AndSave(record, outputPath);
       } else {
-        const buffer = Buffer.from(audio);
+        const buffer = Buffer.from(record);
         fs.writeFileSync(outputPath, buffer);
       }
     } catch (error: any) {
       console.error(`${new Date().toLocaleString()} | Save audio error:`, error.message);
     }
+  });
+
+  ipcMain.handle('select-record-save-path', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: t('select-record-save-path'),
+      defaultPath: store.get('recordSavePath'),
+      properties: ['openDirectory'],
+    });
+    if (canceled) return null;
+    return filePaths[0];
   });
 
   // Data handlers
@@ -1212,6 +1222,10 @@ app.on('ready', async () => {
     event.returnValue = store.get('recordFormat');
   });
 
+  ipcMain.on('get-record-save-path', (event) => {
+    event.returnValue = store.get('recordSavePath');
+  });
+
   ipcMain.on('get-mix-effect', (event) => {
     event.returnValue = store.get('mixEffect');
   });
@@ -1405,6 +1419,13 @@ app.on('ready', async () => {
     store.set('recordFormat', format ?? 'wav');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('record-format', format);
+    });
+  });
+
+  ipcMain.on('set-record-save-path', (_, path) => {
+    store.set('recordSavePath', path ?? app.getPath('documents'));
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('record-save-path', path);
     });
   });
 

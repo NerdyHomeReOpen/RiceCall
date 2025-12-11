@@ -413,10 +413,17 @@ const ipcService = {
     },
   },
 
-  audio: {
-    save: (audio: ArrayBuffer) => {
+  record: {
+    save: (record: ArrayBuffer) => {
       if (!isElectron) return;
-      ipcRenderer.send('save-audio', audio);
+      ipcRenderer.send('save-record', record);
+    },
+
+    savePath: {
+      select: async (): Promise<string | null> => {
+        if (!isElectron) return null;
+        return await ipcRenderer.invoke('select-record-save-path');
+      },
     },
   },
 
@@ -436,6 +443,7 @@ const ipcService = {
       if (settings.inputAudioDevice !== undefined) ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
       if (settings.outputAudioDevice !== undefined) ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
       if (settings.recordFormat !== undefined) ipcRenderer.send('set-record-format', settings.recordFormat);
+      if (settings.recordSavePath !== undefined) ipcRenderer.send('set-record-save-path', settings.recordSavePath);
       if (settings.mixEffect !== undefined) ipcRenderer.send('set-mix-effect', settings.mixEffect);
       if (settings.mixEffectType !== undefined) ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
       if (settings.autoMixSetting !== undefined) ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
@@ -713,6 +721,25 @@ const ipcService = {
         const listener = (_: any, format: 'wav' | 'mp3') => callback(format);
         ipcRenderer.on('record-format', listener);
         return () => ipcRenderer.removeListener('record-format', listener);
+      },
+    },
+
+    recordSavePath: {
+      set: (path: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-record-save-path', path);
+      },
+
+      get: (): string => {
+        if (!isElectron) return '';
+        return ipcRenderer.sendSync('get-record-save-path');
+      },
+
+      onUpdate: (callback: (path: string) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, path: string) => callback(path);
+        ipcRenderer.on('record-save-path', listener);
+        return () => ipcRenderer.removeListener('record-save-path', listener);
       },
     },
 

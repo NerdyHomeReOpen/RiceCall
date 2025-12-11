@@ -138,6 +138,7 @@ export type SystemSettings = {
   inputAudioDevice: string;
   outputAudioDevice: string;
   recordFormat: 'wav' | 'mp3';
+  recordSavePath: string;
   mixEffect: boolean;
   mixEffectType: string;
   autoMixSetting: boolean;
@@ -447,6 +448,7 @@ export type StoreType = {
   inputAudioDevice: string;
   outputAudioDevice: string;
   recordFormat: 'wav' | 'mp3';
+  recordSavePath: string;
   mixEffect: boolean;
   mixEffectType: string;
   autoMixSetting: boolean;

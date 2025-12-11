@@ -10,5 +10,7 @@
   "update-available": "有新版本可用",
   "update-available-message": "新版本 {{version}} 發布於 {{releaseDate}}，點擊「下載更新」按鈕開始下載",
   "update-downloaded": "安裝更新",
-  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」"
+  "update-downloaded-message": "版本 {{version}} 已下載完成，請選擇「立即安裝」或「關閉時安裝」",
+  "select-record-save-path": "選擇錄音存檔位置",
+  "convert-wav-to-mp3-failed": "轉檔至 MP3 失敗"
 }
