@@ -62,9 +62,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handlers
-  const handleFullscreen = () => {
-    if (isFullscreen) ipc.window.unmaximize();
-    else ipc.window.maximize();
+  const handleMaximize = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximize = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
   };
 
   const handleMinimize = () => {
@@ -94,7 +99,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
         </div>
         <div className={header['buttons']}>
           {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimize} />}
-          {buttons.includes('maxsize') && <div className={isFullscreen ? header['restore'] : header['maxsize']} onClick={handleFullscreen} />}
+          {buttons.includes('maxsize') && isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />}
           {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
         </div>
       </div>

@@ -188,9 +188,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     ipc.exit();
   };
 
-  const handleFullscreen = () => {
-    if (isFullscreen) ipc.window.unmaximize();
-    else ipc.window.maximize();
+  const handleMaximize = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximize = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
   };
 
   const handleMinimize = () => {
@@ -353,7 +358,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           }}
         />
         <div className={header['minimize']} onClick={handleMinimize} />
-        <div className={isFullscreen ? header['restore'] : header['maxsize']} onClick={handleFullscreen} />
+        {isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />}
         <div className={header['close']} onClick={handleClose} />
       </div>
     </header>

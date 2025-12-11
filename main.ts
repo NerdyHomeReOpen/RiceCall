@@ -401,6 +401,7 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
 
 export async function createPopup(type: PopupType, id: string, initialData: unknown, force = true, title?: string): Promise<BrowserWindow> {
   const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+  const canResize = type === 'directMessage';
 
   // If force is true, destroy the popup
   if (force) {
@@ -426,12 +427,14 @@ export async function createPopup(type: PopupType, id: string, initialData: unkn
     title: fullTitle,
     width: PopupSize[type].width,
     height: PopupSize[type].height,
+    minWidth: PopupSize[type].width,
+    minHeight: PopupSize[type].height,
     thickFrame: true,
     titleBarStyle: 'hidden',
-    maximizable: false,
-    resizable: false,
+    maximizable: canResize,
+    resizable: canResize,
     fullscreen: false,
-    fullscreenable: false,
+    fullscreenable: canResize,
     hasShadow: true,
     icon: APP_ICON,
     show: false,
@@ -472,6 +475,14 @@ export async function createPopup(type: PopupType, id: string, initialData: unkn
     e.preventDefault();
     popups[id].destroy();
     delete popups[id];
+  });
+
+  popups[id].on('maximize', () => {
+    popups[id]?.webContents.send('maximize');
+  });
+
+  popups[id].on('unmaximize', () => {
+    popups[id]?.webContents.send('unmaximize');
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
@@ -1055,6 +1066,7 @@ app.on('ready', async () => {
     } else {
       window.maximize();
     }
+    window.webContents.send('maximize');
   });
 
   ipcMain.on('window-control-unmaximize', (event) => {
@@ -1065,6 +1077,7 @@ app.on('ready', async () => {
     } else {
       window.unmaximize();
     }
+    window.webContents.send('unmaximize');
   });
 
   ipcMain.on('window-control-close', (event) => {
