@@ -626,42 +626,40 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
               {/* Widget Bar */}
               <div className={`${styles['widget-bar']} ${!isWidgetExpanded ? styles['widget-close'] : ''}`}>
-                <div className={styles['widget-bar-content']}>
-                  {isWidgetExpanded ? (
-                    <>
-                      <div
-                        className={`${styles['widget-bar-item']} ${isAnnouncementVisible ? styles['widget-bar-item-active'] : ''}`}
-                        onClick={() => {
-                          setIsAnnouncementVisible((v) => !v);
-                          setIsWidgetExpanded(false);
-                        }}
-                      >
-                        <span className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`}></span>
-                        <span className={styles['widget-bar-item-text']}>公告</span>
-                      </div>
-                      <div className={styles['widget-bar-spliter']}></div>
-                      <div className={styles['widget-bar-item']}>
-                        <span className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></span>
-                        <span className={styles['widget-bar-item-text']}>送花</span>
-                      </div>
-                      <div className={styles['widget-bar-spliter']}></div>
-                      <div
-                        className={styles['widget-bar-item']}
-                        onClick={() => {
-                          handleOpenServerApplication(userId, currentServerId);
-                          setIsWidgetExpanded(false);
-                        }}
-                      >
-                        <span className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`}></span>
-                        <span className={styles['widget-bar-item-text']}>更多</span>
-                      </div>
-                    </>
-                  ) : (
-                    <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(!isWidgetExpanded)}>
-                      <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`}></span>
+                {isWidgetExpanded ? (
+                  <>
+                    <div
+                      className={`${styles['widget-bar-item']} ${isAnnouncementVisible ? styles['widget-bar-item-active'] : ''}`}
+                      onClick={() => {
+                        setIsAnnouncementVisible((prev) => !prev);
+                        setIsWidgetExpanded(false);
+                      }}
+                    >
+                      <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`}></div>
+                      <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
                     </div>
-                  )}
-                </div>
+                    <div className={styles['widget-bar-spliter']}></div>
+                    <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(false)}>
+                      <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></div>
+                      <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
+                    </div>
+                    <div className={styles['widget-bar-spliter']}></div>
+                    <div
+                      className={styles['widget-bar-item']}
+                      onClick={() => {
+                        handleOpenServerApplication(userId, currentServerId);
+                        setIsWidgetExpanded(false);
+                      }}
+                    >
+                      <div className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`}></div>
+                      <span className={styles['widget-bar-item-text']}>{t('more')}</span>
+                    </div>
+                  </>
+                ) : (
+                  <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(!isWidgetExpanded)}>
+                    <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`}></span>
+                  </div>
+                )}
               </div>
 
               {/* Bottom Area */}

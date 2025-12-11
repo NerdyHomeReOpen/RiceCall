@@ -521,32 +521,22 @@
 }
 
 .widget-bar {
-  width: auto;
-  max-width: 260px;
-  height: 23px;
+  z-index: 1000;
+  position: absolute;
+  display: flex;
+  align-items: center;
+  right: 10px;
+  gap: 5px;
+  background: #fff;
   border-bottom-left-radius: 5px;
   border-bottom-right-radius: 5px;
-  position: absolute;
-  overflow: hidden;
   box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
-  right: 0;
-  z-index: 1000;
-  background: #fff;
-  margin-right: 1rem;
   border-top: unset;
+  overflow: hidden;
 }
 
 .widget-close {
   height: 16px;
-}
-
-.widget-bar-content {
-  height: 23px;
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  padding: 0 4px;
-  gap: 4px;
 }
 
 .widget-close .widget-bar-content {
@@ -556,14 +546,17 @@
 .widget-bar-spliter {
   width: 2px;
   height: 16px;
-  background: url("/channel/widgetbar_spliter.png") no-repeat center;
+  background-image: url('/channel/widgetbar_spliter.webp');
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .widget-bar-item {
   display: flex;
   cursor: pointer;
-  padding-left: 1rem;
-  padding-right: 1rem;
+  place-items: center;
+  gap: 5px;
+  padding: 3px 25px;
 }
 
 .widget-close .widget-bar-item {
@@ -593,7 +586,6 @@
   background-size: auto;
   background-position: 0 0;
   display: flex;
-  margin-right: 5px;
 }
 
 .widget-close .widget-bar-item-icon {
@@ -603,19 +595,21 @@
 }
 
 .widget-bar-item-icon.announcement-icon {
-  background-image: url("/channel/widgetbar_bullet.png");
+  background-image: url('/channel/widgetbar_bullet.webp');
 }
 
 .widget-bar-item-icon.rcshow-icon {
-  background-image: url("/channel/widgetbar_rcshow.png");
+  background-image: url('/channel/widgetbar_rcshow.webp');
 }
 
 .widget-bar-item-icon.more-icon {
-  background-image: url("/channel/widgetbar_more.png");
+  background-image: url('/channel/widgetbar_more.webp');
 }
 
 .widget-bar-item-icon.arrow-down-icon {
-  background-image: url("/channel/widgetBar_Stretch.png");
+  width: 20px;
+  height: 16px;
+  background-image: url('/channel/widgetBar_Stretch.webp');
 }
 
 .widget-bar-item-text {
