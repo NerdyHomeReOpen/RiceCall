@@ -28,6 +28,9 @@ import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
 import { handleOpenChannelEvent, handleOpenServerApplication } from '@/utils/popup';
 
+// Constants
+import { SHOW_FRAME_ORIGIN } from '@/constant';
+
 const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
 const MESSAGE_VIERER_DEVIATION = 100;
 
@@ -172,8 +175,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const sidebarRef = useRef<HTMLDivElement>(null);
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
+    const showAreaRef = useRef<HTMLIFrameElement>(null);
     const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const messageAreaRef = useRef<HTMLDivElement>(null);
+    const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
 
     // States
     const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -183,10 +188,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
     const [lastMessageTime, setLastMessageTime] = useState<number>(0);
     const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
-    const [isAnnouncementVisible, setIsAnnouncementVisible] = useState<boolean>(true);
     const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
     const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
     const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
+    const [mode, setMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
     // Variables
     const { userId } = user;
@@ -216,7 +221,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       let isQueuing = false;
       let isControlled = false;
       let isCurrentChannelQueueControlled = false;
-
       for (const m of queueUsers) {
         if (m.isQueueControlled) isCurrentChannelQueueControlled = true;
         if (m.userId !== userId) continue;
@@ -229,9 +233,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           isQueuing = true;
         }
       }
-
       const isIdling = !isMicTaken && !isQueuing;
-
       return { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled };
     }, [queueUsers, userId, permissionLevel]);
 
@@ -268,7 +270,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       {
         id: 'close-announcement',
         label: t('close-announcement'),
-        onClick: () => setIsAnnouncementVisible(false),
+        onClick: () => setMode('none'),
       },
     ];
 
@@ -286,8 +288,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       {
         id: 'open-announcement',
         label: t('open-announcement'),
-        show: !isAnnouncementVisible,
-        onClick: () => setIsAnnouncementVisible(true),
+        show: mode === 'none',
+        onClick: () => setMode('announcement'),
       },
     ];
 
@@ -431,17 +433,26 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       sidebarRef.current.style.width = `${e.clientX}px`;
     };
 
+    const getResizableAreaRef = () => {
+      if (mode === 'announcement') return annAreaRef;
+      if (mode === 'show') return showAreaRef;
+      return null;
+    };
+
     const handleAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
+      const targetRef = getResizableAreaRef();
+      if (!targetRef?.current) return;
       e.currentTarget.setPointerCapture(e.pointerId);
       isResizingAnnAreaRef.current = true;
     };
 
     const handleAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-      if (!isResizingAnnAreaRef.current || !annAreaRef.current) return;
+      const targetRef = getResizableAreaRef();
+      if (!isResizingAnnAreaRef.current || !targetRef?.current) return;
       if (channelUIMode === 'classic') {
-        annAreaRef.current.style.height = `${e.clientY - annAreaRef.current.offsetTop}px`;
+        targetRef.current.style.height = `${e.clientY - targetRef.current.offsetTop}px`;
       } else if (channelUIMode === 'three-line') {
-        annAreaRef.current.style.width = `${e.clientX - annAreaRef.current.offsetLeft}px`;
+        targetRef.current.style.width = `${e.clientX - targetRef.current.offsetLeft}px`;
       }
     };
 
@@ -457,7 +468,27 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       setIsAtBottom(true);
     }, []);
 
+    const updateShowFrameState = useCallback(
+      (userId: string, anchorId: string | null, channelMode: Channel['voiceMode']) => {
+        if (!showAreaRef.current?.contentWindow) return;
+        if (prevStateRef.current.userId === userId && prevStateRef.current.anchorId === anchorId && prevStateRef.current.channelMode === channelMode) return;
+        prevStateRef.current = { userId, anchorId, channelMode };
+        showAreaRef.current.contentWindow.postMessage({ uid: userId, aid: anchorId, channelMode: channelMode }, SHOW_FRAME_ORIGIN);
+      },
+      [showAreaRef],
+    );
+
+    const handleShowFrameLoad = useCallback(() => {
+      const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+      updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
+    }, [userId, queueUsers, currentChannelVoiceMode, updateShowFrameState]);
+
     // Effects
+    useEffect(() => {
+      const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+      updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
+    }, [userId, queueUsers, currentChannelVoiceMode, updateShowFrameState]);
+
     useEffect(() => {
       webRTCRef.current.changeBitrate(currentChannelBitrate);
     }, [currentChannelBitrate]);
@@ -593,33 +624,44 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
           <main className={styles['content']}>
             {/* Message Area */}
             <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
-              {/* Announcement Area */}
-              {isAnnouncementVisible && (
-                <div
-                  ref={annAreaRef}
-                  className={styles['announcement-area']}
-                  style={isAnnouncementVisible ? (channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }) : { display: 'none' }}
-                  onContextMenu={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    const { clientX: x, clientY: y } = e;
-                    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
-                  }}
-                >
-                  <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} imageSize={'big'} />
-                </div>
-              )}
+              {mode !== 'none' &&
+                (mode === 'announcement' ? (
+                  <div
+                    ref={annAreaRef}
+                    className={styles['announcement-area']}
+                    style={channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
+                    onContextMenu={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      const { clientX: x, clientY: y } = e;
+                      contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
+                    }}
+                  >
+                    <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} imageSize={'big'} />
+                  </div>
+                ) : mode === 'show' ? (
+                  <iframe
+                    ref={showAreaRef}
+                    className={styles['rcshow-area']}
+                    style={channelUIMode === 'classic' ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
+                    id="showFrame"
+                    src={SHOW_FRAME_ORIGIN}
+                    height="100%"
+                    width="100%"
+                    onLoad={handleShowFrameLoad}
+                  />
+                ) : null)}
 
               {/* Resize Handle */}
               <div
                 className="resize-handle-vertical"
-                style={channelUIMode === 'classic' && isAnnouncementVisible ? {} : { display: 'none' }}
+                style={channelUIMode === 'classic' && mode !== 'none' ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
               <div
                 className="resize-handle"
-                style={channelUIMode === 'three-line' && isAnnouncementVisible ? {} : { display: 'none' }}
+                style={channelUIMode === 'three-line' && mode !== 'none' ? {} : { display: 'none' }}
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
@@ -629,9 +671,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 {isWidgetExpanded ? (
                   <>
                     <div
-                      className={`${styles['widget-bar-item']} ${isAnnouncementVisible ? styles['widget-bar-item-active'] : ''}`}
+                      className={`${styles['widget-bar-item']} ${mode === 'announcement' ? styles['widget-bar-item-active'] : ''}`}
                       onClick={() => {
-                        setIsAnnouncementVisible((prev) => !prev);
+                        if (mode === 'announcement') setMode('none');
+                        else setMode('announcement');
                         setIsWidgetExpanded(false);
                       }}
                     >
@@ -639,7 +682,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                       <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
                     </div>
                     <div className={styles['widget-bar-spliter']}></div>
-                    <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(false)}>
+                    <div
+                      className={`${styles['widget-bar-item']} ${mode === 'show' ? styles['widget-bar-item-active'] : ''}`}
+                      onClick={() => {
+                        if (mode === 'show') setMode('none');
+                        else setMode('show');
+                        setIsWidgetExpanded(false);
+                      }}
+                    >
                       <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></div>
                       <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
                     </div>
@@ -647,7 +697,10 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     <div
                       className={styles['widget-bar-item']}
                       onClick={() => {
-                        handleOpenServerApplication(userId, currentServerId);
+                        handleOpenServerApplication(userId, currentServerId, (action) => {
+                          if (action === 'openShowFrame') setMode('show');
+                          if (action === 'openChannelEvent') handleOpenChannelEvent(userId, currentServerId, channelEvents);
+                        });
                         setIsWidgetExpanded(false);
                       }}
                     >

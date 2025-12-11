@@ -34,6 +34,7 @@
   flex-direction: column;
   align-items: center;
   width: 55px;
+  cursor: pointer;
 }
 
 .button-item-icon {
@@ -41,13 +42,10 @@
   height: 44px;
   padding: 0;
   background: none;
+  background-position: -44px 0;
   border: none;
 }
 
-.button-item-box.active .button-item-icon {
-  cursor: pointer;
-  background-position: -44px 0;
-}
 
 .button-item-box:nth-child(1) .button-item-icon {
   background-image: url('/channel/widget_vote.webp');

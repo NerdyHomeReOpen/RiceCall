@@ -501,13 +501,19 @@
   min-height: 0;
 }
 
-.announcement-area {
+.announcement-area,
+.rcshow-area {
   width: 100%;
   min-width: 200px;
   height: 100%;
   min-height: 60px;
   padding: 10px;
   overflow-y: auto;
+}
+
+.rcshow-area {
+  padding: 0 !important;
+  overflow: hidden;
 }
 
 .bottom-area {
