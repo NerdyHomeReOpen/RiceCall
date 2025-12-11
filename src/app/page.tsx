@@ -622,14 +622,16 @@ const RootPageComponent: React.FC = React.memo(() => {
         setServerOnlineMembers([]);
         setChannelEvents([]);
       }
-      const { update } = args[0];
-      if (update.signature && update.signature !== userRef.current.signature) {
-        // user activity update
-        const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, createdAt: Date.now() });
-        setFriendActivities((prev) => [newActive, ...prev]);
-      }
-      setUser((prev) => ({ ...prev, ...args[0].update }));
+      // Add activity when signature is updated
+      args.forEach(({ update }) => {
+        if (update.signature && userRef.current.signature !== update.signature) {
+          const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, createdAt: Date.now() });
+          setFriendActivities((prev) => [newActive, ...prev]);
+        }
+      });
+      // Set user id to local storage (for hot reload)
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
+      setUser((prev) => ({ ...prev, ...args[0].update }));
     });
     return () => unsub();
   }, [currentServerId]);
@@ -644,20 +646,12 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Friend> }[]) => {
+      // Add activity when signature is updated
       args.forEach(({ targetId, update }) => {
-        // friend activity update
-        const targetFriend = friendsRef.current.find((f) => f.targetId === targetId);
-        if (update.signature) {
-          const newActive = Default.friendActivity({
-            ...targetFriend,
-            ...update,
-            userId: targetId,
-            content: update.signature,
-            createdAt: Date.now(),
-          });
-          if (targetFriend && targetFriend.relationStatus === 2 && targetFriend.signature !== newActive.signature) {
-            setFriendActivities((prev) => [newActive, ...prev]);
-          }
+        const targetFriend = friendsRef.current.find((f) => f.targetId === targetId && f.relationStatus === 2);
+        if (targetFriend && update.signature && targetFriend.signature !== update.signature) {
+          const newActivity = Default.friendActivity({ ...targetFriend, content: update.signature, createdAt: Date.now() });
+          setFriendActivities((prev) => [newActivity, ...prev]);
         }
       });
       const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
