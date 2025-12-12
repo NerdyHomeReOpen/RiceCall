@@ -68,6 +68,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     birthDay: targetBirthDay,
     country: targetCountry,
     badges: targetBadges,
+    isVerified: targetIsVerified,
     shareFavoriteServers: targetShareFavoriteServers,
     shareJoinedServers: targetShareJoinedServers,
     shareRecentServers: targetShareRecentServers,
@@ -230,6 +231,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             <p className={styles['user-name-text']}>{targetName}</p>
             {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
             <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} isSelf={isSelf} isHover={true} />
+            {targetIsVerified ? <div className={styles['official-icon']} title={t('is-official')} /> : null}
           </div>
           <p className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
             @{targetDisplayId}

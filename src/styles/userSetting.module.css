@@ -201,6 +201,16 @@
   user-select: text;
 }
 
+.official-icon {
+  width: 17px;
+  height: 16px;
+  image-rendering: auto;
+  background-image: url('/official.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
 .user-account-text {
   font-size: 1em;
   color: #fff;
