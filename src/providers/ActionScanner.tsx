@@ -9,7 +9,9 @@ import ipc from '@/services/ipc.service';
 const BASE_VOLUME = 5;
 
 type ActionScannerContextType = {
-  isKeepAlive: boolean;
+  isIdling: boolean;
+  isManualIdling: boolean;
+  setIsManualIdling: (value: boolean) => void;
 };
 
 const ActionScannerContext = createContext<ActionScannerContextType | null>(null);
@@ -38,10 +40,11 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const toggleSpeakerKeyRef = useRef<string>('Alt+m');
   const toggleMicrophoneKeyRef = useRef<string>('Alt+v');
   const lastActiveRef = useRef<number>(Date.now());
-  const isSpeakingRef = useRef(false);
+  const isSpeakingRef = useRef<boolean>(false);
+  const isManualIdlingRef = useRef<boolean>(false);
 
   // States
-  const [isKeepAlive, setIsKeepAlive] = useState<boolean>(true);
+  const [isIdling, setIsIdling] = useState<boolean>(false);
 
   // Handlers
   const buildKey = (e: KeyboardEvent) => {
@@ -94,17 +97,23 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     webRTC.toggleMicMuted();
   }, [webRTC]);
 
+  const setIsManualIdling = useCallback((value: boolean) => {
+    isManualIdlingRef.current = value;
+    requestAnimationFrame(() => {
+      setIsIdling(value);
+    });
+  }, []);
+
   // Effects
   useEffect(() => {
-    if (!idleCheck.current) return;
     const interval = setInterval(() => {
       const now = Date.now();
-      if (isKeepAlive && now - lastActiveRef.current >= idleMinutes.current * 60_000) {
-        setIsKeepAlive(false);
+      if (idleCheck.current && now - lastActiveRef.current >= idleMinutes.current * 60_000) {
+        setIsIdling(true);
       }
     }, 1000);
     return () => clearInterval(interval);
-  }, [isKeepAlive]);
+  }, []);
 
   useEffect(() => {
     let ticking = false;
@@ -114,23 +123,20 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
         ticking = true;
         requestAnimationFrame(() => {
           lastActiveRef.current = Date.now();
-          if (!isKeepAlive) setIsKeepAlive(true);
+          if (isIdling && !isManualIdlingRef.current) setIsIdling(false);
           ticking = false;
         });
       }
     };
 
     const events: Array<[keyof WindowEventMap, AddEventListenerOptions?]> = [
-      ['click', { passive: true }],
       ['mousemove', { passive: true }],
-      ['mousedown', { passive: true }],
-      ['keydown'],
       ['scroll', { passive: true }],
     ];
 
     events.forEach(([e, opt]) => window.addEventListener(e, updateActivity, opt));
     return () => events.forEach(([e, opt]) => window.removeEventListener(e, updateActivity, opt));
-  }, [isKeepAlive]);
+  }, [isIdling]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -268,7 +274,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     return () => unsub();
   }, []);
 
-  return <ActionScannerContext.Provider value={{ isKeepAlive }}>{children}</ActionScannerContext.Provider>;
+  return <ActionScannerContext.Provider value={{ isIdling, isManualIdling: isManualIdlingRef.current, setIsManualIdling }}>{children}</ActionScannerContext.Provider>;
 };
 
 ActionScannerProvider.displayName = 'ActionScannerProvider';

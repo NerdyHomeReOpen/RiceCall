@@ -51,6 +51,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
+import { useActionScanner } from '@/providers/ActionScanner';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -70,7 +71,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
-  // const actionScanner = useActionScanner();
+  const actionScanner = useActionScanner();
   const { t, i18n } = useTranslation();
 
   // Refs
@@ -175,6 +176,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleChangeStatus = (status: User['status']) => {
+    actionScanner.setIsManualIdling(status !== 'online');
     ipc.socket.send('editUser', { update: { status } });
   };
 
@@ -213,13 +215,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   // Effects
-  // TODO: fix auto set to online when manual set to idle or other status
-  // useEffect(() => {
-  //   const next = actionScanner.isKeepAlive ? 'online' : 'idle';
-  //   if (user.status !== next) {
-  //     ipc.socket.send('editUser', { update: { status: next } });
-  //   }
-  // }, [actionScanner.isKeepAlive, user.status]);
+  useEffect(() => {
+    const next = actionScanner.isIdling ? 'idle' : 'online';
+    if (user.status !== next && !actionScanner.isManualIdling) {
+      ipc.socket.send('editUser', { update: { status: next } });
+    }
+  }, [actionScanner.isIdling, actionScanner.isManualIdling, user.status]);
 
   useEffect(() => {
     const changeCloseToTray = (enable: boolean) => {
