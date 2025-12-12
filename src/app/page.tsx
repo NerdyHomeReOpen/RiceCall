@@ -577,10 +577,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.data.serverOnlineMembers(currentServerId).then((serverOnlineMembers) => {
         if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
       });
-      setServerMemberApplications([]);
-      // ipc.data.memberApplications(server.serverId).then((serverMemberApplications) => {
-      //   if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
-      // });
+      ipc.data.memberApplications(currentServerId).then((serverMemberApplications) => {
+        if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
+      });
     };
     refresh();
   }, [userId, currentServerId]);
