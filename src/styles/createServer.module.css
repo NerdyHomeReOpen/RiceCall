@@ -3,8 +3,8 @@
   margin-bottom: 15px;
   font-size: 0.9em;
   color: var(--text-color-quaternary);
-  background-color: var(--notify-toaster-background);
-  border: 1px solid var(--notify-toaster-border);
+  background-color: var(--notification-toaster-background);
+  border: 1px solid var(--notification-toaster-border);
 }
 
 .select-type-text {

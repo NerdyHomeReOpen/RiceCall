@@ -14,6 +14,7 @@ export type table_announcements = {
   region: string;
   category: string;
   timestamp: number;
+  until: number;
 };
 
 export type table_badges = {
@@ -123,11 +124,12 @@ export type table_member_invitations = {
   createdAt: number;
 };
 
-export type table_notifies = {
-  notifyId: number;
+export type table_notifications = {
+  notificationId: number;
   content: string;
   region: string;
-  notifyUntil: number;
+  timestamp: number;
+  until: number;
 };
 
 export type table_recommend_servers = {

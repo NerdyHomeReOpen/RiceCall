@@ -957,8 +957,8 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.handle('data-notifies', async (_, region: string) => {
-    return await dataService.notifies({ region }).catch((error) => {
+  ipcMain.handle('data-notifications', async (_, region: string) => {
+    return await dataService.notifications({ region }).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });

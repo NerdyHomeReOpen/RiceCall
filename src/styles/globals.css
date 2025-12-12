@@ -27,8 +27,8 @@
   --text-vip-name: #e4493e;
   --text-vip-name-hover: #9c3028;
   --text-nickname: #6e849b;
-  --notify-toaster-border: #f9c55d;
-  --notify-toaster-background: #fefee4;
+  --notification-toaster-border: #f9c55d;
+  --notification-toaster-background: #fefee4;
   --button-background: #fdfdfd;
   --popup-background: #f7f7f7;
 }
@@ -60,8 +60,8 @@
     --text-vip-name: #e4493e;
     --text-vip-name-hover: #9c3028;
     --text-nickname: #6e849b;
-    --notify-toaster-border: #855800;
-    --notify-toaster-background: #3b3b00;
+    --notification-toaster-border: #855800;
+    --notification-toaster-background: #3b3b00;
     --button-background: linear-gradient(#242424, #1f1f1f);
   } */
 }

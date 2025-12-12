@@ -21,7 +21,7 @@ import {
   Channel,
   MemberApplication,
   MemberInvitation,
-  Notify,
+  Notification,
   Announcement,
   RecommendServer,
   LanguageKey,
@@ -198,9 +198,9 @@ const ipcService = {
       return await ipcRenderer.invoke('data-memberInvitations', receiverId);
     },
 
-    notifies: async (region: LanguageKey): Promise<Notify[]> => {
+    notifications: async (region: LanguageKey): Promise<Notification[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-notifies', region);
+      return await ipcRenderer.invoke('data-notifications', region);
     },
 
     announcements: async (region: LanguageKey): Promise<Announcement[]> => {

@@ -22,7 +22,7 @@ import type {
   OnlineMember,
   MemberApplication,
   QueueUser,
-  Notify,
+  Notification,
   RecommendServer,
   FriendActivity,
   ChannelEvent,
@@ -36,7 +36,7 @@ import ServerPage from '@/pages/Server';
 
 // Components
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import NotifyToaster from '@/components/NotifyToaster';
+import NotificationToaster from '@/components/NotificationToaster';
 
 // Utils
 import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme, handleOpenFriendVerification, handleOpenMemberInvitation, handleOpenErrorDialog } from '@/utils/popup';
@@ -63,10 +63,10 @@ interface HeaderProps {
   currentServer: Server;
   friendApplications: FriendApplication[];
   memberInvitations: MemberInvitation[];
-  systemNotify: string[];
+  systemNotifications: string[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotify }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotifications }) => {
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
@@ -82,10 +82,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   // Variables
   const { userId, name: userName, status: userStatus } = user;
   const { serverId: currentServerId, name: currentServerName } = currentServer;
-  const hasNotify = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotify.length !== 0;
+  const hasNotification = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotifications.length !== 0;
   const hasFriendApplication = friendApplications.length !== 0;
   const hasMemberInvitation = memberInvitations.length !== 0;
-  const hasSystemNotify = systemNotify.length !== 0;
+  const hasSystemNotification = systemNotifications.length !== 0;
   const mainTabs: { id: 'home' | 'friends' | 'server'; label: string }[] = [
     { id: 'home', label: t('home') },
     { id: 'friends', label: t('friends') },
@@ -304,17 +304,17 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           onClick={(e) => {
             const x = e.currentTarget.getBoundingClientRect().left;
             const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showNotifyMenu(x, y, 'right-bottom', [
+            contextMenu.showNotificationMenu(x, y, 'right-bottom', [
               {
                 id: 'no-unread-notify',
                 label: t('no-unread-notify'),
-                show: !hasNotify,
+                show: !hasNotification,
                 className: 'readonly',
               },
               {
                 id: 'friend-verification',
                 label: t('friend-verification'),
-                icon: 'notify',
+                icon: 'notification',
                 show: hasFriendApplication,
                 contentType: 'image',
                 showContentLength: true,
@@ -325,7 +325,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
               {
                 id: 'member-invitation',
                 label: t('member-invitation'),
-                icon: 'notify',
+                icon: 'notification',
                 show: hasMemberInvitation,
                 contentType: 'image',
                 showContentLength: true,
@@ -336,8 +336,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
               {
                 id: 'system-notify',
                 label: t('system-notify'),
-                icon: 'notify',
-                show: hasSystemNotify,
+                icon: 'notification',
+                show: hasSystemNotification,
                 showContentLength: true,
                 showContent: false,
                 contents: memberInvitations.map((mi) => mi.avatarUrl),
@@ -346,7 +346,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
             ]);
           }}
         >
-          <div className={`${header['overlay']} ${hasNotify && header['new']}`} />
+          <div className={`${header['overlay']} ${hasNotification && header['new']}`} />
         </div>
         <div className={header['spliter']} />
         <div
@@ -398,10 +398,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
-  const [systemNotify, setSystemNotify] = useState<string[]>([]);
+  const [systemNotifications, setSystemNotifications] = useState<string[]>([]);
   const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [notifies, setNotifies] = useState<Notify[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
   const [latency, setLatency] = useState<number>(0);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
@@ -545,7 +545,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.data.memberInvitations(userId).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
-      setSystemNotify([]); // TODO: Implement system notify
+      setSystemNotifications([]); // TODO: Implement system notification
     };
     refresh();
   }, [userId]);
@@ -556,8 +556,8 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.data.announcements(region).then((announcements) => {
         if (announcements) setAnnouncements(announcements);
       });
-      ipc.data.notifies(region).then((notifies) => {
-        if (notifies) setNotifies(notifies);
+      ipc.data.notifications(region).then((notifications) => {
+        if (notifications) setNotifications(notifications);
       });
       ipc.data.recommendServers(region).then((recommendServerList) => {
         if (recommendServerList) setRecommendServers(recommendServerList);
@@ -936,7 +936,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     <WebRTCProvider>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} currentServer={currentServer} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
+          <Header user={user} currentServer={currentServer} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotifications={systemNotifications} />
           {!userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
@@ -959,7 +959,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 display={mainTab.selectedTabId === 'server'}
                 latency={latency}
               />
-              <NotifyToaster notifies={notifies} />
+              <NotificationToaster notifications={notifications} />
             </>
           )}
         </ExpandedProvider>

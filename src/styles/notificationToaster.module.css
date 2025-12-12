@@ -1,4 +1,4 @@
-.notify-toaster {
+.notification-toaster {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -11,18 +11,18 @@
   min-height: 25px;
   padding: 3px;
   margin: 10px;
-  background-color: var(--notify-toaster-background);
-  border: solid 1.5px var(--notify-toaster-border);
+  background-color: var(--notification-toaster-background);
+  border: solid 1.5px var(--notification-toaster-border);
   border-radius: 2px;
   transform: translateY(calc(100% + 10px));
   transition: transform 1s linear;
 }
 
-.notify-toaster.show {
+.notification-toaster.show {
   transform: translateY(0);
 }
 
-.notify-toaster-close {
+.notification-toaster-close {
   width: 18px;
   min-width: 18px;
   height: 18px;
@@ -34,10 +34,10 @@
   border: none;
 }
 
-.notify-toaster-close:hover {
+.notification-toaster-close:hover {
   background-position: -18px 0;
 }
 
-.notify-toaster-close:active {
+.notification-toaster-close:active {
   background-position: -36px 0;
 }

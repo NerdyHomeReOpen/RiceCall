@@ -23,12 +23,12 @@ import {
   table_server_blocked_users,
   table_channel_muted_users,
   table_announcements,
-  table_notifies,
+  table_notifications,
 } from './database';
 
 export type Announcement = table_announcements;
 
-export type Notify = table_notifies;
+export type Notification = table_notifications;
 
 export type BadgeList = {
   badges: string;
@@ -186,7 +186,7 @@ export type ContextMenuItem = {
   onClick?: () => void;
 };
 
-export type NotifyMenuItem = {
+export type NotificationMenuItem = {
   id: string;
   label: string;
   show?: boolean;

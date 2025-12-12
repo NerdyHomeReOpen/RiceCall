@@ -2,21 +2,21 @@
 import React, { useEffect, useRef, useState } from 'react';
 
 // CSS
-import styles from '@/styles/notifyMenu.module.css';
+import styles from '@/styles/notificationMenu.module.css';
 import contextMenu from '@/styles/contextMenu.module.css';
 
 // Types
-import type { NotifyMenuItem } from '@/types';
+import type { NotificationMenuItem } from '@/types';
 
-interface NotifyMenuProps {
+interface NotificationMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  items: NotifyMenuItem[];
+  items: NotificationMenuItem[];
   onClose: () => void;
 }
 
-const NotifyMenu: React.FC<NotifyMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
+const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -60,7 +60,7 @@ const NotifyMenu: React.FC<NotifyMenuProps> = React.memo(({ x, y, direction, ite
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['notify-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
+    <div ref={menuRef} className={`context-menu-container ${styles['notification-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
       {items
         .filter((item) => item?.show ?? true)
         .map((item, index) => {
@@ -90,6 +90,6 @@ const NotifyMenu: React.FC<NotifyMenuProps> = React.memo(({ x, y, direction, ite
   );
 });
 
-NotifyMenu.displayName = 'NotifyMenu';
+NotificationMenu.displayName = 'NotificationMenu';
 
-export default NotifyMenu;
+export default NotificationMenu;

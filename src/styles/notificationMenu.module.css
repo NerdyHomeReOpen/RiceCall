@@ -1,4 +1,4 @@
-.notify-menu:not(:empty) {
+.notification-menu:not(:empty) {
   position: fixed;
   z-index: 10000;
   display: flex;
@@ -11,7 +11,7 @@
   box-shadow: var(--box-shadow);
 }
 
-.notify-menu .option {
+.notification-menu .option {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
   border-radius: 3px;
 }
 
-.notify-menu .option::before {
+.notification-menu .option::before {
   position: absolute;
   left: 6px;
   align-self: center;
@@ -37,16 +37,16 @@
   background-size: auto;
 }
 
-.notify-menu .option:not(.readonly):hover {
+.notification-menu .option:not(.readonly):hover {
   cursor: pointer;
   background-color: var(--hover);
 }
 
-.notify-menu .option[data-type='notify']::before {
+.notification-menu .option[data-type='notification']::before {
   background-image: url('/icon_notice_friend.webp');
 }
 
-.notify-menu .contents {
+.notification-menu .contents {
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -56,13 +56,13 @@
   padding: 3px 30px;
 }
 
-.notify-menu img {
+.notification-menu img {
   max-width: 32px;
   max-height: 32px;
   background-size: cover;
   border: solid 1px var(--border);
 }
 
-.notify-menu span {
+.notification-menu span {
   margin: 5px 0;
 }

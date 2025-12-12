@@ -82,8 +82,8 @@ const dataService = {
     return await api.get(`/memberInvitations?${new URLSearchParams(params).toString()}`);
   },
 
-  notifies: async (params: { region: string }) => {
-    return await api.get(`/notifies?${new URLSearchParams(params).toString()}`);
+  notifications: async (params: { region: string }) => {
+    return await api.get(`/notifications?${new URLSearchParams(params).toString()}`);
   },
 
   announcements: async (params: { region: string }) => {

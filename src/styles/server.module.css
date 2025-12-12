@@ -460,8 +460,8 @@
   padding-left: 3px;
   margin-left: auto;
   color: var(--text-color-quaternary);
-  background-color: var(--notify-toaster-background);
-  border: 1px solid var(--notify-toaster-border);
+  background-color: var(--notification-toaster-background);
+  border: 1px solid var(--notification-toaster-border);
   border-radius: 3px;
 }
 
@@ -643,8 +643,8 @@
   width: calc(100% - 20px);
   min-height: 25px;
   padding: 3px;
-  background-color: var(--notify-toaster-background);
-  border: 1.5px solid var(--notify-toaster-border);
+  background-color: var(--notification-toaster-background);
+  border: 1.5px solid var(--notification-toaster-border);
   border-radius: 2px;
 }
 
