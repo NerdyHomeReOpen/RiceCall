@@ -99,7 +99,7 @@ const VolumeSlider = React.memo(
   function VolumeSlider({ value, muted, onChange, onToggleMute, railCls, btnCls }: VolumeSliderProps) {
     // Refs
     const sliderRef = useRef<HTMLInputElement>(null);
-    const btnIsHoverRef = useRef<boolean>(false);
+    const isBtnHoveredRef = useRef<boolean>(false);
 
     return (
       <div className={railCls}>
@@ -109,10 +109,10 @@ const VolumeSlider = React.memo(
         <div
           className={`${btnCls} ${muted ? styles['muted'] : styles['active']}`}
           onClick={onToggleMute}
-          onMouseEnter={() => (btnIsHoverRef.current = true)}
-          onMouseLeave={() => (btnIsHoverRef.current = false)}
+          onMouseEnter={() => (isBtnHoveredRef.current = true)}
+          onMouseLeave={() => (isBtnHoveredRef.current = false)}
           onWheel={(e) => {
-            if (!btnIsHoverRef.current) return;
+            if (!isBtnHoveredRef.current) return;
             const newValue = parseInt(sliderRef.current!.value);
             if (e.deltaY > 0) {
               sliderRef.current!.value = (newValue - 4).toString();

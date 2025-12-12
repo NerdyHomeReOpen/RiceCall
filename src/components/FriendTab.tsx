@@ -56,7 +56,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     badges: friendBadges,
     status: friendStatus,
     relationStatus: friendRelationStatus,
-    isBlocked: friendIsBlocked,
+    isBlocked: isFriendBlocked,
     currentServerId: friendCurrentServerId,
     shareCurrentServer: friendShareCurrentServer,
   } = friend;
@@ -130,7 +130,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     {
       id: 'edit-friend-friend-group',
       label: t('edit-friend-friend-group'),
-      show: !isUser && !isStranger && !friendIsBlocked,
+      show: !isUser && !isStranger && !isFriendBlocked,
       icon: 'submenu',
       hasSubmenu: true,
       submenuItems: friendGroups.map((group, key) => ({
@@ -142,9 +142,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     },
     {
       id: 'block',
-      label: friendIsBlocked ? t('unblock') : t('block'),
+      label: isFriendBlocked ? t('unblock') : t('block'),
       show: !isUser,
-      onClick: () => (friendIsBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
+      onClick: () => (isFriendBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
     },
     {
       id: 'delete-friend',
@@ -193,14 +193,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
 
   // Effects
   useEffect(() => {
-    if (!targetId || !friendCurrentServerId || friendIsBlocked || !isFriend || !friendShareCurrentServer) {
+    if (!targetId || !friendCurrentServerId || isFriendBlocked || !isFriend || !friendShareCurrentServer) {
       setFriendCurrentServer(null);
       return;
     }
     ipc.data.server(targetId, friendCurrentServerId).then((server) => {
       if (server) setFriendCurrentServer(server);
     });
-  }, [targetId, friendCurrentServerId, friendIsBlocked, isFriend, friendShareCurrentServer]);
+  }, [targetId, friendCurrentServerId, isFriendBlocked, isFriend, friendShareCurrentServer]);
 
   return (
     <div
@@ -220,8 +220,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     >
       <div
         className={styles['avatar-picture']}
-        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: isOnline && isFriend && !friendIsBlocked ? '' : 'grayscale(100%)' }}
-        datatype={isOnline && isFriend && !friendIsBlocked && friendStatus !== 'online' /* filter online status icon */ ? friendStatus : ''}
+        style={{ backgroundImage: `url(${friendAvatarUrl})`, filter: isOnline && isFriend && !isFriendBlocked ? '' : 'grayscale(100%)' }}
+        datatype={isOnline && isFriend && !isFriendBlocked && friendStatus !== 'online' /* filter online status icon */ ? friendStatus : ''}
       />
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>

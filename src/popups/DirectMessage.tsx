@@ -90,7 +90,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     currentServerId: targetCurrentServerId,
     badges: targetBadges,
     shareCurrentServer: targetShareCurrentServer,
-    isVerified: targetIsVerified,
+    isVerified: isTargetVerified,
   } = target;
   const { name: targetCurrentServerName } = targetCurrentServer || {};
   const textLength = editor?.getText().length || 0;
@@ -344,7 +344,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
               </div>
             ) : null}
-            {targetIsVerified ? (
+            {isTargetVerified ? (
               <div className={styles['action-area']}>
                 <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
                 <div className={`${styles['official-title-box']} ${styles['action-title']}`}>

@@ -75,8 +75,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     gender: memberGender,
     badges: memberBadges,
     vip: memberVip,
-    isTextMuted: memberIsTextMuted,
-    isVoiceMuted: memberIsVoiceMuted,
+    isTextMuted: isMemberTextMuted,
+    isVoiceMuted: isMemberVoiceMuted,
     currentChannelId: memberCurrentChannelId,
     currentServerId: memberCurrentServerId,
   } = member;
@@ -93,7 +93,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
 
   // Handlers
   const getStatusIcon = () => {
-    if (isMuted || memberIsVoiceMuted) return 'muted';
+    if (isMuted || isMemberVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
     return '';
   };
@@ -157,15 +157,15 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     },
     {
       id: 'forbid-voice',
-      label: memberIsVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
+      label: isMemberVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
       show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-      onClick: () => handleForbidUserVoiceInChannel(memberUserId, currentServerId, channelId, !memberIsVoiceMuted),
+      onClick: () => handleForbidUserVoiceInChannel(memberUserId, currentServerId, channelId, !isMemberVoiceMuted),
     },
     {
       id: 'forbid-text',
-      label: memberIsTextMuted ? t('unforbid-text') : t('forbid-text'),
+      label: isMemberTextMuted ? t('unforbid-text') : t('forbid-text'),
       show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-      onClick: () => handleForbidUserTextInChannel(memberUserId, currentServerId, channelId, !memberIsTextMuted),
+      onClick: () => handleForbidUserTextInChannel(memberUserId, currentServerId, channelId, !isMemberTextMuted),
     },
     {
       id: 'kick-channel',
@@ -327,7 +327,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
         contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >
-      <div className={`${styles['user-text-state']} ${memberIsTextMuted ? styles['muted'] : ''}`} />
+      <div className={`${styles['user-text-state']} ${isMemberTextMuted ? styles['muted'] : ''}`} />
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
