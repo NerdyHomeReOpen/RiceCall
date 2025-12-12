@@ -500,8 +500,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             {t('close')}
           </div>
         ) : (
-          <div className={popup['button']} onClick={() => handleOpenDirectMessage(userId, targetId)}>
-            {t('chat')}
+          <div className={`${popup['button']} ${popup['green']}`} onClick={() => handleOpenDirectMessage(userId, targetId)}>
+            {t('direct-message')}
           </div>
         )}
       </div>
