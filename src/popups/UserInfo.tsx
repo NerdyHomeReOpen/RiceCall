@@ -22,7 +22,7 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenApplyFriend, handleOpenImageCropper } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenDirectMessage, handleOpenApplyFriend, handleOpenImageCropper } from '@/utils/popup';
 import { isMember, isStaff } from '@/utils/permission';
 import { objDiff } from '@/utils/objDiff';
 
@@ -495,9 +495,15 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             {t('add-friend')}
           </div>
         )}
-        <div className={popup['button']} onClick={() => handleClose()}>
-          {t('close')}
-        </div>
+        {isSelf ? (
+          <div className={popup['button']} onClick={() => handleClose()}>
+            {t('close')}
+          </div>
+        ) : (
+          <div className={popup['button']} onClick={() => handleOpenDirectMessage(userId, targetId)}>
+            {t('chat')}
+          </div>
+        )}
       </div>
     </div>
   );
