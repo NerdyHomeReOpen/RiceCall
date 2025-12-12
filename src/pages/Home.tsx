@@ -40,7 +40,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
       <div className={styles['server-name-text']}>{server.name}</div>
       <div className={styles['server-id-box']}>
         <div className={styles['id-icon']} />
-        <div className={styles['server-id-text']}>{server.displayId}</div>
+        <div className={styles['server-id-text']}>{server.specialId || server.displayId}</div>
       </div>
     </div>
   </div>
@@ -104,7 +104,33 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
     if (!canSearchRef.current) return;
 
-    ipc.socket.send('searchServer', { query });
+    ipc.data.searchServer(query).then((servers) => {
+      const q = searchQueryRef.current;
+
+      handleClearSearchState();
+
+      if (!servers.length) return;
+
+      const sorted = [...servers].sort((a, b) => {
+        const aHasId = a.displayId.toString().includes(q);
+        const bHasId = b.displayId.toString().includes(q);
+        return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
+      });
+
+      const { exact, personal, related } = sorted.reduce(
+        (acc, s) => {
+          if (s.specialId === q || s.displayId === q) acc.exact = s;
+          else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
+          else acc.related.push(s);
+          return acc;
+        },
+        { exact: null as Server | null, personal: [] as Server[], related: [] as Server[] },
+      );
+
+      setExactMatch(exact);
+      setPersonalResults(personal);
+      setRelatedResults(related);
+    });
     searchQueryRef.current = query;
     canSearchRef.current = false;
 
@@ -124,16 +150,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     setRelatedResults([]);
   };
 
-  const handleConnectServer = useCallback(
-    (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+  const handleServerSelect = useCallback(
+    (server: Server) => {
       if (loadingBox.isLoading) return;
-      if (serverId === currentServerId) {
+      if (server.serverId === currentServerId) {
         mainTab.setSelectedTabId('server');
         return;
       }
       loadingBox.setIsLoading(true);
-      loadingBox.setLoadingServerId(serverDisplayId);
-      ipc.socket.send('connectServer', { serverId });
+      loadingBox.setLoadingServerId(server.specialId || server.displayId);
+      ipc.socket.send('connectServer', { serverId: server.serverId });
       handleClearSearchState();
     },
     [currentServerId, mainTab, loadingBox],
@@ -185,54 +211,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverSearch', (...args: Server[]) => {
-      const q = searchQueryRef.current;
-
-      handleClearSearchState();
-
-      if (!args.length) return;
-
-      const sorted = [...args].sort((a, b) => {
-        const aHasId = a.displayId.toString().includes(q);
-        const bHasId = b.displayId.toString().includes(q);
-        return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
+    const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
+      if (!userId || !serverDisplayId) return;
+      ipc.data.searchServer(serverDisplayId).then((servers) => {
+        const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
+        if (!target) return;
+        handleServerSelect(target);
       });
-
-      const { exact, personal, related } = sorted.reduce(
-        (acc, s) => {
-          if (s.displayId.toString() === q) acc.exact = s;
-          else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
-          else acc.related.push(s);
-          return acc;
-        },
-        { exact: null as Server | null, personal: [] as Server[], related: [] as Server[] },
-      );
-
-      setExactMatch(exact);
-      setPersonalResults(personal);
-      setRelatedResults(related);
     });
     return () => unsub();
-  }, [servers]);
-
-  useEffect(() => {
-    const unsub = ipc.deepLink.onDeepLink(async (serverId: string) => {
-      if (!userId || !serverId) return;
-      ipc.socket.send('searchServer', { query: serverId });
-      const servers: Server[] = await new Promise((resolve) => {
-        const off = ipc.socket.on('serverSearch', (...args: Server[]) => {
-          off();
-          resolve(args);
-        });
-      });
-      const target = servers.find((s) => s.displayId === serverId);
-      if (!target) {
-        return;
-      }
-      handleConnectServer(target.serverId, target.displayId);
-    });
-    return () => unsub();
-  }, [userId, handleConnectServer]);
+  }, [userId, handleServerSelect]);
 
   useEffect(() => {
     const unsub = ipc.language.onUpdate(() => {
@@ -258,7 +246,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               onChange={handleSearchServer}
               onKeyDown={(e) => {
                 if (e.key !== 'Enter' || !exactMatch) return;
-                handleConnectServer(exactMatch.serverId, exactMatch.displayId);
+                handleServerSelect(exactMatch);
               }}
             />
             <div className={styles['search-input-clear-btn']} onClick={() => handleClearSearchState(true)} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
@@ -267,16 +255,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               {exactMatch && (
                 <>
                   <div className={`${styles['header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
-                    {t('quick-enter-server', { '0': exactMatch.displayId })}
+                    {t('quick-enter-server', { '0': searchQueryRef.current })}
                   </div>
-                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleConnectServer(exactMatch.serverId, exactMatch.displayId)} />
+                  {/* <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleConnectServer(exactMatch.serverId, exactMatch.displayId)} /> */}
                 </>
               )}
               {personalResults.length > 0 && (
                 <>
                   <div className={styles['header-text']}>{t('personal-exclusive')}</div>
                   {personalResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleConnectServer(server.serverId, server.displayId)} />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleServerSelect(server)} />
                   ))}
                 </>
               )}
@@ -284,7 +272,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 <>
                   <div className={styles['header-text']}>{t('related-search')}</div>
                   {relatedResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleConnectServer(server.serverId, server.displayId)} />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleServerSelect(server)} />
                   ))}
                 </>
               )}

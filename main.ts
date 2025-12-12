@@ -985,6 +985,20 @@ app.on('ready', async () => {
     });
   });
 
+  ipcMain.handle('data-searchServer', async (_, query: string) => {
+    return await dataService.searchServer(query).catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      return null;
+    });
+  });
+
+  ipcMain.handle('data-searchUser', async (_, query: string) => {
+    return await dataService.searchUser(query).catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      return null;
+    });
+  });
+
   // Accounts handlers
   ipcMain.on('get-accounts', (event) => {
     event.returnValue = store.get('accounts');

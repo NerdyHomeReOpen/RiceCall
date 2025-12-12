@@ -101,6 +101,14 @@ const dataService = {
     formData.append('_file', file);
     return await api.post('/upload', formData);
   },
+
+  searchServer: async (query: string) => {
+    return await api.get(`/server/search?${new URLSearchParams({ query }).toString()}`);
+  },
+
+  searchUser: async (query: string) => {
+    return await api.get(`/user/search?${new URLSearchParams({ query }).toString()}`);
+  },
 };
 
 export default dataService;

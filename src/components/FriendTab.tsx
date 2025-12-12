@@ -160,15 +160,15 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     },
   ];
 
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+  const handleServerSelect = (server: Server) => {
     if (loadingBox.isLoading) return;
-    if (serverId === userCurrentServerId) {
+    if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
     }
     loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(serverDisplayId);
-    ipc.socket.send('connectServer', { serverId });
+    loadingBox.setLoadingServerId(server.specialId || server.displayId);
+    ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
   const handleBlockUser = (targetId: User['userId']) => {
@@ -235,7 +235,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         {isPending ? (
           <div className={styles['signature']}>{`(${t('pending')})`}</div>
         ) : friendCurrentServer ? (
-          <div className={`${styles['box']} ${styles['has-server']}`} onClick={() => handleServerSelect(friendCurrentServer.serverId, friendCurrentServer.displayId)}>
+          <div className={`${styles['box']} ${styles['has-server']}`} onClick={() => handleServerSelect(friendCurrentServer)}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendCurrentServer.name}</div>
           </div>

@@ -163,6 +163,7 @@ export type table_servers = {
   applyNotice: string;
   description: string;
   displayId: string;
+  specialId: string | null;
   slogan: string;
   level: number;
   wealth: number;

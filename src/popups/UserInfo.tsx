@@ -122,8 +122,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     ipc.window.close();
   };
 
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
+  const handleServerSelect = (server: Server) => {
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   const isFutureDate = useCallback(
@@ -303,14 +303,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
               ) : (
                 recentServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
                     <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
                         <div className={styles['display-id-text']} onDoubleClick={(e) => e.stopPropagation()}>
-                          {server.displayId}
+                          {server.specialId || server.displayId}
                         </div>
                       </div>
                     </div>
@@ -345,7 +345,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
               ) : (
                 joinedServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
                     <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>
@@ -365,7 +365,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
               ) : (
                 favoriteServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
                     <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>

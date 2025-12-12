@@ -32,7 +32,16 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const { t } = useTranslation();
 
   // Variables
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, favorite: serverFavorite, permissionLevel: serverPermissionLevel } = server;
+  const {
+    serverId,
+    name: serverName,
+    avatarUrl: serverAvatarUrl,
+    displayId: serverDisplayId,
+    specialId: serverSpecialId,
+    slogan: serverSlogan,
+    favorite: serverFavorite,
+    permissionLevel: serverPermissionLevel,
+  } = server;
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
@@ -40,7 +49,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     {
       id: 'join-server',
       label: t('join-server'),
-      onClick: () => handleServerSelect(serverId, serverDisplayId),
+      onClick: () => handleServerSelect(server),
     },
     {
       id: 'view-server-info',
@@ -60,14 +69,14 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     },
   ];
 
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+  const handleServerSelect = (server: Server) => {
     if (loadingBox.isLoading) return;
-    if (serverId === userCurrentServerId) {
+    if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
     }
     loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(serverDisplayId);
+    loadingBox.setLoadingServerId(server.specialId || server.displayId);
     ipc.socket.send('connectServer', { serverId });
   };
 
@@ -82,7 +91,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   return (
     <div
       className={homePage['server-card']}
-      onClick={() => handleServerSelect(serverId, serverDisplayId)}
+      onClick={() => handleServerSelect(server)}
       onContextMenu={(e) => {
         e.preventDefault();
         const x = e.clientX;
@@ -94,7 +103,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
       <div className={homePage['server-info-text']}>
         <div className={homePage['server-name-text']}>{serverName}</div>
         <div className={homePage['server-id-box']}>
-          <div className={`${homePage['server-id-text']} ${isServerOwner(serverPermissionLevel) ? homePage['is-owner'] : ''}`}>{`ID: ${serverDisplayId}`}</div>
+          <div className={`${homePage['server-id-text']} ${isServerOwner(serverPermissionLevel) ? homePage['is-owner'] : ''}`}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
         </div>
         <div className={homePage['server-slogen']}>{serverSlogan}</div>
       </div>

@@ -59,8 +59,6 @@ const ClientToServerEventNames = [
   'rejectMemberApplication',
   'rejectMemberInvitation',
   'removeUserFromQueue',
-  'searchServer',
-  'searchUser',
   'sendFriendApplication',
   'sendMemberApplication',
   'sendMemberInvitation',
@@ -108,14 +106,12 @@ const ServerToClientEventNames = [
   'serverOnlineMemberRemove',
   'serverOnlineMemberUpdate',
   'serverRemove',
-  'serverSearch',
   'serverUpdate',
   'SFUJoined',
   'SFULeft',
   'SFUNewProducer',
   'SFUProducerClosed',
   'shakeWindow',
-  'userSearch',
   'userUpdate',
 ];
 

@@ -159,8 +159,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     cooldownRef.current = SHAKE_COOLDOWN;
   };
 
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
+  const handleServerSelect = (server: Server) => {
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   const handleScroll = () => {
@@ -334,7 +334,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['main-content']}>
           <div className={styles['action-body']}>
             {isFriend && isOnline && targetCurrentServer ? (
-              <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer.serverId, targetCurrentServer.displayId)}>
+              <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer)}>
                 <div className={`${styles['action-icon']} ${styles['in-server']}`} />
                 <div className={styles['action-title']}>{targetCurrentServerName}</div>
               </div>

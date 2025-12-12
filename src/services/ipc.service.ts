@@ -217,6 +217,16 @@ const ipcService = {
       if (!isElectron) return null;
       return await ipcRenderer.invoke('data-upload', type, fileName, file);
     },
+
+    searchServer: async (query: string): Promise<Server[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-searchServer', query);
+    },
+
+    searchUser: async (query: string): Promise<User[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-searchUser', query);
+    },
   },
 
   deepLink: {

@@ -108,6 +108,7 @@ const defaultTableServer: table_servers = {
   applyNotice: '',
   description: '',
   displayId: '',
+  specialId: null,
   slogan: '',
   level: 0,
   wealth: 0,
