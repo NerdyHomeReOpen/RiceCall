@@ -28,7 +28,7 @@ const NotificationToaster: React.FC<NotificationToasterProps> = React.memo(({ no
     setShow(false);
     setTimeout(() => {
       if (showNotificationIndex === 0) return;
-      setShowNotificationIndex((prev) => prev - 1);
+      setShowNotificationIndex((prev) => Math.max(0, prev - 1));
       setShow(true);
     }, 2000);
   };
