@@ -88,7 +88,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
-  const isSuperior = permissionLevel >= memberPermission;
+  const isSuperior = permissionLevel > memberPermission;
+  const isEqualOrSuperior = permissionLevel >= memberPermission;
   const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
   // Handlers
@@ -148,7 +149,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     {
       id: 'move-to-channel',
       label: t('move-to-channel'),
-      show: !isUser && isChannelMod(currentPermissionLevel) && isChannelMod(permissionLevel) && !isSameChannel && isSuperior,
+      show: !isUser && isChannelMod(currentPermissionLevel) && isChannelMod(permissionLevel) && !isSameChannel && isEqualOrSuperior,
       onClick: () => handleMoveUserToChannel(memberUserId, currentServerId, currentChannelId),
     },
     {
