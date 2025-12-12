@@ -222,14 +222,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     return () => unsub();
   }, [userId, handleServerSelect]);
 
-  useEffect(() => {
-    const unsub = ipc.language.onUpdate(() => {
-      setSelectRecommendServerCategory('all');
-      setSelectedAnnIndex(0);
-    });
-    return () => unsub();
-  }, []);
-
   return (
     <main className={styles['home']} style={display ? {} : { display: 'none' }}>
       {/* Header */}
