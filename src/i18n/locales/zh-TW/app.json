@@ -84,6 +84,7 @@
   "channel-ui-mode-classic-label": "始終使用經典模式（適用語音、聊天）",
   "channel-ui-mode-three-line-label": "始終使用三欄模式（適用秀場、直播）",
   "characters": "字元",
+  "chat": "聊天",
   "chat-mode": "聊天模式",
   "chat-mode-description": "低延遲，音質流暢（適用於自由、指揮模式下的頻道語音）",
   "check-for-updates": "檢查更新",
