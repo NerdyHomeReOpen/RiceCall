@@ -926,12 +926,6 @@ const RootPageComponent: React.FC = React.memo(() => {
     return () => unsub();
   }, []);
 
-  useEffect(() => {
-    history.pushState = () => {};
-    history.back = () => {};
-    history.forward = () => {};
-  }, []);
-
   return (
     <WebRTCProvider>
       <ActionScannerProvider>

@@ -347,6 +347,7 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow?.webContents.send(mainWindow?.isMaximized() ? 'maximize' : 'unmaximize');
+    mainWindow?.webContents.navigationHistory.clear();
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -410,6 +411,10 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   authWindow.on('close', (e) => {
     e.preventDefault();
     app.exit();
+  });
+
+  authWindow.webContents.on('did-finish-load', () => {
+    authWindow?.webContents.navigationHistory.clear();
   });
 
   authWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -504,6 +509,10 @@ export async function createPopup(type: PopupType, id: string, initialData: unkn
 
   popups[id].on('unmaximize', () => {
     popups[id]?.webContents.send('unmaximize');
+  });
+
+  popups[id].webContents.on('did-finish-load', () => {
+    popups[id]?.webContents.navigationHistory.clear();
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
