@@ -23,12 +23,12 @@ import {
   table_server_blocked_users,
   table_channel_muted_users,
   table_announcements,
-  table_notifies,
+  table_notifications,
 } from './database';
 
 export type Announcement = table_announcements;
 
-export type Notify = table_notifies;
+export type Notification = table_notifications;
 
 export type BadgeList = {
   badges: string;
@@ -138,6 +138,7 @@ export type SystemSettings = {
   inputAudioDevice: string;
   outputAudioDevice: string;
   recordFormat: 'wav' | 'mp3';
+  recordSavePath: string;
   mixEffect: boolean;
   mixEffectType: string;
   autoMixSetting: boolean;
@@ -185,7 +186,7 @@ export type ContextMenuItem = {
   onClick?: () => void;
 };
 
-export type NotifyMenuItem = {
+export type NotificationMenuItem = {
   id: string;
   label: string;
   show?: boolean;
@@ -244,6 +245,7 @@ export type PopupType =
   | 'changeTheme'
   | 'channelPassword'
   | 'channelSetting'
+  | 'chatHistory'
   | 'createChannel'
   | 'createFriendGroup'
   | 'createServer'
@@ -254,7 +256,6 @@ export type PopupType =
   | 'dialogSuccess'
   | 'dialogWarning'
   | 'directMessage'
-  | 'chatHistory'
   | 'editChannelName'
   | 'editChannelOrder'
   | 'editFriendNote'
@@ -268,6 +269,7 @@ export type PopupType =
   | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'searchUser'
+  | 'serverApplication'
   | 'serverBroadcast'
   | 'serverSetting'
   | 'systemSetting'
@@ -278,7 +280,6 @@ export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 
 export type ClientToServerEvents = {
   // User
-  searchUser: (...args: { query: string }[]) => void;
   editUser: (...args: { update: Partial<table_users> }[]) => void;
   editUserSetting: (...args: { update: Partial<table_user_settings> }[]) => void;
   // Friend
@@ -299,7 +300,6 @@ export type ClientToServerEvents = {
   rejectFriendApplication: (...args: { senderId: string }[]) => void;
   // Server
   favoriteServer: (...args: { serverId: string }[]) => void;
-  searchServer: (...args: { query: string }[]) => void;
   connectServer: (...args: { serverId: string }[]) => void;
   disconnectServer: (...args: { serverId: string }[]) => void;
   blockUserFromServer: (...args: { userId: string; serverId: string; blockUntil?: number }[]) => void;
@@ -366,7 +366,6 @@ export type ServerToClientEvents = {
   // Notification
   notification: (...args: { message: string }[]) => void; // not used yet
   // User
-  userSearch: (...args: User[]) => void;
   userUpdate: (...args: { update: Partial<User> }[]) => void;
   // Friend Group
   friendGroupAdd: (...args: { data: FriendGroup }[]) => void;
@@ -381,7 +380,6 @@ export type ServerToClientEvents = {
   friendApplicationUpdate: (...args: { senderId: string; update: Partial<FriendApplication> }[]) => void;
   friendApplicationRemove: (...args: { senderId: string }[]) => void;
   // Server
-  serverSearch: (...args: Server[]) => void;
   serverAdd: (...args: { data: Server }[]) => void;
   serverUpdate: (...args: { serverId: string; update: Partial<Server> }[]) => void;
   serverRemove: (...args: { serverId: string }[]) => void;
@@ -446,6 +444,7 @@ export type StoreType = {
   inputAudioDevice: string;
   outputAudioDevice: string;
   recordFormat: 'wav' | 'mp3';
+  recordSavePath: string;
   mixEffect: boolean;
   mixEffectType: string;
   autoMixSetting: boolean;

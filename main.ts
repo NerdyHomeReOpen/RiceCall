@@ -1,6 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import fs from 'fs';
 import net from 'net';
 import path from 'path';
 import fontList from 'font-list';
+import ffmpeg from 'fluent-ffmpeg';
+import ffmpegPath from 'ffmpeg-static';
+const binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath) : '';
+ffmpeg.setFfmpegPath(binaryPath);
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import { initMain } from 'electron-audio-loopback-josh';
@@ -15,8 +21,9 @@ import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from
 import authService from './src/main/auth.service.js';
 import dataService from './src/main/data.service.js';
 import popupLoaders from './src/main/popupLoader.js';
-import type { StoreType, PopupType, LanguageKey } from './src/types';
+import type { StoreType, PopupType, LanguageKey, SystemSettings } from './src/types';
 import { LANGUAGES } from './src/constant.js';
+import { Readable } from 'stream';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -29,6 +36,19 @@ export function getLanguage(): LanguageKey {
   if (!match) return 'en-US';
 
   return match.code;
+}
+
+function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
+  const buffer = Buffer.from(inputWav);
+  const inputStream = Readable.from(buffer);
+
+  ffmpeg(inputStream)
+    .audioCodec('libmp3lame')
+    .audioBitrate('320k')
+    .save(outputMp3)
+    .on('error', () => {
+      createPopup('dialogError', 'dialogError', { message: t('convert-wav-to-mp3-failed'), timestamp: Date.now() }, true);
+    });
 }
 
 const store = new Store<StoreType>({
@@ -55,6 +75,7 @@ const store = new Store<StoreType>({
     inputAudioDevice: '',
     outputAudioDevice: '',
     recordFormat: 'wav',
+    recordSavePath: app.getPath('documents'),
     mixEffect: false,
     mixEffectType: '',
     autoMixSetting: false,
@@ -104,6 +125,7 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   channelSetting: { height: 520, width: 600 },
   channelPassword: { height: 200, width: 380 },
   changeTheme: { height: 335, width: 480 },
+  chatHistory: { height: 547, width: 714 },
   createServer: { height: 436, width: 478 },
   createChannel: { height: 200, width: 380 },
   createFriendGroup: { height: 200, width: 380 },
@@ -127,12 +149,12 @@ const PopupSize: Record<PopupType, { height: number; width: number }> = {
   memberApplicationSetting: { height: 220, width: 380 },
   memberInvitation: { height: 550, width: 500 },
   searchUser: { height: 200, width: 380 },
+  serverApplication: { height: 150, width: 320 },
   serverSetting: { height: 520, width: 600 },
   serverBroadcast: { height: 300, width: 450 },
   systemSetting: { height: 520, width: 600 },
   userInfo: { height: 630, width: 440 },
   userSetting: { height: 700, width: 500 },
-  chatHistory: { height: 547, width: 714 },
 };
 
 // Constants
@@ -205,7 +227,7 @@ function isAutoLaunchEnabled(): boolean {
   }
 }
 
-export function getSettings() {
+export function getSettings(): SystemSettings {
   return {
     autoLogin: store.get('autoLogin'),
     autoLaunch: isAutoLaunchEnabled(),
@@ -215,12 +237,12 @@ export function getSettings() {
     statusAutoDnd: store.get('statusAutoDnd'),
     channelUIMode: store.get('channelUIMode'),
     closeToTray: store.get('closeToTray'),
-    dontShowDisclaimer: store.get('dontShowDisclaimer'),
     font: store.get('font'),
     fontSize: store.get('fontSize'),
     inputAudioDevice: store.get('inputAudioDevice'),
     outputAudioDevice: store.get('outputAudioDevice'),
     recordFormat: store.get('recordFormat'),
+    recordSavePath: store.get('recordSavePath'),
     mixEffect: store.get('mixEffect'),
     mixEffectType: store.get('mixEffectType'),
     autoMixSetting: store.get('autoMixSetting'),
@@ -325,6 +347,7 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
 
   mainWindow.webContents.on('did-finish-load', () => {
     mainWindow?.webContents.send(mainWindow?.isMaximized() ? 'maximize' : 'unmaximize');
+    mainWindow?.webContents.navigationHistory.clear();
   });
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
@@ -390,6 +413,10 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
     app.exit();
   });
 
+  authWindow.webContents.on('did-finish-load', () => {
+    authWindow?.webContents.navigationHistory.clear();
+  });
+
   authWindow.webContents.setWindowOpenHandler(({ url }) => {
     shell.openExternal(url);
     return { action: 'deny' };
@@ -400,6 +427,7 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
 
 export async function createPopup(type: PopupType, id: string, initialData: unknown, force = true, title?: string): Promise<BrowserWindow> {
   const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
+  const canResize = type === 'directMessage';
 
   // If force is true, destroy the popup
   if (force) {
@@ -425,12 +453,14 @@ export async function createPopup(type: PopupType, id: string, initialData: unkn
     title: fullTitle,
     width: PopupSize[type].width,
     height: PopupSize[type].height,
+    minWidth: PopupSize[type].width,
+    minHeight: PopupSize[type].height,
     thickFrame: true,
     titleBarStyle: 'hidden',
-    maximizable: false,
-    resizable: false,
+    maximizable: canResize,
+    resizable: canResize,
     fullscreen: false,
-    fullscreenable: false,
+    fullscreenable: canResize,
     hasShadow: true,
     icon: APP_ICON,
     show: false,
@@ -471,6 +501,18 @@ export async function createPopup(type: PopupType, id: string, initialData: unkn
     e.preventDefault();
     popups[id].destroy();
     delete popups[id];
+  });
+
+  popups[id].on('maximize', () => {
+    popups[id]?.webContents.send('maximize');
+  });
+
+  popups[id].on('unmaximize', () => {
+    popups[id]?.webContents.send('unmaximize');
+  });
+
+  popups[id].webContents.on('did-finish-load', () => {
+    popups[id]?.webContents.navigationHistory.clear();
   });
 
   popups[id].webContents.setWindowOpenHandler(({ url }) => {
@@ -741,6 +783,41 @@ app.on('ready', async () => {
       });
   });
 
+  ipcMain.on('save-record', (_, record: ArrayBuffer) => {
+    try {
+      const outputDir = store.get('recordSavePath');
+
+      if (!fs.existsSync(outputDir)) {
+        fs.mkdirSync(outputDir, { recursive: true });
+      }
+
+      const format = store.get('recordFormat') === 'mp3' ? 'mp3' : 'wav';
+
+      const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+      const fileName = `recording-${timestamp}.${format}`;
+      const outputPath = path.join(outputDir, fileName);
+
+      if (format === 'mp3') {
+        convertWavToMp3AndSave(record, outputPath);
+      } else {
+        const buffer = Buffer.from(record);
+        fs.writeFileSync(outputPath, buffer);
+      }
+    } catch (error: any) {
+      console.error(`${new Date().toLocaleString()} | Save audio error:`, error.message);
+    }
+  });
+
+  ipcMain.handle('select-record-save-path', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({
+      title: t('select-record-save-path'),
+      defaultPath: store.get('recordSavePath'),
+      properties: ['openDirectory'],
+    });
+    if (canceled) return null;
+    return filePaths[0];
+  });
+
   // Data handlers
   ipcMain.handle('data-user', async (_, userId: string) => {
     return await dataService.user({ userId }).catch((error) => {
@@ -889,8 +966,8 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.handle('data-notifies', async (_, region: string) => {
-    return await dataService.notifies({ region }).catch((error) => {
+  ipcMain.handle('data-notifications', async (_, region: string) => {
+    return await dataService.notifications({ region }).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
@@ -903,8 +980,8 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.handle('data-recommendServers', async () => {
-    return await dataService.recommendServers().catch((error) => {
+  ipcMain.handle('data-recommendServers', async (_, region: string) => {
+    return await dataService.recommendServers({ region }).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
@@ -912,6 +989,20 @@ app.on('ready', async () => {
 
   ipcMain.handle('data-upload', async (_, type: string, fileName: string, file: string) => {
     return await dataService.upload(type, fileName, file).catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      return null;
+    });
+  });
+
+  ipcMain.handle('data-searchServer', async (_, query: string) => {
+    return await dataService.searchServer(query).catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      return null;
+    });
+  });
+
+  ipcMain.handle('data-searchUser', async (_, query: string) => {
+    return await dataService.searchUser(query).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });
@@ -1054,6 +1145,7 @@ app.on('ready', async () => {
     } else {
       window.maximize();
     }
+    window.webContents.send('maximize');
   });
 
   ipcMain.on('window-control-unmaximize', (event) => {
@@ -1064,6 +1156,7 @@ app.on('ready', async () => {
     } else {
       window.unmaximize();
     }
+    window.webContents.send('unmaximize');
   });
 
   ipcMain.on('window-control-close', (event) => {
@@ -1151,6 +1244,10 @@ app.on('ready', async () => {
 
   ipcMain.on('get-record-format', (event) => {
     event.returnValue = store.get('recordFormat');
+  });
+
+  ipcMain.on('get-record-save-path', (event) => {
+    event.returnValue = store.get('recordSavePath');
   });
 
   ipcMain.on('get-mix-effect', (event) => {
@@ -1346,6 +1443,13 @@ app.on('ready', async () => {
     store.set('recordFormat', format ?? 'wav');
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('record-format', format);
+    });
+  });
+
+  ipcMain.on('set-record-save-path', (_, path) => {
+    store.set('recordSavePath', path ?? app.getPath('documents'));
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('record-save-path', path);
     });
   });
 

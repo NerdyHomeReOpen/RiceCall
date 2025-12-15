@@ -2,28 +2,28 @@
 
 .male,
 .Male {
-  height: 16px;
   width: 14px;
-  min-height: 16px;
   min-width: 14px;
+  height: 16px;
+  min-height: 16px;
+  margin-right: 2px;
   background-image: url('/channel/UserIconsMale.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
-  margin-right: 2px;
+  background-size: auto;
 }
 
 .female,
 .Female {
-  height: 16px;
   width: 14px;
-  min-height: 16px;
   min-width: 14px;
+  height: 16px;
+  min-height: 16px;
+  margin-right: 2px;
   background-image: url('/channel/UserIconsFemale.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
-  margin-right: 2px;
+  background-size: auto;
 }
 
 .lv-1 {

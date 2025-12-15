@@ -46,7 +46,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   // Variables
-  const { channelId: selectedChannelId, isLobby: selectedChannelIsLobby } = selectedChannel ?? Default.channel();
+  const { channelId: selectedChannelId, isLobby: isSelectedChannelLobby } = selectedChannel ?? Default.channel();
   const editedChannels = useMemo(() => {
     return serverChannels
       .filter((c) => !c.categoryId)
@@ -73,13 +73,13 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const isSelected = !!selectedChannel;
   const isFirst = firstChannel?.channelId === selectedChannelId;
   const isLast = lastChannel?.channelId === selectedChannelId;
-  const canRename = isSelected && !selectedChannelIsLobby;
-  const canDelete = isSelected && !selectedChannelIsLobby;
-  const canMoveUp = isSelected && !isFirst && !selectedChannelIsLobby && currentIndex > 0;
-  const canMoveDown = isSelected && !isLast && !selectedChannelIsLobby && currentIndex < groupChannels.length - 1;
-  const canTop = isSelected && !isFirst && !selectedChannelIsLobby;
-  const canBottom = isSelected && !isLast && !selectedChannelIsLobby;
-  const canAdd = !selectedChannelIsLobby && !selectedChannel?.categoryId;
+  const canRename = isSelected && !isSelectedChannelLobby;
+  const canDelete = isSelected && !isSelectedChannelLobby;
+  const canMoveUp = isSelected && !isFirst && !isSelectedChannelLobby && currentIndex > 0;
+  const canMoveDown = isSelected && !isLast && !isSelectedChannelLobby && currentIndex < groupChannels.length - 1;
+  const canTop = isSelected && !isFirst && !isSelectedChannelLobby;
+  const canBottom = isSelected && !isLast && !isSelectedChannelLobby;
+  const canAdd = !isSelectedChannelLobby && !selectedChannel?.categoryId;
   const canSubmit = editedChannels.length > 0;
 
   // Handlers
@@ -176,7 +176,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, []);
 
   const categoryTab = (category: Category) => {
-    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, isLobby: categoryIsLobby, order: categoryOrder } = category;
+    const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, isLobby: isCategoryLobby, order: categoryOrder } = category;
     const subChannels = serverChannels?.filter((c) => c.categoryId === categoryId);
     const isSelected = selectedChannelId === categoryId;
 
@@ -191,7 +191,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           }}
         >
           <div
-            className={`${serverPage['tab-icon']} ${expanded[categoryId] ? serverPage['expanded'] : ''} ${serverPage[categoryVisibility]} ${categoryIsLobby ? serverPage['lobby'] : ''}`}
+            className={`${serverPage['tab-icon']} ${expanded[categoryId] ? serverPage['expanded'] : ''} ${serverPage[categoryVisibility]} ${isCategoryLobby ? serverPage['lobby'] : ''}`}
             onClick={(e) => {
               e.stopPropagation();
               setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }));
@@ -213,7 +213,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   const channelTab = (channel: Channel) => {
-    const { channelId, name: channelName, visibility: channelVisibility, isLobby: channelIsLobby, order: channelOrder, categoryId: channelCategoryId } = channel;
+    const { channelId, name: channelName, visibility: channelVisibility, isLobby: isChannelLobby, order: channelOrder, categoryId: channelCategoryId } = channel;
     const isSelected = selectedChannelId === channelId;
 
     return (
@@ -226,7 +226,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           setGroupChannels(serverChannels.filter((sc) => sc.categoryId === channelCategoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)));
         }}
       >
-        <div className={`${serverPage['tab-icon']} ${serverPage[channelVisibility]} ${channelIsLobby ? serverPage['lobby'] : ''}`} onClick={(e) => e.stopPropagation()} />
+        <div className={`${serverPage['tab-icon']} ${serverPage[channelVisibility]} ${isChannelLobby ? serverPage['lobby'] : ''}`} onClick={(e) => e.stopPropagation()} />
         <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
           {channelName}
           <div className={styles['channel-tab-index-text']}>{`(${channelOrder})`}</div>

@@ -51,7 +51,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     const currentChannel = channels.find((c) => c.channelId === user.currentChannelId) || Default.channel();
     const { userId } = user;
     const { serverId } = server;
-    const { channelId: currentChannelId, name: currentChannelName } = currentChannel;
+    const { channelId: currentChannelId, name: currentChannelName, isLobby: isCurrentChannelLobby } = currentChannel;
     const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, currentChannel.permissionLevel);
     const filteredChannelEvents = channelEvents.filter((e) => e.name.toLowerCase().includes(searchText.toLowerCase()) || e.nickname?.toLowerCase().includes(searchText.toLowerCase()));
     const currentChannelEvents = channelEvents
@@ -59,8 +59,10 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
       .filter((e) => e.name.toLowerCase().includes(searchText.toLowerCase()) || e.nickname?.toLowerCase().includes(searchText.toLowerCase()));
 
     // Handlers
-    const getChannelName = (channelId: string) => {
-      return channels.find((c) => c.channelId === channelId)?.isLobby ? t('lobby') : channels.find((c) => c.channelId === channelId)?.name;
+    const getChannelName = (channelId: string | null) => {
+      const channel = channels.find((c) => c.channelId === channelId);
+      if (!channel) return '';
+      return channel.isLobby ? t(channel.name) : channel.name;
     };
 
     const getActionContent = (channelEvent: ChannelEvent) => {
@@ -77,8 +79,8 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
           </div>
         );
       } else {
-        const prevChannelName = channelEvent.prevChannelId ? getChannelName(channelEvent.prevChannelId) : '';
-        const nextChannelName = channelEvent.nextChannelId ? getChannelName(channelEvent.nextChannelId) : '';
+        const prevChannelName = getChannelName(channelEvent.prevChannelId);
+        const nextChannelName = getChannelName(channelEvent.nextChannelId);
         return (
           <div className={`${styles['action-content']} ${styles['green']}`} title={t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}>
             {t('move-to-new-channel', { 0: prevChannelName, 1: nextChannelName })}
@@ -220,7 +222,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
         {/* Body */}
         <div className={popup['popup-body']}>
           <div className={styles['event-list']} style={selectMode === 'current' ? {} : { display: 'none' }}>
-            <div className={styles['current-channel']}>{currentChannelName}</div>
+            <div className={styles['current-channel']}>{isCurrentChannelLobby ? t(currentChannelName) : currentChannelName}</div>
             {currentChannelEvents.reverse().map((e, index) => {
               // Variables
               const isUser = e.userId === userId;

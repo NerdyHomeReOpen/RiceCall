@@ -1,21 +1,21 @@
 .content {
   display: flex;
+  flex-direction: column;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
   width: 100%;
   height: auto;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
   padding: 15px;
-  gap: 5px;
   overflow-y: scroll;
 }
 
 .header {
+  z-index: 1;
   display: flex;
+  justify-content: space-between;
   width: 100%;
   padding: 10px;
-  justify-content: space-between;
-  z-index: 1;
 }
 
 .all-cancel-text {
@@ -31,8 +31,8 @@
 }
 
 .body {
-  width: 100%;
   flex: 1;
+  width: 100%;
 }
 
 .application {
@@ -43,8 +43,8 @@
 
 .user-info-box {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }
 
 .user-name-text {
@@ -56,38 +56,38 @@
 }
 
 .avatar-picture {
-  cursor: pointer;
   width: 45px;
   height: 45px;
-  background-image: url('/im/SecretaryLogo.webp');
-  background-size: cover;
-  background-position: center;
-  border: 1px solid var(--border);
   margin-right: 15px;
+  cursor: pointer;
+  background-image: url('/im/SecretaryLogo.webp');
+  background-position: center;
+  background-size: cover;
+  border: 1px solid var(--border);
 }
 
 .application-content-box {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
   align-items: flex-start;
+  justify-content: space-between;
   height: 80px;
-  border: 1px solid var(--border);
-  background-color: var(--background-secondary);
   padding: 2px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
 }
 
 .content-text {
   display: flex;
+  overflow-y: auto;
   color: var(--text-color-quaternary);
   word-break: break-all;
-  overflow-y: auto;
 }
 
 .action-buttons {
   display: flex;
-  justify-content: flex-end;
   align-items: center;
+  justify-content: flex-end;
   min-width: max-content;
   cursor: pointer;
 }
@@ -96,10 +96,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  height: 23px;
   padding: 3px;
   background-color: var(--background);
   border: 1px solid var(--border);
-  height: 23px;
 }
 
 .action-buttons .button:last-child {
@@ -117,18 +117,18 @@
 }
 
 .direct-message-button {
-  height: 28px;
   width: 30px;
+  height: 28px;
   cursor: pointer;
 }
 
 .direct-message-icon {
+  width: 100%;
+  height: 100%;
   background-image: url('/icon_notice_chat.webp');
-  background-size: auto;
   background-position: center;
   background-position: 0 0;
-  height: 100%;
-  width: 100%;
+  background-size: auto;
 }
 
 .direct-message-icon:hover {

@@ -159,7 +159,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const [voiceThreshold, setVoiceThreshold] = useState<number>(1);
 
   // Recorder
-  const recordFormatRef = useRef<'wav' | 'mp3'>('wav');
   const buffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const isRecordingRef = useRef<boolean>(false);
@@ -747,12 +746,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     recorderGainRef.current?.disconnect();
     if (timerRef.current) clearInterval(timerRef.current);
 
-    const blob = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate, recordFormatRef.current);
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = `ricecall-record-${new Date().toISOString()}.${recordFormatRef.current}`;
-    a.click();
+    const arrayBuffer = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate);
+    ipc.record.save(arrayBuffer);
 
     buffersRef.current = [];
 
@@ -960,16 +955,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     };
     changeSpeakingMode(ipc.systemSettings.speakingMode.get());
     const unsub = ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode);
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const changeRecordFormat = (recordFormat: 'wav' | 'mp3') => {
-      console.info('[WebRTC] record format updated: ', recordFormat);
-      recordFormatRef.current = recordFormat;
-    };
-    changeRecordFormat(ipc.systemSettings.recordFormat.get());
-    const unsub = ipc.systemSettings.recordFormat.onUpdate(changeRecordFormat);
     return () => unsub();
   }, []);
 

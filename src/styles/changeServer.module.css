@@ -1,32 +1,32 @@
 .change-server {
-  flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex: 1;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
   background-color: var(--background-secondary);
 }
 
 .loading-bar {
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   width: 256px;
   height: 12px;
   background-image: url('/icon_loading.gif');
-  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: cover;
 }
 
 .change-server-body {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   align-items: center;
   justify-content: center;
   width: 226px;
   height: 100%;
-  gap: 10px;
 }
 
 .app-logo {
@@ -34,29 +34,29 @@
   min-width: 226px;
   min-height: 54px;
   background-image: url('/login_logo.webp');
-  background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: contain;
 }
 
 .form-wrapper {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 10px;
+  justify-items: center;
   width: 100%;
   max-width: 400px;
-  justify-items: center;
 }
 
 .server-option {
   width: 200px;
   height: 42px;
   margin-top: 10px;
-  background-color: #1680ce;
   color: #fff;
+  cursor: pointer;
+  background-color: #1680ce;
   border: none;
   border-radius: 4px;
-  cursor: pointer;
 }
 
 .server-option:hover {
@@ -68,18 +68,18 @@
 }
 
 .server-option:disabled {
+  cursor: not-allowed;
   background-color: #1680ce;
   opacity: 0.6;
-  cursor: not-allowed;
 }
 
 .label {
-  font-size: 0.9em;
-  color: var(--text-color-secondary);
   display: inline-block;
   width: 80px;
-  text-align: right;
   padding-right: 10px;
+  font-size: 0.9em;
+  color: var(--text-color-secondary);
+  text-align: right;
 }
 
 .warn-text {
@@ -95,22 +95,22 @@
 /* Footer */
 
 .change-server-footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   width: 100%;
   padding: 10px 15px;
-  background-color: var(--footer-background);
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  border-top: 1px solid var(--border);
   margin-top: auto;
+  background-color: var(--footer-background);
+  border-top: 1px solid var(--border);
 }
 
 .back-to-login {
-  text-decoration: none;
-  font-size: 0.9em;
-  color: var(--text-color-quaternary);
   display: flex;
   align-items: flex-end;
+  font-size: 0.9em;
+  color: var(--text-color-quaternary);
+  text-decoration: none;
   cursor: pointer;
 }
 
@@ -119,11 +119,11 @@
 }
 
 .back-to-login::before {
-  content: '';
   min-width: 14px;
   min-height: 14px;
   margin-right: 5px;
   vertical-align: middle;
+  content: '';
   background-repeat: no-repeat;
   background-position: 0 0;
 }

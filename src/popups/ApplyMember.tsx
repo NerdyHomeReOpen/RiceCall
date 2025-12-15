@@ -26,7 +26,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   const [applicationDesc, setApplicationDesc] = useState<MemberApplication['description']>(memberApplication?.description || '');
 
   // Variables
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
+  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
 
   // Handlers
   const handleSendMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
@@ -54,7 +54,7 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
             </div>
             <div className={popup['info-wrapper']}>
               <div className={popup['link-text']}>{serverName}</div>
-              <div className={popup['sub-text']}>{`ID: ${serverDisplayId}`}</div>
+              <div className={popup['sub-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
             </div>
           </div>
           <div className={`${popup['input-box']} ${popup['col']}`}>

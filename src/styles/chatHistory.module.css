@@ -1,17 +1,17 @@
 .content {
-  padding: 0;
   gap: 0;
+  padding: 0;
   overflow: hidden;
 }
 
 .header-box {
-  gap: 0.77rem;
   display: flex;
+  gap: 0.77rem;
   place-items: center;
   width: 100%;
-  background-color: #f7f7f7;
   height: 50px;
   padding: 10px;
+  background-color: #f7f7f7;
   border-bottom: 1px solid #d6d6d6;
 }
 
@@ -37,28 +37,28 @@
 .search-input-box {
   display: flex;
   flex-direction: row;
-  box-shadow: var(--box-shadow);
-  border: 1px solid var(--border);
-  background-color: var(--background);
   align-items: center;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  box-shadow: var(--box-shadow);
 }
 
 .search-input-box input {
-  border: unset !important;
-  background-color: unset !important;
-  box-shadow: unset !important;
   padding: 0.5rem;
+  background-color: unset !important;
+  border: unset !important;
+  box-shadow: unset !important;
 }
 
 .search-icon {
-  background-image: url('/icon_search.webp');
-  background-repeat: no-repeat;
-  background-size: auto;
   width: 16px;
   height: 16px;
-  background-position: 0 0;
   margin-right: 0.5rem;
   cursor: pointer;
+  background-image: url('/icon_search.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
 }
 
 .search-input-box:hover .search-icon {
@@ -70,19 +70,19 @@
 }
 
 .body-box {
-  height: 100%;
-  width: 100%;
-  background-color: #fcfcfc;
   display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: #fcfcfc;
 }
 
 .body-left {
-  border-right: 1px solid #d6d6d6;
+  flex: unset !important;
   width: 250px;
-  overflow: auto;
   height: calc(100% - 4.5rem);
   min-height: 467.34px;
-  flex: unset !important;
+  overflow: auto;
+  border-right: 1px solid #d6d6d6;
 }
 
 .friend-group-box,
@@ -92,22 +92,22 @@
 }
 
 .friend-group {
-  border-radius: 3px;
-  align-items: center;
+  display: flex;
   gap: 2px;
+  align-items: center;
   height: 25px;
   padding: 5px;
-  display: flex;
+  border-radius: 3px;
 }
 
 .friend-info-box {
-  border-radius: 3px;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 5px;
-  padding: 5px 10px 5px 50px;
-  display: flex;
   position: relative;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5px 10px 5px 50px;
+  border-radius: 3px;
 }
 
 .friend-info-box.selected {
@@ -123,46 +123,46 @@
 }
 
 .avatar-border {
-  background-image: url('/win_border.webp');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 30px;
-  width: 30px;
   position: absolute;
   z-index: 1;
+  width: 30px;
+  height: 30px;
+  background-image: url('/win_border.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .avatar {
-  object-fit: cover;
-  background-image: url('/im/SecretaryLogo.webp');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  position: relative;
   min-width: 30px;
   min-height: 30px;
-  position: relative;
+  object-fit: cover;
+  background-image: url('/im/SecretaryLogo.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .name {
-  white-space: nowrap;
-  text-overflow: ellipsis;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .body-right {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 .body-right-top {
-  height: 28px;
-  width: 100%;
-  background-color: #fafcff;
-  border-bottom: 1px solid #d6d6d6;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  height: 28px;
+  background-color: #fafcff;
+  border-bottom: 1px solid #d6d6d6;
 }
 
 .body-right-top-title {
@@ -170,22 +170,22 @@
 }
 
 .body-right-top-delete-button-box {
-  width: 80px;
-  height: 22px;
   display: flex;
   align-items: center;
-  border: 1px solid #b1b1b1;
-  padding: 2px;
-  cursor: pointer;
-  margin-right: 0.5rem;
   justify-content: space-between;
+  width: 80px;
+  height: 22px;
+  padding: 2px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  border: 1px solid #b1b1b1;
 }
 
 .delete-button-icon {
+  width: 16px;
+  height: 16px;
   background-image: url('/Delete_ico.webp');
   background-size: auto;
-  height: 16px;
-  width: 16px;
 }
 
 .body-right-botton {
@@ -194,8 +194,8 @@
 }
 
 .message-date {
+  width: 95%;
+  height: 32px;
   background: linear-gradient(180deg, #fff 0%, #f4f7fc 100%);
   border-bottom: 1px solid #b6cedc;
-  height: 32px;
-  width: 95%;
 }

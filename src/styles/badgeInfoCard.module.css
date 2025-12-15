@@ -1,24 +1,24 @@
 .badge-info-card {
-  z-index: 10000;
   position: fixed;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  padding: 10px;
-  min-height: 145px;
-  width: 300px;
   gap: 10px;
+  align-items: center;
+  width: 300px;
+  min-height: 145px;
+  padding: 10px;
   background-color: var(--background-secondary);
   border: 1px solid var(--border);
 }
 
 .badge-info-wrapper {
-  flex: 1;
   display: flex;
+  flex: 1;
   flex-direction: row;
+  gap: 10px;
   align-items: flex-start;
   width: 100%;
-  gap: 10px;
 }
 
 .badge-avatar-box {
@@ -31,33 +31,33 @@
 .badge-avatar-box .badge-image {
   display: flex;
   align-items: center;
-  height: 64px;
-  width: 64px;
   justify-content: center;
-  background-size: contain;
+  width: 64px;
+  height: 64px;
   background-repeat: no-repeat;
+  background-size: contain;
 }
 
 .badge-avatar-box .badge-rarity-text {
-  color: var(--text-vip-name);
   margin-top: 8px;
+  color: var(--text-vip-name);
 }
 
 .badge-description-box {
   display: flex;
   flex-direction: column;
-  justify-content: flex-start;
-  align-items: flex-start;
-  height: 100%;
-  width: 100%;
-  margin-left: 10px;
   gap: 10px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  margin-left: 10px;
 }
 
 .badge-description-box .badge-name {
-  color: var(--text-color-quaternary);
   font-size: 1.1em;
   font-weight: bold;
+  color: var(--text-color-quaternary);
 }
 
 .badge-description-box .badge-description {

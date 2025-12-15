@@ -1,10 +1,10 @@
 .message {
   padding: 8px;
   margin-bottom: 15px;
-  background-color: var(--notify-toaster-background);
-  border: 1px solid var(--notify-toaster-border);
-  color: var(--text-color-quaternary);
   font-size: 0.9em;
+  color: var(--text-color-quaternary);
+  background-color: var(--notification-toaster-background);
+  border: 1px solid var(--notification-toaster-border);
 }
 
 .select-type-text {
@@ -23,11 +23,11 @@
 .button-group .button {
   width: 50%;
   padding: 10px;
+  text-align: center;
+  cursor: pointer;
   background: var(--button-background);
   border: 1px solid var(--border);
   border-radius: 4px;
-  cursor: pointer;
-  text-align: center;
 }
 
 .button-group .button:hover {
@@ -45,27 +45,27 @@
 .avatar-wrapper {
   display: flex;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
-  height: auto;
+  justify-content: center;
   width: 100%;
+  height: auto;
 }
 
 .avatar-picture {
   position: relative;
-  cursor: pointer;
-  object-fit: cover;
   min-width: 100px;
   min-height: 100px;
+  cursor: pointer;
+  object-fit: cover;
   background-image: url('/logo_server_def.webp');
   background-repeat: no-repeat;
-  background-size: cover;
   background-position: center center;
+  background-size: cover;
 }
 
 .input-wrapper {
   display: flex;
   flex-direction: column;
-  width: 100%;
   gap: 10px;
+  width: 100%;
 }

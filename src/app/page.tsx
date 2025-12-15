@@ -22,7 +22,7 @@ import type {
   OnlineMember,
   MemberApplication,
   QueueUser,
-  Notify,
+  Notification,
   RecommendServer,
   FriendActivity,
   ChannelEvent,
@@ -36,7 +36,7 @@ import ServerPage from '@/pages/Server';
 
 // Components
 import LoadingSpinner from '@/components/common/LoadingSpinner';
-import NotifyToaster from '@/components/NotifyToaster';
+import NotificationToaster from '@/components/NotificationToaster';
 
 // Utils
 import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme, handleOpenFriendVerification, handleOpenMemberInvitation, handleOpenErrorDialog } from '@/utils/popup';
@@ -51,26 +51,27 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
+import { useActionScanner } from '@/providers/ActionScanner';
 
 // Services
 import ipc from '@/services/ipc.service';
 
 // Constants
-import { LANGUAGES } from '@/constant';
+import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
 interface HeaderProps {
   user: User;
   currentServer: Server;
   friendApplications: FriendApplication[];
   memberInvitations: MemberInvitation[];
-  systemNotify: string[];
+  systemNotifications: string[];
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotify }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotifications }) => {
   // Hooks
   const mainTab = useMainTab();
   const contextMenu = useContextMenu();
-  // const actionScanner = useActionScanner();
+  const actionScanner = useActionScanner();
   const { t, i18n } = useTranslation();
 
   // Refs
@@ -82,10 +83,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   // Variables
   const { userId, name: userName, status: userStatus } = user;
   const { serverId: currentServerId, name: currentServerName } = currentServer;
-  const hasNotify = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotify.length !== 0;
+  const hasNotification = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotifications.length !== 0;
   const hasFriendApplication = friendApplications.length !== 0;
   const hasMemberInvitation = memberInvitations.length !== 0;
-  const hasSystemNotify = systemNotify.length !== 0;
+  const hasSystemNotification = systemNotifications.length !== 0;
   const mainTabs: { id: 'home' | 'friends' | 'server'; label: string }[] = [
     { id: 'home', label: t('home') },
     { id: 'friends', label: t('friends') },
@@ -175,6 +176,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleChangeStatus = (status: User['status']) => {
+    actionScanner.setIsManualIdling(status !== 'online');
     ipc.socket.send('editUser', { update: { status } });
   };
 
@@ -188,9 +190,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     ipc.exit();
   };
 
-  const handleFullscreen = () => {
-    if (isFullscreen) ipc.window.unmaximize();
-    else ipc.window.maximize();
+  const handleMaximize = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximize = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
   };
 
   const handleMinimize = () => {
@@ -208,13 +215,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   // Effects
-  // TODO: fix auto set to online when manual set to idle or other status
-  // useEffect(() => {
-  //   const next = actionScanner.isKeepAlive ? 'online' : 'idle';
-  //   if (user.status !== next) {
-  //     ipc.socket.send('editUser', { update: { status: next } });
-  //   }
-  // }, [actionScanner.isKeepAlive, user.status]);
+  useEffect(() => {
+    const next = actionScanner.isIdling ? 'idle' : 'online';
+    if (user.status !== next && !actionScanner.isManualIdling) {
+      ipc.socket.send('editUser', { update: { status: next } });
+    }
+  }, [actionScanner.isIdling, actionScanner.isManualIdling, user.status]);
 
   useEffect(() => {
     const changeCloseToTray = (enable: boolean) => {
@@ -299,17 +305,17 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           onClick={(e) => {
             const x = e.currentTarget.getBoundingClientRect().left;
             const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showNotifyMenu(x, y, 'right-bottom', [
+            contextMenu.showNotificationMenu(x, y, 'right-bottom', [
               {
                 id: 'no-unread-notify',
                 label: t('no-unread-notify'),
-                show: !hasNotify,
+                show: !hasNotification,
                 className: 'readonly',
               },
               {
                 id: 'friend-verification',
                 label: t('friend-verification'),
-                icon: 'notify',
+                icon: 'notification',
                 show: hasFriendApplication,
                 contentType: 'image',
                 showContentLength: true,
@@ -320,7 +326,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
               {
                 id: 'member-invitation',
                 label: t('member-invitation'),
-                icon: 'notify',
+                icon: 'notification',
                 show: hasMemberInvitation,
                 contentType: 'image',
                 showContentLength: true,
@@ -331,8 +337,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
               {
                 id: 'system-notify',
                 label: t('system-notify'),
-                icon: 'notify',
-                show: hasSystemNotify,
+                icon: 'notification',
+                show: hasSystemNotification,
                 showContentLength: true,
                 showContent: false,
                 contents: memberInvitations.map((mi) => mi.avatarUrl),
@@ -341,7 +347,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
             ]);
           }}
         >
-          <div className={`${header['overlay']} ${hasNotify && header['new']}`} />
+          <div className={`${header['overlay']} ${hasNotification && header['new']}`} />
         </div>
         <div className={header['spliter']} />
         <div
@@ -353,7 +359,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           }}
         />
         <div className={header['minimize']} onClick={handleMinimize} />
-        <div className={isFullscreen ? header['restore'] : header['maxsize']} onClick={handleFullscreen} />
+        {isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />}
         <div className={header['close']} onClick={handleClose} />
       </div>
     </header>
@@ -367,7 +373,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const mainTab = useMainTab();
   const loadingBox = useLoading();
   const soundPlayer = useSoundPlayer();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   // Refs
   const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
@@ -376,6 +382,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const serverOnlineMembersRef = useRef<OnlineMember[]>([]);
+  const userRef = useRef<User>(Default.user());
   const friendsRef = useRef<Friend[]>([]);
 
   // States
@@ -392,13 +399,14 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
   const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
-  const [systemNotify, setSystemNotify] = useState<string[]>([]);
+  const [systemNotifications, setSystemNotifications] = useState<string[]>([]);
   const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [notifies, setNotifies] = useState<Notify[]>([]);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
   const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
   const [latency, setLatency] = useState<number>(0);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
+  const [region, setRegion] = useState<LanguageKey>('en-US');
 
   // Variables
   const currentServer = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
@@ -413,8 +421,21 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
+    const language = navigator.language;
+
+    const match = LANGUAGES.find(({ code }) => code.includes(language));
+    if (!match) return setRegion('en-US');
+
+    setRegion(match.code);
+  }, []);
+
+  useEffect(() => {
     friendsRef.current = friends;
   }, [friends]);
+
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
 
   useEffect(() => {
     ipc.tray.title.set(user.name);
@@ -525,10 +546,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.data.memberInvitations(userId).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
-      ipc.data.recommendServers().then((recommendServerList) => {
-        if (recommendServerList) setRecommendServers(recommendServerList);
-      });
-      setSystemNotify([]); // TODO: Implement system notify
+      setSystemNotifications([]); // TODO: Implement system notification
     };
     refresh();
   }, [userId]);
@@ -536,15 +554,20 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      ipc.data.announcements(i18n.language).then((announcements) => {
+      ipc.data.announcements(region).then((announcements) => {
         if (announcements) setAnnouncements(announcements);
       });
-      ipc.data.notifies(i18n.language).then((notifies) => {
-        if (notifies) setNotifies(notifies);
+      ipc.data.notifications(region).then((notifications) => {
+        if (notifications) setNotifications(notifications);
+      });
+      ipc.data.recommendServers(region).then((recommendServerList) => {
+        if (recommendServerList) setRecommendServers(recommendServerList);
       });
     };
+    const interval = setInterval(() => refresh(), REFRESH_REGION_INFO_INTERVAL);
     refresh();
-  }, [i18n.language, userId]);
+    return () => clearInterval(interval);
+  }, [region, userId]);
 
   useEffect(() => {
     if (!userId || !currentServerId) return;
@@ -555,10 +578,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       ipc.data.serverOnlineMembers(currentServerId).then((serverOnlineMembers) => {
         if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
       });
-      setServerMemberApplications([]);
-      // ipc.data.memberApplications(server.serverId).then((serverMemberApplications) => {
-      //   if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
-      // });
+      ipc.data.memberApplications(currentServerId).then((serverMemberApplications) => {
+        if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
+      });
     };
     refresh();
   }, [userId, currentServerId]);
@@ -602,12 +624,16 @@ const RootPageComponent: React.FC = React.memo(() => {
         setServerOnlineMembers([]);
         setChannelEvents([]);
       }
-      // if (args[0].update.signature && args[0].update.signature !== user.signature) {
-      //   const newActive = Default.friendActivity({ ...user, content: args[0].update.signature, createdAt: Date.now() });
-      //   setFriendActivities((prev) => [newActive, ...prev]);
-      // }
-      setUser((prev) => ({ ...prev, ...args[0].update }));
+      // Add activity when signature is updated
+      args.forEach(({ update }) => {
+        if (update.signature && userRef.current.signature !== update.signature) {
+          const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, createdAt: Date.now() });
+          setFriendActivities((prev) => [newActive, ...prev]);
+        }
+      });
+      // Set user id to local storage (for hot reload)
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
+      setUser((prev) => ({ ...prev, ...args[0].update }));
     });
     return () => unsub();
   }, [currentServerId]);
@@ -622,16 +648,14 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Friend> }[]) => {
-      // args.map((a) => {
-      //   // friend activity update
-      //   const targetFriend = friendsRef.current.find((f) => f.targetId === a.targetId);
-      //   if (a.update.signature) {
-      //     const newActive = Default.friendActivity({ ...targetFriend, ...a.update, userId: a.targetId, content: a.update.signature, createdAt: Date.now() });
-      //     if (targetFriend && targetFriend.relationStatus === 2 && targetFriend.signature !== newActive.signature) {
-      //       setFriendActivities((prev) => [newActive, ...prev]);
-      //     }
-      //   }
-      // });
+      // Add activity when signature is updated
+      args.forEach(({ targetId, update }) => {
+        const targetFriend = friendsRef.current.find((f) => f.targetId === targetId && f.relationStatus === 2);
+        if (targetFriend && update.signature && targetFriend.signature !== update.signature) {
+          const newActivity = Default.friendActivity({ ...targetFriend, content: update.signature, createdAt: Date.now() });
+          setFriendActivities((prev) => [newActivity, ...prev]);
+        }
+      });
       const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
       setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
     });
@@ -902,17 +926,11 @@ const RootPageComponent: React.FC = React.memo(() => {
     return () => unsub();
   }, []);
 
-  useEffect(() => {
-    history.pushState = () => {};
-    history.back = () => {};
-    history.forward = () => {};
-  }, []);
-
   return (
     <WebRTCProvider>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} currentServer={currentServer} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotify={systemNotify} />
+          <Header user={user} currentServer={currentServer} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotifications={systemNotifications} />
           {!userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
@@ -935,7 +953,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 display={mainTab.selectedTabId === 'server'}
                 latency={latency}
               />
-              <NotifyToaster notifies={notifies} />
+              <NotificationToaster notifications={notifications} />
             </>
           )}
         </ExpandedProvider>

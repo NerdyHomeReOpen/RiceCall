@@ -31,7 +31,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
   const { t } = useTranslation();
 
   // Variables
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
+  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
@@ -39,7 +39,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
     {
       id: 'join-server',
       label: t('join-server'),
-      onClick: () => handleServerSelect(serverId, serverDisplayId),
+      onClick: () => handleServerSelect(recommendServer),
     },
     {
       id: 'view-server-info',
@@ -49,21 +49,21 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
     },
   ];
 
-  const handleServerSelect = (serverId: RecommendServer['serverId'], serverDisplayId: RecommendServer['displayId']) => {
+  const handleServerSelect = (server: RecommendServer) => {
     if (loadingBox.isLoading) return;
-    if (serverId === userCurrentServerId) {
+    if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
     }
     loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(serverDisplayId);
+    loadingBox.setLoadingServerId(server.specialId || server.displayId);
     ipc.socket.send('connectServer', { serverId });
   };
 
   return (
     <div
       className={homePage['server-card']}
-      onClick={() => handleServerSelect(serverId, serverDisplayId)}
+      onClick={() => handleServerSelect(recommendServer)}
       onContextMenu={(e) => {
         e.preventDefault();
         const x = e.clientX;
@@ -75,7 +75,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
       <div className={homePage['server-info-text']}>
         <div className={homePage['server-name-text']}>{serverName}</div>
         <div className={homePage['server-id-box']}>
-          <div className={homePage['server-id-text']}>{`ID: ${serverDisplayId}`}</div>
+          <div className={homePage['server-id-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
         </div>
         <div className={homePage['server-slogen']}>{serverSlogan}</div>
         {serverOnline >= 0 && (

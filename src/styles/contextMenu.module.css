@@ -1,14 +1,14 @@
 .context-menu:not(:empty) {
-  z-index: 10000;
   position: fixed;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   min-width: max-content;
+  overflow: hidden;
   background-color: var(--background);
   border-radius: 3px;
   box-shadow: var(--box-shadow);
-  overflow: hidden;
 }
 
 .context-menu.hidden {
@@ -16,36 +16,36 @@
 }
 
 .separator {
-  min-height: 1px;
-  min-width: 100%;
   display: block;
+  min-width: 100%;
+  min-height: 1px;
+  margin: 2px 0;
   background-image: url('/ctrl/menu_spliter.webp');
   background-repeat: no-repeat;
   background-size: 100% 100%;
-  margin: 2px 0;
 }
 
 .context-menu .option {
-  color: var(--text-color-secondary);
-  justify-content: flex-start;
+  position: relative;
+  display: flex;
   align-items: center;
+  justify-content: flex-start;
   width: 100%;
   padding: 5px 30px;
   margin: 2px 0;
-  display: flex;
-  position: relative;
+  color: var(--text-color-secondary);
 }
 
 .context-menu .option::before {
   position: absolute;
-  content: '';
   left: 6px;
+  align-self: center;
   min-width: 16px;
   min-height: 16px;
-  background-size: auto;
+  content: '';
   background-repeat: no-repeat;
   background-position: center center;
-  align-self: center;
+  background-size: auto;
 }
 
 .context-menu .option[data-type='setting']::before {
@@ -70,9 +70,9 @@
 }
 
 .context-menu .option[data-type='submenu']::before {
-  background-image: url('/ctrl/icon_submenu.webp');
-  left: unset;
   right: 6px;
+  left: unset;
+  background-image: url('/ctrl/icon_submenu.webp');
 }
 
 .context-menu .option[data-type='checked']::before {
@@ -125,17 +125,17 @@
 }
 
 .mic-context-menu:not(:empty) {
-  z-index: 10000;
   position: fixed;
+  z-index: 10000;
   display: flex;
   flex-direction: column;
   justify-content: space-around;
   min-width: 154px;
   max-width: 154px;
+  overflow: hidden;
   background-color: var(--background);
   border-radius: 3px;
   box-shadow: var(--box-shadow);
-  overflow: hidden;
 }
 
 .mic-context-menu.hidden {
@@ -145,8 +145,8 @@
 .mic-context-menu .option {
   position: relative;
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   width: 100%;
   padding: 8px 30px;
   color: var(--text-color-quaternary);
@@ -154,14 +154,14 @@
 
 .mic-context-menu .option::before {
   position: absolute;
-  content: '';
   left: 6px;
+  align-self: center;
   min-width: 16px;
   min-height: 16px;
-  background-size: auto;
+  content: '';
   background-repeat: no-repeat;
   background-position: center center;
-  align-self: center;
+  background-size: auto;
 }
 
 .mic-context-menu .option:hover {

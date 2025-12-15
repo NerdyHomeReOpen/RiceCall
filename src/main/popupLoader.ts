@@ -154,6 +154,12 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
     return { userId, memberInvitations };
   },
 
+  serverApplication: async ({ userId, serverId }: { userId: string; serverId: string }) => {
+    const [server] = await Promise.all([data.server({ userId, serverId })]);
+
+    return { userId, serverId, server };
+  },
+
   serverSetting: async ({ userId, serverId }: { userId: string; serverId: string }) => {
     const [user, server, serverMembers, memberApplications] = await Promise.all([
       data.user({ userId }),

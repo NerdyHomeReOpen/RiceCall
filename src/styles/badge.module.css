@@ -4,17 +4,17 @@
 
   &.grid {
     display: grid;
-    width: 100%;
     grid-template-columns: repeat(auto-fill, minmax(17px, 1fr));
     grid-auto-rows: 17px;
+    width: 100%;
   }
 }
 
 .badge-image {
   width: 17px;
   height: 17px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   image-rendering: auto;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }

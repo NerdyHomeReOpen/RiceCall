@@ -82,16 +82,16 @@ const dataService = {
     return await api.get(`/memberInvitations?${new URLSearchParams(params).toString()}`);
   },
 
-  notifies: async (params: { region: string }) => {
-    return await api.get(`/notifies?${new URLSearchParams(params).toString()}`);
+  notifications: async (params: { region: string }) => {
+    return await api.get(`/notifications?${new URLSearchParams(params).toString()}`);
   },
 
   announcements: async (params: { region: string }) => {
     return await api.get(`/announcements?${new URLSearchParams(params).toString()}`);
   },
 
-  recommendServers: async () => {
-    return await api.get(`/recommendServers`);
+  recommendServers: async (params: { region: string }) => {
+    return await api.get(`/recommendServers?${new URLSearchParams(params).toString()}`);
   },
 
   upload: async (type: string, fileName: string, file: string): Promise<{ avatar: string; avatarUrl: string }> => {
@@ -100,6 +100,14 @@ const dataService = {
     formData.append('_fileName', fileName);
     formData.append('_file', file);
     return await api.post('/upload', formData);
+  },
+
+  searchServer: async (query: string) => {
+    return await api.get(`/server/search?${new URLSearchParams({ query }).toString()}`);
+  },
+
+  searchUser: async (query: string) => {
+    return await api.get(`/user/search?${new URLSearchParams({ query }).toString()}`);
   },
 };
 

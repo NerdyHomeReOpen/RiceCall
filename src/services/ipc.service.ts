@@ -21,7 +21,7 @@ import {
   Channel,
   MemberApplication,
   MemberInvitation,
-  Notify,
+  Notification,
   Announcement,
   RecommendServer,
   LanguageKey,
@@ -198,24 +198,34 @@ const ipcService = {
       return await ipcRenderer.invoke('data-memberInvitations', receiverId);
     },
 
-    notifies: async (region: Notify['region']): Promise<Notify[]> => {
+    notifications: async (region: LanguageKey): Promise<Notification[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-notifies', region);
+      return await ipcRenderer.invoke('data-notifications', region);
     },
 
-    announcements: async (region: Announcement['region']): Promise<Announcement[]> => {
+    announcements: async (region: LanguageKey): Promise<Announcement[]> => {
       if (!isElectron) return [];
       return await ipcRenderer.invoke('data-announcements', region);
     },
 
-    recommendServers: async (): Promise<RecommendServer[]> => {
+    recommendServers: async (region: LanguageKey): Promise<RecommendServer[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-recommendServers');
+      return await ipcRenderer.invoke('data-recommendServers', region);
     },
 
     upload: async (type: string, fileName: string, file: string): Promise<any | null> => {
       if (!isElectron) return null;
       return await ipcRenderer.invoke('data-upload', type, fileName, file);
+    },
+
+    searchServer: async (query: string): Promise<Server[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-searchServer', query);
+    },
+
+    searchUser: async (query: string): Promise<User[]> => {
+      if (!isElectron) return [];
+      return await ipcRenderer.invoke('data-searchUser', query);
     },
   },
 
@@ -413,6 +423,20 @@ const ipcService = {
     },
   },
 
+  record: {
+    save: (record: ArrayBuffer) => {
+      if (!isElectron) return;
+      ipcRenderer.send('save-record', record);
+    },
+
+    savePath: {
+      select: async (): Promise<string | null> => {
+        if (!isElectron) return null;
+        return await ipcRenderer.invoke('select-record-save-path');
+      },
+    },
+  },
+
   systemSettings: {
     set: (settings: Partial<SystemSettings>) => {
       if (!isElectron) return;
@@ -429,6 +453,7 @@ const ipcService = {
       if (settings.inputAudioDevice !== undefined) ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
       if (settings.outputAudioDevice !== undefined) ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
       if (settings.recordFormat !== undefined) ipcRenderer.send('set-record-format', settings.recordFormat);
+      if (settings.recordSavePath !== undefined) ipcRenderer.send('set-record-save-path', settings.recordSavePath);
       if (settings.mixEffect !== undefined) ipcRenderer.send('set-mix-effect', settings.mixEffect);
       if (settings.mixEffectType !== undefined) ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
       if (settings.autoMixSetting !== undefined) ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
@@ -706,6 +731,25 @@ const ipcService = {
         const listener = (_: any, format: 'wav' | 'mp3') => callback(format);
         ipcRenderer.on('record-format', listener);
         return () => ipcRenderer.removeListener('record-format', listener);
+      },
+    },
+
+    recordSavePath: {
+      set: (path: string) => {
+        if (!isElectron) return;
+        ipcRenderer.send('set-record-save-path', path);
+      },
+
+      get: (): string => {
+        if (!isElectron) return '';
+        return ipcRenderer.sendSync('get-record-save-path');
+      },
+
+      onUpdate: (callback: (path: string) => void) => {
+        if (!isElectron) return () => {};
+        const listener = (_: any, path: string) => callback(path);
+        ipcRenderer.on('record-save-path', listener);
+        return () => ipcRenderer.removeListener('record-save-path', listener);
       },
     },
 

@@ -11,7 +11,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import RecommendServerCard from '@/components/RecommendServerCard';
 
 // Type
-import type { User, Server, Announcement, RecommendServer, LanguageKey } from '@/types';
+import type { User, Server, Announcement, RecommendServer } from '@/types';
 
 // Providers
 import { useTranslation } from 'react-i18next';
@@ -26,7 +26,7 @@ import { handleOpenCreateServer } from '@/utils/popup';
 import { getFormatDate } from '@/utils/language';
 
 // Constants
-import { ANNOUNCEMENT_SLIDE_INTERVAL, LANGUAGES, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
+import { ANNOUNCEMENT_SLIDE_INTERVAL, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
 
 interface SearchResultItemProps {
   server: Server;
@@ -40,7 +40,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
       <div className={styles['server-name-text']}>{server.name}</div>
       <div className={styles['server-id-box']}>
         <div className={styles['id-icon']} />
-        <div className={styles['server-id-text']}>{server.displayId}</div>
+        <div className={styles['server-id-text']}>{server.specialId || server.displayId}</div>
       </div>
     </div>
   </div>
@@ -58,7 +58,7 @@ interface HomePageProps {
 
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, display }) => {
   // Hooks
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const mainTab = useMainTab();
   const loadingBox = useLoading();
 
@@ -79,7 +79,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
   const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
-  const [region, setRegion] = useState<LanguageKey>(i18n.language as LanguageKey);
 
   // Variables
   const { userId, currentServerId } = user;
@@ -89,13 +88,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
   const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]).slice(0, 10);
   const filteredRecommendServers = useMemo(
-    () =>
-      recommendServers
-        .filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory)) && server.tags.includes(region))
-        .sort((a, b) => a.online - b.online),
-    [recommendServers, selectReommendServerCategory, region],
+    () => recommendServers.filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory))),
+    [recommendServers, selectReommendServerCategory],
   );
-  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official') && server.tags.includes(region)), [recommendServers, region]);
+  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official')), [recommendServers]);
 
   // Handlers
   const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -108,7 +104,33 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
     if (!canSearchRef.current) return;
 
-    ipc.socket.send('searchServer', { query });
+    ipc.data.searchServer(query).then((servers) => {
+      const q = searchQueryRef.current;
+
+      handleClearSearchState();
+
+      if (!servers.length) return;
+
+      const sorted = [...servers].sort((a, b) => {
+        const aHasId = a.displayId.toString().includes(q);
+        const bHasId = b.displayId.toString().includes(q);
+        return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
+      });
+
+      const { exact, personal, related } = sorted.reduce(
+        (acc, s) => {
+          if (s.specialId === q || s.displayId === q) acc.exact = s;
+          else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
+          else acc.related.push(s);
+          return acc;
+        },
+        { exact: null as Server | null, personal: [] as Server[], related: [] as Server[] },
+      );
+
+      setExactMatch(exact);
+      setPersonalResults(personal);
+      setRelatedResults(related);
+    });
     searchQueryRef.current = query;
     canSearchRef.current = false;
 
@@ -128,16 +150,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     setRelatedResults([]);
   };
 
-  const handleConnectServer = useCallback(
-    (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
+  const handleServerSelect = useCallback(
+    (server: Server) => {
       if (loadingBox.isLoading) return;
-      if (serverId === currentServerId) {
+      if (server.serverId === currentServerId) {
         mainTab.setSelectedTabId('server');
         return;
       }
       loadingBox.setIsLoading(true);
-      loadingBox.setLoadingServerId(serverDisplayId);
-      ipc.socket.send('connectServer', { serverId });
+      loadingBox.setLoadingServerId(server.specialId || server.displayId);
+      ipc.socket.send('connectServer', { serverId: server.serverId });
       handleClearSearchState();
     },
     [currentServerId, mainTab, loadingBox],
@@ -159,15 +181,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   );
 
   // Effects
-  useEffect(() => {
-    const language = navigator.language;
-
-    const match = LANGUAGES.find(({ code }) => code.includes(language));
-    if (!match) return setRegion('en-US');
-
-    setRegion(match.code);
-  }, []);
-
   useEffect(() => {
     if (!containerRef.current) return;
     const number = selectedAnnIndex % filteredAnns.length;
@@ -198,62 +211,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverSearch', (...args: Server[]) => {
-      const q = searchQueryRef.current;
-
-      handleClearSearchState();
-
-      if (!args.length) return;
-
-      const sorted = [...args].sort((a, b) => {
-        const aHasId = a.displayId.toString().includes(q);
-        const bHasId = b.displayId.toString().includes(q);
-        return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
+    const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
+      if (!userId || !serverDisplayId) return;
+      ipc.data.searchServer(serverDisplayId).then((servers) => {
+        const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
+        if (!target) return;
+        handleServerSelect(target);
       });
-
-      const { exact, personal, related } = sorted.reduce(
-        (acc, s) => {
-          if (s.displayId.toString() === q) acc.exact = s;
-          else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
-          else acc.related.push(s);
-          return acc;
-        },
-        { exact: null as Server | null, personal: [] as Server[], related: [] as Server[] },
-      );
-
-      setExactMatch(exact);
-      setPersonalResults(personal);
-      setRelatedResults(related);
     });
     return () => unsub();
-  }, [servers]);
-
-  useEffect(() => {
-    const unsub = ipc.deepLink.onDeepLink(async (serverId: string) => {
-      if (!userId || !serverId) return;
-      ipc.socket.send('searchServer', { query: serverId });
-      const servers: Server[] = await new Promise((resolve) => {
-        const off = ipc.socket.on('serverSearch', (...args: Server[]) => {
-          off();
-          resolve(args);
-        });
-      });
-      const target = servers.find((s) => s.displayId === serverId);
-      if (!target) {
-        return;
-      }
-      handleConnectServer(target.serverId, target.displayId);
-    });
-    return () => unsub();
-  }, [userId, handleConnectServer]);
-
-  useEffect(() => {
-    const unsub = ipc.language.onUpdate(() => {
-      setSelectRecommendServerCategory('all');
-      setSelectedAnnIndex(0);
-    });
-    return () => unsub();
-  }, []);
+  }, [userId, handleServerSelect]);
 
   return (
     <main className={styles['home']} style={display ? {} : { display: 'none' }}>
@@ -271,7 +238,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               onChange={handleSearchServer}
               onKeyDown={(e) => {
                 if (e.key !== 'Enter' || !exactMatch) return;
-                handleConnectServer(exactMatch.serverId, exactMatch.displayId);
+                handleServerSelect(exactMatch);
               }}
             />
             <div className={styles['search-input-clear-btn']} onClick={() => handleClearSearchState(true)} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
@@ -280,16 +247,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               {exactMatch && (
                 <>
                   <div className={`${styles['header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
-                    {t('quick-enter-server', { '0': exactMatch.displayId })}
+                    {t('quick-enter-server', { '0': searchQueryRef.current })}
                   </div>
-                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleConnectServer(exactMatch.serverId, exactMatch.displayId)} />
+                  {/* <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleConnectServer(exactMatch.serverId, exactMatch.displayId)} /> */}
                 </>
               )}
               {personalResults.length > 0 && (
                 <>
                   <div className={styles['header-text']}>{t('personal-exclusive')}</div>
                   {personalResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleConnectServer(server.serverId, server.displayId)} />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleServerSelect(server)} />
                   ))}
                 </>
               )}
@@ -297,7 +264,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 <>
                   <div className={styles['header-text']}>{t('related-search')}</div>
                   {relatedResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleConnectServer(server.serverId, server.displayId)} />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleServerSelect(server)} />
                   ))}
                 </>
               )}
@@ -346,23 +313,31 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         <div className={styles['banner-wrapper']}>
           <div className={styles['banner-container']}>
             <div ref={containerRef} className={styles['banners']}>
-              {filteredAnns.map((ann) => (
-                <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => setSelectedAnn(ann)}>
-                  {!ann.attachmentUrl ? defaultAnnouncement(ann) : null}
+              {filteredAnns.length > 0 ? (
+                filteredAnns.map((ann) => (
+                  <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => setSelectedAnn(ann)}>
+                    {!ann.attachmentUrl ? defaultAnnouncement(ann) : null}
+                  </div>
+                ))
+              ) : (
+                <div className={styles['banner']}>{defaultAnnouncement({} as Announcement)}</div>
+              )}
+            </div>
+            {filteredAnns.length > 0 && (
+              <>
+                <div className={styles['number-list']}>
+                  {filteredAnns.map((_, index) => (
+                    <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)}></nav>
+                  ))}
                 </div>
-              ))}
-            </div>
-            <div className={styles['number-list']}>
-              {filteredAnns.map((_, index) => (
-                <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)}></nav>
-              ))}
-            </div>
-            <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnn}>
-              {'◀'}
-            </nav>
-            <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnn}>
-              {'▶'}
-            </nav>
+                <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnn}>
+                  {'◀'}
+                </nav>
+                <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnn}>
+                  {'▶'}
+                </nav>
+              </>
+            )}
           </div>
         </div>
 

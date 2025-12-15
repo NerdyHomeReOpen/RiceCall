@@ -4,12 +4,12 @@
   align-items: flex-start;
   width: 100%;
   padding: 0 10px 5px;
+  color: var(--secondary-color);
   background-color: var(--main-color);
   background-image: var(--header-image);
   background-repeat: no-repeat;
   background-position: 0 -30px;
   background-size: cover;
-  color: var(--secondary-color);
 }
 
 .user-signature {
@@ -19,9 +19,9 @@
 
 .direct-option-buttons {
   display: flex;
+  gap: 5px;
   justify-content: left;
   margin-left: 18px;
-  gap: 5px;
   -webkit-app-region: no-drag;
 }
 
@@ -31,91 +31,91 @@
 .direct-option-buttons .un-block-user,
 .direct-option-buttons .invite-temp-group,
 .direct-option-buttons .report {
-  content: '';
   display: inline-block;
   min-width: 30px;
   min-height: 30px;
   vertical-align: middle;
-  background-size: contain;
   cursor: pointer;
+  content: '';
+  background-size: contain;
 }
 
 .direct-option-buttons .file-share {
   background-image: url('/im/Fileshare.webp');
-  background-size: contain;
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .direct-option-buttons .apply-friend {
   background-image: url('/im/AddContact.webp');
-  background-size: contain;
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .direct-option-buttons .block-user {
   background-image: url('/im/BlockUser.webp');
-  background-size: contain;
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .direct-option-buttons .un-block-user {
   background-image: url('/im/UnblockUser.webp');
-  background-size: contain;
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .direct-option-buttons .invite-temp-group {
   background-image: url('/im/InviteTempGroup.webp');
-  background-size: contain;
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .direct-option-buttons .report {
   background-image: url('/im/report.webp');
-  background-size: contain;
-  background-position: center;
   background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
 }
 
 .body-wrapper {
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 .body-box {
   display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: flex-start;
   height: 100%;
-  flex-direction: row;
 }
 
 .sidebar {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: space-between;
-  height: 100%;
   width: fit-content;
+  height: 100%;
   padding: 10px;
-  flex-direction: column;
   border-right: 1px solid var(--border);
 }
 
 .avatar-picture {
+  position: relative;
   min-width: 100px;
   min-height: 100px;
   margin: 10px;
-  position: relative;
   cursor: pointer;
   background-image: url('/im/IMLogo.webp');
-  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: cover;
 }
 
 .avatar-picture.offline {
@@ -123,17 +123,17 @@
 }
 
 .avatar-picture::before {
-  z-index: 1;
-  content: '';
   position: absolute;
   top: -10px;
   left: -10px;
+  z-index: 1;
   min-width: 120px;
   min-height: 120px;
+  content: '';
   background-image: url('/im/logoframe.webp');
-  background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  background-size: cover;
 }
 
 .user-state-box {
@@ -142,11 +142,11 @@
 }
 
 .user-friend-split {
+  width: 2px;
+  height: 15px;
+  margin: 0 10px;
   background-image: url('/mf_spliter.webp');
   background-size: cover;
-  height: 15px;
-  width: 2px;
-  margin: 0 10px;
 }
 
 .target-box {
@@ -159,42 +159,42 @@
   display: flex;
   flex: 1;
   flex-direction: column;
-  min-height: 0;
   min-width: 0;
+  min-height: 0;
 }
 
 .action-body {
   position: relative;
 }
 
-.action-body::after {
-  content: '';
-  position: absolute;
-  left: 50%;
-  bottom: -1px;
-  transform: translateX(-50%);
-  width: 100%;
-  height: 22px;
-  background-image: url('/im/serverin_bkg.webp');
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center center;
-}
-
 .action-area {
-  height: 22px;
-  width: 100%;
   display: flex;
   align-items: center;
+  width: 100%;
+  height: 22px;
+}
+
+.action-area::after {
+  position: absolute;
+  bottom: -1px;
+  left: 50%;
+  width: 100%;
+  height: 22px;
+  content: '';
+  background-image: url('/im/serverin_bkg.webp');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+  transform: translateX(-50%);
 }
 
 .action-icon {
-  min-height: 12px;
-  min-width: 12px;
+  min-width: 14px;
+  min-height: 14px;
   margin-left: 10px;
-  background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
+  background-size: contain;
 }
 
 .action-icon.in-server {
@@ -202,8 +202,8 @@
 }
 
 .action-title {
-  margin-left: 5px;
   width: 100%;
+  margin-left: 5px;
 }
 
 .action-area.clickable {
@@ -215,33 +215,32 @@
 }
 
 .message-area {
-  flex: 5;
   display: flex;
+  flex: 5;
   flex-direction: column;
-  overflow-y: scroll;
-  overflow-x: hidden;
   padding: 10px 10px 0;
+  overflow: hidden scroll;
 }
 
 .input-area {
-  flex: 3;
   display: flex;
   flex-direction: column;
   width: 100%;
+  height: 150px;
   overflow: hidden;
 }
 
 .input-area .top-bar {
-  min-height: 30px;
-  min-width: 100%;
   display: flex;
+  justify-content: space-between;
+  min-width: 100%;
+  min-height: 30px;
   background-image: url('/tool_bkg.webp');
-  background-size: 100%;
   background-repeat: no-repeat;
   background-position: 0 0;
-  border-bottom: 1px solid var(--border);
+  background-size: 100%;
   border-top: 1px solid var(--border);
-  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
 }
 
 .input-area .top-bar .buttons {
@@ -251,11 +250,11 @@
 }
 
 .input-area .top-bar .buttons .button {
-  background-position: 0 0;
-  min-height: 18px;
   min-width: 18px;
+  min-height: 18px;
   margin-right: 10px;
   cursor: pointer;
+  background-position: 0 0;
 }
 
 .input-area .top-bar .buttons .button.font {
@@ -275,31 +274,31 @@
 }
 
 .input-area .top-bar .history-message {
-  height: 100%;
-  width: auto;
   display: flex;
   align-items: center;
+  width: auto;
+  height: 100%;
   margin-right: 15px;
   cursor: pointer;
 }
 
 .input-area .top-bar .history-message::before {
-  content: '';
-  min-height: 18px;
   min-width: 18px;
+  min-height: 18px;
   margin-right: 3px;
+  content: '';
   background-image: url('/im/history.webp');
-  background-size: contain;
   background-repeat: no-repeat;
   background-position: 0 0;
+  background-size: contain;
 }
 
 .input {
-  flex: 1;
   display: block;
+  flex: 1;
   padding: 8px;
-  resize: none;
   overflow: auto;
+  resize: none;
   border: none !important;
 }
 
@@ -355,11 +354,11 @@
 }
 
 .is-official-icon {
-  background-image: url('/official.webp');
   width: 17px;
   height: 16px;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
   image-rendering: auto;
+  background-image: url('/official.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }

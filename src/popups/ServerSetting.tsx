@@ -80,6 +80,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       description: serverDescription,
       type: serverType,
       displayId: serverDisplayId,
+      specialId: serverSpecialId,
       slogan: serverSlogan,
       level: serverLevel,
       wealth: serverWealth,
@@ -331,7 +332,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     </div>
                     <div className={`${popup['input-box']} ${popup['col']}`}>
                       <div className={popup['label']}>{t('id')}</div>
-                      <input name="server-display-id" type="text" value={serverDisplayId} readOnly />
+                      <input name="server-display-id" type="text" value={serverSpecialId || serverDisplayId} readOnly />
                     </div>
                   </div>
                   <div className={`${popup['input-box']} ${popup['col']}`}>
@@ -416,7 +417,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 </div>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('server-link')}</div>
-                  <input name="link" type="text" value={`https://ricecall.com.tw/join?sid=${serverDisplayId}`} readOnly />
+                  <input name="link" type="text" value={`https://ricecall.com.tw/join?sid=${serverSpecialId || serverDisplayId}`} readOnly />
                 </div>
                 <div className={`${popup['input-box']} ${popup['col']}`}>
                   <div className={popup['label']}>{t('description')}</div>

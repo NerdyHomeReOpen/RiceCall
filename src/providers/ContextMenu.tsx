@@ -1,12 +1,12 @@
 import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
 // Types
-import type { ContextMenuItem, NotifyMenuItem, OnlineMember, Badge, User } from '@/types';
+import type { ContextMenuItem, NotificationMenuItem, OnlineMember, Badge, User } from '@/types';
 
 // Components
 import ContextMenu from '@/components/ContextMenu';
 import MicContextMenu from '@/components/MicContextMenu';
-import NotifyMenu from '@/components/NotifyMenu';
+import NotificationMenu from '@/components/NotificationMenu';
 import UserInfoCard from '@/components/UserInfoCard';
 import BadgeInfoCard from '@/components/BadgeInfoCard';
 import EmojiPicker from '@/components/EmojiPicker';
@@ -17,7 +17,7 @@ import EmbedLinkInput from '@/components/EmbedLinkInput';
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
   showMicContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
-  showNotifyMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotifyMenuItem[]) => void;
+  showNotificationMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotificationMenuItem[]) => void;
   showUserInfoBlock: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: OnlineMember) => void;
   showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => void;
   showEmojiPicker: (
@@ -38,7 +38,7 @@ interface ContextMenuContextType {
   showEmbedLinkInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => void;
   closeContextMenu: () => void;
   closeMicContextMenu: () => void;
-  closeNotifyMenu: () => void;
+  closeNotificationMenu: () => void;
   closeUserInfoBlock: () => void;
   closeBadgeInfoCard: () => void;
   closeEmojiPicker: () => void;
@@ -63,7 +63,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // Refs
   const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
   const [isMicContextMenuVisible, setIsMicContextMenuVisible] = React.useState(false);
-  const [isNotifyMenuVisible, setIsNotifyMenuVisible] = React.useState(false);
+  const [isNotificationMenuVisible, setIsNotificationMenuVisible] = React.useState(false);
   const [isUserInfoVisible, setIsUserInfoVisible] = React.useState(false);
   const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
   const [isEmojiPickerVisible, setIsEmojiPickerVisible] = React.useState(false);
@@ -74,7 +74,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   // States
   const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
   const [micContextMenu, setMicContextMenu] = React.useState<ReactNode | null>(null);
-  const [notifyMenu, setNotifyMenu] = React.useState<ReactNode | null>(null);
+  const [notificationMenu, setNotificationMenu] = React.useState<ReactNode | null>(null);
   const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
   const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
   const [emojiPicker, setEmojiPicker] = React.useState<ReactNode | null>(null);
@@ -103,14 +103,14 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsMicContextMenuVisible(false);
   };
 
-  const showNotifyMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotifyMenuItem[]) => {
-    setNotifyMenu(<NotifyMenu items={items} onClose={closeNotifyMenu} x={x} y={y} direction={direction} />);
-    setIsNotifyMenuVisible(true);
+  const showNotificationMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotificationMenuItem[]) => {
+    setNotificationMenu(<NotificationMenu items={items} onClose={closeNotificationMenu} x={x} y={y} direction={direction} />);
+    setIsNotificationMenuVisible(true);
   };
 
-  const closeNotifyMenu = () => {
-    setNotifyMenu(null);
-    setIsNotifyMenuVisible(false);
+  const closeNotificationMenu = () => {
+    setNotificationMenu(null);
+    setIsNotificationMenuVisible(false);
   };
 
   const showUserInfoBlock = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: OnlineMember) => {
@@ -214,7 +214,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         if (isContextMenuVisible) closeContextMenu();
         if (isMicContextMenuVisible) closeMicContextMenu();
         if (isEmojiPickerVisible) closeEmojiPicker();
-        if (isNotifyMenuVisible) closeNotifyMenu();
+        if (isNotificationMenuVisible) closeNotificationMenu();
         if (isStatusDropdownVisible) closeStatusDropdown();
         if (isEmbedLinkInputVisible) closeEmbedLinkInput();
       }
@@ -234,7 +234,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     isBadgeInfoVisible,
     isEmojiPickerVisible,
     isUserInfoVisible,
-    isNotifyMenuVisible,
+    isNotificationMenuVisible,
     isColorPickerVisible,
     isStatusDropdownVisible,
     isEmbedLinkInputVisible,
@@ -245,7 +245,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       value={{
         showContextMenu,
         showMicContextMenu,
-        showNotifyMenu,
+        showNotificationMenu,
         showUserInfoBlock,
         showBadgeInfoCard,
         showEmojiPicker,
@@ -254,7 +254,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         showEmbedLinkInput,
         closeContextMenu,
         closeMicContextMenu,
-        closeNotifyMenu,
+        closeNotificationMenu,
         closeUserInfoBlock,
         closeBadgeInfoCard,
         closeEmojiPicker,
@@ -265,7 +265,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     >
       {isContextMenuVisible && contextMenu}
       {isMicContextMenuVisible && micContextMenu}
-      {isNotifyMenuVisible && notifyMenu}
+      {isNotificationMenuVisible && notificationMenu}
       {isUserInfoVisible && userInfo}
       {badgeInfo && badgeInfo}
       {isEmojiPickerVisible && emojiPicker}

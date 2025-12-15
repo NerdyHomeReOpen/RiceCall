@@ -23,6 +23,7 @@ import ChannelEvent from '@/popups/ChannelEvent';
 import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
+import ChatHistory from '@/popups/chatHistory';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
@@ -41,11 +42,11 @@ import MemberInvitation from '@/popups/MemberInvitation';
 import ImageCropper from '@/popups/ImageCropper';
 import InviteMember from '@/popups/InviteMember';
 import SearchUser from '@/popups/SearchUser';
+import ServerApplication from '@/popups/ServerApplication';
 import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
-import ChatHistory from '@/popups/chatHistory';
 
 // Services
 import ipc from '@/services/ipc.service';
@@ -61,9 +62,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handlers
-  const handleFullscreen = () => {
-    if (isFullscreen) ipc.window.unmaximize();
-    else ipc.window.maximize();
+  const handleMaximize = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximize = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
   };
 
   const handleMinimize = () => {
@@ -93,7 +99,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
         </div>
         <div className={header['buttons']}>
           {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimize} />}
-          {buttons.includes('maxsize') && <div className={isFullscreen ? header['restore'] : header['maxsize']} onClick={handleFullscreen} />}
+          {buttons.includes('maxsize') && (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />)}
           {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
         </div>
       </div>
@@ -146,6 +152,12 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
   },
   channelSetting: {
     type: 'channelSetting',
+    buttons: ['close'],
+    hideHeader: false,
+  },
+
+  chatHistory: {
+    type: 'chatHistory',
     buttons: ['close'],
     hideHeader: false,
   },
@@ -229,6 +241,7 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
+
   imageCropper: {
     type: 'imageCropper',
     buttons: ['close'],
@@ -264,6 +277,11 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
     buttons: ['close'],
     hideHeader: false,
   },
+  serverApplication: {
+    type: 'serverApplication',
+    buttons: ['close'],
+    hideHeader: false,
+  },
   serverBroadcast: {
     type: 'serverBroadcast',
     buttons: ['close'],
@@ -286,11 +304,6 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
   },
   userSetting: {
     type: 'userSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  chatHistory: {
-    type: 'chatHistory',
     buttons: ['close'],
     hideHeader: false,
   },
@@ -328,6 +341,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       changeTheme: t('change-theme'),
       channelPassword: t('please-enter-the-channel-password'),
       channelSetting: initialData?.channel?.name || t('edit-channel'),
+      chatHistory: t('chat-history'),
       createServer: t('create-server'),
       createChannel: t('create-channel'),
       createFriendGroup: t('create-friend-group'),
@@ -351,12 +365,12 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: t('member-application-setting'),
       memberInvitation: t('member-invitation'),
       searchUser: t('search-user'),
+      serverApplication: t('server-application'),
       serverBroadcast: t('server-broadcast'),
       serverSetting: initialData?.server?.name || t('server-setting'),
       systemSetting: t('system-setting'),
       userInfo: t('user-info'),
       userSetting: t('user-setting'),
-      chatHistory: t('chat-history'),
     };
 
     const node = {
@@ -369,6 +383,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       channelEvent: () => <ChannelEvent id={id} {...initialData} />,
       channelPassword: () => <ChannelPassword id={id} {...initialData} />,
       channelSetting: () => <ChannelSetting id={id} {...initialData} />,
+      chatHistory: () => <ChatHistory id={id} {...initialData} />,
       createChannel: () => <CreateChannel id={id} {...initialData} />,
       createFriendGroup: () => <CreateFriendGroup id={id} {...initialData} />,
       createServer: () => <CreateServer id={id} {...initialData} />,
@@ -392,12 +407,12 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
       memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
       searchUser: () => <SearchUser id={id} {...initialData} />,
+      serverApplication: () => <ServerApplication id={id} {...initialData} />,
       serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
       serverSetting: () => <ServerSetting id={id} {...initialData} />,
       systemSetting: () => <SystemSetting id={id} {...initialData} />,
       userInfo: () => <UserInfo id={id} {...initialData} />,
       userSetting: () => <UserInfo id={id} {...initialData} />,
-      chatHistory: () => <ChatHistory id={id} {...initialData} />,
     };
 
     return {
@@ -423,12 +438,6 @@ const PopupPageComponent: React.FC = React.memo(() => {
     if (!id) return;
     setInitialData(ipc.initialData.get(id));
   }, [id]);
-
-  useEffect(() => {
-    history.pushState = () => {};
-    history.back = () => {};
-    history.forward = () => {};
-  }, []);
 
   return (
     <>

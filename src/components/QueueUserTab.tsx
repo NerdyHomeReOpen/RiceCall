@@ -54,26 +54,26 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentSer
     gender: memberGender,
     badges: memberBadges,
     vip: memberVip,
-    isTextMuted: memberIsTextMuted,
-    isVoiceMuted: memberIsVoiceMuted,
+    isTextMuted: isMemberTextMuted,
+    isVoiceMuted: isMemberVoiceMuted,
     currentServerId: memberCurrentServerId,
     currentChannelId: memberCurrentChannelId,
     position: memberPosition,
     leftTime: memberLeftTime,
-    isQueueControlled: memberIsQueueControlled,
+    isQueueControlled,
   } = queueMember;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isUser = memberUserId === userId;
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
-  const isControlled = memberPosition === 0 && memberIsQueueControlled && !isChannelMod(memberPermission);
+  const isControlled = memberPosition === 0 && isQueueControlled && !isChannelMod(memberPermission);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = permissionLevel > memberPermission;
   const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
   // Handlers
   const getStatusIcon = () => {
-    if (isMuted || memberIsVoiceMuted || isControlled) return 'muted';
+    if (isMuted || isMemberVoiceMuted || isControlled) return 'muted';
     if (isSpeaking) return 'play';
     return '';
   };
@@ -148,15 +148,15 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentSer
     },
     {
       id: 'forbid-voice',
-      label: memberIsVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
+      label: isMemberVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
       show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-      onClick: () => handleForbidUserVoiceInChannel(memberUserId, currentServerId, currentChannelId, !memberIsVoiceMuted),
+      onClick: () => handleForbidUserVoiceInChannel(memberUserId, currentServerId, currentChannelId, !isMemberVoiceMuted),
     },
     {
       id: 'forbid-text',
-      label: memberIsTextMuted ? t('unforbid-text') : t('forbid-text'),
+      label: isMemberTextMuted ? t('unforbid-text') : t('forbid-text'),
       show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-      onClick: () => handleForbidUserTextInChannel(memberUserId, currentServerId, currentChannelId, !memberIsTextMuted),
+      onClick: () => handleForbidUserTextInChannel(memberUserId, currentServerId, currentChannelId, !isMemberTextMuted),
     },
     {
       id: 'kick-channel',

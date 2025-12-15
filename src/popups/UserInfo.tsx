@@ -22,7 +22,7 @@ import permission from '@/styles/permission.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 // Utils
-import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenApplyFriend, handleOpenImageCropper } from '@/utils/popup';
+import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenDirectMessage, handleOpenApplyFriend, handleOpenImageCropper } from '@/utils/popup';
 import { isMember, isStaff } from '@/utils/permission';
 import { objDiff } from '@/utils/objDiff';
 
@@ -68,6 +68,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     birthDay: targetBirthDay,
     country: targetCountry,
     badges: targetBadges,
+    isVerified: targetIsVerified,
     shareFavoriteServers: targetShareFavoriteServers,
     shareJoinedServers: targetShareJoinedServers,
     shareRecentServers: targetShareRecentServers,
@@ -122,8 +123,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     ipc.window.close();
   };
 
-  const handleServerSelect = (serverId: Server['serverId'], serverDisplayId: Server['displayId']) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId, serverId, timestamp: Date.now() }));
+  const handleServerSelect = (server: Server) => {
+    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   const isFutureDate = useCallback(
@@ -230,6 +231,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             <p className={styles['user-name-text']}>{targetName}</p>
             {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
             <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} isSelf={isSelf} isHover={true} />
+            {targetIsVerified ? <div className={styles['official-icon']} title={t('is-official')} /> : null}
           </div>
           <p className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
             @{targetDisplayId}
@@ -303,14 +305,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
               ) : (
                 recentServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
                     <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
                         <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
                         <div className={styles['display-id-text']} onDoubleClick={(e) => e.stopPropagation()}>
-                          {server.displayId}
+                          {server.specialId || server.displayId}
                         </div>
                       </div>
                     </div>
@@ -345,7 +347,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
               ) : (
                 joinedServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
                     <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>
@@ -365,7 +367,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
               ) : (
                 favoriteServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server.serverId, server.displayId)}>
+                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
                     <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>
@@ -495,9 +497,15 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             {t('add-friend')}
           </div>
         )}
-        <div className={popup['button']} onClick={() => handleClose()}>
-          {t('close')}
-        </div>
+        {isSelf ? (
+          <div className={popup['button']} onClick={() => handleClose()}>
+            {t('close')}
+          </div>
+        ) : (
+          <div className={popup['button']} onClick={() => handleOpenDirectMessage(userId, targetId)}>
+            {t('chat')}
+          </div>
+        )}
       </div>
     </div>
   );

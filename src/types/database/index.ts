@@ -1,21 +1,20 @@
 export type table_accounts = {
   account: string;
-  email: string;
   password: string;
+  email: string;
   userId: string;
 };
 
 export type table_announcements = {
   announcementId: number;
   title: string;
-  attachmentUrl: string | null;
-  link: string | null;
+  attachmentUrl: string;
+  link: string;
   content: string;
   region: string;
   category: string;
-  discordChannelId: string | null;
-  discordMessageId: string | null;
   timestamp: number;
+  until: number;
 };
 
 export type table_badges = {
@@ -23,6 +22,33 @@ export type table_badges = {
   name: string;
   description: string;
   iconUrl: string;
+  createdAt: number;
+};
+
+export type table_channels = {
+  channelId: string;
+  name: string;
+  announcement: string;
+  password: string;
+  order: number;
+  bitrate: number;
+  userLimit: number;
+  queueTime: number;
+  guestTextGapTime: number;
+  guestTextWaitTime: number;
+  guestTextMaxLength: number;
+  isLobby: boolean;
+  forbidText: boolean;
+  forbidQueue: boolean;
+  forbidGuestText: boolean;
+  forbidGuestVoice: boolean;
+  forbidGuestQueue: boolean;
+  forbidGuestUrl: boolean;
+  type: 'channel' | 'category';
+  visibility: 'public' | 'member' | 'private' | 'readonly';
+  voiceMode: 'free' | 'admin' | 'queue';
+  categoryId: string | null;
+  serverId: string;
   createdAt: number;
 };
 
@@ -45,30 +71,13 @@ export type table_channel_permissions = {
   permissionLevel: number;
 };
 
-export type table_channels = {
-  channelId: string;
-  name: string;
-  announcement: string;
-  password: string;
-  order: number;
-  bitrate: number;
-  userLimit: number;
-  queueTime: number;
-  guestTextGapTime: number;
-  guestTextWaitTime: number;
-  guestTextMaxLength: number;
-  isLobby: boolean;
-  forbidText: boolean;
-  forbidQueue: boolean;
-  forbidGuestText: boolean;
-  forbidGuestVoice: boolean;
-  forbidGuestQueue: boolean;
-  forbidGuestUrl: boolean;
-  type: 'category' | 'channel';
-  visibility: 'public' | 'member' | 'private' | 'readonly';
-  voiceMode: 'free' | 'admin' | 'queue';
-  categoryId: string | null;
-  serverId: string;
+export type table_friends = {
+  userId: string;
+  targetId: string;
+  note: string;
+  relationStatus: number;
+  isBlocked: boolean;
+  friendGroupId: string | null;
   createdAt: number;
 };
 
@@ -87,19 +96,18 @@ export type table_friend_groups = {
   createdAt: number;
 };
 
-export type table_friends = {
-  userId: string;
-  targetId: string;
-  note: string;
-  relationStatus: number;
-  isBlocked: boolean;
-  friendGroupId: string | null;
-  createdAt: number;
-};
-
 export type table_global_permissions = {
   userId: string;
   permissionLevel: number;
+};
+
+export type table_members = {
+  userId: string;
+  serverId: string;
+  nickname: string | null;
+  contribution: number;
+  lastJoinChannelAt: number;
+  createdAt: number;
 };
 
 export type table_member_applications = {
@@ -116,27 +124,24 @@ export type table_member_invitations = {
   createdAt: number;
 };
 
-export type table_members = {
-  userId: string;
-  serverId: string;
-  nickname: string | null;
-  contribution: number;
-  lastJoinChannelAt: number;
-  createdAt: number;
-};
-
-export type table_notifies = {
-  notifyId: number;
+export type table_notifications = {
+  notificationId: number;
   content: string;
   region: string;
-  notifyUntil: number;
-  createdAt: number;
+  timestamp: number;
+  until: number;
 };
 
 export type table_recommend_servers = {
-  categoryId: string;
   serverId: string;
+  categoryId: string | null;
   tags: string;
+};
+
+export type table_recommend_server_categories = {
+  categoryId: string;
+  name: string;
+  order: number;
 };
 
 export type table_reset_email_requests = {
@@ -148,6 +153,30 @@ export type table_reset_email_requests = {
 export type table_reset_password_requests = {
   userId: string;
   code: string;
+  createdAt: number;
+};
+
+export type table_servers = {
+  serverId: string;
+  name: string;
+  avatar: string;
+  avatarUrl: string;
+  announcement: string;
+  applyNotice: string;
+  description: string;
+  displayId: string;
+  specialId: string | null;
+  slogan: string;
+  level: number;
+  wealth: number;
+  receiveApply: boolean;
+  isVerified: boolean;
+  isShowAvailable: boolean;
+  type: 'game' | 'entertainment' | 'other';
+  visibility: 'public' | 'private' | 'invisible' | 'blocked';
+  lobbyId: string | null;
+  receptionLobbyId: string | null;
+  ownerId: string | null;
   createdAt: number;
 };
 
@@ -163,31 +192,35 @@ export type table_server_permissions = {
   permissionLevel: number;
 };
 
-export type table_servers = {
-  serverId: string;
-  name: string;
-  avatar: string;
-  avatarUrl: string;
-  announcement: string;
-  applyNotice: string;
-  description: string;
-  displayId: string;
-  slogan: string;
-  level: number;
-  wealth: number;
-  receiveApply: boolean;
-  isVerified: boolean;
-  type: 'game' | 'entertainment' | 'other';
-  visibility: 'public' | 'private' | 'invisible' | 'blocked';
-  lobbyId: string;
-  receptionLobbyId: string | null;
-  ownerId: string;
+export type table_tokens = {
+  token: string;
+  userId: string;
   createdAt: number;
 };
 
-export type table_tokens = {
+export type table_users = {
   userId: string;
-  token: string;
+  name: string;
+  displayId: string;
+  avatar: string;
+  avatarUrl: string;
+  signature: string;
+  about: string;
+  country: string;
+  level: number;
+  vip: number;
+  xp: number;
+  requiredXp: number;
+  progress: number;
+  birthYear: number;
+  birthMonth: number;
+  birthDay: number;
+  isVerified: boolean;
+  status: string;
+  gender: string;
+  currentChannelId: string | null;
+  currentServerId: string | null;
+  lastActiveAt: number;
   createdAt: number;
 };
 
@@ -207,54 +240,35 @@ export type table_user_badges = {
   obtainedAt: number;
 };
 
+export type table_user_liked_anchors = {
+  userId: string;
+  anchorUserId: string;
+};
+
 export type table_user_servers = {
-  recent: boolean;
+  userId: string;
+  serverId: string;
   owned: boolean;
+  recent: boolean;
   favorite: boolean;
   timestamp: number;
 };
 
-export type table_user_vips = {
-  userId: string;
-  expiresAt: number;
-  createdAt: number;
-};
-
 export type table_user_settings = {
   userId: string;
-  forbidFriendApplications: boolean | null;
-  forbidShakeMessages: boolean | null;
-  forbidMemberInvitations: boolean | null;
-  forbidStrangerMessages: boolean | null;
-  shareCurrentServer: boolean | null;
-  shareRecentServers: boolean | null;
-  shareJoinedServers: boolean | null;
-  shareFavoriteServers: boolean | null;
-  notSaveMessageHistory: boolean | null;
+  forbidFriendApplications: boolean;
+  forbidShakeMessages: boolean;
+  forbidMemberInvitations: boolean;
+  forbidStrangerMessages: boolean;
+  shareCurrentServer: boolean;
+  shareRecentServers: boolean;
+  shareJoinedServers: boolean;
+  shareFavoriteServers: boolean;
+  notSaveMessageHistory: boolean;
 };
 
-export type table_users = {
+export type table_user_show_stats = {
   userId: string;
-  name: string;
-  displayId: string;
-  avatar: string;
-  avatarUrl: string;
-  signature: string;
-  about: string;
-  country: string;
-  level: number;
-  vip: number;
-  vxp: number;
-  xp: number;
-  requiredXp: number;
-  birthYear: number;
-  birthMonth: number;
-  birthDay: number;
-  isVerified: boolean;
-  status: 'online' | 'dnd' | 'idle' | 'gn' | 'offline';
-  gender: 'Male' | 'Female';
-  currentChannelId: string | null;
-  currentServerId: string | null;
-  lastActiveAt: number;
-  createdAt: number;
+  hearts: number;
+  flowers: number;
 };

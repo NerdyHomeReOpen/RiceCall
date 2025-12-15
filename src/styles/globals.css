@@ -27,8 +27,8 @@
   --text-vip-name: #e4493e;
   --text-vip-name-hover: #9c3028;
   --text-nickname: #6e849b;
-  --notify-toaster-border: #f9c55d;
-  --notify-toaster-background: #fefee4;
+  --notification-toaster-border: #f9c55d;
+  --notification-toaster-background: #fefee4;
   --button-background: #fdfdfd;
   --popup-background: #f7f7f7;
 }
@@ -60,18 +60,18 @@
     --text-vip-name: #e4493e;
     --text-vip-name-hover: #9c3028;
     --text-nickname: #6e849b;
-    --notify-toaster-border: #855800;
-    --notify-toaster-background: #3b3b00;
+    --notification-toaster-border: #855800;
+    --notification-toaster-background: #3b3b00;
     --button-background: linear-gradient(#242424, #1f1f1f);
   } */
 }
 
 * {
-  border: none;
   box-sizing: border-box;
-  outline: none;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  outline: none;
+  border: none;
 }
 
 html,
@@ -81,14 +81,14 @@ body {
   flex-direction: column;
   width: 100%;
   height: 100%;
-  margin: 0;
   padding: 0;
+  margin: 0;
+  overflow: clip;
   font-family: arial, sans-serif;
   font-size: 13px;
-  overflow: clip;
   color: var(--text-color);
-  background-color: var(--background);
   user-select: none;
+  background-color: var(--background);
 
   --font-family: arial, sans-serif;
 }
@@ -106,8 +106,8 @@ body {
 
 ::-webkit-scrollbar-thumb {
   background-color: #6d6d6d0f;
-  border-radius: 4px;
   border: 1px solid #6d6d6d26;
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -119,8 +119,8 @@ body {
 .resize-handle {
   min-width: 2px;
   height: 100%;
-  background-color: var(--border);
   cursor: ew-resize;
+  background-color: var(--border);
   transition: background-color 0.1s ease-in-out;
 }
 
@@ -132,8 +132,8 @@ body {
 .resize-handle-vertical {
   width: 100%;
   min-height: 2px;
-  background-color: var(--border);
   cursor: ns-resize;
+  background-color: var(--border);
   transition: background-color 0.1s ease-in-out;
 }
 
@@ -154,12 +154,12 @@ input[type='checkbox'] {
 
 input[type='radio'],
 input[type='checkbox'] {
-  min-height: 19px;
   min-width: 19px;
-  background-size: inherit;
-  background-position: 0 0;
-  cursor: pointer;
+  min-height: 19px;
   appearance: none;
+  cursor: pointer;
+  background-position: 0 0;
+  background-size: inherit;
   border: none;
 }
 
@@ -205,8 +205,8 @@ button {
 *:disabled,
 .disabled {
   color: #c5c5c5 !important;
-  filter: grayscale(100%) !important;
   pointer-events: none !important;
+  filter: grayscale(100%) !important;
 }
 
 *[datatype='read-only'] {
@@ -225,20 +225,20 @@ button {
 /* Hover Text */
 
 .hover-text {
-  z-index: 1;
   position: absolute;
-  left: 0;
   bottom: 100%;
+  left: 0;
+  z-index: 1;
   display: flex;
   align-items: center;
   height: 20px;
   padding-right: 3px;
   padding-left: 3px;
+  color: var(--text-color-quinary);
+  white-space: nowrap;
   background-color: var(--background);
   border: 1px solid var(--border);
   border-radius: 3px;
-  white-space: nowrap;
-  color: var(--text-color-quinary);
   opacity: 0;
 }
 

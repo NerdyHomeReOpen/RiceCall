@@ -66,11 +66,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     name: currentServerName,
     avatarUrl: currentServerAvatarUrl,
     displayId: currentServerDisplayId,
+    specialId: currentServerSpecialId,
     receiveApply: currentServerReceiveApply,
     favorite: isCurrentServerFavorite,
     isVerified: isCurrentServerVerified,
   } = currentServer;
-  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: currentChannelIsLobby } = currentChannel;
+  const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: isCurrentChannelLobby } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
   const connectStatus = 4 - Math.floor(Number(latency) / 50);
   const movableServerUserIds = useMemo(
@@ -238,7 +239,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
             <div className={styles['name-text']}>{currentServerName} </div>
           </div>
           <div className={styles['box']}>
-            <div className={styles['id-text']}>{currentServerDisplayId}</div>
+            <div className={styles['id-text']}>{currentServerSpecialId || currentServerDisplayId}</div>
             <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
             <div className={styles['options']}>
               <div
@@ -268,7 +269,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
         <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
           <div className={'hover-text'}>{`${latency}ms`}</div>
         </div>
-        <div className={styles['current-channel-text']}>{currentChannelIsLobby ? t(`${currentChannelName}`) : currentChannelName}</div>
+        <div className={styles['current-channel-text']}>{isCurrentChannelLobby ? t(currentChannelName) : currentChannelName}</div>
       </div>
 
       {/* Mic Queue */}
