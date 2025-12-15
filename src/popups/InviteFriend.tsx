@@ -18,6 +18,9 @@ import ipc from '@/services/ipc.service';
 import { handleOpenAlertDialog } from '@/utils/popup';
 import Default from '@/utils/default';
 
+// Constants
+import { INVITATION_BASE_URL } from '@/constant';
+
 interface FriendTabProps {
   server: Server;
   friend: Friend;
@@ -171,7 +174,8 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId
   const handleInviteFriend = () => {
     if (selectedUserIds.length === 0) return;
     handleOpenAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
-      const formatedMessage = `<a href='https://ricecall.com/join?sid=${server.specialId || server.displayId}' type='invitation' customLink='true' />`;
+      const invitationLink = `${INVITATION_BASE_URL}?sid=${server.specialId || server.displayId}`;
+      const formatedMessage = `<a href='${invitationLink}' type='invitation' customLink='true' >${invitationLink}</a>`;
       for (const userId of selectedUserIds) {
         ipc.socket.send('directMessage', { targetId: userId, preset: { type: 'dm', content: formatedMessage } });
       }
