@@ -193,5 +193,6 @@ export const LANGUAGES: { code: LanguageKey; label: string }[] = [
   { code: 'tr-TR', label: 'Türkçe' },
 ];
 export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds
+export const INVITATION_BASE_URL = 'https://ricecall.com/join';
 export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';
 export const REFRESH_REGION_INFO_INTERVAL = 1000 * 60 * 10; // 10 minutes
