@@ -7,6 +7,8 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import DOMPurify from 'dompurify';
 
+import ActionLink from '@/components/ActionLink';
+
 import { useImageViewer } from '@/providers/ImageViewer';
 
 import { fromTags } from '@/utils/tagConverter';
@@ -64,6 +66,7 @@ const ALLOWED_ATTR: string[] = [
   'data-kick',
   'data-tag',
   'data-timestamp',
+  'customlink',
 ];
 
 interface MarkdownContentProps {
@@ -87,7 +90,20 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     ol: ({ ...props }: any) => <ol {...props} />,
     li: ({ ...props }: any) => <li {...props} />,
     blockquote: ({ ...props }: any) => <blockquote {...props} />,
-    a: ({ href, ...props }: any) => <a target="_blank" href={href} {...props} />,
+    a: ({ ...props }: any) => {
+      const href = props.href;
+      const isCustom = props.customlink === 'true';
+      const children = props.children;
+      const type = props.type ?? 'joinServer';
+
+      if (isCustom) return <ActionLink type={type} data={href} content={children} />;
+
+      return (
+        <a href={href} target="_blank" rel="noreferrer">
+          {children}
+        </a>
+      );
+    },
     table: ({ ...props }: any) => <table className={markdown['table-wrapper']} {...props} />,
     th: ({ ...props }: any) => <th {...props} />,
     td: ({ ...props }: any) => <td {...props} />,

@@ -171,7 +171,10 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId
   const handleInviteFriend = () => {
     if (selectedUserIds.length === 0) return;
     handleOpenAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
-      // ipc.socket.emit('inviteFriendsToServer', { serverId, targetIds: selectedUserIds });
+      const formatedMessage = `<a href='https://ricecall.com/join?sid=${server.specialId || server.displayId}' type='invitation' customLink='true' />`;
+      for (const userId of selectedUserIds) {
+        ipc.socket.send('directMessage', { targetId: userId, preset: { type: 'dm', content: formatedMessage } });
+      }
       handleClose();
     });
   };
