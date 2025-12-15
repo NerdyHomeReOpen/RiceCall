@@ -167,7 +167,14 @@
   position: relative;
 }
 
-.action-body::after {
+.action-area {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 22px;
+}
+
+.action-area::after {
   position: absolute;
   bottom: -1px;
   left: 50%;
@@ -181,16 +188,9 @@
   transform: translateX(-50%);
 }
 
-.action-area {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 22px;
-}
-
 .action-icon {
-  min-width: 12px;
-  min-height: 12px;
+  min-width: 14px;
+  min-height: 14px;
   margin-left: 10px;
   background-repeat: no-repeat;
   background-position: 0 0;

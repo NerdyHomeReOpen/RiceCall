@@ -334,7 +334,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['main-content']}>
           <div className={styles['action-body']}>
             {isFriend && isOnline && targetCurrentServer ? (
-              <div className={styles['action-area']} style={{ cursor: 'pointer' }} onClick={() => handleServerSelect(targetCurrentServer)}>
+              <div className={`${styles['action-area']} ${styles['clickable']}`} onClick={() => handleServerSelect(targetCurrentServer)}>
                 <div className={`${styles['action-icon']} ${styles['in-server']}`} />
                 <div className={styles['action-title']}>{targetCurrentServerName}</div>
               </div>
