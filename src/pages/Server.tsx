@@ -26,7 +26,7 @@ import ipc from '@/services/ipc.service';
 // Utils
 import { isMember, isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
-import { handleOpenChannelEvent, handleOpenServerApplication } from '@/utils/popup';
+import { handleOpenChannelEvent, handleOpenServerApplication, handleOpenChatHistory } from '@/utils/popup';
 
 // Constants
 import { SHOW_FRAME_ORIGIN } from '@/constant';
@@ -284,6 +284,11 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         id: 'open-channel-event',
         label: t('channel-event'),
         onClick: () => handleOpenChannelEvent(userId, currentServer.serverId, channelEvents),
+      },
+      {
+        id: 'open-channel-history',
+        label: t('channel-history'),
+        onClick: () => handleOpenChatHistory(userId, userId),
       },
       {
         id: 'open-announcement',

@@ -1,4 +1,4 @@
-import { initDatabase } from './db/index.js';
+import { initDatabase } from '../../db/index.js';
 
 export type table_channel_message = {
   messageId: string,
