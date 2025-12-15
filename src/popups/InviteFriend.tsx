@@ -197,7 +197,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId
             <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
           </div>
         </div>
-        <div className={`${styles['confirm-button']} ${selectedUserIds.length === 0 ? 'disabled' : ''}`} onClick={() => handleInviteFriend()}>
+        <div className={`${styles['confirm-button']} ${selectedUserIds.length === 0 ? styles['disabled'] : ''}`} onClick={() => handleInviteFriend()}>
           {t('invite')}
         </div>
       </div>

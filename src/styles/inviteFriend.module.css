@@ -1,22 +1,3 @@
-/* Utils */
-.checkbox {
-  display: flex;
-  align-items: center;
-  padding: 5px;
-  font-size: 14px;
-  color: var(--text-secondary);
-}
-
-input.disabled {
-  cursor: not-allowed;
-}
-
-.space-between {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
 /* Headers */
 .header {
   display: flex;
@@ -142,11 +123,6 @@ input.disabled {
   padding: 5px;
   gap: 5px;
   border-radius: 3px;
-
-  &.disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
 }
 
 .friend-tab.selected {
@@ -203,4 +179,28 @@ input.disabled {
   background-size: cover;
   background-position: center;
   position: relative;
+}
+
+/* Utils */
+.disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}
+
+input.disabled {
+  cursor: not-allowed;
+}
+
+.space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
