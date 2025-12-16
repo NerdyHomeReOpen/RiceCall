@@ -99,8 +99,14 @@ export const handleOpenSearchUser = (userId: User['userId']) => {
   ipc.popup.open('searchUser', 'searchUser', { userId });
 };
 
-export const handleOpenApplyFriend = (userId: User['userId'], targetId: User['userId']) => {
-  ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+export const handleOpenApplyFriend = async (userId: User['userId'], targetId: User['userId']) => {
+  await ipc.data.friendApplication(userId, targetId).then((receivedFriendApplication) => {
+    if (receivedFriendApplication) {
+      ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
+    } else {
+      ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+    }
+  });
 };
 
 export const handleOpenApproveFriend = (userId: User['userId'], targetId: User['userId']) => {
