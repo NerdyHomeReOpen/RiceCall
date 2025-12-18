@@ -627,7 +627,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       // Add activity when signature is updated
       args.forEach(({ update }) => {
         if (update.signature && userRef.current.signature !== update.signature) {
-          const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, createdAt: Date.now() });
+          const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, timestamp: Date.now() });
           setFriendActivities((prev) => [newActive, ...prev]);
         }
       });
@@ -652,7 +652,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       args.forEach(({ targetId, update }) => {
         const targetFriend = friendsRef.current.find((f) => f.targetId === targetId && f.relationStatus === 2);
         if (targetFriend && update.signature && targetFriend.signature !== update.signature) {
-          const newActivity = Default.friendActivity({ ...targetFriend, content: update.signature, createdAt: Date.now() });
+          const newActivity = Default.friendActivity({ ...targetFriend, content: update.signature, timestamp: Date.now() });
           setFriendActivities((prev) => [newActivity, ...prev]);
         }
       });

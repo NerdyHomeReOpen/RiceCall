@@ -38,7 +38,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   const strangerFriendGroup = Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId });
   const blacklistFriendGroup = Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId });
   const filteredFriendGroups = useMemo(
-    () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
+    () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order),
     [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],
   );
 

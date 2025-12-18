@@ -149,7 +149,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
                       <div className={friendPage['user-name']} onClick={() => handleOpenUserInfo(userId, friendActivity.userId)}>
                         {friendActivity.name}
                       </div>
-                      <div className={friendPage['timestamp']}>{getFormatTimeDiff(t, friendActivity.createdAt)}</div>
+                      <div className={friendPage['timestamp']}>{getFormatTimeDiff(t, friendActivity.timestamp)}</div>
                     </div>
                     <div className={friendPage['signature']}>{friendActivity.content}</div>
                   </div>

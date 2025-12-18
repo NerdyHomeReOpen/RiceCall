@@ -1,4 +1,15 @@
 import {
+  User,
+  Channel,
+  Server,
+  Member,
+  Friend,
+  FriendActivity,
+  FriendGroup,
+  FriendApplication,
+  MemberApplication,
+  MemberInvitation,
+  BadgeList,
   table_users,
   table_user_settings,
   table_global_permissions,
@@ -16,8 +27,7 @@ import {
   table_user_activities,
   table_member_applications,
   table_member_invitations,
-} from '@/types/database';
-import { User, Channel, Server, Member, Friend, FriendActivity, FriendGroup, FriendApplication, MemberApplication, MemberInvitation, BadgeList } from '@/types';
+} from '@/types';
 
 const defaultTableUser: table_users = {
   userId: '',
@@ -42,6 +52,7 @@ const defaultTableUser: table_users = {
   currentChannelId: null,
   currentServerId: null,
   lastActiveAt: 0,
+  updatedAt: 0,
   createdAt: 0,
 };
 
@@ -56,11 +67,15 @@ const defaultTableUserSettings: table_user_settings = {
   shareJoinedServers: false,
   shareFavoriteServers: false,
   notSaveMessageHistory: false,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
 const defaultTableGlobalPermission: table_global_permissions = {
   userId: '',
   permissionLevel: 1,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
 const defaultBadgeList: BadgeList = {
@@ -75,6 +90,7 @@ const defaultTableFriend: table_friends = {
   isBlocked: false,
   friendGroupId: null,
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const defaultTableFriendGroup: table_friend_groups = {
@@ -83,19 +99,24 @@ const defaultTableFriendGroup: table_friend_groups = {
   order: 0,
   userId: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const defaultTableFriendApplication: table_friend_applications = {
   senderId: '',
   receiverId: '',
+  applicationId: 0,
   description: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const defaultTableUserActivity: table_user_activities = {
   activityId: 0,
   userId: '',
   content: '',
+  timestamp: 0,
+  updatedAt: 0,
   createdAt: 0,
 };
 
@@ -121,6 +142,7 @@ const defaultTableServer: table_servers = {
   receptionLobbyId: null,
   ownerId: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const defaultTableUserServer: table_user_servers = {
@@ -130,6 +152,8 @@ const defaultTableUserServer: table_user_servers = {
   recent: false,
   favorite: false,
   timestamp: 0,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
 const defaultTableMember: table_members = {
@@ -138,19 +162,25 @@ const defaultTableMember: table_members = {
   nickname: null,
   contribution: 0,
   lastJoinChannelAt: 0,
+  joinAt: 0,
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const defaultTableServerPermission: table_server_permissions = {
   userId: '',
   serverId: '',
   permissionLevel: 1,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
 const defaultTableServerBlocked: table_server_blocked_users = {
   userId: '',
   serverId: '',
   blockedUntil: 0,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
 const defaultTableChannel: table_channels = {
@@ -178,6 +208,7 @@ const defaultTableChannel: table_channels = {
   categoryId: null,
   serverId: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const defaultTableChannelMute: table_channel_muted_users = {
@@ -185,19 +216,25 @@ const defaultTableChannelMute: table_channel_muted_users = {
   channelId: '',
   isTextMuted: false,
   isVoiceMuted: false,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
 const defaultTableChannelPermission: table_channel_permissions = {
   userId: '',
   channelId: '',
   permissionLevel: 1,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
 const defaultTableMemberApplications: table_member_applications = {
   userId: '',
   serverId: '',
+  applicationId: 0,
   description: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const defaultTableMemberInvitations: table_member_invitations = {
@@ -205,6 +242,7 @@ const defaultTableMemberInvitations: table_member_invitations = {
   serverId: '',
   description: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
 const Default = {

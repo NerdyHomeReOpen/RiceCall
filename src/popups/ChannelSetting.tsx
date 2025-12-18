@@ -682,7 +682,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                         </td>
                         <td style={{ width: `${memberColumnWidths[1]}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
                         <td style={{ width: `${memberColumnWidths[2]}px` }}>{moderator.contribution}</td>
-                        <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(moderator.createdAt).toLocaleDateString()}</td>
+                        <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(moderator.joinAt).toLocaleDateString()}</td>
                       </tr>
                     );
                   })}

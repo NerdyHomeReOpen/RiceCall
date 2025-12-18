@@ -204,7 +204,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         </div>
         <div className={serverPage['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
           {subChannels
-            .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
+            .sort((a, b) => a.order - b.order)
             .filter((sc) => sc.type === 'channel')
             .map((sc) => channelTab(sc))}
         </div>
@@ -309,7 +309,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         <div className={styles['body']}>
           <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
             {serverChannels
-              .sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt))
+              .sort((a, b) => a.order - b.order)
               .filter((sc) => !sc.categoryId)
               .map((sc) => (sc.type === 'category' ? categoryTab(sc) : channelTab(sc)))}
           </div>

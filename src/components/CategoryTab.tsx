@@ -70,7 +70,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     const isFull = categoryUserLimit && categoryUserLimit <= categoryMembers.length;
     const isSelected = selectedItemId === `category-${categoryId}`;
     const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel));
-    const filteredCategoryChannels = useMemo(() => categoryChannels.filter(Boolean).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [categoryChannels]);
+    const filteredCategoryChannels = useMemo(() => categoryChannels.sort((a, b) => a.order - b.order), [categoryChannels]);
     const filteredCategoryMembers = useMemo(
       () => categoryMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
       [categoryMembers],

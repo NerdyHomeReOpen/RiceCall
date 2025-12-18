@@ -556,7 +556,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                           </td>
                           <td style={{ width: `${memberColumnWidths[1]}px` }}>{getPermissionText(t, member.permissionLevel)}</td>
                           <td style={{ width: `${memberColumnWidths[2]}px` }}>{member.contribution}</td>
-                          <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(member.createdAt).toLocaleDateString()}</td>
+                          <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(member.joinAt).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
