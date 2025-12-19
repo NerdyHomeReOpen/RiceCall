@@ -43,12 +43,12 @@ interface UserTabProps {
   queueUsers: QueueUser[];
   channel: Channel | Category;
   member: OnlineMember;
-  selectedItemId: string | null;
-  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  selectedUserIds: Set<string>;
+  handleUpdateSelectedUser: (userId: string, clearList?: boolean) => void;
   handleConnectChannel: (serverId: Server['serverId'], channelId: Channel['channelId']) => void;
 }
 
-const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, currentChannel, friends, queueUsers, channel, member, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
+const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, currentChannel, friends, queueUsers, channel, member, selectedUserIds, handleUpdateSelectedUser, handleConnectChannel }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -90,6 +90,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = permissionLevel > memberPermission;
   const isEqualOrSuperior = permissionLevel >= memberPermission;
+  const canMoveMember = !isUser && isChannelMod(permissionLevel) && isEqualOrSuperior;
   const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
 
   // Handlers
@@ -283,9 +284,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   };
 
   const handleDragStart = (e: React.DragEvent, userId: User['userId'], channelId: Channel['channelId']) => {
-    e.dataTransfer.setData('type', 'moveUser');
-    e.dataTransfer.setData('userId', userId);
-    e.dataTransfer.setData('currentChannelId', channelId);
+    e.dataTransfer.setData('application/userIds', JSON.stringify(selectedUserIds.has(userId) ? [...selectedUserIds] : [userId]));
+    e.dataTransfer.setData('application/currentChannelId', channelId);
   };
 
   // Effects
@@ -297,11 +297,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   return (
     <div
       ref={userTabRef}
-      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
-      onClick={() => {
-        if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
-        else setSelectedItemId(`user-${memberUserId}`);
-      }}
+      className={`user-info-card-container ${styles['user-tab']} ${selectedUserIds.has(memberUserId) ? styles['selected'] : ''}`}
+      onClick={(e) => handleUpdateSelectedUser(memberUserId, !e.ctrlKey || !isChannelMod(permissionLevel))}
       onDoubleClick={() => {
         if (isUser) return;
         handleOpenDirectMessage(userId, memberUserId);
@@ -318,7 +315,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
         if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
         hoverTimerRef.current = null;
       }}
-      draggable={!isUser && isChannelMod(permissionLevel) && permissionLevel >= memberPermission}
+      draggable={canMoveMember}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
       onContextMenu={(e) => {
         e.preventDefault();

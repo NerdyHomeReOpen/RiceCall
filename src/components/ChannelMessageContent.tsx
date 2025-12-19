@@ -14,12 +14,13 @@ type MessageGroup = (ChannelMessage & { contents: string[] }) | (PromptMessage &
 
 interface ChannelMessageContentProps {
   user: User;
+  onlineMemberMap: Map<string, string | null>;
   currentServer: Server;
   currentChannel: Channel;
   messages: (ChannelMessage | PromptMessage)[];
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, currentServer, currentChannel, messages }) => {
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, onlineMemberMap, currentServer, currentChannel, messages }) => {
   // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
@@ -45,7 +46,7 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
       {messageGroups.map((messageGroup, index) => (
         <div key={index} className={styles['message-wrapper']}>
           {messageGroup.type === 'general' ? (
-            <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
+            <ChannelMessageTab user={user} onlineMemberMap={onlineMemberMap} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
           ) : (
             <PromptMessageTab user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
           )}

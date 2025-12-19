@@ -31,12 +31,14 @@ interface ChannelTabProps {
   channel: Channel;
   expanded: Record<string, boolean>;
   selectedItemId: string | null;
+  selectedUserIds: Set<string>;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  handleUpdateSelectedUser: (userId: string, clearList?: boolean) => void;
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(
-  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, channel, expanded, selectedItemId, selectedUserIds, setExpanded, setSelectedItemId, handleUpdateSelectedUser }) => {
     // Hooks
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
@@ -170,11 +172,17 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     };
 
     const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
+      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => {
+        ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
+        if (selectedUserIds.has(userId)) handleUpdateSelectedUser(userId);
+      });
     };
 
     const handleMoveAllUsersToChannel = (userIds: User['userId'][], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': userIds.length }), () => ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId }))));
+      handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': userIds.length }), () => {
+        ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId })));
+        userIds.map((u) => (selectedUserIds.has(u) ? handleUpdateSelectedUser(u) : null));
+      });
     };
 
     const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {
@@ -186,27 +194,19 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     };
 
     const handleDragStart = (e: React.DragEvent, userIds: User['userId'][], currentChannelId: Channel['channelId']) => {
-      e.dataTransfer.setData('type', 'moveAllUsers');
-      e.dataTransfer.setData('userIds', userIds.join(','));
-      e.dataTransfer.setData('currentChannelId', currentChannelId);
+      e.dataTransfer.setData('application/userIds', JSON.stringify([...userIds]));
+      e.dataTransfer.setData('application/currentChannelId', currentChannelId);
     };
 
     const handleDrop = (e: React.DragEvent, serverId: Server['serverId'], channelId: Channel['channelId']) => {
       e.preventDefault();
-      const moveType = e.dataTransfer.getData('type');
-      const currentChannelId = e.dataTransfer.getData('currentChannelId');
-      if (!moveType || !currentChannelId || currentChannelId === channelId || isReadonlyChannel) return;
-      switch (moveType) {
-        case 'moveUser':
-          const targetUserId = e.dataTransfer.getData('userId');
-          if (!targetUserId) return;
-          handleMoveUserToChannel(targetUserId, serverId, channelId);
-          break;
-        case 'moveAllUsers':
-          const targetUserIds = e.dataTransfer.getData('userIds');
-          if (!targetUserIds) return;
-          handleMoveAllUsersToChannel(targetUserIds.split(','), serverId, channelId);
-          break;
+      const currentChannelId = e.dataTransfer.getData('application/currentChannelId');
+      const targetUserIds = JSON.parse(e.dataTransfer.getData('application/userIds'));
+      if (!currentChannelId || currentChannelId === channelId || isReadonlyChannel || !targetUserIds || targetUserIds.length === 0) return;
+      if (targetUserIds.length === 1) {
+        handleMoveUserToChannel(targetUserIds[0], serverId, channelId);
+      } else {
+        handleMoveAllUsersToChannel(targetUserIds, serverId, channelId);
       }
     };
 
@@ -270,8 +270,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               queueUsers={queueUsers}
               channel={channel}
               member={member}
-              selectedItemId={selectedItemId}
-              setSelectedItemId={setSelectedItemId}
+              selectedUserIds={selectedUserIds}
+              handleUpdateSelectedUser={handleUpdateSelectedUser}
               handleConnectChannel={handleConnectChannel}
             />
           ))}

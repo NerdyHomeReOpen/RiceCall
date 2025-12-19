@@ -237,6 +237,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       return { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled };
     }, [queueUsers, userId, permissionLevel]);
 
+    const onlineMemberMap = useMemo(() => new Map<string, string | null>(serverOnlineMembers.map((m) => [m.userId, m.currentChannelId])), [serverOnlineMembers]);
+
     // Handlers
     const getMicText = () => {
       if (isMicTaken) return t('mic-taken');
@@ -731,7 +733,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
                   }}
                 >
-                  <ChannelMessageContent user={user} currentServer={currentServer} currentChannel={currentChannel} messages={channelMessages} />
+                  <ChannelMessageContent user={user} onlineMemberMap={onlineMemberMap} currentServer={currentServer} currentChannel={currentChannel} messages={channelMessages} />
                   <div style={{ minHeight: '10px' }}></div>
                   {unreadMessageCount > 0 && (
                     <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
@@ -745,6 +747,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                     <ChannelMessageContent
                       user={user}
+                      onlineMemberMap={onlineMemberMap}
                       currentServer={currentServer}
                       currentChannel={currentChannel}
                       messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []}

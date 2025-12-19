@@ -36,12 +36,13 @@ import ipc from '@/services/ipc.service';
 
 interface ChannelMessageProps {
   user: User;
+  onlineMemberMap: Map<string, string | null>;
   currentChannel: Channel;
   currentServer: Server;
   messageGroup: ChannelMessage & { contents: string[] };
 }
 
-const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, currentChannel, currentServer, messageGroup }) => {
+const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, onlineMemberMap, currentChannel, currentServer, messageGroup }) => {
   // Hooks
   const contextMenu = useContextMenu();
   const { t } = useTranslation();
@@ -49,7 +50,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
   // Variables
   const { userId } = user;
   const { serverId: currentServerId } = currentServer;
-  const { channelId: currentChannelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel } = currentChannel;
+  const { channelId: currentChannelId, categoryId: channelCategoryId } = currentChannel;
   const {
     userId: senderUserId,
     name: senderName,
@@ -59,18 +60,20 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
     isTextMuted: isSenderTextMuted,
     isVoiceMuted: isSenderVoiceMuted,
     permissionLevel: senderPermissionLevel,
-    currentChannelId: senderCurrentChannnelId,
-    currentServerId: senderCurrentServerId,
     contents: messageContents,
     timestamp: messageTimestamp,
   } = messageGroup;
 
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channelPermissionLevel);
+  const senderCurrentChannelId = onlineMemberMap.get(senderUserId);
+
+  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isUser = senderUserId === userId;
-  const isSameChannel = senderCurrentChannnelId === currentChannelId;
-  const isSameServer = senderCurrentServerId === currentServerId;
+  const isSameChannel = !senderCurrentChannelId;
+  const isSameServer = senderCurrentChannelId === currentServerId;
   const isSuperior = permissionLevel > senderPermissionLevel;
+  const isEqualOrSuperior = permissionLevel >= senderPermissionLevel;
   const canUpdatePermission = false && !isUser && isSuperior && isMember(senderPermissionLevel);
+  const canMoveMember = !isUser && isChannelMod(permissionLevel) && isEqualOrSuperior;
   const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
   const formattedMessageContents = useMemo(
     () =>
@@ -201,11 +204,18 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
     handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
   };
 
+  const handleDragStart = (e: React.DragEvent, channelId: Channel['channelId']) => {
+    e.dataTransfer.setData('application/userIds', JSON.stringify([senderUserId]));
+    e.dataTransfer.setData('application/currentChannelId', channelId);
+  };
+
   return (
     <div className={styles['message-box']}>
       <div className={`${styles['header']}`}>
         <div
           className={`${styles['details']}`}
+          draggable={canMoveMember}
+          onDragStart={(e) => handleDragStart(e, senderCurrentChannelId || '')}
           onContextMenu={(e) => {
             e.preventDefault();
             e.stopPropagation();

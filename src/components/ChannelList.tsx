@@ -30,7 +30,7 @@ import {
   handleOpenApplyMember,
   handleOpenServerBroadcast,
 } from '@/utils/popup';
-import { isMember, isServerAdmin, isStaff } from '@/utils/permission';
+import { isMember, isChannelMod, isServerAdmin, isStaff } from '@/utils/permission';
 
 interface ChannelListProps {
   user: User;
@@ -57,6 +57,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   // States
   const [viewType, setViewType] = useState<'all' | 'current'>('all');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   // Variables
@@ -93,6 +94,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
         .sort((a, b) => a.position - b.position),
     [queueUsers, serverOnlineMemberMap],
   );
+
+  const selectedUserIdsSet = useMemo(() => new Set(selectedUserIds), [selectedUserIds]);
 
   // Handlers
   const getContextMenuItems1 = () => [
@@ -194,7 +197,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
 
   const handleLocateUser = () => {
     findMe.findMe();
-    setSelectedItemId(`user-${userId}`);
+    setSelectedItemId(null);
+    setSelectedUserIds([userId]);
   };
 
   const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {
@@ -209,6 +213,30 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   const handleQueueListHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isResizingQueueListRef.current || !queueListRef.current) return;
     queueListRef.current.style.maxHeight = `${e.clientY - queueListRef.current.offsetTop}px`;
+  };
+
+  const handleUpdateSelectedUser = (userId: string, clearList: boolean = false) => {
+    if (clearList) {
+      setSelectedUserIds([]);
+    }
+    if (selectedItemId) setSelectedItemId(null);
+    if (!clearList && selectedUserIdsSet.has(userId)) {
+      setSelectedUserIds((prev) => prev.filter((id) => id !== userId));
+    } else {
+      setSelectedUserIds((prev) => prev.concat(userId));
+    }
+  };
+
+  const handleDropQueue = (e: React.DragEvent) => {
+    e.preventDefault();
+    const targetChannelId = e.dataTransfer.getData('application/currentChannelId');
+    const targetUserIds = JSON.parse(e.dataTransfer.getData('application/userIds'));
+    const queueMembersSet = new Set(queueUsers.map((qu) => qu.userId));
+    if (!targetChannelId || targetChannelId !== currentChannelId || !targetUserIds || targetUserIds.length === 0) return;
+    targetUserIds.map((u: User['userId']) => {
+      if (queueMembersSet.has(u)) return;
+      ipc.socket.send('addUserToQueue', { userId: u, serverId: currentServerId, channelId: currentChannelId });
+    });
   };
 
   // Effects
@@ -276,7 +304,18 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       {currentChannelVoiceMode === 'queue' && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
-          <div ref={queueListRef} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
+          <div
+            ref={queueListRef}
+            onDrop={(e) => handleDropQueue(e)}
+            onDragOver={(e) => {
+              if (isChannelMod(permissionLevel)) {
+                e.preventDefault();
+              } else {
+                e.dataTransfer.dropEffect = 'none';
+              }
+            }}
+            className={styles['scroll-view']}
+          >
             <div className={styles['queue-list']}>
               {filteredQueueMembers.map((queueMember) => (
                 <QueueUserTab
@@ -321,7 +360,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
               channel={currentChannel}
               expanded={{ [currentChannelId]: true }}
               selectedItemId={selectedItemId}
+              selectedUserIds={selectedUserIdsSet}
               setExpanded={() => {}}
+              handleUpdateSelectedUser={handleUpdateSelectedUser}
               setSelectedItemId={setSelectedItemId}
             />
           ) : (
@@ -339,7 +380,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
                   category={item as Category}
                   expanded={expanded}
                   selectedItemId={selectedItemId}
+                  selectedUserIds={selectedUserIdsSet}
                   setExpanded={setExpanded}
+                  handleUpdateSelectedUser={handleUpdateSelectedUser}
                   setSelectedItemId={setSelectedItemId}
                 />
               ) : (
@@ -354,7 +397,9 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
                   channel={item as Channel}
                   expanded={expanded}
                   selectedItemId={selectedItemId}
+                  selectedUserIds={selectedUserIdsSet}
                   setExpanded={setExpanded}
+                  handleUpdateSelectedUser={handleUpdateSelectedUser}
                   setSelectedItemId={setSelectedItemId}
                 />
               ),
