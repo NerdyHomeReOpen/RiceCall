@@ -1,4 +1,3 @@
-// Services
 import api from './api.service.js';
 
 const dataService = {
@@ -94,12 +93,16 @@ const dataService = {
     return await api.get(`/recommendServers?${new URLSearchParams(params).toString()}`);
   },
 
-  upload: async (type: string, fileName: string, file: string): Promise<{ avatar: string; avatarUrl: string }> => {
+  uploadImage: async (folder: string, imageName: string, imageUnit8Array: Uint8Array) => {
+    console.log(folder, imageName, imageUnit8Array);
     const formData = new FormData();
-    formData.append('_type', type);
-    formData.append('_fileName', fileName);
-    formData.append('_file', file);
-    return await api.post('/upload', formData);
+    formData.append('folder', folder);
+    formData.append('imageName', imageName);
+    formData.append('image', new Blob([imageUnit8Array], { type: 'image/webp' }), `${imageName}.webp`);
+    return await api.post('/upload/image', formData).then((response) => {
+      console.log(response);
+      return response;
+    });
   },
 
   searchServer: async (query: string) => {

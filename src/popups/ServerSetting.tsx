@@ -57,6 +57,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
     const isResizingMemberColumn = useRef<boolean>(false);
     const isResizingApplicationColumn = useRef<boolean>(false);
     const isResizingBlockMemberColumn = useRef<boolean>(false);
+    const isUploadingRef = useRef<boolean>(false);
 
     // States
     const [server, setServer] = useState<Server>(serverData);
@@ -231,6 +232,21 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
       });
     };
 
+    const handleUploadImage = (imageUnit8Array: Uint8Array) => {
+      isUploadingRef.current = true;
+      if (imageUnit8Array.length > MAX_FILE_SIZE) {
+        handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+        isUploadingRef.current = false;
+        return;
+      }
+      ipc.data.uploadImage('server', serverId, imageUnit8Array).then((response) => {
+        if (response) {
+          setServer((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
+        }
+        isUploadingRef.current = false;
+      });
+    };
+
     // Effects
     useEffect(() => {
       const onPointerup = () => {
@@ -369,23 +385,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     type="file"
                     id="avatar-upload"
                     style={{ display: 'none' }}
-                    accept="image/png, image/jpg, image/jpeg, image/webp"
+                    accept="image/png, image/jpg, image/jpeg, image/webp, image/gif"
                     onChange={(e) => {
                       const file = e.target.files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onloadend = async () =>
-                        handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
-                          if (imageDataUrl.length > MAX_FILE_SIZE) {
-                            handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-                            return;
-                          }
-                          const response = await ipc.data.upload('server', serverId, imageDataUrl);
-                          if (response) {
-                            setServer((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
-                          }
-                        });
-                      reader.readAsDataURL(file);
+                      if (!file || isUploadingRef.current) return;
+                      file.arrayBuffer().then((arrayBuffer) => {
+                        handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                      });
                     }}
                   />
                   {isServerAdmin(permissionLevel) ? (

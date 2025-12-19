@@ -44,6 +44,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
 
   // Refs
   const signatureInputRef = useRef<HTMLInputElement>(null);
+  const isUploadingRef = useRef<boolean>(false);
 
   // States
   const [target, setTarget] = useState(targetData);
@@ -127,6 +128,22 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
+  const handleUploadImage = (imageUnit8Array: Uint8Array) => {
+    isUploadingRef.current = true;
+    if (imageUnit8Array.length > MAX_FILE_SIZE) {
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      isUploadingRef.current = false;
+      return;
+    }
+    ipc.data.uploadImage('user', userId, imageUnit8Array).then((response) => {
+      if (response) {
+        setTarget((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
+        handleEditUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
+      }
+      isUploadingRef.current = false;
+    });
+  };
+
   const isFutureDate = useCallback(
     (year: number, month: number, day: number) => {
       if (year > currentYear) return true;
@@ -204,24 +221,13 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               if (!isSelf) return;
               const fileInput = document.createElement('input');
               fileInput.type = 'file';
-              fileInput.accept = 'image/png, image/jpg, image/jpeg, image/webp';
+              fileInput.accept = 'image/png, image/jpg, image/jpeg, image/webp, image/gif';
               fileInput.onchange = (e) => {
-                const file = (e.target as HTMLInputElement).files?.[0];
-                if (!file) return;
-                const reader = new FileReader();
-                reader.onloadend = async () =>
-                  handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
-                    if (imageDataUrl.length > MAX_FILE_SIZE) {
-                      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-                      return;
-                    }
-                    const response = await ipc.data.upload('user', userId, imageDataUrl);
-                    if (response) {
-                      setTarget((prev) => ({ ...prev, avatar: response.avatar, avatarUrl: response.avatarUrl }));
-                      handleEditUser({ avatar: response.avatar, avatarUrl: response.avatarUrl });
-                    }
-                  });
-                reader.readAsDataURL(file);
+                const image = (e.target as HTMLInputElement).files?.[0];
+                if (!image || isUploadingRef.current) return;
+                image.arrayBuffer().then((arrayBuffer) => {
+                  handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                });
               };
               fileInput.click();
             }}

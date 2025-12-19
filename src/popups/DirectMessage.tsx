@@ -105,19 +105,20 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
   }, [editor]);
 
-  const handlePaste = async (imageData: string, fileName: string) => {
+  const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
     isUploadingRef.current = true;
-    if (imageData.length > MAX_FILE_SIZE) {
+    if (imageUnit8Array.length > MAX_FILE_SIZE) {
       handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
-    const response = await ipc.data.upload('message', `fileName-${Date.now()}`, imageData);
-    if (response) {
-      editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
-      syncStyles();
-    }
-    isUploadingRef.current = false;
+    ipc.data.uploadImage('message', `${Date.now()}`, imageUnit8Array).then((response) => {
+      if (response) {
+        editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
+        syncStyles();
+      }
+      isUploadingRef.current = false;
+    });
   };
 
   const handleEmojiSelect = (code: string) => {
@@ -406,12 +407,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 const items = e.clipboardData.items;
                 for (const item of items) {
                   if (item.type.startsWith('image/')) {
-                    const file = item.getAsFile();
-                    if (file && !isUploadingRef.current) {
-                      const reader = new FileReader();
-                      reader.onloadend = () => handlePaste(reader.result as string, file.name);
-                      reader.readAsDataURL(file);
-                    }
+                    const image = item.getAsFile();
+                    if (!image || isUploadingRef.current) return;
+                    image.arrayBuffer().then((arrayBuffer) => {
+                      handleUploadImage(new Uint8Array(arrayBuffer), image.name);
+                    });
                   }
                 }
               }}

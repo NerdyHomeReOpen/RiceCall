@@ -11,13 +11,13 @@ import ipc from '@/services/ipc.service';
 
 interface ImageCropperPopupProps {
   id: string;
-  imageData: string;
+  imageUnit8Array: Uint8Array;
 }
 
 const INITIAL_CROP_SIZE = 200;
 const MIN_CROP_SIZE = 100;
 
-const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageData }) => {
+const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageUnit8Array }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -72,10 +72,15 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
 
   const handleCrop = async () => {
     const canvas = previewRef.current;
-    const imageDataUrl = canvas?.toDataURL('image/png');
-    if (!imageDataUrl) return;
-    ipc.popup.submit(id, imageDataUrl);
-    handleClose();
+    if (!canvas) return;
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      ipc.popup.submit(id, uint8Array);
+      handleClose();
+    }, 'image/webp');
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -141,7 +146,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
 
   // Effects
   useEffect(() => {
-    imgRef.current.src = imageData;
+    const blob = new Blob([imageUnit8Array]);
+    const imageUrl = URL.createObjectURL(blob);
+    imgRef.current.src = imageUrl;
     imgRef.current.onload = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -157,7 +164,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
       const cropY = drawY + (drawHeight - maxCropSize) / 2;
       setCropBox({ x: cropX, y: cropY, size: maxCropSize });
     };
-  }, [imageData]);
+  }, [imageUnit8Array]);
 
   useEffect(() => {
     draw();

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useRef, useState } from 'react';
 
 // CSS
 import styles from '@/styles/createServer.module.css';
@@ -30,6 +30,9 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   // Hooks
   const { t } = useTranslation();
 
+  // Refs
+  const isUploadingRef = useRef<boolean>(false);
+
   // States
   const [section, setSection] = useState<number>(0);
   const [serverType, setServerType] = useState<Server['type']>(Default.server().type);
@@ -59,6 +62,22 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
 
   const handleClose = () => {
     ipc.window.close();
+  };
+
+  const handleUploadImage = (imageUnit8Array: Uint8Array) => {
+    isUploadingRef.current = true;
+    if (imageUnit8Array.length > MAX_FILE_SIZE) {
+      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      isUploadingRef.current = false;
+      return;
+    }
+    ipc.data.uploadImage('server', serverAvatar, imageUnit8Array).then((response) => {
+      if (response) {
+        setServerAvatar(response.imageName);
+        setServerAvatarUrl(response.imageUrl);
+      }
+      isUploadingRef.current = false;
+    });
   };
 
   return (
@@ -117,24 +136,13 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                 type="file"
                 id="avatar-upload"
                 style={{ display: 'none' }}
-                accept="image/png, image/jpg, image/jpeg, image/webp"
+                accept="image/png, image/jpg, image/jpeg, image/webp, image/gif"
                 onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const reader = new FileReader();
-                  reader.onloadend = () =>
-                    handleOpenImageCropper(reader.result as string, async (imageDataUrl) => {
-                      if (imageDataUrl.length > MAX_FILE_SIZE) {
-                        handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-                        return;
-                      }
-                      const response = await ipc.data.upload('server', serverAvatar, imageDataUrl);
-                      if (response) {
-                        setServerAvatar(response.avatar);
-                        setServerAvatarUrl(response.avatarUrl);
-                      }
-                    });
-                  reader.readAsDataURL(file);
+                  const image = e.target.files?.[0];
+                  if (!image || isUploadingRef.current) return;
+                  image.arrayBuffer().then((arrayBuffer) => {
+                    handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                  });
                 }}
               />
               <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>

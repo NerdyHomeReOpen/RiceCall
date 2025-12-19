@@ -101,6 +101,23 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     };
   };
 
+  const handleUploadImage = async (imageUnit8Array: Uint8Array) => {
+    const blob = new Blob([imageUnit8Array], { type: 'image/webp' });
+    const imageUrl = URL.createObjectURL(blob);
+    const dominantColor = await getDominantColor(imageUrl);
+    const visibleColor = getVisibleColor(dominantColor);
+    const contrastColor = getContrastColor(dominantColor);
+
+    const newTheme: Theme = {
+      headerImage: `url(${imageUrl})`,
+      mainColor: toRGBString(visibleColor),
+      secondaryColor: toRGBString(contrastColor),
+    };
+
+    ipc.customThemes.current.set(newTheme);
+    ipc.customThemes.add(newTheme);
+  };
+
   // Effects
   useEffect(() => {
     const changeCustomTheme = (customThemes: Theme[]) => {
@@ -213,23 +230,11 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                     style={{ display: 'none' }}
                     accept="image/png, image/jpg, image/jpeg, image/webp"
                     onChange={(e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-                      const reader = new FileReader();
-                      reader.onloadend = () =>
-                        handleOpenImageCropper(reader.result as string, async (imageDataUrl: string) => {
-                          const dominantColor = await getDominantColor(imageDataUrl);
-                          const visibleColor = getVisibleColor(dominantColor);
-                          const contrastColor = getContrastColor(dominantColor);
-                          const newTheme: Theme = {
-                            headerImage: `url(${imageDataUrl})`,
-                            mainColor: toRGBString(visibleColor),
-                            secondaryColor: toRGBString(contrastColor),
-                          };
-                          ipc.customThemes.current.set(newTheme);
-                          ipc.customThemes.add(newTheme);
-                        });
-                      reader.readAsDataURL(file);
+                      const image = e.target.files?.[0];
+                      if (!image) return;
+                      image.arrayBuffer().then((arrayBuffer) => {
+                        handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                      });
                     }}
                   />
                 </div>

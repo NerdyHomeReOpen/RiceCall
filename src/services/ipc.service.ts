@@ -213,9 +213,9 @@ const ipcService = {
       return await ipcRenderer.invoke('data-recommendServers', region);
     },
 
-    upload: async (type: string, fileName: string, file: string): Promise<any | null> => {
+    uploadImage: async (folder: string, imageName: string, imageUnit8Array: Uint8Array): Promise<{ imageName: string; imageUrl: string } | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-upload', type, fileName, file);
+      return await ipcRenderer.invoke('data-uploadImage', folder, imageName, imageUnit8Array);
     },
 
     searchServer: async (query: string): Promise<Server[]> => {
