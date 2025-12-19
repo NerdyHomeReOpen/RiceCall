@@ -169,7 +169,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
           if (disabled) return;
           if (isWarning) return;
           if (isComposingRef.current) return;
-          if (e.shiftKey) return;
+          if (e.shiftKey || e.ctrlKey) return;
           if (e.key === 'Enter') {
             e.preventDefault();
             if (messageInput.trim().length === 0) return;
