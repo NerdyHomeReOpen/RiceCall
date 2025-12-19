@@ -315,6 +315,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
               }
             }}
             className={styles['scroll-view']}
+            style={{ maxHeight: '120px', minHeight: '120px' }}
           >
             <div className={styles['queue-list']}>
               {filteredQueueMembers.map((queueMember) => (
