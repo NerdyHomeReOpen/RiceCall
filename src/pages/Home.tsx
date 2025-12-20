@@ -104,14 +104,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
     if (!canSearchRef.current) return;
 
-    ipc.data.searchServer(query).then((servers) => {
+    ipc.data.searchServer(query).then((serverResults) => {
       const q = searchQueryRef.current;
 
       handleClearSearchState();
 
-      if (!servers.length) return;
+      if (!serverResults.length) return;
 
-      const sorted = [...servers].sort((a, b) => {
+      const sorted = [...serverResults].sort((a, b) => {
         const aHasId = a.displayId.toString().includes(q);
         const bHasId = b.displayId.toString().includes(q);
         return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
@@ -249,7 +249,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   <div className={`${styles['header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
                     {t('quick-enter-server', { '0': searchQueryRef.current })}
                   </div>
-                  {/* <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleConnectServer(exactMatch.serverId, exactMatch.displayId)} /> */}
+                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleServerSelect(exactMatch)} />
                 </>
               )}
               {personalResults.length > 0 && (
