@@ -56,8 +56,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
     nickname: senderNickname,
     vip: senderVip,
     gender: senderGender,
-    isTextMuted: isSenderTextMuted,
-    isVoiceMuted: isSenderVoiceMuted,
     permissionLevel: senderPermissionLevel,
     currentChannelId: senderCurrentChannnelId,
     currentServerId: senderCurrentServerId,
@@ -95,18 +93,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
       id: 'view-profile',
       label: t('view-profile'),
       onClick: () => handleOpenUserInfo(userId, senderUserId),
-    },
-    {
-      id: 'forbid-voice',
-      label: isSenderVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
-      show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-      onClick: () => handleForbidUserVoiceInChannel(senderUserId, currentServerId, currentChannelId, !isSenderVoiceMuted),
-    },
-    {
-      id: 'forbid-text',
-      label: isSenderTextMuted ? t('unforbid-text') : t('forbid-text'),
-      show: !isUser && isChannelMod(permissionLevel) && isSuperior,
-      onClick: () => handleForbidUserTextInChannel(senderUserId, currentServerId, currentChannelId, !isSenderTextMuted),
     },
     {
       id: 'kick-channel',
@@ -180,14 +166,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
       ],
     },
   ];
-
-  const handleForbidUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isTextMuted: boolean) => {
-    ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
-  };
-
-  const handleForbidUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isVoiceMuted: boolean) => {
-    ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
-  };
 
   const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
     ipc.socket.send('editServerPermission', { userId, serverId, update });

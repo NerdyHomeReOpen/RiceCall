@@ -1,3 +1,20 @@
+export enum Permission {
+  Guest = 1,
+  Member = 2,
+  ChannelMod = 3,
+  ChannelAdmin = 4,
+  ServerAdmin = 5,
+  ServerOwner = 6,
+  Staff = 7,
+  SuperAdmin = 8,
+}
+
+export enum RelationStatus {
+  Stranger = 0,
+  Pending = 1,
+  Friend = 2,
+}
+
 export type table_accounts = {
   account: string;
   password: string;
@@ -15,6 +32,7 @@ export type table_announcements = {
   content: string;
   region: string;
   category: string;
+  timestamp: number;
   showFrom: number;
   showTo: number;
   updatedAt: number;
@@ -78,7 +96,7 @@ export type table_channel_muted_users = {
 export type table_channel_permissions = {
   userId: string;
   channelId: string;
-  permissionLevel: number;
+  permissionLevel: Permission;
   updatedAt: number;
   createdAt: number;
 };
@@ -87,7 +105,7 @@ export type table_friends = {
   userId: string;
   targetId: string;
   note: string;
-  relationStatus: number;
+  relationStatus: RelationStatus;
   isBlocked: boolean;
   friendGroupId: string | null;
   updatedAt: number;
@@ -97,7 +115,6 @@ export type table_friends = {
 export type table_friend_applications = {
   senderId: string;
   receiverId: string;
-  applicationId: number; // TODO: Remove this column
   description: string;
   updatedAt: number;
   createdAt: number;
@@ -114,7 +131,7 @@ export type table_friend_groups = {
 
 export type table_global_permissions = {
   userId: string;
-  permissionLevel: number;
+  permissionLevel: Permission;
   updatedAt: number;
   createdAt: number;
 };
@@ -133,7 +150,6 @@ export type table_members = {
 export type table_member_applications = {
   userId: string;
   serverId: string;
-  applicationId: number; // TODO: Remove this column
   description: string;
   updatedAt: number;
   createdAt: number;
@@ -228,7 +244,7 @@ export type table_server_blocked_users = {
 export type table_server_permissions = {
   userId: string;
   serverId: string;
-  permissionLevel: number;
+  permissionLevel: Permission;
   updatedAt: number;
   createdAt: number;
 };

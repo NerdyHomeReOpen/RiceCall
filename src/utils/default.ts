@@ -9,7 +9,6 @@ import {
   FriendApplication,
   MemberApplication,
   MemberInvitation,
-  BadgeList,
   table_users,
   table_user_settings,
   table_global_permissions,
@@ -78,10 +77,6 @@ const defaultTableGlobalPermission: table_global_permissions = {
   createdAt: 0,
 };
 
-const defaultBadgeList: BadgeList = {
-  badges: '',
-};
-
 const defaultTableFriend: table_friends = {
   userId: '',
   targetId: '',
@@ -105,7 +100,6 @@ const defaultTableFriendGroup: table_friend_groups = {
 const defaultTableFriendApplication: table_friend_applications = {
   senderId: '',
   receiverId: '',
-  applicationId: 0,
   description: '',
   createdAt: 0,
   updatedAt: 0,
@@ -231,7 +225,6 @@ const defaultTableChannelPermission: table_channel_permissions = {
 const defaultTableMemberApplications: table_member_applications = {
   userId: '',
   serverId: '',
-  applicationId: 0,
   description: '',
   createdAt: 0,
   updatedAt: 0,
@@ -250,7 +243,7 @@ const Default = {
     ...defaultTableUser,
     ...defaultTableUserSettings,
     ...defaultTableGlobalPermission,
-    ...defaultBadgeList,
+    badges: '',
     ...overrides,
   }),
 
@@ -258,12 +251,11 @@ const Default = {
     ...defaultTableFriend,
     ...defaultTableUser,
     ...defaultTableUserSettings,
-    ...defaultBadgeList,
+    badges: '',
     ...overrides,
   }),
 
   friendActivity: (overrides: Partial<FriendActivity> = {}): FriendActivity => ({
-    ...defaultTableFriend,
     ...defaultTableUser,
     ...defaultTableUserActivity,
     ...overrides,
@@ -283,8 +275,8 @@ const Default = {
   server: (overrides: Partial<Server> = {}): Server => ({
     ...defaultTableServer,
     ...defaultTableUserServer,
-    ...defaultTableMember,
     ...defaultTableServerPermission,
+    contribution: 0,
     ...overrides,
   }),
 
@@ -300,10 +292,7 @@ const Default = {
     ...defaultTableMember,
     ...defaultTableUser,
     ...defaultTableServerBlocked,
-    ...defaultTableServerPermission,
-    ...defaultTableUserSettings,
     ...defaultTableGlobalPermission,
-    ...defaultBadgeList,
     ...overrides,
   }),
 
@@ -315,7 +304,7 @@ const Default = {
 
   memberInvitation: (overrides: Partial<MemberInvitation> = {}): MemberInvitation => ({
     ...defaultTableMemberInvitations,
-    ...defaultTableUser,
+    ...defaultTableServer,
     ...overrides,
   }),
 };
