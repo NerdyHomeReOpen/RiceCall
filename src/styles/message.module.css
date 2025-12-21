@@ -121,6 +121,7 @@
   text-overflow: ellipsis;
   color: var(--text-username);
   white-space: nowrap;
+  user-select: text;
   cursor: pointer;
 
   &:hover {
