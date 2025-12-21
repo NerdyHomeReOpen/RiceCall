@@ -117,7 +117,7 @@ body {
 /* Resize Handle */
 
 .resize-handle {
-  min-width: 2px;
+  min-width: 3px;
   height: 100%;
   cursor: ew-resize;
   background-color: var(--border);
@@ -131,7 +131,7 @@ body {
 
 .resize-handle-vertical {
   width: 100%;
-  min-height: 2px;
+  min-height: 3px;
   cursor: ns-resize;
   background-color: var(--border);
   transition: background-color 0.1s ease-in-out;
