@@ -570,7 +570,18 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [region, userId]);
 
   useEffect(() => {
-    if (!userId || !currentServerId) return;
+    if (!userId) return;
+    if (!currentServerId) {
+      setCurrentServer(Default.server());
+      setChannels([]);
+      setServerOnlineMembers([]);
+      setServerMemberApplications([]);
+      setActionMessages([]);
+      setChannelMessages([]);
+      setQueueUsers([]);
+      setChannelEvents([]);
+      return;
+    }
     const refresh = async () => {
       ipc.data.server(userId, currentServerId).then((server) => {
         if (server) setCurrentServer(server);
@@ -589,7 +600,11 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [userId, currentServerId]);
 
   useEffect(() => {
-    if (!userId || !currentServerId || !currentChannelId) return;
+    if (!userId) return;
+    if (!currentServerId || !currentChannelId) {
+      setCurrentChannel(Default.channel());
+      return;
+    }
     const refresh = async () => {
       ipc.data.channel(userId, currentServerId, currentChannelId).then((channel) => {
         if (channel) setCurrentChannel(channel);
@@ -627,16 +642,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<User> }[]) => {
-      // Remove action messages and channel messages while switching server
-      const newCurrentServerId = args[0].update.currentServerId;
-      if (newCurrentServerId !== undefined && newCurrentServerId !== currentServerId) {
-        setActionMessages([]);
-        setChannelMessages([]);
-        setQueueUsers([]);
-        setChannels([]);
-        setServerOnlineMembers([]);
-        setChannelEvents([]);
-      }
       // Add activity when signature is updated
       args.forEach(({ update }) => {
         if (update.signature && userRef.current.signature !== update.signature) {
