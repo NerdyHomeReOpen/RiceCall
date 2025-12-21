@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 
 // CSS
 import header from '@/styles/header.module.css';
@@ -392,9 +392,11 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
   const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
   const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
+  const [currentServer, setCurrentServer] = useState<Server>(Default.server());
   const [servers, setServers] = useState<Server[]>([]);
   const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
   const [serverMemberApplications, setServerMemberApplications] = useState<MemberApplication[]>([]);
+  const [currentChannel, setCurrentChannel] = useState<Channel>(Default.channel());
   const [channels, setChannels] = useState<Channel[]>([]);
   const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>([]);
   const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
@@ -409,10 +411,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   const [region, setRegion] = useState<LanguageKey>('en-US');
 
   // Variables
-  const currentServer = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
-  const currentChannel = useMemo(() => channels.find((item) => item.channelId === user.currentChannelId) || Default.channel(), [channels, user.currentChannelId]);
-  const { userId, name: userName } = user;
-  const { serverId: currentServerId, name: currentServerName } = currentServer;
+  const { userId, name: userName, currentServerId, currentChannelId } = user;
+  const { name: currentServerName } = currentServer;
 
   // Handlers
   const handleClearMessages = () => {
@@ -572,6 +572,9 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (!userId || !currentServerId) return;
     const refresh = async () => {
+      ipc.data.server(userId, currentServerId).then((server) => {
+        if (server) setCurrentServer(server);
+      });
       ipc.data.channels(userId, currentServerId).then((channels) => {
         if (channels) setChannels(channels);
       });
@@ -584,6 +587,16 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
     refresh();
   }, [userId, currentServerId]);
+
+  useEffect(() => {
+    if (!userId || !currentServerId || !currentChannelId) return;
+    const refresh = async () => {
+      ipc.data.channel(userId, currentServerId, currentChannelId).then((channel) => {
+        if (channel) setCurrentChannel(channel);
+      });
+    };
+    refresh();
+  }, [userId, currentServerId, currentChannelId]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('connect', () => {
