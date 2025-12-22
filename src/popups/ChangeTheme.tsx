@@ -8,6 +8,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Color from '@/utils/color';
 import * as Popup from '@/utils/popup';
+import Logger from '@/utils/logger';
 
 import styles from '@/styles/changeTheme.module.css';
 import popupStyles from '@/styles/popup.module.css';
@@ -91,7 +92,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       }
     };
     img.onerror = () => {
-      console.error(`Error loading color selector image: ${imgSrc}`);
+      new Logger('ColorSelector').error(`Error loading color selector image: ${imgSrc}`);
     };
   };
 
@@ -115,7 +116,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   // Effects
   useEffect(() => {
     const changeCustomTheme = (customThemes: Types.Theme[]) => {
-      console.info('[Custom Themes] custom themes updated: ', customThemes);
+      new Logger('CustomThemes').info(`custom themes updated: ${customThemes}`);
       setCustomThemes(customThemes);
     };
     changeCustomTheme(ipc.customThemes.get());

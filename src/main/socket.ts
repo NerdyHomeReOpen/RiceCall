@@ -113,6 +113,8 @@ const ServerToClientEventNames = [
   'userUpdate',
 ];
 
+const noLogEventSet = new Set<string>(['queueMembersSet', 'serverOnlineMemberUpdate']);
+
 export let socket: Socket | null = null;
 export let seq: number = 0;
 export let interval: NodeJS.Timeout | null = null;
@@ -128,7 +130,7 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
       });
     } catch (err) {
       if (i === retries) throw err;
-      console.warn(`${new Date().toLocaleString()} | Retrying(#${retries}) socket.emit `, event, payload);
+      console.warn(`${new Date().toLocaleString()} | Retrying(#${i}) socket.emit `, event, payload);
     }
   }
   throw new Error('Failed to emit event with retry');
@@ -187,7 +189,7 @@ export function connectSocket(token: string) {
 
     ServerToClientEventNames.forEach((event) => {
       socket?.on(event, async (...args) => {
-        if (event !== 'queueMembersSet' && event !== 'serverOnlineMemberUpdate') console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
+        if (!noLogEventSet.has(event)) console.log(`${new Date().toLocaleString()} | socket.on`, event, ...args);
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
@@ -261,22 +263,23 @@ export function connectSocket(token: string) {
     });
   });
 
-  interval = setInterval(() => {
+  const SendHeartbeat = () => {
     const start = Date.now();
     socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
       if (err) {
         console.warn(`${new Date().toLocaleString()} | Heartbeat ${seq} timeout`);
       } else {
         const latency = Date.now() - start;
-
         console.log(`${new Date().toLocaleString()} | ACK for #${ack.seq} in ${latency} ms`);
-
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send('heartbeat', { seq: ack.seq, latency });
         });
       }
     });
-  }, 30000);
+  };
+
+  SendHeartbeat();
+  interval = setInterval(SendHeartbeat, 30000);
 
   socket.connect();
 }

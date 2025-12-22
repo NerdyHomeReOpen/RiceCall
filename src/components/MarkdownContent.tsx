@@ -56,6 +56,7 @@ const ALLOWED_ATTR: string[] = [
   'width',
   'height',
   'allowfullscreen',
+  'loading',
   'type',
   'style',
   'data-yt',
@@ -91,7 +92,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     th: ({ ...props }: any) => <th {...props} />,
     td: ({ ...props }: any) => <td {...props} />,
     hr: ({ ...props }: any) => <hr {...props} />,
-    img: ({ alt, src, ...props }: any) => <img alt={alt} src={src} {...props} onClick={() => selectImage(src)} />,
+    img: ({ alt, src, ...props }: any) => <img loading="lazy" alt={alt} src={src} {...props} onClick={() => selectImage(src)} />,
     code: ({ children, ...props }: any) => <code {...props}>{children}</code>,
     pre: ({ ...props }: any) => <pre {...props} />,
   };

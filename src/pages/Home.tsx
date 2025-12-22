@@ -78,7 +78,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
-  const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]);
+  const filteredAnns = useMemo(() => [...announcements].sort((a, b) => b.timestamp - a.timestamp), [announcements]);
   const filteredRecommendServers = useMemo(
     () => recommendServers.filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory))),
     [recommendServers, selectReommendServerCategory],
@@ -269,15 +269,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={`${styles['navegate-tab']} ${section === 0 ? styles['active'] : ''}`} data-key="60060" onClick={() => setSection(0)}>
             {t('home')}
           </div>
-          {/* <div className={`${styles['navegate-tab']} ${section === 1 ? styles['active'] : ''}`} data-key="60060" onClick={() => setSection(1)}>
-            {t('announcement')}
-          </div> */}
-          {/* <div className={`${styles['navegate-tab']} ${section === 2 ? styles['active'] : ''}`} data-key="40007" onClick={() => setSection(2)}>
-            {t('game')}
-          </div>
-          <div className={`${styles['navegate-tab']} ${section === 3 ? styles['active'] : ''}`} data-key="30375" onClick={() => setSection(3)}>
-            {t('live')}
-          </div> */}
         </div>
         <div className={styles['right']}>
           <div className={styles['navegate-tab']} data-key="30014" onClick={() => Popup.handleOpenCreateServer(userId)}>

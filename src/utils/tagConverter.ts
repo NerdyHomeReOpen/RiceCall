@@ -33,7 +33,7 @@ export const fromTags = (raw: string) => {
     .replace(emojiRegex, (_, code) => {
       const emoji = emojis.find((e) => e.code === code);
       if (!emoji) return code;
-      return `<img data-emoji='${code}' class='${markdownStyles['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
+      return `<img data-emoji='${code}' loading='lazy' class='${markdownStyles['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
     })
     .replace(discordTimestampRegex, (_, timestamp) => {
       const date = new Date(parseInt(timestamp) * 1000);

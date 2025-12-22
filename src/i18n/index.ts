@@ -5,6 +5,8 @@ import { initReactI18next } from 'react-i18next';
 
 import type * as Types from '@/types';
 
+import Logger from '@/utils/logger';
+
 import enUS_app from './locales/en-US/app.json';
 import enUS_message from './locales/en-US/message.json';
 import enUS_rpc from './locales/en-US/rpc.json';
@@ -88,7 +90,7 @@ if (typeof window !== 'undefined' && window.require) {
     const electron = window.require('electron');
     ipcRenderer = electron.ipcRenderer;
   } catch (error) {
-    console.warn('Not in Electron environment:', error);
+    new Logger('i18n').warn(`Not in Electron environment: ${error}`);
   }
 }
 

@@ -25,7 +25,7 @@ const handleResponse = async (response: Response, method: 'GET' | 'POST' | 'PATC
 
 const apiService = {
   // GET request
-  get: async (endpoint: string, options?: RequestOptions, retry = true, retryCount = 0): Promise<any | null> => {
+  get: async (endpoint: string, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<any | null> => {
     try {
       const response = await fetch(`${env.API_URL}${endpoint}`, {
         headers: {
@@ -36,15 +36,15 @@ const apiService = {
 
       return await handleResponse(response, 'GET');
     } catch (error: any) {
-      if (retry && retryCount < 3) {
-        return await apiService.get(endpoint, options, false, retryCount + 1);
+      if (retryCount < maxRetry) {
+        return await apiService.get(endpoint, options, maxRetry, retryCount + 1);
       }
       throw error;
     }
   },
 
   // POST request
-  post: async (endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions, retry = true, retryCount = 0): Promise<any | null> => {
+  post: async (endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<any | null> => {
     try {
       const isFormData = data instanceof FormData;
 
@@ -63,15 +63,15 @@ const apiService = {
 
       return await handleResponse(response, 'POST');
     } catch (error: any) {
-      if (retry && retryCount < 3) {
-        return await apiService.post(endpoint, data, options, false, retryCount + 1);
+      if (retryCount < maxRetry) {
+        return await apiService.post(endpoint, data, options, maxRetry, retryCount + 1);
       }
       throw error;
     }
   },
 
   // PATCH request
-  patch: async (endpoint: string, data: Record<string, any>, options?: RequestOptions, retry = true, retryCount = 0): Promise<any | null> => {
+  patch: async (endpoint: string, data: Record<string, any>, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<any | null> => {
     try {
       const headers = new Headers({
         ...(options?.headers || {}),
@@ -87,8 +87,8 @@ const apiService = {
 
       return await handleResponse(response, 'PATCH');
     } catch (error: any) {
-      if (retry && retryCount < 3) {
-        return await apiService.patch(endpoint, data, options, false, retryCount + 1);
+      if (retryCount < maxRetry) {
+        return await apiService.patch(endpoint, data, options, maxRetry, retryCount + 1);
       }
       throw error;
     }

@@ -94,15 +94,11 @@ const dataService = {
   },
 
   uploadImage: async (folder: string, imageName: string, imageUnit8Array: Uint8Array) => {
-    console.log(folder, imageName, imageUnit8Array);
     const formData = new FormData();
     formData.append('folder', folder);
     formData.append('imageName', imageName);
     formData.append('image', new Blob([imageUnit8Array], { type: 'image/webp' }), `${imageName}.webp`);
-    return await api.post('/upload/image', formData).then((response) => {
-      console.log(response);
-      return response;
-    });
+    return await api.post('/upload/image', formData);
   },
 
   searchServer: async (query: string) => {

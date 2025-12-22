@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useCallback } from 'react';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -25,6 +25,7 @@ import { useActionScanner } from '@/providers/ActionScanner';
 
 import * as Popup from '@/utils/popup';
 import * as Default from '@/utils/default';
+import Logger from '@/utils/logger';
 
 import headerStyles from '@/styles/header.module.css';
 
@@ -185,6 +186,47 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     i18n.changeLanguage(language);
   };
 
+  const getNotificationMenuItems = () => [
+    {
+      id: 'no-unread-notify',
+      label: t('no-unread-notify'),
+      show: !hasNotification,
+      className: 'readonly',
+    },
+    {
+      id: 'friend-verification',
+      label: t('friend-verification'),
+      icon: 'notification',
+      show: hasFriendApplication,
+      contentType: 'image',
+      showContentLength: true,
+      showContent: true,
+      contents: friendApplications.map((fa) => fa.avatarUrl),
+      onClick: () => Popup.handleOpenFriendVerification(userId),
+    },
+    {
+      id: 'member-invitation',
+      label: t('member-invitation'),
+      icon: 'notification',
+      show: hasMemberInvitation,
+      contentType: 'image',
+      showContentLength: true,
+      showContent: true,
+      contents: memberInvitations.map((mi) => mi.avatarUrl),
+      onClick: () => Popup.handleOpenMemberInvitation(userId),
+    },
+    {
+      id: 'system-notify',
+      label: t('system-notify'),
+      icon: 'notification',
+      show: hasSystemNotification,
+      showContentLength: true,
+      showContent: false,
+      contents: memberInvitations.map((mi) => mi.avatarUrl),
+      onClick: () => {},
+    },
+  ];
+
   // Effects
   useEffect(() => {
     const next = actionScanner.isIdling ? 'idle' : 'online';
@@ -271,46 +313,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           onClick={(e) => {
             const x = e.currentTarget.getBoundingClientRect().left;
             const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showNotificationMenu(x, y, 'right-bottom', [
-              {
-                id: 'no-unread-notify',
-                label: t('no-unread-notify'),
-                show: !hasNotification,
-                className: 'readonly',
-              },
-              {
-                id: 'friend-verification',
-                label: t('friend-verification'),
-                icon: 'notification',
-                show: hasFriendApplication,
-                contentType: 'image',
-                showContentLength: true,
-                showContent: true,
-                contents: friendApplications.map((fa) => fa.avatarUrl),
-                onClick: () => Popup.handleOpenFriendVerification(userId),
-              },
-              {
-                id: 'member-invitation',
-                label: t('member-invitation'),
-                icon: 'notification',
-                show: hasMemberInvitation,
-                contentType: 'image',
-                showContentLength: true,
-                showContent: true,
-                contents: memberInvitations.map((mi) => mi.avatarUrl),
-                onClick: () => Popup.handleOpenMemberInvitation(userId),
-              },
-              {
-                id: 'system-notify',
-                label: t('system-notify'),
-                icon: 'notification',
-                show: hasSystemNotification,
-                showContentLength: true,
-                showContent: false,
-                contents: memberInvitations.map((mi) => mi.avatarUrl),
-                onClick: () => {},
-              },
-            ]);
+            contextMenu.showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
           }}
         >
           <div className={`${headerStyles['overlay']} ${hasNotification && headerStyles['new']}`} />
@@ -383,9 +386,9 @@ const RootPageComponent: React.FC = React.memo(() => {
   const { name: currentServerName } = currentServer;
 
   // Handlers
-  const handleClearMessages = () => {
+  const handleClearMessages = useCallback(() => {
     setChannelMessages([]);
-  };
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -553,7 +556,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('connect', () => {
-      console.info('[Socket] connected');
+      new Logger('Socket').info('connected');
       ipc.popup.close('errorDialog');
       if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
       setIsSocketConnected(true);
@@ -563,7 +566,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('disconnect', () => {
-      console.info('[Socket] disconnected');
+      new Logger('Socket').info('disconnected');
       if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
       disconnectTimerRef.current = setTimeout(() => setIsSocketConnected(false), 30000);
     });
@@ -572,7 +575,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('heartbeat', (...args: { seq: number; latency: number }[]) => {
-      console.log(`[Socket] heartbeat`, args);
+      new Logger('Socket').info(`heartbeat: ${args[0].latency}`);
       setLatency(args[0].latency);
     });
     return () => unsub();
@@ -910,6 +913,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           timestamp: Date.now(),
           buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
         });
+        break;
       case 'friends':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-friend-page'),
@@ -921,6 +925,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           timestamp: Date.now(),
           buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
         });
+        break;
       case 'server':
         ipc.discord.updatePresence({
           details: `${t('in')} ${currentServerName}`,
@@ -932,6 +937,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           timestamp: Date.now(),
           buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
         });
+        break;
     }
   }, [mainTab.selectedTabId, userName, currentServerName, serverOnlineMembers.length, t]);
 

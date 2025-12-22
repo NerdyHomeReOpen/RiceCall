@@ -7,13 +7,11 @@ import { app } from 'electron';
 
 export let env: Record<string, string> = {};
 
-const EnvSchema = z
-  .object({
-    API_URL: z.string(),
-    WS_URL: z.string(),
-    CROWDIN_DISTRIBUTION_HASH: z.string(),
-  })
-  .partial();
+const EnvSchema = z.object({
+  API_URL: z.string(),
+  WS_URL: z.string(),
+  CROWDIN_DISTRIBUTION_HASH: z.string().optional(),
+});
 
 export function loadEnv(server: 'dev' | 'prod' = 'prod') {
   let envLoaded: Record<string, string> = { ...process.env } as any;

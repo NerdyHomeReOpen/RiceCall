@@ -7,6 +7,7 @@ import type * as Types from '@/types';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 import EncodeAudio from '@/utils/encodeAudio';
+import Logger from '@/utils/logger';
 
 const workletCode = `
 class RecorderProcessor extends AudioWorkletProcessor {
@@ -450,7 +451,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           channelId,
         })
         .catch((e) => {
-          console.error('[WebRTC] Error creating consumer: ', e);
+          new Logger('WebRTC').error(`Error creating consumer: ${e}`);
           return null;
         });
       if (!consumerInfo) return;
@@ -468,7 +469,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       const stream = new MediaStream([consumer.track]);
       initSpeakerAudio(userId, stream);
 
-      console.info('[WebRTC] Consumed producer: ', userId);
+      new Logger('WebRTC').info(`Consumed producer: ${userId}`);
     },
     [initSpeakerAudio],
   );
@@ -483,7 +484,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       delete consumersRef.current[producerId];
       removeSpeakerAudio(userId);
 
-      console.info('[WebRTC] Unconsumed producer: ', userId);
+      new Logger('WebRTC').info(`Unconsumed producer: ${userId}`);
     },
     [removeSpeakerAudio],
   );
@@ -500,7 +501,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         channelId,
       })
       .catch((e) => {
-        console.error('[WebRTC] Error creating send transport: ', e);
+        new Logger('WebRTC').error(`Error creating send transport: ${e}`);
         return null;
       });
     if (!transport) return;
@@ -515,7 +516,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           dtlsParameters,
         })
         .then(() => {
-          console.info('[WebRTC] SendTransport connected to SFU');
+          new Logger('WebRTC').info('SendTransport connected to SFU');
           cb();
         })
         .catch(eb);
@@ -529,13 +530,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           channelId,
         })
         .then(({ id }) => {
-          console.info('[WebRTC] SendTransport produced to SFU');
+          new Logger('WebRTC').info('SendTransport produced to SFU');
           cb({ id });
         })
         .catch(eb);
     });
     sendTransportRef.current.on('connectionstatechange', (s) => {
-      console.log('[WebRTC] SendTransport connection state =', s);
+      new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
     });
 
     const track = inputDesRef.current?.stream.getAudioTracks()[0];
@@ -552,11 +553,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       stopTracks: false,
     });
     audioProducerRef.current.on('transportclose', () => {
-      console.log('[WebRTC] Producer transport closed');
+      new Logger('WebRTC').info('Producer transport closed');
       audioProducerRef.current?.close();
     });
     audioProducerRef.current.on('trackended', () => {
-      console.log('[WebRTC] Producer track ended');
+      new Logger('WebRTC').info('Producer track ended');
       audioProducerRef.current?.close();
     });
   }, []);
@@ -574,7 +575,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           channelId,
         })
         .catch((e) => {
-          console.error('[WebRTC] Error creating recv transport: ', e);
+          new Logger('WebRTC').error(`Error creating recv transport: ${e}`);
           return null;
         });
       if (!transport) return;
@@ -589,19 +590,19 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             dtlsParameters,
           })
           .then(() => {
-            console.info('[WebRTC] RecvTransport connected to SFU');
+            new Logger('WebRTC').info('RecvTransport connected to SFU');
             cb();
           })
           .catch(eb);
       });
       recvTransportRef.current.on('connectionstatechange', (s) => {
-        console.log('[WebRTC] RecvTransport connection state =', s);
+        new Logger('WebRTC').info(`RecvTransport connection state = ${s}`);
       });
 
       // consume existing producers
       for (const producer of transport.producers ?? []) {
         consumeOne(producer.id, channelId).catch((e) => {
-          console.error('[WebRTC] Error consuming producer: ', e);
+          new Logger('WebRTC').error(`Error consuming producer: ${e}`);
         });
       }
     },
@@ -684,7 +685,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         initMixAudio(stream);
       })
       .catch((err) => {
-        console.error('[WebRTC] Error capturing audio from system', err);
+        new Logger('WebRTC').error(`Error capturing audio from system: ${err}`);
       });
 
     setIsMixModeActive(true);
@@ -871,13 +872,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         initMicAudio(stream);
       })
       .catch((err) => {
-        console.error('[WebRTC] access input device failed: ', err);
+        new Logger('WebRTC').error(`access input device failed: ${err}`);
       });
   }, [inputAudioDevice, echoCancellation, noiseCancellation, isMicTaken, initMicAudio, removeMicAudio]);
 
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
-      console.info('[WebRTC] input audio device updated: ', inputAudioDevice);
+      new Logger('WebRTC').info(`input audio device updated: ${inputAudioDevice}`);
       setInputAudioDevice(inputAudioDevice);
     };
     changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
@@ -887,11 +888,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeOutputAudioDevice = (outputAudioDevice: string) => {
-      console.info('[WebRTC] output audio device updated: ', outputAudioDevice);
+      new Logger('WebRTC').info(`output audio device updated: ${outputAudioDevice}`);
       const el = speakerRef.current;
       if (el && typeof el.setSinkId === 'function') {
         el.setSinkId(outputAudioDevice).catch((err) => {
-          console.warn('[WebRTC] set output device failed: ', err);
+          new Logger('WebRTC').warn(`set output device failed: ${err}`);
         });
       }
     };
@@ -902,7 +903,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeEchoCancellation = (echoCancellation: boolean) => {
-      console.info('[WebRTC] echo cancellation updated: ', echoCancellation);
+      new Logger('WebRTC').info(`echo cancellation updated: ${echoCancellation}`);
       setEchoCancellation(echoCancellation);
     };
     changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
@@ -912,7 +913,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeNoiseCancellation = (noiseCancellation: boolean) => {
-      console.info('[WebRTC] noise cancellation updated: ', noiseCancellation);
+      new Logger('WebRTC').info(`noise cancellation updated: ${noiseCancellation}`);
       setNoiseCancellation(noiseCancellation);
     };
     changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
@@ -922,7 +923,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
-      console.info('[WebRTC] microphone amplification updated: ', microphoneAmplification);
+      new Logger('WebRTC').info(`microphone amplification updated: ${microphoneAmplification}`);
       microphoneAmplificationRef.current = microphoneAmplification;
       changeMicVolume(micVolumeRef.current);
     };
@@ -933,7 +934,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
-      console.info('[WebRTC] speaking mode updated: ', speakingMode);
+      new Logger('WebRTC').info(`speaking mode updated: ${speakingMode}`);
       micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
         track.enabled = speakingMode === 'key' ? isSpeakKeyPressedRef.current : true;
       });
@@ -961,9 +962,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('SFUNewProducer', ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
-      console.info('[WebRTC] New producer: ', userId);
+      new Logger('WebRTC').info(`New producer: ${userId}`);
       consumeOne(producerId, channelId).catch((e) => {
-        console.error('[WebRTC] Error consuming producer: ', e);
+        new Logger('WebRTC').error(`Error consuming producer: ${e}`);
       });
     });
     return () => unsub();
@@ -971,9 +972,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('SFUProducerClosed', ({ userId, producerId }: { userId: string; producerId: string }) => {
-      console.info('[WebRTC] Producer closed: ', userId);
+      new Logger('WebRTC').info(`Producer closed: ${userId}`);
       unconsumeOne(producerId).catch((e) => {
-        console.error('[WebRTC] Error unconsuming producer: ', e);
+        new Logger('WebRTC').error(`Error unconsuming producer: ${e}`);
       });
     });
     return () => unsub();
