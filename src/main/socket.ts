@@ -136,6 +136,21 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
   throw new Error('Failed to emit event with retry');
 }
 
+function SendHeartbeat() {
+  const start = Date.now();
+  socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
+    if (err) {
+      console.warn(`${new Date().toLocaleString()} | Heartbeat ${seq} timeout`);
+    } else {
+      const latency = Date.now() - start;
+      console.log(`${new Date().toLocaleString()} | ACK for #${ack.seq} in ${latency} ms`);
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('heartbeat', { seq: ack.seq, latency });
+      });
+    }
+  });
+}
+
 export function connectSocket(token: string) {
   if (!token) return;
 
@@ -209,6 +224,10 @@ export function connectSocket(token: string) {
       });
     });
 
+    SendHeartbeat();
+    if (interval) clearInterval(interval);
+    interval = setInterval(SendHeartbeat, 30000);
+
     console.info(`${new Date().toLocaleString()} | Socket connected`);
 
     BrowserWindow.getAllWindows().forEach((window) => {
@@ -262,24 +281,6 @@ export function connectSocket(token: string) {
       window.webContents.send('reconnect_error', error);
     });
   });
-
-  const SendHeartbeat = () => {
-    const start = Date.now();
-    socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
-      if (err) {
-        console.warn(`${new Date().toLocaleString()} | Heartbeat ${seq} timeout`);
-      } else {
-        const latency = Date.now() - start;
-        console.log(`${new Date().toLocaleString()} | ACK for #${ack.seq} in ${latency} ms`);
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('heartbeat', { seq: ack.seq, latency });
-        });
-      }
-    });
-  };
-
-  SendHeartbeat();
-  interval = setInterval(SendHeartbeat, 30000);
 
   socket.connect();
 }
