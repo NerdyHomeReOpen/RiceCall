@@ -18,13 +18,10 @@ import * as Permission from '@/utils/permission';
 import * as Language from '@/utils/language';
 import * as Popup from '@/utils/popup';
 
-import { SHOW_FRAME_ORIGIN } from '@/constant';
+import { SHOW_FRAME_ORIGIN, MESSAGE_VIERER_DEVIATION } from '@/constant';
 
 import styles from '@/styles/server.module.css';
 import messageStyles from '@/styles/message.module.css';
-
-const DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS = 8;
-const MESSAGE_VIERER_DEVIATION = 100;
 
 interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
@@ -168,7 +165,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     const isResizingAnnAreaRef = useRef<boolean>(false);
     const annAreaRef = useRef<HTMLDivElement>(null);
     const showAreaRef = useRef<HTMLIFrameElement>(null);
-    const actionMessageTimer = useRef<NodeJS.Timeout | null>(null);
     const messageAreaRef = useRef<HTMLDivElement>(null);
     const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Types.Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
 
@@ -492,20 +488,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
     }, [isMicTaken, isControlled, currentChannelId]);
 
     useEffect(() => {
-      if (actionMessages.length === 0) {
-        setShowActionMessage(false);
-        return;
-      }
-      if (actionMessageTimer.current) clearTimeout(actionMessageTimer.current);
-      const seconeds = actionMessages[actionMessages.length - 1].displaySeconds ?? DEFAULT_DISPLAY_ACTION_MESSAGE_SECONDS;
-      setShowActionMessage(true);
-      actionMessageTimer.current = setTimeout(() => setShowActionMessage(false), seconeds * 1000);
-      return () => {
-        if (actionMessageTimer.current) {
-          clearTimeout(actionMessageTimer.current);
-          actionMessageTimer.current = null;
-        }
-      };
+      if (actionMessages.length === 0) setShowActionMessage(false);
+      else setShowActionMessage(true);
     }, [actionMessages]);
 
     useEffect(() => {
