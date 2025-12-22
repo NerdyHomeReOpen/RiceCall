@@ -465,7 +465,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       });
       consumersRef.current[producerId] = consumer;
 
-      const userId = consumer.appData.userId as string;
+      const userId = consumer.appData.userId;
+      if (!userId || typeof userId !== 'string') return;
+
       const stream = new MediaStream([consumer.track]);
       initSpeakerAudio(userId, stream);
 
@@ -479,7 +481,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       const consumer = consumersRef.current[producerId];
       if (!consumer) return;
 
-      const userId = consumer.appData.userId as string;
+      const userId = consumer.appData.userId;
+      if (!userId || typeof userId !== 'string') return;
+
       consumer.close();
       delete consumersRef.current[producerId];
       removeSpeakerAudio(userId);
