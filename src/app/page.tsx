@@ -347,9 +347,11 @@ const RootPageComponent: React.FC = React.memo(() => {
   const loadingBoxRef = useRef(loadingBox);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const serverOnlineMembersRef = useRef<Types.OnlineMember[]>([]);
   const userRef = useRef<Types.User>(Default.user());
+  const currentServerRef = useRef<Types.Server>(Default.server());
+  const currentChannelRef = useRef<Types.Channel>(Default.channel());
   const friendsRef = useRef<Types.Friend[]>([]);
+  const serverOnlineMembersRef = useRef<Types.OnlineMember[]>([]);
 
   // States
   const [user, setUser] = useState<Types.User>(Default.user());
@@ -408,6 +410,22 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user.name]);
 
   useEffect(() => {
+    currentServerRef.current = currentServer;
+  }, [currentServer]);
+
+  useEffect(() => {
+    currentChannelRef.current = currentChannel;
+  }, [currentChannel]);
+
+  useEffect(() => {
+    serverOnlineMembersRef.current = serverOnlineMembers;
+  }, [serverOnlineMembers]);
+
+  useEffect(() => {
+    selectedTabIdRef.current = mainTab.selectedTabId;
+  }, [mainTab.selectedTabId]);
+
+  useEffect(() => {
     if (user.userId) return;
 
     const userId = localStorage.getItem('userId');
@@ -422,64 +440,18 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user]);
 
   useEffect(() => {
-    switch (mainTab.selectedTabId) {
-      case 'home':
-        ipc.discord.updatePresence({
-          details: t('rpc:viewing-home-page'),
-          state: `${t('rpc:user', { '0': userName })}`,
-          largeImageKey: 'app_icon',
-          largeImageText: 'RC Voice',
-          smallImageKey: 'home_icon',
-          smallImageText: t('rpc:home-page'),
-          timestamp: Date.now(),
-          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
-        });
-      case 'friends':
-        ipc.discord.updatePresence({
-          details: t('rpc:viewing-friend-page'),
-          state: `${t('rpc:user', { '0': userName })}`,
-          largeImageKey: 'app_icon',
-          largeImageText: 'RC Voice',
-          smallImageKey: 'home_icon',
-          smallImageText: t('rpc:vewing-friend-page'),
-          timestamp: Date.now(),
-          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
-        });
-      case 'server':
-        ipc.discord.updatePresence({
-          details: `${t('in')} ${currentServerName}`,
-          state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
-          largeImageKey: 'app_icon',
-          largeImageText: 'RC Voice',
-          smallImageKey: 'home_icon',
-          smallImageText: t('rpc:viewing-server-page'),
-          timestamp: Date.now(),
-          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
-        });
-    }
-  }, [mainTab.selectedTabId, userName, currentServerName, serverOnlineMembers.length, t]);
-
-  useEffect(() => {
-    selectedTabIdRef.current = mainTab.selectedTabId;
-  }, [mainTab.selectedTabId]);
-
-  useEffect(() => {
-    serverOnlineMembersRef.current = serverOnlineMembers;
-  }, [serverOnlineMembers]);
-
-  useEffect(() => {
-    if (user.currentServerId && selectedTabIdRef.current !== 'server') setSelectedTabIdRef.current('server');
+    if (currentServerId && selectedTabIdRef.current !== 'server') setSelectedTabIdRef.current('server');
     else if (selectedTabIdRef.current === 'server') setSelectedTabIdRef.current('home');
     loadingBoxRef.current.setIsLoading(false);
     loadingBoxRef.current.setLoadingServerId('');
-  }, [user.currentServerId]);
+  }, [currentServerId]);
 
   useEffect(() => {
     const onStorage = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
       if (loadingBox.isLoading) return;
-      if (serverId === user.currentServerId) {
+      if (serverId === currentServerId) {
         mainTab.setSelectedTabId('server');
         return;
       }
@@ -489,7 +461,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
     window.addEventListener('storage', onStorage);
     return () => window.removeEventListener('storage', onStorage);
-  }, [user.currentServerId, mainTab, loadingBox]);
+  }, [currentServerId, mainTab, loadingBox]);
 
   useEffect(() => {
     if (!userId) return;
@@ -608,7 +580,23 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
-      // Remove action messages and channel messages while switching server
+      // Add activity when signature is updated
+      const newActives = args.reduce<Types.FriendActivity[]>((acc, curr) => {
+        if (curr.update.signature && userRef.current.signature !== curr.update.signature) {
+          acc.push(Default.friendActivity({ ...userRef.current, content: curr.update.signature, timestamp: Date.now() }));
+        }
+        return acc;
+      }, []);
+      setFriendActivities((prev) => [...newActives, ...prev]);
+
+      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
+      setUser((prev) => ({ ...prev, ...args[0].update }));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
       const newCurrentServerId = args[0].update.currentServerId;
       if (newCurrentServerId !== undefined && newCurrentServerId !== currentServerId) {
         setChannels([]);
@@ -619,16 +607,6 @@ const RootPageComponent: React.FC = React.memo(() => {
         setQueueUsers([]);
         setChannelEvents([]);
       }
-      // Add activity when signature is updated
-      args.forEach(({ update }) => {
-        if (update.signature && userRef.current.signature !== update.signature) {
-          const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, timestamp: Date.now() });
-          setFriendActivities((prev) => [newActive, ...prev]);
-        }
-      });
-      // Set user id to local storage (for hot reload)
-      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
-      setUser((prev) => ({ ...prev, ...args[0].update }));
     });
     return () => unsub();
   }, [currentServerId]);
@@ -644,13 +622,15 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Types.Friend> }[]) => {
       // Add activity when signature is updated
-      args.forEach(({ targetId, update }) => {
-        const targetFriend = friendsRef.current.find((f) => f.targetId === targetId && f.relationStatus === 2);
-        if (targetFriend && update.signature && targetFriend.signature !== update.signature) {
-          const newActivity = Default.friendActivity({ ...targetFriend, content: update.signature, timestamp: Date.now() });
-          setFriendActivities((prev) => [newActivity, ...prev]);
+      const newActivities = args.reduce<Types.FriendActivity[]>((acc, curr) => {
+        const targetFriend = friendsRef.current.find((f) => f.targetId === curr.targetId && f.relationStatus === 2);
+        if (targetFriend && curr.update.signature && targetFriend.signature !== curr.update.signature) {
+          acc.push(Default.friendActivity({ ...targetFriend, content: curr.update.signature, timestamp: Date.now() }));
         }
-      });
+        return acc;
+      }, []);
+      setFriendActivities((prev) => [...newActivities, ...prev]);
+
       const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
       setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
     });
@@ -723,6 +703,10 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Types.Server> }[]) => {
+      // Update current server
+      const currentServerUpdate = args.filter((i) => i.serverId === currentServerRef.current.serverId).reduce<Partial<Types.Server>>((acc, curr) => ({ ...acc, ...curr.update }), {});
+      setCurrentServer((prev) => ({ ...prev, ...currentServerUpdate }));
+
       const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
       setServers((prev) => prev.map((s) => (update.has(`${s.serverId}`) ? { ...s, ...update.get(`${s.serverId}`) } : s)));
     });
@@ -739,16 +723,16 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: Types.OnlineMember }[]) => {
-      setChannelEvents((prev) => [
-        ...prev,
-        ...args.map((m) => ({
-          ...m.data,
-          type: 'join' as Types.ChannelEvent['type'],
-          prevChannelId: null,
-          nextChannelId: m.data.currentChannelId,
-          timestamp: Date.now(),
-        })),
-      ]);
+      // Add channel events
+      const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
+        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.data.userId && om.serverId === curr.data.serverId);
+        if (!originMember) {
+          acc.push({ ...curr.data, type: 'join' as Types.ChannelEvent['type'], prevChannelId: null, nextChannelId: curr.data.currentChannelId, timestamp: Date.now() });
+        }
+        return acc;
+      }, []);
+      setChannelEvents((prev) => [...newChannelEvents, ...prev]);
+
       const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
       setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
     });
@@ -757,23 +741,16 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.OnlineMember> }[]) => {
-      args.map((m) => {
-        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
-        if (originMember && m.update.currentChannelId) {
-          const originChannelId = originMember.currentChannelId;
-          const newMember = { ...originMember, ...m.update };
-          setChannelEvents((prev) => [
-            ...prev,
-            {
-              ...newMember,
-              type: 'move' as Types.ChannelEvent['type'],
-              prevChannelId: originChannelId,
-              nextChannelId: newMember.currentChannelId,
-              timestamp: Date.now(),
-            },
-          ]);
+      // Add channel events
+      const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
+        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
+        if (originMember && curr.update.currentChannelId) {
+          acc.push({ ...originMember, type: 'move' as Types.ChannelEvent['type'], prevChannelId: originMember.currentChannelId, nextChannelId: curr.update.currentChannelId, timestamp: Date.now() });
         }
-      });
+        return acc;
+      }, []);
+      setChannelEvents((prev) => [...newChannelEvents, ...prev]);
+
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
     });
@@ -782,21 +759,16 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
-      args.map((m) => {
-        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
+      // Add channel events
+      const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
+        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
         if (originMember) {
-          setChannelEvents((prev) => [
-            ...prev,
-            {
-              ...originMember,
-              type: 'leave' as Types.ChannelEvent['type'],
-              prevChannelId: originMember.currentChannelId,
-              nextChannelId: null,
-              timestamp: Date.now(),
-            },
-          ]);
+          acc.push({ ...originMember, type: 'leave' as Types.ChannelEvent['type'], prevChannelId: originMember.currentChannelId, nextChannelId: null, timestamp: Date.now() });
         }
-      });
+        return acc;
+      }, []);
+      setChannelEvents((prev) => [...newChannelEvents, ...prev]);
+
       const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
       setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
     });
@@ -829,6 +801,10 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
+      // Update current channel
+      const currentChannelUpdate = args.filter((i) => i.channelId === currentChannelRef.current.channelId).reduce<Partial<Types.Channel>>((acc, curr) => ({ ...acc, ...curr.update }), {});
+      setCurrentChannel((prev) => ({ ...prev, ...currentChannelUpdate }));
+
       const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
       setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
     });
@@ -920,6 +896,44 @@ const RootPageComponent: React.FC = React.memo(() => {
     });
     return () => unsub();
   }, []);
+
+  useEffect(() => {
+    switch (mainTab.selectedTabId) {
+      case 'home':
+        ipc.discord.updatePresence({
+          details: t('rpc:viewing-home-page'),
+          state: `${t('rpc:user', { '0': userName })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:home-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+      case 'friends':
+        ipc.discord.updatePresence({
+          details: t('rpc:viewing-friend-page'),
+          state: `${t('rpc:user', { '0': userName })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:vewing-friend-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+      case 'server':
+        ipc.discord.updatePresence({
+          details: `${t('in')} ${currentServerName}`,
+          state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
+          largeImageKey: 'app_icon',
+          largeImageText: 'RC Voice',
+          smallImageKey: 'home_icon',
+          smallImageText: t('rpc:viewing-server-page'),
+          timestamp: Date.now(),
+          buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
+        });
+    }
+  }, [mainTab.selectedTabId, userName, currentServerName, serverOnlineMembers.length, t]);
 
   return (
     <WebRTCProvider>
