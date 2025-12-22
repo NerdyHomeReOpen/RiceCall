@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useContext, createContext, useCallb
 import * as mediasoupClient from 'mediasoup-client';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Types
 import { SpeakingMode } from '@/types';

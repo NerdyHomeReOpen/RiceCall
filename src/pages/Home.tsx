@@ -19,7 +19,7 @@ import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { handleOpenCreateServer } from '@/utils/popup';

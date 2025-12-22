@@ -17,7 +17,7 @@ import { useWebRTC } from '@/providers/WebRTC';
 import BadgeList from '@/components/BadgeList';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenEditNickname, handleOpenApplyFriend, handleOpenBlockMember, handleOpenInviteMember } from '@/utils/popup';

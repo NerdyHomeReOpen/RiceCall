@@ -43,7 +43,7 @@ if (typeof window !== 'undefined' && window.require) {
 
 const isElectron = !!ipcRenderer;
 
-const ipcService = {
+const ipc = {
   exit: () => {
     if (!isElectron) return;
     ipcRenderer.send('exit');
@@ -1286,4 +1286,4 @@ const ipcService = {
   },
 };
 
-export default ipcService;
+export default ipc;

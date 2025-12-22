@@ -10,7 +10,7 @@ import { useTranslation } from 'react-i18next';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 interface BlockMemberPopupProps {
   serverId: Server['serverId'];

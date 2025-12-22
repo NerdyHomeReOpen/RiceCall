@@ -4,7 +4,7 @@ import React, { useContext, createContext, ReactNode, useRef, useEffect, useCall
 import { useWebRTC } from '@/providers/WebRTC';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 const BASE_VOLUME = 5;
 

@@ -16,7 +16,7 @@ import ChannelTab from '@/components/ChannelTab';
 import UserTab from '@/components/UserTab';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenChannelSetting, handleOpenCreateChannel, handleOpenEditChannelOrder, handleOpenServerBroadcast, handleOpenChannelPassword } from '@/utils/popup';

@@ -2,7 +2,7 @@
 import type { User, Server, Channel, FriendGroup, ChannelEvent } from '@/types';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 export const handleOpenAlertDialog = (message: string, callback: () => void) => {
   ipc.popup.open('dialogAlert', 'dialogAlert', { message });

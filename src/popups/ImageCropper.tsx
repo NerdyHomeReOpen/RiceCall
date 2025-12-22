@@ -7,7 +7,7 @@ import popup from '@/styles/popup.module.css';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 interface ImageCropperPopupProps {
   id: string;

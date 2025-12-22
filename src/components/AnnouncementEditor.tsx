@@ -21,7 +21,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { handleOpenAlertDialog } from '@/utils/popup';

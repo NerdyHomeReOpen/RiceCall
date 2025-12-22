@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useWebRTC } from '@/providers/WebRTC';
 
 // services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 function lerpColor(color1: string, color2: string, t: number) {
   const c1 = parseInt(color1.slice(1), 16);

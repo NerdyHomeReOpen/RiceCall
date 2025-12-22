@@ -32,7 +32,7 @@ import { getFormatTimestamp } from '@/utils/language';
 import { ALLOWED_MESSAGE_KEYS } from '@/constant';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 interface ChannelMessageProps {
   user: User;

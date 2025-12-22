@@ -11,7 +11,7 @@ import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Types
 import { Theme, LanguageKey } from '@/types';

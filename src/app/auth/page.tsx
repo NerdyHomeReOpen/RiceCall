@@ -12,7 +12,7 @@ import RegisterPage from '@/pages/Register';
 import ChangeServerPage from '@/pages/ChangeServer';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Providers
 import { useTranslation } from 'react-i18next';

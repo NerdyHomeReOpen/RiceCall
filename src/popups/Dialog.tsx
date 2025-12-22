@@ -4,7 +4,7 @@ import React from 'react';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Providers
 import { useTranslation } from 'react-i18next';

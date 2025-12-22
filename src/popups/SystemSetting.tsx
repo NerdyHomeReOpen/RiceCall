@@ -12,7 +12,7 @@ import { useTranslation } from 'react-i18next';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { objDiff } from '@/utils/objDiff';

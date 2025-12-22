@@ -49,7 +49,7 @@ import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 interface HeaderProps {
   title: string;

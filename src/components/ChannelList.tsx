@@ -18,7 +18,7 @@ import CategoryTab from '@/components/CategoryTab';
 import QueueUserTab from '@/components/QueueUserTab';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import {

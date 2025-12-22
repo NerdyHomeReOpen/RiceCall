@@ -16,7 +16,7 @@ import { useTranslation } from 'react-i18next';
 import MarkdownContent from '@/components/MarkdownContent';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 type Staff = {
   title: string;

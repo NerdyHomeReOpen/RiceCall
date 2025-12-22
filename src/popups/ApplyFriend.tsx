@@ -10,7 +10,7 @@ import type { FriendApplication, FriendGroup, User } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { handleOpenUserInfo, handleOpenCreateFriendGroup } from '@/utils/popup';

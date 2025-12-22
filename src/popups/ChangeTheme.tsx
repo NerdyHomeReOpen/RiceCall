@@ -8,7 +8,7 @@ import popup from '@/styles/popup.module.css';
 import { Theme } from '@/types';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Providers
 import { useContextMenu } from '@/providers/ContextMenu';

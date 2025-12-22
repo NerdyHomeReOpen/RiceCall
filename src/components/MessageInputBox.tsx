@@ -22,7 +22,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import emoji from '@/styles/emoji.module.css';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { handleOpenAlertDialog } from '@/utils/popup';

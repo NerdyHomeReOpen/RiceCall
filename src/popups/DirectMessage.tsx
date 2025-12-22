@@ -22,7 +22,7 @@ import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // CSS
 import styles from '@/styles/directMessage.module.css';

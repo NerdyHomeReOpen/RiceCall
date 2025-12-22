@@ -54,7 +54,7 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 import { useActionScanner } from '@/providers/ActionScanner';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Constants
 import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';

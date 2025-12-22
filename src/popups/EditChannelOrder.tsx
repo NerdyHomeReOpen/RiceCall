@@ -12,7 +12,7 @@ import serverPage from '@/styles/server.module.css';
 import popup from '@/styles/popup.module.css';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // Utils
 import { handleOpenAlertDialog, handleOpenCreateChannel, handleOpenEditChannelName } from '@/utils/popup';

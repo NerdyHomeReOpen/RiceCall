@@ -7,7 +7,7 @@ import type { User, Server } from '@/types';
 import { useTranslation } from 'react-i18next';
 
 // Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 // CSS
 import styles from '@/styles/serverApplication.module.css';
