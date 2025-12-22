@@ -1,17 +1,12 @@
 import React, { useEffect, useRef, useState, useContext, createContext, useCallback } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
-
-// Services
 import ipc from '@/ipc';
 
-// Types
-import { SpeakingMode } from '@/types';
+import type * as Types from '@/types';
 
-// Providers
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
-// Utils
-import { encodeAudio } from '@/utils/encodeAudio';
+import EncodeAudio from '@/utils/encodeAudio';
 
 const workletCode = `
 class RecorderProcessor extends AudioWorkletProcessor {
@@ -66,7 +61,7 @@ interface WebRTCContextType {
   mixVolume: number;
   speakerVolume: number;
   voiceThreshold: number;
-  speakingMode: SpeakingMode;
+  speakingMode: Types.SpeakingMode;
   recordTime: number;
 }
 
@@ -106,8 +101,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const recorderGainRef = useRef<GainNode | null>(null);
 
   // Speaking Mode
-  const [speakingMode, setSpeakingMode] = useState<SpeakingMode>('key');
-  const speakingModeRef = useRef<SpeakingMode>('key');
+  const [speakingMode, setSpeakingMode] = useState<Types.SpeakingMode>('key');
+  const speakingModeRef = useRef<Types.SpeakingMode>('key');
 
   // Bitrate
   const bitrateRef = useRef<number>(64000);
@@ -738,7 +733,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     recorderGainRef.current?.disconnect();
     if (timerRef.current) clearInterval(timerRef.current);
 
-    const arrayBuffer = encodeAudio(buffersRef.current, audioContextRef.current.sampleRate);
+    const arrayBuffer = EncodeAudio(buffersRef.current, audioContextRef.current.sampleRate);
     ipc.record.save(arrayBuffer);
 
     buffersRef.current = [];
@@ -937,7 +932,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [changeMicVolume]);
 
   useEffect(() => {
-    const changeSpeakingMode = (speakingMode: SpeakingMode) => {
+    const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
       console.info('[WebRTC] speaking mode updated: ', speakingMode);
       micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
         track.enabled = speakingMode === 'key' ? isSpeakKeyPressedRef.current : true;

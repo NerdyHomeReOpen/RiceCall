@@ -2,19 +2,15 @@
 
 import React, { useEffect } from 'react';
 import i18n from '@/i18n';
+import ipc from '@/ipc';
 
-// Providers
+import type * as Types from '@/types';
+
 import ContextMenuProvider from '@/providers/ContextMenu';
 import MainTabProvider from '@/providers/MainTab';
 import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
-
-// Services
-import ipc from '@/ipc';
-
-// Types
-import { Theme, LanguageKey } from '@/types';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -46,7 +42,7 @@ const Providers = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const changeTheme = (theme: Theme | null) => {
+    const changeTheme = (theme: Types.Theme | null) => {
       console.info('[Theme] theme updated: ', theme);
       if (!theme) return;
       document.body.style.setProperty('--header-image', theme.headerImage, 'important');
@@ -59,7 +55,7 @@ const Providers = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const changeLanguage = (language: LanguageKey) => {
+    const changeLanguage = (language: Types.LanguageKey) => {
       console.info('[Language] language updated: ', language);
       if (!language) return;
       i18n.changeLanguage(language);

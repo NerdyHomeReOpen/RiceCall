@@ -1,40 +1,32 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// Types
-import type { Badge, Friend, Server, User } from '@/types';
+import type * as Types from '@/types';
 
-// Components
 import LevelIcon from '@/components/LevelIcon';
 import BadgeItem from '@/components/BadgeItem';
 
-// Providers
-import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
-// Services
-import ipc from '@/ipc';
+import * as Popup from '@/utils/popup';
+import * as Permission from '@/utils/permission';
+import ObjDiff from '@/utils/objDiff';
 
-// CSS
-import styles from '@/styles/userSetting.module.css';
-import popup from '@/styles/popup.module.css';
-import vip from '@/styles/vip.module.css';
-import permission from '@/styles/permission.module.css';
-import emoji from '@/styles/emoji.module.css';
-
-// Utils
-import { handleOpenAlertDialog, handleOpenErrorDialog, handleOpenDirectMessage, handleOpenApplyFriend, handleOpenImageCropper } from '@/utils/popup';
-import { isMember, isStaff } from '@/utils/permission';
-import { objDiff } from '@/utils/objDiff';
-
-// Constants
 import { MAX_FILE_SIZE } from '@/constant';
 
+import styles from '@/styles/userSetting.module.css';
+import popupStyles from '@/styles/popup.module.css';
+import vipStyles from '@/styles/vip.module.css';
+import permissionStyles from '@/styles/permission.module.css';
+import emojiStyles from '@/styles/emoji.module.css';
+
 interface UserInfoPopupProps {
-  userId: User['userId'];
-  targetId: User['userId'];
-  friend: Friend | null;
-  target: User;
-  targetServers: Server[];
+  userId: Types.User['userId'];
+  targetId: Types.User['userId'];
+  friend: Types.Friend | null;
+  target: Types.User;
+  targetServers: Types.Server[];
 }
 
 const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, targetId, friend, target: targetData, targetServers }) => {
@@ -84,10 +76,10 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   const isFriend = friend?.relationStatus === 2;
   const canSubmit = targetName.trim() && targetGender.trim() && targetCountry.trim() && targetBirthYear && targetBirthMonth && targetBirthDay;
   const joinedServers = useMemo(() => {
-    return targetServers.filter((s) => isMember(s.permissionLevel) && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
+    return targetServers.filter((s) => Permission.isMember(s.permissionLevel) && !Permission.isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
   const favoriteServers = useMemo(() => {
-    return targetServers.filter((s) => s.favorite && !isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
+    return targetServers.filter((s) => s.favorite && !Permission.isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
   const recentServers = useMemo(() => {
     return targetServers
@@ -99,7 +91,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     () =>
       JSON.parse(targetBadges)
         .slice(0, 13)
-        .sort((a: Badge, b: Badge) => a.order - b.order),
+        .sort((a: Types.Badge, b: Types.Badge) => a.order - b.order),
     [targetBadges],
   );
 
@@ -112,7 +104,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     return age;
   };
 
-  const handleEditUser = (update: Partial<User>) => {
+  const handleEditUser = (update: Partial<Types.User>) => {
     ipc.socket.send('editUser', { update });
   };
 
@@ -124,14 +116,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     ipc.window.close();
   };
 
-  const handleServerSelect = (server: Server) => {
+  const handleServerSelect = (server: Types.Server) => {
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   const handleUploadImage = (imageUnit8Array: Uint8Array) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -175,7 +167,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
   }, [targetBirthYear, targetBirthMonth, targetBirthDay, currentYear, currentMonth, currentDay, isFutureDate]);
 
   return (
-    <div className={`${popup['popup-wrapper']} ${styles['user-profile']}`}>
+    <div className={`${popupStyles['popup-wrapper']} ${styles['user-profile']}`}>
       <div className={styles['profile-box']}>
         <div className={styles['header']}>
           <div className={styles['window-action-buttons']}>
@@ -194,16 +186,16 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 const image = (e.target as HTMLInputElement).files?.[0];
                 if (!image || isUploadingRef.current) return;
                 image.arrayBuffer().then((arrayBuffer) => {
-                  handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                  Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
                 });
               };
               fileInput.click();
             }}
           />
-          <div className={`${popup['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
+          <div className={`${popupStyles['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
             <p className={styles['user-name-text']}>{targetName}</p>
-            {targetVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${targetVip}`]}`} />}
-            <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} isSelf={isSelf} isHover={true} />
+            {targetVip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${targetVip}`]}`} />}
+            <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} showTooltip={true} />
             {targetIsVerified ? <div className={styles['official-icon']} title={t('is-official')} /> : null}
           </div>
           <p className={styles['user-account-text']} onClick={() => navigator.clipboard.writeText(targetId)}>
@@ -234,24 +226,24 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
           {selectedTabId === 'userSetting' ? (
             <>
               <div
-                className={`${popup['button']} ${popup['blue']} ${!canSubmit ? 'disabled' : ''}`}
+                className={`${popupStyles['button']} ${popupStyles['blue']} ${!canSubmit ? 'disabled' : ''}`}
                 onClick={() => {
                   if (!countries.includes(targetCountry)) {
-                    handleOpenErrorDialog(t('invalid-country'), () => {});
+                    Popup.handleOpenErrorDialog(t('invalid-country'), () => {});
                     return;
                   }
-                  handleEditUser(objDiff(target, targetData));
+                  handleEditUser(ObjDiff(target, targetData));
                   setSelectedTabId('about');
                 }}
               >
                 {t('confirm')}
               </div>
-              <div className={popup['button']} onClick={() => setSelectedTabId('about')}>
+              <div className={popupStyles['button']} onClick={() => setSelectedTabId('about')}>
                 {t('cancel')}
               </div>
             </>
           ) : (
-            <div className={popup['button']} onClick={() => setSelectedTabId('userSetting')}>
+            <div className={popupStyles['button']} onClick={() => setSelectedTabId('userSetting')}>
               {t('edit-profile')}
             </div>
           )}
@@ -263,7 +255,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
             </div>
           )}
           <div className={styles['user-profile-content']}>
-            <div className={popup['label']}>{t('recent-servers')}</div>
+            <div className={popupStyles['label']}>{t('recent-servers')}</div>
             <div className={styles['server-list']}>
               {!isSelf && !targetShareRecentServers ? (
                 <div className={styles['user-recent-visits-private']}>
@@ -290,9 +282,9 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 ))
               )}
             </div>
-            <div className={popup['label']}>{t('recent-earned')}</div>
+            <div className={popupStyles['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
-              {filteredBadges.map((badge: Badge) => (
+              {filteredBadges.map((badge: Types.Badge) => (
                 <div key={badge.badgeId} className={styles['badge-item']}>
                   <BadgeItem key={badge.badgeId} badge={badge} position="left-top" direction="right-top" />
                 </div>
@@ -302,7 +294,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
         </div>
         <div className={styles['content']} style={selectedTabId === 'groups' ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
-            <div className={popup['select-box']}>
+            <div className={popupStyles['select-box']}>
               <select value={serversView} onChange={(e) => setServersView(e.target.value)}>
                 <option value="joined">{t('joined-servers')}</option>
                 <option value="favorite">{t('favorited-servers')}</option>
@@ -324,7 +316,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
+                        <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
                         <div className={styles['contribution-value-text']}>{server.contribution}</div>
                       </div>
                     </div>
@@ -348,7 +340,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     <div className={styles['server-info-box']}>
                       <div className={styles['server-name-text']}>{server.name}</div>
                       <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div className={`${permission[targetGender]} ${permission[`lv-${server.permissionLevel}`]}`} />
+                        <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
                         <div className={styles['contribution-box']}>
                           <div className={styles['contribution-icon']} />
                           <div className={styles['contribution-value-text']}>{server.contribution}</div>
@@ -363,26 +355,26 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
         </div>
         <div className={styles['content']} style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
-            <div className={popup['col']}>
-              <div className={popup['row']}>
-                <div className={`${popup['input-box']} ${popup['col']}`}>
-                  <div className={popup['label']}>{t('nickname')}</div>
+            <div className={popupStyles['col']}>
+              <div className={popupStyles['row']}>
+                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                  <div className={popupStyles['label']}>{t('nickname')}</div>
                   <input name="name" type="text" value={targetName} maxLength={32} onChange={(e) => setTarget((prev) => ({ ...prev, name: e.target.value }))} />
                 </div>
-                <div className={`${popup['input-box']} ${popup['col']}`}>
-                  <div className={popup['label']}>{t('gender')}</div>
-                  <div className={popup['select-box']} style={{ width: '100%' }}>
-                    <select value={targetGender} onChange={(e) => setTarget((prev) => ({ ...prev, gender: e.target.value as User['gender'] }))}>
+                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                  <div className={popupStyles['label']}>{t('gender')}</div>
+                  <div className={popupStyles['select-box']} style={{ width: '100%' }}>
+                    <select value={targetGender} onChange={(e) => setTarget((prev) => ({ ...prev, gender: e.target.value as Types.User['gender'] }))}>
                       <option value="Male">{t('male')}</option>
                       <option value="Female">{t('female')}</option>
                     </select>
                   </div>
                 </div>
               </div>
-              <div className={popup['row']}>
-                <div className={`${popup['input-box']} ${popup['col']}`}>
-                  <div className={popup['label']}>{t('country')}</div>
-                  <div className={popup['select-box']} style={{ width: '100%' }}>
+              <div className={popupStyles['row']}>
+                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                  <div className={popupStyles['label']}>{t('country')}</div>
+                  <div className={popupStyles['select-box']} style={{ width: '100%' }}>
                     <select value={targetCountry} onChange={(e) => setTarget((prev) => ({ ...prev, country: e.target.value }))}>
                       {countries.map((country) => (
                         <option key={country} value={country}>
@@ -393,10 +385,10 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                   </div>
                 </div>
                 <div style={{ width: '100%' }}>
-                  <div className={`${popup['input-box']} ${popup['col']}`}>
-                    <div className={popup['label']}>{t('birthdate')}</div>
-                    <div className={popup['row']}>
-                      <div className={popup['select-box']} style={{ width: '100%' }}>
+                  <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                    <div className={popupStyles['label']}>{t('birthdate')}</div>
+                    <div className={popupStyles['row']}>
+                      <div className={popupStyles['select-box']} style={{ width: '100%' }}>
                         <select id="birthYear" value={targetBirthYear} onChange={(e) => setTarget((prev) => ({ ...prev, birthYear: Number(e.target.value) }))}>
                           {yearOptions.map((year) => (
                             <option key={year} value={year} disabled={year > currentYear}>
@@ -405,7 +397,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                           ))}
                         </select>
                       </div>
-                      <div className={popup['select-box']} style={{ width: '100%' }}>
+                      <div className={popupStyles['select-box']} style={{ width: '100%' }}>
                         <select id="birthMonth" value={targetBirthMonth} onChange={(e) => setTarget((prev) => ({ ...prev, birthMonth: Number(e.target.value) }))}>
                           {monthOptions.map((month) => (
                             <option key={month} value={month} disabled={targetBirthYear === currentYear && month > currentMonth}>
@@ -414,7 +406,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                           ))}
                         </select>
                       </div>
-                      <div className={popup['select-box']} style={{ width: '100%' }}>
+                      <div className={popupStyles['select-box']} style={{ width: '100%' }}>
                         <select id="birthDay" value={targetBirthDay} onChange={(e) => setTarget((prev) => ({ ...prev, birthDay: Number(e.target.value) }))}>
                           {dayOptions.map((day) => (
                             <option key={day} value={day} disabled={targetBirthYear === currentYear && targetBirthMonth === currentMonth && day > currentDay}>
@@ -427,8 +419,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                   </div>
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('signature')}</div>
+              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                <div className={popupStyles['label']}>{t('signature')}</div>
                 <div style={{ position: 'relative', width: '100%' }}>
                   <input
                     ref={signatureInputRef}
@@ -440,7 +432,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                     style={{ paddingRight: '28px', width: '100%' }}
                   />
                   <div
-                    className={`${emoji['emoji-icon']} ${emoji['emoji-in-input']}`}
+                    className={`${emojiStyles['emoji-icon']} ${emojiStyles['emoji-in-input']}`}
                     onMouseDown={(e) => {
                       e.preventDefault();
                       const x = e.currentTarget.getBoundingClientRect().left;
@@ -453,26 +445,26 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                   />
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('about-me')}</div>
+              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                <div className={popupStyles['label']}>{t('about-me')}</div>
                 <textarea name="about" value={targetAbout} maxLength={200} onChange={(e) => setTarget((prev) => ({ ...prev, about: e.target.value }))} />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className={popup['popup-footer']}>
+      <div className={popupStyles['popup-footer']}>
         {!isFriend && !isSelf && (
-          <div className={`${popup['button']} ${popup['green']}`} onClick={() => handleOpenApplyFriend(userId, targetId)}>
+          <div className={`${popupStyles['button']} ${popupStyles['green']}`} onClick={() => Popup.handleOpenApplyFriend(userId, targetId)}>
             {t('add-friend')}
           </div>
         )}
         {isSelf ? (
-          <div className={popup['button']} onClick={() => handleClose()}>
+          <div className={popupStyles['button']} onClick={() => handleClose()}>
             {t('close')}
           </div>
         ) : (
-          <div className={popup['button']} onClick={() => handleOpenDirectMessage(userId, targetId)}>
+          <div className={popupStyles['button']} onClick={() => Popup.handleOpenDirectMessage(userId, targetId)}>
             {t('chat')}
           </div>
         )}

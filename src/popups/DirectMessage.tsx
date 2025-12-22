@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -8,44 +9,35 @@ import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
 import { ChatEnter } from '@/extensions/ChatEnter';
+import ipc from '@/ipc';
 
-// Types
-import { User, DirectMessage, Server, PromptMessage, Friend } from '@/types';
+import type * as Types from '@/types';
 
-// Providers
-import { useTranslation } from 'react-i18next';
-import { useContextMenu } from '@/providers/ContextMenu';
-
-// Components
 import DirectMessageContent from '@/components/DirectMessageContent';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
-// Services
-import ipc from '@/ipc';
+import { useContextMenu } from '@/providers/ContextMenu';
 
-// CSS
-import styles from '@/styles/directMessage.module.css';
-import markdown from '@/styles/markdown.module.css';
-import popup from '@/styles/popup.module.css';
-import vip from '@/styles/vip.module.css';
-import messageStyles from '@/styles/message.module.css';
+import * as Popup from '@/utils/popup';
+import * as TagConverter from '@/utils/tagConverter';
 
-// Utils
-import { handleOpenAlertDialog, handleOpenApplyFriend, handleOpenChatHistory, handleOpenUserInfo } from '@/utils/popup';
-import { toTags } from '@/utils/tagConverter';
-
-// Constants
 import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN } from '@/constant';
 
+import styles from '@/styles/directMessage.module.css';
+import markdownStyles from '@/styles/markdown.module.css';
+import popupStyles from '@/styles/popup.module.css';
+import messageStyles from '@/styles/message.module.css';
+import vipStyles from '@/styles/vip.module.css';
+
 interface DirectMessagePopupProps {
-  userId: User['userId'];
-  targetId: User['userId'];
-  user: User;
-  friend: Friend | null;
-  target: User;
+  userId: Types.User['userId'];
+  targetId: Types.User['userId'];
+  user: Types.User;
+  friend: Types.Friend | null;
+  target: Types.User;
   event: 'directMessage' | 'shakeWindow';
-  message: DirectMessage;
+  message: Types.DirectMessage;
 }
 
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, user, friend, target, event, message }) => {
@@ -55,7 +47,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const editor = useEditor({
     extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode, ChatEnter],
     content: '',
-    onUpdate: ({ editor }) => setMessageInput(toTags(editor.getHTML())),
+    onUpdate: ({ editor }) => setMessageInput(TagConverter.toTags(editor.getHTML())),
     immediatelyRender: false,
   });
 
@@ -69,9 +61,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   // States
   const [messageInput, setMessageInput] = useState<string>('');
-  const [targetCurrentServer, setTargetCurrentServer] = useState<Server | null>(null);
-  const [friendState, setFriendState] = useState<Friend | null>(friend);
-  const [directMessages, setDirectMessages] = useState<(DirectMessage | PromptMessage)[]>([]);
+  const [targetCurrentServer, setTargetCurrentServer] = useState<Types.Server | null>(null);
+  const [friendState, setFriendState] = useState<Types.Friend | null>(friend);
+  const [directMessages, setDirectMessages] = useState<(Types.DirectMessage | Types.PromptMessage)[]>([]);
   const [cooldown, setCooldown] = useState<number>(0);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
@@ -108,7 +100,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -140,16 +132,16 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     localStorage.setItem('dm-textColor', color);
   };
 
-  const handleSendMessage = (targetId: User['userId'], preset: Partial<DirectMessage>) => {
+  const handleSendMessage = (targetId: Types.User['userId'], preset: Partial<Types.DirectMessage>) => {
     ipc.socket.send('directMessage', { targetId, preset });
   };
 
   const handleBlockUser = () => {
-    handleOpenAlertDialog(t('confirm-block-user', { '0': targetName }), () => ipc.socket.send('blockUser', { targetId }));
+    Popup.handleOpenAlertDialog(t('confirm-block-user', { '0': targetName }), () => ipc.socket.send('blockUser', { targetId }));
   };
 
   const handleUnblockUser = () => {
-    handleOpenAlertDialog(t('confirm-unblock-user', { '0': targetName }), () => ipc.socket.send('unblockUser', { targetId }));
+    Popup.handleOpenAlertDialog(t('confirm-unblock-user', { '0': targetName }), () => ipc.socket.send('unblockUser', { targetId }));
   };
 
   const handleSendShakeWindow = () => {
@@ -160,7 +152,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     cooldownRef.current = SHAKE_COOLDOWN;
   };
 
-  const handleServerSelect = (server: Server) => {
+  const handleServerSelect = (server: Types.Server) => {
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
@@ -233,15 +225,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [isAtBottom]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: User['userId']; update: Partial<Friend> }[]) => {
+    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: Types.User['userId']; update: Partial<Types.Friend> }[]) => {
       if (targetId !== targetUserId) return;
-      setFriendState((prev) => ({ ...prev, ...args[0].update }) as Friend);
+      setFriendState((prev) => ({ ...prev, ...args[0].update }) as Types.Friend);
     });
     return () => unsub();
   }, [targetId, targetUserId]);
 
   useEffect(() => {
-    const onDirectMessage = (...args: DirectMessage[]) => {
+    const onDirectMessage = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
@@ -258,7 +250,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [event, message, userId, targetId]);
 
   useEffect(() => {
-    const onShakeWindow = (...args: DirectMessage[]) => {
+    const onShakeWindow = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
@@ -291,13 +283,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [event, message, userId, targetId]);
 
   return (
-    <div className={popup['popup-wrapper']}>
+    <div className={popupStyles['popup-wrapper']}>
       <div className={styles['header']}>
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
           <div className={`${styles['file-share']} disabled`} />
           {!isFriend ? (
-            <div className={styles['apply-friend']} onClick={() => handleOpenApplyFriend(userId, targetId)} />
+            <div className={styles['apply-friend']} onClick={() => Popup.handleOpenApplyFriend(userId, targetId)} />
           ) : (
             <>
               {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUser} /> : <div className={styles['un-block-user']} onClick={handleUnblockUser} />}
@@ -307,15 +299,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
           <div className={`${styles['report']} disabled`} />
         </div>
       </div>
-      <div className={popup['popup-body']}>
+      <div className={popupStyles['popup-body']}>
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
             <div
               className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`}
               style={{ backgroundImage: `url(${targetAvatarUrl})` }}
-              onClick={() => handleOpenUserInfo(userId, targetId)}
+              onClick={() => Popup.handleOpenUserInfo(userId, targetId)}
             />
-            {targetVip > 0 && <div className={`${vip['vip-icon-big']} ${vip[`vip-${targetVip}`]}`} />}
+            {targetVip > 0 && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
               <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
@@ -323,7 +315,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => handleOpenUserInfo(userId, userId)} />
+            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => Popup.handleOpenUserInfo(userId, userId)} />
           </div>
         </div>
         <div className={styles['main-content']}>
@@ -387,7 +379,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={handleSendShakeWindow} />
               </div>
               <div className={styles['buttons']}>
-                <div className={`${styles['history-message']} disabled`} onClick={() => handleOpenChatHistory(userId, targetId)}>
+                <div className={`${styles['history-message']} disabled`} onClick={() => Popup.handleOpenChatHistory(userId, targetId)}>
                   {t('message-history')}
                 </div>
               </div>
@@ -395,7 +387,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <EditorContent
               editor={editor}
               placeholder={t('input-message')}
-              className={`${styles['input']} ${markdown['markdown-content']} ${isWarning ? styles['warning'] : ''}`}
+              className={`${styles['input']} ${markdownStyles['markdown-content']} ${isWarning ? styles['warning'] : ''}`}
               style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
               onPaste={(e) => {
                 const items = e.clipboardData.items;

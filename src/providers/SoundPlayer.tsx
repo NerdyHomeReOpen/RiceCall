@@ -1,6 +1,4 @@
 import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
-
-// Services
 import ipc from '@/ipc';
 
 interface SoundPlayerContextType {

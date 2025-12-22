@@ -1,29 +1,22 @@
 import React, { useMemo } from 'react';
-
-// CSS
-import styles from '@/styles/message.module.css';
-
-// Types
-import type { PromptMessage, User } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-import { useContextMenu } from '@/providers/ContextMenu';
 
-// Components
+import type * as Types from '@/types';
+
 import MarkdownContent from '@/components/MarkdownContent';
 
-// Utils
-import { escapeHtml } from '@/utils/tagConverter';
-import { getPermissionText } from '@/utils/language';
-import { handleOpenUserInfo } from '@/utils/popup';
+import { useContextMenu } from '@/providers/ContextMenu';
+
+import * as TagConverter from '@/utils/tagConverter';
+import * as Language from '@/utils/language';
+import * as Popup from '@/utils/popup';
+
+import styles from '@/styles/message.module.css';
 
 interface PromptMessageProps {
-  user: User;
-  messageGroup: PromptMessage & {
-    contents: string[];
-  };
-  messageType?: string;
+  user: Types.User;
+  messageGroup: Types.PromptMessage & { contents: string[] };
+  messageType?: Types.PromptMessage['type'];
 }
 
 const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageGroup, messageType = 'info' }) => {
@@ -35,13 +28,13 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
   const { userId } = user;
   const { contents: messageContents, parameter: messageParameter, contentMetadata: messageContentNetadata } = messageGroup;
   const { targetId: senderUserId } = messageContentNetadata;
-  const escapedMessageParameter = Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, escapeHtml(value)]));
+  const escapedMessageParameter = Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, TagConverter.escapeHtml(value)]));
   const formattedMessagesContents = useMemo(
     () =>
       messageContents.map((content) =>
         content
           .split(' ')
-          .map((c) => t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: getPermissionText(t, parseInt(messageParameter.userPermissionLevel)) } }))
+          .map((c) => t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: Language.getPermissionText(t, parseInt(messageParameter.userPermissionLevel)) } }))
           .join(' '),
       ),
     [messageContents, escapedMessageParameter, messageParameter, t],
@@ -52,7 +45,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
     {
       id: 'view-profile',
       label: t('view-profile'),
-      onClick: () => handleOpenUserInfo(userId, senderUserId),
+      onClick: () => Popup.handleOpenUserInfo(userId, senderUserId),
     },
   ];
 

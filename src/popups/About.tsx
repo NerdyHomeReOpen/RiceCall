@@ -1,22 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { FaGithub, FaDiscord } from 'react-icons/fa';
-
-// Package
-import packageJson from '../../package.json';
-const version = packageJson.version;
-
-// CSS
-import styles from '@/styles/about.module.css';
-import popup from '@/styles/popup.module.css';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import { FaGithub, FaDiscord } from 'react-icons/fa';
+import packageJson from '../../package.json' with { type: 'json' };
+const version = packageJson.version;
+import ipc from '@/ipc';
 
-// Components
 import MarkdownContent from '@/components/MarkdownContent';
 
-// Services
-import ipc from '@/ipc';
+import styles from '@/styles/about.module.css';
+import popupStyles from '@/styles/popup.module.css';
 
 type Staff = {
   title: string;
@@ -67,21 +59,21 @@ const AboutPopup: React.FC = React.memo(() => {
   }, []);
 
   return (
-    <div className={`${popup['popup-wrapper']}`}>
-      <div className={popup['popup-body']}>
-        <div className={popup['content']} style={{ justifyContent: 'flex-start' }}>
+    <div className={`${popupStyles['popup-wrapper']}`}>
+      <div className={popupStyles['popup-body']}>
+        <div className={popupStyles['content']} style={{ justifyContent: 'flex-start' }}>
           <div className={styles['app-logo']}></div>
           <div className={styles['app-info']}>
             <div className={styles['app-version-text']}>RiceCall v{version}</div>
             <div className={styles['copyright-text']}>COPYRIGHT @ {currentYear} RiceCall.com ,ALL RIGHTS RESERVED.</div>
-            <div className={popup['row']} style={{ alignSelf: 'center' }}>
-              <div className={popup['link-text']} onClick={() => window.open('https://discord.com/invite/adCWzv6wwS', '_blank')}>
+            <div className={popupStyles['row']} style={{ alignSelf: 'center' }}>
+              <div className={popupStyles['link-text']} onClick={() => window.open('https://discord.com/invite/adCWzv6wwS', '_blank')}>
                 {t('get-help')}
               </div>
-              <div className={popup['link-text']} onClick={() => window.open('https://github.com/NerdyHomeReOpen/RiceCall', '_blank')}>
+              <div className={popupStyles['link-text']} onClick={() => window.open('https://github.com/NerdyHomeReOpen/RiceCall', '_blank')}>
                 {t('project-repo')}
               </div>
-              <div className={popup['link-text']} onClick={() => window.open('http://ricecall.com.tw', '_blank')}>
+              <div className={popupStyles['link-text']} onClick={() => window.open('http://ricecall.com.tw', '_blank')}>
                 {t('official-website')}
               </div>
             </div>
@@ -117,12 +109,12 @@ const AboutPopup: React.FC = React.memo(() => {
           </div>
         </div>
       </div>
-      <div className={`${popup['popup-footer']} aboutFooter`}>
-        <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+      <div className={`${popupStyles['popup-footer']} aboutFooter`}>
+        <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
           <input type="checkbox" name="showDisclaimer" onChange={(e) => setDontShowNextTime(e.target.checked)} />
-          <div className={popup['label']}>{t('dont-show-next-time')}</div>
+          <div className={popupStyles['label']}>{t('dont-show-next-time')}</div>
         </div>
-        <div className={popup['button']} onClick={() => (dontShowNextTime ? handleDontShowNextTime() : handleClose())}>
+        <div className={popupStyles['button']} onClick={() => (dontShowNextTime ? handleDontShowNextTime() : handleClose())}>
           {t('close')}
         </div>
       </div>

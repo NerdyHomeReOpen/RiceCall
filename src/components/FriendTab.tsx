@@ -1,32 +1,25 @@
 import React, { useEffect, useState } from 'react';
-
-// CSS
-import styles from '@/styles/friend.module.css';
-import vip from '@/styles/vip.module.css';
-
-// Types
-import type { User, Friend, FriendGroup, Server } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
+
+import type * as Types from '@/types';
+
+import BadgeList from '@/components/BadgeList';
+import LevelIcon from '@/components/LevelIcon';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
-// Services
-import ipc from '@/ipc';
+import * as Popup from '@/utils/popup';
 
-// Utils
-import { handleOpenAlertDialog, handleOpenDirectMessage, handleOpenUserInfo, handleOpenApplyFriend, handleOpenEditFriendNote } from '@/utils/popup';
-
-// Components
-import BadgeList from '@/components/BadgeList';
-import LevelIcon from '@/components/LevelIcon';
+import styles from '@/styles/friend.module.css';
+import vip from '@/styles/vip.module.css';
 
 interface FriendTabProps {
-  user: User;
-  friend: Friend;
-  friendGroups: FriendGroup[];
+  user: Types.User;
+  friend: Types.Friend;
+  friendGroups: Types.FriendGroup[];
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
@@ -39,7 +32,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   const loadingBox = useLoading();
 
   // States
-  const [friendCurrentServer, setFriendCurrentServer] = useState<Server | null>(null);
+  const [friendCurrentServer, setFriendCurrentServer] = useState<Types.Server | null>(null);
 
   // Variables
   const { userId, currentServerId: userCurrentServerId } = user;
@@ -72,7 +65,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       id: 'direct-message',
       label: t('direct-message'),
       show: !isUser,
-      onClick: () => handleOpenDirectMessage(userId, targetId),
+      onClick: () => Popup.handleOpenDirectMessage(userId, targetId),
     },
     {
       id: 'separator',
@@ -83,19 +76,19 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       id: 'view-profile',
       label: t('view-profile'),
       show: !isUser,
-      onClick: () => handleOpenUserInfo(userId, targetId),
+      onClick: () => Popup.handleOpenUserInfo(userId, targetId),
     },
     {
       id: 'add-friend',
       label: t('add-friend'),
       show: !isUser && !isFriend,
-      onClick: () => handleOpenApplyFriend(userId, targetId),
+      onClick: () => Popup.handleOpenApplyFriend(userId, targetId),
     },
     {
       id: 'edit-note',
       label: t('edit-note'),
       show: !isUser && isFriend,
-      onClick: () => handleOpenEditFriendNote(userId, targetId),
+      onClick: () => Popup.handleOpenEditFriendNote(userId, targetId),
     },
     {
       id: 'separator',
@@ -160,7 +153,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     },
   ];
 
-  const handleServerSelect = (server: Server) => {
+  const handleServerSelect = (server: Types.Server) => {
     if (loadingBox.isLoading) return;
     if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
@@ -171,23 +164,23 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
-  const handleBlockUser = (targetId: User['userId']) => {
-    handleOpenAlertDialog(t('confirm-block-user', { '0': friendName }), () => ipc.socket.send('blockUser', { targetId }));
+  const handleBlockUser = (targetId: Types.User['userId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-block-user', { '0': friendName }), () => ipc.socket.send('blockUser', { targetId }));
   };
 
-  const handleUnblockUser = (targetId: User['userId']) => {
-    handleOpenAlertDialog(t('confirm-unblock-user', { '0': friendName }), () => ipc.socket.send('unblockUser', { targetId }));
+  const handleUnblockUser = (targetId: Types.User['userId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-unblock-user', { '0': friendName }), () => ipc.socket.send('unblockUser', { targetId }));
   };
 
-  const handleDeleteFriend = (targetId: User['userId']) => {
-    handleOpenAlertDialog(t('confirm-delete-friend', { '0': friendName }), () => ipc.socket.send('deleteFriend', { targetId }));
+  const handleDeleteFriend = (targetId: Types.User['userId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-delete-friend', { '0': friendName }), () => ipc.socket.send('deleteFriend', { targetId }));
   };
 
-  const handleDeleteFriendApplication = (targetId: User['userId']) => {
-    handleOpenAlertDialog(t('confirm-delete-friend-application', { '0': friendName }), () => ipc.socket.send('deleteFriendApplication', { receiverId: targetId }));
+  const handleDeleteFriendApplication = (targetId: Types.User['userId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-delete-friend-application', { '0': friendName }), () => ipc.socket.send('deleteFriendApplication', { receiverId: targetId }));
   };
 
-  const handleEditFriend = (targetId: User['userId'], update: Partial<Friend>) => {
+  const handleEditFriend = (targetId: Types.User['userId'], update: Partial<Types.Friend>) => {
     ipc.socket.send('editFriend', { targetId, update });
   };
 
@@ -210,7 +203,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         if (selectedItemId === targetId) setSelectedItemId(null);
         else setSelectedItemId(targetId);
       }}
-      onDoubleClick={() => handleOpenDirectMessage(userId, targetId)}
+      onDoubleClick={() => Popup.handleOpenDirectMessage(userId, targetId)}
       onContextMenu={(e) => {
         e.preventDefault();
         const x = e.clientX;

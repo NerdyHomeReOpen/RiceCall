@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-
-// Types
-import type { Server, MemberApplication } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// Services
 import ipc from '@/ipc';
 
+import type * as Types from '@/types';
+
+import popupStyles from '@/styles/popup.module.css';
+
 interface ApplyMemberPopupProps {
-  server: Server;
-  memberApplication: MemberApplication | null;
+  server: Types.Server;
+  memberApplication: Types.MemberApplication | null;
 }
 
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, memberApplication }) => {
@@ -23,18 +17,18 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
 
   // States
   const [section, setSection] = useState<number>(memberApplication ? 1 : 0); // 0: send, 1: sent, 2: edit
-  const [applicationDesc, setApplicationDesc] = useState<MemberApplication['description']>(memberApplication?.description || '');
+  const [applicationDesc, setApplicationDesc] = useState<Types.MemberApplication['description']>(memberApplication?.description || '');
 
   // Variables
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
 
   // Handlers
-  const handleSendMemberApplication = (serverId: Server['serverId'], preset: Partial<MemberApplication>) => {
+  const handleSendMemberApplication = (serverId: Types.Server['serverId'], preset: Partial<Types.MemberApplication>) => {
     ipc.socket.send('sendMemberApplication', { serverId, preset });
     ipc.window.close();
   };
 
-  const handleEditMemberApplication = (serverId: Server['serverId'], update: Partial<MemberApplication>) => {
+  const handleEditMemberApplication = (serverId: Types.Server['serverId'], update: Partial<Types.MemberApplication>) => {
     ipc.socket.send('editMemberApplication', { serverId, update });
     ipc.window.close();
   };
@@ -44,57 +38,57 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      <div className={popup['popup-body']}>
-        <div className={`${popup['content']} ${popup['col']}`}>
-          <div className={popup['row']}>
-            <div className={popup['avatar-wrapper']}>
-              <div className={popup['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={`${popupStyles['content']} ${popupStyles['col']}`}>
+          <div className={popupStyles['row']}>
+            <div className={popupStyles['avatar-wrapper']}>
+              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
             </div>
-            <div className={popup['info-wrapper']}>
-              <div className={popup['link-text']}>{serverName}</div>
-              <div className={popup['sub-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+            <div className={popupStyles['info-wrapper']}>
+              <div className={popupStyles['link-text']}>{serverName}</div>
+              <div className={popupStyles['sub-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
             </div>
           </div>
-          <div className={`${popup['input-box']} ${popup['col']}`}>
-            <div className={popup['label']}>{t('apply-member-note')}</div>
-            <div className={popup['hint-text']}>{serverApplyNotice || t('none')}</div>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className={popupStyles['label']}>{t('apply-member-note')}</div>
+            <div className={popupStyles['hint-text']}>{serverApplyNotice || t('none')}</div>
           </div>
-          <div className={popup['split']} />
-          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 0 ? {} : { display: 'none' }}>
-            <div className={popup['label']}>{t('note')}</div>
+          <div className={popupStyles['split']} />
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 0 ? {} : { display: 'none' }}>
+            <div className={popupStyles['label']}>{t('note')}</div>
             <textarea rows={2} value={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
-          <div className={popup['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
+          <div className={popupStyles['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('member-application-sent')}
           </div>
-          <div className={`${popup['input-box']} ${popup['col']}`} style={section === 2 ? {} : { display: 'none' }}>
-            <div className={popup['label']}>{t('note')}</div>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 2 ? {} : { display: 'none' }}>
+            <div className={popupStyles['label']}>{t('note')}</div>
             <textarea rows={2} value={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
           </div>
         </div>
       </div>
-      <div className={popup['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div className={popup['button']} onClick={() => handleSendMemberApplication(serverId, { description: applicationDesc })}>
+      <div className={popupStyles['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
+        <div className={popupStyles['button']} onClick={() => handleSendMemberApplication(serverId, { description: applicationDesc })}>
           {t('submit')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>
-      <div className={popup['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
-        <div className={popup['button']} onClick={() => setSection(2)}>
+      <div className={popupStyles['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
+        <div className={popupStyles['button']} onClick={() => setSection(2)}>
           {t('modify')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('confirm')}
         </div>
       </div>
-      <div className={popup['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div className={popup['button']} onClick={() => handleEditMemberApplication(serverId, { description: applicationDesc })}>
+      <div className={popupStyles['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
+        <div className={popupStyles['button']} onClick={() => handleEditMemberApplication(serverId, { description: applicationDesc })}>
           {t('submit')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

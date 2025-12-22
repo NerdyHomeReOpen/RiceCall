@@ -1,25 +1,19 @@
 import React, { useMemo, useState } from 'react';
-
-// CSS
-import styles from '@/styles/friend.module.css';
-
-// Types
-import type { User, FriendGroup, Friend } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
 
-// Utils
-import { handleOpenSearchUser, handleOpenCreateFriendGroup } from '@/utils/popup';
-import Default from '@/utils/default';
+import type * as Types from '@/types';
 
-// Components
 import FriendGroupTab from '@/components/FriendGroupTab';
 
+import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
+
+import styles from '@/styles/friend.module.css';
+
 interface FriendListProps {
-  user: User;
-  friends: Friend[];
-  friendGroups: FriendGroup[];
+  user: Types.User;
+  friends: Types.Friend[];
+  friendGroups: Types.FriendGroup[];
 }
 
 const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, friends }) => {
@@ -75,10 +69,10 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       </div>
       <div className={styles['recent-list']} style={selectedTabId == 1 ? {} : { display: 'none' }}></div>
       <div className={styles['sidebar-footer']}>
-        <div className={styles['button']} datatype="addGroup" onClick={handleOpenCreateFriendGroup}>
+        <div className={styles['button']} datatype="addGroup" onClick={() => Popup.handleOpenCreateFriendGroup()}>
           {t('create-friend-group')}
         </div>
-        <div className={styles['button']} datatype="addFriend" onClick={() => handleOpenSearchUser(userId)}>
+        <div className={styles['button']} datatype="addFriend" onClick={() => Popup.handleOpenSearchUser(userId)}>
           {t('add-friend')}
         </div>
       </div>

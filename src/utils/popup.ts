@@ -1,8 +1,6 @@
-// Types
-import type { User, Server, Channel, FriendGroup, ChannelEvent } from '@/types';
-
-// Services
 import ipc from '@/ipc';
+
+import * as Types from '@/types';
 
 export const handleOpenAlertDialog = (message: string, callback: () => void) => {
   ipc.popup.open('dialogAlert', 'dialogAlert', { message });
@@ -14,67 +12,67 @@ export const handleOpenErrorDialog = (message: string, callback: () => void) => 
   ipc.popup.onSubmit('dialogError', callback);
 };
 
-export const handleOpenDirectMessage = (userId: User['userId'], targetId: User['userId']) => {
+export const handleOpenDirectMessage = (userId: Types.User['userId'], targetId: Types.User['userId']) => {
   ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
 };
 
-export const handleOpenChatHistory = (userId: User['userId'], targetId: User['userId']) => {
+export const handleOpenChatHistory = (userId: Types.User['userId'], targetId: Types.User['userId']) => {
   ipc.popup.open('chatHistory', 'chatHistory', { userId, targetId });
 };
 
-export const handleOpenUserInfo = (userId: User['userId'], targetId: User['userId']) => {
+export const handleOpenUserInfo = (userId: Types.User['userId'], targetId: Types.User['userId']) => {
   ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
 };
 
-export const handleOpenServerSetting = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenServerSetting = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
 };
 
-export const handleOpenChannelEvent = (userId: User['userId'], serverId: Server['serverId'], channelEvents: ChannelEvent[]) => {
+export const handleOpenChannelEvent = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelEvents: Types.ChannelEvent[]) => {
   ipc.popup.open('channelEvent', 'channelEvent', { userId, serverId, channelEvents });
 };
 
-export const handleOpenChannelSetting = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+export const handleOpenChannelSetting = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
   ipc.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
 };
 
-export const handleOpenCreateServer = (userId: User['userId']) => {
+export const handleOpenCreateServer = (userId: Types.User['userId']) => {
   ipc.popup.open('createServer', 'createServer', { userId });
 };
 
-export const handleOpenCreateChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+export const handleOpenCreateChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
   ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
 };
 
-export const handleOpenEditNickname = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenEditNickname = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
 };
 
-export const handleOpenBlockMember = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenBlockMember = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
 };
 
-export const handleOpenKickMemberFromServer = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenKickMemberFromServer = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('kickMemberFromServer', `kickMemberFromServer`, { userId, serverId });
 };
 
-export const handleOpenKickMemberFromChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+export const handleOpenKickMemberFromChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
   ipc.popup.open('kickMemberFromChannel', `kickMemberFromChannel`, { userId, serverId, channelId });
 };
 
-export const handleOpenInviteMember = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenInviteMember = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
 };
 
-export const handleOpenMemberApplicationSetting = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenMemberApplicationSetting = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('memberApplicationSetting', 'memberApplicationSetting', { userId, serverId });
 };
 
-export const handleOpenEditChannelOrder = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenEditChannelOrder = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
 };
 
-export const handleOpenServerBroadcast = (serverId: Server['serverId'], channelId: Channel['channelId']) => {
+export const handleOpenServerBroadcast = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
   ipc.popup.open('serverBroadcast', 'serverBroadcast', { serverId, channelId });
 };
 
@@ -83,23 +81,23 @@ export const handleOpenChannelPassword = (onSubmit: (password: string) => void) 
   ipc.popup.onSubmit('channelPassword', onSubmit);
 };
 
-export const handleOpenEditChannelName = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], channelName: Channel['name'] = '') => {
+export const handleOpenEditChannelName = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], channelName: Types.Channel['name'] = '') => {
   ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName });
 };
 
-export const handleOpenFriendVerification = (userId: User['userId']) => {
+export const handleOpenFriendVerification = (userId: Types.User['userId']) => {
   ipc.popup.open('friendVerification', 'friendVerification', { userId });
 };
 
-export const handleOpenMemberInvitation = (userId: User['userId']) => {
+export const handleOpenMemberInvitation = (userId: Types.User['userId']) => {
   ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
 };
 
-export const handleOpenSearchUser = (userId: User['userId']) => {
+export const handleOpenSearchUser = (userId: Types.User['userId']) => {
   ipc.popup.open('searchUser', 'searchUser', { userId });
 };
 
-export const handleOpenApplyFriend = async (userId: User['userId'], targetId: User['userId']) => {
+export const handleOpenApplyFriend = async (userId: Types.User['userId'], targetId: Types.User['userId']) => {
   await ipc.data.friendApplication(userId, targetId).then((receivedFriendApplication) => {
     if (receivedFriendApplication) {
       ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
@@ -109,7 +107,7 @@ export const handleOpenApplyFriend = async (userId: User['userId'], targetId: Us
   });
 };
 
-export const handleOpenApproveFriend = (userId: User['userId'], targetId: User['userId']) => {
+export const handleOpenApproveFriend = (userId: Types.User['userId'], targetId: Types.User['userId']) => {
   ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
 };
 
@@ -117,15 +115,15 @@ export const handleOpenCreateFriendGroup = () => {
   ipc.popup.open('createFriendGroup', 'createFriendGroup', {});
 };
 
-export const handleOpenEditFriendNote = (userId: User['userId'], targetId: User['userId']) => {
+export const handleOpenEditFriendNote = (userId: Types.User['userId'], targetId: Types.User['userId']) => {
   ipc.popup.open('editFriendNote', 'editFriendNote', { userId, targetId });
 };
 
-export const handleOpenEditFriendGroupName = (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']) => {
+export const handleOpenEditFriendGroupName = (userId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId']) => {
   ipc.popup.open('editFriendGroupName', 'editFriendGroupName', { userId, friendGroupId });
 };
 
-export const handleOpenSystemSetting = (userId: User['userId']) => {
+export const handleOpenSystemSetting = (userId: Types.User['userId']) => {
   ipc.popup.open('systemSetting', 'systemSetting', { userId });
 };
 
@@ -137,7 +135,7 @@ export const handleOpenChangeTheme = () => {
   ipc.popup.open('changeTheme', 'changeTheme', {});
 };
 
-export const handleOpenApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
+export const handleOpenApplyMember = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
   ipc.popup.open('applyMember', 'applyMember', { userId, serverId });
 };
 
@@ -146,7 +144,7 @@ export const handleOpenImageCropper = (imageUnit8Array: Uint8Array, onSubmit: (i
   ipc.popup.onSubmit('imageCropper', onSubmit);
 };
 
-export const handleOpenServerApplication = (userId: User['userId'], serverId: Server['serverId'], onSubmit: (action: string) => void) => {
+export const handleOpenServerApplication = (userId: Types.User['userId'], serverId: Types.Server['serverId'], onSubmit: (action: string) => void) => {
   ipc.popup.open('serverApplication', 'serverApplication', { userId, serverId });
   ipc.popup.onSubmit('serverApplication', onSubmit);
 };

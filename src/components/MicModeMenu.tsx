@@ -1,18 +1,13 @@
 import React from 'react';
-
-// CSS
-import server from '@/styles/server.module.css';
-import popup from '@/styles/popup.module.css';
-
-// Types
-import type { SpeakingMode } from '@/types';
-
-// Hooks
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
+
+import type * as Types from '@/types';
+
 import { useWebRTC } from '@/providers/WebRTC';
 
-// services
-import ipc from '@/ipc';
+import server from '@/styles/server.module.css';
+import popup from '@/styles/popup.module.css';
 
 function lerpColor(color1: string, color2: string, t: number) {
   const c1 = parseInt(color1.slice(1), 16);
@@ -47,7 +42,7 @@ const MicModeMenu: React.FC = React.memo(() => {
   const defaultSpeakingKey = ipc.systemSettings.defaultSpeakingKey.get();
 
   // Handlers
-  const handleEditSpeakingMode = (speakingMode: SpeakingMode) => {
+  const handleEditSpeakingMode = (speakingMode: Types.SpeakingMode) => {
     ipc.systemSettings.speakingMode.set(speakingMode);
   };
 

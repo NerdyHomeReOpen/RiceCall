@@ -1,20 +1,17 @@
 import React, { useMemo, useRef } from 'react';
 
-// CSS
-import styles from '@/styles/message.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { User, DirectMessage, PromptMessage } from '@/types';
-
-// Components
 import DirectMessageTab from '@/components/DirectMessage';
 import PromptMessageTab from '@/components/PromptMessage';
 
-type MessageGroup = (DirectMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
+import styles from '@/styles/message.module.css';
+
+type MessageGroup = (Types.DirectMessage & { contents: string[] }) | (Types.PromptMessage & { contents: string[] });
 
 interface DirectMessageContentProps {
-  user: User;
-  messages: (DirectMessage | PromptMessage)[];
+  user: Types.User;
+  messages: (Types.DirectMessage | Types.PromptMessage)[];
 }
 
 const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ user, messages }) => {

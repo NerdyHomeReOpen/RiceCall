@@ -1,13 +1,8 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// Services
 import ipc from '@/ipc';
+
+import popupStyles from '@/styles/popup.module.css';
 
 interface ImageCropperPopupProps {
   id: string;
@@ -171,9 +166,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   }, [cropBox, draw]);
 
   return (
-    <div className={popup['popup-wrapper']}>
-      <div className={popup['popup-body']}>
-        <div className={`${popup['content']} ${popup['row']}`} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={`${popupStyles['content']} ${popupStyles['row']}`} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <canvas
             ref={canvasRef}
             width={400}
@@ -185,9 +180,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
             onMouseLeave={handleMouseLeave}
             onWheel={handleWheel}
           />
-          <div className={popup['col']}>
+          <div className={popupStyles['col']}>
             <div
-              className={`${popup['input-box']} ${popup['col']}`}
+              className={`${popupStyles['input-box']} ${popupStyles['col']}`}
               style={{
                 width: '150px',
                 height: '150px',
@@ -210,11 +205,11 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
           </div>
         </div>
       </div>
-      <div className={popup['popup-footer']}>
-        <div className={`${popup['button']}`} onClick={handleCrop}>
+      <div className={popupStyles['popup-footer']}>
+        <div className={`${popupStyles['button']}`} onClick={handleCrop}>
           {t('upload')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('close')}
         </div>
       </div>

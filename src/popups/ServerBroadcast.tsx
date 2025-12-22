@@ -1,23 +1,16 @@
 import React, { useState } from 'react';
-
-// Types
-import type { Server, Channel, PromptMessage } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-
-// Services
 import ipc from '@/ipc';
 
-// Constants
+import type * as Types from '@/types';
+
 import { MAX_BROADCAST_LENGTH } from '@/constant';
 
+import popupStyles from '@/styles/popup.module.css';
+
 interface ServerBroadcastPopupProps {
-  serverId: Server['serverId'];
-  channelId: Channel['channelId'];
+  serverId: Types.Server['serverId'];
+  channelId: Types.Channel['channelId'];
 }
 
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ serverId, channelId }) => {
@@ -33,12 +26,12 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   const canSend = broadcastContent.trim() && broadcastContent.length <= MAX_BROADCAST_LENGTH;
 
   // Handlers
-  const handleBroadcastChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], preset: Partial<PromptMessage>) => {
+  const handleBroadcastChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], preset: Partial<Types.PromptMessage>) => {
     ipc.socket.send('actionMessage', { serverId, channelId, preset });
     ipc.window.close();
   };
 
-  const handleBroadcastServer = (serverId: Server['serverId'], preset: Partial<PromptMessage>) => {
+  const handleBroadcastServer = (serverId: Types.Server['serverId'], preset: Partial<Types.PromptMessage>) => {
     ipc.socket.send('actionMessage', { serverId, preset });
     ipc.window.close();
   };
@@ -48,43 +41,43 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      <div className={popup['popup-body']}>
-        <div className={`${popup['content']} ${popup['col']}`}>
-          <div className={popup['row']}>
-            <div className={popup['label']}>{t('receive-channel')}</div>
-            <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={`${popupStyles['content']} ${popupStyles['col']}`}>
+          <div className={popupStyles['row']}>
+            <div className={popupStyles['label']}>{t('receive-channel')}</div>
+            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
               <input name="channelType" type="radio" checked={broadcastType === 'channel'} onChange={() => setBroadcastType('channel')} />
-              <div className={popup['label']}>{t('current-channel')}</div>
+              <div className={popupStyles['label']}>{t('current-channel')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
               <input name="channelType" type="radio" checked={broadcastType === 'server'} onChange={() => setBroadcastType('server')} />
-              <div className={popup['label']}>{t('all-channel')}</div>
+              <div className={popupStyles['label']}>{t('all-channel')}</div>
             </div>
           </div>
-          <div className={popup['row']}>
-            <div className={popup['label']}>{t('broadcast-type')}</div>
-            <div className={`${popup['input-box']} ${popup['row']}`} style={{ width: 'fit-content' }}>
+          <div className={popupStyles['row']}>
+            <div className={popupStyles['label']}>{t('broadcast-type')}</div>
+            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
               <input name="sendType" type="radio" checked={sendType === 'text'} onChange={() => setSendType('text')} />
-              <div className={popup['label']}>{t('text-broadcast')}</div>
+              <div className={popupStyles['label']}>{t('text-broadcast')}</div>
             </div>
-            <div className={`${popup['input-box']} ${popup['row']} ${'disabled'}`} style={{ width: 'fit-content' }}>
+            <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`} style={{ width: 'fit-content' }}>
               <input name="sendType" type="radio" checked={sendType === 'voice'} onChange={() => setSendType('voice')} />
-              <div className={popup['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
+              <div className={popupStyles['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
             </div>
           </div>
-          <div className={`${popup['input-box']} ${popup['col']}`}>
-            <div className={popup['label']}>{t('broadcast-content')}</div>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className={popupStyles['label']}>{t('broadcast-content')}</div>
             <textarea name="content" maxLength={MAX_BROADCAST_LENGTH} style={{ minHeight: '90px' }} onChange={(e) => setBroadcastContent(e.target.value)} />
-            <div className={popup['hint-text']}>
+            <div className={popupStyles['hint-text']}>
               {broadcastContent.length}/{MAX_BROADCAST_LENGTH}
             </div>
           </div>
         </div>
       </div>
-      <div className={popup['popup-footer']}>
+      <div className={popupStyles['popup-footer']}>
         <div
-          className={`${popup['button']} ${!canSend ? 'disabled' : ''}`}
+          className={`${popupStyles['button']} ${!canSend ? 'disabled' : ''}`}
           onClick={() =>
             canSend
               ? broadcastType === 'channel'
@@ -95,7 +88,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

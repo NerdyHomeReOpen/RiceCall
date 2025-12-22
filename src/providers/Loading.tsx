@@ -1,10 +1,7 @@
 import React, { useContext, createContext, ReactNode, useState } from 'react';
-
-// CSS
-import homePage from '@/styles/home.module.css';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+
+import homeStyles from '@/styles/home.module.css';
 
 interface LoadingContextType {
   setIsLoading: (value: boolean) => void;
@@ -50,11 +47,11 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
       }}
     >
       {isLoading && (
-        <div className={homePage['loading-wrapper']}>
-          <div className={homePage['loading-box']}>
-            <div className={homePage['loading-title-contain']}>{t('connecting-server', { '0': loadingServerId })}</div>
-            <div className={homePage['loading-gif']}></div>
-            <div className={homePage['loading-close-btn']} onClick={() => setIsLoading(false)} />
+        <div className={homeStyles['loading-wrapper']}>
+          <div className={homeStyles['loading-box']}>
+            <div className={homeStyles['loading-title-contain']}>{t('connecting-server', { '0': loadingServerId })}</div>
+            <div className={homeStyles['loading-gif']}></div>
+            <div className={homeStyles['loading-close-btn']} onClick={() => setIsLoading(false)} />
           </div>
         </div>
       )}
@@ -63,6 +60,6 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
   );
 };
 
-LoadingProvider.displayName = 'MainTabProvider';
+LoadingProvider.displayName = 'LoadingProvider';
 
 export default LoadingProvider;

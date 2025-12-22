@@ -1,4 +1,3 @@
-// FontFamily.ts
 import { Mark } from '@tiptap/core';
 
 export const FontFamily = Mark.create({

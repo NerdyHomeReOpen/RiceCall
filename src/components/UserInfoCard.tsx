@@ -1,28 +1,22 @@
 import React, { useState, useLayoutEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
-// CSS
-import styles from '@/styles/userInfoCard.module.css';
-import vip from '@/styles/vip.module.css';
-import permission from '@/styles/permission.module.css';
+import type * as Types from '@/types';
 
-// Components
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
-// Types
-import type { OnlineMember } from '@/types';
+import * as Language from '@/utils/language';
 
-// Providers
-import { useTranslation } from 'react-i18next';
-
-// Utils
-import { getPermissionText } from '@/utils/language';
+import styles from '@/styles/userInfoCard.module.css';
+import vip from '@/styles/vip.module.css';
+import permission from '@/styles/permission.module.css';
 
 interface UserInfoCardProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  member: OnlineMember;
+  member: Types.OnlineMember;
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction, member }) => {
@@ -119,7 +113,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
           <div className={styles['info-row']}>
             <div className={styles['permission-wrapper']}>
               <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-              <div className={styles['permission-text']}>{getPermissionText(t, memberPermission)}</div>
+              <div className={styles['permission-text']}>{Language.getPermissionText(t, memberPermission)}</div>
             </div>
             <div className={styles['saperator']} />
             <div className={styles['contribution-wrapper']}>

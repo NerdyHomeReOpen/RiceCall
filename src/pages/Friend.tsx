@@ -1,35 +1,28 @@
 import dynamic from 'next/dynamic';
 import React, { useEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// CSS
-import friendPage from '@/styles/friend.module.css';
-import vip from '@/styles/vip.module.css';
-import emoji from '@/styles/emoji.module.css';
+import type * as Types from '@/types';
 
-// Components
 import FriendList from '@/components/FriendList';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
-// Types
-import type { User, Friend, FriendGroup, FriendActivity } from '@/types';
-
-// Providers
-import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
-// Services
-import ipc from '@/ipc';
+import * as Language from '@/utils/language';
+import * as Popup from '@/utils/popup';
 
-// Utils
-import { getFormatTimeDiff } from '@/utils/language';
-import { handleOpenUserInfo } from '@/utils/popup';
+import friendStyles from '@/styles/friend.module.css';
+import vipStyles from '@/styles/vip.module.css';
+import emojiStyles from '@/styles/emoji.module.css';
 
 interface FriendPageProps {
-  user: User;
-  friends: Friend[];
-  friendActivities: FriendActivity[];
-  friendGroups: FriendGroup[];
+  user: Types.User;
+  friends: Types.Friend[];
+  friendActivities: Types.FriendActivity[];
+  friendGroups: Types.FriendGroup[];
   display: boolean;
 }
 
@@ -48,7 +41,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const { userId, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
 
   // Handlers
-  const handleChangeSignature = (signature: User['signature']) => {
+  const handleChangeSignature = (signature: Types.User['signature']) => {
     if (signature === userSignature) return;
     ipc.socket.send('editUser', { update: { signature } });
   };
@@ -77,25 +70,25 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   }, []);
 
   return (
-    <main className={friendPage['friend']} style={display ? {} : { display: 'none' }}>
-      <header className={friendPage['friend-header']}>
-        <div className={friendPage['avatar-picture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} datatype={''} />
-        <div className={friendPage['base-info-wrapper']}>
-          <div className={friendPage['box']}>
-            <div className={friendPage['level-icon']} />
-            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} isSelf={true} isHover={true} />
-            <div className={friendPage['wealth-icon']} />
-            <div className={friendPage['wealth-value-text']}>0</div>
-            {userVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${userVip}`]}`} />}
+    <main className={friendStyles['friend']} style={display ? {} : { display: 'none' }}>
+      <header className={friendStyles['friend-header']}>
+        <div className={friendStyles['avatar-picture']} style={{ backgroundImage: `url(${userAvatarUrl})` }} datatype={''} />
+        <div className={friendStyles['base-info-wrapper']}>
+          <div className={friendStyles['box']}>
+            <div className={friendStyles['level-icon']} />
+            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} showTooltip={true} />
+            <div className={friendStyles['wealth-icon']} />
+            <div className={friendStyles['wealth-value-text']}>0</div>
+            {userVip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${userVip}`]}`} />}
           </div>
-          <div className={friendPage['box']}>
+          <div className={friendStyles['box']}>
             <BadgeList badges={JSON.parse(userBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
           </div>
         </div>
-        <div className={friendPage['signature-wrapper']}>
+        <div className={friendStyles['signature-wrapper']}>
           <textarea
             ref={signatureInputRef}
-            className={friendPage['signature-input']}
+            className={friendStyles['signature-input']}
             defaultValue={userSignature}
             maxLength={100}
             placeholder={t('signature-placeholder')}
@@ -110,7 +103,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             onCompositionEnd={() => (isComposingRef.current = false)}
           />
           <div
-            className={emoji['emoji-icon']}
+            className={emojiStyles['emoji-icon']}
             onMouseDown={(e) => {
               e.preventDefault();
               const x = e.currentTarget.getBoundingClientRect().left;
@@ -123,27 +116,31 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
           />
         </div>
       </header>
-      <main className={friendPage['friend-body']}>
-        <aside ref={sidebarRef} className={friendPage['sidebar']}>
+      <main className={friendStyles['friend-body']}>
+        <aside ref={sidebarRef} className={friendStyles['sidebar']}>
           <FriendList friendGroups={friendGroups} friends={friends} user={user} />
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
-        <main className={friendPage['content']}>
-          <header className={friendPage['header']}>{t('friend-active')}</header>
-          <div className={`${friendPage['scroll-view']} ${friendPage['friend-active-wrapper']}`}>
-            <div className={friendPage['friend-active-list']}>
+        <main className={friendStyles['content']}>
+          <header className={friendStyles['header']}>{t('friend-active')}</header>
+          <div className={`${friendStyles['scroll-view']} ${friendStyles['friend-active-wrapper']}`}>
+            <div className={friendStyles['friend-active-list']}>
               {friendActivities.map((friendActivity, index) => (
-                <div key={index} className={friendPage['user-activity']}>
-                  <div className={friendPage['user-avatar']} style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }} onClick={() => handleOpenUserInfo(userId, friendActivity.userId)} />
-                  <div className={friendPage['right-info']}>
-                    <div className={friendPage['user-activity-top']}>
-                      {friendActivity.vip !== 0 && <div className={`${friendPage['vip-icon']} ${vip['vip-icon']} ${vip[`vip-${friendActivity.vip}`]}`}></div>}
-                      <div className={friendPage['user-name']} onClick={() => handleOpenUserInfo(userId, friendActivity.userId)}>
+                <div key={index} className={friendStyles['user-activity']}>
+                  <div
+                    className={friendStyles['user-avatar']}
+                    style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }}
+                    onClick={() => Popup.handleOpenUserInfo(userId, friendActivity.userId)}
+                  />
+                  <div className={friendStyles['right-info']}>
+                    <div className={friendStyles['user-activity-top']}>
+                      {friendActivity.vip !== 0 && <div className={`${friendStyles['vip-icon']} ${vipStyles['vip-icon']} ${vipStyles[`vip-${friendActivity.vip}`]}`}></div>}
+                      <div className={friendStyles['user-name']} onClick={() => Popup.handleOpenUserInfo(userId, friendActivity.userId)}>
                         {friendActivity.name}
                       </div>
-                      <div className={friendPage['timestamp']}>{getFormatTimeDiff(t, friendActivity.timestamp)}</div>
+                      <div className={friendStyles['timestamp']}>{Language.getFormatTimeDiff(t, friendActivity.timestamp)}</div>
                     </div>
-                    <div className={friendPage['signature']}>{friendActivity.content}</div>
+                    <div className={friendStyles['signature']}>{friendActivity.content}</div>
                   </div>
                 </div>
               ))}

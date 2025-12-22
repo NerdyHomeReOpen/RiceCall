@@ -1,14 +1,9 @@
 import dynamic from 'next/dynamic';
 import React, { useEffect, useRef, useState } from 'react';
-
-// CSS
-import styles from '@/styles/login.module.css';
-
-// Services
+import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-// Providers
-import { useTranslation } from 'react-i18next';
+import styles from '@/styles/login.module.css';
 
 interface LoginPageProps {
   display: boolean;

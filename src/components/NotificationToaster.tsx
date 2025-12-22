@@ -1,29 +1,26 @@
 import React, { useEffect, useMemo, useState } from 'react';
 
-// Types
-import type { Notification } from '@/types';
+import type * as Types from '@/types';
 
-// CSS
-import styles from '@/styles/notificationToaster.module.css';
-
-// Components
 import MarkdownContent from '@/components/MarkdownContent';
 
+import styles from '@/styles/notificationToaster.module.css';
+
 interface NotificationToasterProps {
-  notifications: Notification[];
+  notifications: Types.Notification[];
 }
 
 const NotificationToaster: React.FC<NotificationToasterProps> = React.memo(({ notifications }) => {
   // States
   const [show, setShow] = useState(false);
-  const [closedNotificationIds, setClosedNotificationIds] = useState<Set<Notification['notificationId']>>(new Set());
+  const [closedNotificationIds, setClosedNotificationIds] = useState<Set<Types.Notification['notificationId']>>(new Set());
   const [showNotificationIndex, setShowNotificationIndex] = useState<number>(0);
 
   // Variables
   const filteredNotifications = useMemo(() => notifications.filter((notification) => !closedNotificationIds.has(notification.notificationId)), [notifications, closedNotificationIds]);
 
   // Handlers
-  const handleClose = (notificationId: Notification['notificationId']) => {
+  const handleClose = (notificationId: Types.Notification['notificationId']) => {
     setClosedNotificationIds((prev) => prev.add(notificationId));
     setShow(false);
     setTimeout(() => {

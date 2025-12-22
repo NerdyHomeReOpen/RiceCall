@@ -1,7 +1,6 @@
 import React, { useContext, createContext, ReactNode, useState } from 'react';
 import Image from 'next/image';
 
-// Styles
 import styles from '@/styles/imageViewer.module.css';
 
 type ImageViewerContextType = {

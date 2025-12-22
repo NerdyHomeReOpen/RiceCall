@@ -1,17 +1,11 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
-
-// CSS
-import styles from '@/styles/changeServer.module.css';
-
-// Services
+import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-// Providers
-import { useTranslation } from 'react-i18next';
+import * as Popup from '@/utils/popup';
 
-// Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
+import styles from '@/styles/changeServer.module.css';
 
 interface ChangeServerPageProps {
   display: boolean;
@@ -37,7 +31,7 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
   // Handlers
   const handleSelectServer = (value: 'prod' | 'dev') => {
     if (value === 'dev') {
-      handleOpenAlertDialog(t('confirm-change-server-to-dev'), () => {
+      Popup.handleOpenAlertDialog(t('confirm-change-server-to-dev'), () => {
         ipc.changeServer(value);
         setSection('login');
       });

@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -7,27 +8,19 @@ import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-import setting from '@/styles/setting.module.css';
-import markdown from '@/styles/markdown.module.css';
-
-// Components
-import MarkdownContent from '@/components/MarkdownContent';
-
-// Providers
-import { useContextMenu } from '@/providers/ContextMenu';
-import { useTranslation } from 'react-i18next';
-
-// Services
 import ipc from '@/ipc';
 
-// Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
+import MarkdownContent from '@/components/MarkdownContent';
+
+import { useContextMenu } from '@/providers/ContextMenu';
+
+import * as Popup from '@/utils/popup';
 import { fromTags, toTags } from '@/utils/tagConverter';
 
-// Constants
+import popupStyles from '@/styles/popup.module.css';
+import settingStyles from '@/styles/setting.module.css';
+import markdownStyles from '@/styles/markdown.module.css';
+
 import { FONT_LIST, MAX_FILE_SIZE } from '@/constant';
 
 interface AnnouncementEditorProps {
@@ -77,7 +70,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -96,11 +89,11 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   }, [editor, syncStyles]);
 
   return (
-    <div className={popup['input-box']}>
+    <div className={popupStyles['input-box']}>
       {!showPreview ? (
         <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid #ccc', height: '380px' }}>
-          <div className={setting['toolbar']}>
-            <div className={popup['select-box']}>
+          <div className={settingStyles['toolbar']}>
+            <div className={popupStyles['select-box']}>
               <select
                 value={fontFamily}
                 onChange={(e) => {
@@ -116,7 +109,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 ))}
               </select>
             </div>
-            <div className={popup['select-box']}>
+            <div className={popupStyles['select-box']}>
               <select
                 value={fontSize}
                 onChange={(e) => {
@@ -133,7 +126,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </select>
             </div>
             <div
-              className={`${setting['button']} ${isTextAlignLeft ? setting['active'] : ''}`}
+              className={`${settingStyles['button']} ${isTextAlignLeft ? settingStyles['active'] : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 editor?.chain().setTextAlign('left').focus().run();
@@ -149,7 +142,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
             <div
-              className={`${setting['button']} ${isTextAlignCenter ? setting['active'] : ''}`}
+              className={`${settingStyles['button']} ${isTextAlignCenter ? settingStyles['active'] : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 editor?.chain().setTextAlign('center').focus().run();
@@ -165,7 +158,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
             <div
-              className={`${setting['button']} ${isTextAlignRight ? setting['active'] : ''}`}
+              className={`${settingStyles['button']} ${isTextAlignRight ? settingStyles['active'] : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 editor?.chain().setTextAlign('right').focus().run();
@@ -181,7 +174,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
             <div
-              className={`${setting['button']} ${isBold ? setting['active'] : ''}`}
+              className={`${settingStyles['button']} ${isBold ? settingStyles['active'] : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 editor?.chain().toggleBold().focus().run();
@@ -194,7 +187,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
             <div
-              className={`${setting['button']} ${isItalic ? setting['active'] : ''}`}
+              className={`${settingStyles['button']} ${isItalic ? settingStyles['active'] : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 editor?.chain().toggleItalic().focus().run();
@@ -207,7 +200,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
             <div
-              className={`${setting['button']} ${isUnderline ? setting['active'] : ''}`}
+              className={`${settingStyles['button']} ${isUnderline ? settingStyles['active'] : ''}`}
               onClick={(e) => {
                 e.preventDefault();
                 editor?.chain().toggleUnderline().focus().run();
@@ -220,7 +213,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
             <div
-              className={setting['button']}
+              className={settingStyles['button']}
               onClick={(e) => {
                 e.preventDefault();
                 const x = e.currentTarget.getBoundingClientRect().left;
@@ -235,7 +228,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               <div style={{ backgroundColor: textColor || '#FFFFFF', width: '16px', height: '16px', borderRadius: '2px' }} />
             </div>
             <div
-              className={setting['button']}
+              className={settingStyles['button']}
               onClick={(e) => {
                 e.preventDefault();
                 const x = e.currentTarget.getBoundingClientRect().left;
@@ -252,7 +245,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               </svg>
             </div>
             <div
-              className={setting['button']}
+              className={settingStyles['button']}
               onClick={(e) => {
                 e.preventDefault();
                 const x = e.currentTarget.getBoundingClientRect().left;
@@ -290,7 +283,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           </div>
           <EditorContent
             editor={editor}
-            className={`${markdown['setting-markdown-container']} ${markdown['markdown-content']}`}
+            className={`${markdownStyles['setting-markdown-container']} ${markdownStyles['markdown-content']}`}
             style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
             onPaste={(e) => {
               const items = e.clipboardData.items;
@@ -308,7 +301,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           />
         </div>
       ) : (
-        <div className={markdown['setting-markdown-container']} style={{ height: '380px' }}>
+        <div className={markdownStyles['setting-markdown-container']} style={{ height: '380px' }}>
           <MarkdownContent markdownText={announcement} />
         </div>
       )}

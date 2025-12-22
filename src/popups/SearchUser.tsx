@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from 'react';
-
-// Types
-import type { User } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-
-// Services
 import ipc from '@/ipc';
 
-// Utils
-import { handleOpenApplyFriend } from '@/utils/popup';
+import type * as Types from '@/types';
+
+import * as Popup from '@/utils/popup';
+
+import popupStyles from '@/styles/popup.module.css';
 
 interface SearchUserPopupProps {
-  userId: User['userId'];
+  userId: Types.User['userId'];
 }
 
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) => {
@@ -43,7 +36,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       ipc.data.friend(userId, targetId).then((friend) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (targetId === userId) setError(t('cannot-add-yourself'));
-        else handleOpenApplyFriend(userId, targetId);
+        else Popup.handleOpenApplyFriend(userId, targetId);
       });
     });
   };
@@ -58,25 +51,25 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
   }, [searchQuery]);
 
   return (
-    <div className={popup['popup-wrapper']}>
-      <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={`${popup['input-box']} ${popup['col']}`} style={{ position: 'relative' }}>
-            <div className={popup['label']}>{t('please-input-user-account')}</div>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={popupStyles['dialog-content']}>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={{ position: 'relative' }}>
+            <div className={popupStyles['label']}>{t('please-input-user-account')}</div>
             <input name="search-query" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} required />
             {error && (
-              <div style={{ position: 'absolute', top: '2rem', right: '0' }} className={`${popup['label']} ${popup['error-message']}`}>
+              <div style={{ position: 'absolute', top: '2rem', right: '0' }} className={`${popupStyles['label']} ${popupStyles['error-message']}`}>
                 {`(${t(error)})`}
               </div>
             )}
           </div>
         </div>
       </div>
-      <div className={popup['popup-footer']}>
-        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleSearchUser(searchQuery) : null)}>
+      <div className={popupStyles['popup-footer']}>
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleSearchUser(searchQuery) : null)}>
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

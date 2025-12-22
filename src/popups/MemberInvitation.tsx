@@ -1,24 +1,17 @@
 import React, { useEffect, useState } from 'react';
-
-// Types
-import type { Server, MemberInvitation } from '@/types';
-
-// CSS
-import styles from '@/styles/verification.module.css';
-import popup from '@/styles/popup.module.css';
-
-// Services
+import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-// Providers
-import { useTranslation } from 'react-i18next';
+import type * as Types from '@/types';
 
-// Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
-import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
+import * as Popup from '@/utils/popup';
+import * as Language from '@/utils/language';
+
+import styles from '@/styles/verification.module.css';
+import popupStyles from '@/styles/popup.module.css';
 
 interface MemberInvitationPopupProps {
-  memberInvitations: MemberInvitation[];
+  memberInvitations: Types.MemberInvitation[];
 }
 
 const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo(({ memberInvitations: memberInvitationsData }) => {
@@ -26,27 +19,27 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
   const { t } = useTranslation();
 
   // States
-  const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>(memberInvitationsData);
+  const [memberInvitations, setMemberInvitations] = useState<Types.MemberInvitation[]>(memberInvitationsData);
 
   // Handlers
-  const handleAcceptMemberInvitation = (serverId: Server['serverId']) => {
+  const handleAcceptMemberInvitation = (serverId: Types.Server['serverId']) => {
     ipc.socket.send('acceptMemberInvitation', { serverId });
   };
 
-  const handleRejectMemberInvitation = (serverId: Server['serverId']) => {
+  const handleRejectMemberInvitation = (serverId: Types.Server['serverId']) => {
     ipc.socket.send('rejectMemberInvitation', { serverId });
   };
 
   const handleRejectAllMemberInvitation = () => {
     if (memberInvitations.length === 0) return;
-    handleOpenAlertDialog(t('confirm-reject-all-member-invitation'), () => {
+    Popup.handleOpenAlertDialog(t('confirm-reject-all-member-invitation'), () => {
       ipc.socket.send('rejectMemberInvitation', ...memberInvitations.map((item) => ({ serverId: item.serverId })));
     });
   };
 
   // Effects
   useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationAdd', (...args: { data: MemberInvitation }[]) => {
+    const unsub = ipc.socket.on('memberInvitationAdd', (...args: { data: Types.MemberInvitation }[]) => {
       const add = new Set(args.map((i) => `${i.data.serverId}`));
       setMemberInvitations((prev) => prev.filter((mi) => !add.has(`${mi.serverId}`)).concat(args.map((i) => i.data)));
     });
@@ -54,7 +47,7 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationUpdate', (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {
+    const unsub = ipc.socket.on('memberInvitationUpdate', (...args: { serverId: string; update: Partial<Types.MemberInvitation> }[]) => {
       const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
       setMemberInvitations((prev) => prev.map((mi) => (update.has(`${mi.serverId}`) ? { ...mi, ...update.get(`${mi.serverId}`) } : mi)));
     });
@@ -70,8 +63,8 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
   }, []);
 
   return (
-    <div className={popup['popup-wrapper']} tabIndex={0}>
-      <div className={popup['popup-body']} style={{ flexDirection: 'column' }}>
+    <div className={popupStyles['popup-wrapper']} tabIndex={0}>
+      <div className={popupStyles['popup-body']} style={{ flexDirection: 'column' }}>
         <div className={styles['header']}>
           <div className={styles['processing-status']}>
             {t('unprocessed')}
@@ -88,18 +81,18 @@ const MemberInvitationPopup: React.FC<MemberInvitationPopupProps> = React.memo((
               <div style={{ flex: 1 }}>
                 <div className={styles['user-info-box']}>
                   <div className={styles['user-name-text']}>{memberInvitation.name}</div>
-                  <div className={styles['time-text']} title={getFormatTimestamp(t, memberInvitation.createdAt)}>
-                    {getFormatTimeDiff(t, memberInvitation.createdAt)}
+                  <div className={styles['time-text']} title={Language.getFormatTimestamp(t, memberInvitation.createdAt)}>
+                    {Language.getFormatTimeDiff(t, memberInvitation.createdAt)}
                   </div>
                 </div>
                 <div className={styles['application-content-box']}>
-                  <div className={popup['col']}>
+                  <div className={popupStyles['col']}>
                     <div className={styles['content-text']}>{t('invite-you-to-be-member')}</div>
                     <div className={styles['content-text']}>
                       {t('note')}: {memberInvitation.description}
                     </div>
                   </div>
-                  <div className={popup['row']} style={{ alignSelf: 'flex-end' }}>
+                  <div className={popupStyles['row']} style={{ alignSelf: 'flex-end' }}>
                     <div className={styles['action-buttons']}>
                       <div className={styles['button']} onClick={() => handleAcceptMemberInvitation(memberInvitation.serverId)}>
                         {t('accept')}

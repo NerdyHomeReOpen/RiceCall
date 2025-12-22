@@ -1,35 +1,27 @@
 import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
+import ipc from '@/ipc';
 
-// CSS
-import styles from '@/styles/home.module.css';
+import type * as Types from '@/types';
 
-// Components
 import ServerList from '@/components/ServerList';
 import MarkdownContent from '@/components/MarkdownContent';
 import RecommendServerCard from '@/components/RecommendServerCard';
 
-// Type
-import type { User, Server, Announcement, RecommendServer } from '@/types';
-
-// Providers
-import { useTranslation } from 'react-i18next';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
-// Services
-import ipc from '@/ipc';
+import * as Popup from '@/utils/popup';
+import * as Language from '@/utils/language';
 
-// Utils
-import { handleOpenCreateServer } from '@/utils/popup';
-import { getFormatDate } from '@/utils/language';
-
-// Constants
 import { ANNOUNCEMENT_SLIDE_INTERVAL, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
 
+import styles from '@/styles/home.module.css';
+
 interface SearchResultItemProps {
-  server: Server;
+  server: Types.Server;
   onClick: () => void;
 }
 
@@ -49,10 +41,10 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
 SearchResultItem.displayName = 'SearchResultItem';
 
 interface HomePageProps {
-  user: User;
-  servers: Server[];
-  announcements: Announcement[];
-  recommendServers: RecommendServer[];
+  user: Types.User;
+  servers: Types.Server[];
+  announcements: Types.Announcement[];
+  recommendServers: Types.RecommendServer[];
   display: boolean;
 }
 
@@ -72,12 +64,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
 
   // States
-  const [exactMatch, setExactMatch] = useState<Server | null>(null);
-  const [personalResults, setPersonalResults] = useState<Server[]>([]);
-  const [relatedResults, setRelatedResults] = useState<Server[]>([]);
+  const [exactMatch, setExactMatch] = useState<Types.Server | null>(null);
+  const [personalResults, setPersonalResults] = useState<Types.Server[]>([]);
+  const [relatedResults, setRelatedResults] = useState<Types.Server[]>([]);
   const [section, setSection] = useState<number>(0);
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
-  const [selectedAnn, setSelectedAnn] = useState<Announcement | null>(null);
+  const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
   const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
 
   // Variables
@@ -117,14 +109,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
         return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
       });
 
-      const { exact, personal, related } = sorted.reduce(
+      const { exact, personal, related } = sorted.reduce<{ exact: Types.Server | null; personal: Types.Server[]; related: Types.Server[] }>(
         (acc, s) => {
           if (s.specialId === q || s.displayId === q) acc.exact = s;
           else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
           else acc.related.push(s);
           return acc;
         },
-        { exact: null as Server | null, personal: [] as Server[], related: [] as Server[] },
+        { exact: null, personal: [], related: [] },
       );
 
       setExactMatch(exact);
@@ -151,7 +143,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   };
 
   const handleServerSelect = useCallback(
-    (server: Server) => {
+    (server: Types.Server) => {
       if (loadingBox.isLoading) return;
       if (server.serverId === currentServerId) {
         mainTab.setSelectedTabId('server');
@@ -173,7 +165,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     setSelectedAnnIndex((prev) => (prev === 0 ? filteredAnns.length - 1 : prev - 1));
   };
 
-  const defaultAnnouncement = (ann: Announcement) => (
+  const defaultAnnouncement = (ann: Types.Announcement) => (
     <>
       <Image src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
       <span>{ann.title}</span>
@@ -288,7 +280,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           </div> */}
         </div>
         <div className={styles['right']}>
-          <div className={styles['navegate-tab']} data-key="30014" onClick={() => handleOpenCreateServer(userId)}>
+          <div className={styles['navegate-tab']} data-key="30014" onClick={() => Popup.handleOpenCreateServer(userId)}>
             {t('create-server')}
           </div>
           {section !== 4 && (
@@ -314,7 +306,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   </div>
                 ))
               ) : (
-                <div className={styles['banner']}>{defaultAnnouncement({} as Announcement)}</div>
+                <div className={styles['banner']}>{defaultAnnouncement({} as Types.Announcement)}</div>
               )}
             </div>
             {filteredAnns.length > 0 && (
@@ -379,7 +371,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 {t(`${selectedAnn?.category}`)}
               </div>
               <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
-              <div className={styles['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.timestamp)}</div>
+              <div className={styles['announcement-datail-date']}>{selectedAnn && Language.getFormatDate(selectedAnn.timestamp)}</div>
             </div>
             {selectedAnn.attachmentUrl && <div className={styles['banner']} style={{ backgroundImage: `url(${selectedAnn.attachmentUrl})` }} />}
             <div className={styles['announcement-detail-content']}>
