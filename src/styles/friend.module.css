@@ -422,6 +422,7 @@
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
   white-space: nowrap;
+  user-select: none;
 }
 
 .friend-tab .server-name-text {
@@ -527,12 +528,12 @@
   min-width: 0;
 }
 
-.user-activity-top > div:first-child,
-.user-activity-top > div:nth-child(2) {
+.user-activity-top>div:first-child,
+.user-activity-top>div:nth-child(2) {
   flex-shrink: 0;
 }
 
-.user-activity-top > div:last-child {
+.user-activity-top>div:last-child {
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -550,7 +551,12 @@
   cursor: pointer;
 }
 
+.user-name:hover {
+  text-decoration: underline;
+}
+
 .signature {
+  min-height: 18px;
   max-width: 100%;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -560,7 +566,5 @@
 }
 
 .timestamp {
-  align-self: flex-end;
-  font-size: 0.9em;
   color: var(--text-color-quinary);
 }
