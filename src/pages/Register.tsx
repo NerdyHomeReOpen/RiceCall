@@ -1,18 +1,12 @@
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 import i18n from '@/i18n';
 
-// CSS
+import * as Popup from '@/utils/popup';
+
 import styles from '@/styles/register.module.css';
-
-// Providers
-import { useTranslation } from 'react-i18next';
-
-// Services
-import ipc from '@/ipc';
-
-// Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
 
 interface RegisterPageProps {
   display: boolean;
@@ -131,7 +125,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     await ipc.auth.register({ account, password, email, username, locale: i18n.language ?? 'zh-TW' }).then((res) => {
       if (res.success) {
-        handleOpenAlertDialog(t(res.message, { '0': email }), () => setSection('login'));
+        Popup.handleOpenAlertDialog(t(res.message, { '0': email }), () => setSection('login'));
       }
     });
 
@@ -140,7 +134,6 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
   return (
     <main className={styles['register']} style={display ? {} : { display: 'none' }}>
-      {/* Body */}
       <main className={styles['register-body']}>
         <div className={styles['app-logo']} />
         <div className={styles['form-wrapper']}>
@@ -252,8 +245,6 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
           )}
         </div>
       </main>
-
-      {/* Footer */}
       <div className={styles['register-footer']}>
         <div className={styles['back-to-login']} onClick={() => setSection('login')}>
           {t('back-to-login')}

@@ -1,18 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useEffect, useRef, useState } from 'react';
 
-// CSS
-import styles from '@/styles/notificationMenu.module.css';
-import contextMenu from '@/styles/contextMenu.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { NotificationMenuItem } from '@/types';
+import styles from '@/styles/notificationMenu.module.css';
+import contextMenuStyles from '@/styles/contextMenu.module.css';
 
 interface NotificationMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  items: NotificationMenuItem[];
+  items: Types.NotificationMenuItem[];
   onClose: () => void;
 }
 
@@ -67,7 +65,7 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
           return (
             <div key={index}>
               <div
-                className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? contextMenu['disabled'] : ''}`}
+                className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? contextMenuStyles['disabled'] : ''}`}
                 data-type={item.icon || ''}
                 onClick={() => {
                   if (item.disabled) return;

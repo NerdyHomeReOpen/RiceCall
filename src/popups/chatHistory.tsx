@@ -1,81 +1,77 @@
 import React from 'react';
 
-// CSS
-import popup from '@/styles/popup.module.css';
-import chatHistory from '@/styles/chatHistory.module.css';
-import friednList from '@/styles/friend.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { FriendApplication, FriendGroup, User } from '@/types';
+import styles from '@/styles/chatHistory.module.css';
+import popupStyles from '@/styles/popup.module.css';
+import friendStyles from '@/styles/friend.module.css';
 
 interface ChatHistoryPopupProps {
-  userId: User['userId'];
-  targetId: User['userId'];
-  target: User;
-  friendGroups: FriendGroup[];
-  friendApplication: FriendApplication | null;
+  userId: Types.User['userId'];
+  targetId: Types.User['userId'];
+  target: Types.User;
+  friendGroups: Types.FriendGroup[];
+  friendApplication: Types.FriendApplication | null;
 }
 
 const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(() => {
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Body */}
-      <div className={popup['popup-body']}>
-        <div className={`${chatHistory['content']} ${popup['content']} ${popup['col']}`}>
-          <div className={`${chatHistory['header-box']} ${popup['row']}`}>
-            <div className={chatHistory['select-wrapper']}>
-              <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className={popup['select']}>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={`${styles['content']} ${popupStyles['content']} ${popupStyles['col']}`}>
+          <div className={`${styles['header-box']} ${popupStyles['row']}`}>
+            <div className={styles['select-wrapper']}>
+              <div className={popupStyles['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
+                <select className={popupStyles['select']}>
                   <option value="當前聯繫人">當前聯繫人</option>
                   <option value="語音群訊息">語音群訊息</option>
                 </select>
               </div>
-              <div className={popup['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className={popup['select']}>
+              <div className={popupStyles['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
+                <select className={popupStyles['select']}>
                   <option value="最近一週">最近一週</option>
                   <option value="最近一個月">最近一個月</option>
                   <option value="最近三個月">最近三個月</option>
                 </select>
               </div>
             </div>
-            <div className={chatHistory['search-wrapper']}>
-              <span className={chatHistory['search-title']}>關鍵字</span>
-              <div className={`${chatHistory['search-input-box']} ${popup['input-box']} ${popup['col']}`}>
+            <div className={styles['search-wrapper']}>
+              <span className={styles['search-title']}>關鍵字</span>
+              <div className={`${styles['search-input-box']} ${popupStyles['input-box']} ${popupStyles['col']}`}>
                 <input type="text" />
-                <div className={chatHistory['search-icon']}></div>
+                <div className={styles['search-icon']}></div>
               </div>
             </div>
           </div>
-          <div className={chatHistory['body-box']}>
-            <div className={`${chatHistory['body-left']} ${friednList['friend-group-list']}`}>
-              <div className={chatHistory['friend-group-box']}>
-                <div className={`${friednList['friend-group-tab']}`}>
-                  <div className={`${friednList['toggle-icon']} ${friednList['expanded']}`}></div>
+          <div className={styles['body-box']}>
+            <div className={`${styles['body-left']} ${friendStyles['friend-group-list']}`}>
+              <div className={styles['friend-group-box']}>
+                <div className={`${friendStyles['friend-group-tab']}`}>
+                  <div className={`${friendStyles['toggle-icon']} ${friendStyles['expanded']}`}></div>
                   <div>黑名單</div>
                   <div>(0)</div>
                 </div>
-                {/* friend list */}
-                <div className={chatHistory['friend-group-list']}>
-                  <div className={chatHistory['friend-info-box']}>
-                    <div className={chatHistory['avatar-box']}>
-                      <div className={chatHistory['avatar-border']}></div>
-                      <div className={chatHistory['avatar']}></div>
+                <div className={styles['friend-group-list']}>
+                  <div className={styles['friend-info-box']}>
+                    <div className={styles['avatar-box']}>
+                      <div className={styles['avatar-border']}></div>
+                      <div className={styles['avatar']}></div>
                     </div>
-                    <div className={chatHistory['name']}>123</div>
+                    <div className={styles['name']}>123</div>
                   </div>
                 </div>
               </div>
             </div>
-            <div className={chatHistory['body-right']}>
-              <div className={chatHistory['body-right-top']}>
-                <div className={chatHistory['body-right-top-title']}>與 %d 的聊天訊息紀錄</div>
-                <div className={chatHistory['body-right-top-delete-button-box']}>
-                  <div className={chatHistory['delete-button-icon']}></div>
-                  <div className={chatHistory['delete-button-text']}>刪除紀錄</div>
+            <div className={styles['body-right']}>
+              <div className={styles['body-right-top']}>
+                <div className={styles['body-right-top-title']}>與 %d 的聊天訊息紀錄</div>
+                <div className={styles['body-right-top-delete-button-box']}>
+                  <div className={styles['delete-button-icon']}></div>
+                  <div className={styles['delete-button-text']}>刪除紀錄</div>
                 </div>
               </div>
-              <div className={chatHistory['body-right-botton']}>
-                <div className={chatHistory['message-date']}></div>
+              <div className={styles['body-right-botton']}>
+                <div className={styles['message-date']}></div>
               </div>
             </div>
           </div>

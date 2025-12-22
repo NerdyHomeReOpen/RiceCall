@@ -1,25 +1,18 @@
 import React, { useMemo } from 'react';
-
-// CSS
-import styles from '@/styles/message.module.css';
-
-// Types
-import type { DirectMessage } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
 
-// Components
+import type * as Types from '@/types';
+
 import MarkdownContent from '@/components/MarkdownContent';
 
-// Utils
-import { getFormatTimestamp } from '@/utils/language';
+import * as Language from '@/utils/language';
 
-// Constants
 import { ALLOWED_MESSAGE_KEYS } from '@/constant';
 
+import styles from '@/styles/message.module.css';
+
 interface DirectMessageProps {
-  messageGroup: DirectMessage & {
+  messageGroup: Types.DirectMessage & {
     contents: string[];
   };
 }
@@ -30,7 +23,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
 
   // Variables
   const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
-  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
+  const formattedTimestamp = Language.getFormatTimestamp(t, messageTimestamp);
   const formattedMessageContents = useMemo(
     () =>
       messageContents.map((content) =>

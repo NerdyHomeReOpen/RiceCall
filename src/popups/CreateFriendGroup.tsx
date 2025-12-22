@@ -1,32 +1,25 @@
 import React, { useState } from 'react';
-
-// Types
-import type { FriendGroup } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-
-// Services
 import ipc from '@/ipc';
 
-// Utils
-import Default from '@/utils/default';
+import type * as Types from '@/types';
+
+import * as Default from '@/utils/default';
+
+import popupStyles from '@/styles/popup.module.css';
 
 const CreateFriendGroupPopup: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [friendGroupName, setFriendGroupName] = useState<FriendGroup['name']>(Default.friendGroup().name);
+  const [friendGroupName, setFriendGroupName] = useState<Types.FriendGroup['name']>(Default.friendGroup().name);
 
   // Variables
   const canSubmit = friendGroupName.trim();
 
   // Handlers
-  const handleCreateFriendGroup = (preset: Partial<FriendGroup>) => {
+  const handleCreateFriendGroup = (preset: Partial<Types.FriendGroup>) => {
     ipc.socket.send('createFriendGroup', { preset });
     ipc.window.close();
   };
@@ -36,23 +29,20 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Body */}
-      <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={`${popup['input-box']} ${popup['col']}`}>
-            <div className={popup['label']}>{t('please-input-friend-group-name')}</div>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={popupStyles['dialog-content']}>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className={popupStyles['label']}>{t('please-input-friend-group-name')}</div>
             <input name="friend-group-name" type="text" maxLength={32} onChange={(e) => setFriendGroupName(e.target.value)} />
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className={popup['popup-footer']}>
-        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleCreateFriendGroup({ name: friendGroupName }) : null)}>
+      <div className={popupStyles['popup-footer']}>
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleCreateFriendGroup({ name: friendGroupName }) : null)}>
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

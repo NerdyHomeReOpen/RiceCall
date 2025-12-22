@@ -2,20 +2,14 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// CSS
-import header from '@/styles/header.module.css';
-
-// Pages
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
 import ChangeServerPage from '@/pages/ChangeServer';
 
-// Services
-import ipc from '@/ipc';
-
-// Providers
-import { useTranslation } from 'react-i18next';
+import headerStyles from '@/styles/header.module.css';
 
 const Header: React.FC = React.memo(() => {
   // Hooks
@@ -50,16 +44,13 @@ const Header: React.FC = React.memo(() => {
   }, [t]);
 
   return (
-    <header className={`${header['header']} ${header['big']}`}>
-      {/* Title */}
-      <div className={header['title-box']}>
-        <div className={header['app-icon']} />
+    <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
+      <div className={headerStyles['title-box']}>
+        <div className={headerStyles['app-icon']} />
       </div>
-
-      {/* Buttons */}
-      <div className={header['buttons']}>
-        <div className={header['minimize']} onClick={() => handleMinimize()} />
-        <div className={header['close']} onClick={() => handleClose()} />
+      <div className={headerStyles['buttons']}>
+        <div className={headerStyles['minimize']} onClick={() => handleMinimize()} />
+        <div className={headerStyles['close']} onClick={() => handleClose()} />
       </div>
     </header>
   );

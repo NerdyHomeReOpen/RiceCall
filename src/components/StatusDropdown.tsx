@@ -1,20 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// CSS
-import header from '@/styles/header.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { User } from '@/types';
-
-// Constants
 import { STATUS_OPTIONS } from '@/constant';
+
+import headerStyles from '@/styles/header.module.css';
 
 interface StatusDropdownProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   onClose: () => void;
-  onStatusSelect: (status: User['status']) => void;
+  onStatusSelect: (status: Types.User['status']) => void;
 }
 
 const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direction, onClose, onStatusSelect }) => {
@@ -61,11 +58,11 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
   }, [x, y, direction]);
 
   return (
-    <div ref={dropdownRef} className={`context-menu-container ${header['status-dropdown']}`} style={display ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
+    <div ref={dropdownRef} className={`context-menu-container ${headerStyles['status-dropdown']}`} style={display ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
       {STATUS_OPTIONS.map((status) => (
         <div
           key={status}
-          className={header['option']}
+          className={headerStyles['option']}
           datatype={status}
           onClick={() => {
             onStatusSelect(status);

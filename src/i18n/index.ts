@@ -3,10 +3,8 @@ import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-// Types
-import type { LanguageKey } from '@/types';
+import type * as Types from '@/types';
 
-// en-US
 import enUS_app from './locales/en-US/app.json';
 import enUS_message from './locales/en-US/message.json';
 import enUS_rpc from './locales/en-US/rpc.json';
@@ -70,7 +68,7 @@ import zhTW_country from './locales/zh-TW/country.json';
 import zhTW_badge from './locales/zh-TW/badge.json';
 import zhTW_position from './locales/zh-TW/position.json';
 
-const APP_TO_CROWDIN: Record<LanguageKey, string> = {
+const APP_TO_CROWDIN: Record<Types.LanguageKey, string> = {
   'zh-TW': 'zh-TW',
   'zh-CN': 'zh-CN',
   'en-US': 'en',
@@ -96,7 +94,7 @@ if (typeof window !== 'undefined' && window.require) {
 
 const getHash = () => ipcRenderer?.sendSync('get-env')?.CROWDIN_DISTRIBUTION_HASH || '';
 
-const toCrowdin = (lng: string) => APP_TO_CROWDIN[lng.replace('_', '-') as LanguageKey] ?? lng;
+const toCrowdin = (lng: string) => APP_TO_CROWDIN[lng.replace('_', '-') as Types.LanguageKey] ?? lng;
 
 /** OTA backend */
 class CrowdinBackend {

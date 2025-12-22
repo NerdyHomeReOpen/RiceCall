@@ -1,51 +1,34 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-
-// CSS
-import styles from '@/styles/server.module.css';
-import vip from '@/styles/vip.module.css';
-import permission from '@/styles/permission.module.css';
-
-// Types
-import type { Channel, Server, User, OnlineMember, Friend, Category, QueueUser } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
+
+import type * as Types from '@/types';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
 import { useWebRTC } from '@/providers/WebRTC';
 
-// Components
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
-// Services
-import ipc from '@/ipc';
+import * as Popup from '@/utils/popup';
+import * as Permission from '@/utils/permission';
 
-// Utils
-import {
-  handleOpenAlertDialog,
-  handleOpenDirectMessage,
-  handleOpenUserInfo,
-  handleOpenEditNickname,
-  handleOpenApplyFriend,
-  handleOpenBlockMember,
-  handleOpenKickMemberFromServer,
-  handleOpenKickMemberFromChannel,
-  handleOpenInviteMember,
-} from '@/utils/popup';
-import { isMember, isServerAdmin, isServerOwner, isChannelMod, isChannelAdmin } from '@/utils/permission';
+import styles from '@/styles/server.module.css';
+import vip from '@/styles/vip.module.css';
+import permission from '@/styles/permission.module.css';
 
 interface UserTabProps {
-  user: User;
-  currentServer: Server;
-  currentChannel: Channel;
-  friends: Friend[];
-  queueUsers: QueueUser[];
-  channel: Channel | Category;
-  member: OnlineMember;
+  user: Types.User;
+  currentServer: Types.Server;
+  currentChannel: Types.Channel;
+  friends: Types.Friend[];
+  queueUsers: Types.QueueUser[];
+  channel: Types.Channel | Types.Category;
+  member: Types.OnlineMember;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
-  handleConnectChannel: (serverId: Server['serverId'], channelId: Channel['channelId']) => void;
+  handleConnectChannel: (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => void;
 }
 
 const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, currentChannel, friends, queueUsers, channel, member, selectedItemId, setSelectedItemId, handleConnectChannel }) => {
@@ -90,7 +73,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = permissionLevel > memberPermission;
   const isEqualOrSuperior = permissionLevel >= memberPermission;
-  const canUpdatePermission = !isUser && isSuperior && isMember(memberPermission);
+  const canUpdatePermission = !isUser && isSuperior && Permission.isMember(memberPermission);
 
   // Handlers
   const getStatusIcon = () => {
@@ -110,25 +93,25 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
       id: 'add-to-queue',
       label: t('add-to-queue'),
       disabled: isUserInQueue,
-      show: !isUser && isChannelMod(permissionLevel) && isSuperior && isSameChannel && channelVoiceMode === 'queue',
+      show: !isUser && Permission.isChannelMod(permissionLevel) && isSuperior && isSameChannel && channelVoiceMode === 'queue',
       onClick: () => handleAddUserToQueue(memberUserId, currentServerId, channelId),
     },
     {
       id: 'direct-message',
       label: t('direct-message'),
       show: !isUser,
-      onClick: () => handleOpenDirectMessage(userId, memberUserId),
+      onClick: () => Popup.handleOpenDirectMessage(userId, memberUserId),
     },
     {
       id: 'view-profile',
       label: t('view-profile'),
-      onClick: () => handleOpenUserInfo(userId, memberUserId),
+      onClick: () => Popup.handleOpenUserInfo(userId, memberUserId),
     },
     {
       id: 'add-friend',
       label: t('add-friend'),
       show: !isUser && !isFriend,
-      onClick: () => handleOpenApplyFriend(userId, memberUserId),
+      onClick: () => Popup.handleOpenApplyFriend(userId, memberUserId),
     },
     {
       id: 'set-mute',
@@ -139,8 +122,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     {
       id: 'edit-nickname',
       label: t('edit-nickname'),
-      show: isMember(memberPermission) && (isUser || (isServerAdmin(permissionLevel) && isSuperior)),
-      onClick: () => handleOpenEditNickname(memberUserId, currentServerId),
+      show: Permission.isMember(memberPermission) && (isUser || (Permission.isServerAdmin(permissionLevel) && isSuperior)),
+      onClick: () => Popup.handleOpenEditNickname(memberUserId, currentServerId),
     },
     {
       id: 'separator',
@@ -149,7 +132,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     {
       id: 'move-to-channel',
       label: t('move-to-channel'),
-      show: !isUser && isChannelMod(currentPermissionLevel) && isChannelMod(permissionLevel) && !isSameChannel && isEqualOrSuperior,
+      show: !isUser && Permission.isChannelMod(currentPermissionLevel) && Permission.isChannelMod(permissionLevel) && !isSameChannel && isEqualOrSuperior,
       onClick: () => handleMoveUserToChannel(memberUserId, currentServerId, currentChannelId),
     },
     {
@@ -159,32 +142,32 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     {
       id: 'forbid-voice',
       label: isMemberVoiceMuted ? t('unforbid-voice') : t('forbid-voice'),
-      show: !isUser && isChannelMod(permissionLevel) && isSuperior,
+      show: !isUser && Permission.isChannelMod(permissionLevel) && isSuperior,
       onClick: () => handleForbidUserVoiceInChannel(memberUserId, currentServerId, channelId, !isMemberVoiceMuted),
     },
     {
       id: 'forbid-text',
       label: isMemberTextMuted ? t('unforbid-text') : t('forbid-text'),
-      show: !isUser && isChannelMod(permissionLevel) && isSuperior,
+      show: !isUser && Permission.isChannelMod(permissionLevel) && isSuperior,
       onClick: () => handleForbidUserTextInChannel(memberUserId, currentServerId, channelId, !isMemberTextMuted),
     },
     {
       id: 'kick-channel',
       label: t('kick-channel'),
-      show: !isUser && isChannelMod(permissionLevel) && isSuperior && memberCurrentChannelId !== currentServerLobbyId,
-      onClick: () => handleOpenKickMemberFromChannel(memberUserId, currentServerId, channelId),
+      show: !isUser && Permission.isChannelMod(permissionLevel) && isSuperior && memberCurrentChannelId !== currentServerLobbyId,
+      onClick: () => Popup.handleOpenKickMemberFromChannel(memberUserId, currentServerId, channelId),
     },
     {
       id: 'kick-server',
       label: t('kick-server'),
-      show: !isUser && isServerAdmin(permissionLevel) && isSuperior && memberCurrentServerId === currentServerId,
-      onClick: () => handleOpenKickMemberFromServer(memberUserId, currentServerId),
+      show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior && memberCurrentServerId === currentServerId,
+      onClick: () => Popup.handleOpenKickMemberFromServer(memberUserId, currentServerId),
     },
     {
       id: 'block',
       label: t('block'),
-      show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-      onClick: () => handleOpenBlockMember(memberUserId, currentServerId),
+      show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior,
+      onClick: () => Popup.handleOpenBlockMember(memberUserId, currentServerId),
     },
     {
       id: 'separator',
@@ -193,52 +176,52 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     {
       id: 'terminate-self-membership',
       label: t('terminate-self-membership'),
-      show: isUser && isMember(permissionLevel) && !isServerOwner(permissionLevel),
+      show: isUser && Permission.isMember(permissionLevel) && !Permission.isServerOwner(permissionLevel),
       onClick: () => handleTerminateMember(userId, currentServerId, t('self')),
     },
     {
       id: 'invite-to-be-member',
       label: t('invite-to-be-member'),
-      show: !isUser && !isMember(memberPermission) && isServerAdmin(permissionLevel),
-      onClick: () => handleOpenInviteMember(memberUserId, currentServerId),
+      show: !isUser && !Permission.isMember(memberPermission) && Permission.isServerAdmin(permissionLevel),
+      onClick: () => Popup.handleOpenInviteMember(memberUserId, currentServerId),
     },
     {
       id: 'member-management',
       label: t('member-management'),
-      show: canUpdatePermission && (channelCategoryId === null ? isServerAdmin(permissionLevel) : isChannelAdmin(permissionLevel)),
+      show: canUpdatePermission && (channelCategoryId === null ? Permission.isServerAdmin(permissionLevel) : Permission.isChannelAdmin(permissionLevel)),
       icon: 'submenu',
       hasSubmenu: true,
       submenuItems: [
         {
           id: 'terminate-member',
           label: t('terminate-member'),
-          show: !isUser && isServerAdmin(permissionLevel) && isSuperior && isMember(memberPermission) && !isServerOwner(memberPermission),
+          show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior && Permission.isMember(memberPermission) && !Permission.isServerOwner(memberPermission),
           onClick: () => handleTerminateMember(memberUserId, currentServerId, memberName),
         },
         {
           id: 'set-channel-mod',
-          label: isChannelMod(memberPermission) ? t('unset-channel-mod') : t('set-channel-mod'),
-          show: canUpdatePermission && isChannelAdmin(permissionLevel) && !isChannelAdmin(memberPermission) && channelCategoryId !== null,
+          label: Permission.isChannelMod(memberPermission) ? t('unset-channel-mod') : t('set-channel-mod'),
+          show: canUpdatePermission && Permission.isChannelAdmin(permissionLevel) && !Permission.isChannelAdmin(memberPermission) && channelCategoryId !== null,
           onClick: () =>
-            isChannelMod(memberPermission)
+            Permission.isChannelMod(memberPermission)
               ? handleEditChannelPermission(memberUserId, currentServerId, channelId, { permissionLevel: 2 })
               : handleEditChannelPermission(memberUserId, currentServerId, channelId, { permissionLevel: 3 }),
         },
         {
           id: 'set-channel-admin',
-          label: isChannelAdmin(memberPermission) ? t('unset-channel-admin') : t('set-channel-admin'),
-          show: canUpdatePermission && isServerAdmin(permissionLevel) && !isServerAdmin(memberPermission),
+          label: Permission.isChannelAdmin(memberPermission) ? t('unset-channel-admin') : t('set-channel-admin'),
+          show: canUpdatePermission && Permission.isServerAdmin(permissionLevel) && !Permission.isServerAdmin(memberPermission),
           onClick: () =>
-            isChannelAdmin(memberPermission)
+            Permission.isChannelAdmin(memberPermission)
               ? handleEditChannelPermission(memberUserId, currentServerId, channelCategoryId || channelId, { permissionLevel: 2 })
               : handleEditChannelPermission(memberUserId, currentServerId, channelCategoryId || channelId, { permissionLevel: 4 }),
         },
         {
           id: 'set-server-admin',
-          label: isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
-          show: canUpdatePermission && isServerOwner(permissionLevel) && !isServerOwner(memberPermission),
+          label: Permission.isServerAdmin(memberPermission) ? t('unset-server-admin') : t('set-server-admin'),
+          show: canUpdatePermission && Permission.isServerOwner(permissionLevel) && !Permission.isServerOwner(memberPermission),
           onClick: () =>
-            isServerAdmin(memberPermission)
+            Permission.isServerAdmin(memberPermission)
               ? handleEditServerPermission(memberUserId, currentServerId, { permissionLevel: 2 })
               : handleEditServerPermission(memberUserId, currentServerId, { permissionLevel: 5 }),
         },
@@ -246,43 +229,43 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     },
   ];
 
-  const handleMuteUser = (userId: User['userId']) => {
+  const handleMuteUser = (userId: Types.User['userId']) => {
     webRTC.muteUser(userId);
   };
 
-  const handleUnmuteUser = (userId: User['userId']) => {
+  const handleUnmuteUser = (userId: Types.User['userId']) => {
     webRTC.unmuteUser(userId);
   };
 
-  const handleEditServerPermission = (userId: User['userId'], serverId: Server['serverId'], update: Partial<Server>) => {
+  const handleEditServerPermission = (userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Server>) => {
     ipc.socket.send('editServerPermission', { userId, serverId, update });
   };
 
-  const handleEditChannelPermission = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
+  const handleEditChannelPermission = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>) => {
     ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
   };
 
-  const handleMoveUserToChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
-    handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
+  const handleMoveUserToChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
   };
 
-  const handleAddUserToQueue = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']) => {
+  const handleAddUserToQueue = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
     ipc.socket.send('addUserToQueue', { userId, serverId, channelId });
   };
 
-  const handleForbidUserTextInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isTextMuted: boolean) => {
+  const handleForbidUserTextInChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isTextMuted: boolean) => {
     ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
   };
 
-  const handleForbidUserVoiceInChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], isVoiceMuted: boolean) => {
+  const handleForbidUserVoiceInChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isVoiceMuted: boolean) => {
     ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
   };
 
-  const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], userName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
+  const handleTerminateMember = (userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']) => {
+    Popup.handleOpenAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
   };
 
-  const handleDragStart = (e: React.DragEvent, userId: User['userId'], channelId: Channel['channelId']) => {
+  const handleDragStart = (e: React.DragEvent, userId: Types.User['userId'], channelId: Types.Channel['channelId']) => {
     e.dataTransfer.setData('type', 'moveUser');
     e.dataTransfer.setData('userId', userId);
     e.dataTransfer.setData('currentChannelId', channelId);
@@ -304,7 +287,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
       }}
       onDoubleClick={() => {
         if (isUser) return;
-        handleOpenDirectMessage(userId, memberUserId);
+        Popup.handleOpenDirectMessage(userId, memberUserId);
       }}
       onMouseEnter={(e) => {
         const x = e.currentTarget.getBoundingClientRect().right;
@@ -318,7 +301,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
         if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
         hoverTimerRef.current = null;
       }}
-      draggable={!isUser && isChannelMod(permissionLevel) && permissionLevel >= memberPermission}
+      draggable={!isUser && Permission.isChannelMod(permissionLevel) && permissionLevel >= memberPermission}
       onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
       onContextMenu={(e) => {
         e.preventDefault();

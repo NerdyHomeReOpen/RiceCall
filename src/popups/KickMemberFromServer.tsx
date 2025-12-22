@@ -1,20 +1,14 @@
 import React, { useState } from 'react';
-
-// Types
-import type { Member, Server, User } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-
-// Services
 import ipc from '@/ipc';
 
+import type * as Types from '@/types';
+
+import popupStyles from '@/styles/popup.module.css';
+
 interface KickMemberFromServerPopupProps {
-  serverId: Server['serverId'];
-  member: Member;
+  serverId: Types.Server['serverId'];
+  member: Types.Member;
 }
 
 const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = React.memo(({ serverId, member }) => {
@@ -84,7 +78,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
     }
   };
 
-  const handleBlockUserFromServer = (userId: User['userId'], serverId: Server['serverId'], blockUntil: number) => {
+  const handleBlockUserFromServer = (userId: Types.User['userId'], serverId: Types.Server['serverId'], blockUntil: number) => {
     ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
     ipc.window.close();
   };
@@ -94,18 +88,17 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Body */}
-      <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
-          <div className={popup['col']}>
-            <div className={popup['label']}>{t('confirm-kick-user-from-server', { '0': memberNickname || memberName })}</div>
-            <div className={popup['col']}>
-              <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('kick-time')}</div>
-                <div className={`${popup['row']}`}>
-                  <div className={popup['select-box']}>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={popupStyles['dialog-content']}>
+          <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
+          <div className={popupStyles['col']}>
+            <div className={popupStyles['label']}>{t('confirm-kick-user-from-server', { '0': memberNickname || memberName })}</div>
+            <div className={popupStyles['col']}>
+              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                <div className={popupStyles['label']}>{t('kick-time')}</div>
+                <div className={`${popupStyles['row']}`}>
+                  <div className={popupStyles['select-box']}>
                     <select value={selectTime} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
                       {getLengthOptions().map((option) => (
                         <option key={option} value={option}>
@@ -114,7 +107,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
                       ))}
                     </select>
                   </div>
-                  <div className={popup['select-box']}>
+                  <div className={popupStyles['select-box']}>
                     <select value={formatType} onChange={(e) => setFormatType(e.target.value)}>
                       {formatTypeOptions.map((option) => (
                         <option key={option.key} value={option.key}>
@@ -125,10 +118,10 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
                   </div>
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('kick-reason')}</div>
-                <div className={`${popup['row']}`}>
-                  <div className={popup['select-box']}>
+              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                <div className={popupStyles['label']}>{t('kick-reason')}</div>
+                <div className={`${popupStyles['row']}`}>
+                  <div className={popupStyles['select-box']}>
                     <select value={selectReason} onChange={(e) => setSelectReason(e.target.value)}>
                       {kickReasonOptions.map((option) => (
                         <option key={option.key} value={option.key}>
@@ -138,7 +131,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
                     </select>
                   </div>
                   {selectReason === 'other' && (
-                    <div className={popup['input-box']}>
+                    <div className={popupStyles['input-box']}>
                       <input type="text" value={otherReason} placeholder={`${t('reason')}(${t('limit-text', { 0: '20' })})`} maxLength={20} onChange={(e) => setOtherReason(e.target.value)} />
                     </div>
                   )}
@@ -148,13 +141,11 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className={popup['popup-footer']}>
-        <div className={popup['button']} onClick={() => handleBlockUserFromServer(userId, serverId, Date.now() + getBlockTime())}>
+      <div className={popupStyles['popup-footer']}>
+        <div className={popupStyles['button']} onClick={() => handleBlockUserFromServer(userId, serverId, Date.now() + getBlockTime())}>
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

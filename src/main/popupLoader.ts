@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getSettings } from '../../main.js';
 
-// Services
 import data from './data.service.js';
 
 const popupLoaders: Record<string, (data: any) => Promise<any>> = {

@@ -1,27 +1,20 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
-
-// Types
-import type { Channel, Category, Server, User } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// CSS
-import styles from '@/styles/editChannelOrder.module.css';
-import serverPage from '@/styles/server.module.css';
-import popup from '@/styles/popup.module.css';
-
-// Services
 import ipc from '@/ipc';
 
-// Utils
-import { handleOpenAlertDialog, handleOpenCreateChannel, handleOpenEditChannelName } from '@/utils/popup';
-import Default from '@/utils/default';
+import type * as Types from '@/types';
+
+import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
+
+import styles from '@/styles/editChannelOrder.module.css';
+import serverPage from '@/styles/server.module.css';
+import popupStyles from '@/styles/popup.module.css';
 
 interface EditChannelOrderPopupProps {
-  userId: User['userId'];
-  serverId: Server['serverId'];
-  serverChannels: Channel[];
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
+  serverChannels: Types.Channel[];
 }
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ userId, serverId, serverChannels: serverChannelsData }) => {
@@ -40,9 +33,9 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   );
 
   // States
-  const [serverChannels, setServerChannels] = useState<(Channel | Category)[]>(serverChannelsData.filter((c) => !c.isLobby));
-  const [selectedChannel, setSelectedChannel] = useState<Channel | Category | null>(null);
-  const [groupChannels, setGroupChannels] = useState<(Channel | Category)[]>([]);
+  const [serverChannels, setServerChannels] = useState<(Types.Channel | Types.Category)[]>(serverChannelsData.filter((c) => !c.isLobby));
+  const [selectedChannel, setSelectedChannel] = useState<Types.Channel | Types.Category | null>(null);
+  const [groupChannels, setGroupChannels] = useState<(Types.Channel | Types.Category)[]>([]);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   // Variables
@@ -83,13 +76,13 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const canSubmit = editedChannels.length > 0;
 
   // Handlers
-  const handleEditChannels = (serverId: Server['serverId'], updates: Partial<Channel>[]) => {
+  const handleEditChannels = (serverId: Types.Server['serverId'], updates: Partial<Types.Channel>[]) => {
     ipc.socket.send('editChannel', ...updates.map((update) => ({ serverId, channelId: update.channelId!, update })));
     ipc.window.close();
   };
 
-  const handleDeleteChannel = (channelId: Channel['channelId'], serverId: Server['serverId']) => {
-    handleOpenAlertDialog(t('confirm-delete-channel', { '0': selectedChannel?.name ?? '' }), () => {
+  const handleDeleteChannel = (channelId: Types.Channel['channelId'], serverId: Types.Server['serverId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-delete-channel', { '0': selectedChannel?.name ?? '' }), () => {
       ipc.socket.send('deleteChannel', { serverId, channelId });
       setSelectedChannel(null);
     });
@@ -152,7 +145,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, [serverChannels]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelAdd', (...args: { data: Channel }[]) => {
+    const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
       const add = new Set(args.map((i) => `${i.data.channelId}`));
       setServerChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
     });
@@ -160,7 +153,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Channel> }[]) => {
+    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
       const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
       setServerChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
     });
@@ -175,7 +168,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     return () => unsub();
   }, []);
 
-  const categoryTab = (category: Category) => {
+  const categoryTab = (category: Types.Category) => {
     const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, isLobby: isCategoryLobby, order: categoryOrder } = category;
     const subChannels = serverChannels?.filter((c) => c.categoryId === categoryId);
     const isSelected = selectedChannelId === categoryId;
@@ -212,7 +205,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     );
   };
 
-  const channelTab = (channel: Channel) => {
+  const channelTab = (channel: Types.Channel) => {
     const { channelId, name: channelName, visibility: channelVisibility, isLobby: isChannelLobby, order: channelOrder, categoryId: channelCategoryId } = channel;
     const isSelected = selectedChannelId === channelId;
 
@@ -236,14 +229,13 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Header */}
+    <div className={popupStyles['popup-wrapper']}>
       <div className={styles['header']} onClick={handleUnselect}>
         <div
           className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            handleOpenCreateChannel(userId, serverId, selectedChannelId);
+            Popup.handleOpenCreateChannel(userId, serverId, selectedChannelId);
           }}
         >
           {t('create')}
@@ -252,7 +244,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           className={`${styles['change-channel-name-btn']} ${!canRename ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            handleOpenEditChannelName(userId, serverId, selectedChannelId);
+            Popup.handleOpenEditChannelName(userId, serverId, selectedChannelId);
           }}
         >
           {t('change-name')}
@@ -303,9 +295,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('move-bottom')}
         </div>
       </div>
-
-      {/* Body */}
-      <div className={popup['popup-body']} onClick={handleUnselect}>
+      <div className={popupStyles['popup-body']} onClick={handleUnselect}>
         <div className={styles['body']}>
           <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
             {serverChannels
@@ -315,13 +305,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className={popup['popup-footer']}>
-        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannels(serverId, editedChannels) : null)}>
+      <div className={popupStyles['popup-footer']}>
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannels(serverId, editedChannels) : null)}>
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

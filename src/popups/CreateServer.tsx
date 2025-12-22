@@ -1,29 +1,21 @@
 import React, { useMemo, useRef, useState } from 'react';
-
-// CSS
-import styles from '@/styles/createServer.module.css';
-import popup from '@/styles/popup.module.css';
-import setting from '@/styles/setting.module.css';
-
-// Types
-import type { User, Server } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-
-// Services
 import ipc from '@/ipc';
 
-// Utils
-import { handleOpenAlertDialog, handleOpenImageCropper } from '@/utils/popup';
-import Default from '@/utils/default';
+import type * as Types from '@/types';
 
-// Constants
+import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
+
 import { MAX_FILE_SIZE } from '@/constant';
 
+import styles from '@/styles/createServer.module.css';
+import popupStyles from '@/styles/popup.module.css';
+import settingStyles from '@/styles/setting.module.css';
+
 interface CreateServerPopupProps {
-  user: User;
-  servers: Server[];
+  user: Types.User;
+  servers: Types.Server[];
 }
 
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, servers }) => {
@@ -35,11 +27,11 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
 
   // States
   const [section, setSection] = useState<number>(0);
-  const [serverType, setServerType] = useState<Server['type']>(Default.server().type);
-  const [serverName, setServerName] = useState<Server['name']>(Default.server().name);
-  const [serverSlogan, setServerSlogan] = useState<Server['slogan']>(Default.server().slogan);
-  const [serverAvatar, setServerAvatar] = useState<Server['avatar']>(Default.server().avatar);
-  const [serverAvatarUrl, setServerAvatarUrl] = useState<Server['avatarUrl']>(Default.server().avatarUrl);
+  const [serverType, setServerType] = useState<Types.Server['type']>(Default.server().type);
+  const [serverName, setServerName] = useState<Types.Server['name']>(Default.server().name);
+  const [serverSlogan, setServerSlogan] = useState<Types.Server['slogan']>(Default.server().slogan);
+  const [serverAvatar, setServerAvatar] = useState<Types.Server['avatar']>(Default.server().avatar);
+  const [serverAvatarUrl, setServerAvatarUrl] = useState<Types.Server['avatarUrl']>(Default.server().avatarUrl);
 
   // Variables
   const { level: userLevel } = user;
@@ -55,7 +47,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   ];
 
   // Handlers
-  const handleCreateServer = (preset: Partial<Server>) => {
+  const handleCreateServer = (preset: Partial<Types.Server>) => {
     ipc.socket.send('createServer', { preset });
     ipc.window.close();
   };
@@ -67,7 +59,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   const handleUploadImage = (imageUnit8Array: Uint8Array) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -82,16 +74,13 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
 
   return (
     <>
-      <div className={popup['popup-wrapper']} style={section === 0 ? {} : { display: 'none' }}>
-        {/* Tab */}
-        <div className={popup['popup-tabs']}>
-          <div className={`${popup['tab']} ${popup['active']}`}>{t('select-server-type')}</div>
-          <div className={popup['tab']}>{t('fill-info')}</div>
+      <div className={popupStyles['popup-wrapper']} style={section === 0 ? {} : { display: 'none' }}>
+        <div className={popupStyles['popup-tabs']}>
+          <div className={`${popupStyles['tab']} ${popupStyles['active']}`}>{t('select-server-type')}</div>
+          <div className={popupStyles['tab']}>{t('fill-info')}</div>
         </div>
-
-        {/* Body */}
-        <div className={popup['popup-body']}>
-          <div className={setting['content']}>
+        <div className={popupStyles['popup-body']}>
+          <div className={settingStyles['content']}>
             <div className={`${styles['message']}`}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
             <div className={styles['select-type-text']}>{t('please-select-server-type')}</div>
             <div className={styles['button-group']}>
@@ -100,7 +89,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                   key={type.value}
                   className={`${styles['button']} ${serverType === type.value ? styles['selected'] : ''}`}
                   onClick={() => {
-                    setServerType(type.value as Server['type']);
+                    setServerType(type.value as Types.Server['type']);
                     setSection(1);
                   }}
                 >
@@ -110,25 +99,19 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className={popup['popup-footer']}>
-          <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['popup-footer']}>
+          <div className={popupStyles['button']} onClick={handleClose}>
             {t('cancel')}
           </div>
         </div>
       </div>
-
-      <div className={popup['popup-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
-        {/* Tab */}
-        <div className={popup['popup-tabs']}>
-          <div className={popup['tab']}>{t('select-server-type')}</div>
-          <div className={`${popup['tab']}  ${popup['active']}`}>{t('fill-info')}</div>
+      <div className={popupStyles['popup-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
+        <div className={popupStyles['popup-tabs']}>
+          <div className={popupStyles['tab']}>{t('select-server-type')}</div>
+          <div className={`${popupStyles['tab']}  ${popupStyles['active']}`}>{t('fill-info')}</div>
         </div>
-
-        {/* Body */}
-        <div className={popup['popup-body']}>
-          <div className={`${setting['content']} ${popup['col']}`} style={{ justifyContent: 'space-evenly' }}>
+        <div className={popupStyles['popup-body']}>
+          <div className={`${settingStyles['content']} ${popupStyles['col']}`} style={{ justifyContent: 'space-evenly' }}>
             <div className={styles['avatar-wrapper']}>
               <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
               <input
@@ -141,29 +124,29 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                   const image = e.target.files?.[0];
                   if (!image || isUploadingRef.current) return;
                   image.arrayBuffer().then((arrayBuffer) => {
-                    handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                    Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
                   });
                 }}
               />
-              <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popup['button']}>
+              <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popupStyles['button']}>
                 {t('upload-avatar')}
               </label>
             </div>
-            <div className={popup['col']}>
-              <div className={`${popup['input-box']} ${popup['row']}`}>
-                <div className={popup['label']} style={{ width: '100px' }}>
+            <div className={popupStyles['col']}>
+              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <div className={popupStyles['label']} style={{ width: '100px' }}>
                   {t('server-type')}
                 </div>
                 <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
               </div>
-              <div className={`${popup['input-box']} ${popup['row']}`}>
-                <div className={popup['label']} style={{ width: '100px' }}>
+              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <div className={popupStyles['label']} style={{ width: '100px' }}>
                   {t('server-name')}
                 </div>
                 <input name="server-name" type="text" placeholder={t('server-name-placeholder')} maxLength={32} onChange={(e) => setServerName(e.target.value)} />
               </div>
-              <div className={`${popup['input-box']} ${popup['row']}`}>
-                <div className={popup['label']} style={{ width: '100px' }}>
+              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <div className={popupStyles['label']} style={{ width: '100px' }}>
                   {t('server-slogan')}
                 </div>
                 <input name="server-slogan" type="text" placeholder={t('server-slogan-placeholder')} maxLength={32} onChange={(e) => setServerSlogan(e.target.value)} />
@@ -171,14 +154,12 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className={popup['popup-footer']}>
-          <div className={popup['button']} onClick={() => setSection(0)}>
+        <div className={popupStyles['popup-footer']}>
+          <div className={popupStyles['button']} onClick={() => setSection(0)}>
             {t('previous')}
           </div>
           <div
-            className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`}
+            className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
             onClick={() =>
               canSubmit
                 ? handleCreateServer({
@@ -193,7 +174,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
           >
             {t('confirm')}
           </div>
-          <div className={popup['button']} onClick={handleClose}>
+          <div className={popupStyles['button']} onClick={handleClose}>
             {t('cancel')}
           </div>
         </div>

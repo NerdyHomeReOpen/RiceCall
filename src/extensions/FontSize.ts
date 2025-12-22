@@ -1,4 +1,3 @@
-// FontSize.ts
 import { Mark } from '@tiptap/core';
 
 export const FontSize = Mark.create({

@@ -1,22 +1,16 @@
 import React, { useEffect, useRef, useState } from 'react';
-
-// CSS
-import styles from '@/styles/changeTheme.module.css';
-import popup from '@/styles/popup.module.css';
-
-// Types
-import { Theme } from '@/types';
-
-// Services
+import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-// Providers
-import { useContextMenu } from '@/providers/ContextMenu';
-import { useTranslation } from 'react-i18next';
+import type * as Types from '@/types';
 
-// Utils
-import { getDominantColor, getContrastColor, getVisibleColor, toRGBString, type RGB } from '@/utils/color';
-import { handleOpenImageCropper } from '@/utils/popup';
+import { useContextMenu } from '@/providers/ContextMenu';
+
+import * as Color from '@/utils/color';
+import * as Popup from '@/utils/popup';
+
+import styles from '@/styles/changeTheme.module.css';
+import popupStyles from '@/styles/popup.module.css';
 
 const ChangeThemePopup: React.FC = React.memo(() => {
   // Hooks
@@ -31,8 +25,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   // States
   const [hoveredThemeIndex, setHoveredThemeIndex] = useState<number | null>(null);
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
-  const [pickedColor, setPickedColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
-  const [customThemes, setCustomThemes] = useState<Theme[]>(Array.from({ length: 7 }));
+  const [pickedColor, setPickedColor] = useState<Color.RGB>({ r: 0, g: 0, b: 0 });
+  const [customThemes, setCustomThemes] = useState<Types.Theme[]>(Array.from({ length: 7 }));
 
   // Handlers
   const handleSelectTheme = (event: React.MouseEvent<HTMLDivElement>) => {
@@ -55,13 +49,13 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       ctx.fillRect(0, 0, 20, 20);
       return canvas.toDataURL('webp', 1);
     };
-    const visibleColor = getVisibleColor(pickedColor);
-    const contrastColor = getContrastColor(pickedColor);
+    const visibleColor = Color.getVisibleColor(pickedColor);
+    const contrastColor = Color.getContrastColor(pickedColor);
 
-    const newTheme: Theme = {
+    const newTheme: Types.Theme = {
       headerImage: `url(${headerImage()})`,
-      mainColor: toRGBString(visibleColor),
-      secondaryColor: toRGBString(contrastColor),
+      mainColor: Color.toRGBString(visibleColor),
+      secondaryColor: Color.toRGBString(contrastColor),
     };
 
     ipc.customThemes.current.set(newTheme);
@@ -92,7 +86,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
         const safeOffsetX = Math.max(0, Math.min(offsetX, img.naturalWidth - 1));
         const safeOffsetY = Math.max(0, Math.min(offsetY, img.naturalHeight - 1));
         const pixelData = ctx.getImageData(safeOffsetX, safeOffsetY, 1, 1).data;
-        const color: RGB = { r: pixelData[0], g: pixelData[1], b: pixelData[2] };
+        const color: Color.RGB = { r: pixelData[0], g: pixelData[1], b: pixelData[2] };
         setPickedColor(color);
       }
     };
@@ -104,14 +98,14 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   const handleUploadImage = async (imageUnit8Array: Uint8Array) => {
     const blob = new Blob([imageUnit8Array], { type: 'image/webp' });
     const imageUrl = URL.createObjectURL(blob);
-    const dominantColor = await getDominantColor(imageUrl);
-    const visibleColor = getVisibleColor(dominantColor);
-    const contrastColor = getContrastColor(dominantColor);
+    const dominantColor = await Color.getDominantColor(imageUrl);
+    const visibleColor = Color.getVisibleColor(dominantColor);
+    const contrastColor = Color.getContrastColor(dominantColor);
 
-    const newTheme: Theme = {
+    const newTheme: Types.Theme = {
       headerImage: `url(${imageUrl})`,
-      mainColor: toRGBString(visibleColor),
-      secondaryColor: toRGBString(contrastColor),
+      mainColor: Color.toRGBString(visibleColor),
+      secondaryColor: Color.toRGBString(contrastColor),
     };
 
     ipc.customThemes.current.set(newTheme);
@@ -120,7 +114,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
-    const changeCustomTheme = (customThemes: Theme[]) => {
+    const changeCustomTheme = (customThemes: Types.Theme[]) => {
       console.info('[Custom Themes] custom themes updated: ', customThemes);
       setCustomThemes(customThemes);
     };
@@ -147,15 +141,13 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   }, []);
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Body */}
-      <div className={popup['popup-body']}>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
         <div className={styles['ct-wrapper']}>
           <div className={styles['ct-contain']}>
             <div className={styles['theme-selector']}>
               <div className={styles['theme-options']}>
                 <div className={styles['theme-slots-big']}>
-                  {/* Default Themes (Big) */}
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
@@ -176,17 +168,11 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                     </div>
                   ))}
                 </div>
-
                 <div className={styles['theme-slots-small']}>
-                  {/* Default Themes (Small) */}
                   {Array.from({ length: 15 }, (_, i) => (
                     <div key={i + 4} className={styles['theme']} data-theme-index={i + 4} onClick={handleSelectTheme} />
                   ))}
-
-                  {/* Color Selector */}
                   <div className={styles['color-selector']} onClick={() => setShowColorPicker((prev) => !prev)} />
-
-                  {/* Custom Colors */}
                   {customThemes.slice(0, 7).map((customTheme, i) => {
                     // Handlers
                     const getContextMenuItems = () => [
@@ -221,8 +207,6 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       <div key={`color-box-empty-${i}`} />
                     );
                   })}
-
-                  {/* Image Selector */}
                   <div className={styles['image-selector']} onClick={() => fileInputRef.current?.click()} />
                   <input
                     type="file"
@@ -233,17 +217,16 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       const image = e.target.files?.[0];
                       if (!image) return;
                       image.arrayBuffer().then((arrayBuffer) => {
-                        handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                        Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
                       });
                     }}
                   />
                 </div>
-
                 {showColorPicker && (
                   <div className={styles['color-selector-box']}>
                     <div ref={colorSelectorRef} className={styles['color-selector-image']} onMouseDown={handleColorSelect} onMouseMove={handleColorSelect} />
                     <div className={styles['color-selector-footer']}>
-                      <div className={styles['color-selected-color']} style={{ backgroundColor: toRGBString(pickedColor) }} />
+                      <div className={styles['color-selected-color']} style={{ backgroundColor: Color.toRGBString(pickedColor) }} />
                       <div className={styles['color-selected-btn']}>
                         <div className={styles['color-selected-save']} onClick={handleSaveSelectedColor} />
                         <div className={styles['color-selected-cancel']} onClick={() => setShowColorPicker(false)} />

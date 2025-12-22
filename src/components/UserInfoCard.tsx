@@ -1,28 +1,22 @@
 import React, { useState, useLayoutEffect, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 
-// CSS
-import styles from '@/styles/userInfoCard.module.css';
-import vip from '@/styles/vip.module.css';
-import permission from '@/styles/permission.module.css';
+import type * as Types from '@/types';
 
-// Components
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
-// Types
-import type { OnlineMember } from '@/types';
+import * as Language from '@/utils/language';
 
-// Providers
-import { useTranslation } from 'react-i18next';
-
-// Utils
-import { getPermissionText } from '@/utils/language';
+import styles from '@/styles/userInfoCard.module.css';
+import vip from '@/styles/vip.module.css';
+import permission from '@/styles/permission.module.css';
 
 interface UserInfoCardProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  member: OnlineMember;
+  member: Types.OnlineMember;
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction, member }) => {
@@ -95,25 +89,17 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
       onClick={(e) => e.stopPropagation()}
     >
       <div className={styles['body']}>
-        {/* Top Section */}
         <div className={styles['top']}>
-          {/* Left Avatar */}
           <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${memberAvatarUrl})` }} />
-
-          {/* Right Info */}
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                 <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
                 <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
               </div>
-
-              {/* VIP Info Text */}
               <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
               {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
             </div>
-
-            {/* Xp Info */}
             <div className={styles['xp-wrapper']}>
               <div className={styles['level-text']}>{`${t('level')} ${memberLevel} (${memberXp}/${memberRequiredXp})`}</div>
               <div className={styles['xp-progress-container']}>
@@ -122,24 +108,14 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
             </div>
           </div>
         </div>
-
-        {/* Bottom Section */}
         <div className={styles['bottom']}>
-          {/* Nickname Row */}
           <div className={styles['nickname-row']}>{memberNickname && <div className={styles['nickname-text']}>{memberNickname}</div>}</div>
-
-          {/* Info Row */}
           <div className={styles['info-row']}>
-            {/* Permission */}
             <div className={styles['permission-wrapper']}>
               <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-              <div className={styles['permission-text']}>{getPermissionText(t, memberPermission)}</div>
+              <div className={styles['permission-text']}>{Language.getPermissionText(t, memberPermission)}</div>
             </div>
-
-            {/* Saperator */}
             <div className={styles['saperator']} />
-
-            {/* Contribution */}
             <div className={styles['contribution-wrapper']}>
               <div className={styles['contribution-text']}>{t('contribution')}:</div>
               <div className={styles['contribution-value']}>{memberContributions}</div>
@@ -147,8 +123,6 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
           </div>
         </div>
       </div>
-
-      {/* Badges Section */}
       <div className={styles['footer']}>
         <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} />
       </div>

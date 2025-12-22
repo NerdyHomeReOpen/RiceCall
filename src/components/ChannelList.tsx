@@ -1,46 +1,31 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-
-// CSS
-import styles from '@/styles/server.module.css';
-import header from '@/styles/header.module.css';
-
-// Types
-import type { OnlineMember, Channel, Server, User, Category, Friend, QueueUser, MemberApplication } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
-import { useContextMenu } from '@/providers/ContextMenu';
-import { useFindMeContext } from '@/providers/FindMe';
+import ipc from '@/ipc';
 
-// Components
+import type * as Types from '@/types';
+
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
 import QueueUserTab from '@/components/QueueUserTab';
 
-// Services
-import ipc from '@/ipc';
+import { useContextMenu } from '@/providers/ContextMenu';
+import { useFindMeContext } from '@/providers/FindMe';
 
-// Utils
-import {
-  handleOpenAlertDialog,
-  handleOpenServerSetting,
-  handleOpenEditNickname,
-  handleOpenCreateChannel,
-  handleOpenEditChannelOrder,
-  handleOpenApplyMember,
-  handleOpenServerBroadcast,
-} from '@/utils/popup';
-import { isMember, isServerAdmin, isStaff } from '@/utils/permission';
+import * as Popup from '@/utils/popup';
+import * as Permission from '@/utils/permission';
+
+import styles from '@/styles/server.module.css';
+import header from '@/styles/header.module.css';
 
 interface ChannelListProps {
-  user: User;
-  currentServer: Server;
-  currentChannel: Channel;
-  friends: Friend[];
-  queueUsers: QueueUser[];
-  serverOnlineMembers: OnlineMember[];
-  serverMemberApplications: MemberApplication[];
-  channels: (Channel | Category)[];
+  user: Types.User;
+  currentServer: Types.Server;
+  currentChannel: Types.Channel;
+  friends: Types.Friend[];
+  queueUsers: Types.QueueUser[];
+  serverOnlineMembers: Types.OnlineMember[];
+  serverMemberApplications: Types.MemberApplication[];
+  channels: (Types.Channel | Types.Category)[];
   latency: number;
 }
 
@@ -80,10 +65,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   );
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
-  const filteredQueueMembers = useMemo<(QueueUser & OnlineMember)[]>(
+  const filteredQueueMembers = useMemo<Types.QueueMember[]>(
     () =>
       queueUsers
-        .reduce<(QueueUser & OnlineMember)[]>((acc, qm) => {
+        .reduce<Types.QueueMember[]>((acc, qm) => {
           if (qm.position < 0 || qm.leftTime <= 0) return acc;
           const online = serverOnlineMemberMap.get(qm.userId);
           if (!online) return acc;
@@ -99,16 +84,16 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     {
       id: 'apply-member',
       label: t('apply-member'),
-      show: !isMember(permissionLevel),
+      show: !Permission.isMember(permissionLevel),
       icon: 'applyMember',
       onClick: () => handleApplyMember(userId, currentServerId),
     },
     {
       id: 'member-management',
       label: t('member-management'),
-      show: isServerAdmin(permissionLevel),
+      show: Permission.isServerAdmin(permissionLevel),
       icon: 'memberManagement',
-      onClick: () => handleOpenServerSetting(userId, currentServerId),
+      onClick: () => Popup.handleOpenServerSetting(userId, currentServerId),
     },
     {
       id: 'separator',
@@ -118,8 +103,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       id: 'edit-nickname',
       label: t('edit-nickname'),
       icon: 'editGroupcard',
-      show: isMember(permissionLevel),
-      onClick: () => handleOpenEditNickname(userId, currentServerId),
+      show: Permission.isMember(permissionLevel),
+      onClick: () => Popup.handleOpenEditNickname(userId, currentServerId),
     },
     {
       id: 'locate-me',
@@ -152,8 +137,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     {
       id: 'create-channel',
       label: t('create-channel'),
-      show: isServerAdmin(permissionLevel),
-      onClick: () => handleOpenCreateChannel(userId, currentServerId, ''),
+      show: Permission.isServerAdmin(permissionLevel),
+      onClick: () => Popup.handleOpenCreateChannel(userId, currentServerId, ''),
     },
     {
       id: 'separator',
@@ -162,7 +147,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     {
       id: 'kick-all-users-from-server',
       label: t('kick-all-users-from-server'),
-      show: isStaff(permissionLevel) && movableServerUserIds.length > 0,
+      show: Permission.isStaff(permissionLevel) && movableServerUserIds.length > 0,
       onClick: () => handleKickUsersFromServer(movableServerUserIds, currentServerId),
     },
     {
@@ -172,24 +157,24 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     {
       id: 'broadcast',
       label: t('broadcast'),
-      show: isServerAdmin(permissionLevel),
-      onClick: () => handleOpenServerBroadcast(currentServerId, currentChannelId),
+      show: Permission.isServerAdmin(permissionLevel),
+      onClick: () => Popup.handleOpenServerBroadcast(currentServerId, currentChannelId),
     },
     {
       id: 'edit-channel-order',
       label: t('edit-channel-order'),
-      show: isServerAdmin(permissionLevel),
-      onClick: () => handleOpenEditChannelOrder(userId, currentServerId),
+      show: Permission.isServerAdmin(permissionLevel),
+      onClick: () => Popup.handleOpenEditChannelOrder(userId, currentServerId),
     },
   ];
 
-  const handleFavoriteServer = (serverId: Server['serverId']) => {
+  const handleFavoriteServer = (serverId: Types.Server['serverId']) => {
     ipc.socket.send('favoriteServer', { serverId });
   };
 
-  const handleApplyMember = (userId: User['userId'], serverId: Server['serverId']) => {
-    if (!currentServerReceiveApply) handleOpenAlertDialog(t('cannot-apply-member'), () => {});
-    else handleOpenApplyMember(userId, serverId);
+  const handleApplyMember = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
+    if (!currentServerReceiveApply) Popup.handleOpenAlertDialog(t('cannot-apply-member'), () => {});
+    else Popup.handleOpenApplyMember(userId, serverId);
   };
 
   const handleLocateUser = () => {
@@ -197,8 +182,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     setSelectedItemId(`user-${userId}`);
   };
 
-  const handleKickUsersFromServer = (userIds: User['userId'][], serverId: Server['serverId']) => {
-    handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
+  const handleKickUsersFromServer = (userIds: Types.User['userId'][], serverId: Types.Server['serverId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
   const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -228,9 +213,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
 
   return (
     <>
-      {/* Header */}
       <div className={styles['sidebar-header']}>
-        <div className={styles['avatar-box']} onClick={() => handleOpenServerSetting(userId, currentServerId)}>
+        <div className={styles['avatar-box']} onClick={() => Popup.handleOpenServerSetting(userId, currentServerId)}>
           <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${currentServerAvatarUrl})` }} />
         </div>
         <div className={styles['base-info-wrapper']}>
@@ -257,22 +241,18 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
                   contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
                 }}
               >
-                <div className={`${header['overlay']} ${isServerAdmin(permissionLevel) && serverMemberApplications.length > 0 ? header['new'] : ''}`} />
+                <div className={`${header['overlay']} ${Permission.isServerAdmin(permissionLevel) && serverMemberApplications.length > 0 ? header['new'] : ''}`} />
               </div>
             </div>
           </div>
         </div>
       </div>
-
-      {/* Current Channel */}
       <div className={styles['current-channel-box']}>
         <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
           <div className={'hover-text'}>{`${latency}ms`}</div>
         </div>
         <div className={styles['current-channel-text']}>{isCurrentChannelLobby ? t(currentChannelName) : currentChannelName}</div>
       </div>
-
-      {/* Mic Queue */}
       {currentChannelVoiceMode === 'queue' && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
@@ -295,11 +275,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           <div className={styles['saperator-2']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
         </>
       )}
-
-      {/* Channel List Title */}
       <div className={styles['section-title-text']}>{viewType === 'current' ? t('current-channel') : t('all-channel')}</div>
-
-      {/* Channel List */}
       <div
         className={styles['scroll-view']}
         onContextMenu={(e) => {
@@ -336,7 +312,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
                   queueUsers={queueUsers}
                   serverOnlineMembers={serverOnlineMembers}
                   channels={channels}
-                  category={item as Category}
+                  category={item as Types.Category}
                   expanded={expanded}
                   selectedItemId={selectedItemId}
                   setExpanded={setExpanded}
@@ -351,7 +327,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
                   friends={friends}
                   queueUsers={queueUsers}
                   serverOnlineMembers={serverOnlineMembers}
-                  channel={item as Channel}
+                  channel={item as Types.Channel}
                   expanded={expanded}
                   selectedItemId={selectedItemId}
                   setExpanded={setExpanded}
@@ -362,11 +338,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           )}
         </div>
       </div>
-
-      {/* Saperator */}
       <div className={styles['saperator-3']} />
-
-      {/* Footer */}
       <div className={styles['sidebar-footer']}>
         <div className={`${styles['navegate-tab']} ${viewType === 'current' ? styles['active'] : ''}`} onClick={() => setViewType('current')}>
           {t('current-channel')}
