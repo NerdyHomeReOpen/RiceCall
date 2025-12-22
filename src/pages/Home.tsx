@@ -86,7 +86,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
-  const filteredAnns = useMemo(() => announcements.sort((a, b) => b.showFrom - a.showFrom), [announcements]);
+  const filteredAnns = useMemo(() => announcements.sort((a, b) => b.timestamp - a.timestamp), [announcements]);
   const filteredRecommendServers = useMemo(
     () => recommendServers.filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory))),
     [recommendServers, selectReommendServerCategory],
@@ -391,7 +391,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 {t(`${selectedAnn?.category}`)}
               </div>
               <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
-              <div className={styles['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.showFrom)}</div>
+              <div className={styles['announcement-datail-date']}>{selectedAnn && getFormatDate(selectedAnn.timestamp)}</div>
             </div>
             {selectedAnn.attachmentUrl && <div className={styles['banner']} style={{ backgroundImage: `url(${selectedAnn.attachmentUrl})` }} />}
             <div className={styles['announcement-detail-content']}>
