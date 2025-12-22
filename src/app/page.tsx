@@ -608,6 +608,17 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
+      // Remove action messages and channel messages while switching server
+      const newCurrentServerId = args[0].update.currentServerId;
+      if (newCurrentServerId !== undefined && newCurrentServerId !== currentServerId) {
+        setChannels([]);
+        setServerOnlineMembers([]);
+        setServerMemberApplications([]);
+        setActionMessages([]);
+        setChannelMessages([]);
+        setQueueUsers([]);
+        setChannelEvents([]);
+      }
       // Add activity when signature is updated
       args.forEach(({ update }) => {
         if (update.signature && userRef.current.signature !== update.signature) {
