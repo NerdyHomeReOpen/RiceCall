@@ -28,7 +28,7 @@ export function escapeHtml(str: unknown): string {
     .replace(/(^|\n)&gt;\s/g, '$1> ');
 }
 
-export const fromTags = (raw: string) => {
+export function fromTags(raw: string) {
   return raw
     .replace(emojiRegex, (_, code) => {
       const emoji = emojis.find((e) => e.code === code);
@@ -51,9 +51,9 @@ export const fromTags = (raw: string) => {
     .replace(kickRegex, (_, username) => {
       return `<iframe data-kick='${username}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
     });
-};
+}
 
-export const toTags = (raw: string) => {
+export function toTags(raw: string) {
   return raw
     .replace(emojiBackRegex, (_: string, code: string) => {
       return `:${escapeHtml(code)}:`;
@@ -74,4 +74,4 @@ export const toTags = (raw: string) => {
       return `<kick data-kick='${escapeHtml(username)}'></kick>`;
     })
     .replace(pTagRegex, '');
-};
+}

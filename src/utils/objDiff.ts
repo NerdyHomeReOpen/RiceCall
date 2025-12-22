@@ -4,7 +4,7 @@
  * @param originalObj - The original object
  * @returns The difference between the two objects
  */
-export default function objDiff<T extends object>(newObj: Partial<T>, originalObj: T): Partial<T> {
+export function objDiff<T extends object>(newObj: Partial<T>, originalObj: T): Partial<T> {
   return Object.keys(newObj).reduce((acc, key) => {
     if (newObj[key as keyof T] !== originalObj[key as keyof T]) {
       acc[key as keyof T] = newObj[key as keyof T];
@@ -12,3 +12,5 @@ export default function objDiff<T extends object>(newObj: Partial<T>, originalOb
     return acc;
   }, {} as Partial<T>);
 }
+
+export default objDiff;

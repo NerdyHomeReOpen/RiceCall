@@ -6,7 +6,7 @@ type StereoBuffer = { left: Float32Array; right: Float32Array };
  * @param sampleRate - Sample rate
  * @returns Encoded audio data
  */
-export default function encodeAudio(buffers: StereoBuffer[], sampleRate: number): ArrayBuffer {
+export function encodeAudio(buffers: StereoBuffer[], sampleRate: number): ArrayBuffer {
   const left = buffers.flatMap((b) => Array.from(b.left));
   const right = buffers.flatMap((b) => Array.from(b.right));
   const length = left.length + right.length;
@@ -42,3 +42,5 @@ export default function encodeAudio(buffers: StereoBuffer[], sampleRate: number)
 
   return buffer;
 }
+
+export default encodeAudio;
