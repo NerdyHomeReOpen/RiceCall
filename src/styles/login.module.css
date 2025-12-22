@@ -184,7 +184,7 @@
   justify-content: space-between;
   width: 100%;
   max-width: 400px;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: var(--text-color-quaternary);
 }
 
@@ -262,7 +262,7 @@
 .change-server {
   display: flex;
   align-items: flex-end;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: var(--text-color-quaternary);
   text-decoration: none;
   cursor: pointer;

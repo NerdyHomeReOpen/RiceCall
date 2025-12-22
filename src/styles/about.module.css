@@ -91,10 +91,9 @@
 
 .staff-title {
   display: inline-block;
-  min-width: 7em;
-  padding: 4px;
+  min-width: 80px;
+  padding: 4px 8px;
   margin-right: 8px;
-  font-size: 0.9em;
   font-weight: bold;
   color: #fff;
   text-align: center;
@@ -110,15 +109,9 @@
 .ricecall-id {
   display: inline-block;
   margin-right: 8px;
-  font-size: 0.9em;
-  font-weight: bold;
   color: var(--text-link);
   text-align: center;
-  cursor: pointer;
-
-  &:hover {
-    text-decoration: underline;
-  }
+  user-select: text;
 }
 
 .github-icon-link:hover svg {

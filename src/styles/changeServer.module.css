@@ -77,7 +77,7 @@
   display: inline-block;
   width: 80px;
   padding-right: 10px;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: var(--text-color-secondary);
   text-align: right;
 }
@@ -108,7 +108,7 @@
 .back-to-login {
   display: flex;
   align-items: flex-end;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: var(--text-color-quaternary);
   text-decoration: none;
   cursor: pointer;

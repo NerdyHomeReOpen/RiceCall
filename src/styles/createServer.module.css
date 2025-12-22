@@ -1,7 +1,7 @@
 .message {
   padding: 8px;
   margin-bottom: 15px;
-  font-size: 0.9em;
+  font-size: 0.9rem;
   color: var(--text-color-quaternary);
   background-color: var(--notification-toaster-background);
   border: 1px solid var(--notification-toaster-border);

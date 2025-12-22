@@ -268,7 +268,7 @@
   margin-left: 3px;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 1.1em;
+  font-size: 1.1rem;
   color: var(--text-color-quinary);
   white-space: nowrap;
 }

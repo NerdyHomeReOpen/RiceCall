@@ -212,14 +212,12 @@
 }
 
 .user-account-text {
-  font-size: 1em;
   color: #fff;
   cursor: pointer;
   user-select: text;
 }
 
 .user-info-text {
-  font-size: 1em;
   color: #fff;
 }
 
@@ -345,8 +343,6 @@
   align-items: center;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 1em;
-  line-height: 1em;
   color: var(--text-color-quaternary);
   white-space: nowrap;
 }
