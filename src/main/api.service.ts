@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import log from 'electron-log';
 import { token } from '../../main.js';
 import { env } from './env.js';
 
@@ -14,10 +15,10 @@ type ApiRequestData = {
 const handleResponse = async (response: Response, method: 'GET' | 'POST' | 'PATCH'): Promise<any> => {
   const result = await response.json();
   if (!response.ok) {
-    console.error(`${new Date().toLocaleString()} | HTTP ${method} ${response.url} [${response.status}]: ${result.message}`);
+    log.error(`HTTP ${method} ${response.url} [${response.status}]: ${result.message}`);
     throw new Error(result.message);
   } else {
-    console.log(`${new Date().toLocaleString()} | HTTP ${method} ${response.url} [${response.status}]: ${result.message}`);
+    log.info(`HTTP ${method} ${response.url} [${response.status}]: ${result.message}`);
     if (result.data) result.data.message = result.message || '';
     return result.data;
   }

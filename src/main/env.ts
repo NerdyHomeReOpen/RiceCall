@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { app } from 'electron';
+import log from 'electron-log';
 
 export let env: Record<string, string> = {};
 
@@ -34,7 +35,7 @@ export function loadEnv(server: 'dev' | 'prod' = 'prod') {
   const parsed = EnvSchema.safeParse(envLoaded);
 
   if (!parsed.success) {
-    console.warn(`${new Date().toLocaleString()} | Invalid env values:`, parsed.error.flatten().fieldErrors);
+    log.warn(`Invalid env values:`, parsed.error.flatten().fieldErrors);
   } else {
     Object.assign(envLoaded, parsed.data);
   }

@@ -2,6 +2,7 @@
 import fs from 'fs';
 import net from 'net';
 import path from 'path';
+import { Readable } from 'stream';
 import fontList from 'font-list';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
@@ -9,6 +10,14 @@ const binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar',
 ffmpeg.setFfmpegPath(binaryPath);
 import serve from 'electron-serve';
 import Store from 'electron-store';
+import log from 'electron-log';
+log.initialize();
+log.transports.file.level = 'info';
+log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
+log.transports.file.maxSize = 5 * 1024 * 1024;
+log.transports.remote.url = `${env.API_URL}/logs`;
+Object.assign(console, log.functions);
+log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
@@ -21,15 +30,14 @@ import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from
 import authService from './src/main/auth.service.js';
 import dataService from './src/main/data.service.js';
 import popupLoaders from './src/main/popupLoader.js';
-import type { StoreType, PopupType, LanguageKey, SystemSettings } from './src/types';
+import * as Types from './src/types';
 import { LANGUAGES } from './src/constant.js';
-import { Readable } from 'stream';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
 }
 
-export function getLanguage(): LanguageKey {
+export function getRegion(): Types.LanguageKey {
   const language = app.getLocale();
 
   const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
@@ -51,12 +59,12 @@ function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
     });
 }
 
-const store = new Store<StoreType>({
+const store = new Store<Types.StoreType>({
   defaults: {
     // Accounts
     accounts: {},
     // Language
-    language: getLanguage(),
+    language: getRegion(),
     // Custom Themes
     customThemes: [],
     currentTheme: null,
@@ -115,7 +123,7 @@ const store = new Store<StoreType>({
   },
 });
 
-const PopupSize: Record<PopupType, { height: number; width: number }> = {
+const PopupSize: Record<Types.PopupType, { height: number; width: number }> = {
   aboutus: { height: 750, width: 500 },
   applyFriend: { height: 375, width: 490 },
   approveFriend: { height: 250, width: 400 },
@@ -213,7 +221,7 @@ function setAutoLaunch(enable: boolean) {
       openAsHidden: false,
     });
   } catch (error) {
-    console.error(`${new Date().toLocaleString()} | Set auto launch error:`, error);
+    log.error(`Set auto launch error: ${error}`);
   }
 }
 
@@ -222,12 +230,12 @@ function isAutoLaunchEnabled(): boolean {
     const settings = app.getLoginItemSettings();
     return settings.openAtLogin;
   } catch (error) {
-    console.error(`${new Date().toLocaleString()} | Get auto launch error:`, error);
+    log.error(`Get auto launch error: ${error}`);
     return false;
   }
 }
 
-export function getSettings(): SystemSettings {
+export function getSettings(): Types.SystemSettings {
   return {
     autoLogin: store.get('autoLogin'),
     autoLaunch: isAutoLaunchEnabled(),
@@ -288,7 +296,7 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
 
   if (DEV) {
     waitForPort(PORT).catch((err) => {
-      console.error(`${new Date().toLocaleString()} | Cannot connect to Next.js server:`, err);
+      log.error(`Cannot connect to Next.js server: ${err}`);
       app.exit();
     });
   }
@@ -367,7 +375,7 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
 
   if (DEV) {
     waitForPort(PORT).catch((err) => {
-      console.error(`${new Date().toLocaleString()} | Cannot connect to Next.js server:`, err);
+      log.error(`Cannot connect to Next.js server: ${err}`);
       app.quit();
     });
   }
@@ -425,7 +433,7 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   return authWindow;
 }
 
-export async function createPopup(type: PopupType, id: string, initialData: unknown, force = true, title?: string): Promise<BrowserWindow> {
+export async function createPopup(type: Types.PopupType, id: string, initialData: unknown, force = true, title?: string): Promise<BrowserWindow> {
   const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
   const canResize = type === 'directMessage';
 
@@ -444,7 +452,7 @@ export async function createPopup(type: PopupType, id: string, initialData: unkn
 
   if (DEV) {
     waitForPort(PORT).catch((err) => {
-      console.error(`${new Date().toLocaleString()} | Cannot connect to Next.js server:`, err);
+      log.error(`Cannot connect to Next.js server: ${err}`);
       app.exit();
     });
   }
@@ -542,7 +550,7 @@ async function checkForUpdates(force = false) {
   }
 
   const channel = store.get('updateChannel');
-  console.log(`${new Date().toLocaleString()} | Checking for updates, channel:`, channel);
+  log.info(`Checking for updates, channel: ${channel}`);
 
   if (channel === 'dev') {
     autoUpdater.allowPrerelease = true;
@@ -556,7 +564,7 @@ async function checkForUpdates(force = false) {
     autoUpdater.autoInstallOnAppQuit = false;
     autoUpdater.allowDowngrade = true;
     const result = await autoUpdater.checkForUpdates().catch((error) => {
-      console.log(`${new Date().toLocaleString()} | Cannot check for updates in dev channel:`, error.message);
+      log.error(`Cannot check for updates in dev channel: ${error.message}`);
     });
     if (result?.isUpdateAvailable) return result;
   }
@@ -572,14 +580,14 @@ async function checkForUpdates(force = false) {
   autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.allowDowngrade = false;
   const result = await autoUpdater.checkForUpdates().catch((error) => {
-    console.error(`${new Date().toLocaleString()} | Cannot check for updates in latest channel:`, error.message);
+    log.error(`Cannot check for updates in latest channel: ${error.message}`);
   });
   if (result?.isUpdateAvailable) return result;
 }
 
 async function configureAutoUpdater() {
   autoUpdater.on('update-available', (info: UpdateInfo) => {
-    console.info(`${new Date().toLocaleString()} | Update available: ${info.version}`);
+    log.info(`Update available: ${info.version}`);
 
     dialog
       .showMessageBox({
@@ -595,24 +603,24 @@ async function configureAutoUpdater() {
         }
       })
       .catch((error) => {
-        console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
+        log.error(`Cannot show update dialog: ${error.message}`);
       });
     isUpdateNotified = true;
   });
 
   autoUpdater.on('update-not-available', () => {
-    console.info(`${new Date().toLocaleString()} | Is latest version`);
+    log.info(`Is latest version`);
   });
 
   autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
     let message = `${progressInfo.bytesPerSecond}`;
     message = `${message} - ${progressInfo.percent}%`;
     message = `${message} (${progressInfo.transferred}/${progressInfo.total})`;
-    console.info(`${new Date().toLocaleString()} | Downloading update: ${message}`);
+    log.info(`Downloading update: ${message}`);
   });
 
   autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
-    console.info(`${new Date().toLocaleString()} | Update downloaded: ${info.version}`);
+    log.info(`Update downloaded: ${info.version}`);
 
     dialog
       .showMessageBox({
@@ -630,7 +638,7 @@ async function configureAutoUpdater() {
         }
       })
       .catch((error) => {
-        console.error(`${new Date().toLocaleString()} | Cannot show update dialog:`, error.message);
+        log.error(`Cannot show update dialog: ${error.message}`);
       });
     isUpdateNotified = false;
   });
@@ -804,7 +812,7 @@ app.on('ready', async () => {
         fs.writeFileSync(outputPath, buffer);
       }
     } catch (error: any) {
-      console.error(`${new Date().toLocaleString()} | Save audio error:`, error.message);
+      log.error(`Save audio error: ${error.message}`);
     }
   });
 
@@ -821,7 +829,7 @@ app.on('ready', async () => {
   // Data handlers
   ipcMain.handle('data-user', async (_, userId: string) => {
     return await dataService.user({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      log.error(`Cannot get user data: ${error.message}`);
       return null;
     });
   });
@@ -834,176 +842,176 @@ app.on('ready', async () => {
   });
 
   ipcMain.handle('data-friend', async (_, userId: string, targetId: string) => {
-    return await dataService.friend({ userId, targetId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.friend({ userId, targetId }).catch(() => {
+      log.error(`Cannot get friend data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-friends', async (_, userId: string) => {
-    return await dataService.friends({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.friends({ userId }).catch(() => {
+      log.error(`Cannot get friends data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-friendActivities', async (_, userId: string) => {
-    return await dataService.friendActivities({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.friendActivities({ userId }).catch(() => {
+      log.error(`Cannot get friend activities data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-friendGroup', async (_, userId: string, friendGroupId: string) => {
-    return await dataService.friendGroup({ userId, friendGroupId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.friendGroup({ userId, friendGroupId }).catch(() => {
+      log.error(`Cannot get friend group data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-friendGroups', async (_, userId: string) => {
-    return await dataService.friendGroups({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.friendGroups({ userId }).catch(() => {
+      log.error(`Cannot get friend groups data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-friendApplication', async (_, receiverId: string, senderId: string) => {
-    return await dataService.friendApplication({ receiverId, senderId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.friendApplication({ receiverId, senderId }).catch(() => {
+      log.error(`Cannot get friend application data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-friendApplications', async (_, receiverId: string) => {
-    return await dataService.friendApplications({ receiverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.friendApplications({ receiverId }).catch(() => {
+      log.error(`Cannot get friend applications data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-server', async (_, userId: string, serverId: string) => {
-    return await dataService.server({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.server({ userId, serverId }).catch(() => {
+      log.error(`Cannot get server data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-servers', async (_, userId: string) => {
-    return await dataService.servers({ userId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.servers({ userId }).catch(() => {
+      log.error(`Cannot get servers data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-serverMembers', async (_, serverId: string) => {
-    return await dataService.serverMembers({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.serverMembers({ serverId }).catch(() => {
+      log.error(`Cannot get server members data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-serverOnlineMembers', async (_, serverId: string) => {
-    return await dataService.serverOnlineMembers({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.serverOnlineMembers({ serverId }).catch(() => {
+      log.error(`Cannot get server online members data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-channel', async (_, userId: string, serverId: string, channelId: string) => {
-    return await dataService.channel({ userId, serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.channel({ userId, serverId, channelId }).catch(() => {
+      log.error(`Cannot get channel data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-channels', async (_, userId: string, serverId: string) => {
-    return await dataService.channels({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.channels({ userId, serverId }).catch(() => {
+      log.error(`Cannot get channels data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-channelMembers', async (_, serverId: string, channelId: string) => {
-    return await dataService.channelMembers({ serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.channelMembers({ serverId, channelId }).catch(() => {
+      log.error(`Cannot get channel members data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-member', async (_, userId: string, serverId: string, channelId?: string) => {
-    return await dataService.member({ userId, serverId, channelId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.member({ userId, serverId, channelId }).catch(() => {
+      log.error(`Cannot get member data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-memberApplication', async (_, userId: string, serverId: string) => {
-    return await dataService.memberApplication({ userId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.memberApplication({ userId, serverId }).catch(() => {
+      log.error(`Cannot get member application data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-memberApplications', async (_, serverId: string) => {
-    return await dataService.memberApplications({ serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.memberApplications({ serverId }).catch(() => {
+      log.error(`Cannot get member applications data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-memberInvitation', async (_, receiverId: string, serverId: string) => {
-    return await dataService.memberInvitation({ receiverId, serverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.memberInvitation({ receiverId, serverId }).catch(() => {
+      log.error(`Cannot get member invitation data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-memberInvitations', async (_, receiverId: string) => {
-    return await dataService.memberInvitations({ receiverId }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.memberInvitations({ receiverId }).catch(() => {
+      log.error(`Cannot get member invitations data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-notifications', async (_, region: string) => {
-    return await dataService.notifications({ region }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.notifications({ region }).catch(() => {
+      log.error(`Cannot get notifications data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-announcements', async (_, region: string) => {
-    return await dataService.announcements({ region }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.announcements({ region }).catch(() => {
+      log.error(`Cannot get announcements data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-recommendServers', async (_, region: string) => {
-    return await dataService.recommendServers({ region }).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.recommendServers({ region }).catch(() => {
+      log.error(`Cannot get recommend servers data, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-uploadImage', async (_, folder: string, imageName: string, imageUnit8Array: Uint8Array) => {
-    return await dataService.uploadImage(folder, imageName, imageUnit8Array).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.uploadImage(folder, imageName, imageUnit8Array).catch(() => {
+      log.error(`Cannot upload image, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-searchServer', async (_, query: string) => {
-    return await dataService.searchServer(query).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.searchServer(query).catch(() => {
+      log.error(`Cannot search server, skipping...`);
       return null;
     });
   });
 
   ipcMain.handle('data-searchUser', async (_, query: string) => {
-    return await dataService.searchUser(query).catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return await dataService.searchUser(query).catch(() => {
+      log.error(`Cannot search user, skipping...`);
       return null;
     });
   });
@@ -1045,8 +1053,8 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('set-language', (_, language) => {
-    store.set('language', language ?? getLanguage());
-    initMainI18n(language ?? getLanguage());
+    store.set('language', language ?? getRegion());
+    initMainI18n(language ?? getRegion());
     setTrayDetail();
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
@@ -1106,10 +1114,15 @@ app.on('ready', async () => {
 
   // Popup handlers
   ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
-    console.log(`${new Date().toLocaleString()} | Open popup`, type, id);
+    log.info(`Opening ${type} (${id})...`);
 
     const loader = popupLoaders[type];
-    if (loader) initialData = await loader(initialData);
+    if (loader)
+      initialData = await loader(initialData).catch(() => {
+        log.error(`Cannot load ${type} data, aborting...`);
+        return null;
+      });
+    if (!initialData) return;
 
     createPopup(type, id, initialData, force);
   });
@@ -1702,14 +1715,14 @@ async function handleDeepLink(url: string) {
         break;
     }
   } catch (error) {
-    console.error(`${new Date().toLocaleString()} | Error parsing deep link:`, error);
+    log.error(`Error parsing deep link: ${error}`);
   }
 }
 
 process.on('uncaughtException', (error) => {
-  console.error(`${new Date().toLocaleString()} | Uncaught exception:`, error);
+  log.error(`Uncaught exception: ${error}`);
 });
 
 process.on('unhandledRejection', (error) => {
-  console.error(`${new Date().toLocaleString()} | Unhandled rejection:`, error);
+  log.error(`Unhandled rejection: ${error}`);
 });
