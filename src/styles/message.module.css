@@ -95,10 +95,10 @@
 
 .details {
   display: flex;
+  flex-direction: row;
   gap: 3px;
   align-items: center;
   overflow: hidden;
-  flex-direction: row;
 }
 
 .details .username-text {
@@ -106,8 +106,8 @@
   text-overflow: ellipsis;
   color: var(--text-username);
   white-space: nowrap;
-  user-select: text;
   cursor: pointer;
+  user-select: text;
 
   &:hover {
     text-decoration: underline;
@@ -117,8 +117,8 @@
 .details .timestamp-text {
   min-width: fit-content;
   margin-left: 5px;
-  user-select: text;
   color: var(--text-color-quinary);
+  user-select: text;
 }
 
 .content {
