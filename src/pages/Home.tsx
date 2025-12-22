@@ -167,7 +167,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   const defaultAnnouncement = (ann: Types.Announcement) => (
     <>
-      <Image src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
+      <Image loading="lazy" src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
       <span>{ann.title}</span>
     </>
   );
