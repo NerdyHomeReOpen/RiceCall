@@ -385,6 +385,15 @@ export type ServerToClientEvents = {
   error: (error: Error) => void;
 };
 
+export type ClientToServerEventsWithAck = {
+  SFUCreateTransport: (payload: SFUCreateTransportParams) => SFUCreateTransportReturnType;
+  SFUConnectTransport: (payload: SFUConnectTransportParams) => void;
+  SFUCreateProducer: (payload: SFUCreateProducerParams) => SFUCreateProducerReturnType;
+  SFUCreateConsumer: (payload: SFUCreateConsumerParams) => SFUCreateConsumerReturnType;
+  SFUJoin: (payload: { channelId: string }) => void;
+  SFULeave: (payload: { channelId: string }) => void;
+};
+
 export type StoreType = {
   accounts: Record<string, any>;
   language: LanguageKey;

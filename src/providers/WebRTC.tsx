@@ -5,15 +5,7 @@ import * as mediasoupClient from 'mediasoup-client';
 import ipc from '@/services/ipc.service';
 
 // Types
-import {
-  SpeakingMode,
-  SFUCreateConsumerReturnType,
-  SFUCreateTransportReturnType,
-  SFUCreateProducerReturnType,
-  SFUCreateConsumerParams,
-  SFUCreateTransportParams,
-  SFUCreateProducerParams,
-} from '@/types';
+import { SpeakingMode } from '@/types';
 
 // Providers
 import { useSoundPlayer } from '@/providers/SoundPlayer';
@@ -456,7 +448,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
       const consumerInfo = await ipc.socket
-        .emit<SFUCreateConsumerParams, SFUCreateConsumerReturnType>('SFUCreateConsumer', {
+        .emit('SFUCreateConsumer', {
           transportId: recvTransportRef.current!.id,
           producerId,
           rtpCapabilities: deviceRef.current.rtpCapabilities,
@@ -508,7 +500,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
 
     const transport = await ipc.socket
-      .emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', {
+      .emit('SFUCreateTransport', {
         direction: 'send',
         channelId,
       })
@@ -535,7 +527,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     });
     sendTransportRef.current.on('produce', ({ kind, rtpParameters }, cb, eb) => {
       ipc.socket
-        .emit<SFUCreateProducerParams, SFUCreateProducerReturnType>('SFUCreateProducer', {
+        .emit('SFUCreateProducer', {
           transportId: sendTransportRef.current!.id,
           kind,
           rtpParameters,
@@ -582,7 +574,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       }
 
       const transport = await ipc.socket
-        .emit<SFUCreateTransportParams, SFUCreateTransportReturnType>('SFUCreateTransport', {
+        .emit('SFUCreateTransport', {
           direction: 'recv',
           channelId,
         })

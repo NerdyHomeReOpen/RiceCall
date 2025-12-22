@@ -6,6 +6,7 @@ import {
   MixMode,
   ServerToClientEvents,
   ClientToServerEvents,
+  ClientToServerEventsWithAck,
   ChannelUIMode,
   ACK,
   Theme,
@@ -59,10 +60,10 @@ const ipcService = {
       ipcRenderer.on(event, listener);
       return () => ipcRenderer.removeListener(event, listener);
     },
-    emit: <T, R>(event: string, payload: T): Promise<R> => {
-      if (!isElectron) return Promise.resolve(null as R);
+    emit: <T extends keyof ClientToServerEventsWithAck>(event: T, payload: Parameters<ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<ClientToServerEventsWithAck[T]>> => {
+      if (!isElectron) return Promise.resolve(null as ReturnType<ClientToServerEventsWithAck[T]>);
       return new Promise((resolve, reject) => {
-        ipcRenderer.invoke(event, payload).then((ack: ACK<R>) => {
+        ipcRenderer.invoke(event, payload).then((ack: ACK<ReturnType<ClientToServerEventsWithAck[T]>>) => {
           if (ack?.ok) resolve(ack.data);
           else reject(new Error(ack?.error || 'unknown error'));
         });
