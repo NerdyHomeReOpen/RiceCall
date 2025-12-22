@@ -85,14 +85,12 @@
   flex-direction: column;
   gap: 3px;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
 }
 
 .message-box.event {
   flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
 }
 
 .details {
@@ -119,7 +117,7 @@
 .details .timestamp-text {
   min-width: fit-content;
   margin-left: 5px;
-  font-size: 0.9em;
+  user-select: text;
   color: var(--text-color-quinary);
 }
 

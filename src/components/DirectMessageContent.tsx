@@ -42,7 +42,7 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
     <div ref={messagesViewerRef} className={styles['message-viewer-wrapper']}>
       {messageGroups.map((messageGroup, index) => (
         <div key={index} className={styles['message-wrapper']}>
-          {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab user={user} messageGroup={messageGroup} messageType={messageGroup.type} />}
+          {messageGroup.type === 'dm' ? <DirectMessageTab user={user} messageGroup={messageGroup} /> : <PromptMessageTab user={user} messageGroup={messageGroup} messageType={messageGroup.type} />}
         </div>
       ))}
     </div>
