@@ -181,23 +181,21 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
 
   return (
     <div className={styles['message-box']}>
-      <div className={`${styles['header']}`}>
-        <div
-          className={`${styles['details']}`}
-          onContextMenu={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const { clientX: x, clientY: y } = e;
-            contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-          }}
-        >
-          <div className={`${senderPermissionLevel > 2 && permission[senderGender]} ${senderPermissionLevel > 2 && permission[`lv-${senderPermissionLevel}`]}`} />
-          {senderVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
-          <div className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`} onClick={() => handleOpenUserInfo(userId, senderUserId)}>
-            {senderNickname || senderName}
-          </div>
-          <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
+      <div
+        className={`${styles['details']}`}
+        onContextMenu={(e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          const { clientX: x, clientY: y } = e;
+          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+        }}
+      >
+        <div className={`${senderPermissionLevel > 2 && permission[senderGender]} ${senderPermissionLevel > 2 && permission[`lv-${senderPermissionLevel}`]}`} />
+        {senderVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
+        <div className={`${styles['username-text']} ${senderVip > 0 ? `${vip['vip-name-color']}` : ''}`} onClick={() => handleOpenUserInfo(userId, senderUserId)}>
+          {senderNickname || senderName}
         </div>
+        <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>
       {formattedMessageContents.map((content, index) => (
         <MarkdownContent key={index} markdownText={content} />

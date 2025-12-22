@@ -42,15 +42,13 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
 
   return (
     <div className={styles['message-viewer-wrapper']}>
-      {messageGroups.map((messageGroup, index) => (
-        <div key={index} className={styles['message-wrapper']}>
-          {messageGroup.type === 'general' ? (
-            <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
-          ) : (
-            <PromptMessageTab user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
-          )}
-        </div>
-      ))}
+      {messageGroups.map((messageGroup, index) =>
+        messageGroup.type === 'general' ? (
+          <ChannelMessageTab key={index} user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
+        ) : (
+          <PromptMessageTab key={index} user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
+        ),
+      )}
     </div>
   );
 });

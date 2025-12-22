@@ -57,23 +57,21 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
   ];
 
   return (
-    <>
+    <div
+      className={`${styles['message-box']} ${styles['event']}`}
+      onContextMenu={(e) => {
+        if (!senderUserId) return;
+        e.preventDefault();
+        e.stopPropagation();
+        const { clientX: x, clientY: y } = e;
+        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+      }}
+    >
       <div className={styles[`${messageType}-icon`]} />
-      <div
-        className={styles['message-box']}
-        onContextMenu={(e) => {
-          if (!senderUserId) return;
-          e.preventDefault();
-          e.stopPropagation();
-          const { clientX: x, clientY: y } = e;
-          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-        }}
-      >
-        {formattedMessagesContents.map((content, index) => (
-          <MarkdownContent key={index} markdownText={content} />
-        ))}
-      </div>
-    </>
+      {formattedMessagesContents.map((content, index) => (
+        <MarkdownContent key={index} markdownText={content} />
+      ))}
+    </div>
   );
 });
 

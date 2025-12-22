@@ -170,7 +170,8 @@
   border-radius: 5px;
 }
 
-.markdown-content img:not(.emoji) {
+.markdown-content img:not(.emoji),
+.markdown-content.image-size-small img:not(.emoji) {
   max-width: calc(min(90%, 256px));
   margin: 5px;
   transition: box-shadow 0.3s ease-in-out;
