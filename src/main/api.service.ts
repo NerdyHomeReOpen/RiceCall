@@ -46,9 +46,11 @@ const apiService = {
   // POST request
   post: async (endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions, retry = true, retryCount = 0): Promise<any | null> => {
     try {
+      const isFormData = data instanceof FormData;
+
       const headers = new Headers({
-        ...(data instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...(options?.headers || {}),
+        ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
         Authorization: `Bearer ${token}`,
       });
 
@@ -56,7 +58,7 @@ const apiService = {
         method: 'POST',
         headers: headers,
         credentials: options?.credentials || 'omit',
-        body: data instanceof FormData ? data : JSON.stringify(data),
+        body: isFormData ? data : JSON.stringify(data),
       });
 
       return await handleResponse(response, 'POST');

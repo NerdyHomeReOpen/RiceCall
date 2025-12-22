@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import React from 'react';
 
-// CSS
-import loadingSpinner from '@/styles/loadingSpinner.module.css';
+import styles from '@/styles/loadingSpinner.module.css';
 
 interface LoadingSpinnerProps {
   className?: string;
@@ -19,7 +18,7 @@ const LoadingSpinner: React.FC<LoadingSpinnerProps> = React.memo(({ className })
         height: '100%',
       }}
     >
-      <div className={loadingSpinner['spinner']} />
+      <div className={styles['spinner']} />
     </div>
   );
 });

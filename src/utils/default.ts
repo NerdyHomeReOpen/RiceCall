@@ -1,25 +1,6 @@
-import {
-  table_users,
-  table_user_settings,
-  table_global_permissions,
-  table_servers,
-  table_user_servers,
-  table_members,
-  table_server_permissions,
-  table_server_blocked_users,
-  table_channels,
-  table_channel_muted_users,
-  table_channel_permissions,
-  table_friends,
-  table_friend_groups,
-  table_friend_applications,
-  table_user_activities,
-  table_member_applications,
-  table_member_invitations,
-} from '@/types/database';
-import { User, Channel, Server, Member, Friend, FriendActivity, FriendGroup, FriendApplication, MemberApplication, MemberInvitation, BadgeList } from '@/types';
+import type * as Types from '@/types';
 
-const defaultTableUser: table_users = {
+const defaultTableUser: Types.table_users = {
   userId: '',
   name: '',
   displayId: '',
@@ -42,10 +23,11 @@ const defaultTableUser: table_users = {
   currentChannelId: null,
   currentServerId: null,
   lastActiveAt: 0,
+  updatedAt: 0,
   createdAt: 0,
 };
 
-const defaultTableUserSettings: table_user_settings = {
+const defaultTableUserSettings: Types.table_user_settings = {
   userId: '',
   forbidFriendApplications: false,
   forbidShakeMessages: false,
@@ -56,18 +38,18 @@ const defaultTableUserSettings: table_user_settings = {
   shareJoinedServers: false,
   shareFavoriteServers: false,
   notSaveMessageHistory: false,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
-const defaultTableGlobalPermission: table_global_permissions = {
+const defaultTableGlobalPermission: Types.table_global_permissions = {
   userId: '',
   permissionLevel: 1,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
-const defaultBadgeList: BadgeList = {
-  badges: '',
-};
-
-const defaultTableFriend: table_friends = {
+const defaultTableFriend: Types.table_friends = {
   userId: '',
   targetId: '',
   note: '',
@@ -75,31 +57,36 @@ const defaultTableFriend: table_friends = {
   isBlocked: false,
   friendGroupId: null,
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const defaultTableFriendGroup: table_friend_groups = {
+const defaultTableFriendGroup: Types.table_friend_groups = {
   friendGroupId: '',
   name: '',
   order: 0,
   userId: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const defaultTableFriendApplication: table_friend_applications = {
+const defaultTableFriendApplication: Types.table_friend_applications = {
   senderId: '',
   receiverId: '',
   description: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const defaultTableUserActivity: table_user_activities = {
+const defaultTableUserActivity: Types.table_user_activities = {
   activityId: 0,
   userId: '',
   content: '',
+  timestamp: 0,
+  updatedAt: 0,
   createdAt: 0,
 };
 
-const defaultTableServer: table_servers = {
+const defaultTableServer: Types.table_servers = {
   serverId: '',
   name: '',
   avatar: `${Date.now()}`,
@@ -121,39 +108,48 @@ const defaultTableServer: table_servers = {
   receptionLobbyId: null,
   ownerId: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const defaultTableUserServer: table_user_servers = {
+const defaultTableUserServer: Types.table_user_servers = {
   userId: '',
   serverId: '',
   owned: false,
   recent: false,
   favorite: false,
   timestamp: 0,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
-const defaultTableMember: table_members = {
+const defaultTableMember: Types.table_members = {
   userId: '',
   serverId: '',
   nickname: null,
   contribution: 0,
   lastJoinChannelAt: 0,
+  joinAt: 0,
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const defaultTableServerPermission: table_server_permissions = {
+const defaultTableServerPermission: Types.table_server_permissions = {
   userId: '',
   serverId: '',
   permissionLevel: 1,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
-const defaultTableServerBlocked: table_server_blocked_users = {
+const defaultTableServerBlocked: Types.table_server_blocked_users = {
   userId: '',
   serverId: '',
   blockedUntil: 0,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
-const defaultTableChannel: table_channels = {
+const defaultTableChannel: Types.table_channels = {
   channelId: '',
   name: '',
   announcement: '',
@@ -178,108 +174,107 @@ const defaultTableChannel: table_channels = {
   categoryId: null,
   serverId: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const defaultTableChannelMute: table_channel_muted_users = {
+const defaultTableChannelMute: Types.table_channel_muted_users = {
   userId: '',
   channelId: '',
   isTextMuted: false,
   isVoiceMuted: false,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
-const defaultTableChannelPermission: table_channel_permissions = {
+const defaultTableChannelPermission: Types.table_channel_permissions = {
   userId: '',
   channelId: '',
   permissionLevel: 1,
+  updatedAt: 0,
+  createdAt: 0,
 };
 
-const defaultTableMemberApplications: table_member_applications = {
+const defaultTableMemberApplications: Types.table_member_applications = {
   userId: '',
   serverId: '',
   description: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const defaultTableMemberInvitations: table_member_invitations = {
+const defaultTableMemberInvitations: Types.table_member_invitations = {
   receiverId: '',
   serverId: '',
   description: '',
   createdAt: 0,
+  updatedAt: 0,
 };
 
-const Default = {
-  user: (overrides: Partial<User> = {}): User => ({
-    ...defaultTableUser,
-    ...defaultTableUserSettings,
-    ...defaultTableGlobalPermission,
-    ...defaultBadgeList,
-    ...overrides,
-  }),
+export const user = (overrides: Partial<Types.User> = {}): Types.User => ({
+  ...defaultTableUser,
+  ...defaultTableUserSettings,
+  ...defaultTableGlobalPermission,
+  badges: '',
+  ...overrides,
+});
 
-  friend: (overrides: Partial<Friend> = {}): Friend => ({
-    ...defaultTableFriend,
-    ...defaultTableUser,
-    ...defaultTableUserSettings,
-    ...defaultBadgeList,
-    ...overrides,
-  }),
+export const friend = (overrides: Partial<Types.Friend> = {}): Types.Friend => ({
+  ...defaultTableFriend,
+  ...defaultTableUser,
+  ...defaultTableUserSettings,
+  badges: '',
+  ...overrides,
+});
 
-  friendActivity: (overrides: Partial<FriendActivity> = {}): FriendActivity => ({
-    ...defaultTableFriend,
-    ...defaultTableUser,
-    ...defaultTableUserActivity,
-    ...overrides,
-  }),
+export const friendActivity = (overrides: Partial<Types.FriendActivity> = {}): Types.FriendActivity => ({
+  ...defaultTableUser,
+  ...defaultTableUserActivity,
+  ...overrides,
+});
 
-  friendGroup: (overrides: Partial<FriendGroup> = {}): FriendGroup => ({
-    ...defaultTableFriendGroup,
-    ...overrides,
-  }),
+export const friendGroup = (overrides: Partial<Types.FriendGroup> = {}): Types.FriendGroup => ({
+  ...defaultTableFriendGroup,
+  ...overrides,
+});
 
-  friendApplication: (overrides: Partial<FriendApplication> = {}): FriendApplication => ({
-    ...defaultTableFriendApplication,
-    ...defaultTableUser,
-    ...overrides,
-  }),
+export const friendApplication = (overrides: Partial<Types.FriendApplication> = {}): Types.FriendApplication => ({
+  ...defaultTableFriendApplication,
+  ...defaultTableUser,
+  ...overrides,
+});
 
-  server: (overrides: Partial<Server> = {}): Server => ({
-    ...defaultTableServer,
-    ...defaultTableUserServer,
-    ...defaultTableMember,
-    ...defaultTableServerPermission,
-    ...overrides,
-  }),
+export const server = (overrides: Partial<Types.Server> = {}): Types.Server => ({
+  ...defaultTableServer,
+  ...defaultTableUserServer,
+  ...defaultTableServerPermission,
+  contribution: 0,
+  ...overrides,
+});
 
-  channel: (overrides: Partial<Channel> = {}): Channel => ({
-    ...defaultTableChannel,
-    ...defaultTableChannelMute,
-    ...defaultTableChannelPermission,
-    type: 'channel',
-    ...overrides,
-  }),
+export const channel = (overrides: Partial<Types.Channel> = {}): Types.Channel => ({
+  ...defaultTableChannel,
+  ...defaultTableChannelMute,
+  ...defaultTableChannelPermission,
+  type: 'channel',
+  ...overrides,
+});
 
-  member: (overrides: Partial<Member> = {}): Member => ({
-    ...defaultTableMember,
-    ...defaultTableUser,
-    ...defaultTableServerBlocked,
-    ...defaultTableServerPermission,
-    ...defaultTableUserSettings,
-    ...defaultTableGlobalPermission,
-    ...defaultBadgeList,
-    ...overrides,
-  }),
+export const member = (overrides: Partial<Types.Member> = {}): Types.Member => ({
+  ...defaultTableMember,
+  ...defaultTableUser,
+  ...defaultTableServerBlocked,
+  ...defaultTableGlobalPermission,
+  ...overrides,
+});
 
-  memberApplication: (overrides: Partial<MemberApplication> = {}): MemberApplication => ({
-    ...defaultTableMemberApplications,
-    ...defaultTableUser,
-    ...overrides,
-  }),
+export const memberApplication = (overrides: Partial<Types.MemberApplication> = {}): Types.MemberApplication => ({
+  ...defaultTableMemberApplications,
+  ...defaultTableUser,
+  ...overrides,
+});
 
-  memberInvitation: (overrides: Partial<MemberInvitation> = {}): MemberInvitation => ({
-    ...defaultTableMemberInvitations,
-    ...defaultTableUser,
-    ...overrides,
-  }),
-};
-
-export default Default;
+export const memberInvitation = (overrides: Partial<Types.MemberInvitation> = {}): Types.MemberInvitation => ({
+  ...defaultTableMemberInvitations,
+  ...defaultTableServer,
+  ...overrides,
+});

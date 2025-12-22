@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
-
-// Types
-import type { Member, Server, Channel, User } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// CSS
-import popup from '@/styles/popup.module.css';
+import type * as Types from '@/types';
 
-// Services
-import ipc from '@/services/ipc.service';
+import popupStyles from '@/styles/popup.module.css';
 
 interface KickMemberFromChannelPopupProps {
-  serverId: Server['serverId'];
-  channel: Channel;
-  member: Member;
+  serverId: Types.Server['serverId'];
+  channel: Types.Channel;
+  member: Types.Member;
 }
 
 const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = React.memo(({ serverId, channel, member }) => {
@@ -85,7 +79,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
     }
   };
 
-  const handleBlockUserFromChannel = (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId'], blockUntil: number) => {
+  const handleBlockUserFromChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], blockUntil: number) => {
     ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId, blockUntil });
     ipc.window.close();
   };
@@ -95,20 +89,19 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Body */}
-      <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={`${popup['dialog-icon']} ${popup['alert']}`} />
-          <div className={popup['col']}>
-            <div className={popup['label']} style={{ minWidth: '0' }}>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={popupStyles['dialog-content']}>
+          <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
+          <div className={popupStyles['col']}>
+            <div className={popupStyles['label']} style={{ minWidth: '0' }}>
               {t('confirm-kick-user-from-channel', { '0': memberNickname || memberName, '1': channel.name })}
             </div>
-            <div className={popup['col']}>
-              <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('kick-time')}</div>
-                <div className={`${popup['row']}`}>
-                  <div className={popup['select-box']}>
+            <div className={popupStyles['col']}>
+              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                <div className={popupStyles['label']}>{t('kick-time')}</div>
+                <div className={`${popupStyles['row']}`}>
+                  <div className={popupStyles['select-box']}>
                     <select value={selectTime} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
                       {getLengthOptions().map((option) => (
                         <option key={option} value={option}>
@@ -117,7 +110,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                       ))}
                     </select>
                   </div>
-                  <div className={popup['select-box']}>
+                  <div className={popupStyles['select-box']}>
                     <select value={formatType} onChange={(e) => setFormatType(e.target.value)}>
                       {formatTypeOptions.map((option) => (
                         <option key={option.key} value={option.key}>
@@ -128,10 +121,10 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                   </div>
                 </div>
               </div>
-              <div className={`${popup['input-box']} ${popup['col']}`}>
-                <div className={popup['label']}>{t('kick-reason')}</div>
-                <div className={`${popup['row']}`}>
-                  <div className={popup['select-box']}>
+              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                <div className={popupStyles['label']}>{t('kick-reason')}</div>
+                <div className={`${popupStyles['row']}`}>
+                  <div className={popupStyles['select-box']}>
                     <select value={selectReason} onChange={(e) => setSelectReason(e.target.value)}>
                       {kickReasonOptions.map((option) => (
                         <option key={option.key} value={option.key}>
@@ -141,7 +134,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                     </select>
                   </div>
                   {selectReason === 'other' && (
-                    <div className={popup['input-box']}>
+                    <div className={popupStyles['input-box']}>
                       <input type="text" value={otherReason} placeholder={`${t('reason')}(${t('limit-text', { 0: '20' })})`} maxLength={20} onChange={(e) => setOtherReason(e.target.value)} />
                     </div>
                   )}
@@ -151,13 +144,11 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className={popup['popup-footer']}>
-        <div className={popup['button']} onClick={() => handleBlockUserFromChannel(userId, serverId, channel.channelId, Date.now() + getBlockTime())}>
+      <div className={popupStyles['popup-footer']}>
+        <div className={popupStyles['button']} onClick={() => handleBlockUserFromChannel(userId, serverId, channel.channelId, Date.now() + getBlockTime())}>
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>
@@ -165,6 +156,6 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   );
 });
 
-KickMemberFromChannelPopup.displayName = 'BKickMemberFromChannelPopup';
+KickMemberFromChannelPopup.displayName = 'KickMemberFromChannelPopup';
 
 export default KickMemberFromChannelPopup;

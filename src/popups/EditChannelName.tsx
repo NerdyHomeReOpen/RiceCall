@@ -1,21 +1,15 @@
 import React, { useState } from 'react';
-
-// Types
-import type { Channel, Server } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// CSS
-import popup from '@/styles/popup.module.css';
+import type * as Types from '@/types';
 
-// Services
-import ipc from '@/services/ipc.service';
+import popupStyles from '@/styles/popup.module.css';
 
 interface EditChannelNamePopupProps {
-  serverId: Server['serverId'];
-  channelId: Channel['channelId'];
-  channel: Channel;
+  serverId: Types.Server['serverId'];
+  channelId: Types.Channel['channelId'];
+  channel: Types.Channel;
 }
 
 const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channelId, channel }) => {
@@ -29,7 +23,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleEditChannel = (serverId: Server['serverId'], channelId: Channel['channelId'], update: Partial<Channel>) => {
+  const handleEditChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>) => {
     ipc.socket.send('editChannel', { serverId, channelId, update });
     ipc.window.close();
   };
@@ -39,23 +33,20 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Body */}
-      <div className={popup['popup-body']}>
-        <div className={popup['dialog-content']}>
-          <div className={`${popup['input-box']} ${popup['col']}`}>
-            <div className={popup['label']}>{t('channel-name-label')}</div>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={popupStyles['dialog-content']}>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className={popupStyles['label']}>{t('channel-name-label')}</div>
             <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannelName(e.target.value)} />
           </div>
         </div>
       </div>
-
-      {/* Footer */}
-      <div className={popup['popup-footer']}>
-        <div className={`${popup['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannel(serverId, channelId, { name: channelName }) : null)}>
+      <div className={popupStyles['popup-footer']}>
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannel(serverId, channelId, { name: channelName }) : null)}>
           {t('save')}
         </div>
-        <div className={popup['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
       </div>

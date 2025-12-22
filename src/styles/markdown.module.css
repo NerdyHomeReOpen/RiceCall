@@ -170,7 +170,8 @@
   border-radius: 5px;
 }
 
-.markdown-content img:not(.emoji) {
+.markdown-content img:not(.emoji),
+.markdown-content.image-size-small img:not(.emoji) {
   max-width: calc(min(90%, 256px));
   margin: 5px;
   transition: box-shadow 0.3s ease-in-out;
@@ -180,11 +181,11 @@
   }
 }
 
-.markdown-content .image-size-medium img:not(.emoji) {
+.markdown-content.image-size-medium img:not(.emoji) {
   max-width: calc(min(90%, 512px));
 }
 
-.markdown-content .image-size-big img:not(.emoji) {
+.markdown-content.image-size-big img:not(.emoji) {
   max-width: calc(min(90%, 1024px));
 }
 

@@ -1,8 +1,27 @@
+export enum Permission {
+  Guest = 1,
+  Member = 2,
+  ChannelMod = 3,
+  ChannelAdmin = 4,
+  ServerAdmin = 5,
+  ServerOwner = 6,
+  Staff = 7,
+  SuperAdmin = 8,
+}
+
+export enum RelationStatus {
+  Stranger = 0,
+  Pending = 1,
+  Friend = 2,
+}
+
 export type table_accounts = {
   account: string;
   password: string;
   email: string;
   userId: string;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_announcements = {
@@ -14,7 +33,10 @@ export type table_announcements = {
   region: string;
   category: string;
   timestamp: number;
-  until: number;
+  showFrom: number;
+  showTo: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_badges = {
@@ -22,6 +44,7 @@ export type table_badges = {
   name: string;
   description: string;
   iconUrl: string;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -49,6 +72,7 @@ export type table_channels = {
   voiceMode: 'free' | 'admin' | 'queue';
   categoryId: string | null;
   serverId: string;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -56,6 +80,8 @@ export type table_channel_blocked_users = {
   userId: string;
   channelId: string;
   blockedUntil: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_channel_muted_users = {
@@ -63,21 +89,26 @@ export type table_channel_muted_users = {
   channelId: string;
   isTextMuted: boolean;
   isVoiceMuted: boolean;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_channel_permissions = {
   userId: string;
   channelId: string;
-  permissionLevel: number;
+  permissionLevel: Permission;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_friends = {
   userId: string;
   targetId: string;
   note: string;
-  relationStatus: number;
+  relationStatus: RelationStatus;
   isBlocked: boolean;
   friendGroupId: string | null;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -85,6 +116,7 @@ export type table_friend_applications = {
   senderId: string;
   receiverId: string;
   description: string;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -93,12 +125,15 @@ export type table_friend_groups = {
   name: string;
   order: number;
   userId: string;
+  updatedAt: number;
   createdAt: number;
 };
 
 export type table_global_permissions = {
   userId: string;
-  permissionLevel: number;
+  permissionLevel: Permission;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_members = {
@@ -107,6 +142,8 @@ export type table_members = {
   nickname: string | null;
   contribution: number;
   lastJoinChannelAt: number;
+  joinAt: number;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -114,6 +151,7 @@ export type table_member_applications = {
   userId: string;
   serverId: string;
   description: string;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -121,6 +159,16 @@ export type table_member_invitations = {
   receiverId: string;
   serverId: string;
   description: string;
+  updatedAt: number;
+  createdAt: number;
+};
+
+export type table_message_logs = {
+  logId: number;
+  roomId: string;
+  senderId: string;
+  content: string;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -128,8 +176,10 @@ export type table_notifications = {
   notificationId: number;
   content: string;
   region: string;
-  timestamp: number;
-  until: number;
+  showFrom: number;
+  showTo: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_recommend_servers = {
@@ -147,12 +197,14 @@ export type table_recommend_server_categories = {
 export type table_reset_email_requests = {
   userId: string;
   code: string;
+  updatedAt: number;
   createdAt: number;
 };
 
 export type table_reset_password_requests = {
   userId: string;
   code: string;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -177,6 +229,7 @@ export type table_servers = {
   lobbyId: string | null;
   receptionLobbyId: string | null;
   ownerId: string | null;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -184,17 +237,22 @@ export type table_server_blocked_users = {
   userId: string;
   serverId: string;
   blockedUntil: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_server_permissions = {
   userId: string;
   serverId: string;
-  permissionLevel: number;
+  permissionLevel: Permission;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_tokens = {
   token: string;
   userId: string;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -221,6 +279,7 @@ export type table_users = {
   currentChannelId: string | null;
   currentServerId: string | null;
   lastActiveAt: number;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -228,6 +287,8 @@ export type table_user_activities = {
   activityId: number;
   userId: string;
   content: string;
+  timestamp: number;
+  updatedAt: number;
   createdAt: number;
 };
 
@@ -238,11 +299,16 @@ export type table_user_badges = {
   order: number;
   showTo: number;
   obtainedAt: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_user_liked_anchors = {
   userId: string;
   anchorUserId: string;
+  sendTime: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_user_servers = {
@@ -252,6 +318,8 @@ export type table_user_servers = {
   recent: boolean;
   favorite: boolean;
   timestamp: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_user_settings = {
@@ -265,10 +333,21 @@ export type table_user_settings = {
   shareJoinedServers: boolean;
   shareFavoriteServers: boolean;
   notSaveMessageHistory: boolean;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_user_show_stats = {
   userId: string;
   hearts: number;
   flowers: number;
+  updatedAt: number;
+  createdAt: number;
+};
+
+export type table_user_show_daily_record = {
+  userId: string;
+  date: string;
+  totalFlower: number;
+  dailyTotalFlower: number;
 };

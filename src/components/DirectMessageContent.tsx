@@ -1,20 +1,17 @@
 import React, { useMemo, useRef } from 'react';
 
-// CSS
-import styles from '@/styles/message.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { User, DirectMessage, PromptMessage } from '@/types';
-
-// Components
 import DirectMessageTab from '@/components/DirectMessage';
 import PromptMessageTab from '@/components/PromptMessage';
 
-type MessageGroup = (DirectMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
+import styles from '@/styles/message.module.css';
+
+type MessageGroup = (Types.DirectMessage & { contents: string[] }) | (Types.PromptMessage & { contents: string[] });
 
 interface DirectMessageContentProps {
-  user: User;
-  messages: (DirectMessage | PromptMessage)[];
+  user: Types.User;
+  messages: (Types.DirectMessage | Types.PromptMessage)[];
 }
 
 const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ user, messages }) => {
@@ -43,11 +40,13 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
 
   return (
     <div ref={messagesViewerRef} className={styles['message-viewer-wrapper']}>
-      {messageGroups.map((messageGroup, index) => (
-        <div key={index} className={styles['message-wrapper']}>
-          {messageGroup.type === 'dm' ? <DirectMessageTab messageGroup={messageGroup} /> : <PromptMessageTab user={user} messageGroup={messageGroup} messageType={messageGroup.type} />}
-        </div>
-      ))}
+      {messageGroups.map((messageGroup, index) =>
+        messageGroup.type === 'dm' ? (
+          <DirectMessageTab key={index} user={user} messageGroup={messageGroup} />
+        ) : (
+          <PromptMessageTab key={index} user={user} messageGroup={messageGroup} messageType={messageGroup.type} />
+        ),
+      )}
     </div>
   );
 });

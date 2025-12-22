@@ -1,22 +1,16 @@
 import React from 'react';
-
-// Types
-import type { User, Server } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// Services
-import ipc from '@/services/ipc.service';
+import type * as Types from '@/types';
 
-// CSS
 import styles from '@/styles/serverApplication.module.css';
-import popup from '@/styles/popup.module.css';
+import popupStyles from '@/styles/popup.module.css';
 
 interface ServerApplicationPopupProps {
-  userId: User['userId'];
-  serverId: Server['serverId'];
-  server: Server;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
+  server: Types.Server;
 }
 
 const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo(({ server }) => {
@@ -34,8 +28,8 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      <div className={popup['popup-body']}>
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
         <div className={styles['middle-area']}>
           <div className={`${styles['button-item-box']} disabled`}>
             <div className={styles['button-item-icon']}></div>
@@ -59,7 +53,7 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
           </div>
         </div>
       </div>
-      <div className={popup['popup-footer']}>
+      <div className={popupStyles['popup-footer']}>
         <div className={styles['placeholder']}></div>
       </div>
     </div>

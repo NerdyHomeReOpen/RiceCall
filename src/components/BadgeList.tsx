@@ -1,16 +1,13 @@
 import React, { useMemo } from 'react';
 
-// CSS
-import badgeStyle from '@/styles/badge.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { Badge } from '@/types';
-
-// Components
 import BadgeItem from '@/components/BadgeItem';
 
+import badgeStyle from '@/styles/badge.module.css';
+
 interface BadgeListProps {
-  badges: Badge[];
+  badges: Types.Badge[];
   position?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   direction?: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   maxDisplay?: number;

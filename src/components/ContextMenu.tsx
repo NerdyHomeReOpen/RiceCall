@@ -1,19 +1,17 @@
 import React, { useEffect, useRef, useState } from 'react';
 
-// CSS
-import contextMenu from '@/styles/contextMenu.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { ContextMenuItem } from '@/types';
+import styles from '@/styles/contextMenu.module.css';
 
 /**
  * Clean the menu items by removing duplicate separators and ensuring that separators are not placed at the beginning or end of the menu.
  * @param items - The menu items to clean.
  * @returns The cleaned menu items.
  */
-export function cleanMenu(items: ContextMenuItem[]): ContextMenuItem[] {
+export function cleanMenu(items: Types.ContextMenuItem[]): Types.ContextMenuItem[] {
   const preFiltered = items.filter((item) => item.id === 'separator' || item.show !== false);
-  const result: ContextMenuItem[] = [];
+  const result: Types.ContextMenuItem[] = [];
 
   for (let i = 0; i < preFiltered.length; i++) {
     const cur = preFiltered[i];
@@ -33,7 +31,7 @@ interface ContextMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  items: ContextMenuItem[];
+  items: Types.ContextMenuItem[];
   onClose: () => void;
 }
 
@@ -82,17 +80,17 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${contextMenu['context-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
+    <div ref={menuRef} className={`context-menu-container ${styles['context-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
       {cleanMenu(items)
         .filter((item) => item?.show ?? true)
         .map((item, index) => {
           if (item.id === 'separator') {
-            return <div className={contextMenu['separator']} key={index} />;
+            return <div className={styles['separator']} key={index} />;
           }
           return (
             <div
               key={index}
-              className={`${contextMenu['option']} ${item.hasSubmenu ? contextMenu['has-submenu'] : ''} ${item.disabled ? contextMenu['disabled'] : ''}`}
+              className={`${styles['option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? styles['disabled'] : ''}`}
               data-type={item.icon || ''}
               onClick={() => {
                 if (item.disabled) return;

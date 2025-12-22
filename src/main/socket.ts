@@ -3,10 +3,8 @@ import { BrowserWindow, ipcMain } from 'electron';
 import { createPopup } from '../../main.js';
 import { env } from './env.js';
 
-// Types
-import type { ACK } from '../types';
+import type * as Types from '@/types';
 
-// Events
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
 
 const ClientToServerEventNames = [
@@ -119,11 +117,11 @@ export let socket: Socket | null = null;
 export let seq: number = 0;
 export let interval: NodeJS.Timeout | null = null;
 
-async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): Promise<ACK<T>> {
+async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): Promise<Types.ACK<T>> {
   for (let i = 0; i <= retries; i++) {
     try {
-      return await new Promise<ACK<T>>((resolve, reject) => {
-        socket?.timeout(5000).emit(event, payload, (err: unknown, ack: ACK<T>) => {
+      return await new Promise<Types.ACK<T>>((resolve, reject) => {
+        socket?.timeout(5000).emit(event, payload, (err: unknown, ack: Types.ACK<T>) => {
           if (err) reject(err);
           else resolve(ack);
         });

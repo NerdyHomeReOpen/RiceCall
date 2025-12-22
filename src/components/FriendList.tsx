@@ -1,25 +1,19 @@
 import React, { useMemo, useState } from 'react';
-
-// CSS
-import styles from '@/styles/friend.module.css';
-
-// Types
-import type { User, FriendGroup, Friend } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
 
-// Utils
-import { handleOpenSearchUser, handleOpenCreateFriendGroup } from '@/utils/popup';
-import Default from '@/utils/default';
+import type * as Types from '@/types';
 
-// Components
 import FriendGroupTab from '@/components/FriendGroupTab';
 
+import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
+
+import styles from '@/styles/friend.module.css';
+
 interface FriendListProps {
-  user: User;
-  friends: Friend[];
-  friendGroups: FriendGroup[];
+  user: Types.User;
+  friends: Types.Friend[];
+  friendGroups: Types.FriendGroup[];
 }
 
 const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, friends }) => {
@@ -38,13 +32,12 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   const strangerFriendGroup = Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId });
   const blacklistFriendGroup = Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId });
   const filteredFriendGroups = useMemo(
-    () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)),
+    () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order),
     [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],
   );
 
   return (
     <>
-      {/* Navigation Tabs */}
       <div className={styles['navigate-tabs']}>
         <div className={`${styles['tab']} ${selectedTabId === 0 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(0)}>
           <div className={styles['friend-list-icon']} />
@@ -53,18 +46,13 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
           <div className={styles['recent-icon']} />
         </div>
       </div>
-
-      {/* Search Bar */}
       <div className={styles['search-bar']}>
         <div className={styles['search-icon']} />
         <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
         <div className={styles['prev-icon']} />
         <div className={styles['next-icon']} />
       </div>
-
-      {/* Friend List */}
       <div className={styles['scroll-view']} style={selectedTabId === 0 ? {} : { display: 'none' }}>
-        {/* Friend Groups */}
         <div className={styles['friend-group-list']}>
           {filteredFriendGroups.map((friendGroup) => (
             <FriendGroupTab
@@ -79,16 +67,12 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
           ))}
         </div>
       </div>
-
-      {/* Recent */}
       <div className={styles['recent-list']} style={selectedTabId == 1 ? {} : { display: 'none' }}></div>
-
-      {/* Bottom Buttons */}
       <div className={styles['sidebar-footer']}>
-        <div className={styles['button']} datatype="addGroup" onClick={handleOpenCreateFriendGroup}>
+        <div className={styles['button']} datatype="addGroup" onClick={() => Popup.handleOpenCreateFriendGroup()}>
           {t('create-friend-group')}
         </div>
-        <div className={styles['button']} datatype="addFriend" onClick={() => handleOpenSearchUser(userId)}>
+        <div className={styles['button']} datatype="addFriend" onClick={() => Popup.handleOpenSearchUser(userId)}>
           {t('add-friend')}
         </div>
       </div>

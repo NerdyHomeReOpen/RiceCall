@@ -1,9 +1,7 @@
 import React, { useEffect, useContext, createContext, ReactNode } from 'react';
 
-// Types
-import type { ContextMenuItem, NotificationMenuItem, OnlineMember, Badge, User } from '@/types';
+import type * as Types from '@/types';
 
-// Components
 import ContextMenu from '@/components/ContextMenu';
 import MicContextMenu from '@/components/MicContextMenu';
 import NotificationMenu from '@/components/NotificationMenu';
@@ -15,11 +13,11 @@ import StatusDropdown from '@/components/StatusDropdown';
 import EmbedLinkInput from '@/components/EmbedLinkInput';
 
 interface ContextMenuContextType {
-  showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
-  showMicContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => void;
-  showNotificationMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotificationMenuItem[]) => void;
-  showUserInfoBlock: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: OnlineMember) => void;
-  showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => void;
+  showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => void;
+  showMicContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => void;
+  showNotificationMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.NotificationMenuItem[]) => void;
+  showUserInfoBlock: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: Types.OnlineMember) => void;
+  showBadgeInfoCard: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Types.Badge) => void;
   showEmojiPicker: (
     x: number,
     y: number,
@@ -34,7 +32,7 @@ interface ContextMenuContextType {
     onTextColorChange?: (color: string) => void,
   ) => void;
   showColorPicker: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => void;
-  showStatusDropdown: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: User['status']) => void) => void;
+  showStatusDropdown: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: Types.User['status']) => void) => void;
   showEmbedLinkInput: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => void;
   closeContextMenu: () => void;
   closeMicContextMenu: () => void;
@@ -83,7 +81,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [embedLinkInput, setEmbedLinkInput] = React.useState<ReactNode | null>(null);
 
   // Handlers
-  const showContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => {
+  const showContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => {
     setContextMenu(<ContextMenu items={items} onClose={closeContextMenu} x={x} y={y} direction={direction} />);
     setIsContextMenuVisible(true);
   };
@@ -93,7 +91,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsContextMenuVisible(false);
   };
 
-  const showMicContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: ContextMenuItem[]) => {
+  const showMicContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => {
     setMicContextMenu(<MicContextMenu items={items} onClose={closeMicContextMenu} x={x} y={y} direction={direction} />);
     setIsMicContextMenuVisible(true);
   };
@@ -103,7 +101,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsMicContextMenuVisible(false);
   };
 
-  const showNotificationMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: NotificationMenuItem[]) => {
+  const showNotificationMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.NotificationMenuItem[]) => {
     setNotificationMenu(<NotificationMenu items={items} onClose={closeNotificationMenu} x={x} y={y} direction={direction} />);
     setIsNotificationMenuVisible(true);
   };
@@ -113,7 +111,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsNotificationMenuVisible(false);
   };
 
-  const showUserInfoBlock = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: OnlineMember) => {
+  const showUserInfoBlock = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: Types.OnlineMember) => {
     setUserInfo(<UserInfoCard member={member} x={x} y={y} direction={direction} />);
     setIsUserInfoVisible(true);
   };
@@ -123,7 +121,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsUserInfoVisible(false);
   };
 
-  const showBadgeInfoCard = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Badge) => {
+  const showBadgeInfoCard = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Types.Badge) => {
     setBadgeInfo(<BadgeInfoCard badge={badge} x={x} y={y} direction={direction} />);
     setIsBadgeInfoVisible(true);
   };
@@ -179,7 +177,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     setIsColorPickerVisible(false);
   };
 
-  const showStatusDropdown = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: User['status']) => void) => {
+  const showStatusDropdown = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: Types.User['status']) => void) => {
     setStatusDropdown(<StatusDropdown onStatusSelect={onStatusSelect} onClose={closeStatusDropdown} x={x} y={y} direction={direction} />);
     setIsStatusDropdownVisible(true);
   };

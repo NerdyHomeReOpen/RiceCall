@@ -1,21 +1,16 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
-// CSS
-import homePage from '@/styles/home.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { Server, User } from '@/types';
-
-// Components
 import ServerCard from '@/components/ServerCard';
 
-// Providers
-import { useTranslation } from 'react-i18next';
+import homeStyles from '@/styles/home.module.css';
 
 interface ServerListProps {
   title: string;
-  user: User;
-  servers: Server[];
+  user: Types.User;
+  servers: Types.Server[];
 }
 
 const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers }) => {
@@ -31,15 +26,15 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers
 
   return (
     <>
-      <div className={homePage['server-list-title']}>{title}</div>
-      <div className={homePage['servers-container']}>
-        <div className={homePage['server-list']}>
+      <div className={homeStyles['server-list-title']}>{title}</div>
+      <div className={homeStyles['servers-container']}>
+        <div className={homeStyles['server-list']}>
           {displayedServers.map((server) => (
             <ServerCard key={server.serverId} user={user} server={server} />
           ))}
         </div>
         {canExpand && (
-          <div className={`${homePage['view-more-btn']} ${expanded ? homePage['more-icon'] : homePage['less-icon']}`} onClick={() => setExpanded((prev) => !prev)}>
+          <div className={`${homeStyles['view-more-btn']} ${expanded ? homeStyles['more-icon'] : homeStyles['less-icon']}`} onClick={() => setExpanded((prev) => !prev)}>
             {expanded ? t('view-less') : t('view-more')}
           </div>
         )}

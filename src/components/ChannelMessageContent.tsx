@@ -1,22 +1,19 @@
 import React, { useMemo } from 'react';
 
-// CSS
-import styles from '@/styles/message.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { User, ChannelMessage, PromptMessage, Channel, Server } from '@/types';
-
-// Components
 import ChannelMessageTab from '@/components/ChannelMessage';
 import PromptMessageTab from '@/components/PromptMessage';
 
-type MessageGroup = (ChannelMessage & { contents: string[] }) | (PromptMessage & { contents: string[] });
+import styles from '@/styles/message.module.css';
+
+type MessageGroup = (Types.ChannelMessage & { contents: string[] }) | (Types.PromptMessage & { contents: string[] });
 
 interface ChannelMessageContentProps {
-  user: User;
-  currentServer: Server;
-  currentChannel: Channel;
-  messages: (ChannelMessage | PromptMessage)[];
+  user: Types.User;
+  currentServer: Types.Server;
+  currentChannel: Types.Channel;
+  messages: (Types.ChannelMessage | Types.PromptMessage)[];
 }
 
 const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, currentServer, currentChannel, messages }) => {
@@ -42,15 +39,13 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
 
   return (
     <div className={styles['message-viewer-wrapper']}>
-      {messageGroups.map((messageGroup, index) => (
-        <div key={index} className={styles['message-wrapper']}>
-          {messageGroup.type === 'general' ? (
-            <ChannelMessageTab user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
-          ) : (
-            <PromptMessageTab user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
-          )}
-        </div>
-      ))}
+      {messageGroups.map((messageGroup, index) =>
+        messageGroup.type === 'general' ? (
+          <ChannelMessageTab key={index} user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
+        ) : (
+          <PromptMessageTab key={index} user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
+        ),
+      )}
     </div>
   );
 });

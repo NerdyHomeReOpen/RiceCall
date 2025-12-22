@@ -6,6 +6,7 @@ import {
   MixMode,
   ServerToClientEvents,
   ClientToServerEvents,
+  ClientToServerEventsWithAck,
   ChannelUIMode,
   ACK,
   Theme,
@@ -42,7 +43,7 @@ if (typeof window !== 'undefined' && window.require) {
 
 const isElectron = !!ipcRenderer;
 
-const ipcService = {
+const ipc = {
   exit: () => {
     if (!isElectron) return;
     ipcRenderer.send('exit');
@@ -59,10 +60,10 @@ const ipcService = {
       ipcRenderer.on(event, listener);
       return () => ipcRenderer.removeListener(event, listener);
     },
-    emit: <T, R>(event: string, payload: T): Promise<R> => {
-      if (!isElectron) return Promise.resolve(null as R);
+    emit: <T extends keyof ClientToServerEventsWithAck>(event: T, payload: Parameters<ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<ClientToServerEventsWithAck[T]>> => {
+      if (!isElectron) return Promise.resolve(null as ReturnType<ClientToServerEventsWithAck[T]>);
       return new Promise((resolve, reject) => {
-        ipcRenderer.invoke(event, payload).then((ack: ACK<R>) => {
+        ipcRenderer.invoke(event, payload).then((ack: ACK<ReturnType<ClientToServerEventsWithAck[T]>>) => {
           if (ack?.ok) resolve(ack.data);
           else reject(new Error(ack?.error || 'unknown error'));
         });
@@ -213,9 +214,9 @@ const ipcService = {
       return await ipcRenderer.invoke('data-recommendServers', region);
     },
 
-    upload: async (type: string, fileName: string, file: string): Promise<any | null> => {
+    uploadImage: async (folder: string, imageName: string, imageUnit8Array: Uint8Array): Promise<{ imageName: string; imageUrl: string } | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-upload', type, fileName, file);
+      return await ipcRenderer.invoke('data-uploadImage', folder, imageName, imageUnit8Array);
     },
 
     searchServer: async (query: string): Promise<Server[]> => {
@@ -1285,4 +1286,4 @@ const ipcService = {
   },
 };
 
-export default ipcService;
+export default ipc;

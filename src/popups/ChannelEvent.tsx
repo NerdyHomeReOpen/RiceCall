@@ -1,33 +1,27 @@
 import React, { useRef, useState, useEffect } from 'react';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-import styles from '@/styles/channelEvent.module.css';
-import permission from '@/styles/permission.module.css';
-import setting from '@/styles/setting.module.css';
-
-// Types
-import type { Channel, OnlineMember, User, ChannelEvent, Server } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
+
+import type * as Types from '@/types';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 
-// Services
-import ipc from '@/services/ipc.service';
+import * as Popup from '@/utils/popup';
+import * as Permission from '@/utils/permission';
+import * as Language from '@/utils/language';
+import * as Default from '@/utils/default';
 
-// Utils
-import { handleOpenUserInfo, handleOpenBlockMember, handleOpenKickMemberFromServer } from '@/utils/popup';
-import { isServerAdmin } from '@/utils/permission';
-import { getFormatDate } from '@/utils/language';
-import Default from '@/utils/default';
+import popupStyles from '@/styles/popup.module.css';
+import styles from '@/styles/channelEvent.module.css';
+import permissionStyles from '@/styles/permission.module.css';
+import settingStyles from '@/styles/setting.module.css';
 
 interface ChannelEventPopupProps {
-  user: User;
-  server: Server;
-  channels: Channel[];
-  serverOnlineMembers: OnlineMember[];
-  channelEvents: ChannelEvent[];
+  user: Types.User;
+  server: Types.Server;
+  channels: Types.Channel[];
+  serverOnlineMembers: Types.OnlineMember[];
+  channelEvents: Types.ChannelEvent[];
 }
 
 const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
@@ -37,13 +31,13 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     const contextMenu = useContextMenu();
 
     // Refs
-    const serverOnlineMembersRef = useRef<OnlineMember[]>(serverOnlineMembersData);
+    const serverOnlineMembersRef = useRef<Types.OnlineMember[]>(serverOnlineMembersData);
 
     // States
-    const [user, setUser] = useState<User>(userData);
-    const [channels, setChannels] = useState<Channel[]>(channelsData);
-    const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>(serverOnlineMembersData);
-    const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>(channelEventsData);
+    const [user, setUser] = useState<Types.User>(userData);
+    const [channels, setChannels] = useState<Types.Channel[]>(channelsData);
+    const [serverOnlineMembers, setServerOnlineMembers] = useState<Types.OnlineMember[]>(serverOnlineMembersData);
+    const [channelEvents, setChannelEvents] = useState<Types.ChannelEvent[]>(channelEventsData);
     const [selectMode, setSelectMode] = useState<'current' | 'all'>('current');
     const [searchText, setSearchText] = useState<string>('');
 
@@ -65,7 +59,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
       return channel.isLobby ? t(channel.name) : channel.name;
     };
 
-    const getActionContent = (channelEvent: ChannelEvent) => {
+    const getActionContent = (channelEvent: Types.ChannelEvent) => {
       if (channelEvent.type === 'join') {
         return (
           <div className={`${styles['action-content']} ${styles['green']}`} title={t('join-current-server')}>
@@ -89,7 +83,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
       }
     };
 
-    const getCurrentActionContent = (channelEvent: ChannelEvent) => {
+    const getCurrentActionContent = (channelEvent: Types.ChannelEvent) => {
       if (channelEvent.type === 'join' || (channelEvent.type === 'move' && channelEvent.nextChannelId === currentChannelId)) {
         return (
           <div className={`${styles['action-content']} ${styles['green']}`} title={t('join-current-channel')}>
@@ -111,19 +105,19 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     }, [serverOnlineMembers]);
 
     useEffect(() => {
-      const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<User> }[]) => {
+      const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
         setUser((prev) => ({ ...prev, ...args[0].update }));
       });
       return () => unsub();
     }, []);
 
     useEffect(() => {
-      const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: OnlineMember }[]) => {
+      const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: Types.OnlineMember }[]) => {
         setChannelEvents((prev) => [
           ...prev,
           ...args.map((m) => ({
             ...m.data,
-            type: 'join' as ChannelEvent['type'],
+            type: 'join' as Types.ChannelEvent['type'],
             prevChannelId: null,
             nextChannelId: m.data.currentChannelId,
             timestamp: Date.now(),
@@ -136,7 +130,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     }, []);
 
     useEffect(() => {
-      const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
+      const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.OnlineMember> }[]) => {
         args.map((m) => {
           const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
           if (originMember && m.update.currentChannelId) {
@@ -146,7 +140,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
               ...prev,
               {
                 ...newMember,
-                type: 'move' as ChannelEvent['type'],
+                type: 'move' as Types.ChannelEvent['type'],
                 prevChannelId: originChannelId,
                 nextChannelId: newMember.currentChannelId,
                 timestamp: Date.now(),
@@ -169,7 +163,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
               ...prev,
               {
                 ...originMember,
-                type: 'leave' as ChannelEvent['type'],
+                type: 'leave' as Types.ChannelEvent['type'],
                 prevChannelId: originMember.currentChannelId,
                 nextChannelId: null,
                 timestamp: Date.now(),
@@ -184,7 +178,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     }, []);
 
     useEffect(() => {
-      const unsub = ipc.socket.on('channelAdd', (...args: { data: Channel }[]) => {
+      const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
         const add = new Set(args.map((i) => `${i.data.channelId}`));
         setChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
       });
@@ -192,7 +186,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     }, []);
 
     useEffect(() => {
-      const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Channel> }[]) => {
+      const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
         const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
         setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
       });
@@ -208,8 +202,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     }, []);
 
     return (
-      <div className={popup['popup-wrapper']}>
-        {/* Header */}
+      <div className={popupStyles['popup-wrapper']}>
         <div className={styles['options-viewer']}>
           <div className={`${styles['option-tab']} ${selectMode === 'current' ? styles['active'] : ''}`} onClick={() => setSelectMode('current')}>
             {t('current-channel')}
@@ -219,8 +212,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
             {t('all-channel')}
           </div>
         </div>
-        {/* Body */}
-        <div className={popup['popup-body']}>
+        <div className={popupStyles['popup-body']}>
           <div className={styles['event-list']} style={selectMode === 'current' ? {} : { display: 'none' }}>
             <div className={styles['current-channel']}>{isCurrentChannelLobby ? t(currentChannelName) : currentChannelName}</div>
             {currentChannelEvents.reverse().map((e, index) => {
@@ -234,19 +226,19 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                   id: 'view-profile',
                   label: t('view-profile'),
                   show: true,
-                  onClick: () => handleOpenUserInfo(userId, e.userId),
+                  onClick: () => Popup.handleOpenUserInfo(userId, e.userId),
                 },
                 {
                   id: 'kick-server',
                   label: t('kick-server'),
-                  show: !isUser && isServerAdmin(permissionLevel) && isSuperior,
-                  onClick: () => handleOpenKickMemberFromServer(e.userId, serverId),
+                  show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior,
+                  onClick: () => Popup.handleOpenKickMemberFromServer(e.userId, serverId),
                 },
                 {
                   id: 'block',
                   label: t('block'),
-                  show: !isUser && isSuperior && isServerAdmin(permissionLevel),
-                  onClick: () => handleOpenBlockMember(e.userId, serverId),
+                  show: !isUser && isSuperior && Permission.isServerAdmin(permissionLevel),
+                  onClick: () => Popup.handleOpenBlockMember(e.userId, serverId),
                 },
               ];
 
@@ -262,12 +254,12 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                   }}
                 >
                   <div className={styles['user-detail']}>
-                    <div className={`${permission[e.gender]} ${permission[`lv-${e.permissionLevel}`]}`} />
+                    <div className={`${permissionStyles[e.gender]} ${permissionStyles[`lv-${e.permissionLevel}`]}`} />
                     <div className={`${styles['name']} ${e.nickname ? styles['highlight'] : ''}`}>{e.nickname || e.name}</div>
                   </div>
                   {getCurrentActionContent(e)}
-                  <div className={styles['time']} title={getFormatDate(e.timestamp, 'all')}>
-                    {getFormatDate(e.timestamp, 't')}
+                  <div className={styles['time']} title={Language.getFormatDate(e.timestamp, 'all')}>
+                    {Language.getFormatDate(e.timestamp, 't')}
                   </div>
                 </div>
               );
@@ -285,13 +277,13 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                   id: 'view-profile',
                   label: t('view-profile'),
                   show: true,
-                  onClick: () => handleOpenUserInfo(userId, e.userId),
+                  onClick: () => Popup.handleOpenUserInfo(userId, e.userId),
                 },
                 {
                   id: 'block',
                   label: t('block'),
-                  show: !isUser && isSuperior && isServerAdmin(permissionLevel),
-                  onClick: () => handleOpenBlockMember(e.userId, serverId),
+                  show: !isUser && isSuperior && Permission.isServerAdmin(permissionLevel),
+                  onClick: () => Popup.handleOpenBlockMember(e.userId, serverId),
                 },
               ];
 
@@ -307,23 +299,22 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                   }}
                 >
                   <div className={styles['user-detail']}>
-                    <div className={`${permission[e.gender]} ${permission[`lv-${e.permissionLevel}`]}`} />
+                    <div className={`${permissionStyles[e.gender]} ${permissionStyles[`lv-${e.permissionLevel}`]}`} />
                     <div className={`${styles['name']} ${e.nickname ? styles['highlight'] : ''}`}>{e.nickname || e.name}</div>
                   </div>
                   {getActionContent(e)}
-                  <div className={styles['time']} title={getFormatDate(e.timestamp, 'all')}>
-                    {getFormatDate(e.timestamp, 't')}
+                  <div className={styles['time']} title={Language.getFormatDate(e.timestamp, 'all')}>
+                    {Language.getFormatDate(e.timestamp, 't')}
                   </div>
                 </div>
               );
             })}
           </div>
         </div>
-        {/* Footer */}
-        <div className={popup['popup-footer']}>
-          <div className={setting['search-box']}>
-            <div className={setting['search-icon']}></div>
-            <input name="search-query" type="text" className={setting['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
+        <div className={popupStyles['popup-footer']}>
+          <div className={settingStyles['search-box']}>
+            <div className={settingStyles['search-icon']}></div>
+            <input name="search-query" type="text" className={settingStyles['search-input']} placeholder={t('search-placeholder')} value={searchText} onChange={(e) => setSearchText(e.target.value)} />
           </div>
         </div>
       </div>

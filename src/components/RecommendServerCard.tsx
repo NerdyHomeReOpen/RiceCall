@@ -1,26 +1,20 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// CSS
-import homePage from '@/styles/home.module.css';
+import type * as Types from '@/types';
 
-// Providers
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 import { useMainTab } from '@/providers/MainTab';
-import { useTranslation } from 'react-i18next';
 
-// Type
-import type { User, RecommendServer } from '@/types';
-
-// Services
-import ipc from '@/services/ipc.service';
-
-// Utils
 import { handleOpenServerSetting } from '@/utils/popup';
 
+import homeStyles from '@/styles/home.module.css';
+
 interface RecommendServerCardProps {
-  user: User;
-  recommendServer: RecommendServer;
+  user: Types.User;
+  recommendServer: Types.RecommendServer;
 }
 
 const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ user, recommendServer }) => {
@@ -49,7 +43,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
     },
   ];
 
-  const handleServerSelect = (server: RecommendServer) => {
+  const handleServerSelect = (server: Types.RecommendServer) => {
     if (loadingBox.isLoading) return;
     if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
@@ -62,7 +56,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
 
   return (
     <div
-      className={homePage['server-card']}
+      className={homeStyles['server-card']}
       onClick={() => handleServerSelect(recommendServer)}
       onContextMenu={(e) => {
         e.preventDefault();
@@ -71,15 +65,15 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
         contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >
-      <div className={homePage['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
-      <div className={homePage['server-info-text']}>
-        <div className={homePage['server-name-text']}>{serverName}</div>
-        <div className={homePage['server-id-box']}>
-          <div className={homePage['server-id-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+      <div className={homeStyles['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
+      <div className={homeStyles['server-info-text']}>
+        <div className={homeStyles['server-name-text']}>{serverName}</div>
+        <div className={homeStyles['server-id-box']}>
+          <div className={homeStyles['server-id-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
         </div>
-        <div className={homePage['server-slogen']}>{serverSlogan}</div>
+        <div className={homeStyles['server-slogen']}>{serverSlogan}</div>
         {serverOnline >= 0 && (
-          <div className={homePage['server-online']}>
+          <div className={homeStyles['server-online']}>
             {t('online')}: {serverOnline}
           </div>
         )}

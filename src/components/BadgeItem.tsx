@@ -1,16 +1,13 @@
 import React, { useRef } from 'react';
 
-// CSS
-import badgeStyle from '@/styles/badge.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type { Badge } from '@/types';
-
-// Providers
 import { useContextMenu } from '@/providers/ContextMenu';
 
+import styles from '@/styles/badge.module.css';
+
 interface BadgeItemProps {
-  badge: Badge;
+  badge: Types.Badge;
   position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
 }
@@ -39,7 +36,7 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direc
         hoverTimerRef.current = null;
       }}
     >
-      <div className={badgeStyle['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
+      <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
     </div>
   );
 });

@@ -1,19 +1,15 @@
 import React, { useState, useEffect, useRef } from 'react';
-
-// CSS
-import styles from '@/styles/badgeInfoCard.module.css';
-
-// Types
-import type { Badge } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+
+import type * as Types from '@/types';
+
+import styles from '@/styles/badgeInfoCard.module.css';
 
 interface BadgeInfoCardProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  badge: Badge;
+  badge: Types.Badge;
 }
 
 const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, direction, badge }) => {

@@ -1,11 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-
-// Providers
 import { useTranslation } from 'react-i18next';
 
-// CSS
-import setting from '@/styles/setting.module.css';
-import popup from '@/styles/popup.module.css';
+import settingStyles from '@/styles/setting.module.css';
+import popupStyles from '@/styles/popup.module.css';
 
 interface EmbedLinkInputProps {
   x: number;
@@ -63,14 +60,14 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
   }, [x, y, direction]);
 
   return (
-    <div ref={embedLinkInputRef} className={`context-menu-container ${setting['input-dropdown']} ${popup['col']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
-      <div className={`${popup['input-box']} ${popup['col']}`}>
-        <div className={popup['label']}>{t('link')}</div>
+    <div ref={embedLinkInputRef} className={`context-menu-container ${settingStyles['input-dropdown']} ${popupStyles['col']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
+      <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+        <div className={popupStyles['label']}>{t('link')}</div>
         <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
       </div>
-      <div className={popup['row']} style={{ justifyContent: 'space-between' }}>
+      <div className={popupStyles['row']} style={{ justifyContent: 'space-between' }}>
         <div
-          className={popup['button']}
+          className={popupStyles['button']}
           onClick={() => {
             onSubmit(linkUrl);
             onClose();
@@ -78,7 +75,7 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
         >
           {t('confirm')}
         </div>
-        <div className={popup['button']} onClick={onClose}>
+        <div className={popupStyles['button']} onClick={onClose}>
           {t('cancel')}
         </div>
       </div>

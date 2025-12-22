@@ -41,15 +41,9 @@
   height: 100%;
   padding: 0;
   overflow: auto;
-  scrollbar-width: none;
   background-color: var(--background);
   border-top: 1px solid #0000001f;
   border-left: 1px solid #0000001f;
-}
-
-.emoji-grid::-webkit-scrollbar {
-  width: 0;
-  height: 0;
 }
 
 .emoji {
@@ -243,7 +237,7 @@
   border: none;
 }
 
-.emoji-tab-btn + .emoji-tab-btn {
+.emoji-tab-btn+.emoji-tab-btn {
   margin-left: 0;
 }
 

@@ -1,23 +1,18 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// Services
-import ipc from '@/services/ipc.service';
+import popupStyles from '@/styles/popup.module.css';
 
 interface ImageCropperPopupProps {
   id: string;
-  imageData: string;
+  imageUnit8Array: Uint8Array;
 }
 
 const INITIAL_CROP_SIZE = 200;
 const MIN_CROP_SIZE = 100;
 
-const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageData }) => {
+const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageUnit8Array }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -72,10 +67,15 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
 
   const handleCrop = async () => {
     const canvas = previewRef.current;
-    const imageDataUrl = canvas?.toDataURL('image/png');
-    if (!imageDataUrl) return;
-    ipc.popup.submit(id, imageDataUrl);
-    handleClose();
+    if (!canvas) return;
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      ipc.popup.submit(id, uint8Array);
+      handleClose();
+    }, 'image/webp');
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
@@ -141,7 +141,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
 
   // Effects
   useEffect(() => {
-    imgRef.current.src = imageData;
+    const blob = new Blob([imageUnit8Array]);
+    const imageUrl = URL.createObjectURL(blob);
+    imgRef.current.src = imageUrl;
     imgRef.current.onload = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;
@@ -157,66 +159,61 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
       const cropY = drawY + (drawHeight - maxCropSize) / 2;
       setCropBox({ x: cropX, y: cropY, size: maxCropSize });
     };
-  }, [imageData]);
+  }, [imageUnit8Array]);
 
   useEffect(() => {
     draw();
   }, [cropBox, draw]);
 
   return (
-    <>
-      <div className={popup['popup-wrapper']}>
-        {/* Body */}
-        <div className={popup['popup-body']}>
-          <div className={`${popup['content']} ${popup['row']}`} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
-            <canvas
-              ref={canvasRef}
-              width={400}
-              height={400}
-              style={{ border: '1px solid #000' }}
-              onMouseDown={handleMouseDown}
-              onMouseMove={handleMouseMove}
-              onMouseUp={handleMouseUp}
-              onMouseLeave={handleMouseLeave}
-              onWheel={handleWheel}
-            />
-            <div className={popup['col']}>
-              <div
-                className={`${popup['input-box']} ${popup['col']}`}
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={`${popupStyles['content']} ${popupStyles['row']}`} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <canvas
+            ref={canvasRef}
+            width={400}
+            height={400}
+            style={{ border: '1px solid #000' }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            onWheel={handleWheel}
+          />
+          <div className={popupStyles['col']}>
+            <div
+              className={`${popupStyles['input-box']} ${popupStyles['col']}`}
+              style={{
+                width: '150px',
+                height: '150px',
+                boxShadow: '0 1px 1px #00000080',
+                padding: '5px',
+                border: '1px solid #888',
+                borderRadius: '12px',
+              }}
+            >
+              <canvas
+                ref={previewRef}
                 style={{
-                  width: '150px',
-                  height: '150px',
-                  boxShadow: '0 1px 1px #00000080',
-                  padding: '5px',
+                  width: '100%',
+                  height: '100%',
                   border: '1px solid #888',
-                  borderRadius: '12px',
+                  borderRadius: '8px',
                 }}
-              >
-                <canvas
-                  ref={previewRef}
-                  style={{
-                    width: '100%',
-                    height: '100%',
-                    border: '1px solid #888',
-                    borderRadius: '8px',
-                  }}
-                />
-              </div>
+              />
             </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className={popup['popup-footer']}>
-          <div className={`${popup['button']}`} onClick={handleCrop}>
-            {t('upload')}
-          </div>
-          <div className={popup['button']} onClick={handleClose}>
-            {t('close')}
-          </div>
+      </div>
+      <div className={popupStyles['popup-footer']}>
+        <div className={`${popupStyles['button']}`} onClick={handleCrop}>
+          {t('upload')}
+        </div>
+        <div className={popupStyles['button']} onClick={handleClose}>
+          {t('close')}
         </div>
       </div>
-    </>
+    </div>
   );
 });
 

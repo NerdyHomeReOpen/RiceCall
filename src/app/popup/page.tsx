@@ -3,17 +3,11 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useMemo } from 'react';
-
-// CSS
-import header from '@/styles/header.module.css';
-
-// Types
-import type { PopupType } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// Components
+import type * as Types from '@/types';
+
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
 import ApproveFriend from '@/popups/ApproveFriend';
@@ -48,8 +42,7 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-// Services
-import ipc from '@/services/ipc.service';
+import header from '@/styles/header.module.css';
 
 interface HeaderProps {
   title: string;
@@ -109,7 +102,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
 Header.displayName = 'Header';
 
-const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
+const defaultPopup: Record<Types.PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
   aboutus: {
     type: 'aboutus',
     buttons: ['close'],
@@ -311,7 +304,7 @@ const defaultPopup: Record<PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
 
 type Popup = {
   id: string;
-  type: PopupType;
+  type: Types.PopupType;
   title: string;
   buttons: ('close' | 'minimize' | 'maxsize')[];
   node: () => React.ReactNode | null;
@@ -324,7 +317,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   // States
   const [id, setId] = useState<string | null>(null);
-  const [type, setType] = useState<PopupType | null>(null);
+  const [type, setType] = useState<Types.PopupType | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
 
   // Variables
@@ -427,7 +420,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
-      const type = params.get('type') as PopupType;
+      const type = params.get('type') as Types.PopupType;
       const id = params.get('id') as string;
       setId(id || null);
       setType(type || null);

@@ -82,45 +82,31 @@
 
 .message-box {
   display: flex;
-  flex: 1;
   flex-direction: column;
   gap: 3px;
-  justify-content: center;
+  align-items: flex-start;
+  justify-content: flex-start;
   min-width: 0;
 }
 
-.message-box .username-text {
-  align-self: center;
-  color: var(--text-username);
-}
-
-.info-box {
-  display: flex;
-  flex: 1;
+.message-box.event {
   flex-direction: row;
-  gap: 3px;
-  align-items: flex-start;
 }
 
-.header {
+.details {
   display: flex;
   gap: 3px;
   align-items: center;
   overflow: hidden;
+  flex-direction: row;
 }
 
-.header .details {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-  overflow: hidden;
-}
-
-.header .username-text {
+.details .username-text {
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-username);
   white-space: nowrap;
+  user-select: text;
   cursor: pointer;
 
   &:hover {
@@ -128,10 +114,10 @@
   }
 }
 
-.header .timestamp-text {
+.details .timestamp-text {
   min-width: fit-content;
   margin-left: 5px;
-  font-size: 0.9em;
+  user-select: text;
   color: var(--text-color-quinary);
 }
 

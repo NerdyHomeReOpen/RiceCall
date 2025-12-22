@@ -987,8 +987,8 @@ app.on('ready', async () => {
     });
   });
 
-  ipcMain.handle('data-upload', async (_, type: string, fileName: string, file: string) => {
-    return await dataService.upload(type, fileName, file).catch((error) => {
+  ipcMain.handle('data-uploadImage', async (_, folder: string, imageName: string, imageUnit8Array: Uint8Array) => {
+    return await dataService.uploadImage(folder, imageName, imageUnit8Array).catch((error) => {
       createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
       return null;
     });

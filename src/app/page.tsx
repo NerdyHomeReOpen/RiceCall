@@ -1,48 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+import ipc from '@/ipc';
 
-// CSS
-import header from '@/styles/header.module.css';
+import type * as Types from '@/types';
 
-// Types
-import type {
-  PopupType,
-  Server,
-  User,
-  Channel,
-  FriendGroup,
-  ChannelMessage,
-  PromptMessage,
-  FriendApplication,
-  MemberInvitation,
-  Announcement,
-  Friend,
-  OnlineMember,
-  MemberApplication,
-  QueueUser,
-  Notification,
-  RecommendServer,
-  FriendActivity,
-  ChannelEvent,
-  LanguageKey,
-} from '@/types';
+import LoadingSpinner from '@/components/common/LoadingSpinner';
+import NotificationToaster from '@/components/NotificationToaster';
 
-// Pages
 import FriendPage from '@/pages/Friend';
 import HomePage from '@/pages/Home';
 import ServerPage from '@/pages/Server';
 
-// Components
-import LoadingSpinner from '@/components/common/LoadingSpinner';
-import NotificationToaster from '@/components/NotificationToaster';
-
-// Utils
-import { handleOpenUserInfo, handleOpenSystemSetting, handleOpenAboutUs, handleOpenChangeTheme, handleOpenFriendVerification, handleOpenMemberInvitation, handleOpenErrorDialog } from '@/utils/popup';
-import Default from '@/utils/default';
-
-// Providers
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
@@ -53,17 +23,18 @@ import { useLoading } from '@/providers/Loading';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 import { useActionScanner } from '@/providers/ActionScanner';
 
-// Services
-import ipc from '@/services/ipc.service';
+import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
 
-// Constants
+import headerStyles from '@/styles/header.module.css';
+
 import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
 interface HeaderProps {
-  user: User;
-  currentServer: Server;
-  friendApplications: FriendApplication[];
-  memberInvitations: MemberInvitation[];
+  user: Types.User;
+  currentServer: Types.Server;
+  friendApplications: Types.FriendApplication[];
+  memberInvitations: Types.MemberInvitation[];
   systemNotifications: string[];
 }
 
@@ -99,13 +70,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       id: 'system-setting',
       label: t('system-setting'),
       icon: 'setting',
-      onClick: () => handleOpenSystemSetting(userId),
+      onClick: () => Popup.handleOpenSystemSetting(userId),
     },
     {
       id: 'change-theme',
       label: t('change-theme'),
       icon: 'skin',
-      onClick: handleOpenChangeTheme,
+      onClick: Popup.handleOpenChangeTheme,
     },
     {
       id: 'feedback',
@@ -153,7 +124,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
         {
           id: 'about-us',
           label: t('about-ricecall'),
-          onClick: handleOpenAboutUs,
+          onClick: Popup.handleOpenAboutUs,
         },
       ],
     },
@@ -171,11 +142,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     },
   ];
 
-  const handleLeaveServer = (serverId: Server['serverId']) => {
+  const handleLeaveServer = (serverId: Types.Server['serverId']) => {
     ipc.socket.send('disconnectServer', { serverId });
   };
 
-  const handleChangeStatus = (status: User['status']) => {
+  const handleChangeStatus = (status: Types.User['status']) => {
     actionScanner.setIsManualIdling(status !== 'online');
     ipc.socket.send('editUser', { update: { status } });
   };
@@ -209,7 +180,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     else ipc.exit();
   };
 
-  const handleLanguageChange = (language: LanguageKey) => {
+  const handleLanguageChange = (language: Types.LanguageKey) => {
     ipc.language.set(language);
     i18n.changeLanguage(language);
   };
@@ -242,14 +213,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   }, []);
 
   return (
-    <header className={`${header['header']} ${header['big']}`}>
-      {/* Title */}
-      <div className={header['title-box']}>
-        <div className={header['name-box']} onClick={() => handleOpenUserInfo(userId, userId)}>
+    <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
+      <div className={headerStyles['title-box']}>
+        <div className={headerStyles['name-box']} onClick={() => Popup.handleOpenUserInfo(userId, userId)}>
           {userName}
         </div>
         <div
-          className={header['status-box']}
+          className={headerStyles['status-box']}
           onClick={(e) => {
             const x = e.currentTarget.getBoundingClientRect().left;
             const y = e.currentTarget.getBoundingClientRect().bottom;
@@ -258,26 +228,24 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
             });
           }}
         >
-          <div className={header['status-display']} datatype={userStatus} />
-          <div className={header['status-triangle']} />
+          <div className={headerStyles['status-display']} datatype={userStatus} />
+          <div className={headerStyles['status-triangle']} />
         </div>
       </div>
-
-      {/* Main Tabs */}
-      <div className={header['main-tabs']}>
+      <div className={headerStyles['main-tabs']}>
         {mainTabs.map((tab) =>
           tab.id === 'server' && !currentServerId ? null : (
             <div
               key={`tabs-${tab.id}`}
               data-tab-id={tab.id}
-              className={`${header['tab']} ${tab.id === mainTab.selectedTabId ? header['selected'] : ''}`}
+              className={`${headerStyles['tab']} ${tab.id === mainTab.selectedTabId ? headerStyles['selected'] : ''}`}
               onClick={() => mainTab.setSelectedTabId(tab.id)}
             >
-              <div className={header['tab-lable']}>{tab.label}</div>
-              <div className={header['tab-bg']} />
+              <div className={headerStyles['tab-lable']}>{tab.label}</div>
+              <div className={headerStyles['tab-bg']} />
               {tab.id === 'server' && (
                 <svg
-                  className={`${header['tab-close']} themeTabClose`}
+                  className={`${headerStyles['tab-close']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
                     handleLeaveServer(currentServerId);
@@ -295,13 +263,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
           ),
         )}
       </div>
-
-      {/* Buttons */}
-      <div className={header['buttons']}>
-        <div className={header['gift']} />
-        <div className={header['game']} />
+      <div className={headerStyles['buttons']}>
+        <div className={headerStyles['gift']} />
+        <div className={headerStyles['game']} />
         <div
-          className={header['notice']}
+          className={headerStyles['notice']}
           onClick={(e) => {
             const x = e.currentTarget.getBoundingClientRect().left;
             const y = e.currentTarget.getBoundingClientRect().bottom;
@@ -321,7 +287,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                 showContentLength: true,
                 showContent: true,
                 contents: friendApplications.map((fa) => fa.avatarUrl),
-                onClick: () => handleOpenFriendVerification(userId),
+                onClick: () => Popup.handleOpenFriendVerification(userId),
               },
               {
                 id: 'member-invitation',
@@ -332,7 +298,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                 showContentLength: true,
                 showContent: true,
                 contents: memberInvitations.map((mi) => mi.avatarUrl),
-                onClick: () => handleOpenMemberInvitation(userId),
+                onClick: () => Popup.handleOpenMemberInvitation(userId),
               },
               {
                 id: 'system-notify',
@@ -347,20 +313,20 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
             ]);
           }}
         >
-          <div className={`${header['overlay']} ${hasNotification && header['new']}`} />
+          <div className={`${headerStyles['overlay']} ${hasNotification && headerStyles['new']}`} />
         </div>
-        <div className={header['spliter']} />
+        <div className={headerStyles['spliter']} />
         <div
-          className={header['menu']}
+          className={headerStyles['menu']}
           onClick={(e) => {
             const x = e.currentTarget.getBoundingClientRect().right + 50;
             const y = e.currentTarget.getBoundingClientRect().bottom;
             contextMenu.showContextMenu(x, y, 'left-bottom', getContextMenuItems());
           }}
         />
-        <div className={header['minimize']} onClick={handleMinimize} />
-        {isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />}
-        <div className={header['close']} onClick={handleClose} />
+        <div className={headerStyles['minimize']} onClick={handleMinimize} />
+        {isFullscreen ? <div className={headerStyles['restore']} onClick={handleUnmaximize} /> : <div className={headerStyles['maxsize']} onClick={handleMaximize} />}
+        <div className={headerStyles['close']} onClick={handleClose} />
       </div>
     </header>
   );
@@ -381,38 +347,38 @@ const RootPageComponent: React.FC = React.memo(() => {
   const loadingBoxRef = useRef(loadingBox);
   const popupOffSubmitRef = useRef<(() => void) | null>(null);
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const serverOnlineMembersRef = useRef<OnlineMember[]>([]);
-  const userRef = useRef<User>(Default.user());
-  const friendsRef = useRef<Friend[]>([]);
+  const serverOnlineMembersRef = useRef<Types.OnlineMember[]>([]);
+  const userRef = useRef<Types.User>(Default.user());
+  const friendsRef = useRef<Types.Friend[]>([]);
 
   // States
-  const [user, setUser] = useState<User>(Default.user());
-  const [friends, setFriends] = useState<Friend[]>([]);
-  const [friendActivities, setFriendActivities] = useState<FriendActivity[]>([]);
-  const [friendGroups, setFriendGroups] = useState<FriendGroup[]>([]);
-  const [friendApplications, setFriendApplications] = useState<FriendApplication[]>([]);
-  const [memberInvitations, setMemberInvitations] = useState<MemberInvitation[]>([]);
-  const [servers, setServers] = useState<Server[]>([]);
-  const [serverOnlineMembers, setServerOnlineMembers] = useState<OnlineMember[]>([]);
-  const [serverMemberApplications, setServerMemberApplications] = useState<MemberApplication[]>([]);
-  const [channels, setChannels] = useState<Channel[]>([]);
-  const [channelEvents, setChannelEvents] = useState<ChannelEvent[]>([]);
-  const [channelMessages, setChannelMessages] = useState<ChannelMessage[]>([]);
-  const [actionMessages, setActionMessages] = useState<PromptMessage[]>([]);
+  const [user, setUser] = useState<Types.User>(Default.user());
+  const [friends, setFriends] = useState<Types.Friend[]>([]);
+  const [friendActivities, setFriendActivities] = useState<Types.FriendActivity[]>([]);
+  const [friendGroups, setFriendGroups] = useState<Types.FriendGroup[]>([]);
+  const [friendApplications, setFriendApplications] = useState<Types.FriendApplication[]>([]);
+  const [memberInvitations, setMemberInvitations] = useState<Types.MemberInvitation[]>([]);
+  const [currentServer, setCurrentServer] = useState<Types.Server>(Default.server());
+  const [servers, setServers] = useState<Types.Server[]>([]);
+  const [serverOnlineMembers, setServerOnlineMembers] = useState<Types.OnlineMember[]>([]);
+  const [serverMemberApplications, setServerMemberApplications] = useState<Types.MemberApplication[]>([]);
+  const [currentChannel, setCurrentChannel] = useState<Types.Channel>(Default.channel());
+  const [channels, setChannels] = useState<Types.Channel[]>([]);
+  const [channelEvents, setChannelEvents] = useState<Types.ChannelEvent[]>([]);
+  const [channelMessages, setChannelMessages] = useState<Types.ChannelMessage[]>([]);
+  const [actionMessages, setActionMessages] = useState<Types.PromptMessage[]>([]);
   const [systemNotifications, setSystemNotifications] = useState<string[]>([]);
-  const [queueUsers, setQueueUsers] = useState<QueueUser[]>([]);
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-  const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [recommendServers, setRecommendServers] = useState<RecommendServer[]>([]);
+  const [queueUsers, setQueueUsers] = useState<Types.QueueUser[]>([]);
+  const [announcements, setAnnouncements] = useState<Types.Announcement[]>([]);
+  const [notifications, setNotifications] = useState<Types.Notification[]>([]);
+  const [recommendServers, setRecommendServers] = useState<Types.RecommendServer[]>([]);
   const [latency, setLatency] = useState<number>(0);
   const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [region, setRegion] = useState<LanguageKey>('en-US');
+  const [region, setRegion] = useState<Types.LanguageKey>('en-US');
 
   // Variables
-  const currentServer = useMemo(() => servers.find((item) => item.serverId === user.currentServerId) || Default.server(), [servers, user.currentServerId]);
-  const currentChannel = useMemo(() => channels.find((item) => item.channelId === user.currentChannelId) || Default.channel(), [channels, user.currentChannelId]);
-  const { userId, name: userName } = user;
-  const { serverId: currentServerId, name: currentServerName } = currentServer;
+  const { userId, name: userName, currentServerId, currentChannelId } = user;
+  const { name: currentServerName } = currentServer;
 
   // Handlers
   const handleClearMessages = () => {
@@ -570,8 +536,22 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [region, userId]);
 
   useEffect(() => {
-    if (!userId || !currentServerId) return;
+    if (!userId) return;
+    if (!currentServerId) {
+      setCurrentServer(Default.server());
+      setChannels([]);
+      setServerOnlineMembers([]);
+      setServerMemberApplications([]);
+      setActionMessages([]);
+      setChannelMessages([]);
+      setQueueUsers([]);
+      setChannelEvents([]);
+      return;
+    }
     const refresh = async () => {
+      ipc.data.server(userId, currentServerId).then((server) => {
+        if (server) setCurrentServer(server);
+      });
       ipc.data.channels(userId, currentServerId).then((channels) => {
         if (channels) setChannels(channels);
       });
@@ -584,6 +564,20 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
     refresh();
   }, [userId, currentServerId]);
+
+  useEffect(() => {
+    if (!userId) return;
+    if (!currentServerId || !currentChannelId) {
+      setCurrentChannel(Default.channel());
+      return;
+    }
+    const refresh = async () => {
+      ipc.data.channel(userId, currentServerId, currentChannelId).then((channel) => {
+        if (channel) setCurrentChannel(channel);
+      });
+    };
+    refresh();
+  }, [userId, currentServerId, currentChannelId]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('connect', () => {
@@ -613,21 +607,22 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<User> }[]) => {
+    const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
       // Remove action messages and channel messages while switching server
       const newCurrentServerId = args[0].update.currentServerId;
       if (newCurrentServerId !== undefined && newCurrentServerId !== currentServerId) {
+        setChannels([]);
+        setServerOnlineMembers([]);
+        setServerMemberApplications([]);
         setActionMessages([]);
         setChannelMessages([]);
         setQueueUsers([]);
-        setChannels([]);
-        setServerOnlineMembers([]);
         setChannelEvents([]);
       }
       // Add activity when signature is updated
       args.forEach(({ update }) => {
         if (update.signature && userRef.current.signature !== update.signature) {
-          const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, createdAt: Date.now() });
+          const newActive = Default.friendActivity({ ...userRef.current, content: update.signature, timestamp: Date.now() });
           setFriendActivities((prev) => [newActive, ...prev]);
         }
       });
@@ -639,7 +634,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [currentServerId]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendAdd', (...args: { data: Friend }[]) => {
+    const unsub = ipc.socket.on('friendAdd', (...args: { data: Types.Friend }[]) => {
       const add = new Set(args.map((i) => `${i.data.targetId}`));
       setFriends((prev) => prev.filter((f) => !add.has(`${f.targetId}`)).concat(args.map((i) => i.data)));
     });
@@ -647,12 +642,12 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Friend> }[]) => {
+    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Types.Friend> }[]) => {
       // Add activity when signature is updated
       args.forEach(({ targetId, update }) => {
         const targetFriend = friendsRef.current.find((f) => f.targetId === targetId && f.relationStatus === 2);
         if (targetFriend && update.signature && targetFriend.signature !== update.signature) {
-          const newActivity = Default.friendActivity({ ...targetFriend, content: update.signature, createdAt: Date.now() });
+          const newActivity = Default.friendActivity({ ...targetFriend, content: update.signature, timestamp: Date.now() });
           setFriendActivities((prev) => [newActivity, ...prev]);
         }
       });
@@ -671,7 +666,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupAdd', (...args: { data: FriendGroup }[]) => {
+    const unsub = ipc.socket.on('friendGroupAdd', (...args: { data: Types.FriendGroup }[]) => {
       const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
       setFriendGroups((prev) => prev.filter((fg) => !add.has(`${fg.friendGroupId}`)).concat(args.map((i) => i.data)));
     });
@@ -679,7 +674,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupUpdate', (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => {
+    const unsub = ipc.socket.on('friendGroupUpdate', (...args: { friendGroupId: string; update: Partial<Types.FriendGroup> }[]) => {
       const update = new Map(args.map((i) => [`${i.friendGroupId}`, i.update] as const));
       setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
     });
@@ -695,7 +690,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationAdd', (...args: { data: FriendApplication }[]) => {
+    const unsub = ipc.socket.on('friendApplicationAdd', (...args: { data: Types.FriendApplication }[]) => {
       const add = new Set(args.map((i) => `${i.data.senderId}`));
       setFriendApplications((prev) => prev.filter((fa) => !add.has(`${fa.senderId}`)).concat(args.map((i) => i.data)));
     });
@@ -703,7 +698,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationUpdate', (...args: { senderId: string; update: Partial<FriendApplication> }[]) => {
+    const unsub = ipc.socket.on('friendApplicationUpdate', (...args: { senderId: string; update: Partial<Types.FriendApplication> }[]) => {
       const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
       setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
     });
@@ -719,7 +714,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverAdd', (...args: { data: Server }[]) => {
+    const unsub = ipc.socket.on('serverAdd', (...args: { data: Types.Server }[]) => {
       const add = new Set(args.map((i) => `${i.data.serverId}`));
       setServers((prev) => prev.filter((s) => !add.has(`${s.serverId}`)).concat(args.map((i) => i.data)));
     });
@@ -727,7 +722,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Server> }[]) => {
+    const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Types.Server> }[]) => {
       const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
       setServers((prev) => prev.map((s) => (update.has(`${s.serverId}`) ? { ...s, ...update.get(`${s.serverId}`) } : s)));
     });
@@ -743,12 +738,12 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: OnlineMember }[]) => {
+    const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: Types.OnlineMember }[]) => {
       setChannelEvents((prev) => [
         ...prev,
         ...args.map((m) => ({
           ...m.data,
-          type: 'join' as ChannelEvent['type'],
+          type: 'join' as Types.ChannelEvent['type'],
           prevChannelId: null,
           nextChannelId: m.data.currentChannelId,
           timestamp: Date.now(),
@@ -761,7 +756,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => {
+    const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.OnlineMember> }[]) => {
       args.map((m) => {
         const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
         if (originMember && m.update.currentChannelId) {
@@ -771,7 +766,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             ...prev,
             {
               ...newMember,
-              type: 'move' as ChannelEvent['type'],
+              type: 'move' as Types.ChannelEvent['type'],
               prevChannelId: originChannelId,
               nextChannelId: newMember.currentChannelId,
               timestamp: Date.now(),
@@ -794,7 +789,7 @@ const RootPageComponent: React.FC = React.memo(() => {
             ...prev,
             {
               ...originMember,
-              type: 'leave' as ChannelEvent['type'],
+              type: 'leave' as Types.ChannelEvent['type'],
               prevChannelId: originMember.currentChannelId,
               nextChannelId: null,
               timestamp: Date.now(),
@@ -809,7 +804,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args: { data: MemberApplication }[]) => {
+    const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args: { data: Types.MemberApplication }[]) => {
       const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
       setServerMemberApplications((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
     });
@@ -825,7 +820,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelAdd', (...args: { data: Channel }[]) => {
+    const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
       const add = new Set(args.map((i) => `${i.data.channelId}`));
       setChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
     });
@@ -833,7 +828,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Channel> }[]) => {
+    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
       const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
       setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
     });
@@ -849,7 +844,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationAdd', (...args: { data: MemberInvitation }[]) => {
+    const unsub = ipc.socket.on('memberInvitationAdd', (...args: { data: Types.MemberInvitation }[]) => {
       const add = new Set(args.map((i) => `${i.data.serverId}`));
       setMemberInvitations((prev) => prev.filter((mi) => !add.has(`${mi.serverId}`)).concat(args.map((i) => i.data)));
     });
@@ -857,7 +852,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationUpdate', (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => {
+    const unsub = ipc.socket.on('memberInvitationUpdate', (...args: { serverId: string; update: Partial<Types.MemberInvitation> }[]) => {
       const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
       setMemberInvitations((prev) => prev.map((mi) => (update.has(`${mi.serverId}`) ? { ...mi, ...update.get(`${mi.serverId}`) } : mi)));
     });
@@ -873,21 +868,21 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelMessage', (...args: ChannelMessage[]) => {
+    const unsub = ipc.socket.on('channelMessage', (...args: Types.ChannelMessage[]) => {
       setChannelMessages((prev) => [...prev, ...args]);
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('actionMessage', (...args: PromptMessage[]) => {
+    const unsub = ipc.socket.on('actionMessage', (...args: Types.PromptMessage[]) => {
       setActionMessages((prev) => [...prev, ...args]);
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('queueMembersSet', (...args: QueueUser[]) => {
+    const unsub = ipc.socket.on('queueMembersSet', (...args: Types.QueueUser[]) => {
       setQueueUsers(args);
     });
     return () => unsub();
@@ -901,7 +896,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [soundPlayer]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('openPopup', (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
+    const unsub = ipc.socket.on('openPopup', (...args: { type: Types.PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
       args.forEach((p) => {
         loadingBoxRef.current.setIsLoading(false);
         loadingBoxRef.current.setLoadingServerId('');
@@ -921,7 +916,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error: Error) => {
-      handleOpenErrorDialog(error.message, () => {});
+      Popup.handleOpenErrorDialog(error.message, () => {});
     });
     return () => unsub();
   }, []);

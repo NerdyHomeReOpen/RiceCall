@@ -30,58 +30,33 @@ export type Announcement = table_announcements;
 
 export type Notification = table_notifications;
 
-export type BadgeList = {
-  badges: string;
-};
-
-export type User = table_users & table_global_permissions & table_user_settings & BadgeList;
+export type User = table_users & table_global_permissions & table_user_settings & { badges: string };
 
 export type UserSetting = table_user_settings;
 
 export type Badge = table_badges & table_user_badges;
 
-export type Friend = table_friends & table_users & table_user_settings & BadgeList;
+export type Friend = table_friends & table_users & table_user_settings & { badges: string };
 
-export type FriendActivity = table_friends & table_users & table_user_activities;
+export type FriendActivity = table_users & table_user_activities;
 
 export type FriendGroup = table_friend_groups;
 
 export type FriendApplication = table_friend_applications & table_users;
 
-export type Server = table_servers & table_user_servers & table_members & table_server_permissions;
+export type Server = table_servers & table_user_servers & table_server_permissions & { contribution: number };
 
-export type RecommendServer = table_servers &
-  table_recommend_servers & {
-    online: number;
-  };
+export type RecommendServer = table_servers & table_recommend_servers & { online: number };
 
-export type Category = table_channels &
-  table_channel_muted_users &
-  table_channel_permissions & {
-    type: 'category';
-  };
+export type Category = table_channels & table_channel_muted_users & table_channel_permissions & { type: 'category' };
 
-export type Channel = table_channels &
-  table_channel_muted_users &
-  table_channel_permissions & {
-    type: 'channel';
-  };
+export type Channel = table_channels & table_channel_muted_users & table_channel_permissions & { type: 'channel' };
 
-export type ChannelEvent = OnlineMember & {
-  type: 'join' | 'move' | 'leave';
-  prevChannelId: string | null;
-  nextChannelId: string | null;
-  timestamp: number;
-};
+export type ChannelEvent = OnlineMember & { type: 'join' | 'move' | 'leave'; prevChannelId: string | null; nextChannelId: string | null; timestamp: number };
 
-export type OnlineMember = table_members & table_users & table_channel_muted_users & table_server_permissions & BadgeList;
+export type OnlineMember = table_members & table_users & table_channel_muted_users & table_server_permissions & { badges: string };
 
-export type QueueUser = {
-  userId: string;
-  position: number;
-  leftTime: number;
-  isQueueControlled: boolean;
-};
+export type QueueUser = { userId: string; position: number; leftTime: number; isQueueControlled: boolean };
 
 export type QueueMember = QueueUser & OnlineMember;
 
@@ -89,7 +64,7 @@ export type Member = table_members & table_users & table_server_blocked_users & 
 
 export type MemberApplication = table_member_applications & table_users;
 
-export type MemberInvitation = table_member_invitations & table_users;
+export type MemberInvitation = table_member_invitations & table_servers;
 
 export type Message = {
   parameter: Record<string, string>;
@@ -99,29 +74,13 @@ export type Message = {
   timestamp: number;
 };
 
-export type ChannelMessage = Message &
-  OnlineMember & {
-    type: 'general';
-  };
+export type ChannelMessage = Message & Member & { type: 'general' };
 
-export type ChatHistory = Message &
-  User & {
-    type: 'chatHistory';
-    user1Id: string;
-    user2Id: string;
-  };
+export type ChatHistory = Message & User & { type: 'chatHistory'; user1Id: string; user2Id: string };
 
-export type DirectMessage = Message &
-  User & {
-    type: 'dm';
-    user1Id: string;
-    user2Id: string;
-  };
+export type DirectMessage = Message & User & { type: 'dm'; user1Id: string; user2Id: string };
 
-export type PromptMessage = Message & {
-  type: 'alert' | 'info' | 'warn' | 'event';
-  displaySeconds?: number;
-};
+export type PromptMessage = Message & { type: 'alert' | 'info' | 'warn' | 'event'; displaySeconds?: number };
 
 export type SystemSettings = {
   autoLogin: boolean;
@@ -426,6 +385,15 @@ export type ServerToClientEvents = {
   error: (error: Error) => void;
 };
 
+export type ClientToServerEventsWithAck = {
+  SFUCreateTransport: (payload: SFUCreateTransportParams) => SFUCreateTransportReturnType;
+  SFUConnectTransport: (payload: SFUConnectTransportParams) => void;
+  SFUCreateProducer: (payload: SFUCreateProducerParams) => SFUCreateProducerReturnType;
+  SFUCreateConsumer: (payload: SFUCreateConsumerParams) => SFUCreateConsumerReturnType;
+  SFUJoin: (payload: { channelId: string }) => void;
+  SFULeave: (payload: { channelId: string }) => void;
+};
+
 export type StoreType = {
   accounts: Record<string, any>;
   language: LanguageKey;
@@ -522,3 +490,5 @@ export type SFUCreateConsumerReturnType = {
   kind: mediasoupClient.types.MediaKind;
   rtpParameters: any;
 };
+
+export * from './database';

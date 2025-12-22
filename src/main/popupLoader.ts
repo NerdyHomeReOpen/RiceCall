@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { getSettings } from '../../main.js';
 
-// Services
 import data from './data.service.js';
 
 const popupLoaders: Record<string, (data: any) => Promise<any>> = {
@@ -12,17 +11,13 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
   },
 
   applyFriend: async ({ userId, targetId }: { userId: string; targetId: string }) => {
-    const [target, friendGroups, friendApplication, receivedFriendApplication] = await Promise.all([
+    const [target, friendGroups, friendApplication] = await Promise.all([
       data.user({ userId: targetId }),
       data.friendGroups({ userId }),
-      data.friendApplication({ senderId: userId, receiverId: targetId }),
-      data.friendApplication({ senderId: targetId, receiverId: userId }),
+      data.friendApplication({ receiverId: userId, senderId: targetId }),
     ]);
 
-    if (!receivedFriendApplication) {
-      return { userId, targetId, target, friendGroups, friendApplication };
-    }
-    return { isApprove: true, targetId, friendGroups };
+    return { userId, targetId, target, friendGroups, friendApplication };
   },
 
   approveFriend: async ({ userId, targetId }: { userId: string; targetId: string }) => {

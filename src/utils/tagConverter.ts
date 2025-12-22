@@ -1,9 +1,7 @@
-// /utils/tagConverter.ts
 import { emojis } from '@/emojis';
 
-// CSS
-import markdown from '@/styles/markdown.module.css';
-import permission from '@/styles/permission.module.css';
+import markdownStyles from '@/styles/markdown.module.css';
+import permissionStyles from '@/styles/permission.module.css';
 
 /* ---------- forward  ---------- */
 const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g; // :code:
@@ -35,23 +33,23 @@ export const fromTags = (raw: string) => {
     .replace(emojiRegex, (_, code) => {
       const emoji = emojis.find((e) => e.code === code);
       if (!emoji) return code;
-      return `<img data-emoji='${code}' class='${markdown['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
+      return `<img data-emoji='${code}' class='${markdownStyles['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
     })
     .replace(discordTimestampRegex, (_, timestamp) => {
       const date = new Date(parseInt(timestamp) * 1000);
       return date.toLocaleString();
     })
     .replace(userTagRegex, (_, name, _level, level = '2', _gender, gender = 'Male') => {
-      return `<span data-name='${name}'><span class='${markdown['user-icon']} ${permission[gender]} ${permission[`lv-${level}`]}'></span><span class='${markdown['user-name']}'>${name}</span></span>`;
+      return `<span data-name='${name}'><span class='${markdownStyles['user-icon']} ${permissionStyles[gender]} ${permissionStyles[`lv-${level}`]}'></span><span class='${markdownStyles['user-name']}'>${name}</span></span>`;
     })
     .replace(ytRegex, (_, videoId) => {
-      return `<iframe data-yt='${videoId}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
+      return `<iframe data-yt='${videoId}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
     })
     .replace(twitchRegex, (_, channel) => {
-      return `<iframe data-tw='${channel}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.twitch.tv/?channel=${channel}&autoplay=true&parent=localhost"></iframe>`;
+      return `<iframe data-tw='${channel}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.twitch.tv/?channel=${channel}&autoplay=true&parent=localhost"></iframe>`;
     })
     .replace(kickRegex, (_, username) => {
-      return `<iframe data-kick='${username}' class='${markdown['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
+      return `<iframe data-kick='${username}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
     });
 };
 

@@ -1,27 +1,21 @@
 import React from 'react';
+import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// CSS
-import homePage from '@/styles/home.module.css';
+import type * as Types from '@/types';
 
-// Providers
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 import { useMainTab } from '@/providers/MainTab';
-import { useTranslation } from 'react-i18next';
 
-// Type
-import type { User, Server } from '@/types';
+import * as Popup from '@/utils/popup';
+import * as Permission from '@/utils/permission';
 
-// Services
-import ipc from '@/services/ipc.service';
-
-// Utils
-import { handleOpenAlertDialog, handleOpenServerSetting } from '@/utils/popup';
-import { isMember, isServerOwner } from '@/utils/permission';
+import homeStyles from '@/styles/home.module.css';
 
 interface ServerCardProps {
-  user: User;
-  server: Server;
+  user: Types.User;
+  server: Types.Server;
 }
 
 const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
@@ -54,7 +48,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     {
       id: 'view-server-info',
       label: t('view-server-info'),
-      onClick: () => handleOpenServerSetting(userId, serverId),
+      onClick: () => Popup.handleOpenServerSetting(userId, serverId),
     },
     {
       id: 'set-favorite',
@@ -64,12 +58,12 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     {
       id: 'terminate-self-membership',
       label: t('terminate-self-membership'),
-      show: isMember(serverPermissionLevel) && !isServerOwner(serverPermissionLevel),
+      show: Permission.isMember(serverPermissionLevel) && !Permission.isServerOwner(serverPermissionLevel),
       onClick: () => handleTerminateMember(userId, serverId, t('self')),
     },
   ];
 
-  const handleServerSelect = (server: Server) => {
+  const handleServerSelect = (server: Types.Server) => {
     if (loadingBox.isLoading) return;
     if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
@@ -80,17 +74,17 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ipc.socket.send('connectServer', { serverId });
   };
 
-  const handleFavoriteServer = (serverId: Server['serverId']) => {
+  const handleFavoriteServer = (serverId: Types.Server['serverId']) => {
     ipc.socket.send('favoriteServer', { serverId });
   };
 
-  const handleTerminateMember = (userId: User['userId'], serverId: Server['serverId'], memberName: User['name']) => {
-    handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
+  const handleTerminateMember = (userId: Types.User['userId'], serverId: Types.Server['serverId'], memberName: Types.User['name']) => {
+    Popup.handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
   };
 
   return (
     <div
-      className={homePage['server-card']}
+      className={homeStyles['server-card']}
       onClick={() => handleServerSelect(server)}
       onContextMenu={(e) => {
         e.preventDefault();
@@ -99,13 +93,13 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
         contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >
-      <div className={homePage['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
-      <div className={homePage['server-info-text']}>
-        <div className={homePage['server-name-text']}>{serverName}</div>
-        <div className={homePage['server-id-box']}>
-          <div className={`${homePage['server-id-text']} ${isServerOwner(serverPermissionLevel) ? homePage['is-owner'] : ''}`}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+      <div className={homeStyles['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
+      <div className={homeStyles['server-info-text']}>
+        <div className={homeStyles['server-name-text']}>{serverName}</div>
+        <div className={homeStyles['server-id-box']}>
+          <div className={`${homeStyles['server-id-text']} ${Permission.isServerOwner(serverPermissionLevel) ? homeStyles['is-owner'] : ''}`}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
         </div>
-        <div className={homePage['server-slogen']}>{serverSlogan}</div>
+        <div className={homeStyles['server-slogen']}>{serverSlogan}</div>
       </div>
     </div>
   );

@@ -7,15 +7,12 @@ import rehypeHighlight from 'rehype-highlight';
 import rehypeRaw from 'rehype-raw';
 import DOMPurify from 'dompurify';
 
-// CSS
-import 'highlight.js/styles/github.css';
-import markdown from '@/styles/markdown.module.css';
+import { useImageViewer } from '@/providers/ImageViewer';
 
-// Utils
 import { fromTags } from '@/utils/tagConverter';
 
-// Providers
-import { useImageViewer } from '@/providers/ImageViewer';
+import 'highlight.js/styles/github.css';
+import markdown from '@/styles/markdown.module.css';
 
 // DOMPurify
 const ALLOWED_TAGS = [

@@ -1,7 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useRef } from 'react';
-
-// Services
-import ipc from '@/services/ipc.service';
+import ipc from '@/ipc';
 
 interface SoundPlayerContextType {
   playSound: (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => void;

@@ -1,36 +1,30 @@
 import React, { useMemo } from 'react';
-
-// CSS
-import styles from '@/styles/message.module.css';
-
-// Types
-import type { DirectMessage } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
 
-// Components
+import type * as Types from '@/types';
+
 import MarkdownContent from '@/components/MarkdownContent';
 
-// Utils
-import { getFormatTimestamp } from '@/utils/language';
+import * as Language from '@/utils/language';
+import * as Popup from '@/utils/popup';
 
-// Constants
 import { ALLOWED_MESSAGE_KEYS } from '@/constant';
 
+import styles from '@/styles/message.module.css';
+
 interface DirectMessageProps {
-  messageGroup: DirectMessage & {
-    contents: string[];
-  };
+  user: Types.User;
+  messageGroup: Types.DirectMessage & { contents: string[] };
 }
 
-const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }) => {
+const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ user, messageGroup }) => {
   // Hooks
   const { t } = useTranslation();
 
   // Variables
-  const { name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
-  const formattedTimestamp = getFormatTimestamp(t, messageTimestamp);
+  const { userId } = user;
+  const { userId: senderUserId, name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
+  const formattedTimestamp = Language.getFormatTimestamp(t, messageTimestamp);
   const formattedMessageContents = useMemo(
     () =>
       messageContents.map((content) =>
@@ -44,8 +38,10 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
 
   return (
     <div className={styles['message-box']}>
-      <div className={styles['header']}>
-        <div className={styles['username-text']}>{senderName}</div>
+      <div className={styles['details']}>
+        <div className={styles['username-text']} onClick={() => Popup.handleOpenUserInfo(userId, senderUserId)}>
+          {senderName}
+        </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>
       {formattedMessageContents.map((content, index) => (

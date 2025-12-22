@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
@@ -9,27 +10,18 @@ import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
 import { ChatEnter } from '@/extensions/ChatEnter';
+import ipc from '@/ipc';
 
-// CSS
-import messageInputBox from '@/styles/messageInputBox.module.css';
-import markdown from '@/styles/markdown.module.css';
-
-// Providers
-import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 
-// Styles
-import emoji from '@/styles/emoji.module.css';
-
-// Services
-import ipc from '@/services/ipc.service';
-
-// Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
+import * as Popup from '@/utils/popup';
 import { toTags } from '@/utils/tagConverter';
 
-// Constants
 import { MAX_FILE_SIZE } from '@/constant';
+
+import styles from '@/styles/messageInputBox.module.css';
+import markdown from '@/styles/markdown.module.css';
+import emoji from '@/styles/emoji.module.css';
 
 interface MessageInputBoxProps {
   onSendMessage?: (message: string) => void;
@@ -82,19 +74,20 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
     textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
   }, [editor]);
 
-  const handlePaste = async (imageData: string, fileName: string) => {
+  const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
     isUploadingRef.current = true;
-    if (imageData.length > MAX_FILE_SIZE) {
-      handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+    if (imageUnit8Array.length > MAX_FILE_SIZE) {
+      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
-    const response = await ipc.data.upload('message', `fileName-${Date.now()}`, imageData);
-    if (response) {
-      editor?.chain().insertImage({ src: response.avatarUrl, alt: fileName }).focus().run();
-      syncStyles();
-    }
-    isUploadingRef.current = false;
+    ipc.data.uploadImage('message', `${Date.now()}`, imageUnit8Array).then((response) => {
+      if (response) {
+        editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
+        syncStyles();
+      }
+      isUploadingRef.current = false;
+    });
   };
 
   const handleEmojiSelect = (code: string) => {
@@ -125,7 +118,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
   }, [editor]);
 
   return (
-    <div className={`${messageInputBox['message-input-box']} ${disabled ? messageInputBox['disabled'] : ''} ${isWarning ? messageInputBox['warning'] : ''}`}>
+    <div className={`${styles['message-input-box']} ${disabled ? styles['disabled'] : ''} ${isWarning ? styles['warning'] : ''}`}>
       <div
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {
@@ -147,21 +140,19 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
           );
         }}
       />
-
       <EditorContent
         editor={editor}
-        className={`${messageInputBox['textarea']} ${markdown['markdown-content']}`}
+        className={`${styles['textarea']} ${markdown['markdown-content']}`}
         style={{ wordBreak: 'break-all', border: 'none' }}
         onPaste={(e) => {
           const items = e.clipboardData.items;
           for (const item of items) {
             if (item.type.startsWith('image/')) {
-              const file = item.getAsFile();
-              if (file && !isUploadingRef.current) {
-                const reader = new FileReader();
-                reader.onloadend = () => handlePaste(reader.result as string, file.name);
-                reader.readAsDataURL(file);
-              }
+              const image = item.getAsFile();
+              if (!image || isUploadingRef.current) return;
+              image.arrayBuffer().then((arrayBuffer) => {
+                handleUploadImage(new Uint8Array(arrayBuffer), image.name);
+              });
             }
           }
         }}
@@ -169,7 +160,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
           if (disabled) return;
           if (isWarning) return;
           if (isComposingRef.current) return;
-          if (e.shiftKey) return;
+          if (e.shiftKey || e.ctrlKey) return;
           if (e.key === 'Enter') {
             e.preventDefault();
             if (messageInput.trim().length === 0) return;
@@ -183,7 +174,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
         maxLength={maxLength}
       />
       {isCloseToMaxLength && (
-        <div className={messageInputBox['message-input-length-text']}>
+        <div className={styles['message-input-length-text']}>
           {editor?.getText().length}/{maxLength}
         </div>
       )}

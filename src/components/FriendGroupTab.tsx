@@ -1,29 +1,22 @@
 import React, { useState, useMemo } from 'react';
-
-// CSS
-import styles from '@/styles/friend.module.css';
-
-// Types
-import type { User, FriendGroup, Friend } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
+
+import type * as Types from '@/types';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 
-// Services
-import ipc from '@/services/ipc.service';
-
-// Components
 import FriendTab from '@/components/FriendTab';
 
-// Utils
-import { handleOpenAlertDialog, handleOpenEditFriendGroupName } from '@/utils/popup';
+import * as Popup from '@/utils/popup';
+
+import styles from '@/styles/friend.module.css';
 
 interface FriendGroupTabProps {
-  user: User;
-  friends: Friend[];
-  friendGroup: FriendGroup;
-  friendGroups: FriendGroup[];
+  user: Types.User;
+  friends: Types.Friend[];
+  friendGroup: Types.FriendGroup;
+  friendGroups: Types.FriendGroup[];
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
@@ -59,7 +52,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
       id: 'edit-friend-group-name',
       label: t('edit-friend-group-name'),
       show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
-      onClick: () => handleOpenEditFriendGroupName(userId, friendGroupId),
+      onClick: () => Popup.handleOpenEditFriendGroupName(userId, friendGroupId),
     },
     {
       id: 'delete-friend-group',
@@ -69,13 +62,12 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
     },
   ];
 
-  const handleDeleteFriendGroup = (friendGroupId: FriendGroup['friendGroupId']) => {
-    handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipc.socket.send('deleteFriendGroup', { friendGroupId }));
+  const handleDeleteFriendGroup = (friendGroupId: Types.FriendGroup['friendGroupId']) => {
+    Popup.handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipc.socket.send('deleteFriendGroup', { friendGroupId }));
   };
 
   return (
     <div key={friendGroupId}>
-      {/* Tab View */}
       <div
         className={`${styles['friend-group-tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
         onClick={() => setExpanded((prev) => !prev)}
@@ -92,8 +84,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
           {friendGroupId !== 'blacklist' && friendGroupId !== 'stranger' ? `(${friendsOnlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}
         </div>
       </div>
-
-      {/* Expanded Sections */}
       <div className={styles['tab-content']} style={expanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
           <FriendTab user={user} key={friend.targetId} friend={friend} friendGroups={friendGroups} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
