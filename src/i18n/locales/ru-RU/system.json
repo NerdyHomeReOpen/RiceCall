@@ -1,6 +1,6 @@
 {
   "cancel": "Отменить",
-  "convert-wav-to-mp3-failed": "轉檔至 MP3 失敗",
+  "convert-wav-to-mp3-failed": "Ошибка преобразования в MP3",
   "download-update": "Загрузить обновление",
   "exit": "Выйти",
   "install-after-quit": "Устанавливать в закрытом виде",
@@ -8,7 +8,7 @@
   "is-latest-version": "Это уже последняя версия.",
   "logout": "Отключиться",
   "open-main-window": "Показать/скрыть главное меню",
-  "select-record-save-path": "選擇錄音存檔位置",
+  "select-record-save-path": "Выберите место хранения записей",
   "update-available": "Доступна новая версия",
   "update-available-message": "Новая версия {{version}} вышла {{releaseDate}}. Нажмите кнопку «Загрузить обновление», чтобы начать загрузку.",
   "update-downloaded": "Установите обновление",

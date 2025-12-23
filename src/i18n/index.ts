@@ -2,6 +2,7 @@
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
@@ -79,29 +80,14 @@ const APP_TO_CROWDIN: Record<Types.LanguageKey, string> = {
   'tr-TR': 'tr',
 };
 
-// Safe reference to electron's ipcRenderer
-let ipcRenderer: any = null;
-
-// Initialize ipcRenderer only in client-side and Electron environment
-if (typeof window !== 'undefined' && window.require) {
-  try {
-    const electron = window.require('electron');
-    ipcRenderer = electron.ipcRenderer;
-  } catch (error) {
-    console.warn('Not in Electron environment:', error);
-  }
-}
-
-const getHash = () => ipcRenderer?.sendSync('get-env')?.CROWDIN_DISTRIBUTION_HASH || '';
-
-const toCrowdin = (lng: string) => APP_TO_CROWDIN[lng.replace('_', '-') as Types.LanguageKey] ?? lng;
+const getHash = () => ipc.env.get()?.CROWDIN_DISTRIBUTION_HASH || '';
 
 /** OTA backend */
 class CrowdinBackend {
   type = 'backend' as const;
   client = new otaClient(getHash());
   read(lng: string, _ns: string, cb: any) {
-    const crowdinLng = toCrowdin(lng);
+    const crowdinLng = APP_TO_CROWDIN[lng.replace('_', '-') as Types.LanguageKey] ?? lng;
     this.client
       .getStringsByLocale(crowdinLng)
       .then((data: any) => cb(null, data))

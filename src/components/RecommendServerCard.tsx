@@ -51,7 +51,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
     }
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(server.specialId || server.displayId);
-    ipc.socket.send('connectServer', { serverId });
+    ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
   return (

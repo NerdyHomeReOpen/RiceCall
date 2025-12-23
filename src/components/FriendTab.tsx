@@ -190,7 +190,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       setFriendCurrentServer(null);
       return;
     }
-    ipc.data.server(targetId, friendCurrentServerId).then((server) => {
+    ipc.data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
       if (server) setFriendCurrentServer(server);
     });
   }, [targetId, friendCurrentServerId, isFriendBlocked, isFriend, friendShareCurrentServer]);
@@ -222,7 +222,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
           <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>
             {friendNote || friendName} {friendNote !== '' ? `(${friendName})` : ''}
           </div>
-          <LevelIcon level={friendLevel} xp={friendXp} requiredXp={friendRequiredXp} />
+          <LevelIcon level={friendLevel} xp={friendXp} requiredXp={friendRequiredXp} showTooltip={false} />
           <BadgeList badges={JSON.parse(friendBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
         {isPending ? (

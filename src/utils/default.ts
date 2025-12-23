@@ -210,71 +210,91 @@ const defaultTableMemberInvitations: Types.table_member_invitations = {
   updatedAt: 0,
 };
 
-export const user = (overrides: Partial<Types.User> = {}): Types.User => ({
-  ...defaultTableUser,
-  ...defaultTableUserSettings,
-  ...defaultTableGlobalPermission,
-  badges: '',
-  ...overrides,
-});
+export function user(overrides: Partial<Types.User> = {}): Types.User {
+  return {
+    ...defaultTableUser,
+    ...defaultTableUserSettings,
+    ...defaultTableGlobalPermission,
+    badges: '',
+    ...overrides,
+  };
+}
 
-export const friend = (overrides: Partial<Types.Friend> = {}): Types.Friend => ({
-  ...defaultTableFriend,
-  ...defaultTableUser,
-  ...defaultTableUserSettings,
-  badges: '',
-  ...overrides,
-});
+export function friend(overrides: Partial<Types.Friend> = {}): Types.Friend {
+  return {
+    ...defaultTableFriend,
+    ...defaultTableUser,
+    ...defaultTableUserSettings,
+    badges: '',
+    ...overrides,
+  };
+}
 
-export const friendActivity = (overrides: Partial<Types.FriendActivity> = {}): Types.FriendActivity => ({
-  ...defaultTableUser,
-  ...defaultTableUserActivity,
-  ...overrides,
-});
+export function friendActivity(overrides: Partial<Types.FriendActivity> = {}): Types.FriendActivity {
+  return {
+    ...defaultTableUser,
+    ...defaultTableUserActivity,
+    ...overrides,
+  };
+}
 
-export const friendGroup = (overrides: Partial<Types.FriendGroup> = {}): Types.FriendGroup => ({
-  ...defaultTableFriendGroup,
-  ...overrides,
-});
+export function friendGroup(overrides: Partial<Types.FriendGroup> = {}): Types.FriendGroup {
+  return {
+    ...defaultTableFriendGroup,
+    ...overrides,
+  };
+}
 
-export const friendApplication = (overrides: Partial<Types.FriendApplication> = {}): Types.FriendApplication => ({
-  ...defaultTableFriendApplication,
-  ...defaultTableUser,
-  ...overrides,
-});
+export function friendApplication(overrides: Partial<Types.FriendApplication> = {}): Types.FriendApplication {
+  return {
+    ...defaultTableFriendApplication,
+    ...defaultTableUser,
+    ...overrides,
+  };
+}
 
-export const server = (overrides: Partial<Types.Server> = {}): Types.Server => ({
-  ...defaultTableServer,
-  ...defaultTableUserServer,
-  ...defaultTableServerPermission,
-  contribution: 0,
-  ...overrides,
-});
+export function server(overrides: Partial<Types.Server> = {}): Types.Server {
+  return {
+    ...defaultTableServer,
+    ...defaultTableUserServer,
+    ...defaultTableServerPermission,
+    contribution: 0,
+    ...overrides,
+  };
+}
 
-export const channel = (overrides: Partial<Types.Channel> = {}): Types.Channel => ({
-  ...defaultTableChannel,
-  ...defaultTableChannelMute,
-  ...defaultTableChannelPermission,
-  type: 'channel',
-  ...overrides,
-});
+export function channel(overrides: Partial<Types.Channel> = {}): Types.Channel {
+  return {
+    ...defaultTableChannel,
+    ...defaultTableChannelMute,
+    ...defaultTableChannelPermission,
+    type: 'channel',
+    ...overrides,
+  };
+}
 
-export const member = (overrides: Partial<Types.Member> = {}): Types.Member => ({
-  ...defaultTableMember,
-  ...defaultTableUser,
-  ...defaultTableServerBlocked,
-  ...defaultTableGlobalPermission,
-  ...overrides,
-});
+export function member(overrides: Partial<Types.Member> = {}): Types.Member {
+  return {
+    ...defaultTableMember,
+    ...defaultTableUser,
+    ...defaultTableServerBlocked,
+    ...defaultTableGlobalPermission,
+    ...overrides,
+  };
+}
 
-export const memberApplication = (overrides: Partial<Types.MemberApplication> = {}): Types.MemberApplication => ({
-  ...defaultTableMemberApplications,
-  ...defaultTableUser,
-  ...overrides,
-});
+export function memberApplication(overrides: Partial<Types.MemberApplication> = {}): Types.MemberApplication {
+  return {
+    ...defaultTableMemberApplications,
+    ...defaultTableUser,
+    ...overrides,
+  };
+}
 
-export const memberInvitation = (overrides: Partial<Types.MemberInvitation> = {}): Types.MemberInvitation => ({
-  ...defaultTableMemberInvitations,
-  ...defaultTableServer,
-  ...overrides,
-});
+export function memberInvitation(overrides: Partial<Types.MemberInvitation> = {}): Types.MemberInvitation {
+  return {
+    ...defaultTableMemberInvitations,
+    ...defaultTableServer,
+    ...overrides,
+  };
+}

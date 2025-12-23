@@ -46,7 +46,6 @@
   border: none;
 }
 
-
 .button-item-box:nth-child(1) .button-item-icon {
   background-image: url('/channel/widget_vote.webp');
 }

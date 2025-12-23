@@ -4,16 +4,15 @@ import dotenv from 'dotenv';
 import { expand } from 'dotenv-expand';
 import { z } from 'zod';
 import { app } from 'electron';
+import Logger from './logger.js';
 
 export let env: Record<string, string> = {};
 
-const EnvSchema = z
-  .object({
-    API_URL: z.string(),
-    WS_URL: z.string(),
-    CROWDIN_DISTRIBUTION_HASH: z.string(),
-  })
-  .partial();
+const EnvSchema = z.object({
+  API_URL: z.string(),
+  WS_URL: z.string(),
+  CROWDIN_DISTRIBUTION_HASH: z.string().optional(),
+});
 
 export function loadEnv(server: 'dev' | 'prod' = 'prod') {
   let envLoaded: Record<string, string> = { ...process.env } as any;
@@ -36,7 +35,7 @@ export function loadEnv(server: 'dev' | 'prod' = 'prod') {
   const parsed = EnvSchema.safeParse(envLoaded);
 
   if (!parsed.success) {
-    console.warn(`${new Date().toLocaleString()} | Invalid env values:`, parsed.error.flatten().fieldErrors);
+    new Logger('Env').warn(`Invalid env values: ${JSON.stringify(parsed.error.flatten().fieldErrors)}`);
   } else {
     Object.assign(envLoaded, parsed.data);
   }

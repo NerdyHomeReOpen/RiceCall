@@ -1,32 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import {
-  DiscordPresence,
-  PopupType,
-  SpeakingMode,
-  MixMode,
-  ServerToClientEvents,
-  ClientToServerEvents,
-  ClientToServerEventsWithAck,
-  ChannelUIMode,
-  ACK,
-  Theme,
-  SystemSettings,
-  User,
-  Friend,
-  FriendActivity,
-  FriendGroup,
-  FriendApplication,
-  Server,
-  Member,
-  OnlineMember,
-  Channel,
-  MemberApplication,
-  MemberInvitation,
-  Notification,
-  Announcement,
-  RecommendServer,
-  LanguageKey,
-} from '@/types';
+import * as Types from '@/types';
+
+import { Logger } from '@/utils/logger';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -37,7 +12,7 @@ if (typeof window !== 'undefined' && window.require) {
     const electron = window.require('electron');
     ipcRenderer = electron.ipcRenderer;
   } catch (error) {
-    console.warn('Not in Electron environment:', error);
+    new Logger('IPC').warn(`Not in Electron environment: ${error}`);
   }
 }
 
@@ -50,20 +25,20 @@ const ipc = {
   },
 
   socket: {
-    send: <T extends keyof ClientToServerEvents>(event: T, ...args: Parameters<ClientToServerEvents[T]>) => {
+    send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => {
       if (!isElectron) return;
       ipcRenderer.send(event, ...args);
     },
-    on: <T extends keyof ServerToClientEvents>(event: T, callback: (...args: Parameters<ServerToClientEvents[T]>) => ReturnType<ServerToClientEvents[T]>) => {
+    on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) => {
       if (!isElectron) return () => {};
-      const listener = (_: any, ...args: Parameters<ServerToClientEvents[T]>) => callback(...args);
+      const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
       ipcRenderer.on(event, listener);
       return () => ipcRenderer.removeListener(event, listener);
     },
-    emit: <T extends keyof ClientToServerEventsWithAck>(event: T, payload: Parameters<ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<ClientToServerEventsWithAck[T]>> => {
-      if (!isElectron) return Promise.resolve(null as ReturnType<ClientToServerEventsWithAck[T]>);
+    emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => {
+      if (!isElectron) return Promise.resolve(null as ReturnType<Types.ClientToServerEventsWithAck[T]>);
       return new Promise((resolve, reject) => {
-        ipcRenderer.invoke(event, payload).then((ack: ACK<ReturnType<ClientToServerEventsWithAck[T]>>) => {
+        ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
           if (ack?.ok) resolve(ack.data);
           else reject(new Error(ack?.error || 'unknown error'));
         });
@@ -94,139 +69,139 @@ const ipc = {
   },
 
   data: {
-    user: async (userId: User['userId']): Promise<User | null> => {
+    user: async (params: { userId: string }): Promise<Types.User | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user', userId);
+      return await ipcRenderer.invoke('data-user', params);
     },
 
-    userHotReload: async (userId: User['userId']): Promise<User | null> => {
+    userHotReload: async (params: { userId: string }): Promise<Types.User | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user-hot-reload', userId);
+      return await ipcRenderer.invoke('data-user-hot-reload', params);
     },
 
-    friend: async (userId: User['userId'], targetId: User['userId']): Promise<Friend | null> => {
+    friend: async (params: { userId: string; targetId: string }): Promise<Types.Friend | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friend', userId, targetId);
+      return await ipcRenderer.invoke('data-friend', params);
     },
 
-    friends: async (userId: User['userId']): Promise<Friend[]> => {
+    friends: async (params: { userId: string }): Promise<Types.Friend[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friends', userId);
+      return await ipcRenderer.invoke('data-friends', params);
     },
 
-    friendActivities: async (userId: User['userId']): Promise<FriendActivity[]> => {
+    friendActivities: async (params: { userId: string }): Promise<Types.FriendActivity[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendActivities', userId);
+      return await ipcRenderer.invoke('data-friendActivities', params);
     },
 
-    friendGroup: async (userId: User['userId'], friendGroupId: FriendGroup['friendGroupId']): Promise<FriendGroup | null> => {
+    friendGroup: async (params: { userId: string; friendGroupId: string }): Promise<Types.FriendGroup | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendGroup', userId, friendGroupId);
+      return await ipcRenderer.invoke('data-friendGroup', params);
     },
 
-    friendGroups: async (userId: User['userId']): Promise<FriendGroup[]> => {
+    friendGroups: async (params: { userId: string }): Promise<Types.FriendGroup[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendGroups', userId);
+      return await ipcRenderer.invoke('data-friendGroups', params);
     },
 
-    friendApplication: async (receiverId: User['userId'], senderId: User['userId']): Promise<FriendApplication | null> => {
+    friendApplication: async (params: { receiverId: string; senderId: string }): Promise<Types.FriendApplication | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendApplication', receiverId, senderId);
+      return await ipcRenderer.invoke('data-friendApplication', params);
     },
 
-    friendApplications: async (receiverId: User['userId']): Promise<FriendApplication[]> => {
+    friendApplications: async (params: { receiverId: string }): Promise<Types.FriendApplication[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendApplications', receiverId);
+      return await ipcRenderer.invoke('data-friendApplications', params);
     },
 
-    server: async (userId: User['userId'], serverId: Server['serverId']): Promise<Server | null> => {
+    server: async (params: { userId: string; serverId: string }): Promise<Types.Server | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-server', userId, serverId);
+      return await ipcRenderer.invoke('data-server', params);
     },
 
-    servers: async (userId: User['userId']): Promise<Server[]> => {
+    servers: async (params: { userId: string }): Promise<Types.Server[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-servers', userId);
+      return await ipcRenderer.invoke('data-servers', params);
     },
 
-    serverMembers: async (serverId: Server['serverId']): Promise<Member[]> => {
+    serverMembers: async (params: { serverId: string }): Promise<Types.Member[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverMembers', serverId);
+      return await ipcRenderer.invoke('data-serverMembers', params);
     },
 
-    serverOnlineMembers: async (serverId: Server['serverId']): Promise<OnlineMember[]> => {
+    serverOnlineMembers: async (params: { serverId: string }): Promise<Types.OnlineMember[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverOnlineMembers', serverId);
+      return await ipcRenderer.invoke('data-serverOnlineMembers', params);
     },
 
-    channel: async (userId: User['userId'], serverId: Server['serverId'], channelId: Channel['channelId']): Promise<Channel | null> => {
+    channel: async (params: { userId: string; serverId: string; channelId: string }): Promise<Types.Channel | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-channel', userId, serverId, channelId);
+      return await ipcRenderer.invoke('data-channel', params);
     },
 
-    channels: async (userId: User['userId'], serverId: Server['serverId']): Promise<Channel[]> => {
+    channels: async (params: { userId: string; serverId: string }): Promise<Types.Channel[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channels', userId, serverId);
+      return await ipcRenderer.invoke('data-channels', params);
     },
 
-    channelMembers: async (serverId: Server['serverId'], channelId: Channel['channelId']): Promise<Member[]> => {
+    channelMembers: async (params: { serverId: string; channelId: string }): Promise<Types.Member[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channelMembers', serverId, channelId);
+      return await ipcRenderer.invoke('data-channelMembers', params);
     },
 
-    member: async (userId: User['userId'], serverId: Server['serverId'], channelId?: Channel['channelId']): Promise<Member | null> => {
+    member: async (params: { userId: string; serverId: string; channelId?: string }): Promise<Types.Member | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-member', userId, serverId, channelId);
+      return await ipcRenderer.invoke('data-member', params);
     },
 
-    memberApplication: async (userId: User['userId'], serverId: Server['serverId']): Promise<MemberApplication | null> => {
+    memberApplication: async (params: { userId: string; serverId: string }): Promise<Types.MemberApplication | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberApplication', userId, serverId);
+      return await ipcRenderer.invoke('data-memberApplication', params);
     },
 
-    memberApplications: async (serverId: Server['serverId']): Promise<MemberApplication[]> => {
+    memberApplications: async (params: { serverId: string }): Promise<Types.MemberApplication[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberApplications', serverId);
+      return await ipcRenderer.invoke('data-memberApplications', params);
     },
 
-    memberInvitation: async (receiverId: User['userId'], serverId: Server['serverId']): Promise<MemberInvitation | null> => {
+    memberInvitation: async (params: { receiverId: string; serverId: string }): Promise<Types.MemberInvitation | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberInvitation', receiverId, serverId);
+      return await ipcRenderer.invoke('data-memberInvitation', params);
     },
 
-    memberInvitations: async (receiverId: User['userId']): Promise<MemberInvitation[]> => {
+    memberInvitations: async (params: { receiverId: string }): Promise<Types.MemberInvitation[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberInvitations', receiverId);
+      return await ipcRenderer.invoke('data-memberInvitations', params);
     },
 
-    notifications: async (region: LanguageKey): Promise<Notification[]> => {
+    notifications: async (params: { region: Types.LanguageKey }): Promise<Types.Notification[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-notifications', region);
+      return await ipcRenderer.invoke('data-notifications', params);
     },
 
-    announcements: async (region: LanguageKey): Promise<Announcement[]> => {
+    announcements: async (params: { region: Types.LanguageKey }): Promise<Types.Announcement[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-announcements', region);
+      return await ipcRenderer.invoke('data-announcements', params);
     },
 
-    recommendServers: async (region: LanguageKey): Promise<RecommendServer[]> => {
+    recommendServers: async (params: { region: Types.LanguageKey }): Promise<Types.RecommendServer[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-recommendServers', region);
+      return await ipcRenderer.invoke('data-recommendServers', params);
     },
 
-    uploadImage: async (folder: string, imageName: string, imageUnit8Array: Uint8Array): Promise<{ imageName: string; imageUrl: string } | null> => {
+    uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-uploadImage', folder, imageName, imageUnit8Array);
+      return await ipcRenderer.invoke('data-uploadImage', params);
     },
 
-    searchServer: async (query: string): Promise<Server[]> => {
+    searchServer: async (params: { query: string }): Promise<Types.Server[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchServer', query);
+      return await ipcRenderer.invoke('data-searchServer', params);
     },
 
-    searchUser: async (query: string): Promise<User[]> => {
+    searchUser: async (params: { query: string }): Promise<Types.User[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchUser', query);
+      return await ipcRenderer.invoke('data-searchUser', params);
     },
   },
 
@@ -288,7 +263,7 @@ const ipc = {
   },
 
   popup: {
-    open: (type: PopupType, id: string, initialData: any, force?: boolean) => {
+    open: (type: Types.PopupType, id: string, initialData: any, force?: boolean) => {
       if (!isElectron) return;
       ipcRenderer.send('open-popup', type, id, initialData, force);
     },
@@ -346,32 +321,32 @@ const ipc = {
   },
 
   language: {
-    get: (): LanguageKey => {
+    get: (): Types.LanguageKey => {
       if (!isElectron) return 'zh-TW';
       return ipcRenderer.sendSync('get-language');
     },
 
-    set: (language: LanguageKey) => {
+    set: (language: Types.LanguageKey) => {
       if (!isElectron) return;
       ipcRenderer.send('set-language', language);
     },
 
-    onUpdate: (callback: (language: LanguageKey) => void) => {
+    onUpdate: (callback: (language: Types.LanguageKey) => void) => {
       if (!isElectron) return () => {};
       ipcRenderer.removeAllListeners('language');
-      const listener = (_: any, language: LanguageKey) => callback(language);
+      const listener = (_: any, language: Types.LanguageKey) => callback(language);
       ipcRenderer.on('language', listener);
       return () => ipcRenderer.removeListener('language', listener);
     },
   },
 
   customThemes: {
-    get: (): Theme[] => {
+    get: (): Types.Theme[] => {
       if (!isElectron) return [];
       return ipcRenderer.sendSync('get-custom-themes');
     },
 
-    add: (theme: Theme) => {
+    add: (theme: Types.Theme) => {
       if (!isElectron) return;
       ipcRenderer.send('add-custom-theme', theme);
     },
@@ -381,29 +356,29 @@ const ipc = {
       ipcRenderer.send('delete-custom-theme', index);
     },
 
-    onUpdate: (callback: (themes: Theme[]) => void) => {
+    onUpdate: (callback: (themes: Types.Theme[]) => void) => {
       if (!isElectron) return () => [];
       ipcRenderer.removeAllListeners('custom-themes');
-      const listener = (_: any, themes: Theme[]) => callback(themes);
+      const listener = (_: any, themes: Types.Theme[]) => callback(themes);
       ipcRenderer.on('custom-themes', listener);
       return () => ipcRenderer.removeListener('custom-themes', listener);
     },
 
     current: {
-      get: (): Theme | null => {
+      get: (): Types.Theme | null => {
         if (!isElectron) return null;
         return ipcRenderer.sendSync('get-current-theme');
       },
 
-      set: (theme: Theme | null) => {
+      set: (theme: Types.Theme | null) => {
         if (!isElectron) return;
         ipcRenderer.send('set-current-theme', theme);
       },
 
-      onUpdate: (callback: (theme: Theme | null) => void) => {
+      onUpdate: (callback: (theme: Types.Theme | null) => void) => {
         if (!isElectron) return () => null;
         ipcRenderer.removeAllListeners('current-theme');
-        const listener = (_: any, theme: Theme | null) => callback(theme);
+        const listener = (_: any, theme: Types.Theme | null) => callback(theme);
         ipcRenderer.on('current-theme', listener);
         return () => ipcRenderer.removeListener('current-theme', listener);
       },
@@ -411,7 +386,7 @@ const ipc = {
   },
 
   discord: {
-    updatePresence: (presence: DiscordPresence) => {
+    updatePresence: (presence: Types.DiscordPresence) => {
       if (!isElectron) return;
       ipcRenderer.send('update-discord-presence', presence);
     },
@@ -439,7 +414,7 @@ const ipc = {
   },
 
   systemSettings: {
-    set: (settings: Partial<SystemSettings>) => {
+    set: (settings: Partial<Types.SystemSettings>) => {
       if (!isElectron) return;
       if (settings.autoLogin !== undefined) ipcRenderer.send('set-auto-login', settings.autoLogin);
       if (settings.autoLaunch !== undefined) ipcRenderer.send('set-auto-launch', settings.autoLaunch);
@@ -483,7 +458,7 @@ const ipc = {
       if (settings.updateChannel !== undefined) ipcRenderer.send('set-update-channel', settings.updateChannel);
     },
 
-    get: (): SystemSettings | null => {
+    get: (): Types.SystemSettings | null => {
       if (!isElectron) return null;
       return ipcRenderer.sendSync('get-system-settings');
     },
@@ -603,19 +578,19 @@ const ipc = {
     },
 
     channelUIMode: {
-      set: (key: ChannelUIMode) => {
+      set: (key: Types.ChannelUIMode) => {
         if (!isElectron) return;
         ipcRenderer.send('set-channel-ui-mode', key);
       },
 
-      get: (): ChannelUIMode => {
+      get: (): Types.ChannelUIMode => {
         if (!isElectron) return 'classic';
         return ipcRenderer.sendSync('get-channel-ui-mode');
       },
 
-      onUpdate: (callback: (key: ChannelUIMode) => void) => {
+      onUpdate: (callback: (key: Types.ChannelUIMode) => void) => {
         if (!isElectron) return () => {};
-        const listener = (_: any, channelUIMode: ChannelUIMode) => callback(channelUIMode);
+        const listener = (_: any, channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
         ipcRenderer.on('channel-ui-mode', listener);
         return () => ipcRenderer.removeListener('channel-ui-mode', listener);
       },
@@ -717,19 +692,19 @@ const ipc = {
     },
 
     recordFormat: {
-      set: (format: 'wav' | 'mp3') => {
+      set: (format: Types.RecordFormat) => {
         if (!isElectron) return;
         ipcRenderer.send('set-record-format', format);
       },
 
-      get: (): 'wav' | 'mp3' => {
+      get: (): Types.RecordFormat => {
         if (!isElectron) return 'wav';
         return ipcRenderer.sendSync('get-record-format');
       },
 
-      onUpdate: (callback: (format: 'wav' | 'mp3') => void) => {
+      onUpdate: (callback: (format: Types.RecordFormat) => void) => {
         if (!isElectron) return () => {};
-        const listener = (_: any, format: 'wav' | 'mp3') => callback(format);
+        const listener = (_: any, format: Types.RecordFormat) => callback(format);
         ipcRenderer.on('record-format', listener);
         return () => ipcRenderer.removeListener('record-format', listener);
       },
@@ -888,38 +863,38 @@ const ipc = {
     },
 
     mixMode: {
-      set: (key: MixMode) => {
+      set: (key: Types.MixMode) => {
         if (!isElectron) return;
         ipcRenderer.send('set-mix-mode', key);
       },
 
-      get: (): MixMode => {
+      get: (): Types.MixMode => {
         if (!isElectron) return 'app';
         return ipcRenderer.sendSync('get-mix-mode');
       },
 
-      onUpdate: (callback: (key: MixMode) => void) => {
+      onUpdate: (callback: (key: Types.MixMode) => void) => {
         if (!isElectron) return () => {};
-        const listener = (_: any, key: MixMode) => callback(key);
+        const listener = (_: any, key: Types.MixMode) => callback(key);
         ipcRenderer.on('mix-mode', listener);
         return () => ipcRenderer.removeListener('mix-mode', listener);
       },
     },
 
     speakingMode: {
-      set: (key: SpeakingMode) => {
+      set: (key: Types.SpeakingMode) => {
         if (!isElectron) return;
         ipcRenderer.send('set-speaking-mode', key);
       },
 
-      get: (): SpeakingMode => {
+      get: (): Types.SpeakingMode => {
         if (!isElectron) return 'auto';
         return ipcRenderer.sendSync('get-speaking-mode');
       },
 
-      onUpdate: (callback: (key: SpeakingMode) => void) => {
+      onUpdate: (callback: (key: Types.SpeakingMode) => void) => {
         if (!isElectron) return () => {};
-        const listener = (_: any, key: SpeakingMode) => callback(key);
+        const listener = (_: any, key: Types.SpeakingMode) => callback(key);
         ipcRenderer.on('speaking-mode', listener);
         return () => ipcRenderer.removeListener('speaking-mode', listener);
       },
@@ -1283,6 +1258,13 @@ const ipc = {
   changeServer: (server: 'prod' | 'dev') => {
     if (!isElectron) return;
     ipcRenderer.send('change-server', server);
+  },
+
+  env: {
+    get: (): Record<string, string> => {
+      if (!isElectron) return {};
+      return ipcRenderer.sendSync('get-env');
+    },
   },
 };
 

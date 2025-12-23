@@ -3,6 +3,8 @@ import ipc from '@/ipc';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
+import Logger from '@/utils/logger';
+
 const BASE_VOLUME = 5;
 
 type ActionScannerContextType = {
@@ -192,7 +194,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeStatusAutoIdle = (enable: boolean) => {
-      console.info('[ActionScanner] status auto idle updated: ', enable);
+      new Logger('ActionScanner').info(`Status auto idle updated: ${enable}`);
       idleCheck.current = enable;
       lastActiveRef.current = Date.now();
     };
@@ -203,7 +205,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeStatusAutoIdleMinutes = (value: number) => {
-      console.info('[ActionScanner] status auto idle minutes updated: ', value);
+      new Logger('ActionScanner').info(`Status auto idle minutes updated: ${value}`);
       idleMinutes.current = value;
     };
     changeStatusAutoIdleMinutes(ipc.systemSettings.statusAutoIdleMinutes.get());
@@ -213,7 +215,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeDefaultSpeakingKey = (key: string) => {
-      console.info('[ActionScanner] default speaking key updated: ', key);
+      new Logger('ActionScanner').info(`Default speaking key updated: ${key}`);
       speakingKeyRef.current = key;
     };
     changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
@@ -223,7 +225,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeHotKeyOpenMainWindow = (key: string) => {
-      console.info('[ActionScanner] hot key open main window updated: ', key);
+      new Logger('ActionScanner').info(`Hot key open main window updated: ${key}`);
       openMainWindowKeyRef.current = key;
     };
     changeHotKeyOpenMainWindow(ipc.systemSettings.hotKeyOpenMainWindow.get());
@@ -233,7 +235,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeHotKeyIncreaseVolume = (key: string) => {
-      console.info('[ActionScanner] hot key increase volume updated: ', key);
+      new Logger('ActionScanner').info(`Hot key increase volume updated: ${key}`);
       increaseVolumeKeyRef.current = key;
     };
     changeHotKeyIncreaseVolume(ipc.systemSettings.hotKeyIncreaseVolume.get());
@@ -243,7 +245,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeHotKeyDecreaseVolume = (key: string) => {
-      console.info('[ActionScanner] hot key decrease volume updated: ', key);
+      new Logger('ActionScanner').info(`Hot key decrease volume updated: ${key}`);
       decreaseVolumeKeyRef.current = key;
     };
     changeHotKeyDecreaseVolume(ipc.systemSettings.hotKeyDecreaseVolume.get());
@@ -253,7 +255,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeHotKeyToggleSpeaker = (key: string) => {
-      console.info('[ActionScanner] hot key toggle speaker updated: ', key);
+      new Logger('ActionScanner').info(`Hot key toggle speaker updated: ${key}`);
       toggleSpeakerKeyRef.current = key;
     };
     changeHotKeyToggleSpeaker(ipc.systemSettings.hotKeyToggleSpeaker.get());
@@ -263,7 +265,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
 
   useEffect(() => {
     const changeHotKeyToggleMicrophone = (key: string) => {
-      console.info('[ActionScanner] hot key toggle microphone updated: ', key);
+      new Logger('ActionScanner').info(`Hot key toggle microphone updated: ${key}`);
       toggleMicrophoneKeyRef.current = key;
     };
     changeHotKeyToggleMicrophone(ipc.systemSettings.hotKeyToggleMicrophone.get());

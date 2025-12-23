@@ -316,7 +316,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
       {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
       <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
-      <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} />
+      <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} showTooltip={false} />
       <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isUser && <div className={styles['my-location-icon']} />}
     </div>

@@ -104,7 +104,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       isUploadingRef.current = false;
       return;
     }
-    ipc.data.uploadImage('message', `${Date.now()}`, imageUnit8Array).then((response) => {
+    ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
       if (response) {
         editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
         syncStyles();
@@ -188,7 +188,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
       setTargetCurrentServer(null);
       return;
     }
-    ipc.data.server(targetId, targetCurrentServerId).then((server) => {
+    ipc.data.server({ userId: targetId, serverId: targetCurrentServerId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
   }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);
@@ -309,7 +309,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             />
             {targetVip > 0 && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
-              <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} />
+              <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} showTooltip={false} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
               <BadgeList badges={JSON.parse(targetBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} grid={true} />
             </div>

@@ -96,7 +96,7 @@ export type SystemSettings = {
 
   inputAudioDevice: string;
   outputAudioDevice: string;
-  recordFormat: 'wav' | 'mp3';
+  recordFormat: RecordFormat;
   recordSavePath: string;
   mixEffect: boolean;
   mixEffectType: string;
@@ -191,6 +191,8 @@ export type SpeakingMode = 'key' | 'auto';
 export type MixMode = 'all' | 'app';
 
 export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
+
+export type RecordFormat = 'wav' | 'mp3';
 
 export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
 
@@ -411,7 +413,7 @@ export type StoreType = {
   fontSize: number;
   inputAudioDevice: string;
   outputAudioDevice: string;
-  recordFormat: 'wav' | 'mp3';
+  recordFormat: RecordFormat;
   recordSavePath: string;
   mixEffect: boolean;
   mixEffectType: string;

@@ -127,7 +127,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
       isUploadingRef.current = false;
       return;
     }
-    ipc.data.uploadImage('user', userId, imageUnit8Array).then((response) => {
+    ipc.data.uploadImage({ folder: 'user', imageName: userId, imageUnit8Array }).then((response) => {
       if (response) {
         setTarget((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
         handleEditUser({ avatar: response.imageName, avatarUrl: response.imageUrl });

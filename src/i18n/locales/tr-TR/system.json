@@ -1,6 +1,6 @@
 {
   "cancel": "İptal etmek",
-  "convert-wav-to-mp3-failed": "轉檔至 MP3 失敗",
+  "convert-wav-to-mp3-failed": "MP3’e dönüştürme başarısız oldu",
   "download-update": "Güncellemeyi indir",
   "exit": "Çıkış",
   "install-after-quit": "Kapalıyken kurun",
@@ -8,7 +8,7 @@
   "is-latest-version": "Zaten son versiyon bu.",
   "logout": "oturumu Kapat",
   "open-main-window": "Ana pencereyi aç",
-  "select-record-save-path": "選擇錄音存檔位置",
+  "select-record-save-path": "Kayıt arşiv konumunu seç",
   "update-available": "Yeni bir sürüm mevcut",
   "update-available-message": "Yeni sürüm {{version}} {{releaseDate}} tarihinde yayınlandı. İndirmeyi başlatmak için \"Güncellemeyi İndir\" düğmesine tıklayın.",
   "update-downloaded": "Güncellemeyi Yükleme",

@@ -28,12 +28,12 @@ export function escapeHtml(str: unknown): string {
     .replace(/(^|\n)&gt;\s/g, '$1> ');
 }
 
-export const fromTags = (raw: string) => {
+export function fromTags(raw: string) {
   return raw
     .replace(emojiRegex, (_, code) => {
       const emoji = emojis.find((e) => e.code === code);
       if (!emoji) return code;
-      return `<img data-emoji='${code}' class='${markdownStyles['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
+      return `<img data-emoji='${code}' loading='lazy' class='${markdownStyles['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
     })
     .replace(discordTimestampRegex, (_, timestamp) => {
       const date = new Date(parseInt(timestamp) * 1000);
@@ -51,9 +51,9 @@ export const fromTags = (raw: string) => {
     .replace(kickRegex, (_, username) => {
       return `<iframe data-kick='${username}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
     });
-};
+}
 
-export const toTags = (raw: string) => {
+export function toTags(raw: string) {
   return raw
     .replace(emojiBackRegex, (_: string, code: string) => {
       return `:${escapeHtml(code)}:`;
@@ -74,4 +74,4 @@ export const toTags = (raw: string) => {
       return `<kick data-kick='${escapeHtml(username)}'></kick>`;
     })
     .replace(pTagRegex, '');
-};
+}

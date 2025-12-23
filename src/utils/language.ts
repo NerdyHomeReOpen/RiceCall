@@ -1,7 +1,7 @@
 import { TFunction } from 'i18next';
 import i18n from '@/i18n';
 
-export const getPermissionText = (t: TFunction<'translation', undefined>, permission: number): string => {
+export function getPermissionText(t: TFunction<'translation', undefined>, permission: number): string {
   const permissionMap: Record<number, string> = {
     1: t('guest'),
     2: t('member'),
@@ -13,9 +13,9 @@ export const getPermissionText = (t: TFunction<'translation', undefined>, permis
     8: t('super-admin'),
   };
   return permissionMap[permission] || t('unknown-user');
-};
+}
 
-export const getFormatTimeDiff = (t: TFunction<'translation', undefined>, timestamp: number): string => {
+export function getFormatTimeDiff(t: TFunction<'translation', undefined>, timestamp: number): string {
   const now = Date.now();
   const diff = Math.floor((timestamp - now) / 1000);
   const isFuture = diff > 0;
@@ -44,9 +44,9 @@ export const getFormatTimeDiff = (t: TFunction<'translation', undefined>, timest
   }
 
   return t('just-now');
-};
+}
 
-export const getFormatDate = (timestamp: number, type: string = 'd' as 'd' | 't' | 'all'): string => {
+export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't' | 'all'): string {
   const date = new Date(timestamp);
   const year = date.getFullYear();
   const month = (date.getMonth() + 1).toString().padStart(2, '0');
@@ -62,17 +62,17 @@ export const getFormatDate = (timestamp: number, type: string = 'd' as 'd' | 't'
     default:
       return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
   }
-};
+}
 
-export const getFormatTimeFromSecond = (seconds: number): string => {
+export function getFormatTimeFromSecond(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
   const s = Math.floor(seconds % 60);
   const pad = (n: number) => n.toString().padStart(2, '0');
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
-};
+}
 
-export const getFormatTimestamp = (t: TFunction<'translation', undefined>, timestamp: number): string => {
+export function getFormatTimestamp(t: TFunction<'translation', undefined>, timestamp: number): string {
   const timezoneLang = i18n.language;
   const now = new Date();
   const messageDate = new Date(timestamp);
@@ -92,4 +92,4 @@ export const getFormatTimestamp = (t: TFunction<'translation', undefined>, times
     return `${t('yesterday')} ${timeString}`;
   }
   return `${messageDate.toLocaleDateString(timezoneLang)} ${timeString}`;
-};
+}

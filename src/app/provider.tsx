@@ -12,6 +12,8 @@ import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
 
+import Logger from '@/utils/logger';
+
 interface ProvidersProps {
   children: React.ReactNode;
 }
@@ -20,7 +22,7 @@ const Providers = ({ children }: ProvidersProps) => {
   // Effects
   useEffect(() => {
     const changeFont = (font: string | null) => {
-      console.info('[Font] font updated: ', font);
+      new Logger('Font').info(`Font updated: ${font}`);
       if (!font) return;
       document.body.style.setProperty('font-family', font, 'important');
       document.body.style.setProperty('--font-family', font, 'important');
@@ -32,7 +34,7 @@ const Providers = ({ children }: ProvidersProps) => {
 
   useEffect(() => {
     const changeFontSize = (fontSize: number | null) => {
-      console.info('[Font] font size updated: ', fontSize);
+      new Logger('Font').info(`Font size updated: ${fontSize}`);
       if (!fontSize) return;
       document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
     };
@@ -43,7 +45,7 @@ const Providers = ({ children }: ProvidersProps) => {
 
   useEffect(() => {
     const changeTheme = (theme: Types.Theme | null) => {
-      console.info('[Theme] theme updated: ', theme);
+      new Logger('Theme').info(`Theme updated: ${theme}`);
       if (!theme) return;
       document.body.style.setProperty('--header-image', theme.headerImage, 'important');
       document.body.style.setProperty('--main-color', theme.mainColor, 'important');
@@ -56,7 +58,7 @@ const Providers = ({ children }: ProvidersProps) => {
 
   useEffect(() => {
     const changeLanguage = (language: Types.LanguageKey) => {
-      console.info('[Language] language updated: ', language);
+      new Logger('Language').info(`Language updated: ${language}`);
       if (!language) return;
       i18n.changeLanguage(language);
     };

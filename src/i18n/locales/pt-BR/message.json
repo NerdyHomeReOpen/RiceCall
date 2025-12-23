@@ -97,7 +97,7 @@
   "not-receive-application": "Este grupo não aceita pedidos para se tornar membro.",
   "others-device-login": "Outro dispositivo está conectado, por favor conecte-se novamente",
   "permission-denied": "Sem permissão suficiente.",
-  "receive-member-invitation": "您收到了群會員邀請。",
+  "receive-member-invitation": "Você recebeu um convite para participar de um grupo.",
   "receive-shake-window": "Você recebeu uma vibração de janela",
   "register-failed": "Erro ao registrar-se. Tente novamente mais tarde.",
   "register-success": "Cadastro de conta concluído com sucesso. Acesse {{0}} para verificar seu endereço de e-mail e ativar sua conta. Você não poderá fazer login até que sua conta seja ativada. Caso não tenha recebido o e-mail de verificação, acesse o [site oficial](https://ricecall.com.tw) para solicitar o reenvio do e-mail de verificação.",

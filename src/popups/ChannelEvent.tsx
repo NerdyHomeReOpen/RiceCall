@@ -113,16 +113,16 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
 
     useEffect(() => {
       const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: Types.OnlineMember }[]) => {
-        setChannelEvents((prev) => [
-          ...prev,
-          ...args.map((m) => ({
-            ...m.data,
-            type: 'join' as Types.ChannelEvent['type'],
-            prevChannelId: null,
-            nextChannelId: m.data.currentChannelId,
-            timestamp: Date.now(),
-          })),
-        ]);
+        // Add channel events
+        const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
+          const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.data.userId && om.serverId === curr.data.serverId);
+          if (!originMember) {
+            acc.push({ ...curr.data, type: 'join' as Types.ChannelEvent['type'], prevChannelId: null, nextChannelId: curr.data.currentChannelId, timestamp: Date.now() });
+          }
+          return acc;
+        }, []);
+        setChannelEvents((prev) => [...newChannelEvents, ...prev]);
+
         const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
         setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
       });
@@ -131,23 +131,16 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
 
     useEffect(() => {
       const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.OnlineMember> }[]) => {
-        args.map((m) => {
-          const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
-          if (originMember && m.update.currentChannelId) {
-            const originChannelId = originMember.currentChannelId;
-            const newMember = { ...originMember, ...m.update };
-            setChannelEvents((prev) => [
-              ...prev,
-              {
-                ...newMember,
-                type: 'move' as Types.ChannelEvent['type'],
-                prevChannelId: originChannelId,
-                nextChannelId: newMember.currentChannelId,
-                timestamp: Date.now(),
-              },
-            ]);
+        // Add channel events
+        const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
+          const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
+          if (originMember && curr.update.currentChannelId) {
+            acc.push({ ...originMember, type: 'move' as Types.ChannelEvent['type'], prevChannelId: originMember.currentChannelId, nextChannelId: curr.update.currentChannelId, timestamp: Date.now() });
           }
-        });
+          return acc;
+        }, []);
+        setChannelEvents((prev) => [...newChannelEvents, ...prev]);
+
         const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
         setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
       });
@@ -156,21 +149,16 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
 
     useEffect(() => {
       const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
-        args.map((m) => {
-          const originMember = serverOnlineMembersRef.current.find((om) => om.userId === m.userId);
+        // Add channel events
+        const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
+          const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
           if (originMember) {
-            setChannelEvents((prev) => [
-              ...prev,
-              {
-                ...originMember,
-                type: 'leave' as Types.ChannelEvent['type'],
-                prevChannelId: originMember.currentChannelId,
-                nextChannelId: null,
-                timestamp: Date.now(),
-              },
-            ]);
+            acc.push({ ...originMember, type: 'leave' as Types.ChannelEvent['type'], prevChannelId: originMember.currentChannelId, nextChannelId: null, timestamp: Date.now() });
           }
-        });
+          return acc;
+        }, []);
+        setChannelEvents((prev) => [...newChannelEvents, ...prev]);
+
         const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
         setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
       });

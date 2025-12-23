@@ -97,7 +97,7 @@
   "not-receive-application": "Gruba katılamıyorum; şu anda bu ses grubu için üyelik başvuruları kabul edilmiyor.",
   "others-device-login": "Başka bir cihaz oturum açtı, lütfen tekrar oturum açın",
   "permission-denied": "Yetersiz izinler",
-  "receive-member-invitation": "您收到了群會員邀請。",
+  "receive-member-invitation": "Bir grup üyelik daveti aldınız.",
   "receive-shake-window": "Diğer taraf size bir pencere titreşimi gönderdi",
   "register-failed": "Kayıt başarısız oldu, lütfen daha sonra tekrar deneyin",
   "register-success": "Hesap kaydı başarılı. Hesabınızı etkinleştirmek için lütfen e-posta adresinizi doğrulamak üzere {{0}} adresine gidin. Hesabınız etkinleştirilene kadar oturum açamazsınız. Doğrulama e-postası almadıysanız, lütfen doğrulama e-postasını yeniden göndermek için [resmi web sitesi](https://ricecall.com.tw) adresine gidin.",

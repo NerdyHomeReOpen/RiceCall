@@ -34,7 +34,9 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
       messageContents.map((content) =>
         content
           .split(' ')
-          .map((c) => t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: Language.getPermissionText(t, parseInt(messageParameter.userPermissionLevel)) } }))
+          .map((c) =>
+            c.startsWith('message:') ? t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: Language.getPermissionText(t, parseInt(messageParameter.userPermissionLevel)) } }) : c,
+          )
           .join(' '),
       ),
     [messageContents, escapedMessageParameter, messageParameter, t],

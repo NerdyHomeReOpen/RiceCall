@@ -1,4 +1,4 @@
-import { LanguageKey, User } from '@/types';
+import type * as Types from '@/types';
 
 export type RecommendServerCategory = {
   id: string;
@@ -9,15 +9,87 @@ export type RecommendServerCategory = {
 };
 
 export const FONT_LIST = [
-  { label: 'Arial', value: 'Arial, sans-serif' },
-  { label: 'Times New Roman', value: '"Times New Roman", serif' },
-  { label: 'Georgia', value: 'Georgia, serif' },
-  { label: 'Verdana', value: 'Verdana, sans-serif' },
-  { label: 'Courier New', value: '"Courier New", monospace' },
-  { label: '微軟正黑體', value: '"Microsoft JhengHei", sans-serif' },
-  { label: '微軟雅黑', value: '"Microsoft YaHei", sans-serif' },
-  { label: 'PingFang TC', value: '"PingFang TC", sans-serif' },
-  { label: 'Noto Sans TC', value: '"Noto Sans TC", sans-serif' },
+  // --- 推薦首選 ---
+  {
+    label: 'System Default',
+    value: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", "LiHei Pro", sans-serif',
+  },
+
+  // --- 無襯線字體 (Sans-serif) - 適合 UI 與標題 ---
+  {
+    label: 'Arial',
+    value: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
+  },
+  {
+    label: 'Verdana',
+    value: 'Verdana, Geneva, Tahoma, sans-serif',
+  },
+  {
+    label: 'Tahoma',
+    value: 'Tahoma, Verdana, Geneva, sans-serif',
+  },
+  {
+    label: 'Trebuchet MS',
+    value: '"Trebuchet MS", "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", sans-serif',
+  },
+  {
+    label: 'Impact',
+    value: 'Impact, Haettenschweiler, "Arial Narrow Bold", sans-serif',
+  },
+  {
+    label: 'Segoe UI',
+    value: '"Segoe UI", Frutiger, "Frutiger Linotype", "Dejavu Sans", "Helvetica Neue", Arial, sans-serif',
+  },
+  {
+    label: 'Roboto',
+    value: 'Roboto, "Helvetica Neue", Arial, sans-serif',
+  },
+
+  // --- 襯線字體 (Serif) - 適合文章閱讀 ---
+  {
+    label: 'Times New Roman',
+    value: '"Times New Roman", Times, serif',
+  },
+  {
+    label: 'Georgia',
+    value: 'Georgia, "Times New Roman", Times, serif',
+  },
+  {
+    label: 'Garamond',
+    value: '"EB Garamond", Garamond, "Palatino Linotype", "Book Antiqua", Palatino, serif',
+  },
+  {
+    label: 'Palatino',
+    value: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
+  },
+
+  // --- 等寬字體 (Monospace) - 適合程式碼 ---
+  {
+    label: 'Consolas',
+    value: 'Consolas, "Andale Mono", "Lucida Console", "Liberation Mono", Monaco, monospace',
+  },
+  {
+    label: 'Courier New',
+    value: '"Courier New", Courier, "Lucida Sans Typewriter", "Lucida Typewriter", monospace',
+  },
+  {
+    label: 'Monaco',
+    value: 'Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace',
+  },
+
+  // --- 中文專用 (Traditional Chinese) ---
+  {
+    label: '微軟正黑體 (Microsoft JhengHei)',
+    value: '"Microsoft JhengHei", "Heiti TC", sans-serif',
+  },
+  {
+    label: '新細明體 (PMingLiU)',
+    value: '"PMingLiU", "LiSong Pro", "Songti TC", serif',
+  },
+  {
+    label: '標楷體 (KaiTi)',
+    value: '"KaiTi", "BiauKai", "DFKai-SB", serif',
+  },
 ];
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
 export const SHAKE_COOLDOWN = 3;
@@ -122,7 +194,7 @@ export const CATEGORIES: RecommendServerCategory[] = [
     ],
   },
 ];
-export const STATUS_OPTIONS: User['status'][] = ['online', 'dnd', 'idle', 'gn'];
+export const STATUS_OPTIONS: Types.User['status'][] = ['online', 'dnd', 'idle', 'gn'];
 export const MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
   {
     tKey: 'name',
@@ -182,7 +254,7 @@ export const RECOMMEND_SERVER_CATEGORY_TABS = [
   { key: 'game', tKey: 'game' },
   { key: 'community', tKey: 'community' },
 ];
-export const LANGUAGES: { code: LanguageKey; label: string }[] = [
+export const LANGUAGES: { code: Types.LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
   { code: 'zh-CN', label: '简体中文' },
   { code: 'en-US', label: 'English' },
@@ -195,3 +267,4 @@ export const LANGUAGES: { code: LanguageKey; label: string }[] = [
 export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds
 export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';
 export const REFRESH_REGION_INFO_INTERVAL = 1000 * 60 * 10; // 10 minutes
+export const MESSAGE_VIERER_DEVIATION = 100;

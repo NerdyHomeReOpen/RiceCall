@@ -86,13 +86,13 @@ const AboutPopup: React.FC = React.memo(() => {
                 <div className={styles['name-wrapper']}>
                   <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title, { ns: 'position' })}</span>
                   <span>{staff.contact}</span>
-                </div>
-                <div className={styles['icon-wrapper']}>
                   {staff.ricecall && (
                     <div className={styles['ricecall-id']} title="RiceCall" onClick={() => navigator.clipboard.writeText(staff.ricecall)}>
-                      @{staff.ricecall}
+                      (@{staff.ricecall})
                     </div>
                   )}
+                </div>
+                <div className={styles['icon-wrapper']}>
                   {staff.github && (
                     <div className={styles['github-icon-link']} title="GitHub" onClick={() => window.open(`https://github.com/${staff.github}`, '_blank')}>
                       <FaGithub size={20} />

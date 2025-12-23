@@ -15,7 +15,7 @@ type SortField<T> = keyof T;
  * @param direction - The direction to sort by (1 for ascending, -1 for descending)
  * @returns A function that sorts an array of objects by the specified field in the specified direction
  */
-const Sorter = <T extends object>(field: SortField<T>, direction: SortDirection = 1) => {
+export function Sorter<T extends object>(field: SortField<T>, direction: SortDirection = 1) {
   return (a: T, b: T) => {
     const valueA = a[field];
     const valueB = b[field];
@@ -37,6 +37,6 @@ const Sorter = <T extends object>(field: SortField<T>, direction: SortDirection 
 
     return 0;
   };
-};
+}
 
 export default Sorter;

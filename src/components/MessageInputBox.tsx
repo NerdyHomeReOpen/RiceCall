@@ -81,7 +81,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
       isUploadingRef.current = false;
       return;
     }
-    ipc.data.uploadImage('message', `${Date.now()}`, imageUnit8Array).then((response) => {
+    ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
       if (response) {
         editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
         syncStyles();

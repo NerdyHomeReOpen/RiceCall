@@ -422,6 +422,7 @@
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
   white-space: nowrap;
+  user-select: none;
 }
 
 .friend-tab .server-name-text {
@@ -463,7 +464,7 @@
 
 .content .header {
   padding: 10px;
-  font-size: 1em;
+  font-size: 1rem;
   font-weight: bold;
 }
 
@@ -550,8 +551,13 @@
   cursor: pointer;
 }
 
+.user-name:hover {
+  text-decoration: underline;
+}
+
 .signature {
   max-width: 100%;
+  min-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
@@ -560,7 +566,5 @@
 }
 
 .timestamp {
-  align-self: flex-end;
-  font-size: 0.9em;
   color: var(--text-color-quinary);
 }

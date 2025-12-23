@@ -452,14 +452,14 @@
 .server-slogen {
   display: flex;
   align-items: center;
-  height: 1em;
+  height: 1rem;
   color: var(--text-color-quaternary);
 }
 
 .server-online {
   display: flex;
   align-items: center;
-  height: 1em;
+  height: 1rem;
   color: var(--text-color-quaternary);
 }
 
@@ -935,26 +935,30 @@
 }
 
 .announcement-detail-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
   display: flex;
   flex-direction: row;
   gap: 10px;
   align-items: center;
   justify-content: flex-start;
   padding: 10px;
-  font-size: 1.2em;
+  font-size: 1.2rem;
   font-weight: bold;
+  background-color: var(--background);
   border-bottom: 1px solid var(--border);
 }
 
 .announcement-detail-title {
   flex: 5;
   align-items: flex-start;
-  font-size: 1.2em;
+  font-size: 1.2rem;
 }
 
 .announcement-datail-date {
   flex: 1;
-  font-size: 0.8em;
+  font-size: 0.8rem;
   color: #999;
   text-align: right;
 }

@@ -25,7 +25,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
 
   // Handlers
   const handleSearchUser = (query: string) => {
-    ipc.data.searchUser(query).then((users) => {
+    ipc.data.searchUser({ query }).then((users) => {
       if (!users.length) {
         setError(t('user-not-found'));
         return;
@@ -33,7 +33,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
 
       const { userId: targetId } = users[0];
 
-      ipc.data.friend(userId, targetId).then((friend) => {
+      ipc.data.friend({ userId, targetId }).then((friend) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (targetId === userId) setError(t('cannot-add-yourself'));
         else Popup.handleOpenApplyFriend(userId, targetId);
