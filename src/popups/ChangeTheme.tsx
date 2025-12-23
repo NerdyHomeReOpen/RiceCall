@@ -116,7 +116,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   // Effects
   useEffect(() => {
     const changeCustomTheme = (customThemes: Types.Theme[]) => {
-      new Logger('CustomThemes').info(`custom themes updated: ${customThemes}`);
+      new Logger('CustomThemes').info(`Custom themes updated: ${customThemes}`);
       setCustomThemes(customThemes);
     };
     changeCustomTheme(ipc.customThemes.get());

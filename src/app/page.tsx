@@ -556,7 +556,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('connect', () => {
-      new Logger('Socket').info('connected');
       ipc.popup.close('errorDialog');
       if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
       setIsSocketConnected(true);
@@ -566,7 +565,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('disconnect', () => {
-      new Logger('Socket').info('disconnected');
       if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
       disconnectTimerRef.current = setTimeout(() => setIsSocketConnected(false), 30000);
     });
@@ -575,7 +573,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('heartbeat', (...args: { seq: number; latency: number }[]) => {
-      new Logger('Socket').info(`heartbeat: ${args[0].latency}`);
       setLatency(args[0].latency);
     });
     return () => unsub();

@@ -1,4 +1,4 @@
-import { LanguageKey, User } from '@/types';
+import type * as Types from '@/types';
 
 export type RecommendServerCategory = {
   id: string;
@@ -122,7 +122,7 @@ export const CATEGORIES: RecommendServerCategory[] = [
     ],
   },
 ];
-export const STATUS_OPTIONS: User['status'][] = ['online', 'dnd', 'idle', 'gn'];
+export const STATUS_OPTIONS: Types.User['status'][] = ['online', 'dnd', 'idle', 'gn'];
 export const MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
   {
     tKey: 'name',
@@ -182,7 +182,7 @@ export const RECOMMEND_SERVER_CATEGORY_TABS = [
   { key: 'game', tKey: 'game' },
   { key: 'community', tKey: 'community' },
 ];
-export const LANGUAGES: { code: LanguageKey; label: string }[] = [
+export const LANGUAGES: { code: Types.LanguageKey; label: string }[] = [
   { code: 'zh-TW', label: '繁體中文' },
   { code: 'zh-CN', label: '简体中文' },
   { code: 'en-US', label: 'English' },

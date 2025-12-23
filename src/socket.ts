@@ -1,10 +1,9 @@
 import { io, Socket } from 'socket.io-client';
 import { BrowserWindow, ipcMain } from 'electron';
-import log from 'electron-log';
-import { createPopup } from '../../main.js';
+import { createPopup } from '../main.js';
+import type * as Types from './types';
 import { env } from './env.js';
-
-import type * as Types from '@/types';
+import Logger from './logger.js';
 
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
 
@@ -131,7 +130,7 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
       });
     } catch (err) {
       if (i === retries) throw err;
-      log.warn(`Retrying(#${i}) socket.emit `, event, payload);
+      new Logger('Socket').warn(`Retrying(#${i}) socket.emit ${event}: ${JSON.stringify(payload)}`);
     }
   }
   throw new Error('Failed to emit event with retry');
@@ -141,10 +140,10 @@ function sendHeartbeat() {
   const start = Date.now();
   socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
     if (err) {
-      log.warn(`Heartbeat ${seq} timeout`);
+      new Logger('Socket').warn(`Heartbeat ${seq} timeout`);
     } else {
       const latency = Date.now() - start;
-      log.info(`ACK for #${ack.seq} in ${latency} ms`);
+      new Logger('Socket').info(`ACK for #${ack.seq} in ${latency} ms`);
       BrowserWindow.getAllWindows().forEach((window) => {
         window.webContents.send('heartbeat', { seq: ack.seq, latency });
       });
@@ -181,15 +180,15 @@ export function connectSocket(token: string) {
     // Register event listeners
     ClientToServerEventWithAckNames.forEach((event) => {
       ipcMain.handle(event, (_, payload) => {
-        log.info(`socket.emit`, event, payload);
+        new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(payload)}`);
         return new Promise((resolve) => {
           emitWithRetry(event, payload)
             .then((ack) => {
-              log.info(`socket.onAck`, event, ack);
+              new Logger('Socket').info(`socket.onAck ${event}: ${JSON.stringify(ack)}`);
               resolve(ack);
             })
             .catch((err) => {
-              log.error(`socket.emit error`, event, err);
+              new Logger('Socket').error(`socket.emit ${event} error: ${err.message}`);
               resolve({ ok: false, error: err.message });
             });
         });
@@ -198,14 +197,14 @@ export function connectSocket(token: string) {
 
     ClientToServerEventNames.forEach((event) => {
       ipcMain.on(event, (_, ...args) => {
-        log.info(`socket.emit`, event, ...args);
+        new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(args)}`);
         socket?.emit(event, ...args);
       });
     });
 
     ServerToClientEventNames.forEach((event) => {
       socket?.on(event, async (...args) => {
-        if (!noLogEventSet.has(event)) log.info(`socket.on`, event, ...args);
+        if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
@@ -229,7 +228,7 @@ export function connectSocket(token: string) {
     if (interval) clearInterval(interval);
     interval = setInterval(sendHeartbeat, 30000);
 
-    log.info(`Socket connected`);
+    new Logger('Socket').info(`Socket connected`);
 
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('connect', null);
@@ -252,7 +251,7 @@ export function connectSocket(token: string) {
 
     if (interval) clearInterval(interval);
 
-    log.info(`Socket disconnected, reason:`, reason);
+    new Logger('Socket').info(`Socket disconnected, reason: ${reason}`);
 
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('disconnect', reason);
@@ -260,7 +259,7 @@ export function connectSocket(token: string) {
   });
 
   socket.on('connect_error', (error) => {
-    log.error(`Socket connect error:`, error);
+    new Logger('Socket').error(`Socket connect error: ${error}`);
 
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('connect_error', error);
@@ -268,7 +267,7 @@ export function connectSocket(token: string) {
   });
 
   socket.on('reconnect', (attemptNumber) => {
-    log.info(`Socket reconnected, attempt number:`, attemptNumber);
+    new Logger('Socket').info(`Socket reconnected, attempt number: ${attemptNumber}`);
 
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect', attemptNumber);
@@ -276,7 +275,7 @@ export function connectSocket(token: string) {
   });
 
   socket.on('reconnect_error', (error) => {
-    log.error(`Socket reconnect error:`, error);
+    new Logger('Socket').error(`Socket reconnect error: ${error}`);
 
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('reconnect_error', error);

@@ -1259,6 +1259,13 @@ const ipc = {
     if (!isElectron) return;
     ipcRenderer.send('change-server', server);
   },
+
+  env: {
+    get: (): Record<string, string> => {
+      if (!isElectron) return {};
+      return ipcRenderer.sendSync('get-env');
+    },
+  },
 };
 
 export default ipc;

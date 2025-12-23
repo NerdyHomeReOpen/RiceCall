@@ -876,13 +876,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         initMicAudio(stream);
       })
       .catch((err) => {
-        new Logger('WebRTC').error(`access input device failed: ${err}`);
+        new Logger('WebRTC').error(`Access input device failed: ${err}`);
       });
   }, [inputAudioDevice, echoCancellation, noiseCancellation, isMicTaken, initMicAudio, removeMicAudio]);
 
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
-      new Logger('WebRTC').info(`input audio device updated: ${inputAudioDevice}`);
+      new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);
       setInputAudioDevice(inputAudioDevice);
     };
     changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
@@ -892,11 +892,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeOutputAudioDevice = (outputAudioDevice: string) => {
-      new Logger('WebRTC').info(`output audio device updated: ${outputAudioDevice}`);
+      new Logger('WebRTC').info(`Output audio device updated: ${outputAudioDevice}`);
       const el = speakerRef.current;
       if (el && typeof el.setSinkId === 'function') {
         el.setSinkId(outputAudioDevice).catch((err) => {
-          new Logger('WebRTC').warn(`set output device failed: ${err}`);
+          new Logger('WebRTC').warn(`Set output device failed: ${err}`);
         });
       }
     };
@@ -907,7 +907,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeEchoCancellation = (echoCancellation: boolean) => {
-      new Logger('WebRTC').info(`echo cancellation updated: ${echoCancellation}`);
+      new Logger('WebRTC').info(`Echo cancellation updated: ${echoCancellation}`);
       setEchoCancellation(echoCancellation);
     };
     changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
@@ -917,7 +917,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeNoiseCancellation = (noiseCancellation: boolean) => {
-      new Logger('WebRTC').info(`noise cancellation updated: ${noiseCancellation}`);
+      new Logger('WebRTC').info(`Noise cancellation updated: ${noiseCancellation}`);
       setNoiseCancellation(noiseCancellation);
     };
     changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
@@ -927,7 +927,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
-      new Logger('WebRTC').info(`microphone amplification updated: ${microphoneAmplification}`);
+      new Logger('WebRTC').info(`Microphone amplification updated: ${microphoneAmplification}`);
       microphoneAmplificationRef.current = microphoneAmplification;
       changeMicVolume(micVolumeRef.current);
     };
@@ -938,7 +938,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
-      new Logger('WebRTC').info(`speaking mode updated: ${speakingMode}`);
+      new Logger('WebRTC').info(`Speaking mode updated: ${speakingMode}`);
       micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
         track.enabled = speakingMode === 'key' ? isSpeakKeyPressedRef.current : true;
       });

@@ -32,7 +32,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
   const outputDeviceIdRef = useRef<string | null>(null);
 
   const playSound = (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => {
-    new Logger('SoundPlayer').info(`play sound: ${sound}, force: ${force}`);
+    new Logger('SoundPlayer').info(`Play sound: ${sound}`);
 
     if (disableAllSoundEffectRef.current && !force) return;
 
@@ -87,7 +87,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
   // Effects
   useEffect(() => {
     const changeOutputAudioDevice = (deviceId: string) => {
-      new Logger('SoundPlayer').info(`output device updated: ${deviceId}`);
+      new Logger('SoundPlayer').info(`Output device updated: ${deviceId}`);
       outputDeviceIdRef.current = deviceId || null;
     };
     changeOutputAudioDevice(ipc.systemSettings.outputAudioDevice.get());
@@ -97,7 +97,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeDisableAllSoundEffect = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`disable all sound effect updated: ${enabled}`);
+      new Logger('SoundPlayer').info(`Disable all sound effect updated: ${enabled}`);
       disableAllSoundEffectRef.current = enabled;
     };
     changeDisableAllSoundEffect(ipc.systemSettings.disableAllSoundEffect.get());
@@ -107,7 +107,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeEnterVoiceChannelSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`enter voice channel sound updated: ${enabled}`);
+      new Logger('SoundPlayer').info(`Enter voice channel sound updated: ${enabled}`);
       enterVoiceChannelSoundRef.current = enabled;
     };
     changeEnterVoiceChannelSound(ipc.systemSettings.enterVoiceChannelSound.get());
@@ -117,7 +117,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeLeaveVoiceChannelSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`leave voice channel sound updated: ${enabled}`);
+      new Logger('SoundPlayer').info(`Leave voice channel sound updated: ${enabled}`);
       leaveVoiceChannelSoundRef.current = enabled;
     };
     changeLeaveVoiceChannelSound(ipc.systemSettings.leaveVoiceChannelSound.get());
@@ -127,7 +127,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeStartSpeakingSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`start speaking sound updated: ${enabled}`);
+      new Logger('SoundPlayer').info(`Start speaking sound updated: ${enabled}`);
       startSpeakingSoundRef.current = enabled;
     };
     changeStartSpeakingSound(ipc.systemSettings.startSpeakingSound.get());
@@ -137,7 +137,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeStopSpeakingSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`stop speaking sound updated: ${enabled}`);
+      new Logger('SoundPlayer').info(`Stop speaking sound updated: ${enabled}`);
       stopSpeakingSoundRef.current = enabled;
     };
     changeStopSpeakingSound(ipc.systemSettings.stopSpeakingSound.get());
@@ -147,7 +147,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeReceiveDirectMessageSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`receive direct message sound updated: ${enabled}`);
+      new Logger('SoundPlayer').info(`Receive direct message sound updated: ${enabled}`);
       receiveDirectMessageSoundRef.current = enabled;
     };
     changeReceiveDirectMessageSound(ipc.systemSettings.receiveDirectMessageSound.get());
@@ -157,7 +157,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeReceiveChannelMessageSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`receive channel message sound updated: ${enabled}`);
+      new Logger('SoundPlayer').info(`Receive channel message sound updated: ${enabled}`);
       receiveChannelMessageSoundRef.current = enabled;
     };
     changeReceiveChannelMessageSound(ipc.systemSettings.receiveChannelMessageSound.get());
