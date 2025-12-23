@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -25,7 +26,6 @@ import { useActionScanner } from '@/providers/ActionScanner';
 
 import * as Popup from '@/utils/popup';
 import * as Default from '@/utils/default';
-import Logger from '@/utils/logger';
 
 import headerStyles from '@/styles/header.module.css';
 
@@ -893,6 +893,24 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error: Error) => {
       Popup.handleOpenErrorDialog(error.message, () => {});
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('shakeWindow', (...args: any[]) => {
+      const initialData: Record<string, unknown> | undefined = args[0].initialData;
+      if (!initialData) return;
+      ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'shakeWindow', message: args[0] }, false);
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('directMessage', (...args: any[]) => {
+      const initialData: Record<string, unknown> | undefined = args[0].initialData;
+      if (!initialData) return;
+      ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'directMessage', message: args[0] }, false);
     });
     return () => unsub();
   }, []);

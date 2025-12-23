@@ -1,6 +1,5 @@
 import { io, Socket } from 'socket.io-client';
 import { BrowserWindow, ipcMain } from 'electron';
-import { createPopup } from '../main.js';
 import type * as Types from './types';
 import { env } from './env.js';
 import Logger from './logger.js';
@@ -208,19 +207,6 @@ export function connectSocket(token: string) {
         BrowserWindow.getAllWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
-        // Handle special events
-        if (event === 'shakeWindow') {
-          const initialData: Record<string, unknown> | undefined = args[0].initialData;
-          if (!initialData) return;
-          const title = initialData.name as string;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, title);
-        }
-        if (event === 'directMessage') {
-          const initialData: Record<string, unknown> | undefined = args[0].initialData;
-          if (!initialData) return;
-          const title = initialData.name as string;
-          createPopup('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event, message: args[0] }, false, title);
-        }
       });
     });
 
