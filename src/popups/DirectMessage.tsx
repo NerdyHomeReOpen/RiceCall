@@ -309,7 +309,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             />
             {targetVip > 0 && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
-              <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} />
+              <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} showTooltip={false} />
               {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
               <BadgeList badges={JSON.parse(targetBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} grid={true} />
             </div>
