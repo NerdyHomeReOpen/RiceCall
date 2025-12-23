@@ -528,12 +528,12 @@
   min-width: 0;
 }
 
-.user-activity-top>div:first-child,
-.user-activity-top>div:nth-child(2) {
+.user-activity-top > div:first-child,
+.user-activity-top > div:nth-child(2) {
   flex-shrink: 0;
 }
 
-.user-activity-top>div:last-child {
+.user-activity-top > div:last-child {
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -556,8 +556,8 @@
 }
 
 .signature {
-  min-height: 18px;
   max-width: 100%;
+  min-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
