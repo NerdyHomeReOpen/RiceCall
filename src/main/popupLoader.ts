@@ -14,7 +14,7 @@ const popupLoaders: Record<string, (data: any) => Promise<any>> = {
     const [target, friendGroups, friendApplication] = await Promise.all([
       data.user({ userId: targetId }),
       data.friendGroups({ userId }),
-      data.friendApplication({ receiverId: userId, senderId: targetId }),
+      data.friendApplication({ senderId: userId, receiverId: targetId }),
     ]);
 
     return { userId, targetId, target, friendGroups, friendApplication };
