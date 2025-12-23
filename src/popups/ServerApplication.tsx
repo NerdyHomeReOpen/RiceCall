@@ -8,8 +8,6 @@ import styles from '@/styles/serverApplication.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
 interface ServerApplicationPopupProps {
-  userId: Types.User['userId'];
-  serverId: Types.Server['serverId'];
   server: Types.Server;
 }
 
