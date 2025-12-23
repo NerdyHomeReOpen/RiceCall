@@ -96,7 +96,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
     if (!canSearchRef.current) return;
 
-    ipc.data.searchServer(query).then((serverResults) => {
+    ipc.data.searchServer({ query }).then((serverResults) => {
       const q = searchQueryRef.current;
 
       handleClearSearchState();
@@ -205,7 +205,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   useEffect(() => {
     const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
       if (!userId || !serverDisplayId) return;
-      ipc.data.searchServer(serverDisplayId).then((servers) => {
+      ipc.data.searchServer({ query: serverDisplayId }).then((servers) => {
         const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
         if (!target) return;
         handleServerSelect(target);

@@ -69,139 +69,139 @@ const ipc = {
   },
 
   data: {
-    user: async (userId: Types.User['userId']): Promise<Types.User | null> => {
+    user: async (params: { userId: string }): Promise<Types.User | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user', userId);
+      return await ipcRenderer.invoke('data-user', params);
     },
 
-    userHotReload: async (userId: Types.User['userId']): Promise<Types.User | null> => {
+    userHotReload: async (params: { userId: string }): Promise<Types.User | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user-hot-reload', userId);
+      return await ipcRenderer.invoke('data-user-hot-reload', params);
     },
 
-    friend: async (userId: Types.User['userId'], targetId: Types.User['userId']): Promise<Types.Friend | null> => {
+    friend: async (params: { userId: string; targetId: string }): Promise<Types.Friend | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friend', userId, targetId);
+      return await ipcRenderer.invoke('data-friend', params);
     },
 
-    friends: async (userId: Types.User['userId']): Promise<Types.Friend[]> => {
+    friends: async (params: { userId: string }): Promise<Types.Friend[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friends', userId);
+      return await ipcRenderer.invoke('data-friends', params);
     },
 
-    friendActivities: async (userId: Types.User['userId']): Promise<Types.FriendActivity[]> => {
+    friendActivities: async (params: { userId: string }): Promise<Types.FriendActivity[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendActivities', userId);
+      return await ipcRenderer.invoke('data-friendActivities', params);
     },
 
-    friendGroup: async (userId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId']): Promise<Types.FriendGroup | null> => {
+    friendGroup: async (params: { userId: string; friendGroupId: string }): Promise<Types.FriendGroup | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendGroup', userId, friendGroupId);
+      return await ipcRenderer.invoke('data-friendGroup', params);
     },
 
-    friendGroups: async (userId: Types.User['userId']): Promise<Types.FriendGroup[]> => {
+    friendGroups: async (params: { userId: string }): Promise<Types.FriendGroup[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendGroups', userId);
+      return await ipcRenderer.invoke('data-friendGroups', params);
     },
 
-    friendApplication: async (receiverId: Types.User['userId'], senderId: Types.User['userId']): Promise<Types.FriendApplication | null> => {
+    friendApplication: async (params: { receiverId: string; senderId: string }): Promise<Types.FriendApplication | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendApplication', receiverId, senderId);
+      return await ipcRenderer.invoke('data-friendApplication', params);
     },
 
-    friendApplications: async (receiverId: Types.User['userId']): Promise<Types.FriendApplication[]> => {
+    friendApplications: async (params: { receiverId: string }): Promise<Types.FriendApplication[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendApplications', receiverId);
+      return await ipcRenderer.invoke('data-friendApplications', params);
     },
 
-    server: async (userId: Types.User['userId'], serverId: Types.Server['serverId']): Promise<Types.Server | null> => {
+    server: async (params: { userId: string; serverId: string }): Promise<Types.Server | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-server', userId, serverId);
+      return await ipcRenderer.invoke('data-server', params);
     },
 
-    servers: async (userId: Types.User['userId']): Promise<Types.Server[]> => {
+    servers: async (params: { userId: string }): Promise<Types.Server[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-servers', userId);
+      return await ipcRenderer.invoke('data-servers', params);
     },
 
-    serverMembers: async (serverId: Types.Server['serverId']): Promise<Types.Member[]> => {
+    serverMembers: async (params: { serverId: string }): Promise<Types.Member[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverMembers', serverId);
+      return await ipcRenderer.invoke('data-serverMembers', params);
     },
 
-    serverOnlineMembers: async (serverId: Types.Server['serverId']): Promise<Types.OnlineMember[]> => {
+    serverOnlineMembers: async (params: { serverId: string }): Promise<Types.OnlineMember[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverOnlineMembers', serverId);
+      return await ipcRenderer.invoke('data-serverOnlineMembers', params);
     },
 
-    channel: async (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): Promise<Types.Channel | null> => {
+    channel: async (params: { userId: string; serverId: string; channelId: string }): Promise<Types.Channel | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-channel', userId, serverId, channelId);
+      return await ipcRenderer.invoke('data-channel', params);
     },
 
-    channels: async (userId: Types.User['userId'], serverId: Types.Server['serverId']): Promise<Types.Channel[]> => {
+    channels: async (params: { userId: string; serverId: string }): Promise<Types.Channel[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channels', userId, serverId);
+      return await ipcRenderer.invoke('data-channels', params);
     },
 
-    channelMembers: async (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): Promise<Types.Member[]> => {
+    channelMembers: async (params: { serverId: string; channelId: string }): Promise<Types.Member[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channelMembers', serverId, channelId);
+      return await ipcRenderer.invoke('data-channelMembers', params);
     },
 
-    member: async (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId?: Types.Channel['channelId']): Promise<Types.Member | null> => {
+    member: async (params: { userId: string; serverId: string; channelId?: string }): Promise<Types.Member | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-member', userId, serverId, channelId);
+      return await ipcRenderer.invoke('data-member', params);
     },
 
-    memberApplication: async (userId: Types.User['userId'], serverId: Types.Server['serverId']): Promise<Types.MemberApplication | null> => {
+    memberApplication: async (params: { userId: string; serverId: string }): Promise<Types.MemberApplication | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberApplication', userId, serverId);
+      return await ipcRenderer.invoke('data-memberApplication', params);
     },
 
-    memberApplications: async (serverId: Types.Server['serverId']): Promise<Types.MemberApplication[]> => {
+    memberApplications: async (params: { serverId: string }): Promise<Types.MemberApplication[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberApplications', serverId);
+      return await ipcRenderer.invoke('data-memberApplications', params);
     },
 
-    memberInvitation: async (receiverId: Types.User['userId'], serverId: Types.Server['serverId']): Promise<Types.MemberInvitation | null> => {
+    memberInvitation: async (params: { receiverId: string; serverId: string }): Promise<Types.MemberInvitation | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberInvitation', receiverId, serverId);
+      return await ipcRenderer.invoke('data-memberInvitation', params);
     },
 
-    memberInvitations: async (receiverId: Types.User['userId']): Promise<Types.MemberInvitation[]> => {
+    memberInvitations: async (params: { receiverId: string }): Promise<Types.MemberInvitation[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberInvitations', receiverId);
+      return await ipcRenderer.invoke('data-memberInvitations', params);
     },
 
-    notifications: async (region: Types.LanguageKey): Promise<Types.Notification[]> => {
+    notifications: async (params: { region: Types.LanguageKey }): Promise<Types.Notification[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-notifications', region);
+      return await ipcRenderer.invoke('data-notifications', params);
     },
 
-    announcements: async (region: Types.LanguageKey): Promise<Types.Announcement[]> => {
+    announcements: async (params: { region: Types.LanguageKey }): Promise<Types.Announcement[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-announcements', region);
+      return await ipcRenderer.invoke('data-announcements', params);
     },
 
-    recommendServers: async (region: Types.LanguageKey): Promise<Types.RecommendServer[]> => {
+    recommendServers: async (params: { region: Types.LanguageKey }): Promise<Types.RecommendServer[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-recommendServers', region);
+      return await ipcRenderer.invoke('data-recommendServers', params);
     },
 
-    uploadImage: async (folder: string, imageName: string, imageUnit8Array: Uint8Array): Promise<{ imageName: string; imageUrl: string } | null> => {
+    uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
       if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-uploadImage', folder, imageName, imageUnit8Array);
+      return await ipcRenderer.invoke('data-uploadImage', params);
     },
 
-    searchServer: async (query: string): Promise<Types.Server[]> => {
+    searchServer: async (params: { query: string }): Promise<Types.Server[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchServer', query);
+      return await ipcRenderer.invoke('data-searchServer', params);
     },
 
-    searchUser: async (query: string): Promise<Types.User[]> => {
+    searchUser: async (params: { query: string }): Promise<Types.User[]> => {
       if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchUser', query);
+      return await ipcRenderer.invoke('data-searchUser', params);
     },
   },
 

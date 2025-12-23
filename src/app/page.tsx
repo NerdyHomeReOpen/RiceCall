@@ -434,7 +434,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
-    ipc.data.userHotReload(userId).then((user) => {
+    ipc.data.userHotReload({ userId }).then((user) => {
       if (user) {
         setUser(user);
         setIsSocketConnected(true);
@@ -469,22 +469,22 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      ipc.data.servers(userId).then((servers) => {
+      ipc.data.servers({ userId }).then((servers) => {
         if (servers) setServers(servers);
       });
-      ipc.data.friends(userId).then((friends) => {
+      ipc.data.friends({ userId }).then((friends) => {
         if (friends) setFriends(friends);
       });
-      ipc.data.friendActivities(userId).then((friendActivities) => {
+      ipc.data.friendActivities({ userId }).then((friendActivities) => {
         if (friendActivities) setFriendActivities(friendActivities);
       });
-      ipc.data.friendGroups(userId).then((friendGroups) => {
+      ipc.data.friendGroups({ userId }).then((friendGroups) => {
         if (friendGroups) setFriendGroups(friendGroups);
       });
-      ipc.data.friendApplications(userId).then((friendApplications) => {
+      ipc.data.friendApplications({ receiverId: userId }).then((friendApplications) => {
         if (friendApplications) setFriendApplications(friendApplications);
       });
-      ipc.data.memberInvitations(userId).then((memberInvitations) => {
+      ipc.data.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
         if (memberInvitations) setMemberInvitations(memberInvitations);
       });
       setSystemNotifications([]); // TODO: Implement system notification
@@ -495,13 +495,13 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (!userId) return;
     const refresh = async () => {
-      ipc.data.announcements(region).then((announcements) => {
+      ipc.data.announcements({ region }).then((announcements) => {
         if (announcements) setAnnouncements(announcements);
       });
-      ipc.data.notifications(region).then((notifications) => {
+      ipc.data.notifications({ region }).then((notifications) => {
         if (notifications) setNotifications(notifications);
       });
-      ipc.data.recommendServers(region).then((recommendServerList) => {
+      ipc.data.recommendServers({ region }).then((recommendServerList) => {
         if (recommendServerList) setRecommendServers(recommendServerList);
       });
     };
@@ -524,16 +524,16 @@ const RootPageComponent: React.FC = React.memo(() => {
       return;
     }
     const refresh = async () => {
-      ipc.data.server(userId, currentServerId).then((server) => {
+      ipc.data.server({ userId, serverId: currentServerId }).then((server) => {
         if (server) setCurrentServer(server);
       });
-      ipc.data.channels(userId, currentServerId).then((channels) => {
+      ipc.data.channels({ userId, serverId: currentServerId }).then((channels) => {
         if (channels) setChannels(channels);
       });
-      ipc.data.serverOnlineMembers(currentServerId).then((serverOnlineMembers) => {
+      ipc.data.serverOnlineMembers({ serverId: currentServerId }).then((serverOnlineMembers) => {
         if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
       });
-      ipc.data.memberApplications(currentServerId).then((serverMemberApplications) => {
+      ipc.data.memberApplications({ serverId: currentServerId }).then((serverMemberApplications) => {
         if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
       });
     };
@@ -547,7 +547,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       return;
     }
     const refresh = async () => {
-      ipc.data.channel(userId, currentServerId, currentChannelId).then((channel) => {
+      ipc.data.channel({ userId, serverId: currentServerId, channelId: currentChannelId }).then((channel) => {
         if (channel) setCurrentChannel(channel);
       });
     };

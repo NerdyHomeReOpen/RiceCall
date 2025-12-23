@@ -74,7 +74,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
       isUploadingRef.current = false;
       return;
     }
-    ipc.data.uploadImage('announcement', `${Date.now()}`, imageUnit8Array).then((response) => {
+    ipc.data.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
       if (response) {
         editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
         syncStyles();

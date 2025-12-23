@@ -95,20 +95,20 @@ const dataService = {
     return await api.get(`/recommendServers?${new URLSearchParams(params).toString()}`);
   },
 
-  uploadImage: async (folder: string, imageName: string, imageUnit8Array: Uint8Array): Promise<{ imageName: string; imageUrl: string } | null> => {
+  uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
     const formData = new FormData();
-    formData.append('folder', folder);
-    formData.append('imageName', imageName);
-    formData.append('image', new Blob([imageUnit8Array], { type: 'image/webp' }), `${imageName}.webp`);
+    formData.append('folder', params.folder);
+    formData.append('imageName', params.imageName);
+    formData.append('image', new Blob([params.imageUnit8Array], { type: 'image/webp' }), `${params.imageName}.webp`);
     return await api.post('/upload/image', formData);
   },
 
-  searchServer: async (query: string): Promise<Types.Server[]> => {
-    return await api.get(`/server/search?${new URLSearchParams({ query }).toString()}`);
+  searchServer: async (params: { query: string }): Promise<Types.Server[]> => {
+    return await api.get(`/server/search?${new URLSearchParams(params).toString()}`);
   },
 
-  searchUser: async (query: string): Promise<Types.User[]> => {
-    return await api.get(`/user/search?${new URLSearchParams({ query }).toString()}`);
+  searchUser: async (params: { query: string }): Promise<Types.User[]> => {
+    return await api.get(`/user/search?${new URLSearchParams(params).toString()}`);
   },
 };
 

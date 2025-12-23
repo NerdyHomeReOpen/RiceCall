@@ -98,7 +98,7 @@ export function handleOpenSearchUser(userId: Types.User['userId']) {
 }
 
 export async function handleOpenApplyFriend(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  await ipc.data.friendApplication(userId, targetId).then((receivedFriendApplication) => {
+  await ipc.data.friendApplication({ receiverId: userId, senderId: targetId }).then((receivedFriendApplication) => {
     if (receivedFriendApplication) {
       ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
     } else {

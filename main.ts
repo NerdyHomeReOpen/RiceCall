@@ -827,190 +827,190 @@ app.on('ready', async () => {
   });
 
   // Data handlers
-  ipcMain.handle('data-user', async (_, userId: string) => {
-    return await dataService.user({ userId }).catch((error) => {
+  ipcMain.handle('data-user', async (_, params: { userId: string }) => {
+    return await dataService.user(params).catch((error) => {
       log.error(`Cannot get user data: ${error.message}`);
       return null;
     });
   });
 
-  ipcMain.handle('data-user-hot-reload', async (_, userId: string) => {
+  ipcMain.handle('data-user-hot-reload', async (_, params: { userId: string }) => {
     if (!token) return null;
-    return await dataService.user({ userId }).catch(() => {
+    return await dataService.user(params).catch(() => {
       return null;
     });
   });
 
-  ipcMain.handle('data-friend', async (_, userId: string, targetId: string) => {
-    return await dataService.friend({ userId, targetId }).catch(() => {
+  ipcMain.handle('data-friend', async (_, params: { userId: string; targetId: string }) => {
+    return await dataService.friend(params).catch(() => {
       log.error(`Cannot get friend data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-friends', async (_, userId: string) => {
-    return await dataService.friends({ userId }).catch(() => {
+  ipcMain.handle('data-friends', async (_, params: { userId: string }) => {
+    return await dataService.friends(params).catch(() => {
       log.error(`Cannot get friends data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-friendActivities', async (_, userId: string) => {
-    return await dataService.friendActivities({ userId }).catch(() => {
+  ipcMain.handle('data-friendActivities', async (_, params: { userId: string }) => {
+    return await dataService.friendActivities(params).catch(() => {
       log.error(`Cannot get friend activities data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-friendGroup', async (_, userId: string, friendGroupId: string) => {
-    return await dataService.friendGroup({ userId, friendGroupId }).catch(() => {
+  ipcMain.handle('data-friendGroup', async (_, params: { userId: string; friendGroupId: string }) => {
+    return await dataService.friendGroup(params).catch(() => {
       log.error(`Cannot get friend group data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-friendGroups', async (_, userId: string) => {
-    return await dataService.friendGroups({ userId }).catch(() => {
+  ipcMain.handle('data-friendGroups', async (_, params: { userId: string }) => {
+    return await dataService.friendGroups(params).catch(() => {
       log.error(`Cannot get friend groups data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-friendApplication', async (_, receiverId: string, senderId: string) => {
-    return await dataService.friendApplication({ receiverId, senderId }).catch(() => {
+  ipcMain.handle('data-friendApplication', async (_, params: { receiverId: string; senderId: string }) => {
+    return await dataService.friendApplication(params).catch(() => {
       log.error(`Cannot get friend application data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-friendApplications', async (_, receiverId: string) => {
-    return await dataService.friendApplications({ receiverId }).catch(() => {
+  ipcMain.handle('data-friendApplications', async (_, params: { receiverId: string }) => {
+    return await dataService.friendApplications(params).catch(() => {
       log.error(`Cannot get friend applications data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-server', async (_, userId: string, serverId: string) => {
-    return await dataService.server({ userId, serverId }).catch(() => {
+  ipcMain.handle('data-server', async (_, params: { userId: string; serverId: string }) => {
+    return await dataService.server(params).catch(() => {
       log.error(`Cannot get server data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-servers', async (_, userId: string) => {
-    return await dataService.servers({ userId }).catch(() => {
+  ipcMain.handle('data-servers', async (_, params: { userId: string }) => {
+    return await dataService.servers(params).catch(() => {
       log.error(`Cannot get servers data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-serverMembers', async (_, serverId: string) => {
-    return await dataService.serverMembers({ serverId }).catch(() => {
+  ipcMain.handle('data-serverMembers', async (_, params: { serverId: string }) => {
+    return await dataService.serverMembers(params).catch(() => {
       log.error(`Cannot get server members data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-serverOnlineMembers', async (_, serverId: string) => {
-    return await dataService.serverOnlineMembers({ serverId }).catch(() => {
+  ipcMain.handle('data-serverOnlineMembers', async (_, params: { serverId: string }) => {
+    return await dataService.serverOnlineMembers(params).catch(() => {
       log.error(`Cannot get server online members data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-channel', async (_, userId: string, serverId: string, channelId: string) => {
-    return await dataService.channel({ userId, serverId, channelId }).catch(() => {
+  ipcMain.handle('data-channel', async (_, params: { userId: string; serverId: string; channelId: string }) => {
+    return await dataService.channel(params).catch(() => {
       log.error(`Cannot get channel data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-channels', async (_, userId: string, serverId: string) => {
-    return await dataService.channels({ userId, serverId }).catch(() => {
+  ipcMain.handle('data-channels', async (_, params: { userId: string; serverId: string }) => {
+    return await dataService.channels(params).catch(() => {
       log.error(`Cannot get channels data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-channelMembers', async (_, serverId: string, channelId: string) => {
-    return await dataService.channelMembers({ serverId, channelId }).catch(() => {
+  ipcMain.handle('data-channelMembers', async (_, params: { serverId: string; channelId: string }) => {
+    return await dataService.channelMembers(params).catch(() => {
       log.error(`Cannot get channel members data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-member', async (_, userId: string, serverId: string, channelId?: string) => {
-    return await dataService.member({ userId, serverId, channelId }).catch(() => {
+  ipcMain.handle('data-member', async (_, params: { userId: string; serverId: string; channelId?: string }) => {
+    return await dataService.member(params).catch(() => {
       log.error(`Cannot get member data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-memberApplication', async (_, userId: string, serverId: string) => {
-    return await dataService.memberApplication({ userId, serverId }).catch(() => {
+  ipcMain.handle('data-memberApplication', async (_, params: { userId: string; serverId: string }) => {
+    return await dataService.memberApplication(params).catch(() => {
       log.error(`Cannot get member application data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-memberApplications', async (_, serverId: string) => {
-    return await dataService.memberApplications({ serverId }).catch(() => {
+  ipcMain.handle('data-memberApplications', async (_, params: { serverId: string }) => {
+    return await dataService.memberApplications(params).catch(() => {
       log.error(`Cannot get member applications data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-memberInvitation', async (_, receiverId: string, serverId: string) => {
-    return await dataService.memberInvitation({ receiverId, serverId }).catch(() => {
+  ipcMain.handle('data-memberInvitation', async (_, params: { receiverId: string; serverId: string }) => {
+    return await dataService.memberInvitation(params).catch(() => {
       log.error(`Cannot get member invitation data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-memberInvitations', async (_, receiverId: string) => {
-    return await dataService.memberInvitations({ receiverId }).catch(() => {
+  ipcMain.handle('data-memberInvitations', async (_, params: { receiverId: string }) => {
+    return await dataService.memberInvitations(params).catch(() => {
       log.error(`Cannot get member invitations data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-notifications', async (_, region: string) => {
-    return await dataService.notifications({ region }).catch(() => {
+  ipcMain.handle('data-notifications', async (_, params: { region: string }) => {
+    return await dataService.notifications(params).catch(() => {
       log.error(`Cannot get notifications data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-announcements', async (_, region: string) => {
-    return await dataService.announcements({ region }).catch(() => {
+  ipcMain.handle('data-announcements', async (_, params: { region: string }) => {
+    return await dataService.announcements(params).catch(() => {
       log.error(`Cannot get announcements data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-recommendServers', async (_, region: string) => {
-    return await dataService.recommendServers({ region }).catch(() => {
+  ipcMain.handle('data-recommendServers', async (_, params: { region: string }) => {
+    return await dataService.recommendServers(params).catch(() => {
       log.error(`Cannot get recommend servers data, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-uploadImage', async (_, folder: string, imageName: string, imageUnit8Array: Uint8Array) => {
-    return await dataService.uploadImage(folder, imageName, imageUnit8Array).catch(() => {
+  ipcMain.handle('data-uploadImage', async (_, params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }) => {
+    return await dataService.uploadImage(params).catch(() => {
       log.error(`Cannot upload image, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-searchServer', async (_, query: string) => {
-    return await dataService.searchServer(query).catch(() => {
+  ipcMain.handle('data-searchServer', async (_, params: { query: string }) => {
+    return await dataService.searchServer(params).catch(() => {
       log.error(`Cannot search server, skipping...`);
       return null;
     });
   });
 
-  ipcMain.handle('data-searchUser', async (_, query: string) => {
-    return await dataService.searchUser(query).catch(() => {
+  ipcMain.handle('data-searchUser', async (_, params: { query: string }) => {
+    return await dataService.searchUser(params).catch(() => {
       log.error(`Cannot search user, skipping...`);
       return null;
     });

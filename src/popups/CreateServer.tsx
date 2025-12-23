@@ -63,7 +63,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
       isUploadingRef.current = false;
       return;
     }
-    ipc.data.uploadImage('server', serverAvatar, imageUnit8Array).then((response) => {
+    ipc.data.uploadImage({ folder: 'server', imageName: serverAvatar, imageUnit8Array }).then((response) => {
       if (response) {
         setServerAvatar(response.imageName);
         setServerAvatarUrl(response.imageUrl);

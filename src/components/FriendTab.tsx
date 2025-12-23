@@ -190,7 +190,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       setFriendCurrentServer(null);
       return;
     }
-    ipc.data.server(targetId, friendCurrentServerId).then((server) => {
+    ipc.data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
       if (server) setFriendCurrentServer(server);
     });
   }, [targetId, friendCurrentServerId, isFriendBlocked, isFriend, friendShareCurrentServer]);

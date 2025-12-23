@@ -225,7 +225,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
         isUploadingRef.current = false;
         return;
       }
-      ipc.data.uploadImage('server', serverId, imageUnit8Array).then((response) => {
+      ipc.data.uploadImage({ folder: 'server', imageName: serverId, imageUnit8Array }).then((response) => {
         if (response) {
           setServer((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
         }
