@@ -527,9 +527,9 @@
 }
 
 .widget-bar {
+  z-index: 1;
   position: absolute;
   right: 10px;
-  z-index: 1000;
   display: flex;
   gap: 5px;
   align-items: center;
@@ -539,10 +539,23 @@
   border-bottom-right-radius: 5px;
   border-bottom-left-radius: 5px;
   box-shadow: var(--box-shadow);
+  transform: translateY(-110%);
+  transition: transform 0.5s linear;
+}
+
+.widget-bar-expanded {
+  transform: translateY(0%) !important;
 }
 
 .widget-close {
-  height: 16px;
+  z-index: 1;
+  position: absolute;
+  right: 15px;
+  background: #fff;
+  border-top: unset;
+  border-bottom-right-radius: 5px;
+  border-bottom-left-radius: 5px;
+  box-shadow: var(--box-shadow);
 }
 
 .widget-bar-spliter {

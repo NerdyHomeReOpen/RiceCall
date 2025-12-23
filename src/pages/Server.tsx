@@ -513,6 +513,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
         if (!(e.target as HTMLElement).closest(`.${styles['mic-mode-menu']}`)) {
           setIsMicModeMenuVisible(false);
         }
+        if (!(e.target as HTMLElement).closest(`.${styles['widget-bar']}`)) {
+          setIsWidgetExpanded(false);
+        }
       };
       document.addEventListener('pointerdown', onPointerDown);
       return () => document.removeEventListener('pointerdown', onPointerDown);
@@ -632,52 +635,49 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 onPointerDown={handleAnnAreaHandleDown}
                 onPointerMove={handleAnnAreaHandleMove}
               />
-              <div className={`${styles['widget-bar']} ${!isWidgetExpanded ? styles['widget-close'] : ''}`}>
-                {isWidgetExpanded ? (
-                  <>
-                    <div
-                      className={`${styles['widget-bar-item']} ${mode === 'announcement' ? styles['widget-bar-item-active'] : ''}`}
-                      onClick={() => {
-                        if (mode === 'announcement') setMode('none');
-                        else setMode('announcement');
-                        setIsWidgetExpanded(false);
-                      }}
-                    >
-                      <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`}></div>
-                      <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
-                    </div>
-                    <div className={styles['widget-bar-spliter']}></div>
-                    <div
-                      className={`${styles['widget-bar-item']} ${mode === 'show' ? styles['widget-bar-item-active'] : ''}`}
-                      onClick={() => {
-                        if (mode === 'show') setMode('none');
-                        else setMode('show');
-                        setIsWidgetExpanded(false);
-                      }}
-                    >
-                      <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></div>
-                      <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
-                    </div>
-                    <div className={styles['widget-bar-spliter']}></div>
-                    <div
-                      className={styles['widget-bar-item']}
-                      onClick={() => {
-                        Popup.handleOpenServerApplication(userId, currentServerId, (action) => {
-                          if (action === 'openShowFrame') setMode('show');
-                          if (action === 'openChannelEvent') Popup.handleOpenChannelEvent(userId, currentServerId, channelEvents);
-                        });
-                        setIsWidgetExpanded(false);
-                      }}
-                    >
-                      <div className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`}></div>
-                      <span className={styles['widget-bar-item-text']}>{t('more')}</span>
-                    </div>
-                  </>
-                ) : (
-                  <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(!isWidgetExpanded)}>
-                    <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`}></span>
-                  </div>
-                )}
+              <div className={styles['widget-close']}>
+                <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(true)}>
+                  <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`}></span>
+                </div>
+              </div>
+              <div className={`${styles['widget-bar']} ${isWidgetExpanded ? styles['widget-bar-expanded'] : ''}`}>
+                <div
+                  className={`${styles['widget-bar-item']} ${mode === 'announcement' ? styles['widget-bar-item-active'] : ''}`}
+                  onClick={() => {
+                    if (mode === 'announcement') setMode('none');
+                    else setMode('announcement');
+                    setIsWidgetExpanded(false);
+                  }}
+                >
+                  <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`}></div>
+                  <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
+                </div>
+                <div className={styles['widget-bar-spliter']}></div>
+                <div
+                  className={`${styles['widget-bar-item']} ${mode === 'show' ? styles['widget-bar-item-active'] : ''}`}
+                  onClick={() => {
+                    if (mode === 'show') setMode('none');
+                    else setMode('show');
+                    setIsWidgetExpanded(false);
+                  }}
+                >
+                  <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></div>
+                  <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
+                </div>
+                <div className={styles['widget-bar-spliter']}></div>
+                <div
+                  className={styles['widget-bar-item']}
+                  onClick={() => {
+                    Popup.handleOpenServerApplication(userId, currentServerId, (action) => {
+                      if (action === 'openShowFrame') setMode('show');
+                      if (action === 'openChannelEvent') Popup.handleOpenChannelEvent(userId, currentServerId, channelEvents);
+                    });
+                    setIsWidgetExpanded(false);
+                  }}
+                >
+                  <div className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`}></div>
+                  <span className={styles['widget-bar-item-text']}>{t('more')}</span>
+                </div>
               </div>
               <div className={styles['bottom-area']}>
                 <div
