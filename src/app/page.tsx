@@ -450,7 +450,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [currentServerId]);
 
   useEffect(() => {
-    const onStorage = ({ key, newValue }: StorageEvent) => {
+    const onTriggerHandleServerSelect = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
       if (loadingBox.isLoading) return;
@@ -462,8 +462,8 @@ const RootPageComponent: React.FC = React.memo(() => {
       loadingBox.setLoadingServerId(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
     };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    window.addEventListener('storage', onTriggerHandleServerSelect);
+    return () => window.removeEventListener('storage', onTriggerHandleServerSelect);
   }, [currentServerId, mainTab, loadingBox]);
 
   useEffect(() => {
