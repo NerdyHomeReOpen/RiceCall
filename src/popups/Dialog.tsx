@@ -25,7 +25,7 @@ interface DialogPopupProps {
   timestamp?: number;
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = ({ id, iconType, message, parameter, timestamp }) => {
+const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, message, parameter, timestamp }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -62,7 +62,7 @@ const DialogPopup: React.FC<DialogPopupProps> = ({ id, iconType, message, parame
       </div>
     </div>
   );
-};
+});
 
 DialogPopup.displayName = 'DialogPopup';
 
