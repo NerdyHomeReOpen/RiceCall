@@ -137,7 +137,7 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
   throw new Error('Failed to emit event with retry');
 }
 
-function SendHeartbeat() {
+function sendHeartbeat() {
   const start = Date.now();
   socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
     if (err) {
@@ -225,9 +225,9 @@ export function connectSocket(token: string) {
       });
     });
 
-    SendHeartbeat();
+    sendHeartbeat();
     if (interval) clearInterval(interval);
-    interval = setInterval(SendHeartbeat, 30000);
+    interval = setInterval(sendHeartbeat, 30000);
 
     log.info(`Socket connected`);
 

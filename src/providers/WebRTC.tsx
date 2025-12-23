@@ -888,7 +888,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
     const unsub = ipc.systemSettings.inputAudioDevice.onUpdate(changeInputAudioDevice);
     return () => unsub();
-  }, [initMicAudio]);
+  }, []);
 
   useEffect(() => {
     const changeOutputAudioDevice = (outputAudioDevice: string) => {
