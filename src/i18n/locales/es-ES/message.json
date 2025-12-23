@@ -97,7 +97,7 @@
   "not-receive-application": "No se puede unirse al grupo, este grupo de voz no acepta solicitudes de membresía.",
   "others-device-login": "Otro dispositivo ha iniciado sesión, por favor vuelve a iniciar sesión",
   "permission-denied": "Permiso denegado.",
-  "receive-member-invitation": "您收到了群會員邀請。",
+  "receive-member-invitation": "Ha recibido una invitación para unirse a un grupo.",
   "receive-shake-window": "El contacto te ha enviado un zumbido.",
   "register-failed": "Error al registrarse, por favor, inténtalo de nuevo más tarde",
   "register-success": "Registro de cuenta exitoso. Por favor, dirígete a {{0}} para verificar tu dirección de correo electrónico y activar su cuenta. No podrás iniciar sesión hasta que su cuenta esté activada. Si no has recibido un correo electrónico de verificación, visita el [sitio web oficial](https://ricecall.com.tw) para que te lo reenvíen.",

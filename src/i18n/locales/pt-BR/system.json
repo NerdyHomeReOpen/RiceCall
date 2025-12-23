@@ -1,6 +1,6 @@
 {
   "cancel": "Cancelar",
-  "convert-wav-to-mp3-failed": "轉檔至 MP3 失敗",
+  "convert-wav-to-mp3-failed": "Falha ao converter para MP3",
   "download-update": "Baixar atualização",
   "exit": "Sair",
   "install-after-quit": "Instalar quando fechado",
@@ -8,7 +8,7 @@
   "is-latest-version": "Já é a versão mais recente.",
   "logout": "Desconectar",
   "open-main-window": "Mostrar/esconder menu principal",
-  "select-record-save-path": "選擇錄音存檔位置",
+  "select-record-save-path": "Selecionar local de armazenamento das gravações",
   "update-available": "Uma nova versão está disponível",
   "update-available-message": "A nova versão {{version}} foi lançada em {{releaseDate}}. Clique no botão \"Baixar atualização\" para iniciar o download.",
   "update-downloaded": "Instalar atualizações",

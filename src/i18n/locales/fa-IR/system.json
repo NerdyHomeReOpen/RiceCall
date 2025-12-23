@@ -1,6 +1,6 @@
 {
   "cancel": "انصراف",
-  "convert-wav-to-mp3-failed": "轉檔至 MP3 失敗",
+  "convert-wav-to-mp3-failed": "تبدیل به MP3 ناموفق بود",
   "download-update": "دانلود به‌روزرسانی",
   "exit": "خروج",
   "install-after-quit": "هنگام بسته بودن نصب کنید",
@@ -8,7 +8,7 @@
   "is-latest-version": "این در حال حاضر آخرین نسخه است.",
   "logout": "خروج",
   "open-main-window": "نشان دان یا مخفی کردن منوی اصلی",
-  "select-record-save-path": "選擇錄音存檔位置",
+  "select-record-save-path": "انتخاب محل ذخیره‌سازی ضبط صدا",
   "update-available": "نسخه جدید در دسترس است",
   "update-available-message": "نسخه جدید {{version}} در تاریخ {{releaseDate}} منتشر شد. برای شروع دانلود، روی دکمه \"دانلود به‌روزرسانی\" کلیک کنید.",
   "update-downloaded": "نصب به‌روزرسانی",
