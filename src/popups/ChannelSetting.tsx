@@ -201,11 +201,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
-      const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-      setChannel((prev) => (update.has(`${prev.channelId}`) ? { ...prev, ...update.get(`${prev.channelId}`) } : prev));
+      const match = args.find((i) => String(i.channelId) === String(channelId));
+      if (match) setChannel((prev) => ({ ...prev, ...match.update }));
     });
     return () => unsub();
-  }, []);
+  }, [channelId]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverMemberAdd', (...args: { data: Types.Member }[]) => {

@@ -20,6 +20,7 @@ import LevelIcon from '@/components/LevelIcon';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
 import * as TagConverter from '@/utils/tagConverter';
 
 import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN } from '@/constant';
@@ -40,7 +41,7 @@ interface DirectMessagePopupProps {
   message: Types.DirectMessage;
 }
 
-const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, user, friend, target, event, message }) => {
+const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, user, friend: friendData, target, event, message }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -62,7 +63,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   // States
   const [messageInput, setMessageInput] = useState<string>('');
   const [targetCurrentServer, setTargetCurrentServer] = useState<Types.Server | null>(null);
-  const [friendState, setFriendState] = useState<Types.Friend | null>(friend);
+  const [friend, setFriend] = useState<Types.Friend | null>(friendData);
   const [directMessages, setDirectMessages] = useState<(Types.DirectMessage | Types.PromptMessage)[]>([]);
   const [cooldown, setCooldown] = useState<number>(0);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
@@ -87,8 +88,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const { name: targetCurrentServerName } = targetCurrentServer || {};
   const textLength = editor?.getText().length || 0;
   const isWarning = textLength > MAX_INPUT_LENGTH;
-  const isFriend = friendState?.relationStatus === 2;
-  const isBlocked = friendState?.isBlocked;
+  const isFriend = friend?.relationStatus === 2;
+  const isBlocked = friend?.isBlocked;
   const isOnline = targetStatus !== 'offline';
 
   // Handlers
@@ -194,8 +195,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);
 
   useEffect(() => {
-    if (!friendState) ipc.socket.send('stranger', { targetId });
-  }, [friendState, targetId]);
+    if (!friend) ipc.socket.send('stranger', { targetId });
+  }, [friend, targetId]);
 
   useEffect(() => {
     if (!messageAreaRef.current || directMessages.length === 0) return;
@@ -226,11 +227,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: Types.User['userId']; update: Partial<Types.Friend> }[]) => {
-      if (targetId !== targetUserId) return;
-      setFriendState((prev) => ({ ...prev, ...args[0].update }) as Types.Friend);
+      const match = args.find((i) => String(i.targetId) === String(targetUserId));
+      if (match) setFriend((prev) => (prev ? { ...prev, ...match.update } : Default.friend(match.update)));
     });
     return () => unsub();
-  }, [targetId, targetUserId]);
+  }, [targetUserId]);
 
   useEffect(() => {
     const onDirectMessage = (...args: Types.DirectMessage[]) => {

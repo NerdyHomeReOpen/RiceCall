@@ -246,11 +246,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
     useEffect(() => {
       const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Types.Server> }[]) => {
-        const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
-        setServer((prev) => (update.has(`${prev.serverId}`) ? { ...prev, ...update.get(`${prev.serverId}`) } : prev));
+        const match = args.find((i) => String(i.serverId) === String(serverId));
+        if (match) setServer((prev) => ({ ...prev, ...match.update }));
       });
       return () => unsub();
-    }, []);
+    }, [serverId]);
 
     useEffect(() => {
       const unsub = ipc.socket.on('serverMemberAdd', (...args: { data: Types.Member }[]) => {
