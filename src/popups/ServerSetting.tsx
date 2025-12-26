@@ -467,28 +467,36 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <tbody className={settingStyles['table-container']}>
                     {filteredMembers.map((member) => {
                       // Variables
-                      const isUser = member.userId === userId;
-                      const isSuperior = permissionLevel > member.permissionLevel;
-                      const canUpdatePermission = !isUser && isSuperior && Permission.isMember(member.permissionLevel);
+                      const {
+                        userId: memberUserId,
+                        name: memberName,
+                        nickname: memberNickname,
+                        gender: memberGender,
+                        permissionLevel: memberPermissionLevel,
+                        joinAt: memberJoinAt,
+                        contribution: memberContribution,
+                      } = member;
+                      const isSelf = memberUserId === userId;
+                      const isSuperior = permissionLevel > memberPermissionLevel;
 
                       // Handlers
                       const getContextMenuItems = () => [
                         {
                           id: 'direct-message',
                           label: t('direct-message'),
-                          show: !isUser,
-                          onClick: () => Popup.handleOpenDirectMessage(userId, member.userId),
+                          show: !isSelf,
+                          onClick: () => Popup.handleOpenDirectMessage(userId, memberUserId),
                         },
                         {
                           id: 'view-profile',
                           label: t('view-profile'),
-                          onClick: () => Popup.handleOpenUserInfo(userId, member.userId),
+                          onClick: () => Popup.handleOpenUserInfo(userId, memberUserId),
                         },
                         {
                           id: 'edit-nickname',
                           label: t('edit-nickname'),
-                          show: Permission.isMember(member.permissionLevel) && (isUser || (Permission.isServerAdmin(permissionLevel) && isSuperior)),
-                          onClick: () => Popup.handleOpenEditNickname(member.userId, serverId),
+                          show: (isSelf || (Permission.isServerAdmin(permissionLevel) && isSuperior)) && Permission.isMember(memberPermissionLevel),
+                          onClick: () => Popup.handleOpenEditNickname(memberUserId, serverId),
                         },
                         {
                           id: 'separator',
@@ -497,8 +505,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         {
                           id: 'block',
                           label: t('block'),
-                          show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior,
-                          onClick: () => Popup.handleOpenBlockMember(member.userId, serverId),
+                          show: !isSelf && isSuperior && Permission.isServerAdmin(permissionLevel),
+                          onClick: () => Popup.handleOpenBlockMember(memberUserId, serverId),
                         },
                         {
                           id: 'separator',
@@ -507,7 +515,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                         {
                           id: 'member-management',
                           label: t('member-management'),
-                          show: !isUser && Permission.isMember(member.permissionLevel) && isSuperior,
+                          show: !isSelf && isSuperior && Permission.isMember(memberPermissionLevel),
                           icon: 'submenu',
                           hasSubmenu: true,
                           submenuItems: [
@@ -515,17 +523,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                               id: 'terminate-member',
                               label: t('terminate-member'),
                               show:
-                                !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior && Permission.isMember(member.permissionLevel) && !Permission.isServerOwner(member.permissionLevel),
-                              onClick: () => handleTerminateMember(member.userId, serverId, member.name),
+                                !isSelf && isSuperior && Permission.isMember(memberPermissionLevel) && !Permission.isServerOwner(memberPermissionLevel) && Permission.isServerAdmin(permissionLevel),
+                              onClick: () => handleTerminateMember(memberUserId, serverId, memberName),
                             },
                             {
                               id: 'set-server-admin',
-                              label: Permission.isServerAdmin(member.permissionLevel) ? t('unset-server-admin') : t('set-server-admin'),
-                              show: canUpdatePermission && Permission.isServerOwner(permissionLevel) && !Permission.isServerOwner(member.permissionLevel),
+                              label: Permission.isServerAdmin(memberPermissionLevel) ? t('unset-server-admin') : t('set-server-admin'),
+                              show: Permission.isServerOwner(permissionLevel) && !Permission.isServerOwner(memberPermissionLevel),
                               onClick: () =>
-                                Permission.isServerAdmin(member.permissionLevel)
-                                  ? handleEditServerPermission(member.userId, serverId, { permissionLevel: 2 })
-                                  : handleEditServerPermission(member.userId, serverId, { permissionLevel: 5 }),
+                                Permission.isServerAdmin(memberPermissionLevel)
+                                  ? handleEditServerPermission(memberUserId, serverId, { permissionLevel: 2 })
+                                  : handleEditServerPermission(memberUserId, serverId, { permissionLevel: 5 }),
                             },
                           ],
                         },
@@ -533,11 +541,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
 
                       return (
                         <tr
-                          key={member.userId}
-                          className={`${selectedItemId === `member-${member.userId}` ? popupStyles['selected'] : ''}`}
+                          key={memberUserId}
+                          className={`${selectedItemId === `member-${memberUserId}` ? popupStyles['selected'] : ''}`}
                           onClick={() => {
-                            if (selectedItemId === `member-${member.userId}`) setSelectedItemId('');
-                            else setSelectedItemId(`member-${member.userId}`);
+                            if (selectedItemId === `member-${memberUserId}`) setSelectedItemId('');
+                            else setSelectedItemId(`member-${memberUserId}`);
                           }}
                           onContextMenu={(e) => {
                             e.preventDefault();
@@ -546,13 +554,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td title={member.nickname || member.name} style={{ width: `${memberColumnWidths[0]}px` }}>
-                            <div className={`${permissionStyles[member.gender]} ${permissionStyles[`lv-${member.permissionLevel}`]}`} />
-                            <div className={`${popupStyles['name']} ${member.nickname ? popupStyles['highlight'] : ''}`}>{member.nickname || member.name}</div>
+                          <td title={memberNickname || memberName} style={{ width: `${memberColumnWidths[0]}px` }}>
+                            <div className={`${permissionStyles[memberGender]} ${permissionStyles[`lv-${memberPermissionLevel}`]}`} />
+                            <div className={`${popupStyles['name']} ${memberNickname ? popupStyles['highlight'] : ''}`}>{memberNickname || memberName}</div>
                           </td>
-                          <td style={{ width: `${memberColumnWidths[1]}px` }}>{Language.getPermissionText(t, member.permissionLevel)}</td>
-                          <td style={{ width: `${memberColumnWidths[2]}px` }}>{member.contribution}</td>
-                          <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(member.joinAt).toLocaleDateString()}</td>
+                          <td style={{ width: `${memberColumnWidths[1]}px` }}>{Language.getPermissionText(t, memberPermissionLevel)}</td>
+                          <td style={{ width: `${memberColumnWidths[2]}px` }}>{memberContribution}</td>
+                          <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(memberJoinAt).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
@@ -650,41 +658,42 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <tbody className={settingStyles['table-container']}>
                     {filteredApplications.map((application) => {
                       // Variables
-                      const isUser = application.userId === userId;
+                      const { userId: applicationUserId, name: applicationName, description: applicationDescription, createdAt: applicationCreatedAt } = application;
+                      const isSelf = applicationUserId === userId;
 
                       // Handlers
                       const getContextMenuItems = () => [
                         {
                           id: 'view-profile',
                           label: t('view-profile'),
-                          show: !isUser,
-                          onClick: () => Popup.handleOpenUserInfo(userId, application.userId),
+                          show: !isSelf,
+                          onClick: () => Popup.handleOpenUserInfo(userId, applicationUserId),
                         },
                         {
                           id: 'accept-application',
                           label: t('accept-application'),
-                          show: !isUser && Permission.isServerAdmin(permissionLevel),
+                          show: !isSelf && Permission.isServerAdmin(permissionLevel),
                           onClick: () => {
-                            handleApproveMemberApplication(application.userId, serverId);
+                            handleApproveMemberApplication(applicationUserId, serverId);
                           },
                         },
                         {
                           id: 'deny-application',
                           label: t('deny-application'),
-                          show: !isUser && Permission.isServerAdmin(permissionLevel),
+                          show: !isSelf && Permission.isServerAdmin(permissionLevel),
                           onClick: () => {
-                            handleRejectMemberApplication(application.userId, serverId);
+                            handleRejectMemberApplication(applicationUserId, serverId);
                           },
                         },
                       ];
 
                       return (
                         <tr
-                          key={application.userId}
-                          className={`${selectedItemId === `application-${application.userId}` ? popupStyles['selected'] : ''}`}
+                          key={applicationUserId}
+                          className={`${selectedItemId === `application-${applicationUserId}` ? popupStyles['selected'] : ''}`}
                           onClick={() => {
-                            if (selectedItemId === `application-${application.userId}`) setSelectedItemId('');
-                            else setSelectedItemId(`application-${application.userId}`);
+                            if (selectedItemId === `application-${applicationUserId}`) setSelectedItemId('');
+                            else setSelectedItemId(`application-${applicationUserId}`);
                           }}
                           onContextMenu={(e) => {
                             e.preventDefault();
@@ -693,9 +702,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td style={{ width: `${applicationColumnWidths[0]}px` }}>{application.name}</td>
-                          <td style={{ width: `${applicationColumnWidths[1]}px` }}>{application.description}</td>
-                          <td style={{ width: `${applicationColumnWidths[2]}px` }}>{new Date(application.createdAt).toLocaleDateString()}</td>
+                          <td style={{ width: `${applicationColumnWidths[0]}px` }}>{applicationName}</td>
+                          <td style={{ width: `${applicationColumnWidths[1]}px` }}>{applicationDescription}</td>
+                          <td style={{ width: `${applicationColumnWidths[2]}px` }}>{new Date(applicationCreatedAt).toLocaleDateString()}</td>
                         </tr>
                       );
                     })}
@@ -740,31 +749,32 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                   <tbody className={settingStyles['table-container']}>
                     {filteredBlockMembers.map((member) => {
                       // Variables
-                      const isUser = member.userId === userId;
+                      const { userId: memberUserId, name: memberName, nickname: memberNickname, blockedUntil: memberBlockedUntil } = member;
+                      const isSelf = memberUserId === userId;
 
                       // Handlers
                       const getContextMenuItems = () => [
                         {
                           id: 'view-profile',
                           label: t('view-profile'),
-                          show: !isUser,
-                          onClick: () => Popup.handleOpenUserInfo(userId, member.userId),
+                          show: !isSelf,
+                          onClick: () => Popup.handleOpenUserInfo(userId, memberUserId),
                         },
                         {
                           id: 'unblock',
                           label: t('unblock'),
                           show: true,
-                          onClick: () => handleUnblockUserFromServer(member.userId, member.name, serverId),
+                          onClick: () => handleUnblockUserFromServer(memberUserId, memberName, serverId),
                         },
                       ];
 
                       return (
                         <tr
-                          key={member.userId}
-                          className={`${selectedItemId === `blocked-${member.userId}` ? popupStyles['selected'] : ''}`}
+                          key={memberUserId}
+                          className={`${selectedItemId === `blocked-${memberUserId}` ? popupStyles['selected'] : ''}`}
                           onClick={() => {
-                            if (selectedItemId === `blocked-${member.userId}`) setSelectedItemId('');
-                            else setSelectedItemId(`blocked-${member.userId}`);
+                            if (selectedItemId === `blocked-${memberUserId}`) setSelectedItemId('');
+                            else setSelectedItemId(`blocked-${memberUserId}`);
                           }}
                           onContextMenu={(e) => {
                             e.preventDefault();
@@ -773,10 +783,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                             contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                           }}
                         >
-                          <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
-                          <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>
-                            {member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}
-                          </td>
+                          <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{memberNickname || memberName}</td>
+                          <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>{memberBlockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(memberBlockedUntil).toLocaleString()}`}</td>
                         </tr>
                       );
                     })}

@@ -205,7 +205,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
             <div className={styles['current-channel']}>{isCurrentChannelLobby ? t(currentChannelName) : currentChannelName}</div>
             {currentChannelEvents.reverse().map((e, index) => {
               // Variables
-              const isUser = e.userId === userId;
+              const isSelf = e.userId === userId;
               const isSuperior = permissionLevel > e.permissionLevel;
 
               // Handlers
@@ -219,13 +219,13 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                 {
                   id: 'kick-server',
                   label: t('kick-server'),
-                  show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior,
+                  show: !isSelf && Permission.isServerAdmin(permissionLevel) && isSuperior,
                   onClick: () => Popup.handleOpenKickMemberFromServer(e.userId, serverId),
                 },
                 {
                   id: 'block',
                   label: t('block'),
-                  show: !isUser && isSuperior && Permission.isServerAdmin(permissionLevel),
+                  show: !isSelf && isSuperior && Permission.isServerAdmin(permissionLevel),
                   onClick: () => Popup.handleOpenBlockMember(e.userId, serverId),
                 },
               ];
@@ -256,7 +256,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
           <div className={styles['event-list']} style={selectMode === 'all' ? {} : { display: 'none' }}>
             {filteredChannelEvents.reverse().map((e, index) => {
               // Variables
-              const isUser = e.userId === userId;
+              const isSelf = e.userId === userId;
               const isSuperior = permissionLevel > e.permissionLevel;
 
               // Handlers
@@ -270,7 +270,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                 {
                   id: 'block',
                   label: t('block'),
-                  show: !isUser && isSuperior && Permission.isServerAdmin(permissionLevel),
+                  show: !isSelf && isSuperior && Permission.isServerAdmin(permissionLevel),
                   onClick: () => Popup.handleOpenBlockMember(e.userId, serverId),
                 },
               ];
