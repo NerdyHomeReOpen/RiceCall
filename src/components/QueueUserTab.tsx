@@ -22,11 +22,12 @@ interface QueueUserTabProps {
   currentChannel: Types.Channel;
   friends: Types.Friend[];
   queueMember: Types.QueueMember;
+  queueMembers: Types.QueueMember[];
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentServer, currentChannel, friends, queueMember, selectedItemId, setSelectedItemId }) => {
+const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentServer, currentChannel, friends, queueMember, queueMembers, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const contextMenu = useContextMenu();
@@ -81,13 +82,13 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentSer
     {
       id: 'move-up-queue',
       label: t('move-up-queue'),
-      show: memberPosition > 1 && Permission.isChannelMod(permissionLevel),
+      show: memberPosition > 1 && queueMembers.length > 2 && Permission.isChannelMod(permissionLevel),
       onClick: () => handleMoveUserQueuePositionUp(memberUserId, currentServerId, currentChannelId, memberPosition - 1),
     },
     {
       id: 'move-down-queue',
       label: t('move-down-queue'),
-      show: memberPosition > 0 && Permission.isChannelMod(permissionLevel),
+      show: memberPosition > 0 && queueMembers.length > 2 && memberPosition < queueMembers.length - 1 && Permission.isChannelMod(permissionLevel),
       onClick: () => handleMoveUserQueuePositionDown(memberUserId, currentServerId, currentChannelId, memberPosition + 1),
     },
     {
@@ -266,7 +267,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentSer
   };
 
   const handleRemoveUserFromQueue = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberName }), () => ipc.socket.send('removeUserFromQueue', { serverId, channelId, userId }));
+    Popup.handleOpenAlertDialog(t('confirm-remove-from-queue', { '0': memberNickname || memberName }), () => ipc.socket.send('removeUserFromQueue', { serverId, channelId, userId }));
   };
 
   const handleClearQueue = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {

@@ -264,6 +264,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
                   user={user}
                   friends={friends}
                   queueMember={queueMember}
+                  queueMembers={filteredQueueMembers}
                   currentServer={currentServer}
                   currentChannel={currentChannel}
                   selectedItemId={selectedItemId}

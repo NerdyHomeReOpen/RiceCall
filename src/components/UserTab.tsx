@@ -66,7 +66,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isUser = memberUserId === userId;
-  const isUserInQueue = useMemo(() => queueUsers.some((qu) => qu.userId === memberUserId), [queueUsers, memberUserId]);
+  const isUserInQueue = useMemo(() => queueUsers.some((qu) => qu.userId === memberUserId && qu.position >= 0), [queueUsers, memberUserId]);
   const isSameChannel = memberCurrentChannelId === currentChannelId;
   const isSpeaking = isUser ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
   const isMuted = isUser ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
@@ -93,7 +93,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
       id: 'add-to-queue',
       label: t('add-to-queue'),
       disabled: isUserInQueue,
-      show: !isUser && Permission.isChannelMod(permissionLevel) && isSuperior && isSameChannel && channelVoiceMode === 'queue',
+      show: !isUser && Permission.isChannelMod(permissionLevel) && isEqualOrSuperior && isSameChannel && channelVoiceMode === 'queue',
       onClick: () => handleAddUserToQueue(memberUserId, currentServerId, channelId),
     },
     {
