@@ -149,8 +149,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
               className={`${emojiStyles['color-select-box']}`}
               onMouseDown={(e) => {
                 e.preventDefault();
-                const x = e.currentTarget.getBoundingClientRect().right;
-                const y = e.currentTarget.getBoundingClientRect().top;
+                const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
                 contextMenu.showColorPicker(x, y, 'left-top', (color) => {
                   setSelectedColor(color);
                   onTextColorChange?.(color);

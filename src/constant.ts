@@ -268,3 +268,7 @@ export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds
 export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';
 export const REFRESH_REGION_INFO_INTERVAL = 1000 * 60 * 10; // 10 minutes
 export const MESSAGE_VIERER_DEVIATION = 100;
+export const SERVER_OPTIONS: { tKey: string; value: 'prod' | 'dev' }[] = [
+  { tKey: 'prod', value: 'prod' },
+  { tKey: 'dev', value: 'dev' },
+];

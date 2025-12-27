@@ -23,11 +23,6 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
   const [friendGroupId, setFriendGroupId] = useState<Types.FriendGroup['friendGroupId']>('');
 
   // Handlers
-  const handleApproveFriendApplication = (senderId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId'] | null, friendNote: Types.Friend['note']) => {
-    ipc.socket.send('approveFriendApplication', { senderId, friendGroupId, note: friendNote });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -74,7 +69,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
                   ))}
                 </select>
               </div>
-              <div className={popupStyles['link-text']} onClick={() => Popup.handleOpenCreateFriendGroup()}>
+              <div className={popupStyles['link-text']} onClick={() => Popup.openCreateFriendGroup()}>
                 {t('create-friend-group')}
               </div>
             </div>
@@ -86,7 +81,13 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleApproveFriendApplication(targetId, friendGroupId || null, friendNotes)}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.approveFriendApplication(targetId, friendGroupId || null, friendNotes);
+            handleClose();
+          }}
+        >
           {t('add')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

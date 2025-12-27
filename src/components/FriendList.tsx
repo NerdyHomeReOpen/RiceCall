@@ -28,7 +28,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
   // Variables
   const { userId } = user;
   const filteredFriends = useMemo(() => friends.filter((f) => f.name.includes(searchQuery)), [friends, searchQuery]);
-  const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: 0, userId });
+  const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: -1, userId });
   const strangerFriendGroup = Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId });
   const blacklistFriendGroup = Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId });
   const filteredFriendGroups = useMemo(
@@ -69,10 +69,10 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
       </div>
       <div className={styles['recent-list']} style={selectedTabId == 1 ? {} : { display: 'none' }}></div>
       <div className={styles['sidebar-footer']}>
-        <div className={styles['button']} datatype="addGroup" onClick={() => Popup.handleOpenCreateFriendGroup()}>
+        <div className={styles['button']} datatype="addGroup" onClick={() => Popup.openCreateFriendGroup()}>
           {t('create-friend-group')}
         </div>
-        <div className={styles['button']} datatype="addFriend" onClick={() => Popup.handleOpenSearchUser(userId)}>
+        <div className={styles['button']} datatype="addFriend" onClick={() => Popup.openSearchUser(userId)}>
           {t('add-friend')}
         </div>
       </div>

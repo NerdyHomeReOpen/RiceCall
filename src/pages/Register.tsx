@@ -30,6 +30,19 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
   const [usernameError, setUsernameError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // Variables
+  const canSubmit =
+    !!account.trim() &&
+    !!password.trim() &&
+    !!username.trim() &&
+    !!email.trim() &&
+    !!confirmPassword.trim() &&
+    !accountError &&
+    !passwordError &&
+    !confirmPasswordError &&
+    !usernameError &&
+    !emailError;
+
   // Handlers
   function validateAccount(value: string): string {
     value = value.trim();
@@ -104,7 +117,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     }
   };
 
-  const handleSubmit = async () => {
+  const submit = async () => {
     if (!account.trim()) {
       setAccountError(t('please-input-account'));
     }
@@ -125,7 +138,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     await ipc.auth.register({ account, password, email, username, locale: i18n.language ?? 'zh-TW' }).then((res) => {
       if (res.success) {
-        Popup.handleOpenAlertDialog(t(res.message, { '0': email }), () => setSection('login'));
+        Popup.openAlertDialog(t(res.message, { '0': email }), () => setSection('login'));
       }
     });
 
@@ -223,22 +236,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                 </div>
                 {usernameError ? <div className={styles['warn-text']}>{usernameError}</div> : <div className={styles['hint-text']}>{t('nickname-hint')}</div>}
               </div>
-              <button
-                className={styles['submit-button']}
-                onClick={handleSubmit}
-                disabled={
-                  !account.trim() ||
-                  !password.trim() ||
-                  !username.trim() ||
-                  !email.trim() ||
-                  !confirmPassword.trim() ||
-                  !!accountError ||
-                  !!passwordError ||
-                  !!confirmPasswordError ||
-                  !!usernameError ||
-                  !!emailError
-                }
-              >
+              <button className={styles['submit-button']} onClick={submit} disabled={!canSubmit}>
                 {t('register')}
               </button>
             </>

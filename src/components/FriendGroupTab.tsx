@@ -1,6 +1,4 @@
 import React, { useState, useMemo } from 'react';
-import { useTranslation } from 'react-i18next';
-import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
@@ -9,6 +7,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import FriendTab from '@/components/FriendTab';
 
 import * as Popup from '@/utils/popup';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/friend.module.css';
 
@@ -23,7 +22,6 @@ interface FriendGroupTabProps {
 
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friendGroup, friends, friendGroups, selectedItemId, setSelectedItemId }) => {
   // Hooks
-  const { t } = useTranslation();
   const contextMenu = useContextMenu();
 
   // States
@@ -47,24 +45,11 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
   const friendsOnlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
 
   // Handlers
-  const getContextMenuItems = () => [
-    {
-      id: 'edit-friend-group-name',
-      label: t('edit-friend-group-name'),
-      show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
-      onClick: () => Popup.handleOpenEditFriendGroupName(userId, friendGroupId),
-    },
-    {
-      id: 'delete-friend-group',
-      label: t('delete-friend-group'),
-      show: !['', 'blacklist', 'stranger'].includes(friendGroupId),
-      onClick: () => handleDeleteFriendGroup(friendGroupId),
-    },
-  ];
-
-  const handleDeleteFriendGroup = (friendGroupId: Types.FriendGroup['friendGroupId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipc.socket.send('deleteFriendGroup', { friendGroupId }));
-  };
+  const getContextMenuItems = () =>
+    new CtxMenuBuilder()
+      .addEditFriendGroupNameOption({ friendGroupId }, () => Popup.openEditFriendGroupName(userId, friendGroupId))
+      .addDeleteFriendGroupOption({ friendGroupId }, () => Popup.deleteFriendGroup(friendGroupId, friendGroupName))
+      .build();
 
   return (
     <div key={friendGroupId}>
@@ -73,8 +58,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
         onClick={() => setExpanded((prev) => !prev)}
         onContextMenu={(e) => {
           e.preventDefault();
-          const x = e.clientX;
-          const y = e.clientY;
+          const { clientX: x, clientY: y } = e;
           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
         }}
       >

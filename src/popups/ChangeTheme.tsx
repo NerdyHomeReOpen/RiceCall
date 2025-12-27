@@ -175,15 +175,6 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                   ))}
                   <div className={styles['color-selector']} onClick={() => setShowColorPicker((prev) => !prev)} />
                   {customThemes.slice(0, 7).map((customTheme, i) => {
-                    // Handlers
-                    const getContextMenuItems = () => [
-                      {
-                        id: 'delete',
-                        label: t('delete'),
-                        onClick: () => handleRemoveCustom(i),
-                      },
-                    ];
-
                     return customTheme ? (
                       <div
                         key={`custom-${i}`}
@@ -199,9 +190,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                         onClick={handleSelectTheme}
                         onContextMenu={(e) => {
                           e.preventDefault();
-                          const x = e.clientX;
-                          const y = e.clientY;
-                          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+                          const { clientX: x, clientY: y } = e;
+                          contextMenu.showContextMenu(x, y, 'right-bottom', (() => [{ id: 'delete', label: t('delete'), onClick: () => handleRemoveCustom(i) }])());
                         }}
                       />
                     ) : (
@@ -218,7 +208,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                       const image = e.target.files?.[0];
                       if (!image) return;
                       image.arrayBuffer().then((arrayBuffer) => {
-                        Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                        Popup.openImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
                       });
                     }}
                   />

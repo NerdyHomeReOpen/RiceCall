@@ -7,9 +7,9 @@ import type * as Types from '@/types';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Popup from '@/utils/popup';
-import * as Permission from '@/utils/permission';
 import * as Language from '@/utils/language';
 import * as Default from '@/utils/default';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import popupStyles from '@/styles/popup.module.css';
 import styles from '@/styles/channelEvent.module.css';
@@ -209,26 +209,12 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
               const isSuperior = permissionLevel > e.permissionLevel;
 
               // Handlers
-              const getContextMenuItems = () => [
-                {
-                  id: 'view-profile',
-                  label: t('view-profile'),
-                  show: true,
-                  onClick: () => Popup.handleOpenUserInfo(userId, e.userId),
-                },
-                {
-                  id: 'kick-server',
-                  label: t('kick-server'),
-                  show: !isSelf && Permission.isServerAdmin(permissionLevel) && isSuperior,
-                  onClick: () => Popup.handleOpenKickMemberFromServer(e.userId, serverId),
-                },
-                {
-                  id: 'block',
-                  label: t('block'),
-                  show: !isSelf && isSuperior && Permission.isServerAdmin(permissionLevel),
-                  onClick: () => Popup.handleOpenBlockMember(e.userId, serverId),
-                },
-              ];
+              const getContextMenuItems = () =>
+                new CtxMenuBuilder()
+                  .addViewProfileOption(() => Popup.openUserInfo(userId, e.userId))
+                  .addKickUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openKickMemberFromServer(e.userId, serverId))
+                  .addBlockUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openBlockMember(e.userId, serverId))
+                  .build();
 
               return (
                 <div
@@ -236,8 +222,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                   className={styles['event-box']}
                   onContextMenu={(e) => {
                     e.preventDefault();
-                    const x = e.clientX;
-                    const y = e.clientY;
+                    const { clientX: x, clientY: y } = e;
                     contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                   }}
                 >
@@ -260,20 +245,12 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
               const isSuperior = permissionLevel > e.permissionLevel;
 
               // Handlers
-              const getContextMenuItems = () => [
-                {
-                  id: 'view-profile',
-                  label: t('view-profile'),
-                  show: true,
-                  onClick: () => Popup.handleOpenUserInfo(userId, e.userId),
-                },
-                {
-                  id: 'block',
-                  label: t('block'),
-                  show: !isSelf && isSuperior && Permission.isServerAdmin(permissionLevel),
-                  onClick: () => Popup.handleOpenBlockMember(e.userId, serverId),
-                },
-              ];
+              const getContextMenuItems = () =>
+                new CtxMenuBuilder()
+                  .addViewProfileOption(() => Popup.openUserInfo(userId, e.userId))
+                  .addKickUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openKickMemberFromServer(e.userId, serverId))
+                  .addBlockUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openBlockMember(e.userId, serverId))
+                  .build();
 
               return (
                 <div
@@ -281,8 +258,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
                   className={styles['event-box']}
                   onContextMenu={(e) => {
                     e.preventDefault();
-                    const x = e.clientX;
-                    const y = e.clientY;
+                    const { clientX: x, clientY: y } = e;
                     contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
                   }}
                 >

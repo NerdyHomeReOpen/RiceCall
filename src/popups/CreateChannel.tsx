@@ -5,6 +5,7 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import * as Default from '@/utils/default';
+import * as Popup from '@/utils/popup';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -18,19 +19,13 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
   const { t } = useTranslation();
 
   // States
-  const [channel, setChannel] = useState<Types.Channel>(Default.channel());
+  const [channelName, setChannelName] = useState<string>(Default.channel().name);
 
   // Variables
-  const { name: channelName } = channel;
   const { channelId: parentChannelId, name: parentChannelName } = parentData || {};
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleCreateChannel = (serverId: Types.Server['serverId'], preset: Partial<Types.Channel>) => {
-    ipc.socket.send('createChannel', { serverId, preset });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -45,14 +40,18 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
           </div>
           <div className={popupStyles['input-box']}>
             <div className={popupStyles['label']}>{t('channel-name')}</div>
-            <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel({ ...channel, name: e.target.value })} />
+            <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannelName(e.target.value)} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
         <div
           className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => (canSubmit ? handleCreateChannel(serverId, { name: channelName, categoryId: parentChannelId || null }) : null)}
+          onClick={() => {
+            if (!canSubmit) return;
+            Popup.createChannel(serverId, { name: channelName, categoryId: parentChannelId || null });
+            handleClose();
+          }}
         >
           {t('confirm')}
         </div>

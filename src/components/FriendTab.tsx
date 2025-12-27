@@ -12,6 +12,7 @@ import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
 import * as Popup from '@/utils/popup';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/friend.module.css';
 import vip from '@/styles/vip.module.css';
@@ -60,98 +61,25 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   const isFriend = friendRelationStatus === 2;
 
   // Handlers
-  const getContextMenuItems = () => [
-    {
-      id: 'direct-message',
-      label: t('direct-message'),
-      show: !isSelf,
-      onClick: () => Popup.handleOpenDirectMessage(userId, targetId),
-    },
-    {
-      id: 'separator',
-      label: '',
-      show: !isSelf,
-    },
-    {
-      id: 'view-profile',
-      label: t('view-profile'),
-      show: !isSelf,
-      onClick: () => Popup.handleOpenUserInfo(userId, targetId),
-    },
-    {
-      id: 'add-friend',
-      label: t('add-friend'),
-      show: !isSelf && !isFriend,
-      onClick: () => Popup.handleOpenApplyFriend(userId, targetId),
-    },
-    {
-      id: 'edit-note',
-      label: t('edit-note'),
-      show: !isSelf && isFriend,
-      onClick: () => Popup.handleOpenEditFriendNote(userId, targetId),
-    },
-    {
-      id: 'separator',
-      label: '',
-    },
-    {
-      id: 'permission-setting',
-      label: t('permission-setting'),
-      show: !isSelf && isFriend,
-      icon: 'submenu',
-      disabled: true,
-      hasSubmenu: true,
-      submenuItems: [
-        {
-          id: 'set-hide-or-show-online-to-friend',
-          label: t('hide-online-to-friend'),
-          disabled: true,
-          onClick: () => {
-            /* TODO: handlePrivateFriend() */
-          },
-        },
-        {
-          id: 'set-notify-friend-online',
-          label: t('notify-friend-online'),
-          disabled: true,
-          onClick: () => {
-            /* TODO: handleNotifyFriendOnline() */
-          },
-        },
-      ],
-    },
-    {
-      id: 'edit-friend-friend-group',
-      label: t('edit-friend-friend-group'),
-      show: !isSelf && !isStranger && !isFriendBlocked,
-      icon: 'submenu',
-      hasSubmenu: true,
-      submenuItems: friendGroups.map((group, key) => ({
-        id: `friend-group-${key}`,
-        label: group.name,
-        show: !((group.friendGroupId || null) === friend.friendGroupId),
-        onClick: () => handleEditFriend(targetId, { friendGroupId: group.friendGroupId || null }),
-      })),
-    },
-    {
-      id: 'block',
-      label: isFriendBlocked ? t('unblock') : t('block'),
-      show: !isSelf,
-      onClick: () => (isFriendBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
-    },
-    {
-      id: 'delete-friend',
-      label: t('delete-friend'),
-      show: !isSelf && isFriend,
-      onClick: () => handleDeleteFriend(targetId),
-    },
-    {
-      id: 'delete-friend-application',
-      label: t('delete-friend-application'),
-      show: !isSelf && isPending,
-      onClick: () => handleDeleteFriendApplication(targetId),
-    },
-  ];
+  const getContextMenuItems = () =>
+    new CtxMenuBuilder()
+      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, targetId))
+      .addViewProfileOption(() => Popup.openUserInfo(userId, targetId))
+      .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(userId, targetId))
+      .addEditNoteOption({ isSelf, isFriend }, () => Popup.openEditFriendNote(userId, targetId))
+      .addSeparator()
+      .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => {}, onNotifyFriendOnlineClick: () => {} }, () => {})
+      .addEditFriendFriendGroupOption(
+        { isSelf, isStranger, isBlocked: isFriendBlocked },
+        () => {},
+        new CtxMenuBuilder()
+          .addFriendGroupOption({ friendGroupId: friend.friendGroupId || '', friendGroups: friendGroups }, (friendGroupId) => Popup.editFriend(targetId, { friendGroupId: friendGroupId || null }))
+          .build(),
+      )
+      .addBlockUserOption({ isSelf, isBlocked: isFriendBlocked }, () => (isFriendBlocked ? Popup.unblockUser(targetId, friendName) : Popup.blockUser(targetId, friendName)))
+      .addDeleteFriendOption({ isSelf, isFriend }, () => Popup.deleteFriend(targetId, friendName))
+      .addDeleteFriendApplicationOption({ isSelf, isPending }, () => Popup.deleteFriendApplication(targetId))
+      .build();
 
   const handleServerSelect = (server: Types.Server) => {
     if (loadingBox.isLoading) return;
@@ -162,26 +90,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     loadingBox.setIsLoading(true);
     loadingBox.setLoadingServerId(server.specialId || server.displayId);
     ipc.socket.send('connectServer', { serverId: server.serverId });
-  };
-
-  const handleBlockUser = (targetId: Types.User['userId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-block-user', { '0': friendName }), () => ipc.socket.send('blockUser', { targetId }));
-  };
-
-  const handleUnblockUser = (targetId: Types.User['userId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-unblock-user', { '0': friendName }), () => ipc.socket.send('unblockUser', { targetId }));
-  };
-
-  const handleDeleteFriend = (targetId: Types.User['userId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-delete-friend', { '0': friendName }), () => ipc.socket.send('deleteFriend', { targetId }));
-  };
-
-  const handleDeleteFriendApplication = (targetId: Types.User['userId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-delete-friend-application', { '0': friendName }), () => ipc.socket.send('deleteFriendApplication', { receiverId: targetId }));
-  };
-
-  const handleEditFriend = (targetId: Types.User['userId'], update: Partial<Types.Friend>) => {
-    ipc.socket.send('editFriend', { targetId, update });
   };
 
   // Effects
@@ -203,11 +111,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         if (selectedItemId === targetId) setSelectedItemId(null);
         else setSelectedItemId(targetId);
       }}
-      onDoubleClick={() => Popup.handleOpenDirectMessage(userId, targetId)}
+      onDoubleClick={() => Popup.openDirectMessage(userId, targetId)}
       onContextMenu={(e) => {
         e.preventDefault();
-        const x = e.clientX;
-        const y = e.clientY;
+        const { clientX: x, clientY: y } = e;
         contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >

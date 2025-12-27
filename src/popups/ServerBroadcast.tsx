@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import { MAX_BROADCAST_LENGTH } from '@/constant';
 
 import popupStyles from '@/styles/popup.module.css';
@@ -26,16 +28,6 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   const canSend = broadcastContent.trim() && broadcastContent.length <= MAX_BROADCAST_LENGTH;
 
   // Handlers
-  const handleBroadcastChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], preset: Partial<Types.PromptMessage>) => {
-    ipc.socket.send('actionMessage', { serverId, channelId, preset });
-    ipc.window.close();
-  };
-
-  const handleBroadcastServer = (serverId: Types.Server['serverId'], preset: Partial<Types.PromptMessage>) => {
-    ipc.socket.send('actionMessage', { serverId, preset });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -78,13 +70,12 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
       <div className={popupStyles['popup-footer']}>
         <div
           className={`${popupStyles['button']} ${!canSend ? 'disabled' : ''}`}
-          onClick={() =>
-            canSend
-              ? broadcastType === 'channel'
-                ? handleBroadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent })
-                : handleBroadcastServer(serverId, { type: 'alert', content: broadcastContent })
-              : null
-          }
+          onClick={() => {
+            if (!canSend) return;
+            if (broadcastType === 'channel') Popup.broadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
+            else Popup.broadcastServer(serverId, { type: 'alert', content: broadcastContent });
+            handleClose();
+          }}
         >
           {t('confirm')}
         </div>

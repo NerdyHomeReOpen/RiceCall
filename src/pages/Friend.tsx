@@ -41,7 +41,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const { userId, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
 
   // Handlers
-  const handleChangeSignature = (signature: Types.User['signature']) => {
+  const changeSignature = (signature: Types.User['signature']) => {
     if (signature === userSignature) return;
     ipc.socket.send('editUser', { update: { signature } });
   };
@@ -92,7 +92,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             defaultValue={userSignature}
             maxLength={100}
             placeholder={t('signature-placeholder')}
-            onBlur={(e) => handleChangeSignature(e.target.value)}
+            onBlur={(e) => changeSignature(e.target.value)}
             onKeyDown={(e) => {
               if (e.key !== 'Enter') return;
               else e.preventDefault();
@@ -106,8 +106,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             className={emojiStyles['emoji-icon']}
             onMouseDown={(e) => {
               e.preventDefault();
-              const x = e.currentTarget.getBoundingClientRect().left;
-              const y = e.currentTarget.getBoundingClientRect().bottom;
+              const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
               contextMenu.showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (_, full) => {
                 signatureInputRef.current?.focus();
                 document.execCommand('insertText', false, full);
@@ -127,15 +126,11 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
             <div className={friendStyles['friend-active-list']}>
               {friendActivities.map((friendActivity, index) => (
                 <div key={index} className={friendStyles['user-activity']}>
-                  <div
-                    className={friendStyles['user-avatar']}
-                    style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }}
-                    onClick={() => Popup.handleOpenUserInfo(userId, friendActivity.userId)}
-                  />
+                  <div className={friendStyles['user-avatar']} style={{ backgroundImage: `url(${friendActivity.avatarUrl})` }} onClick={() => Popup.openUserInfo(userId, friendActivity.userId)} />
                   <div className={friendStyles['right-info']}>
                     <div className={friendStyles['user-activity-top']}>
                       {friendActivity.vip !== 0 && <div className={`${friendStyles['vip-icon']} ${vipStyles['vip-icon']} ${vipStyles[`vip-${friendActivity.vip}`]}`}></div>}
-                      <div className={friendStyles['user-name']} onClick={() => Popup.handleOpenUserInfo(userId, friendActivity.userId)}>
+                      <div className={friendStyles['user-name']} onClick={() => Popup.openUserInfo(userId, friendActivity.userId)}>
                         {friendActivity.name}
                       </div>
                       <div className={friendStyles['timestamp']}>{Language.getFormatTimeDiff(t, friendActivity.timestamp)}</div>
