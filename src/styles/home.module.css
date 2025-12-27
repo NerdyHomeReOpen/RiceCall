@@ -408,14 +408,7 @@
 }
 
 .server-avatar-picture {
-  min-width: 70px;
-  min-height: 70px;
   cursor: pointer;
-  object-fit: cover;
-  background-image: url('/logo_server_def.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
 }
 
 .server-info-text {

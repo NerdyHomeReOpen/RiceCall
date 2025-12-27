@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
@@ -58,13 +59,11 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   } = currentServer;
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: isCurrentChannelLobby } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
+  const hasNewServerMemberApplications = Permission.isServerAdmin(permissionLevel) && serverMemberApplications.length > 0;
   const connectStatus = 4 - Math.floor(Number(latency) / 50);
-  const movableServerUserIds = useMemo(
-    () => serverOnlineMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId),
-    [userId, serverOnlineMembers, permissionLevel],
-  );
+  const movableServerUserIds = serverOnlineMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId);
+  const filteredChannels = [...channels].filter((c) => !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt));
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
-  const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
   const queueMembers = useMemo<Types.QueueMember[]>(
     () =>
       queueUsers
@@ -118,6 +117,36 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     queueListRef.current.style.maxHeight = `${e.clientY - queueListRef.current.offsetTop}px`;
   };
 
+  const handleInviteFriendsClick = () => {
+    Popup.openInviteFriend(userId, currentServerId);
+  };
+
+  const handleServerSettingClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
+  };
+
+  const handleServerAvatarClick = () => {
+    Popup.openServerSetting(userId, currentServerId);
+  };
+
+  const handleChannelListContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
+  };
+
+  const handleCurrentChannelTabClick = () => {
+    setViewType('current');
+  };
+
+  const handleAllChannelTabClick = () => {
+    setViewType('all');
+  };
+
   // Effects
   useEffect(() => {
     for (const channel of channels) {
@@ -136,8 +165,8 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   return (
     <>
       <div className={styles['sidebar-header']}>
-        <div className={styles['avatar-box']} onClick={() => Popup.openServerSetting(userId, currentServerId)}>
-          <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${currentServerAvatarUrl})` }} />
+        <div className={styles['avatar-box']} onClick={handleServerAvatarClick}>
+          <Image className={styles['avatar-picture']} src={currentServerAvatarUrl} alt={currentServerName} width={50} height={50} loading="lazy" draggable="false" />
         </div>
         <div className={styles['base-info-wrapper']}>
           <div className={styles['box']}>
@@ -148,18 +177,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
             <div className={styles['id-text']}>{currentServerSpecialId || currentServerDisplayId}</div>
             <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
             <div className={styles['options']}>
-              <div className={styles['invitation-icon']} onClick={() => Popup.openInviteFriend(userId, currentServerId)} />
+              <div className={styles['invitation-icon']} onClick={handleInviteFriendsClick} />
               <div className={styles['saperator-1']} />
-              <div
-                className={styles['setting-icon']}
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
-                  contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
-                }}
-              >
-                <div className={`${header['overlay']} ${Permission.isServerAdmin(permissionLevel) && serverMemberApplications.length > 0 ? header['new'] : ''}`} />
+              <div className={styles['setting-icon']} onClick={handleServerSettingClick}>
+                <div className={`${header['overlay']} ${hasNewServerMemberApplications ? header['new'] : ''}`} />
               </div>
             </div>
           </div>
@@ -195,15 +216,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
         </>
       )}
       <div className={styles['section-title-text']}>{viewType === 'current' ? t('current-channel') : t('all-channel')}</div>
-      <div
-        className={styles['scroll-view']}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const { clientX: x, clientY: y } = e;
-          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
-        }}
-      >
+      <div className={styles['scroll-view']} onContextMenu={handleChannelListContextMenu}>
         <div className={styles['channel-list']}>
           {viewType === 'current' ? (
             <ChannelTab
@@ -215,9 +228,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
               queueUsers={queueUsers}
               serverOnlineMembers={serverOnlineMembers}
               channel={currentChannel}
-              expanded={{ [currentChannelId]: true }}
               selectedItemId={selectedItemId}
-              setExpanded={() => {}}
               setSelectedItemId={setSelectedItemId}
             />
           ) : (
@@ -260,10 +271,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       </div>
       <div className={styles['saperator-3']} />
       <div className={styles['sidebar-footer']}>
-        <div className={`${styles['navegate-tab']} ${viewType === 'current' ? styles['active'] : ''}`} onClick={() => setViewType('current')}>
+        <div className={`${styles['navegate-tab']} ${viewType === 'current' ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
           {t('current-channel')}
         </div>
-        <div className={`${styles['navegate-tab']} ${viewType === 'all' ? styles['active'] : ''}`} onClick={() => setViewType('all')}>
+        <div className={`${styles['navegate-tab']} ${viewType === 'all' ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
           {t('all-channel')}
         </div>
       </div>

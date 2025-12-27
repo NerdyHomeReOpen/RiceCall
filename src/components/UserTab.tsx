@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
@@ -76,6 +75,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const isSuperior = permissionLevel > memberPermission;
   const isEqualOrSuperior = permissionLevel >= memberPermission;
   const isChannelQueueMode = channelVoiceMode === 'queue';
+  const isSelected = selectedItemId === `user-${memberUserId}`;
+  const isDraggable = !isSelf && isSuperior && Permission.isChannelMod(permissionLevel);
+  const memberHasVip = memberVip > 0;
 
   // Handlers
   const getStatusIcon = () => {
@@ -107,17 +109,17 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinUserChannelOption({ isSelf, isInSameChannel }, () => Popup.connectChannel(currentServerId, channelId, canJoin, needsPassword))
-      .addAddToQueueOption({ isSelf, isEqualOrSuperior, isQueueMode: isChannelQueueMode, isInQueue }, () => handleAddUserToQueue(memberUserId, currentServerId, channelId))
+      .addAddToQueueOption({ isSelf, isEqualOrSuperior, isQueueMode: isChannelQueueMode, isInQueue }, () => Popup.addUserToQueue(memberUserId, currentServerId, channelId))
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, memberUserId))
       .addViewProfileOption(() => Popup.openUserInfo(userId, memberUserId))
       .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(userId, memberUserId))
-      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? handleUnmuteUser(memberUserId) : handleMuteUser(memberUserId)))
+      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? webRTC.unmuteUser(memberUserId) : webRTC.muteUser(memberUserId)))
       .addEditNicknameOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openEditNickname(memberUserId, currentServerId))
       .addSeparator()
       .addMoveToChannelOption({ currentPermissionLevel, permissionLevel, isSelf, isInSameChannel, isEqualOrSuperior }, () => Popup.moveUserToChannel(memberUserId, currentServerId, currentChannelId))
       .addSeparator()
-      .addForbidVoiceOption({ isSelf, isSuperior, isVoiceMuted: isMemberVoiceMuted }, () => handleForbidUserVoiceInChannel(memberUserId, currentServerId, channelId, !isMemberVoiceMuted))
-      .addForbidTextOption({ isSelf, isSuperior, isTextMuted: isMemberTextMuted }, () => handleForbidUserTextInChannel(memberUserId, currentServerId, channelId, !isMemberTextMuted))
+      .addForbidVoiceOption({ isSelf, isSuperior, isVoiceMuted: isMemberVoiceMuted }, () => Popup.forbidUserVoiceInChannel(memberUserId, currentServerId, channelId, !isMemberVoiceMuted))
+      .addForbidTextOption({ isSelf, isSuperior, isTextMuted: isMemberTextMuted }, () => Popup.forbidUserTextInChannel(memberUserId, currentServerId, channelId, !isMemberTextMuted))
       .addKickUserFromChannelOption({ permissionLevel, isSelf, isSuperior, isInLobby }, () => Popup.openKickMemberFromChannel(memberUserId, currentServerId, channelId))
       .addKickUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openKickMemberFromServer(memberUserId, currentServerId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openBlockMember(memberUserId, currentServerId))
@@ -127,30 +129,41 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior, channelCategoryId }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
-  const handleMuteUser = (userId: Types.User['userId']) => {
-    webRTC.muteUser(userId);
+  const handleTabClick = () => {
+    if (isSelected) setSelectedItemId(null);
+    else setSelectedItemId(`user-${memberUserId}`);
   };
 
-  const handleUnmuteUser = (userId: Types.User['userId']) => {
-    webRTC.unmuteUser(userId);
+  const handleTabDoubleClick = () => {
+    if (isSelf) return;
+    Popup.openDirectMessage(userId, memberUserId);
   };
 
-  const handleAddUserToQueue = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-    ipc.socket.send('addUserToQueue', { userId, serverId, channelId });
-  };
-
-  const handleForbidUserTextInChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isTextMuted: boolean) => {
-    ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
-  };
-
-  const handleForbidUserVoiceInChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isVoiceMuted: boolean) => {
-    ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
-  };
-
-  const handleDragStart = (e: React.DragEvent, userId: Types.User['userId'], channelId: Types.Channel['channelId']) => {
+  const handleTabDragStart = (e: React.DragEvent) => {
+    if (!isDraggable) return;
     e.dataTransfer.setData('type', 'moveUser');
-    e.dataTransfer.setData('userId', userId);
+    e.dataTransfer.setData('userId', memberUserId);
     e.dataTransfer.setData('currentChannelId', channelId);
+  };
+
+  const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+  };
+
+  const handleTabMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => {
+      contextMenu.showUserInfoBlock(x, y, 'right-bottom', member);
+    }, 200);
+  };
+
+  const handleTabMouseLeave = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = null;
   };
 
   // Effects
@@ -162,40 +175,20 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   return (
     <div
       ref={userTabRef}
-      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `user-${memberUserId}` ? styles['selected'] : ''}`}
-      onClick={() => {
-        if (selectedItemId === `user-${memberUserId}`) setSelectedItemId(null);
-        else setSelectedItemId(`user-${memberUserId}`);
-      }}
-      onDoubleClick={() => {
-        if (isSelf) return;
-        Popup.openDirectMessage(userId, memberUserId);
-      }}
-      onMouseEnter={(e) => {
-        const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = setTimeout(() => {
-          contextMenu.showUserInfoBlock(x, y, 'right-bottom', member);
-        }, 200);
-      }}
-      onMouseLeave={() => {
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = null;
-      }}
-      draggable={!isSelf && isSuperior && Permission.isChannelMod(permissionLevel)}
-      onDragStart={(e) => handleDragStart(e, memberUserId, channelId)}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const { clientX: x, clientY: y } = e;
-        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-      }}
+      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
+      onClick={handleTabClick}
+      onDoubleClick={handleTabDoubleClick}
+      onMouseEnter={handleTabMouseEnter}
+      onMouseLeave={handleTabMouseLeave}
+      draggable={isDraggable}
+      onDragStart={handleTabDragStart}
+      onContextMenu={handleTabContextMenu}
     >
       <div className={`${styles['user-text-state']} ${isMemberTextMuted ? styles['muted'] : ''}`} />
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-      {memberVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
-      <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberVip > 0 ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
+      {memberHasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
+      <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberHasVip ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
       <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} showTooltip={false} />
       <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isSelf && <div className={styles['my-location-icon']} />}

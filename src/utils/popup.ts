@@ -396,6 +396,10 @@ export function joinQueue(serverId: Types.Server['serverId'], channelId: Types.C
   ipc.socket.send('joinQueue', { serverId, channelId, position });
 }
 
+export function addUserToQueue(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+  ipc.socket.send('addUserToQueue', { userId, serverId, channelId });
+}
+
 export function leaveQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
   ipc.socket.send('leaveQueue', { serverId, channelId });
 }

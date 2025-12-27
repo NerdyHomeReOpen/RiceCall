@@ -25,13 +25,6 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 40px;
-  min-height: 40px;
-  object-fit: cover;
-  background-image: url('/im/SecretaryLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
 }
 
 .avatar-picture::before {
@@ -499,16 +492,6 @@
   width: 100%;
 }
 
-.user-avatar {
-  min-width: 30px;
-  min-height: 30px;
-  cursor: pointer;
-  background-image: url('/im/IMLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
-}
-
 .right-info {
   display: flex;
   flex: 1;
@@ -528,12 +511,12 @@
   min-width: 0;
 }
 
-.user-activity-top > div:first-child,
-.user-activity-top > div:nth-child(2) {
+.user-activity-top>div:first-child,
+.user-activity-top>div:nth-child(2) {
   flex-shrink: 0;
 }
 
-.user-activity-top > div:last-child {
+.user-activity-top>div:last-child {
   flex-shrink: 0;
   margin-left: auto;
 }
