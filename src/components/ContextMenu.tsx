@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
@@ -36,6 +37,9 @@ interface ContextMenuProps {
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
+  // Hooks
+  const { t } = useTranslation();
+
   // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -108,7 +112,7 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
                 if (item.hasSubmenu) setSubMenu(null);
               }}
             >
-              {item.label}
+              {t(item.label)}
               {item.hasSubmenu && subMenu}
             </div>
           );

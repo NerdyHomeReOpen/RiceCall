@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditFriendNotePopupProps {
@@ -21,11 +23,6 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
   const { targetId, name: targetName } = friend;
 
   // Handlers
-  const handleEditFriend = (targetId: Types.User['userId'], update: Partial<Types.Friend>) => {
-    ipc.socket.send('editFriend', { targetId, update });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -41,7 +38,13 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleEditFriend(targetId, { note: friendNote })}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.editFriend(targetId, { note: friendNote });
+            handleClose();
+          }}
+        >
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

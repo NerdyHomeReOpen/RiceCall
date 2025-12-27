@@ -17,6 +17,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as Permission from '@/utils/permission';
 import * as Language from '@/utils/language';
 import * as Popup from '@/utils/popup';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import { SHOW_FRAME_ORIGIN, MESSAGE_VIERER_DEVIATION } from '@/constant';
 
@@ -27,8 +28,8 @@ interface MessageInputBoxGuardProps {
   lastJoinChannelTime: number;
   lastMessageTime: number;
   permissionLevel: number;
-  channelForbidText: boolean;
-  channelForbidGuestText: boolean;
+  isChannelForbidText: boolean;
+  isChannelForbidGuestText: boolean;
   channelGuestTextGapTime: number;
   channelGuestTextWaitTime: number;
   channelGuestTextMaxLength: number;
@@ -41,8 +42,8 @@ const MessageInputBoxGuard = React.memo(
     lastJoinChannelTime,
     lastMessageTime,
     permissionLevel,
-    channelForbidText,
-    channelForbidGuestText,
+    isChannelForbidText,
+    isChannelForbidGuestText,
     channelGuestTextGapTime,
     channelGuestTextWaitTime,
     channelGuestTextMaxLength,
@@ -62,8 +63,8 @@ const MessageInputBoxGuard = React.memo(
     const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
 
     const isForbidByMutedText = isChannelTextMuted;
-    const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && channelForbidText;
-    const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && channelForbidGuestText;
+    const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && isChannelForbidText;
+    const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && isChannelForbidGuestText;
     const isForbidByForbidGuestTextGap = !Permission.isMember(permissionLevel) && leftGapTime > 0;
     const isForbidByForbidGuestTextWait = !Permission.isMember(permissionLevel) && leftWaitTime > 0;
     const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
@@ -189,9 +190,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       announcement: currentChannelAnnouncement,
       bitrate: currentChannelBitrate,
       voiceMode: currentChannelVoiceMode,
-      forbidText: currentChannelForbidText,
-      forbidQueue: currentChannelForbidQueue,
-      forbidGuestText: currentChannelForbidGuestText,
+      forbidText: isCurrentChannelForbidText,
+      forbidQueue: isCurrentChannelQueueForbidden,
+      forbidGuestText: isCurrentChannelGuestTextForbidden,
       guestTextGapTime: currentChannelGuestTextGapTime,
       guestTextWaitTime: currentChannelGuestTextWaitTime,
       guestTextMaxLength: currentChannelGuestTextMaxLength,
@@ -254,139 +255,51 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
       return className;
     };
 
-    const getContextMenuItems1 = () => [
-      {
-        id: 'close-announcement',
-        label: t('close-announcement'),
-        onClick: () => setMode('none'),
-      },
-    ];
+    const getContextMenuItems1 = () => new CtxMenuBuilder().addCloseAnnouncementOption({ permissionLevel }, () => setMode('none')).build();
 
-    const getContextMenuItems2 = () => [
-      {
-        id: 'clean-up-message',
-        label: t('clean-up-message'),
-        onClick: onClearMessages,
-      },
-      {
-        id: 'open-channel-event',
-        label: t('channel-event'),
-        onClick: () => Popup.handleOpenChannelEvent(userId, currentServer.serverId, channelEvents),
-      },
-      {
-        id: 'open-announcement',
-        label: t('open-announcement'),
-        show: mode !== 'announcement',
-        onClick: () => setMode('announcement'),
-      },
-    ];
+    const getContextMenuItems2 = () =>
+      new CtxMenuBuilder()
+        .addCleanUpMessageOption({ permissionLevel }, () => onClearMessages())
+        .addOpenChannelEventOption({ permissionLevel }, () => Popup.openChannelEvent(userId, currentServer.serverId, channelEvents))
+        .addOpenAnnouncementOption({ permissionLevel }, () => setMode('announcement'))
+        .build();
 
-    const getContextMenuItems3 = () => [
-      {
-        id: 'free-speech',
-        label: t('free-speech'),
-        icon: isCurrentChannelFreeMode ? 'checked' : '',
-        onClick: () => handleEditChannel(currentServerId, currentChannelId, { voiceMode: 'free' }),
-      },
-      {
-        id: 'admin-speech',
-        label: t('admin-speech'),
-        icon: isCurrentChannelAdminMode ? 'checked' : '',
-        onClick: () => handleEditChannel(currentServerId, currentChannelId, { voiceMode: 'admin' }),
-      },
-      {
-        id: 'queue-speech',
-        label: t('queue-speech'),
-        icon: isCurrentChannelQueueMode ? 'submenu' : '',
-        hasSubmenu: isCurrentChannelQueueMode,
-        onClick: () => handleEditChannel(currentServerId, currentChannelId, { voiceMode: 'queue' }),
-        submenuItems: [
-          {
-            id: 'forbid-guest-queue',
-            label: t('forbid-queue'),
-            icon: currentChannelForbidQueue ? 'checked' : '',
-            disabled: !isCurrentChannelQueueMode,
-            onClick: () => handleEditChannel(currentServerId, currentChannelId, { forbidQueue: !currentChannelForbidQueue }),
-          },
-          {
-            id: 'control-queue',
-            label: t('control-queue'),
-            icon: isCurrentChannelQueueControlled ? 'checked' : '',
-            disabled: !isCurrentChannelQueueMode,
-            onClick: () => handleControlQueue(currentServerId, currentChannelId),
-          },
-        ],
-      },
-    ];
-
-    const handleSendMessage = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], preset: Partial<Types.ChannelMessage>): void => {
-      ipc.socket.send('channelMessage', { serverId, channelId, preset });
-      setLastMessageTime(Date.now());
-    };
-
-    const handleEditChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>) => {
-      ipc.socket.send('editChannel', { serverId, channelId, update });
-    };
-
-    const handleJoinQueue = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], position?: number) => {
-      ipc.socket.send('joinQueue', { serverId, channelId, position });
-    };
-
-    const handleLeaveQueue = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-      ipc.socket.send('leaveQueue', { serverId, channelId });
-    };
-
-    const handleControlQueue = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-      ipc.socket.send('controlQueue', { serverId, channelId });
-    };
-
-    const handleToggleSpeakerMute = () => {
-      webRTC.toggleSpeakerMuted();
-    };
-
-    const handleEditSpeakerVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-      webRTC.changeSpeakerVolume(parseInt(e.target.value));
-    };
-
-    const handleToggleMicMute = () => {
-      webRTC.toggleMicMuted();
-    };
-
-    const handleEditMicVolume = (e: React.ChangeEvent<HTMLInputElement>) => {
-      webRTC.changeMicVolume(parseInt(e.target.value));
-    };
-
-    const handleToggleMixingMode = async () => {
-      if (!webRTC.isMicTaken) return;
-      webRTC.toggleMixMode();
-    };
-
-    const handleToggleRecord = async () => {
-      webRTC.toggleRecording();
-    };
+    const getContextMenuItems3 = () =>
+      new CtxMenuBuilder()
+        .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Popup.editChannel(currentServerId, currentChannelId, { voiceMode: 'free' }))
+        .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Popup.editChannel(currentServerId, currentChannelId, { voiceMode: 'admin' }))
+        .addQueueSpeechOption(
+          { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
+          () => Popup.editChannel(currentServerId, currentChannelId, { voiceMode: 'queue' }),
+          new CtxMenuBuilder()
+            .addForbidQueueOption({ permissionLevel, isForbidQueue: isCurrentChannelQueueForbidden }, () =>
+              Popup.editChannel(currentServerId, currentChannelId, { forbidQueue: !isCurrentChannelQueueForbidden }),
+            )
+            .addControlQueueOption({ permissionLevel, isQueueControlled: isCurrentChannelQueueControlled }, () => Popup.controlQueue(currentServerId, currentChannelId))
+            .build(),
+        )
+        .build();
 
     const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
       if (isCurrentChannelQueueMode) {
         if (!isIdling) {
-          const x = e.currentTarget.getBoundingClientRect().left;
-          const y = e.currentTarget.getBoundingClientRect().top;
+          const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
           contextMenu.showMicContextMenu(x, y, 'right-top', [
             {
               id: 'untake-mic',
               label: t('untake-mic'),
               show: isCurrentChannelQueueMode,
-              onClick: () => handleLeaveQueue(currentServerId, currentChannelId),
+              onClick: () => Popup.leaveQueue(currentServerId, currentChannelId),
             },
           ]);
         } else if (Permission.isChannelMod(permissionLevel)) {
-          const x = e.currentTarget.getBoundingClientRect().left;
-          const y = e.currentTarget.getBoundingClientRect().top;
+          const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
           contextMenu.showMicContextMenu(x, y, 'right-top', [
             {
               id: 'take-mic-in-queue',
               label: t('take-mic-in-queue'),
               show: isCurrentChannelQueueMode,
-              onClick: () => handleJoinQueue(currentServerId, currentChannelId),
+              onClick: () => Popup.joinQueue(currentServerId, currentChannelId),
             },
             {
               id: 'separator',
@@ -396,17 +309,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               id: 'take-mic-directly',
               label: t('take-mic-directly'),
               show: isCurrentChannelQueueMode,
-              onClick: () => handleJoinQueue(currentServerId, currentChannelId, -2),
+              onClick: () => Popup.joinQueue(currentServerId, currentChannelId, -2),
             },
           ]);
         } else {
-          handleJoinQueue(currentServerId, currentChannelId);
+          Popup.joinQueue(currentServerId, currentChannelId);
         }
       } else {
         if (isMicTaken) {
-          handleLeaveQueue(currentServerId, currentChannelId);
+          Popup.leaveQueue(currentServerId, currentChannelId);
         } else {
-          handleJoinQueue(currentServerId, currentChannelId);
+          Popup.joinQueue(currentServerId, currentChannelId);
         }
       }
     };
@@ -669,9 +582,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                 <div
                   className={styles['widget-bar-item']}
                   onClick={() => {
-                    Popup.handleOpenServerApplication(userId, currentServerId, (action) => {
+                    Popup.openServerApplication(userId, currentServerId, (action) => {
                       if (action === 'openShowFrame') setMode('show');
-                      if (action === 'openChannelEvent') Popup.handleOpenChannelEvent(userId, currentServerId, channelEvents);
+                      if (action === 'openChannelEvent') Popup.openChannelEvent(userId, currentServerId, channelEvents);
                     });
                     setIsWidgetExpanded(false);
                   }}
@@ -716,13 +629,16 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                     lastJoinChannelTime={lastJoinChannelTime}
                     lastMessageTime={lastMessageTime}
                     permissionLevel={permissionLevel}
-                    channelForbidText={currentChannelForbidText}
-                    channelForbidGuestText={currentChannelForbidGuestText}
+                    isChannelForbidText={isCurrentChannelForbidText}
+                    isChannelForbidGuestText={isCurrentChannelGuestTextForbidden}
                     channelGuestTextGapTime={currentChannelGuestTextGapTime}
                     channelGuestTextWaitTime={currentChannelGuestTextWaitTime}
                     channelGuestTextMaxLength={currentChannelGuestTextMaxLength}
                     isChannelTextMuted={isCurrentChannelTextMuted}
-                    onSendMessage={(message) => handleSendMessage(currentServerId, currentChannelId, { type: 'general', content: message })}
+                    onSendMessage={(message) => {
+                      Popup.sendChannelMessage(currentServerId, currentChannelId, { type: 'general', content: message });
+                      setLastMessageTime(Date.now());
+                    }}
                   />
                 </div>
               </div>
@@ -733,8 +649,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   className={styles['voice-mode-dropdown']}
                   style={Permission.isChannelMod(permissionLevel) ? {} : { display: 'none' }}
                   onClick={(e) => {
-                    const x = e.currentTarget.getBoundingClientRect().left;
-                    const y = e.currentTarget.getBoundingClientRect().top;
+                    const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
                     contextMenu.showContextMenu(x, y, 'right-top', getContextMenuItems3());
                   }}
                 >
@@ -753,7 +668,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
               <div className={styles['buttons']}>
                 <div
                   className={`${styles['bkg-mode-btn']} ${webRTC.isMixModeActive ? styles['active'] : ''}`}
-                  onClick={handleToggleMixingMode}
+                  onClick={() => webRTC.toggleMixMode()}
                   title={webRTC.isMixModeActive ? t('mixing-on') : t('mixing-off')}
                 >
                   {t('mixing')}
@@ -764,8 +679,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   <VolumeSlider
                     value={webRTC.micVolume}
                     muted={webRTC.isMicMuted || webRTC.micVolume === 0}
-                    onChange={handleEditMicVolume}
-                    onToggleMute={handleToggleMicMute}
+                    onChange={(e) => webRTC.changeMicVolume(parseInt(e.target.value))}
+                    onToggleMute={() => webRTC.toggleMicMuted()}
                     railCls={styles['volume-slider']}
                     btnCls={styles['mic-btn']}
                   />
@@ -778,14 +693,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
                   <VolumeSlider
                     value={webRTC.speakerVolume}
                     muted={webRTC.isSpeakerMuted || webRTC.speakerVolume === 0}
-                    onChange={handleEditSpeakerVolume}
-                    onToggleMute={handleToggleSpeakerMute}
+                    onChange={(e) => webRTC.changeSpeakerVolume(parseInt(e.target.value))}
+                    onToggleMute={() => webRTC.toggleSpeakerMuted()}
                     railCls={styles['volume-slider']}
                     btnCls={styles['speaker-btn']}
                   />
                 </div>
                 <div className={`${styles['record-mode']} ${webRTC.isRecording ? styles['active'] : ''}`}>
-                  <div className={`${styles['record-mode-btn']} ${webRTC.isRecording ? styles['active'] : ''}`} onClick={handleToggleRecord} />
+                  <div className={`${styles['record-mode-btn']} ${webRTC.isRecording ? styles['active'] : ''}`} onClick={() => webRTC.toggleRecording()} />
                   <div className={`${styles['record-mode-text']} ${webRTC.isRecording ? styles['active'] : ''}`}>{Language.getFormatTimeFromSecond(webRTC.recordTime)}</div>
                 </div>
               </div>

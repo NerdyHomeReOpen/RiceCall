@@ -16,11 +16,11 @@ const Header: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   // Handlers
-  const handleMinimize = () => {
+  const minimize = () => {
     ipc.window.minimize();
   };
 
-  const handleClose = () => {
+  const close = () => {
     ipc.window.close();
   };
 
@@ -49,8 +49,8 @@ const Header: React.FC = React.memo(() => {
         <div className={headerStyles['app-icon']} />
       </div>
       <div className={headerStyles['buttons']}>
-        <div className={headerStyles['minimize']} onClick={() => handleMinimize()} />
-        <div className={headerStyles['close']} onClick={() => handleClose()} />
+        <div className={headerStyles['minimize']} onClick={minimize} />
+        <div className={headerStyles['close']} onClick={close} />
       </div>
     </header>
   );

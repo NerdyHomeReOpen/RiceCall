@@ -101,7 +101,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -131,18 +131,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     editor?.chain().setColor(color).focus().run();
     syncStyles();
     localStorage.setItem('dm-textColor', color);
-  };
-
-  const handleSendMessage = (targetId: Types.User['userId'], preset: Partial<Types.DirectMessage>) => {
-    ipc.socket.send('directMessage', { targetId, preset });
-  };
-
-  const handleBlockUser = () => {
-    Popup.handleOpenAlertDialog(t('confirm-block-user', { '0': targetName }), () => ipc.socket.send('blockUser', { targetId }));
-  };
-
-  const handleUnblockUser = () => {
-    Popup.handleOpenAlertDialog(t('confirm-unblock-user', { '0': targetName }), () => ipc.socket.send('unblockUser', { targetId }));
   };
 
   const handleSendShakeWindow = () => {
@@ -294,10 +282,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['direct-option-buttons']}>
           <div className={`${styles['file-share']} disabled`} />
           {!isFriend ? (
-            <div className={styles['apply-friend']} onClick={() => Popup.handleOpenApplyFriend(userId, targetId)} />
+            <div className={styles['apply-friend']} onClick={() => Popup.openApplyFriend(userId, targetId)} />
           ) : (
             <>
-              {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUser} /> : <div className={styles['un-block-user']} onClick={handleUnblockUser} />}
+              {!isBlocked ? (
+                <div className={styles['block-user']} onClick={() => Popup.blockUser(targetId, targetName)} />
+              ) : (
+                <div className={styles['un-block-user']} onClick={() => Popup.unblockUser(targetId, targetName)} />
+              )}
               <div className={`${styles['invite-temp-group']} disabled`} />
             </>
           )}
@@ -310,7 +302,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div
               className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`}
               style={{ backgroundImage: `url(${targetAvatarUrl})` }}
-              onClick={() => Popup.handleOpenUserInfo(userId, targetId)}
+              onClick={() => Popup.openUserInfo(userId, targetId)}
             />
             {targetVip > 0 && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
@@ -320,7 +312,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => Popup.handleOpenUserInfo(userId, userId)} />
+            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => Popup.openUserInfo(userId, userId)} />
           </div>
         </div>
         <div className={styles['main-content']}>
@@ -384,7 +376,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={handleSendShakeWindow} />
               </div>
               <div className={styles['buttons']}>
-                <div className={`${styles['history-message']} disabled`} onClick={() => Popup.handleOpenChatHistory(userId, targetId)}>
+                <div className={`${styles['history-message']} disabled`} onClick={() => Popup.openChatHistory(userId, targetId)}>
                   {t('message-history')}
                 </div>
               </div>
@@ -413,7 +405,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
                 if (e.key === 'Enter') {
                   e.preventDefault();
                   if (messageInput.trim().length === 0) return;
-                  handleSendMessage(targetId, { type: 'dm', content: messageInput });
+                  Popup.sendMessage(targetId, { type: 'dm', content: messageInput });
                   editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
                   syncStyles();
                 }

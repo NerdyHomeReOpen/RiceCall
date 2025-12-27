@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface MemberApplicationSettingPopupProps {
@@ -20,11 +22,6 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
   const [serverApplyNote, setServerApplyNote] = useState<string>(server.applyNotice);
 
   // Handlers
-  const handleEditServer = (serverId: Types.Server['serverId'], update: Partial<Types.Server>) => {
-    ipc.socket.send('editServer', { serverId, update });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -44,7 +41,13 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote })}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.editServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
+            handleClose();
+          }}
+        >
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

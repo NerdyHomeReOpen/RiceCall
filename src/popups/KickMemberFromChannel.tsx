@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface KickMemberFromChannelPopupProps {
@@ -23,6 +25,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   const [otherReason, setOtherReason] = useState<string>('');
 
   // Variables
+  const { channelId, name: channelName } = channel;
   const { userId, name: memberName, nickname: memberNickname } = member;
   const formatTypeOptions = [
     { key: 'seconds', label: t('second') },
@@ -79,11 +82,6 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
     }
   };
 
-  const handleBlockUserFromChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], blockUntil: number) => {
-    ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId, blockUntil });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -95,7 +93,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
           <div className={popupStyles['col']}>
             <div className={popupStyles['label']} style={{ minWidth: '0' }}>
-              {t('confirm-kick-user-from-channel', { '0': memberNickname || memberName, '1': channel.name })}
+              {t('confirm-kick-user-from-channel', { '0': memberNickname || memberName, '1': channelName })}
             </div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
@@ -145,7 +143,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleBlockUserFromChannel(userId, serverId, channel.channelId, Date.now() + getBlockTime())}>
+        <div className={popupStyles['button']} onClick={() => Popup.blockUserFromChannel(userId, serverId, channelId, Date.now() + getBlockTime())}>
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

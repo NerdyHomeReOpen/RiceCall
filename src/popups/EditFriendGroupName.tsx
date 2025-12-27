@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditFriendGroupNamePopupProps {
@@ -22,11 +24,6 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
   const canSubmit = friendGroupName.trim();
 
   // Handlers
-  const handleEditFriendGroup = (friendGroupId: Types.FriendGroup['friendGroupId'], update: Partial<Types.FriendGroup>) => {
-    ipc.socket.send('editFriendGroup', { friendGroupId, update });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -42,7 +39,14 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditFriendGroup(friendGroupId, { name: friendGroupName }) : null)}>
+        <div
+          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
+          onClick={() => {
+            if (!canSubmit) return;
+            Popup.editFriendGroup(friendGroupId, { name: friendGroupName });
+            handleClose();
+          }}
+        >
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

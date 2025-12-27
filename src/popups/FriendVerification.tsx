@@ -22,20 +22,6 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
   // States
   const [friendApplications, setFriendApplications] = useState<Types.FriendApplication[]>(friendApplicationsData);
 
-  // Handlers
-  const handleRejectFriendApplication = (senderId: Types.User['userId'], applicationName: Types.FriendApplication['name']) => {
-    Popup.handleOpenAlertDialog(t('confirm-reject-friend-application', { 0: applicationName }), () => {
-      ipc.socket.send('rejectFriendApplication', { senderId });
-    });
-  };
-
-  const handleRejectAllFriendApplication = () => {
-    if (friendApplications.length === 0) return;
-    Popup.handleOpenAlertDialog(t('confirm-reject-all-friend-application'), () => {
-      ipc.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId })));
-    });
-  };
-
   // Effects
   useEffect(() => {
     const unsub = ipc.socket.on('friendApplicationAdd', (...args: { data: Types.FriendApplication }[]) => {
@@ -69,49 +55,48 @@ const FriendVerificationPopup: React.FC<FriendVerificationPopupProps> = React.me
             {t('unprocessed')}
             <span className={styles['processing-status-count']}>({friendApplications.length})</span>
           </div>
-          <div className={styles['all-cancel-text']} onClick={handleRejectAllFriendApplication}>
+          <div className={styles['all-cancel-text']} onClick={() => Popup.rejectAllFriendApplication(friendApplications)}>
             {t('reject-all')}
           </div>
         </div>
         <div className={styles['content']}>
-          {friendApplications.map((friendApplication) => (
-            <div key={friendApplication.senderId} className={styles['application']}>
-              <div
-                className={styles['avatar-picture']}
-                style={{ backgroundImage: `url(${friendApplication.avatarUrl})` }}
-                onClick={() => Popup.handleOpenUserInfo(userId, friendApplication.senderId)}
-              />
-              <div style={{ flex: 1 }}>
-                <div className={styles['user-info-box']}>
-                  <div className={styles['user-name-text']}>{friendApplication.name}</div>
-                  <div className={styles['time-text']} title={Language.getFormatTimestamp(t, friendApplication.createdAt)}>
-                    {Language.getFormatTimeDiff(t, friendApplication.createdAt)}
-                  </div>
-                </div>
-                <div className={styles['application-content-box']}>
-                  <div className={popupStyles['col']}>
-                    <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
-                    <div className={styles['content-text']}>
-                      {t('note')}: {friendApplication.description}
+          {friendApplications.map((application) => {
+            const { senderId, avatarUrl: senderAvatarUrl, name: senderName, createdAt: applicationCreatedAt, description: applicationDescription } = application;
+            return (
+              <div key={senderId} className={styles['application']}>
+                <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${senderAvatarUrl})` }} onClick={() => Popup.openUserInfo(userId, senderId)} />
+                <div style={{ flex: 1 }}>
+                  <div className={styles['user-info-box']}>
+                    <div className={styles['user-name-text']}>{senderName}</div>
+                    <div className={styles['time-text']} title={Language.getFormatTimestamp(t, applicationCreatedAt)}>
+                      {Language.getFormatTimeDiff(t, applicationCreatedAt)}
                     </div>
                   </div>
-                  <div className={popupStyles['row']} style={{ alignSelf: 'flex-end' }}>
-                    <div className={styles['action-buttons']}>
-                      <div className={styles['button']} onClick={() => Popup.handleOpenApproveFriend(userId, friendApplication.senderId)}>
-                        {t('accept')}
-                      </div>
-                      <div className={styles['button']} onClick={() => handleRejectFriendApplication(friendApplication.senderId, friendApplication.name)}>
-                        {t('reject')}
+                  <div className={styles['application-content-box']}>
+                    <div className={popupStyles['col']}>
+                      <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
+                      <div className={styles['content-text']}>
+                        {t('note')}: {applicationDescription}
                       </div>
                     </div>
-                    <div className={styles['direct-message-button']} onClick={() => Popup.handleOpenDirectMessage(userId, friendApplication.senderId)}>
-                      <div className={styles['direct-message-icon']} />
+                    <div className={popupStyles['row']} style={{ alignSelf: 'flex-end' }}>
+                      <div className={styles['action-buttons']}>
+                        <div className={styles['button']} onClick={() => Popup.openApproveFriend(userId, senderId)}>
+                          {t('accept')}
+                        </div>
+                        <div className={styles['button']} onClick={() => Popup.rejectFriendApplication(senderId, senderName)}>
+                          {t('reject')}
+                        </div>
+                      </div>
+                      <div className={styles['direct-message-button']} onClick={() => Popup.openDirectMessage(userId, senderId)}>
+                        <div className={styles['direct-message-icon']} />
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
