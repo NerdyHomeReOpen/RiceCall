@@ -1,10 +1,45 @@
-/* eslint-disable @next/next/no-img-element */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
 import styles from '@/styles/notificationMenu.module.css';
 import contextMenuStyles from '@/styles/contextMenu.module.css';
+
+interface NotificationMenuItemProps {
+  item: Types.NotificationMenuItem;
+  onClose: () => void;
+}
+
+const NotificationMenuItem: React.FC<NotificationMenuItemProps> = React.memo(({ item, onClose }) => {
+  // Variables
+  const { label, showContentLength, showContent, contentType, contents, icon, className, disabled, onClick } = item;
+
+  // Handlers
+  const handleClick = () => {
+    if (disabled) return;
+    onClick?.();
+    onClose();
+  };
+
+  return (
+    <>
+      <div className={`${styles['option']} ${className && styles[className]} ${disabled ? contextMenuStyles['disabled'] : ''}`} data-type={icon || ''} onClick={handleClick}>
+        {showContentLength ? `${label} (${contents ? contents.length : 0})` : label}
+      </div>
+      {showContent && contents && (
+        <div className={styles['contents']}>
+          {contents
+            .slice(0, 3)
+            .map((content, index) => (contentType === 'image' ? <Image key={index} src={content} alt={content} width={32} height={32} loading="lazy" draggable="false" /> : content))}
+          {contents.length > 3 && <span>...({contents.length - 3})</span>}
+        </div>
+      )}
+    </>
+  );
+});
+
+NotificationMenuItem.displayName = 'NotificationMenuItem';
 
 interface NotificationMenuProps {
   x: number;
@@ -22,6 +57,9 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
   const [display, setDisplay] = useState(false);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
+
+  // Variables
+  const filteredItems = useMemo(() => items.filter((item) => item?.show ?? true), [items]);
 
   // Effect
   useEffect(() => {
@@ -59,31 +97,9 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
 
   return (
     <div ref={menuRef} className={`context-menu-container ${styles['notification-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
-      {items
-        .filter((item) => item?.show ?? true)
-        .map((item, index) => {
-          return (
-            <div key={index}>
-              <div
-                className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? contextMenuStyles['disabled'] : ''}`}
-                data-type={item.icon || ''}
-                onClick={() => {
-                  if (item.disabled) return;
-                  item.onClick?.();
-                  onClose();
-                }}
-              >
-                {item.showContentLength ? `${item.label} (${item.contents ? item.contents.length : 0})` : item.label}
-              </div>
-              {item.showContent && item.contents && (
-                <div className={styles['contents']}>
-                  {item.contents.slice(0, 3).map((content, index) => (item.contentType === 'image' ? <img loading="lazy" key={index} src={content} alt={content} /> : content))}
-                  {item.contents.length > 3 && <span>...({item.contents.length - 3})</span>}
-                </div>
-              )}
-            </div>
-          );
-        })}
+      {filteredItems.map((item) => (
+        <NotificationMenuItem key={item.id} item={item} onClose={onClose} />
+      ))}
     </div>
   );
 });

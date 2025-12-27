@@ -223,7 +223,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            Popup.handleOpenCreateChannel(userId, serverId, selectedChannelId);
+            Popup.openCreateChannel(userId, serverId, selectedChannelId);
           }}
         >
           {t('create')}
@@ -232,7 +232,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           className={`${styles['change-channel-name-btn']} ${!canRename ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            Popup.handleOpenEditChannelName(userId, serverId, selectedChannelId);
+            Popup.openEditChannelName(userId, serverId, selectedChannelId);
           }}
         >
           {t('change-name')}

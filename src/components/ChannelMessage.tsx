@@ -95,20 +95,23 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior, channelCategoryId }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+  };
+
+  const handleUsernameClick = () => {
+    Popup.openUserInfo(userId, senderUserId);
+  };
+
   return (
     <div className={styles['message-box']}>
-      <div
-        className={`${styles['details']}`}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          e.stopPropagation();
-          const { clientX: x, clientY: y } = e;
-          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-        }}
-      >
+      <div className={`${styles['details']}`} onContextMenu={handleContextMenu}>
         {Permission.isChannelMod(senderPermissionLevel) && <div className={`${permission[senderGender]} ${permission[`lv-${senderPermissionLevel}`]}`} />}
         {senderHasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
-        <div className={`${styles['username-text']} ${senderHasVip ? `${vip['vip-name-color']}` : ''}`} onClick={() => Popup.openUserInfo(userId, senderUserId)}>
+        <div className={`${styles['username-text']} ${senderHasVip ? `${vip['vip-name-color']}` : ''}`} onClick={handleUsernameClick}>
           {senderNickname || senderName}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>

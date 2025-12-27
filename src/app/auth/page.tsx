@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -62,6 +62,11 @@ const AuthPageComponent: React.FC = React.memo(() => {
   // States
   const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
 
+  // Variables
+  const displayLoginPage = useMemo(() => section === 'login', [section]);
+  const displayRegisterPage = useMemo(() => section === 'register', [section]);
+  const displayChangeServerPage = useMemo(() => section === 'change-server', [section]);
+
   // Effects
   useEffect(() => {
     const autoLogin = async () => {
@@ -78,9 +83,9 @@ const AuthPageComponent: React.FC = React.memo(() => {
   return (
     <>
       <Header />
-      <LoginPage display={section === 'login'} setSection={setSection} />
-      <RegisterPage display={section === 'register'} setSection={setSection} />
-      <ChangeServerPage display={section === 'change-server'} setSection={setSection} />
+      <LoginPage display={displayLoginPage} setSection={setSection} />
+      <RegisterPage display={displayRegisterPage} setSection={setSection} />
+      <ChangeServerPage display={displayChangeServerPage} setSection={setSection} />
     </>
   );
 });

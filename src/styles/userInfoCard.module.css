@@ -68,15 +68,6 @@
   height: 98px;
 }
 
-.avatar-picture {
-  min-width: 98px;
-  min-height: 98px;
-  background-image: url('/im/IMLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
-}
-
 .user-info-wrapper {
   display: flex;
   flex: 1;

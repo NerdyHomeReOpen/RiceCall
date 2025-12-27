@@ -1,4 +1,5 @@
 import React, { useState, useLayoutEffect, useRef } from 'react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
@@ -46,6 +47,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     vip: memberVip,
   } = member;
   const vipBoost = Math.min(2, 1 + memberVip * 0.2);
+  const memberHasVip = memberVip > 0;
 
   // Effects
   useLayoutEffect(() => {
@@ -90,15 +92,15 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     >
       <div className={styles['body']}>
         <div className={styles['top']}>
-          <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${memberAvatarUrl})` }} />
+          <Image src={memberAvatarUrl} alt={memberName} width={98} height={98} loading="lazy" draggable="false" />
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
+                <div className={`${styles['name-text']} ${memberHasVip && vip['vip-name-color']}`}>{memberName}</div>
                 <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} showTooltip={false} />
               </div>
               <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
-              {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
+              {memberHasVip && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
             </div>
             <div className={styles['xp-wrapper']}>
               <div className={styles['level-text']}>{`${t('level')} ${memberLevel} (${memberXp}/${memberRequiredXp})`}</div>

@@ -35,14 +35,16 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
     () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order),
     [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],
   );
+  const isSelectedFriendList = selectedTabId === 0;
+  const isSelectedRecentList = selectedTabId === 1;
 
   return (
     <>
       <div className={styles['navigate-tabs']}>
-        <div className={`${styles['tab']} ${selectedTabId === 0 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(0)}>
+        <div className={`${styles['tab']} ${isSelectedFriendList ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(0)}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div className={`${styles['tab']} ${selectedTabId === 1 ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(1)}>
+        <div className={`${styles['tab']} ${isSelectedRecentList ? styles['selected'] : ''}`} onClick={() => setSelectedTabId(1)}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
@@ -52,7 +54,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
         <div className={styles['prev-icon']} />
         <div className={styles['next-icon']} />
       </div>
-      <div className={styles['scroll-view']} style={selectedTabId === 0 ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={isSelectedFriendList ? {} : { display: 'none' }}>
         <div className={styles['friend-group-list']}>
           {filteredFriendGroups.map((friendGroup) => (
             <FriendGroupTab
@@ -67,7 +69,7 @@ const FriendList: React.FC<FriendListProps> = React.memo(({ user, friendGroups, 
           ))}
         </div>
       </div>
-      <div className={styles['recent-list']} style={selectedTabId == 1 ? {} : { display: 'none' }}></div>
+      <div className={styles['recent-list']} style={isSelectedRecentList ? {} : { display: 'none' }}></div>
       <div className={styles['sidebar-footer']}>
         <div className={styles['button']} datatype="addGroup" onClick={() => Popup.openCreateFriendGroup()}>
           {t('create-friend-group')}

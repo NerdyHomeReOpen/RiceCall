@@ -107,6 +107,59 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
     syncStyles();
   };
 
+  const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
+    contextMenu.showEmojiPicker(
+      x,
+      y,
+      'right-top',
+      e.currentTarget as HTMLElement,
+      true,
+      false,
+      fontSizeRef.current,
+      textColorRef.current,
+      handleEmojiSelect,
+      handleFontSizeChange,
+      handleTextColorChange,
+    );
+  };
+
+  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const items = e.clipboardData.items;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const image = item.getAsFile();
+        if (!image || isUploadingRef.current) return;
+        image.arrayBuffer().then((arrayBuffer) => {
+          handleUploadImage(new Uint8Array(arrayBuffer), image.name);
+        });
+      }
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    if (isWarning) return;
+    if (isComposingRef.current) return;
+    if (e.shiftKey || e.ctrlKey) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (messageInput.trim().length === 0) return;
+      onSendMessage?.(messageInput);
+      editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+      syncStyles();
+    }
+  };
+
+  const handleCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+
+  const handleCompositionEnd = () => {
+    isComposingRef.current = false;
+  };
+
   // Effects
   useEffect(() => {
     editor?.on('selectionUpdate', syncStyles);
@@ -119,57 +172,15 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
 
   return (
     <div className={`${styles['message-input-box']} ${disabled ? styles['disabled'] : ''} ${isWarning ? styles['warning'] : ''}`}>
-      <div
-        className={emoji['emoji-icon']}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
-          contextMenu.showEmojiPicker(
-            x,
-            y,
-            'right-top',
-            e.currentTarget as HTMLElement,
-            true,
-            false,
-            fontSizeRef.current,
-            textColorRef.current,
-            handleEmojiSelect,
-            handleFontSizeChange,
-            handleTextColorChange,
-          );
-        }}
-      />
+      <div className={emoji['emoji-icon']} onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}
         className={`${styles['textarea']} ${markdown['markdown-content']}`}
         style={{ wordBreak: 'break-all', border: 'none' }}
-        onPaste={(e) => {
-          const items = e.clipboardData.items;
-          for (const item of items) {
-            if (item.type.startsWith('image/')) {
-              const image = item.getAsFile();
-              if (!image || isUploadingRef.current) return;
-              image.arrayBuffer().then((arrayBuffer) => {
-                handleUploadImage(new Uint8Array(arrayBuffer), image.name);
-              });
-            }
-          }
-        }}
-        onKeyDown={(e) => {
-          if (disabled) return;
-          if (isWarning) return;
-          if (isComposingRef.current) return;
-          if (e.shiftKey || e.ctrlKey) return;
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            if (messageInput.trim().length === 0) return;
-            onSendMessage?.(messageInput);
-            editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
-            syncStyles();
-          }
-        }}
-        onCompositionStart={() => (isComposingRef.current = true)}
-        onCompositionEnd={() => (isComposingRef.current = false)}
+        onPaste={handlePaste}
+        onKeyDown={handleKeyDown}
+        onCompositionStart={handleCompositionStart}
+        onCompositionEnd={handleCompositionEnd}
         maxLength={maxLength}
       />
       {isCloseToMaxLength && (

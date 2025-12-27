@@ -418,6 +418,7 @@
 }
 
 .badge-item {
+  display: flex;
   padding: 2px;
   border: 1px solid #fff0;
 

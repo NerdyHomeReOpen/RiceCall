@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -9,7 +10,6 @@ import { useLoading } from '@/providers/Loading';
 import { useMainTab } from '@/providers/MainTab';
 
 import * as Popup from '@/utils/popup';
-import * as Permission from '@/utils/permission';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import homeStyles from '@/styles/home.module.css';
@@ -35,20 +35,23 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     specialId: serverSpecialId,
     slogan: serverSlogan,
     favorite: serverFavorite,
+    ownerId: serverOwnerId,
+    owned: serverOwned,
     permissionLevel: serverPermissionLevel,
   } = server;
   const { userId, currentServerId: userCurrentServerId } = user;
+  const isOwner = serverOwnerId === userId && serverOwned;
 
   // Handles
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addJoinServerOption(() => selectServer(server))
+      .addJoinServerOption(handleJoinServer)
       .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
-      .addFavoriteServerOption({ isFavorite: serverFavorite }, () => handleFavoriteServer(serverId))
+      .addFavoriteServerOption({ isFavorite: serverFavorite }, () => Popup.favoriteServer(serverId))
       .addTerminateSelfMembershipOption({ permissionLevel: serverPermissionLevel }, () => Popup.terminateMember(userId, serverId, t('self')))
       .build();
 
-  const selectServer = (server: Types.Server) => {
+  const handleJoinServer = () => {
     if (loadingBox.isLoading) return;
     if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
@@ -59,26 +62,19 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ipc.socket.send('connectServer', { serverId });
   };
 
-  const handleFavoriteServer = (serverId: Types.Server['serverId']) => {
-    ipc.socket.send('favoriteServer', { serverId });
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
   };
 
   return (
-    <div
-      className={homeStyles['server-card']}
-      onClick={() => selectServer(server)}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        const x = e.clientX;
-        const y = e.clientY;
-        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-      }}
-    >
-      <div className={homeStyles['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
+    <div className={homeStyles['server-card']} onClick={handleJoinServer} onContextMenu={handleContextMenu}>
+      <Image className={homeStyles['server-avatar-picture']} src={serverAvatarUrl} alt={serverName} width={70} height={70} loading="lazy" draggable="false" />
       <div className={homeStyles['server-info-text']}>
         <div className={homeStyles['server-name-text']}>{serverName}</div>
         <div className={homeStyles['server-id-box']}>
-          <div className={`${homeStyles['server-id-text']} ${Permission.isServerOwner(serverPermissionLevel) ? homeStyles['is-owner'] : ''}`}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+          <div className={`${homeStyles['server-id-text']} ${isOwner ? homeStyles['is-owner'] : ''}`}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
         </div>
         <div className={homeStyles['server-slogen']}>{serverSlogan}</div>
       </div>

@@ -49,14 +49,7 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 50px;
-  min-height: 50px;
   cursor: pointer;
-  object-fit: cover;
-  background-image: url('/logo_server_def.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
   box-shadow: 0 2px 2px var(--shadow);
 }
 

@@ -694,8 +694,8 @@ export default class ContextMenuClass {
 
   addOpenChannelEventOption(params: { permissionLevel: Types.Permission }, onClick: () => void): this {
     this.options.push({
-      id: 'open-channel-event',
-      label: 'open-channel-event',
+      id: 'channel-event',
+      label: 'channel-event',
       show: Permission.isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
