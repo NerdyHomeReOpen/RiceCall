@@ -10,6 +10,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as TagConverter from '@/utils/tagConverter';
 import * as Language from '@/utils/language';
 import * as Popup from '@/utils/popup';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/message.module.css';
 
@@ -43,13 +44,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
   );
 
   // Handlers
-  const getContextMenuItems = () => [
-    {
-      id: 'view-profile',
-      label: t('view-profile'),
-      onClick: () => Popup.handleOpenUserInfo(userId, senderUserId),
-    },
-  ];
+  const getContextMenuItems = () => new CtxMenuBuilder().addViewProfileOption(() => Popup.openUserInfo(userId, senderUserId)).build();
 
   return (
     <div

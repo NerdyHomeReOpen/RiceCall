@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditNicknamePopupProps {
@@ -23,15 +25,6 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
   const { name: memberName } = member;
 
   // Handlers
-  const handleEditMember = (userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Member>) => {
-    ipc.socket.send('editMember', { userId, serverId, update });
-    ipc.window.close();
-  };
-
-  const applyEditMember = (userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Member>) => {
-    ipc.socket.send('editMember', { userId, serverId, update });
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -53,13 +46,19 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname || null })}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.editMember(userId, serverId, { nickname: memberNickname || null });
+            handleClose();
+          }}
+        >
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>
           {t('cancel')}
         </div>
-        <div className={popupStyles['button']} onClick={() => applyEditMember(userId, serverId, { nickname: memberNickname || null })}>
+        <div className={popupStyles['button']} onClick={() => Popup.editMember(userId, serverId, { nickname: memberNickname || null })}>
           {t('apply')}
         </div>
       </div>

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
@@ -11,6 +10,7 @@ import UserTab from '@/components/UserTab';
 
 import * as Popup from '@/utils/popup';
 import * as Permission from '@/utils/permission';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/server.module.css';
 
@@ -59,126 +59,38 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const isReadonlyChannel = channelVisibility === 'readonly';
     const isFull = channelUserLimit && channelUserLimit <= channelMembers.length;
     const isSelected = selectedItemId === `channel-${channelId}`;
-    const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !Permission.isMember(permissionLevel)) && (!isFull || Permission.isServerAdmin(permissionLevel));
+    const canJoin = useMemo(
+      () => !isInChannel && !isReadonlyChannel && !(isMemberChannel && !Permission.isMember(permissionLevel)) && (!isFull || Permission.isServerAdmin(permissionLevel)),
+      [isInChannel, isReadonlyChannel, isMemberChannel, permissionLevel, isFull],
+    );
+    const needsPassword = useMemo(() => !Permission.isChannelMod(permissionLevel) && isPrivateChannel, [permissionLevel, isPrivateChannel]);
     const filteredChannelMembers = useMemo(
       () => channelMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
       [channelMembers],
     );
 
     // Handlers
-    const getContextMenuItems = () => [
-      {
-        id: 'join-channel',
-        label: t('join-channel'),
-        disabled: !canJoin,
-        show: !isInChannel,
-        onClick: () => handleConnectChannel(currentServerId, channelId),
-      },
-      {
-        id: 'view-or-edit',
-        label: t('view-or-edit'),
-        onClick: () => Popup.handleOpenChannelSetting(userId, currentServerId, channelId),
-      },
-      {
-        id: 'separator',
-        label: '',
-      },
-      {
-        id: 'create-channel',
-        label: t('create-channel'),
-        show: Permission.isServerAdmin(permissionLevel) && channelCategoryId === null,
-        onClick: () => Popup.handleOpenCreateChannel(userId, currentServerId, ''),
-      },
-      {
-        id: 'create-sub-channel',
-        label: t('create-sub-channel'),
-        show: !isLobby && Permission.isChannelAdmin(permissionLevel),
-        onClick: () => Popup.handleOpenCreateChannel(userId, currentServerId, channelCategoryId ? channelCategoryId : channelId),
-      },
-      {
-        id: 'delete-channel',
-        label: t('delete-channel'),
-        show: !isLobby && Permission.isChannelAdmin(permissionLevel),
-        onClick: () => handleDeleteChannel(currentServerId, channelId),
-      },
-      {
-        id: 'separator',
-        label: '',
-      },
-      {
-        id: 'broadcast',
-        label: t('broadcast'),
-        show: Permission.isChannelAdmin(permissionLevel),
-        onClick: () => Popup.handleOpenServerBroadcast(currentServerId, channelId),
-      },
-      {
-        id: 'move-all-user-to-channel',
-        label: t('move-all-user-to-channel'),
-        show: !isInChannel && Permission.isChannelMod(currentPermissionLevel) && Permission.isChannelMod(permissionLevel) && movableChannelUserIds.length > 0,
-        onClick: () => handleMoveAllUsersToChannel(movableChannelUserIds, currentServerId, currentChannelId),
-      },
-      {
-        id: 'edit-channel-order',
-        label: t('edit-channel-order'),
-        show: Permission.isServerAdmin(permissionLevel),
-        onClick: () => Popup.handleOpenEditChannelOrder(userId, currentServerId),
-      },
-      {
-        id: 'separator',
-        label: '',
-      },
-      {
-        id: 'kick-channel-users-from-server',
-        label: t('kick-channel-users-from-server'),
-        show: Permission.isStaff(permissionLevel) && movableChannelUserIds.length > 0,
-        onClick: () => handleKickUsersFromServer(movableChannelUserIds, currentServerId),
-      },
-      {
-        id: 'kick-all-users-from-server',
-        label: t('kick-all-users-from-server'),
-        show: Permission.isStaff(permissionLevel) && movableServerUserIds.length > 0,
-        onClick: () => handleKickUsersFromServer(movableServerUserIds, currentServerId),
-      },
-      {
-        id: 'separator',
-        label: '',
-      },
-      {
-        id: 'set-reception-lobby',
-        label: t('set-reception-lobby'),
-        disabled: isPrivateChannel || isReadonlyChannel,
-        show: Permission.isServerAdmin(permissionLevel) && !isReceptionLobby,
-        onClick: () => handleEditServer(currentServerId, { receptionLobbyId: channelId }),
-      },
-    ];
-
-    const handleEditServer = (serverId: Types.Server['serverId'], update: Partial<Types.Server>) => {
-      ipc.socket.send('editServer', { serverId, update });
-    };
-
-    const handleConnectChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-      if (!canJoin) return;
-      if (!Permission.isChannelMod(permissionLevel) && isPrivateChannel) Popup.handleOpenChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
-      else ipc.socket.send('connectChannel', { serverId, channelId });
-    };
-
-    const handleMoveUserToChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-      ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
-    };
-
-    const handleMoveAllUsersToChannel = (userIds: Types.User['userId'][], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-      Popup.handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': userIds.length }), () =>
-        ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId }))),
-      );
-    };
-
-    const handleKickUsersFromServer = (userIds: Types.User['userId'][], serverId: Types.Server['serverId']) => {
-      Popup.handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
-    };
-
-    const handleDeleteChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-      Popup.handleOpenAlertDialog(t('confirm-delete-channel', { '0': channelName }), () => ipc.socket.send('deleteChannel', { serverId, channelId }));
-    };
+    const getContextMenuItems = () =>
+      new CtxMenuBuilder()
+        .addJoinChannelOption({ canJoin, isInChannel }, () => Popup.connectChannel(currentServerId, channelId, canJoin, needsPassword))
+        .addViewOrEditOption(() => Popup.openChannelSetting(userId, currentServerId, channelId))
+        .addSeparator()
+        .addCreateChannelOption({ permissionLevel }, () => Popup.openCreateChannel(userId, currentServerId, ''))
+        .addCreateSubChannelOption({ permissionLevel }, () => Popup.openCreateChannel(userId, currentServerId, channelCategoryId ? channelCategoryId : channelId))
+        .addDeleteChannelOption({ permissionLevel }, () => Popup.deleteChannel(currentServerId, channelId, channelName))
+        .addSeparator()
+        .addBroadcastOption({ permissionLevel }, () => Popup.openServerBroadcast(currentServerId, channelId))
+        .addSeparator()
+        .addMoveAllUserToChannelOption({ isInChannel, currentPermissionLevel, permissionLevel, movableUserIds: movableChannelUserIds }, () =>
+          Popup.moveAllUsersToChannel(movableChannelUserIds, currentServerId, currentChannelId),
+        )
+        .addEditChannelOrderOption({ permissionLevel }, () => Popup.openEditChannelOrder(userId, currentServerId))
+        .addSeparator()
+        .addKickChannelUsersFromServerOption({ permissionLevel, movableUserIds: movableChannelUserIds }, () => Popup.kickUsersFromServer(movableChannelUserIds, currentServerId))
+        .addKickAllUsersFromServerOption({ permissionLevel, movableUserIds: movableServerUserIds }, () => Popup.kickUsersFromServer(movableServerUserIds, currentServerId))
+        .addSeparator()
+        .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => Popup.editServer(currentServerId, { receptionLobbyId: channelId }))
+        .build();
 
     const handleDragStart = (e: React.DragEvent, userIds: Types.User['userId'][], currentChannelId: Types.Channel['channelId']) => {
       e.dataTransfer.setData('type', 'moveAllUsers');
@@ -195,12 +107,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
         case 'moveUser':
           const targetUserId = e.dataTransfer.getData('userId');
           if (!targetUserId) return;
-          handleMoveUserToChannel(targetUserId, serverId, channelId);
+          Popup.moveUserToChannel(targetUserId, serverId, channelId);
           break;
         case 'moveAllUsers':
           const targetUserIds = e.dataTransfer.getData('userIds');
           if (!targetUserIds) return;
-          handleMoveAllUsersToChannel(targetUserIds.split(','), serverId, channelId);
+          Popup.moveAllUsersToChannel(targetUserIds.split(','), serverId, channelId);
           break;
       }
     };
@@ -222,7 +134,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
             if (isSelected) setSelectedItemId(null);
             else setSelectedItemId(`channel-${channelId}`);
           }}
-          onDoubleClick={() => handleConnectChannel(currentServerId, channelId)}
+          onDoubleClick={() => Popup.connectChannel(currentServerId, channelId, canJoin, needsPassword)}
           draggable={Permission.isChannelMod(permissionLevel) && movableChannelUserIds.length > 0}
           onDragStart={(e) => handleDragStart(e, movableChannelUserIds, channelId)}
           onDragOver={(e) => {
@@ -264,7 +176,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               member={member}
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
-              handleConnectChannel={handleConnectChannel}
+              canJoin={canJoin}
+              needsPassword={needsPassword}
             />
           ))}
         </div>

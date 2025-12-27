@@ -24,6 +24,7 @@ import {
   table_channel_muted_users,
   table_announcements,
   table_notifications,
+  Permission,
 } from './database';
 
 export type Announcement = table_announcements;
@@ -144,6 +145,82 @@ export type ContextMenuItem = {
   style?: React.CSSProperties;
   onClick?: () => void;
 };
+
+export type ContextMenuOptionParams =
+  | {
+      type: 'joinChannel';
+      canJoin: boolean;
+      isInChannel: boolean;
+      onClick: () => void;
+    }
+  | {
+      type: 'viewOrEdit';
+      onClick: () => void;
+    }
+  | {
+      type: 'createChannel';
+      permissionLevel: Permission;
+      onClick: () => void;
+    }
+  | {
+      type: 'createSubChannel';
+      permissionLevel: Permission;
+      onClick: () => void;
+    }
+  | {
+      type: 'deleteChannel';
+      permissionLevel: Permission;
+      onClick: () => void;
+    }
+  | {
+      type: 'broadcast';
+      serverId: string;
+      channelId: string;
+    }
+  | {
+      type: 'separator';
+    }
+  | {
+      type: 'viewProfile';
+      userId: string;
+    }
+  | {
+      type: 'block';
+      userId: string;
+    }
+  | {
+      type: 'deleteFriend';
+      userId: string;
+    }
+  | {
+      type: 'deleteFriendApplication';
+      userId: string;
+    }
+  | {
+      type: 'deleteMember';
+      userId: string;
+    }
+  | {
+      type: 'terminateMember';
+      userId: string;
+    }
+  | {
+      type: 'setChannelMod';
+      userId: string;
+      serverId: string;
+      channelId: string;
+    }
+  | {
+      type: 'setChannelAdmin';
+      userId: string;
+      serverId: string;
+      channelId: string;
+    }
+  | {
+      type: 'setServerAdmin';
+      userId: string;
+      serverId: string;
+    };
 
 export type NotificationMenuItem = {
   id: string;

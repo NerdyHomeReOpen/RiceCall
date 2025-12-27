@@ -77,7 +77,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
   const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -123,8 +123,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
         className={emoji['emoji-icon']}
         onMouseDown={(e) => {
           e.preventDefault();
-          const x = e.currentTarget.getBoundingClientRect().left;
-          const y = e.currentTarget.getBoundingClientRect().top;
+          const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
           contextMenu.showEmojiPicker(
             x,
             y,
@@ -134,9 +133,9 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
             false,
             fontSizeRef.current,
             textColorRef.current,
-            (code) => handleEmojiSelect(code),
-            (size) => handleFontSizeChange(size),
-            (color) => handleTextColorChange(color),
+            handleEmojiSelect,
+            handleFontSizeChange,
+            handleTextColorChange,
           );
         }}
       />

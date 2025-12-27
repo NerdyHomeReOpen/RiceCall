@@ -48,7 +48,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
     }
   };
 
-  const handleSubmit = async () => {
+  const submit = async () => {
     if (!account || !password) return;
 
     setIsLoading(true);
@@ -65,11 +65,11 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
     setIsLoading(false);
   };
 
-  const handleDeleteAccount = (account: string) => {
+  const deleteAccount = (account: string) => {
     ipc.accounts.delete(account);
   };
 
-  const handleForgotPassword = () => {
+  const forgotPassword = () => {
     window.open('https://ricecall.com/forget', '_blank');
   };
 
@@ -107,7 +107,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
           className={styles['form-wrapper']}
           onSubmit={(e) => {
             e.preventDefault();
-            handleSubmit();
+            submit();
           }}
         >
           {isLoading ? (
@@ -146,7 +146,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
                           className={styles['account-select-delete-btn']}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteAccount(account);
+                            deleteAccount(account);
                           }}
                         />
                       </div>
@@ -170,7 +170,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
                   {t('auto-login')}
                 </div>
               </div>
-              <button className={styles['submit-button']} onClick={handleSubmit} tabIndex={-1} disabled={!account || !password}>
+              <button className={styles['submit-button']} onClick={submit} tabIndex={-1} disabled={!account || !password}>
                 {t('login')}
               </button>
             </>
@@ -189,7 +189,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
             {t('change-server')}
           </div>
         </div>
-        <div className={styles['forget-password']} onClick={() => handleForgotPassword()}>
+        <div className={styles['forget-password']} onClick={() => forgotPassword()}>
           {t('forgot-password')}
         </div>
       </div>

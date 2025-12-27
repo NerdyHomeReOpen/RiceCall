@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface KickMemberFromServerPopupProps {
@@ -78,11 +80,6 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
     }
   };
 
-  const handleBlockUserFromServer = (userId: Types.User['userId'], serverId: Types.Server['serverId'], blockUntil: number) => {
-    ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -142,7 +139,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleBlockUserFromServer(userId, serverId, Date.now() + getBlockTime())}>
+        <div className={popupStyles['button']} onClick={() => Popup.blockUserFromServer(userId, serverId, Date.now() + getBlockTime())}>
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

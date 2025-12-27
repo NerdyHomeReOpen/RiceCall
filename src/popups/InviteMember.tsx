@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface InviteMemberPopupProps {
@@ -24,16 +26,6 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   const { userId: targetId, name: targetName, avatarUrl: targetAvatarUrl, displayId: targetDisplayId, contribution: targetContribution } = target;
 
   // Handlers
-  const handleSendMemberInvitation = (receiverId: Types.Member['userId'], serverId: Types.Server['serverId'], preset: Partial<Types.MemberInvitation>) => {
-    ipc.socket.send('sendMemberInvitation', { receiverId, serverId, preset });
-    ipc.window.close();
-  };
-
-  const handleEditMemberInvitation = (receiverId: Types.Member['userId'], serverId: Types.Server['serverId'], update: Partial<Types.MemberInvitation>) => {
-    ipc.socket.send('editMemberInvitation', { receiverId, serverId, update });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -71,7 +63,13 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
         </div>
       </div>
       <div className={popupStyles['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => handleSendMemberInvitation(targetId, serverId, { description: invitationDesc })}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.sendMemberInvitation(targetId, serverId, { description: invitationDesc });
+            handleClose();
+          }}
+        >
           {t('submit')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>
@@ -87,7 +85,13 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
         </div>
       </div>
       <div className={popupStyles['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => handleEditMemberInvitation(targetId, serverId, { description: invitationDesc })}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.editMemberInvitation(targetId, serverId, { description: invitationDesc });
+            handleClose();
+          }}
+        >
           {t('submit')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

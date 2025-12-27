@@ -86,11 +86,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official')), [recommendServers]);
 
   // Handlers
-  const handleSearchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const searchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
     const query = e.target.value;
 
     if (!query) {
-      handleClearSearchState(true);
+      clearSearchState(true);
       return;
     }
 
@@ -99,7 +99,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     ipc.data.searchServer({ query }).then((serverResults) => {
       const q = searchQueryRef.current;
 
-      handleClearSearchState();
+      clearSearchState();
 
       if (!serverResults.length) return;
 
@@ -130,19 +130,19 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
     searchTimerRef.current = setTimeout(() => {
       canSearchRef.current = true;
       if (searchQueryRef.current !== searchInputRef.current?.value) {
-        handleSearchServer(e);
+        searchServer(e);
       }
     }, 500);
   };
 
-  const handleClearSearchState = (clearSearchQuery: boolean = false) => {
+  const clearSearchState = (clearSearchQuery: boolean = false) => {
     if (clearSearchQuery && searchInputRef.current) searchInputRef.current.value = '';
     setExactMatch(null);
     setPersonalResults([]);
     setRelatedResults([]);
   };
 
-  const handleServerSelect = useCallback(
+  const selectServer = useCallback(
     (server: Types.Server) => {
       if (loadingBox.isLoading) return;
       if (server.serverId === currentServerId) {
@@ -152,16 +152,16 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       loadingBox.setIsLoading(true);
       loadingBox.setLoadingServerId(server.specialId || server.displayId);
       ipc.socket.send('connectServer', { serverId: server.serverId });
-      handleClearSearchState();
+      clearSearchState();
     },
     [currentServerId, mainTab, loadingBox],
   );
 
-  const handleNextAnn = () => {
+  const nextAnn = () => {
     setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length);
   };
 
-  const handlePrevAnn = () => {
+  const prevAnn = () => {
     setSelectedAnnIndex((prev) => (prev === 0 ? filteredAnns.length - 1 : prev - 1));
   };
 
@@ -195,7 +195,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
-        handleClearSearchState(true);
+        clearSearchState(true);
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
@@ -208,11 +208,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
       ipc.data.searchServer({ query: serverDisplayId }).then((servers) => {
         const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
         if (!target) return;
-        handleServerSelect(target);
+        selectServer(target);
       });
     });
     return () => unsub();
-  }, [userId, handleServerSelect]);
+  }, [userId, selectServer]);
 
   return (
     <main className={styles['home']} style={display ? {} : { display: 'none' }}>
@@ -225,14 +225,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               ref={searchInputRef}
               placeholder={t('search-server-placeholder')}
               className={styles['search-input']}
-              onFocus={handleSearchServer}
-              onChange={handleSearchServer}
+              onFocus={searchServer}
+              onChange={searchServer}
               onKeyDown={(e) => {
                 if (e.key !== 'Enter' || !exactMatch) return;
-                handleServerSelect(exactMatch);
+                selectServer(exactMatch);
               }}
             />
-            <div className={styles['search-input-clear-btn']} onClick={() => handleClearSearchState(true)} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
+            <div className={styles['search-input-clear-btn']} onClick={() => clearSearchState(true)} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
             <div className={styles['search-input-icon']} style={!searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
             <div className={styles['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
@@ -240,14 +240,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                   <div className={`${styles['header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
                     {t('quick-enter-server', { '0': searchQueryRef.current })}
                   </div>
-                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => handleServerSelect(exactMatch)} />
+                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => selectServer(exactMatch)} />
                 </>
               )}
               {personalResults.length > 0 && (
                 <>
                   <div className={styles['header-text']}>{t('personal-exclusive')}</div>
                   {personalResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleServerSelect(server)} />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => selectServer(server)} />
                   ))}
                 </>
               )}
@@ -255,7 +255,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                 <>
                   <div className={styles['header-text']}>{t('related-search')}</div>
                   {relatedResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => handleServerSelect(server)} />
+                    <SearchResultItem key={server.serverId} server={server} onClick={() => selectServer(server)} />
                   ))}
                 </>
               )}
@@ -271,7 +271,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           </div>
         </div>
         <div className={styles['right']}>
-          <div className={styles['navegate-tab']} data-key="30014" onClick={() => Popup.handleOpenCreateServer(userId)}>
+          <div className={styles['navegate-tab']} data-key="30014" onClick={() => Popup.openCreateServer(userId)}>
             {t('create-server')}
           </div>
           {section !== 4 && (
@@ -307,10 +307,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
                     <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)}></nav>
                   ))}
                 </div>
-                <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnn}>
+                <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={prevAnn}>
                   {'◀'}
                 </nav>
-                <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnn}>
+                <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={nextAnn}>
                   {'▶'}
                 </nav>
               </>

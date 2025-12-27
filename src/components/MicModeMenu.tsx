@@ -42,11 +42,11 @@ const MicModeMenu: React.FC = React.memo(() => {
   const defaultSpeakingKey = ipc.systemSettings.defaultSpeakingKey.get();
 
   // Handlers
-  const handleEditSpeakingMode = (speakingMode: Types.SpeakingMode) => {
+  const editSpeakingMode = (speakingMode: Types.SpeakingMode) => {
     ipc.systemSettings.speakingMode.set(speakingMode);
   };
 
-  const handleEditVoiceThreshold = (voiceThreshold: number) => {
+  const editVoiceThreshold = (voiceThreshold: number) => {
     webRTC.changeVoiceThreshold(voiceThreshold);
   };
 
@@ -55,14 +55,14 @@ const MicModeMenu: React.FC = React.memo(() => {
       <div className={popup['col']}>
         <div className={popup['label']}>{t('current-speaking-mode')}</div>
         <div className={`${popup['input-box']} ${popup['row']}`}>
-          <input type="radio" name="visibility" checked={webRTC.speakingMode === 'key'} onChange={() => handleEditSpeakingMode('key')} />
+          <input type="radio" name="visibility" checked={webRTC.speakingMode === 'key'} onChange={() => editSpeakingMode('key')} />
           <div className={popup['label']}>{t('default-speaking-mode-key-label')}</div>
           <div style={webRTC.speakingMode === 'key' ? {} : { display: 'none' }} className={popup['input-box']}>
             <input name="speaking-key" type="text" value={defaultSpeakingKey} style={{ maxWidth: '200px' }} readOnly />
           </div>
         </div>
         <div className={`${popup['input-box']} ${popup['row']}`}>
-          <input type="radio" name="visibility" checked={webRTC.speakingMode === 'auto'} onChange={() => handleEditSpeakingMode('auto')} />
+          <input type="radio" name="visibility" checked={webRTC.speakingMode === 'auto'} onChange={() => editSpeakingMode('auto')} />
           <div className={popup['label']}>{t('default-speaking-mode-auto-label')}</div>
           <div style={webRTC.speakingMode === 'auto' ? {} : { display: 'none' }} className={server['voice-threshold-input-wrapper']}>
             <div className={server['voice-threshold-input-wrapper']}>
@@ -73,7 +73,7 @@ const MicModeMenu: React.FC = React.memo(() => {
                 max="100"
                 value={webRTC.voiceThreshold}
                 style={{ background: voiceThresholdColor }}
-                onChange={(e) => handleEditVoiceThreshold(parseInt(e.target.value))}
+                onChange={(e) => editVoiceThreshold(parseInt(e.target.value))}
               />
               <div className={`${server['voice-state-icon']} ${isActive ? server['active'] : ''}`} />
             </div>

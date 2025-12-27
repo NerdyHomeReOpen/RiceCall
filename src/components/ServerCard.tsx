@@ -10,6 +10,7 @@ import { useMainTab } from '@/providers/MainTab';
 
 import * as Popup from '@/utils/popup';
 import * as Permission from '@/utils/permission';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import homeStyles from '@/styles/home.module.css';
 
@@ -39,31 +40,15 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
-  const getContextMenuItems = () => [
-    {
-      id: 'join-server',
-      label: t('join-server'),
-      onClick: () => handleServerSelect(server),
-    },
-    {
-      id: 'view-server-info',
-      label: t('view-server-info'),
-      onClick: () => Popup.handleOpenServerSetting(userId, serverId),
-    },
-    {
-      id: 'set-favorite',
-      label: !serverFavorite ? t('favorite') : t('unfavorite'),
-      onClick: () => handleFavoriteServer(serverId),
-    },
-    {
-      id: 'terminate-self-membership',
-      label: t('terminate-self-membership'),
-      show: Permission.isMember(serverPermissionLevel) && !Permission.isServerOwner(serverPermissionLevel),
-      onClick: () => handleTerminateMember(userId, serverId, t('self')),
-    },
-  ];
+  const getContextMenuItems = () =>
+    new CtxMenuBuilder()
+      .addJoinServerOption(() => selectServer(server))
+      .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
+      .addFavoriteServerOption({ isFavorite: serverFavorite }, () => handleFavoriteServer(serverId))
+      .addTerminateSelfMembershipOption({ permissionLevel: serverPermissionLevel }, () => Popup.terminateMember(userId, serverId, t('self')))
+      .build();
 
-  const handleServerSelect = (server: Types.Server) => {
+  const selectServer = (server: Types.Server) => {
     if (loadingBox.isLoading) return;
     if (server.serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
@@ -78,14 +63,10 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ user, server }) => {
     ipc.socket.send('favoriteServer', { serverId });
   };
 
-  const handleTerminateMember = (userId: Types.User['userId'], serverId: Types.Server['serverId'], memberName: Types.User['name']) => {
-    Popup.handleOpenAlertDialog(t('confirm-terminate-membership', { '0': memberName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
-  };
-
   return (
     <div
       className={homeStyles['server-card']}
-      onClick={() => handleServerSelect(server)}
+      onClick={() => selectServer(server)}
       onContextMenu={(e) => {
         e.preventDefault();
         const x = e.clientX;

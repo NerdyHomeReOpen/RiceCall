@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
-import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
@@ -13,6 +12,7 @@ import { useFindMeContext } from '@/providers/FindMe';
 
 import * as Popup from '@/utils/popup';
 import * as Permission from '@/utils/permission';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/server.module.css';
 import header from '@/styles/header.module.css';
@@ -80,110 +80,32 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   );
 
   // Handlers
-  const getContextMenuItems1 = () => [
-    {
-      id: 'apply-member',
-      label: t('apply-member'),
-      show: !Permission.isMember(permissionLevel),
-      icon: 'applyMember',
-      onClick: () => handleApplyMember(userId, currentServerId),
-    },
-    {
-      id: 'member-management',
-      label: t('member-management'),
-      show: Permission.isServerAdmin(permissionLevel),
-      icon: 'memberManagement',
-      onClick: () => Popup.handleOpenServerSetting(userId, currentServerId),
-    },
-    {
-      id: 'separator',
-      label: '',
-    },
-    {
-      id: 'edit-nickname',
-      label: t('edit-nickname'),
-      icon: 'editGroupcard',
-      show: Permission.isMember(permissionLevel),
-      onClick: () => Popup.handleOpenEditNickname(userId, currentServerId),
-    },
-    {
-      id: 'locate-me',
-      label: t('locate-me'),
-      icon: 'locateme',
-      onClick: () => handleLocateUser(),
-    },
-    {
-      id: 'separator',
-      label: '',
-    },
-    {
-      id: 'report',
-      label: t('report'),
-      icon: 'report',
-      disabled: true,
-      onClick: () => {
-        // window.open('https://ricecall.com/report-server', '_blank');
-      },
-    },
-    {
-      id: 'favorite',
-      label: isCurrentServerFavorite ? t('unfavorite') : t('favorite'),
-      icon: isCurrentServerFavorite ? 'collect' : 'uncollect',
-      onClick: () => handleFavoriteServer(currentServerId),
-    },
-  ];
+  const getContextMenuItems1 = () =>
+    new CtxMenuBuilder()
+      .addApplyMemberOption({ permissionLevel }, () => Popup.applyMember(userId, currentServerId, currentServerReceiveApply))
+      .addServerSettingOption({ permissionLevel }, () => Popup.openServerSetting(userId, currentServerId))
+      .addSeparator()
+      .addEditNicknameOption({ permissionLevel, isSelf: true, isSuperior: false }, () => Popup.openEditNickname(userId, currentServerId))
+      .addLocateMeOption(() => locateMe())
+      .addSeparator()
+      .addReportOption(() => {})
+      .addFavoriteServerOption({ isFavorite: isCurrentServerFavorite }, () => Popup.favoriteServer(currentServerId))
+      .build();
 
-  const getContextMenuItems2 = () => [
-    {
-      id: 'create-channel',
-      label: t('create-channel'),
-      show: Permission.isServerAdmin(permissionLevel),
-      onClick: () => Popup.handleOpenCreateChannel(userId, currentServerId, ''),
-    },
-    {
-      id: 'separator',
-      label: '',
-    },
-    {
-      id: 'kick-all-users-from-server',
-      label: t('kick-all-users-from-server'),
-      show: Permission.isStaff(permissionLevel) && movableServerUserIds.length > 0,
-      onClick: () => handleKickUsersFromServer(movableServerUserIds, currentServerId),
-    },
-    {
-      id: 'separator',
-      label: '',
-    },
-    {
-      id: 'broadcast',
-      label: t('broadcast'),
-      show: Permission.isServerAdmin(permissionLevel),
-      onClick: () => Popup.handleOpenServerBroadcast(currentServerId, currentChannelId),
-    },
-    {
-      id: 'edit-channel-order',
-      label: t('edit-channel-order'),
-      show: Permission.isServerAdmin(permissionLevel),
-      onClick: () => Popup.handleOpenEditChannelOrder(userId, currentServerId),
-    },
-  ];
+  const getContextMenuItems2 = () =>
+    new CtxMenuBuilder()
+      .addCreateChannelOption({ permissionLevel }, () => Popup.openCreateChannel(userId, currentServerId, ''))
+      .addSeparator()
+      .addKickAllUsersFromServerOption({ permissionLevel, movableUserIds: movableServerUserIds }, () => Popup.kickUsersFromServer(movableServerUserIds, currentServerId))
+      .addSeparator()
+      .addBroadcastOption({ permissionLevel }, () => Popup.openServerBroadcast(currentServerId, currentChannelId))
+      .addSeparator()
+      .addEditChannelOrderOption({ permissionLevel }, () => Popup.openEditChannelOrder(userId, currentServerId))
+      .build();
 
-  const handleFavoriteServer = (serverId: Types.Server['serverId']) => {
-    ipc.socket.send('favoriteServer', { serverId });
-  };
-
-  const handleApplyMember = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
-    if (!currentServerReceiveApply) Popup.handleOpenAlertDialog(t('cannot-apply-member'), () => {});
-    else Popup.handleOpenApplyMember(userId, serverId);
-  };
-
-  const handleLocateUser = () => {
+  const locateMe = () => {
     findMe.findMe();
     setSelectedItemId(`user-${userId}`);
-  };
-
-  const handleKickUsersFromServer = (userIds: Types.User['userId'][], serverId: Types.Server['serverId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
   };
 
   const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -214,7 +136,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   return (
     <>
       <div className={styles['sidebar-header']}>
-        <div className={styles['avatar-box']} onClick={() => Popup.handleOpenServerSetting(userId, currentServerId)}>
+        <div className={styles['avatar-box']} onClick={() => Popup.openServerSetting(userId, currentServerId)}>
           <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${currentServerAvatarUrl})` }} />
         </div>
         <div className={styles['base-info-wrapper']}>
@@ -226,13 +148,14 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
             <div className={styles['id-text']}>{currentServerSpecialId || currentServerDisplayId}</div>
             <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
             <div className={styles['options']}>
-              <div className={styles['invitation-icon']} onClick={() => Popup.handleOpenInviteFriend(userId, currentServerId)} />
+              <div className={styles['invitation-icon']} onClick={() => Popup.openInviteFriend(userId, currentServerId)} />
               <div className={styles['saperator-1']} />
               <div
                 className={styles['setting-icon']}
                 onClick={(e) => {
-                  const x = e.currentTarget.getBoundingClientRect().left;
-                  const y = e.currentTarget.getBoundingClientRect().bottom;
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
                   contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
                 }}
               >
@@ -276,6 +199,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
         className={styles['scroll-view']}
         onContextMenu={(e) => {
           e.preventDefault();
+          e.stopPropagation();
           const { clientX: x, clientY: y } = e;
           contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
         }}

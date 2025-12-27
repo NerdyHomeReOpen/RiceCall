@@ -47,11 +47,6 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   ];
 
   // Handlers
-  const handleCreateServer = (preset: Partial<Types.Server>) => {
-    ipc.socket.send('createServer', { preset });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -59,7 +54,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
   const handleUploadImage = (imageUnit8Array: Uint8Array) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -124,7 +119,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                   const image = e.target.files?.[0];
                   if (!image || isUploadingRef.current) return;
                   image.arrayBuffer().then((arrayBuffer) => {
-                    Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                    Popup.openImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
                   });
                 }}
               />
@@ -160,17 +155,11 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
           </div>
           <div
             className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
-            onClick={() =>
-              canSubmit
-                ? handleCreateServer({
-                    name: serverName,
-                    avatar: serverAvatar,
-                    avatarUrl: serverAvatarUrl,
-                    slogan: serverSlogan,
-                    type: serverType,
-                  })
-                : null
-            }
+            onClick={() => {
+              if (!canSubmit) return;
+              Popup.createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
+              handleClose();
+            }}
           >
             {t('confirm')}
           </div>

@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditChannelNamePopupProps {
@@ -23,11 +25,6 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleEditChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>) => {
-    ipc.socket.send('editChannel', { serverId, channelId, update });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -43,7 +40,14 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannel(serverId, channelId, { name: channelName }) : null)}>
+        <div
+          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
+          onClick={() => {
+            if (!canSubmit) return;
+            Popup.editChannel(serverId, channelId, { name: channelName });
+            handleClose();
+          }}
+        >
           {t('save')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

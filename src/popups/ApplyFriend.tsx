@@ -30,17 +30,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
   const { name: targetName, displayId: targetDisplayId, avatarUrl: targetAvatarUrl } = target;
 
   // Handlers
-  const handleSendFriendApplication = (receiverId: Types.User['userId'], preset: Partial<Types.FriendApplication>, friendGroupId: Types.FriendGroup['friendGroupId'] | null) => {
-    ipc.socket.send('sendFriendApplication', { receiverId, preset, friendGroupId });
-    ipc.window.close();
-  };
-
-  const handleEditFriendApplication = (receiverId: Types.User['userId'], update: Partial<Types.FriendApplication>) => {
-    ipc.socket.send('editFriendApplication', { receiverId, update });
-    ipc.window.close();
-  };
-
-  const handleClose = () => {
+  const close = () => {
     ipc.window.close();
   };
 
@@ -79,7 +69,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
               <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
             </div>
             <div className={popupStyles['info-wrapper']}>
-              <div className={popupStyles['link-text']} onClick={() => Popup.handleOpenUserInfo(userId, targetId)}>
+              <div className={popupStyles['link-text']} onClick={() => Popup.openUserInfo(userId, targetId)}>
                 {targetName}
               </div>
               <div className={popupStyles['sub-text']}>{targetDisplayId}</div>
@@ -99,7 +89,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
                   ))}
                 </select>
               </div>
-              <div className={popupStyles['link-text']} onClick={() => Popup.handleOpenCreateFriendGroup()}>
+              <div className={popupStyles['link-text']} onClick={() => Popup.openCreateFriendGroup()}>
                 {t('create-friend-group')}
               </div>
             </div>
@@ -116,10 +106,16 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         </div>
       </div>
       <div className={popupStyles['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => handleSendFriendApplication(targetId, { description: applicationDesc }, friendGroupId || null)}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.sendFriendApplication(targetId, { description: applicationDesc }, friendGroupId || null);
+            close();
+          }}
+        >
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={close}>
           {t('cancel')}
         </div>
       </div>
@@ -127,15 +123,21 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ userId, 
         <div className={popupStyles['button']} onClick={() => setSection(2)}>
           {t('modify')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={close}>
           {t('confirm')}
         </div>
       </div>
       <div className={popupStyles['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => handleEditFriendApplication(targetId, { description: applicationDesc })}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.editFriendApplication(targetId, { description: applicationDesc });
+            close();
+          }}
+        >
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={close}>
           {t('cancel')}
         </div>
       </div>

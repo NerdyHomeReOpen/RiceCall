@@ -4,6 +4,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface BlockMemberPopupProps {
@@ -26,12 +28,6 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   ];
 
   // Handlers
-  const handleBlockUserFromServer = (userId: Types.User['userId'], serverId: Types.Server['serverId'], blockUntil: number) => {
-    ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
-    ipc.socket.send('terminateMember', { userId, serverId });
-    ipc.window.close();
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -61,7 +57,13 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleBlockUserFromServer(userId, serverId, -1)}>
+        <div
+          className={popupStyles['button']}
+          onClick={() => {
+            Popup.blockUserFromServer(userId, serverId, -1);
+            handleClose();
+          }}
+        >
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

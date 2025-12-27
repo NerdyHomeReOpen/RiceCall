@@ -3,6 +3,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useRef, useCallback } from 'react';
+import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -17,7 +18,6 @@ import ServerPage from '@/pages/Server';
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
-import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
@@ -26,6 +26,7 @@ import { useActionScanner } from '@/providers/ActionScanner';
 
 import * as Popup from '@/utils/popup';
 import * as Default from '@/utils/default';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import headerStyles from '@/styles/header.module.css';
 
@@ -46,11 +47,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   const actionScanner = useActionScanner();
   const { t, i18n } = useTranslation();
 
-  // Refs
-  const isCloseToTray = useRef<boolean>(true);
-
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isCloseToTray, setIsCloseToTray] = useState(true);
 
   // Variables
   const { userId, name: userName, status: userStatus } = user;
@@ -66,125 +65,59 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   ];
 
   // Handlers
-  const getContextMenuItems = () => [
-    {
-      id: 'system-setting',
-      label: t('system-setting'),
-      icon: 'setting',
-      onClick: () => Popup.handleOpenSystemSetting(userId),
-    },
-    {
-      id: 'change-theme',
-      label: t('change-theme'),
-      icon: 'skin',
-      onClick: Popup.handleOpenChangeTheme,
-    },
-    {
-      id: 'feedback',
-      label: t('feedback'),
-      icon: 'feedback',
-      onClick: () => window.open('https://ricecall.com/feedback', '_blank'),
-    },
-    {
-      id: 'language-select',
-      label: t('language-select'),
-      icon: 'submenu-left',
-      hasSubmenu: true,
-      submenuItems: LANGUAGES.map((language) => ({
-        id: `language-select-${language.code}`,
-        label: language.label,
-        onClick: () => handleLanguageChange(language.code),
-      })),
-    },
-    {
-      id: 'help-center',
-      label: t('help-center'),
-      icon: 'submenu-left',
-      hasSubmenu: true,
-      submenuItems: [
-        {
-          id: 'faq',
-          label: t('faq'),
-          onClick: () => window.open('https://ricecall.com/#faq', '_blank'),
-        },
-        {
-          id: 'agreement',
-          label: t('agreement'),
-          onClick: () => window.open('https://ricecall.com/terms', '_blank'),
-        },
-        // {
-        //   id: 'privacy-policy',
-        //   label: t('privacy-policy'),
-        //   onClick: () => window.open('https://ricecall.com/privacy-policy', '_blank'),
-        // },
-        {
-          id: 'contact-us',
-          label: t('contact-us'),
-          onClick: () => window.open('https://ricecall.com/contact', '_blank'),
-        },
-        {
-          id: 'about-us',
-          label: t('about-ricecall'),
-          onClick: Popup.handleOpenAboutUs,
-        },
-      ],
-    },
-    {
-      id: 'logout',
-      label: t('logout'),
-      icon: 'logout',
-      onClick: handleLogout,
-    },
-    {
-      id: 'exit',
-      label: t('exit'),
-      icon: 'exit',
-      onClick: handleExit,
-    },
-  ];
-
-  const handleLeaveServer = (serverId: Types.Server['serverId']) => {
-    ipc.socket.send('disconnectServer', { serverId });
-  };
-
-  const handleChangeStatus = (status: Types.User['status']) => {
-    actionScanner.setIsManualIdling(status !== 'online');
-    ipc.socket.send('editUser', { update: { status } });
-  };
-
-  const handleLogout = () => {
+  const logout = () => {
     ipc.auth.logout();
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
   };
 
-  const handleExit = () => {
+  const exit = () => {
     ipc.exit();
   };
 
-  const handleMaximize = () => {
+  const maximize = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
   };
 
-  const handleUnmaximize = () => {
+  const unmaximize = () => {
     if (!isFullscreen) return;
     ipc.window.unmaximize();
   };
 
-  const handleMinimize = () => {
+  const minimize = () => {
     ipc.window.minimize();
   };
 
-  const handleClose = () => {
-    if (isCloseToTray.current) ipc.window.close();
+  const close = () => {
+    if (isCloseToTray) ipc.window.close();
     else ipc.exit();
   };
 
-  const handleLanguageChange = (language: Types.LanguageKey) => {
+  const changeLanguage = (language: Types.LanguageKey) => {
     ipc.language.set(language);
     i18n.changeLanguage(language);
   };
+
+  const getContextMenuItems = () =>
+    new CtxMenuBuilder()
+      .addSystemSettingOption(() => Popup.openSystemSetting(userId))
+      .addChangeThemeOption(Popup.openChangeTheme)
+      .addFeedbackOption(() => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'))
+      .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
+      .addHelpCenterOption(
+        {
+          onFaqClick: () => window.open('https://ricecall.com.tw/#faq', '_blank'),
+          onAgreementClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
+          onSpecificationClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
+          onContactUsClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
+          onAboutUsClick: () => Popup.openAboutUs,
+        },
+        () => {},
+      )
+      .addLogoutOption(logout)
+      .addExitOption(exit)
+      .build();
 
   const getNotificationMenuItems = () => [
     {
@@ -202,7 +135,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       showContentLength: true,
       showContent: true,
       contents: friendApplications.map((fa) => fa.avatarUrl),
-      onClick: () => Popup.handleOpenFriendVerification(userId),
+      onClick: () => Popup.openFriendVerification(userId),
     },
     {
       id: 'member-invitation',
@@ -213,7 +146,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       showContentLength: true,
       showContent: true,
       contents: memberInvitations.map((mi) => mi.avatarUrl),
-      onClick: () => Popup.handleOpenMemberInvitation(userId),
+      onClick: () => Popup.openMemberInvitation(userId),
     },
     {
       id: 'system-notify',
@@ -237,9 +170,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 
   useEffect(() => {
     const changeCloseToTray = (enable: boolean) => {
-      isCloseToTray.current = enable;
+      setIsCloseToTray(enable);
     };
-    changeCloseToTray(isCloseToTray.current);
+    changeCloseToTray(ipc.systemSettings.closeToTray.get());
     const unsub = ipc.systemSettings.closeToTray.onUpdate(changeCloseToTray);
     return () => unsub();
   }, []);
@@ -257,16 +190,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   return (
     <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
       <div className={headerStyles['title-box']}>
-        <div className={headerStyles['name-box']} onClick={() => Popup.handleOpenUserInfo(userId, userId)}>
+        <div className={headerStyles['name-box']} onClick={() => Popup.openUserInfo(userId, userId)}>
           {userName}
         </div>
         <div
           className={headerStyles['status-box']}
           onClick={(e) => {
-            const x = e.currentTarget.getBoundingClientRect().left;
-            const y = e.currentTarget.getBoundingClientRect().bottom;
+            const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
             contextMenu.showStatusDropdown(x, y, 'right-bottom', (status) => {
-              handleChangeStatus(status);
+              actionScanner.setIsManualIdling(status !== 'online');
+              Popup.editUserStatus(status);
             });
           }}
         >
@@ -290,7 +223,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
                   className={`${headerStyles['tab-close']} themeTabClose`}
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleLeaveServer(currentServerId);
+                    Popup.leaveServer(currentServerId);
                   }}
                   xmlns="http://www.w3.org/2000/svg"
                   width="12"
@@ -311,8 +244,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
         <div
           className={headerStyles['notice']}
           onClick={(e) => {
-            const x = e.currentTarget.getBoundingClientRect().left;
-            const y = e.currentTarget.getBoundingClientRect().bottom;
+            const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
             contextMenu.showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
           }}
         >
@@ -322,14 +254,15 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
         <div
           className={headerStyles['menu']}
           onClick={(e) => {
-            const x = e.currentTarget.getBoundingClientRect().right + 50;
-            const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showContextMenu(x, y, 'left-bottom', getContextMenuItems());
+            e.preventDefault();
+            e.stopPropagation();
+            const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+            contextMenu.showContextMenu(x + 50, y, 'left-bottom', getContextMenuItems());
           }}
         />
-        <div className={headerStyles['minimize']} onClick={handleMinimize} />
-        {isFullscreen ? <div className={headerStyles['restore']} onClick={handleUnmaximize} /> : <div className={headerStyles['maxsize']} onClick={handleMaximize} />}
-        <div className={headerStyles['close']} onClick={handleClose} />
+        <div className={headerStyles['minimize']} onClick={minimize} />
+        {isFullscreen ? <div className={headerStyles['restore']} onClick={unmaximize} /> : <div className={headerStyles['maxsize']} onClick={maximize} />}
+        <div className={headerStyles['close']} onClick={close} />
       </div>
     </header>
   );
@@ -386,7 +319,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const { name: currentServerName } = currentServer;
 
   // Handlers
-  const handleClearMessages = useCallback(() => {
+  const clearChannelMessages = useCallback(() => {
     setChannelMessages([]);
   }, []);
 
@@ -892,7 +825,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error: Error) => {
-      Popup.handleOpenErrorDialog(error.message, () => {});
+      Popup.openErrorDialog(error.message, () => {});
     });
     return () => unsub();
   }, []);
@@ -979,7 +912,7 @@ const RootPageComponent: React.FC = React.memo(() => {
                 channelMessages={channelMessages}
                 actionMessages={actionMessages}
                 channelEvents={channelEvents}
-                onClearMessages={handleClearMessages}
+                onClearMessages={clearChannelMessages}
                 display={mainTab.selectedTabId === 'server'}
                 latency={latency}
               />

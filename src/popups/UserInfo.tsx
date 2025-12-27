@@ -104,33 +104,29 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
     return age;
   };
 
-  const handleEditUser = (update: Partial<Types.User>) => {
-    ipc.socket.send('editUser', { update });
-  };
-
-  const handleMinimize = () => {
+  const minimize = () => {
     ipc.window.minimize();
   };
 
-  const handleClose = () => {
+  const close = () => {
     ipc.window.close();
   };
 
-  const handleServerSelect = (server: Types.Server) => {
+  const selectServer = (server: Types.Server) => {
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   const handleUploadImage = (imageUnit8Array: Uint8Array) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
     ipc.data.uploadImage({ folder: 'user', imageName: userId, imageUnit8Array }).then((response) => {
       if (response) {
         setTarget((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
-        handleEditUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
+        Popup.editUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
       }
       isUploadingRef.current = false;
     });
@@ -171,8 +167,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
       <div className={styles['profile-box']}>
         <div className={styles['header']}>
           <div className={styles['window-action-buttons']}>
-            <div className={styles['minimize-btn']} onClick={() => handleMinimize()} />
-            <div className={styles['close-btn']} onClick={() => handleClose()} />
+            <div className={styles['minimize-btn']} onClick={minimize} />
+            <div className={styles['close-btn']} onClick={close} />
           </div>
           <div
             className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`}
@@ -189,7 +185,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                   if (image.type === 'image/gif') {
                     handleUploadImage(new Uint8Array(arrayBuffer));
                   } else {
-                    Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                    Popup.openImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
                   }
                 });
               };
@@ -233,10 +229,10 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 className={`${popupStyles['button']} ${popupStyles['blue']} ${!canSubmit ? 'disabled' : ''}`}
                 onClick={() => {
                   if (!countries.includes(targetCountry)) {
-                    Popup.handleOpenErrorDialog(t('invalid-country'), () => {});
+                    Popup.openErrorDialog(t('invalid-country'), () => {});
                     return;
                   }
-                  handleEditUser(ObjDiff(target, targetData));
+                  Popup.editUser(ObjDiff(target, targetData));
                   setSelectedTabId('about');
                 }}
               >
@@ -270,20 +266,23 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               ) : recentServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
               ) : (
-                recentServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
-                    <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
-                    <div className={styles['server-info-box']}>
-                      <div className={styles['server-name-text']}>{server.name}</div>
-                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-                        <div className={`${isSelf && server.ownerId === userId ? styles['is-owner'] : ''}`} />
-                        <div className={styles['display-id-text']} onDoubleClick={(e) => e.stopPropagation()}>
-                          {server.specialId || server.displayId}
+                recentServers.map((server) => {
+                  const { serverId, avatarUrl: serverAvatarUrl, name: serverName, ownerId: serverOwnerId, specialId: serverSpecialId, displayId: serverDisplayId } = server;
+                  return (
+                    <div key={serverId} className={styles['server-card']} onDoubleClick={() => selectServer(server)}>
+                      <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+                      <div className={styles['server-info-box']}>
+                        <div className={styles['server-name-text']}>{serverName}</div>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+                          <div className={`${isSelf && serverOwnerId === userId ? styles['is-owner'] : ''}`} />
+                          <div className={styles['display-id-text']} onDoubleClick={(e) => e.stopPropagation()}>
+                            {serverSpecialId || serverDisplayId}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
             <div className={popupStyles['label']}>{t('recent-earned')}</div>
@@ -314,18 +313,21 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               ) : joinedServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
               ) : (
-                joinedServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
-                    <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
-                    <div className={styles['server-info-box']}>
-                      <div className={styles['server-name-text']}>{server.name}</div>
-                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
-                        <div className={styles['contribution-value-text']}>{server.contribution}</div>
+                joinedServers.map((server) => {
+                  const { serverId, avatarUrl: serverAvatarUrl, name: serverName, permissionLevel: serverPermissionLevel, contribution: serverContribution } = server;
+                  return (
+                    <div key={serverId} className={styles['server-card']} onDoubleClick={() => selectServer(server)}>
+                      <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+                      <div className={styles['server-info-box']}>
+                        <div className={styles['server-name-text']}>{serverName}</div>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${serverPermissionLevel}`]}`} />
+                          <div className={styles['contribution-value-text']}>{serverContribution}</div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
             <div className={styles['server-list']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
@@ -338,21 +340,24 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
               ) : favoriteServers.length === 0 ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
               ) : (
-                favoriteServers.map((server) => (
-                  <div key={server.serverId} className={styles['server-card']} onDoubleClick={() => handleServerSelect(server)}>
-                    <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
-                    <div className={styles['server-info-box']}>
-                      <div className={styles['server-name-text']}>{server.name}</div>
-                      <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
-                        <div className={styles['contribution-box']}>
-                          <div className={styles['contribution-icon']} />
-                          <div className={styles['contribution-value-text']}>{server.contribution}</div>
+                favoriteServers.map((server) => {
+                  const { serverId, avatarUrl: serverAvatarUrl, name: serverName, permissionLevel: serverPermissionLevel, contribution: serverContribution } = server;
+                  return (
+                    <div key={serverId} className={styles['server-card']} onDoubleClick={() => selectServer(server)}>
+                      <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+                      <div className={styles['server-info-box']}>
+                        <div className={styles['server-name-text']}>{serverName}</div>
+                        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${serverPermissionLevel}`]}`} />
+                          <div className={styles['contribution-box']}>
+                            <div className={styles['contribution-icon']} />
+                            <div className={styles['contribution-value-text']}>{serverContribution}</div>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))
+                  );
+                })
               )}
             </div>
           </div>
@@ -459,16 +464,16 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
       </div>
       <div className={popupStyles['popup-footer']}>
         {!isFriend && !isSelf && (
-          <div className={`${popupStyles['button']} ${popupStyles['green']}`} onClick={() => Popup.handleOpenApplyFriend(userId, targetId)}>
+          <div className={`${popupStyles['button']} ${popupStyles['green']}`} onClick={() => Popup.openApplyFriend(userId, targetId)}>
             {t('add-friend')}
           </div>
         )}
         {isSelf ? (
-          <div className={popupStyles['button']} onClick={() => handleClose()}>
+          <div className={popupStyles['button']} onClick={close}>
             {t('close')}
           </div>
         ) : (
-          <div className={popupStyles['button']} onClick={() => Popup.handleOpenDirectMessage(userId, targetId)}>
+          <div className={popupStyles['button']} onClick={() => Popup.openDirectMessage(userId, targetId)}>
             {t('chat')}
           </div>
         )}

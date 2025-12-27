@@ -36,7 +36,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
       ipc.data.friend({ userId, targetId }).then((friend) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (targetId === userId) setError(t('cannot-add-yourself'));
-        else Popup.handleOpenApplyFriend(userId, targetId);
+        else Popup.openApplyFriend(userId, targetId);
       });
     });
   };
@@ -66,7 +66,14 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleSearchUser(searchQuery) : null)}>
+        <div
+          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
+          onClick={() => {
+            if (!canSubmit) return;
+            handleSearchUser(searchQuery);
+            handleClose();
+          }}
+        >
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

@@ -8,7 +8,8 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 import { useMainTab } from '@/providers/MainTab';
 
-import { handleOpenServerSetting } from '@/utils/popup';
+import * as Popup from '@/utils/popup';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import homeStyles from '@/styles/home.module.css';
 
@@ -29,19 +30,11 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
-  const getContextMenuItems = () => [
-    {
-      id: 'join-server',
-      label: t('join-server'),
-      onClick: () => handleServerSelect(recommendServer),
-    },
-    {
-      id: 'view-server-info',
-      label: t('view-server-info'),
-      disabled: true,
-      onClick: () => handleOpenServerSetting(userId, serverId),
-    },
-  ];
+  const getContextMenuItems = () =>
+    new CtxMenuBuilder()
+      .addJoinServerOption(() => handleServerSelect(recommendServer))
+      .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
+      .build();
 
   const handleServerSelect = (server: Types.RecommendServer) => {
     if (loadingBox.isLoading) return;
@@ -60,8 +53,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
       onClick={() => handleServerSelect(recommendServer)}
       onContextMenu={(e) => {
         e.preventDefault();
-        const x = e.clientX;
-        const y = e.clientY;
+        const { clientX: x, clientY: y } = e;
         contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
       }}
     >

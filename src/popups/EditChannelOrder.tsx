@@ -76,18 +76,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const canSubmit = editedChannels.length > 0;
 
   // Handlers
-  const handleEditChannels = (serverId: Types.Server['serverId'], updates: Partial<Types.Channel>[]) => {
-    ipc.socket.send('editChannel', ...updates.map((update) => ({ serverId, channelId: update.channelId!, update })));
-    ipc.window.close();
-  };
-
-  const handleDeleteChannel = (channelId: Types.Channel['channelId'], serverId: Types.Server['serverId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-delete-channel', { '0': selectedChannel?.name ?? '' }), () => {
-      ipc.socket.send('deleteChannel', { serverId, channelId });
-      setSelectedChannel(null);
-    });
-  };
-
   const handleClose = () => {
     ipc.window.close();
   };
@@ -253,7 +241,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           className={`${styles['delete-channel-btn']} ${!canDelete ? 'disabled' : ''}`}
           onClick={(e) => {
             e.stopPropagation();
-            handleDeleteChannel(selectedChannel!.channelId, serverId);
+            Popup.deleteChannel(serverId, selectedChannel!.channelId, selectedChannel!.name);
+            setSelectedChannel(null);
           }}
         >
           {t('delete')}
@@ -306,7 +295,14 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleEditChannels(serverId, editedChannels) : null)}>
+        <div
+          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
+          onClick={() => {
+            if (!canSubmit) return;
+            Popup.editChannels(serverId, editedChannels);
+            handleClose();
+          }}
+        >
           {t('confirm')}
         </div>
         <div className={popupStyles['button']} onClick={handleClose}>

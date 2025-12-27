@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
@@ -21,7 +21,7 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers
   const [expanded, setExpanded] = useState(false);
 
   // Variables
-  const displayedServers = expanded ? servers : servers.slice(0, 6);
+  const displayedServers = useMemo(() => (expanded ? servers : servers.slice(0, 6)), [servers, expanded]);
   const canExpand = servers.length > 6;
 
   return (

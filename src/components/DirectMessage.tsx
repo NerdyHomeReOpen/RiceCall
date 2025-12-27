@@ -39,7 +39,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ user, messageG
   return (
     <div className={styles['message-box']}>
       <div className={styles['details']}>
-        <div className={styles['username-text']} onClick={() => Popup.handleOpenUserInfo(userId, senderUserId)}>
+        <div className={styles['username-text']} onClick={() => Popup.openUserInfo(userId, senderUserId)}>
           {senderName}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>

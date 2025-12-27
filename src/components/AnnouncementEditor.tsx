@@ -70,7 +70,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
     isUploadingRef.current = true;
     if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
       isUploadingRef.current = false;
       return;
     }
@@ -216,8 +216,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               className={settingStyles['button']}
               onClick={(e) => {
                 e.preventDefault();
-                const x = e.currentTarget.getBoundingClientRect().left;
-                const y = e.currentTarget.getBoundingClientRect().bottom;
+                const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
                 contextMenu.showColorPicker(x, y, 'right-bottom', (color) => {
                   editor?.chain().setColor(color).focus().run();
                   setTextColor(color);
@@ -231,8 +230,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               className={settingStyles['button']}
               onClick={(e) => {
                 e.preventDefault();
-                const x = e.currentTarget.getBoundingClientRect().left;
-                const y = e.currentTarget.getBoundingClientRect().bottom;
+                const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
                 contextMenu.showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (code) => {
                   editor?.chain().insertEmoji({ code }).focus().run();
                   syncStyles();
@@ -248,8 +246,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
               className={settingStyles['button']}
               onClick={(e) => {
                 e.preventDefault();
-                const x = e.currentTarget.getBoundingClientRect().left;
-                const y = e.currentTarget.getBoundingClientRect().bottom;
+                const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
                 contextMenu.showEmbedLinkInput(x, y, 'right-bottom', (linkUrl) => {
                   const isYouTube = linkUrl.trim().includes('youtube.com/');
                   const isTwitch = linkUrl.trim().includes('twitch.tv/');
