@@ -1,4 +1,5 @@
 import React from 'react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -32,32 +33,30 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ us
   // Handles
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addJoinServerOption(() => handleServerSelect(recommendServer))
+      .addJoinServerOption(handleJoinServer)
       .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
       .build();
 
-  const handleServerSelect = (server: Types.RecommendServer) => {
+  const handleJoinServer = () => {
     if (loadingBox.isLoading) return;
-    if (server.serverId === userCurrentServerId) {
+    if (serverId === userCurrentServerId) {
       mainTab.setSelectedTabId('server');
       return;
     }
     loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(server.specialId || server.displayId);
-    ipc.socket.send('connectServer', { serverId: server.serverId });
+    loadingBox.setLoadingServerId(serverSpecialId || serverDisplayId);
+    ipc.socket.send('connectServer', { serverId });
+  };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
   };
 
   return (
-    <div
-      className={homeStyles['server-card']}
-      onClick={() => handleServerSelect(recommendServer)}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        const { clientX: x, clientY: y } = e;
-        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-      }}
-    >
-      <div className={homeStyles['server-avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }}></div>
+    <div className={homeStyles['server-card']} onClick={handleJoinServer} onContextMenu={handleContextMenu}>
+      <Image className={homeStyles['server-avatar-picture']} src={serverAvatarUrl} alt={serverName} width={70} height={70} loading="lazy" draggable="false" />
       <div className={homeStyles['server-info-text']}>
         <div className={homeStyles['server-name-text']}>{serverName}</div>
         <div className={homeStyles['server-id-box']}>

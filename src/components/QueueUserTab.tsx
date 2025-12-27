@@ -63,6 +63,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentSer
   const isControlled = memberPosition === 0 && isQueueControlled && !Permission.isChannelMod(memberPermission);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = permissionLevel > memberPermission;
+  const isSelected = selectedItemId === `queue-${memberUserId}`;
   const memberHasVip = memberVip > 0;
 
   // Handlers
@@ -105,7 +106,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentSer
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, memberUserId))
       .addViewProfileOption(() => Popup.openUserInfo(userId, memberUserId))
       .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(userId, memberUserId))
-      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? unmuteUser(memberUserId) : muteUser(memberUserId)))
+      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? webRTC.unmuteUser(memberUserId) : webRTC.muteUser(memberUserId)))
       .addEditNicknameOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openEditNickname(memberUserId, currentServerId))
       .addSeparator()
       .addForbidVoiceOption({ isSelf, isSuperior, isVoiceMuted: isMemberVoiceMuted }, () => Popup.forbidUserVoiceInChannel(memberUserId, currentServerId, currentChannelId, !isMemberVoiceMuted))
@@ -123,38 +124,44 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ user, currentSer
       )
       .build();
 
-  const muteUser = (userId: Types.User['userId']) => {
-    webRTC.muteUser(userId);
+  const handleTabClick = () => {
+    if (isSelected) setSelectedItemId(null);
+    else setSelectedItemId(`queue-${memberUserId}`);
   };
 
-  const unmuteUser = (userId: Types.User['userId']) => {
-    webRTC.unmuteUser(userId);
+  const handleTabDoubleClick = () => {
+    if (isSelf) return;
+    Popup.openDirectMessage(userId, memberUserId);
+  };
+
+  const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+  };
+
+  const handleTabMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => {
+      contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
+    }, 200);
+  };
+
+  const handleTabMouseLeave = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = null;
   };
 
   return (
     <div
-      className={`user-info-card-container ${styles['user-tab']} ${selectedItemId === `queue-${memberUserId}` ? styles['selected'] : ''}`}
-      onClick={() => {
-        if (selectedItemId === `queue-${memberUserId}`) setSelectedItemId(null);
-        else setSelectedItemId(`queue-${memberUserId}`);
-      }}
-      onMouseEnter={(e) => {
-        const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = setTimeout(() => {
-          contextMenu.showUserInfoBlock(x, y, 'right-bottom', queueMember);
-        }, 200);
-      }}
-      onMouseLeave={() => {
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = null;
-      }}
-      onContextMenu={(e) => {
-        e.preventDefault();
-        e.stopPropagation();
-        const { clientX: x, clientY: y } = e;
-        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-      }}
+      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
+      onClick={handleTabClick}
+      onDoubleClick={handleTabDoubleClick}
+      onMouseEnter={handleTabMouseEnter}
+      onMouseLeave={handleTabMouseLeave}
+      onContextMenu={handleTabContextMenu}
     >
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />

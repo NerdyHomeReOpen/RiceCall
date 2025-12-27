@@ -2,7 +2,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -40,9 +40,13 @@ interface HeaderProps {
   systemNotifications: string[];
 }
 
+type Tab = {
+  id: 'home' | 'friends' | 'server';
+  label: string;
+};
+
 const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotifications }) => {
   // Hooks
-  const mainTab = useMainTab();
   const contextMenu = useContextMenu();
   const actionScanner = useActionScanner();
   const { t, i18n } = useTranslation();
@@ -58,23 +62,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   const hasFriendApplication = friendApplications.length !== 0;
   const hasMemberInvitation = memberInvitations.length !== 0;
   const hasSystemNotification = systemNotifications.length !== 0;
-  const mainTabs: { id: 'home' | 'friends' | 'server'; label: string }[] = [
-    { id: 'home', label: t('home') },
-    { id: 'friends', label: t('friends') },
-    { id: 'server', label: currentServerName },
-  ];
+  const mainTabs: Tab[] = useMemo(
+    () => [
+      { id: 'home', label: t('home') },
+      { id: 'friends', label: t('friends') },
+      { id: 'server', label: currentServerName },
+    ],
+    [currentServerName, t],
+  );
 
   // Handlers
-  const logout = () => {
-    ipc.auth.logout();
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
-  };
-
-  const exit = () => {
-    ipc.exit();
-  };
-
   const maximize = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
@@ -87,6 +84,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 
   const minimize = () => {
     ipc.window.minimize();
+  };
+
+  const logout = () => {
+    ipc.auth.logout();
+    localStorage.removeItem('token');
+    localStorage.removeItem('userId');
+  };
+
+  const exit = () => {
+    ipc.exit();
   };
 
   const close = () => {
@@ -160,11 +167,33 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     },
   ];
 
+  const handleStatusDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+    contextMenu.showStatusDropdown(x, y, 'right-bottom', (status) => {
+      actionScanner.setIsManualIdling(status !== 'online');
+      Popup.editUserStatus(status);
+    });
+  };
+
+  const handleMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+    contextMenu.showContextMenu(x + 50, y, 'left-bottom', getContextMenuItems());
+  };
+
+  const handleNotificationMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+    contextMenu.showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
+  };
+
   // Effects
   useEffect(() => {
     const next = actionScanner.isIdling ? 'idle' : 'online';
     if (user.status !== next && !actionScanner.isManualIdling) {
-      ipc.socket.send('editUser', { update: { status: next } });
+      Popup.editUserStatus(next);
     }
   }, [actionScanner.isIdling, actionScanner.isManualIdling, user.status]);
 
@@ -193,73 +222,24 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
         <div className={headerStyles['name-box']} onClick={() => Popup.openUserInfo(userId, userId)}>
           {userName}
         </div>
-        <div
-          className={headerStyles['status-box']}
-          onClick={(e) => {
-            const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-            contextMenu.showStatusDropdown(x, y, 'right-bottom', (status) => {
-              actionScanner.setIsManualIdling(status !== 'online');
-              Popup.editUserStatus(status);
-            });
-          }}
-        >
+        <div className={headerStyles['status-box']} onClick={handleStatusDropdownClick}>
           <div className={headerStyles['status-display']} datatype={userStatus} />
           <div className={headerStyles['status-triangle']} />
         </div>
       </div>
       <div className={headerStyles['main-tabs']}>
-        {mainTabs.map((tab) =>
-          tab.id === 'server' && !currentServerId ? null : (
-            <div
-              key={`tabs-${tab.id}`}
-              data-tab-id={tab.id}
-              className={`${headerStyles['tab']} ${tab.id === mainTab.selectedTabId ? headerStyles['selected'] : ''}`}
-              onClick={() => mainTab.setSelectedTabId(tab.id)}
-            >
-              <div className={headerStyles['tab-lable']}>{tab.label}</div>
-              <div className={headerStyles['tab-bg']} />
-              {tab.id === 'server' && (
-                <svg
-                  className={`${headerStyles['tab-close']} themeTabClose`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    Popup.leaveServer(currentServerId);
-                  }}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
-                  <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </div>
-          ),
-        )}
+        {mainTabs.map((tab) => (
+          <TabItem key={tab.id} tab={tab} currentServerId={currentServerId} />
+        ))}
       </div>
       <div className={headerStyles['buttons']}>
         <div className={headerStyles['gift']} />
         <div className={headerStyles['game']} />
-        <div
-          className={headerStyles['notice']}
-          onClick={(e) => {
-            const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-            contextMenu.showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
-          }}
-        >
+        <div className={headerStyles['notice']} onClick={handleNotificationMenuClick}>
           <div className={`${headerStyles['overlay']} ${hasNotification && headerStyles['new']}`} />
         </div>
         <div className={headerStyles['spliter']} />
-        <div
-          className={headerStyles['menu']}
-          onClick={(e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-            contextMenu.showContextMenu(x + 50, y, 'left-bottom', getContextMenuItems());
-          }}
-        />
+        <div className={headerStyles['menu']} onClick={handleMenuClick} />
         <div className={headerStyles['minimize']} onClick={minimize} />
         {isFullscreen ? <div className={headerStyles['restore']} onClick={unmaximize} /> : <div className={headerStyles['maxsize']} onClick={maximize} />}
         <div className={headerStyles['close']} onClick={close} />
@@ -269,6 +249,46 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 });
 
 Header.displayName = 'Header';
+
+interface TabItemProps {
+  tab: Tab;
+  currentServerId: string;
+}
+
+const TabItem = React.memo(({ tab, currentServerId }: TabItemProps) => {
+  // Hooks
+  const mainTab = useMainTab();
+
+  // Variables
+  const { id: tabId, label: tabLabel } = tab;
+  const isSelected = tabId === mainTab.selectedTabId;
+
+  // Handlers
+  const handleTabClick = () => {
+    mainTab.setSelectedTabId(tabId);
+  };
+
+  const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    e.stopPropagation();
+    Popup.leaveServer(currentServerId);
+  };
+
+  if (tabId === 'server' && !currentServerId) return null;
+  return (
+    <div key={`tabs-${tabId}`} data-tab-id={tabId} className={`${headerStyles['tab']} ${isSelected ? headerStyles['selected'] : ''}`} onClick={handleTabClick}>
+      <div className={headerStyles['tab-lable']}>{tabLabel}</div>
+      <div className={headerStyles['tab-bg']} />
+      {tabId === 'server' && (
+        <svg className={`${headerStyles['tab-close']} themeTabClose`} onClick={handleCloseButtonClick} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
+          <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </div>
+  );
+});
+
+TabItem.displayName = 'TabItem';
 
 const RootPageComponent: React.FC = React.memo(() => {
   // Hooks

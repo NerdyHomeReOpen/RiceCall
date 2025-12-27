@@ -6,6 +6,24 @@ import { STATUS_OPTIONS } from '@/constant';
 
 import headerStyles from '@/styles/header.module.css';
 
+interface StatusItemProps {
+  status: Types.User['status'];
+  onStatusSelect: (status: Types.User['status']) => void;
+  onClose: () => void;
+}
+
+const StatusItem: React.FC<StatusItemProps> = React.memo(({ status, onStatusSelect, onClose }) => {
+  // Handlers
+  const handleClick = () => {
+    onStatusSelect(status);
+    onClose();
+  };
+
+  return <div key={status} className={headerStyles['option']} datatype={status} onClick={handleClick} />;
+});
+
+StatusItem.displayName = 'StatusItem';
+
 interface StatusDropdownProps {
   x: number;
   y: number;
@@ -60,15 +78,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
   return (
     <div ref={dropdownRef} className={`context-menu-container ${headerStyles['status-dropdown']}`} style={display ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
       {STATUS_OPTIONS.map((status) => (
-        <div
-          key={status}
-          className={headerStyles['option']}
-          datatype={status}
-          onClick={() => {
-            onStatusSelect(status);
-            onClose();
-          }}
-        />
+        <StatusItem key={status} status={status} onStatusSelect={onStatusSelect} onClose={onClose} />
       ))}
     </div>
   );

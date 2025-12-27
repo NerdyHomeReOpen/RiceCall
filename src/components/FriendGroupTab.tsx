@@ -42,7 +42,10 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
         return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroupId && f.relationStatus !== 0).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
     }
   }, [friendGroupId, friends]);
-  const friendsOnlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
+  const friendsOnlineCount = friendGroupFriends.filter((f) => f.status !== 'offline').length;
+  const isSelected = selectedItemId === friendGroupId;
+  const isStranger = friendGroupId === 'stranger';
+  const isBlacklist = friendGroupId === 'blacklist';
 
   // Handlers
   const getContextMenuItems = () =>
@@ -51,22 +54,22 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ user, friend
       .addDeleteFriendGroupOption({ friendGroupId }, () => Popup.deleteFriendGroup(friendGroupId, friendGroupName))
       .build();
 
+  const handleTabClick = () => {
+    setExpanded((prev) => !prev);
+  };
+
+  const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+  };
+
   return (
     <div key={friendGroupId}>
-      <div
-        className={`${styles['friend-group-tab']} ${selectedItemId === friendGroupId ? styles['selected'] : ''}`}
-        onClick={() => setExpanded((prev) => !prev)}
-        onContextMenu={(e) => {
-          e.preventDefault();
-          const { clientX: x, clientY: y } = e;
-          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-        }}
-      >
+      <div className={`${styles['friend-group-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onContextMenu={handleTabContextMenu}>
         <div className={`${styles['toggle-icon']} ${expanded ? styles['expanded'] : ''}`} />
         <div className={styles['tab-label']}>{friendGroupName}</div>
-        <div className={styles['tab-count']}>
-          {friendGroupId !== 'blacklist' && friendGroupId !== 'stranger' ? `(${friendsOnlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}
-        </div>
+        <div className={styles['tab-count']}>{!isStranger && !isBlacklist ? `(${friendsOnlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}</div>
       </div>
       <div className={styles['tab-content']} style={expanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (

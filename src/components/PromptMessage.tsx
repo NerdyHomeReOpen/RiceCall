@@ -27,8 +27,8 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
 
   // Variables
   const { userId } = user;
-  const { contents: messageContents, parameter: messageParameter, contentMetadata: messageContentNetadata } = messageGroup;
-  const { targetId: senderUserId } = messageContentNetadata;
+  const { contents: messageContents, parameter: messageParameter, contentMetadata: messageContentMetadata } = messageGroup;
+  const { targetId: senderUserId } = messageContentMetadata;
   const escapedMessageParameter = Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, TagConverter.escapeHtml(value)]));
   const formattedMessagesContents = useMemo(
     () =>
@@ -46,17 +46,15 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
   // Handlers
   const getContextMenuItems = () => new CtxMenuBuilder().addViewProfileOption(() => Popup.openUserInfo(userId, senderUserId)).build();
 
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+  };
+
   return (
-    <div
-      className={`${styles['message-box']} ${styles['event']}`}
-      onContextMenu={(e) => {
-        if (!senderUserId) return;
-        e.preventDefault();
-        e.stopPropagation();
-        const { clientX: x, clientY: y } = e;
-        contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-      }}
-    >
+    <div className={`${styles['message-box']} ${styles['event']}`} onContextMenu={handleContextMenu}>
       <div className={styles[`${messageType}-icon`]} />
       {formattedMessagesContents.map((content, index) => (
         <MarkdownContent key={index} markdownText={content} />
