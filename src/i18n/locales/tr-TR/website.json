@@ -269,7 +269,7 @@
     "forget": {
       "forgetTitle": "şifreyi unuttum",
       "enterAccount": "Lütfen hesap numaranızı girin, bağlı e-posta adresinize bir şifre sıfırlama bağlantısı göndereceğiz.",
-      "account": "hesap numarası",
+      "account": "Hesap numarası",
       "sendEmail": "Sıfırlama Bağlantısını Gönder",
       "sendingEmail": "Gönderiliyor...",
       "backLogin": "Girişe Dön"
