@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
@@ -19,29 +20,31 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 interface UserTabProps {
-  user: Types.User;
-  currentServer: Types.Server;
-  currentChannel: Types.Channel;
-  friends: Types.Friend[];
-  queueUsers: Types.QueueUser[];
-  channel: Types.Channel | Types.Category;
   member: Types.OnlineMember;
-  selectedItemId: string | null;
-  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  channel: Types.Channel | Types.Category;
   canJoin: boolean;
   needsPassword: boolean;
+  selectedItemId: string | null;
+  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, currentChannel, friends, queueUsers, channel, member, selectedItemId, setSelectedItemId, canJoin, needsPassword }) => {
+const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, canJoin, needsPassword, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
-  const webRTC = useWebRTC();
-  const findMe = useFindMeContext();
+  const { showContextMenu, showUserInfoBlock } = useContextMenu();
+  const { isMuted, isSpeaking, unmuteUser, muteUser } = useWebRTC();
+  const { userTabRef: findMeUserTabRef } = useFindMeContext();
 
   // Refs
   const userTabRef = useRef<HTMLDivElement>(null);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const currentServer = useAppSelector((state) => state.currentServer.data);
+  const currentChannel = useAppSelector((state) => state.currentChannel.data);
+  const friends = useAppSelector((state) => state.friends.data);
+  const queueUsers = useAppSelector((state) => state.queueUsers.data);
 
   // Variables
   const { userId } = user;
@@ -69,8 +72,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   const isInSameChannel = memberCurrentChannelId === currentChannelId;
   const isInLobby = memberCurrentChannelId === currentServerLobbyId;
   const isInQueue = useMemo(() => queueUsers.some((qu) => qu.userId === memberUserId), [queueUsers, memberUserId]);
-  const isSpeaking = isSelf ? webRTC.isSpeaking('user') : webRTC.isSpeaking(memberUserId);
-  const isMuted = isSelf ? webRTC.isMuted('user') : webRTC.isMuted(memberUserId);
+  const isUserSpeaking = isSelf ? isSpeaking('user') : isSpeaking(memberUserId);
+  const isUserMuted = isSelf ? isMuted('user') : isMuted(memberUserId);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
   const isSuperior = permissionLevel > memberPermission;
   const isEqualOrSuperior = permissionLevel >= memberPermission;
@@ -81,8 +84,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
 
   // Handlers
   const getStatusIcon = () => {
-    if (isMuted || isMemberVoiceMuted) return 'muted';
-    if (isSpeaking) return 'play';
+    if (isUserMuted || isMemberVoiceMuted) return 'muted';
+    if (isUserSpeaking) return 'play';
     return '';
   };
 
@@ -106,14 +109,14 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
       )
       .build();
 
-  const getContextMenuItems = () =>
+  const getTabContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinUserChannelOption({ isSelf, isInSameChannel }, () => Popup.connectChannel(currentServerId, channelId, canJoin, needsPassword))
       .addAddToQueueOption({ isSelf, isEqualOrSuperior, isQueueMode: isChannelQueueMode, isInQueue }, () => Popup.addUserToQueue(memberUserId, currentServerId, channelId))
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, memberUserId))
       .addViewProfileOption(() => Popup.openUserInfo(userId, memberUserId))
       .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(userId, memberUserId))
-      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? webRTC.unmuteUser(memberUserId) : webRTC.muteUser(memberUserId)))
+      .addSetMuteOption({ isSelf, isMuted: isUserMuted }, () => (isUserMuted ? unmuteUser(memberUserId) : muteUser(memberUserId)))
       .addEditNicknameOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openEditNickname(memberUserId, currentServerId))
       .addSeparator()
       .addMoveToChannelOption({ currentPermissionLevel, permissionLevel, isSelf, isInSameChannel, isEqualOrSuperior }, () => Popup.moveUserToChannel(memberUserId, currentServerId, currentChannelId))
@@ -150,14 +153,14 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', getTabContextMenuItems());
   };
 
   const handleTabMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     hoverTimerRef.current = setTimeout(() => {
-      contextMenu.showUserInfoBlock(x, y, 'right-bottom', member);
+      showUserInfoBlock(x, y, 'right-bottom', member);
     }, 200);
   };
 
@@ -168,9 +171,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
 
   // Effects
   useEffect(() => {
-    if (!findMe || !isSelf) return;
-    findMe.userTabRef.current = userTabRef.current;
-  }, [findMe, isSelf]);
+    if (!isSelf) return;
+    findMeUserTabRef.current = userTabRef.current;
+  }, [findMeUserTabRef, isSelf]);
 
   return (
     <div

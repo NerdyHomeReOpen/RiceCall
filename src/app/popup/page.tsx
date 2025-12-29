@@ -333,10 +333,14 @@ const PopupPageComponent: React.FC = React.memo(() => {
   const [initialData, setInitialData] = useState<any | null>(null);
 
   // Variables
-  const { title, buttons, node, hideHeader } = useMemo<Popup>(() => {
-    if (!id || !type || !initialData) return { id: '', type: 'dialogAlert', title: '', buttons: ['close'], node: () => null, hideHeader: true };
+  const { buttons, hideHeader } = useMemo(() => {
+    if (!type) return { buttons: [], hideHeader: true };
+    return defaultPopup[type];
+  }, [type]);
 
-    const title = {
+  const title = useMemo(() => {
+    if (!type) return '';
+    return {
       aboutus: t('about-ricecall'),
       applyFriend: t('apply-friend'),
       applyMember: t('apply-member'),
@@ -378,9 +382,12 @@ const PopupPageComponent: React.FC = React.memo(() => {
       systemSetting: t('system-setting'),
       userInfo: t('user-info'),
       userSetting: t('user-setting'),
-    };
+    }[type];
+  }, [type, initialData, t]);
 
-    const node = {
+  const node = useMemo<() => React.ReactNode | null>(() => {
+    if (!type || !initialData) return () => null;
+    return {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,
       applyMember: () => <ApplyMember id={id} {...initialData} />,
@@ -422,15 +429,8 @@ const PopupPageComponent: React.FC = React.memo(() => {
       systemSetting: () => <SystemSetting id={id} {...initialData} />,
       userInfo: () => <UserInfo id={id} {...initialData} />,
       userSetting: () => <UserInfo id={id} {...initialData} />,
-    };
-
-    return {
-      ...defaultPopup[type],
-      id,
-      title: title[type],
-      node: node[type],
-    };
-  }, [id, type, initialData, t]);
+    }[type];
+  }, [id, type, initialData]);
 
   // Effects
   useEffect(() => {

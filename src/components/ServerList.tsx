@@ -9,11 +9,10 @@ import homeStyles from '@/styles/home.module.css';
 
 interface ServerListProps {
   title: string;
-  user: Types.User;
   servers: Types.Server[];
 }
 
-const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers }) => {
+const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -30,7 +29,7 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, user, servers
       <div className={homeStyles['servers-container']}>
         <div className={homeStyles['server-list']}>
           {displayedServers.map((server) => (
-            <ServerCard key={server.serverId} user={user} server={server} />
+            <ServerCard key={server.serverId} server={server} />
           ))}
         </div>
         {canExpand && (

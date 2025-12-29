@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -57,17 +58,17 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ userId, frie
 FriendActivity.displayName = 'FriendActivity';
 
 interface FriendPageProps {
-  user: Types.User;
-  friends: Types.Friend[];
-  friendActivities: Types.FriendActivity[];
-  friendGroups: Types.FriendGroup[];
   display: boolean;
 }
 
-const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, friends, friendActivities, friendGroups, display }) => {
+const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
+  const { showEmojiPicker } = useContextMenu();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const friendActivities = useAppSelector((state) => state.friendActivities.data);
 
   // Refs
   const sidebarRef = useRef<HTMLDivElement>(null);
@@ -116,7 +117,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    contextMenu.showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (_, full) => {
+    showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (_, full) => {
       signatureInputRef.current?.focus();
       document.execCommand('insertText', false, full);
     });
@@ -168,7 +169,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ user, frien
       </header>
       <main className={friendStyles['friend-body']}>
         <aside ref={sidebarRef} className={friendStyles['sidebar']}>
-          <FriendList friendGroups={friendGroups} friends={friends} user={user} />
+          <FriendList />
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
         <main className={friendStyles['content']}>

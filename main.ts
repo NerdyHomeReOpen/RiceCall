@@ -40,10 +40,8 @@ if (process.platform === 'linux') {
 
 export function getRegion(): Types.LanguageKey {
   const language = app.getLocale();
-
   const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
   if (!match) return 'en-US';
-
   return match.code;
 }
 

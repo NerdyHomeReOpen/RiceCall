@@ -528,13 +528,13 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addFriendGroupOption(params: { friendGroupId: string; friendGroups: Types.FriendGroup[] }, onClick: (friendGroupId: string) => void): this {
+  addFriendGroupOption(params: { friendGroupId: string | null; friendGroups: Types.FriendGroup[] }, onClick: (friendGroupId: string | null) => void): this {
     this.options.push(
       ...params.friendGroups.map((group) => ({
         id: `friend-group-${group.friendGroupId}`,
         label: group.name,
         show: !((group.friendGroupId || null) === params.friendGroupId),
-        onClick: () => onClick(group.friendGroupId),
+        onClick: () => onClick(group.friendGroupId || null),
       })),
     );
     return this;
@@ -779,11 +779,11 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addMoveDownQueueOption(params: { queuePosition: number; queueLength: number; permissionLevel: Types.Permission }, onClick: () => void): this {
+  addMoveDownQueueOption(params: { queuePosition: number; permissionLevel: Types.Permission }, onClick: () => void): this {
     this.options.push({
       id: 'move-down-queue',
       label: 'move-down-queue',
-      show: params.queuePosition > 0 && params.queuePosition < params.queueLength - 1 && Permission.isChannelMod(params.permissionLevel),
+      show: params.queuePosition > 0 && Permission.isChannelMod(params.permissionLevel),
       onClick: onClick,
     });
     return this;

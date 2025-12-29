@@ -21,41 +21,42 @@ interface RecommendServerCardProps {
 
 const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ user, recommendServer }) => {
   // Hooks
-  const contextMenu = useContextMenu();
-  const loadingBox = useLoading();
-  const mainTab = useMainTab();
   const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+  const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
+  const { setSelectedTabId } = useMainTab();
 
   // Variables
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
   const { userId, currentServerId: userCurrentServerId } = user;
 
   // Handles
-  const getContextMenuItems = () =>
+  const getServerCardContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addJoinServerOption(handleJoinServer)
+      .addJoinServerOption(handleServerCardClick)
       .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
       .build();
 
-  const handleJoinServer = () => {
-    if (loadingBox.isLoading) return;
+  const handleServerCardClick = () => {
+    if (isLoading) return;
     if (serverId === userCurrentServerId) {
-      mainTab.setSelectedTabId('server');
+      setSelectedTabId('server');
       return;
     }
-    loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(serverSpecialId || serverDisplayId);
+    setIsLoading(true);
+    setLoadingServerId(serverSpecialId || serverDisplayId);
     ipc.socket.send('connectServer', { serverId });
   };
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', getServerCardContextMenuItems());
   };
 
   return (
-    <div className={homeStyles['server-card']} onClick={handleJoinServer} onContextMenu={handleContextMenu}>
+    <div className={homeStyles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
       <Image className={homeStyles['server-avatar-picture']} src={serverAvatarUrl} alt={serverName} width={70} height={70} loading="lazy" draggable="false" />
       <div className={homeStyles['server-info-text']}>
         <div className={homeStyles['server-name-text']}>{serverName}</div>
