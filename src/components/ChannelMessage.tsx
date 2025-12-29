@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
@@ -19,16 +20,18 @@ import permission from '@/styles/permission.module.css';
 import vip from '@/styles/vip.module.css';
 
 interface ChannelMessageProps {
-  user: Types.User;
-  currentChannel: Types.Channel;
-  currentServer: Types.Server;
   messageGroup: Types.ChannelMessage & { contents: string[] };
 }
 
-const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, currentChannel, currentServer, messageGroup }) => {
+const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup }) => {
   // Hooks
-  const contextMenu = useContextMenu();
   const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const currentServer = useAppSelector((state) => state.currentServer.data);
+  const currentChannel = useAppSelector((state) => state.currentChannel.data);
 
   // Variables
   const { userId } = user;
@@ -84,7 +87,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
       )
       .build();
 
-  const getContextMenuItems = () =>
+  const getMessageContextMenuItems = () =>
     new CtxMenuBuilder()
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, senderUserId))
       .addViewProfileOption(() => Popup.openUserInfo(userId, senderUserId))
@@ -95,11 +98,11 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior, channelCategoryId }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', getMessageContextMenuItems());
   };
 
   const handleUsernameClick = () => {
@@ -108,7 +111,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
 
   return (
     <div className={styles['message-box']}>
-      <div className={`${styles['details']}`} onContextMenu={handleContextMenu}>
+      <div className={`${styles['details']}`} onContextMenu={handleMessageContextMenu}>
         {Permission.isChannelMod(senderPermissionLevel) && <div className={`${permission[senderGender]} ${permission[`lv-${senderPermissionLevel}`]}`} />}
         {senderHasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
         <div className={`${styles['username-text']} ${senderHasVip ? `${vip['vip-name-color']}` : ''}`} onClick={handleUsernameClick}>

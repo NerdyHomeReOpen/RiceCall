@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
@@ -6,17 +7,14 @@ import MarkdownContent from '@/components/MarkdownContent';
 
 import styles from '@/styles/notificationToaster.module.css';
 
-interface NotificationToasterProps {
-  notifications: Types.Notification[];
-}
-
-const NotificationToaster: React.FC<NotificationToasterProps> = React.memo(({ notifications }) => {
+const NotificationToaster: React.FC = React.memo(() => {
   // States
   const [show, setShow] = useState(false);
   const [closedNotificationIds, setClosedNotificationIds] = useState<Set<Types.Notification['notificationId']>>(new Set());
   const [showNotificationIndex, setShowNotificationIndex] = useState<number>(0);
 
   // Variables
+  const notifications = useAppSelector((state) => state.notifications.data);
   const filteredNotifications = useMemo(() => notifications.filter((notification) => !closedNotificationIds.has(notification.notificationId)), [notifications, closedNotificationIds]);
 
   // Handlers

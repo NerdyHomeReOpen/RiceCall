@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -13,25 +14,28 @@ import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
 import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/friend.module.css';
 import vip from '@/styles/vip.module.css';
 
 interface FriendTabProps {
-  user: Types.User;
   friend: Types.Friend;
-  friendGroups: Types.FriendGroup[];
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
 }
 
-const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGroups, selectedItemId, setSelectedItemId }) => {
+const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
-  const mainTab = useMainTab();
-  const loadingBox = useLoading();
+  const { showContextMenu } = useContextMenu();
+  const { setSelectedTabId } = useMainTab();
+  const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const friendGroups = useAppSelector((state) => state.friendGroups.data);
 
   // States
   const [friendCurrentServer, setFriendCurrentServer] = useState<Types.Server | null>(null);
@@ -64,9 +68,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   const isSelected = selectedItemId === targetId;
   const friendHasVip = friendVip > 0;
   const friendHasNote = friendNote !== '' && friendNote !== null;
+  const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: -1, userId });
 
   // Handlers
-  const getContextMenuItems = () =>
+  const getFriendTabContextMenuItems = () =>
     new CtxMenuBuilder()
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, targetId))
       .addViewProfileOption(() => Popup.openUserInfo(userId, targetId))
@@ -78,7 +83,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         { isSelf, isStranger, isBlocked: isFriendBlocked },
         () => {},
         new CtxMenuBuilder()
-          .addFriendGroupOption({ friendGroupId: friend.friendGroupId || '', friendGroups: friendGroups }, (friendGroupId) => Popup.editFriend(targetId, { friendGroupId: friendGroupId || null }))
+          .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => Popup.editFriend(targetId, { friendGroupId }))
           .build(),
       )
       .addBlockUserOption({ isSelf, isBlocked: isFriendBlocked }, () => (isFriendBlocked ? Popup.unblockUser(targetId, friendName) : Popup.blockUser(targetId, friendName)))
@@ -86,14 +91,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
       .addDeleteFriendApplicationOption({ isSelf, isPending }, () => Popup.deleteFriendApplication(targetId))
       .build();
 
-  const handleJoinServer = () => {
-    if (loadingBox.isLoading || !friendCurrentServer) return;
+  const handleServerNameClick = () => {
+    if (isLoading || !friendCurrentServer) return;
     if (friendCurrentServer.serverId === userCurrentServerId) {
-      mainTab.setSelectedTabId('server');
+      setSelectedTabId('server');
       return;
     }
-    loadingBox.setIsLoading(true);
-    loadingBox.setLoadingServerId(friendCurrentServer.specialId || friendCurrentServer.displayId);
+    setIsLoading(true);
+    setLoadingServerId(friendCurrentServer.specialId || friendCurrentServer.displayId);
     ipc.socket.send('connectServer', { serverId: friendCurrentServer.serverId });
   };
 
@@ -106,10 +111,11 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     Popup.openDirectMessage(userId, targetId);
   };
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', getFriendTabContextMenuItems());
   };
 
   // Effects
@@ -124,7 +130,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
   }, [targetId, friendCurrentServerId, isFriendBlocked, isFriend, friendShareCurrentServer]);
 
   return (
-    <div key={targetId} className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleContextMenu}>
+    <div
+      key={targetId}
+      className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`}
+      onClick={handleTabClick}
+      onDoubleClick={handleTabDoubleClick}
+      onContextMenu={handleTabContextMenu}
+    >
       <Image
         className={styles['avatar-picture']}
         style={{ filter: isFriend && isOnline && !isFriendBlocked ? '' : 'grayscale(100%)' }}
@@ -148,7 +160,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
         {isPending ? (
           <div className={styles['signature']}>{`(${t('pending')})`}</div>
         ) : friendCurrentServer ? (
-          <div className={`${styles['box']} ${styles['has-server']}`} onClick={handleJoinServer}>
+          <div className={`${styles['box']} ${styles['has-server']}`} onClick={handleServerNameClick}>
             <div className={styles['location-icon']} />
             <div className={styles['server-name-text']}>{friendCurrentServer.name}</div>
           </div>

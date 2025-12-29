@@ -1,7 +1,8 @@
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
-import Image from 'next/image';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -41,18 +42,20 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
 SearchResultItem.displayName = 'SearchResultItem';
 
 interface HomePageProps {
-  user: Types.User;
-  servers: Types.Server[];
-  announcements: Types.Announcement[];
-  recommendServers: Types.RecommendServer[];
   display: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, announcements, recommendServers, display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   // Hooks
   const { t } = useTranslation();
-  const mainTab = useMainTab();
-  const loadingBox = useLoading();
+  const { setSelectedTabId } = useMainTab();
+  const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const servers = useAppSelector((state) => state.servers.data);
+  const announcements = useAppSelector((state) => state.announcements.data);
+  const recommendServers = useAppSelector((state) => state.recommendServers.data);
 
   // Refs
   const canSearchRef = useRef<boolean>(true);
@@ -67,7 +70,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   const [exactMatch, setExactMatch] = useState<Types.Server | null>(null);
   const [personalResults, setPersonalResults] = useState<Types.Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Types.Server[]>([]);
-  const [section, setSection] = useState<number>(0);
+  const [section, setSection] = useState<'home' | 'personal-exclusive'>('home');
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
   const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
@@ -75,6 +78,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
   // Variables
   const { userId, currentServerId } = user;
   const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
+  const isSelectedHome = section === 'home';
+  const isSelectedPersonalExclusive = section === 'personal-exclusive';
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
@@ -144,17 +149,17 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
 
   const selectServer = useCallback(
     (server: Types.Server) => {
-      if (loadingBox.isLoading) return;
+      if (isLoading) return;
       if (server.serverId === currentServerId) {
-        mainTab.setSelectedTabId('server');
+        setSelectedTabId('server');
         return;
       }
-      loadingBox.setIsLoading(true);
-      loadingBox.setLoadingServerId(server.specialId || server.displayId);
+      setIsLoading(true);
+      setLoadingServerId(server.specialId || server.displayId);
       ipc.socket.send('connectServer', { serverId: server.serverId });
       clearSearchState();
     },
-    [currentServerId, mainTab, loadingBox],
+    [currentServerId, isLoading, setSelectedTabId, setIsLoading, setLoadingServerId],
   );
 
   const nextAnn = () => {
@@ -266,7 +271,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           </div>
         </div>
         <div className={styles['mid']}>
-          <div className={`${styles['navegate-tab']} ${section === 0 ? styles['active'] : ''}`} data-key="60060" onClick={() => setSection(0)}>
+          <div className={`${styles['navegate-tab']} ${isSelectedHome ? styles['active'] : ''}`} data-key="60060" onClick={() => setSection('home')}>
             {t('home')}
           </div>
         </div>
@@ -274,19 +279,19 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
           <div className={styles['navegate-tab']} data-key="30014" onClick={() => Popup.openCreateServer(userId)}>
             {t('create-server')}
           </div>
-          {section !== 4 && (
-            <div className={styles['navegate-tab']} data-key="60004" onClick={() => setSection(4)}>
+          {!isSelectedPersonalExclusive && (
+            <div className={styles['navegate-tab']} data-key="60004" onClick={() => setSection('personal-exclusive')}>
               {t('personal-exclusive')}
             </div>
           )}
-          {section === 4 && (
-            <div className={styles['navegate-tab']} data-key="60005" onClick={() => setSection(0)}>
+          {isSelectedPersonalExclusive && (
+            <div className={styles['navegate-tab']} data-key="60005" onClick={() => setSection('home')}>
               {t('back')}
             </div>
           )}
         </div>
       </header>
-      <main className={styles['home-body']} style={section === 0 ? {} : { display: 'none' }}>
+      <main className={styles['home-body']} style={isSelectedHome ? {} : { display: 'none' }}>
         <div className={styles['banner-wrapper']}>
           <div className={styles['banner-container']}>
             <div ref={containerRef} className={styles['banners']}>
@@ -364,21 +369,21 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ user, servers, 
               <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
               <div className={styles['announcement-datail-date']}>{selectedAnn && Language.getFormatDate(selectedAnn.timestamp)}</div>
             </div>
-            {selectedAnn.attachmentUrl && <div className={styles['banner']} style={{ backgroundImage: `url(${selectedAnn.attachmentUrl})` }} />}
+            {selectedAnn.attachmentUrl && <Image className={styles['banner']} src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />}
             <div className={styles['announcement-detail-content']}>
               <MarkdownContent markdownText={selectedAnn?.content ?? ''} />
             </div>
           </div>
         )}
       </div>
-      <main className={styles['home-body']} style={section === 4 ? {} : { display: 'none' }}>
+      <main className={styles['home-body']} style={isSelectedPersonalExclusive ? {} : { display: 'none' }}>
         <div className={styles['home-wrapper']}>
-          <ServerList title={t('recent-servers')} servers={recentServers} user={user} />
-          <ServerList title={t('my-servers')} servers={ownedServers} user={user} />
-          <ServerList title={t('favorited-servers')} servers={favoriteServers} user={user} />
+          <ServerList title={t('recent-servers')} servers={recentServers} />
+          <ServerList title={t('my-servers')} servers={ownedServers} />
+          <ServerList title={t('favorited-servers')} servers={favoriteServers} />
         </div>
       </main>
-      <main className={styles['home-body']} style={section === 2 || section === 3 ? {} : { display: 'none' }}>
+      <main className={styles['home-body']} style={!isSelectedHome && !isSelectedPersonalExclusive ? {} : { display: 'none' }}>
         <div>{t('not-available-page')}</div>
       </main>
     </main>
