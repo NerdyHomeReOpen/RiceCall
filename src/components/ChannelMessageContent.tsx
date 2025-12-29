@@ -10,13 +10,10 @@ import styles from '@/styles/message.module.css';
 type MessageGroup = (Types.ChannelMessage & { contents: string[] }) | (Types.PromptMessage & { contents: string[] });
 
 interface ChannelMessageContentProps {
-  user: Types.User;
-  currentServer: Types.Server;
-  currentChannel: Types.Channel;
   messages: (Types.ChannelMessage | Types.PromptMessage)[];
 }
 
-const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ user, currentServer, currentChannel, messages }) => {
+const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages }) => {
   // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
@@ -40,11 +37,7 @@ const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo((
   return (
     <div className={styles['message-viewer-wrapper']}>
       {messageGroups.map((messageGroup, index) =>
-        messageGroup.type === 'general' ? (
-          <ChannelMessageTab key={index} user={user} currentServer={currentServer} currentChannel={currentChannel} messageGroup={messageGroup} />
-        ) : (
-          <PromptMessageTab key={index} user={user} messageType={messageGroup.type} messageGroup={messageGroup} />
-        ),
+        messageGroup.type === 'general' ? <ChannelMessageTab key={index} messageGroup={messageGroup} /> : <PromptMessageTab key={index} messageType={messageGroup.type} messageGroup={messageGroup} />,
       )}
     </div>
   );

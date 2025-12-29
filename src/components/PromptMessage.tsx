@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
@@ -15,15 +16,17 @@ import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 import styles from '@/styles/message.module.css';
 
 interface PromptMessageProps {
-  user: Types.User;
   messageGroup: Types.PromptMessage & { contents: string[] };
   messageType?: Types.PromptMessage['type'];
 }
 
-const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageGroup, messageType = 'info' }) => {
+const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, messageType = 'info' }) => {
   // Hooks
-  const contextMenu = useContextMenu();
   const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
 
   // Variables
   const { userId } = user;
@@ -44,17 +47,17 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
   );
 
   // Handlers
-  const getContextMenuItems = () => new CtxMenuBuilder().addViewProfileOption(() => Popup.openUserInfo(userId, senderUserId)).build();
+  const getMessageContextMenuItems = () => new CtxMenuBuilder().addViewProfileOption(() => Popup.openUserInfo(userId, senderUserId)).build();
 
-  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', getMessageContextMenuItems());
   };
 
   return (
-    <div className={`${styles['message-box']} ${styles['event']}`} onContextMenu={handleContextMenu}>
+    <div className={`${styles['message-box']} ${styles['event']}`} onContextMenu={handleMessageContextMenu}>
       <div className={styles[`${messageType}-icon`]} />
       {formattedMessagesContents.map((content, index) => (
         <MarkdownContent key={index} markdownText={content} />

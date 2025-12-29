@@ -63,15 +63,13 @@ const AuthPageComponent: React.FC = React.memo(() => {
   const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
 
   // Variables
-  const displayLoginPage = useMemo(() => section === 'login', [section]);
-  const displayRegisterPage = useMemo(() => section === 'register', [section]);
-  const displayChangeServerPage = useMemo(() => section === 'change-server', [section]);
+  const isDisplayLoginPage = useMemo(() => section === 'login', [section]);
+  const isDisplayRegisterPage = useMemo(() => section === 'register', [section]);
+  const isDisplayChangeServerPage = useMemo(() => section === 'change-server', [section]);
 
   // Effects
   useEffect(() => {
     const autoLogin = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const token = localStorage.getItem('token');
       if (token) {
         return await ipc.auth.autoLogin(token);
@@ -83,9 +81,9 @@ const AuthPageComponent: React.FC = React.memo(() => {
   return (
     <>
       <Header />
-      <LoginPage display={displayLoginPage} setSection={setSection} />
-      <RegisterPage display={displayRegisterPage} setSection={setSection} />
-      <ChangeServerPage display={displayChangeServerPage} setSection={setSection} />
+      <LoginPage display={isDisplayLoginPage} setSection={setSection} />
+      <RegisterPage display={isDisplayRegisterPage} setSection={setSection} />
+      <ChangeServerPage display={isDisplayChangeServerPage} setSection={setSection} />
     </>
   );
 });

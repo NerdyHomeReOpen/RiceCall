@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
@@ -18,30 +19,28 @@ import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 import styles from '@/styles/server.module.css';
 import header from '@/styles/header.module.css';
 
-interface ChannelListProps {
-  user: Types.User;
-  currentServer: Types.Server;
-  currentChannel: Types.Channel;
-  friends: Types.Friend[];
-  queueUsers: Types.QueueUser[];
-  serverOnlineMembers: Types.OnlineMember[];
-  serverMemberApplications: Types.MemberApplication[];
-  channels: (Types.Channel | Types.Category)[];
-  latency: number;
-}
-
-const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, serverMemberApplications, channels, latency }) => {
+const ChannelList: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
-  const findMe = useFindMeContext();
+  const { showContextMenu } = useContextMenu();
+  const { findMe } = useFindMeContext();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const currentServer = useAppSelector((state) => state.currentServer.data);
+  const currentChannel = useAppSelector((state) => state.currentChannel.data);
+  const memberApplications = useAppSelector((state) => state.memberApplications.data);
+  const onlineMembers = useAppSelector((state) => state.onlineMembers.data);
+  const channels = useAppSelector((state) => state.channels.data);
+  const queueUsers = useAppSelector((state) => state.queueUsers.data);
+  const latency = useAppSelector((state) => state.socket.latency);
 
   // Refs
   const queueListRef = useRef<HTMLDivElement>(null);
   const isResizingQueueListRef = useRef<boolean>(false);
 
   // States
-  const [viewType, setViewType] = useState<'all' | 'current'>('all');
+  const [selectedTabId, setSelectedTabId] = useState<'all' | 'current'>('all');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
@@ -59,27 +58,29 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   } = currentServer;
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: isCurrentChannelLobby } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
-  const hasNewServerMemberApplications = Permission.isServerAdmin(permissionLevel) && serverMemberApplications.length > 0;
+  const hasNewMemberApplications = Permission.isServerAdmin(permissionLevel) && memberApplications.length > 0;
+  const isSelectedAllChannelList = selectedTabId === 'all';
+  const isSelectedCurrentChannelList = selectedTabId === 'current';
   const connectStatus = 4 - Math.floor(Number(latency) / 50);
-  const movableServerUserIds = serverOnlineMembers.filter((m) => m.userId !== userId && m.permissionLevel <= permissionLevel).map((m) => m.userId);
+  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const filteredChannels = [...channels].filter((c) => !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt));
-  const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
+  const onlineMemberMap = useMemo(() => new Map(onlineMembers.map((om) => [om.userId, om] as const)), [onlineMembers]);
   const queueMembers = useMemo<Types.QueueMember[]>(
     () =>
       queueUsers
         .reduce<Types.QueueMember[]>((acc, qm) => {
           if (qm.position < 0 || qm.leftTime <= 0) return acc;
-          const online = serverOnlineMemberMap.get(qm.userId);
+          const online = onlineMemberMap.get(qm.userId);
           if (!online) return acc;
           acc.push({ ...qm, ...online });
           return acc;
         }, [])
         .sort((a, b) => a.position - b.position),
-    [queueUsers, serverOnlineMemberMap],
+    [queueUsers, onlineMemberMap],
   );
 
   // Handlers
-  const getContextMenuItems1 = () =>
+  const getServerSettingContextMenuItems = () =>
     new CtxMenuBuilder()
       .addApplyMemberOption({ permissionLevel }, () => Popup.applyMember(userId, currentServerId, currentServerReceiveApply))
       .addServerSettingOption({ permissionLevel }, () => Popup.openServerSetting(userId, currentServerId))
@@ -91,7 +92,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       .addFavoriteServerOption({ isFavorite: isCurrentServerFavorite }, () => Popup.favoriteServer(currentServerId))
       .build();
 
-  const getContextMenuItems2 = () =>
+  const getChannelListContextMenuItems = () =>
     new CtxMenuBuilder()
       .addCreateChannelOption({ permissionLevel }, () => Popup.openCreateChannel(userId, currentServerId, ''))
       .addSeparator()
@@ -103,7 +104,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       .build();
 
   const locateMe = () => {
-    findMe.findMe();
+    findMe();
     setSelectedItemId(`user-${userId}`);
   };
 
@@ -125,7 +126,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
+    showContextMenu(x, y, 'right-bottom', getServerSettingContextMenuItems());
   };
 
   const handleServerAvatarClick = () => {
@@ -136,15 +137,15 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
+    showContextMenu(x, y, 'right-bottom', getChannelListContextMenuItems());
   };
 
   const handleCurrentChannelTabClick = () => {
-    setViewType('current');
+    setSelectedTabId('current');
   };
 
   const handleAllChannelTabClick = () => {
-    setViewType('all');
+    setSelectedTabId('all');
   };
 
   // Effects
@@ -175,12 +176,12 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           </div>
           <div className={styles['box']}>
             <div className={styles['id-text']}>{currentServerSpecialId || currentServerDisplayId}</div>
-            <div className={styles['member-text']}>{serverOnlineMembers.length}</div>
+            <div className={styles['member-text']}>{onlineMembers.length}</div>
             <div className={styles['options']}>
               <div className={styles['invitation-icon']} onClick={handleInviteFriendsClick} />
               <div className={styles['saperator-1']} />
               <div className={styles['setting-icon']} onClick={handleServerSettingClick}>
-                <div className={`${header['overlay']} ${hasNewServerMemberApplications ? header['new'] : ''}`} />
+                <div className={`${header['overlay']} ${hasNewMemberApplications ? header['new'] : ''}`} />
               </div>
             </div>
           </div>
@@ -198,72 +199,24 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           <div ref={queueListRef} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
             <div className={styles['queue-list']}>
               {queueMembers.map((queueMember) => (
-                <QueueUserTab
-                  key={queueMember.userId}
-                  user={user}
-                  friends={friends}
-                  queueMember={queueMember}
-                  queueMembers={queueMembers}
-                  currentServer={currentServer}
-                  currentChannel={currentChannel}
-                  selectedItemId={selectedItemId}
-                  setSelectedItemId={setSelectedItemId}
-                />
+                <QueueUserTab key={queueMember.userId} queueMember={queueMember} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
               ))}
             </div>
           </div>
           <div className={styles['saperator-2']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
         </>
       )}
-      <div className={styles['section-title-text']}>{viewType === 'current' ? t('current-channel') : t('all-channel')}</div>
+      <div className={styles['section-title-text']}>{isSelectedCurrentChannelList ? t('current-channel') : t('all-channel')}</div>
       <div className={styles['scroll-view']} onContextMenu={handleChannelListContextMenu}>
         <div className={styles['channel-list']}>
-          {viewType === 'current' ? (
-            <ChannelTab
-              key={currentChannelId}
-              user={user}
-              currentServer={currentServer}
-              currentChannel={currentChannel}
-              friends={friends}
-              queueUsers={queueUsers}
-              serverOnlineMembers={serverOnlineMembers}
-              channel={currentChannel}
-              selectedItemId={selectedItemId}
-              setSelectedItemId={setSelectedItemId}
-            />
+          {isSelectedCurrentChannelList ? (
+            <ChannelTab key={currentChannelId} channel={currentChannel} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
           ) : (
             filteredChannels.map((item) =>
               item.type === 'category' ? (
-                <CategoryTab
-                  key={item.channelId}
-                  user={user}
-                  currentServer={currentServer}
-                  currentChannel={currentChannel}
-                  friends={friends}
-                  queueUsers={queueUsers}
-                  serverOnlineMembers={serverOnlineMembers}
-                  channels={channels}
-                  category={item as Types.Category}
-                  expanded={expanded}
-                  selectedItemId={selectedItemId}
-                  setExpanded={setExpanded}
-                  setSelectedItemId={setSelectedItemId}
-                />
+                <CategoryTab key={item.channelId} category={item} expanded={expanded} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
               ) : (
-                <ChannelTab
-                  key={item.channelId}
-                  user={user}
-                  currentServer={currentServer}
-                  currentChannel={currentChannel}
-                  friends={friends}
-                  queueUsers={queueUsers}
-                  serverOnlineMembers={serverOnlineMembers}
-                  channel={item as Types.Channel}
-                  expanded={expanded}
-                  selectedItemId={selectedItemId}
-                  setExpanded={setExpanded}
-                  setSelectedItemId={setSelectedItemId}
-                />
+                <ChannelTab key={item.channelId} channel={item} expanded={expanded} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
               ),
             )
           )}
@@ -271,10 +224,10 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       </div>
       <div className={styles['saperator-3']} />
       <div className={styles['sidebar-footer']}>
-        <div className={`${styles['navegate-tab']} ${viewType === 'current' ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
+        <div className={`${styles['navegate-tab']} ${isSelectedCurrentChannelList ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
           {t('current-channel')}
         </div>
-        <div className={`${styles['navegate-tab']} ${viewType === 'all' ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
+        <div className={`${styles['navegate-tab']} ${isSelectedAllChannelList ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
           {t('all-channel')}
         </div>
       </div>
