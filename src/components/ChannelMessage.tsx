@@ -48,11 +48,10 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
   } = messageGroup;
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channelPermissionLevel);
-  const isUser = senderUserId === userId;
-  const isSameChannel = senderCurrentChannnelId === currentChannelId;
-  const isSameServer = senderCurrentServerId === currentServerId;
+  const isSelf = senderUserId === userId;
+  const isInSameChannel = senderCurrentChannnelId === currentChannelId;
+  const isInSameServer = senderCurrentServerId === currentServerId;
   const isSuperior = permissionLevel > senderPermissionLevel;
-  const canUpdatePermission = false && !isUser && isSuperior && Permission.isMember(senderPermissionLevel);
   const formattedTimestamp = Language.getFormatTimestamp(t, messageTimestamp);
   const formattedMessageContents = useMemo(
     () =>
@@ -70,7 +69,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
     {
       id: 'direct-message',
       label: t('direct-message'),
-      show: !isUser,
+      show: !isSelf,
       onClick: () => Popup.handleOpenDirectMessage(userId, senderUserId),
     },
     {
@@ -81,49 +80,49 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
     {
       id: 'kick-channel',
       label: t('kick-channel'),
-      show: !isUser && Permission.isChannelMod(permissionLevel) && isSuperior && isSameChannel,
+      show: !isSelf && isSuperior && isInSameChannel && Permission.isChannelMod(permissionLevel),
       onClick: () => Popup.handleOpenKickMemberFromChannel(senderUserId, currentServerId, currentChannelId),
     },
     {
       id: 'kick-server',
       label: t('kick-server'),
-      show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior && isSameServer,
+      show: !isSelf && isSuperior && isInSameServer && Permission.isServerAdmin(permissionLevel),
       onClick: () => Popup.handleOpenKickMemberFromServer(senderUserId, currentServerId),
     },
     {
       id: 'block',
       label: t('block'),
-      show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior,
+      show: !isSelf && isSuperior && Permission.isServerAdmin(permissionLevel),
       onClick: () => Popup.handleOpenBlockMember(senderUserId, currentServerId),
     },
     {
       id: 'separator',
       label: '',
-      show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior,
+      show: !isSelf && isSuperior && Permission.isServerAdmin(permissionLevel),
     },
     {
       id: 'invite-to-be-member',
       label: t('invite-to-be-member'),
-      show: !isUser && !Permission.isMember(senderPermissionLevel) && Permission.isServerAdmin(permissionLevel),
+      show: !isSelf && !Permission.isMember(senderPermissionLevel) && Permission.isServerAdmin(permissionLevel),
       onClick: () => Popup.handleOpenInviteMember(senderUserId, currentServerId),
     },
     {
       id: 'member-management',
       label: t('member-management'),
-      show: canUpdatePermission && (channelCategoryId === null ? Permission.isServerAdmin(permissionLevel) : Permission.isChannelAdmin(permissionLevel)),
+      show: !isSelf && isSuperior && Permission.isMember(senderPermissionLevel) && (!!channelCategoryId ? Permission.isServerAdmin(permissionLevel) : Permission.isChannelAdmin(permissionLevel)),
       icon: 'submenu',
       hasSubmenu: true,
       submenuItems: [
         {
           id: 'terminate-member',
           label: t('terminate-member'),
-          show: !isUser && Permission.isServerAdmin(permissionLevel) && isSuperior && Permission.isMember(senderPermissionLevel) && !Permission.isServerOwner(senderPermissionLevel),
+          show: !isSelf && isSuperior && Permission.isMember(senderPermissionLevel) && !Permission.isServerOwner(senderPermissionLevel) && Permission.isServerAdmin(permissionLevel),
           onClick: () => handleTerminateMember(senderUserId, currentServerId, senderName),
         },
         {
           id: 'set-channel-mod',
           label: Permission.isChannelMod(senderPermissionLevel) ? t('unset-channel-mod') : t('set-channel-mod'),
-          show: canUpdatePermission && Permission.isChannelAdmin(permissionLevel) && !Permission.isChannelAdmin(senderPermissionLevel) && channelCategoryId !== null,
+          show: !!channelCategoryId && Permission.isChannelAdmin(permissionLevel) && !Permission.isChannelAdmin(senderPermissionLevel),
           onClick: () =>
             Permission.isChannelMod(senderPermissionLevel)
               ? handleEditChannelPermission(senderUserId, currentServerId, currentChannelId, { permissionLevel: 2 })
@@ -132,7 +131,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
         {
           id: 'set-channel-admin',
           label: Permission.isChannelAdmin(senderPermissionLevel) ? t('unset-channel-admin') : t('set-channel-admin'),
-          show: canUpdatePermission && Permission.isServerAdmin(permissionLevel) && !Permission.isServerAdmin(senderPermissionLevel),
+          show: Permission.isServerAdmin(permissionLevel) && !Permission.isServerAdmin(senderPermissionLevel),
           onClick: () =>
             Permission.isChannelAdmin(senderPermissionLevel)
               ? handleEditChannelPermission(senderUserId, currentServerId, channelCategoryId || currentChannelId, { permissionLevel: 2 })
@@ -141,7 +140,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ user, curren
         {
           id: 'set-server-admin',
           label: Permission.isServerAdmin(senderPermissionLevel) ? t('unset-server-admin') : t('set-server-admin'),
-          show: canUpdatePermission && Permission.isServerOwner(permissionLevel) && !Permission.isServerOwner(senderPermissionLevel),
+          show: Permission.isServerOwner(permissionLevel) && !Permission.isServerOwner(senderPermissionLevel),
           onClick: () =>
             Permission.isServerAdmin(senderPermissionLevel)
               ? handleEditServerPermission(senderUserId, currentServerId, { permissionLevel: 2 })

@@ -189,7 +189,7 @@
       },
       "submit": "Log in",
       "submitting": "Logging in...",
-      "forgetPassword": "forget the password",
+      "forgetPassword": "Forget the password",
       "errors": {
         "loginFailed": "Login failed, please try again",
         "networkError": "Network or server error, please try again later",
@@ -267,9 +267,9 @@
       "recaptchaFailed": "reCAPTCHA verification failed, please try again later."
     },
     "forget": {
-      "forgetTitle": "forget the password",
+      "forgetTitle": "Forget the password",
       "enterAccount": "Please enter your account number, and we will send a password reset link to your linked email address.",
-      "account": "account number",
+      "account": "Account number",
       "sendEmail": "Send Reset Link",
       "sendingEmail": "link",
       "backLogin": "Return to Login"

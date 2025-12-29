@@ -65,7 +65,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
   );
   const serverOnlineMemberMap = useMemo(() => new Map(serverOnlineMembers.map((m) => [m.userId, m] as const)), [serverOnlineMembers]);
   const filteredChannels = useMemo(() => channels.filter((c) => !!c && !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
-  const filteredQueueMembers = useMemo<Types.QueueMember[]>(
+  const queueMembers = useMemo<Types.QueueMember[]>(
     () =>
       queueUsers
         .reduce<Types.QueueMember[]>((acc, qm) => {
@@ -258,12 +258,13 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div ref={queueListRef} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
             <div className={styles['queue-list']}>
-              {filteredQueueMembers.map((queueMember) => (
+              {queueMembers.map((queueMember) => (
                 <QueueUserTab
                   key={queueMember.userId}
                   user={user}
                   friends={friends}
                   queueMember={queueMember}
+                  queueMembers={queueMembers}
                   currentServer={currentServer}
                   currentChannel={currentChannel}
                   selectedItemId={selectedItemId}

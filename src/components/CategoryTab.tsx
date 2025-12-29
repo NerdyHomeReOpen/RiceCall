@@ -167,7 +167,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(
     };
 
     const handleMoveUserToChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-      Popup.handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
+      ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
     };
 
     const handleMoveAllUsersToChannel = (userIds: Types.User['userId'][], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {

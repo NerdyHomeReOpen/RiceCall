@@ -53,7 +53,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     currentServerId: friendCurrentServerId,
     shareCurrentServer: friendShareCurrentServer,
   } = friend;
-  const isUser = targetId === userId;
+  const isSelf = targetId === userId;
   const isOnline = friendStatus !== 'offline';
   const isStranger = friendRelationStatus === 0;
   const isPending = friendRelationStatus === 1;
@@ -64,30 +64,30 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     {
       id: 'direct-message',
       label: t('direct-message'),
-      show: !isUser,
+      show: !isSelf,
       onClick: () => Popup.handleOpenDirectMessage(userId, targetId),
     },
     {
       id: 'separator',
       label: '',
-      show: !isUser,
+      show: !isSelf,
     },
     {
       id: 'view-profile',
       label: t('view-profile'),
-      show: !isUser,
+      show: !isSelf,
       onClick: () => Popup.handleOpenUserInfo(userId, targetId),
     },
     {
       id: 'add-friend',
       label: t('add-friend'),
-      show: !isUser && !isFriend,
+      show: !isSelf && !isFriend,
       onClick: () => Popup.handleOpenApplyFriend(userId, targetId),
     },
     {
       id: 'edit-note',
       label: t('edit-note'),
-      show: !isUser && isFriend,
+      show: !isSelf && isFriend,
       onClick: () => Popup.handleOpenEditFriendNote(userId, targetId),
     },
     {
@@ -97,7 +97,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     {
       id: 'permission-setting',
       label: t('permission-setting'),
-      show: !isUser && isFriend,
+      show: !isSelf && isFriend,
       icon: 'submenu',
       disabled: true,
       hasSubmenu: true,
@@ -123,7 +123,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     {
       id: 'edit-friend-friend-group',
       label: t('edit-friend-friend-group'),
-      show: !isUser && !isStranger && !isFriendBlocked,
+      show: !isSelf && !isStranger && !isFriendBlocked,
       icon: 'submenu',
       hasSubmenu: true,
       submenuItems: friendGroups.map((group, key) => ({
@@ -136,19 +136,19 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ user, friend, friendGr
     {
       id: 'block',
       label: isFriendBlocked ? t('unblock') : t('block'),
-      show: !isUser,
+      show: !isSelf,
       onClick: () => (isFriendBlocked ? handleUnblockUser(targetId) : handleBlockUser(targetId)),
     },
     {
       id: 'delete-friend',
       label: t('delete-friend'),
-      show: !isUser && isFriend,
+      show: !isSelf && isFriend,
       onClick: () => handleDeleteFriend(targetId),
     },
     {
       id: 'delete-friend-application',
       label: t('delete-friend-application'),
-      show: !isUser && isPending,
+      show: !isSelf && isPending,
       onClick: () => handleDeleteFriendApplication(targetId),
     },
   ];
