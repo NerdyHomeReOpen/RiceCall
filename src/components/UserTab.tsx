@@ -248,7 +248,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
   };
 
   const handleMoveUserToChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
-    Popup.handleOpenAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
+    ipc.socket.send('moveUserToChannel', { userId, serverId, channelId });
   };
 
   const handleAddUserToQueue = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) => {
