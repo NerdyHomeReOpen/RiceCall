@@ -203,7 +203,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
         <div className={popupStyles['popup-body']}>
           <div className={styles['event-list']} style={selectMode === 'current' ? {} : { display: 'none' }}>
             <div className={styles['current-channel']}>{isCurrentChannelLobby ? t(currentChannelName) : currentChannelName}</div>
-            {currentChannelEvents.reverse().map((e, index) => {
+            {currentChannelEvents.map((e, index) => {
               // Variables
               const isSelf = e.userId === userId;
               const isSuperior = permissionLevel > e.permissionLevel;
@@ -254,7 +254,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
             })}
           </div>
           <div className={styles['event-list']} style={selectMode === 'all' ? {} : { display: 'none' }}>
-            {filteredChannelEvents.reverse().map((e, index) => {
+            {filteredChannelEvents.map((e, index) => {
               // Variables
               const isSelf = e.userId === userId;
               const isSuperior = permissionLevel > e.permissionLevel;
