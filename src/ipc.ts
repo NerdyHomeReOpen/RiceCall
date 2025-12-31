@@ -236,6 +236,7 @@ const ipc = {
     },
 
     close: () => {
+      console.log('close window');
       if (!isElectron) return;
       ipcRenderer.send('window-control-close');
     },
@@ -293,6 +294,33 @@ const ipc = {
       ipcRenderer.on('popup-submit', listener);
       return () => ipcRenderer.removeListener('popup-submit', listener);
     },
+  },
+
+  notification: {
+    show: (id: string, title: string, initialData: any) => {
+      if (!isElectron) return;
+      ipcRenderer.send('show-notification', id, title, initialData);
+    },
+
+    showSystemNotify: (id: string, title: string, body: string) => {
+      if (!isElectron) return;
+      ipcRenderer.send('show-system-notification', id, title, body);
+    },
+
+    get: (id: string): Record<string, any> | null => {
+      if (!isElectron) return null;
+      return ipcRenderer.sendSync(`get-notification-data?id=${id}`);
+    },
+
+    close: (id: string) => {
+      if (!isElectron) return;
+      ipcRenderer.send('close-notification', id);
+    },
+    
+    clear: () => {
+      if (!isElectron) return;
+      ipcRenderer.send('clear-notifications');
+    }
   },
 
   accounts: {

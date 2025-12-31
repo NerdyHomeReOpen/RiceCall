@@ -22,7 +22,7 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, Notification, screen } from 'electron';
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
 import { initMainI18n, t } from './src/i18n.main.js';
@@ -286,6 +286,7 @@ export function getSettings(): Types.SystemSettings {
 let mainWindow: BrowserWindow | null = null;
 let authWindow: BrowserWindow | null = null;
 let popups: Record<string, BrowserWindow> = {};
+let notifications: Record<string, BrowserWindow> = {};
 
 export async function createMainWindow(title?: string): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -541,6 +542,143 @@ export function closePopups() {
   popups = {};
 }
 
+// Notifications
+const NOTIFICATION_MARGIN = 12;
+
+export async function createNotification(id: string, title: string, initialData: unknown) {
+
+  if (DEV) {
+    waitForPort(PORT).catch((err) => {
+      new Logger('System').error(`Cannot connect to Next.js server: ${err}`);
+      app.exit();
+    });
+  }
+
+  const width = 360;
+  const height = 100;
+  const display = screen.getPrimaryDisplay();
+  const { width: screenW, height: screenH } = display.workAreaSize;
+  const index = Object.keys(notifications).length;
+  const x = screenW;
+  const y = screenH - height - NOTIFICATION_MARGIN - (index * (height + NOTIFICATION_MARGIN));
+
+  notifications[id] = new BrowserWindow({
+    title: MAIN_TITLE,
+    width: width,
+    height: height,
+    maxWidth: width,
+    maxHeight: height,
+    frame: false,
+    icon: APP_ICON,
+    x: x,
+    y: y,
+    transparent: true,
+    resizable: false,
+    minimizable: false,
+    maximizable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    fullscreen: false,
+    fullscreenable: false,
+    hasShadow: true,
+    webPreferences: {
+      devTools: DEV,
+      nodeIntegration: true,
+      contextIsolation: false,
+    }
+  });
+
+  if (app.isPackaged || !DEV) {
+    appServe(notifications[id]).then(() => {
+      notifications[id].loadURL(`${BASE_URI}/notification.html?id=${id}`);
+    });
+  } else {
+    notifications[id].loadURL(`${BASE_URI}/notification?id=${id}`);
+  }
+
+  ipcMain.removeAllListeners(`get-notification-data?id=${id}`);
+  ipcMain.on(`get-notification-data?id=${id}`, (event) => {
+    event.returnValue = initialData;
+  });
+
+  notifications[id].on('ready-to-show', () => {
+    notifications[id].showInactive();
+    notifications[id].flashFrame(true);
+  });
+
+  notifications[id].on('focus', () => {
+    notifications[id].flashFrame(false);
+  });
+
+  notifications[id].on('close', (e) => {
+    e.preventDefault();
+    notifications[id].destroy();
+    repositionNotifications();
+    delete notifications[id];
+  });
+
+  notifications[id].webContents.on('did-finish-load', () => {
+    notifications[id].webContents.send('notification-data', { initialData });
+    notifications[id].show();
+
+    const targetX = screenW - width - NOTIFICATION_MARGIN;
+    let currentX = screenW;
+
+    const interval = setInterval(() => {
+      currentX -= 20;             
+      if (currentX <= targetX) {
+        currentX = targetX;
+        clearInterval(interval);
+      }
+      notifications[id].setBounds({ x: currentX, y: y, width: width, height: height });
+    }, 10); // 10 ~ 15
+  });
+
+  return notifications[id];
+}
+
+export function repositionNotifications() {
+  const windows = Object.values(notifications);
+  const { height: screenH } = screen.getPrimaryDisplay().workAreaSize;
+  let y = screenH - 100 - NOTIFICATION_MARGIN;
+
+  for (const win of windows) {
+    if (!win.isDestroyed()) {
+      win.setBounds({ x: win.getBounds().x, y, width: win.getBounds().width, height: win.getBounds().height });
+      y -= win.getBounds().height + NOTIFICATION_MARGIN;
+    }
+  }
+}
+
+export function clearNotifications() {
+  Object.values(notifications).forEach((notification) => {
+    if (notification && !notification.isDestroyed()) {
+      notification.close();
+    }
+  });
+  notifications = {};
+}
+
+export async function showSystemNotification(id: string, content: string, icon?: string, onClick?: () => void) {
+  const notification = new Notification({
+    title: MAIN_TITLE,
+    body: content,
+    icon: icon ?? APP_ICON,
+    silent: false, 
+  });
+
+  notification.show();
+
+  notification.on('click', () => {
+    if (onClick) onClick();
+    else {
+      if (!mainWindow) return;
+      if (mainWindow.isMinimized()) mainWindow.restore();
+      mainWindow.focus();
+    }
+  });
+}
+
 // Auto Updater
 async function checkForUpdates(force = false) {
   if (isUpdateNotified && !force) return;
@@ -731,6 +869,28 @@ app.on('ready', async () => {
 
   ipcMain.on('exit', () => {
     app.exit();
+  });
+
+  // Notifications
+  ipcMain.on('show-notification', (_, id, title, initialData) => {
+    createNotification(id, title, initialData);
+  });
+
+  ipcMain.on('show-system-notification', (_, id, title, content) => {
+    showSystemNotification(id, title, content);
+  });
+
+  ipcMain.on('close-notification', (_, id) => {
+    if (notifications[id]) {
+      if (!notifications[id].isDestroyed()) {
+        notifications[id].close();
+      }
+      delete notifications[id];
+    }
+  });
+
+  ipcMain.on('clear-notifications', () => {
+    clearNotifications();
   });
 
   // Auth handlers
@@ -1600,6 +1760,7 @@ app.whenReady().then(() => {
   const protocolClient = process.execPath;
   const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
 
+  app.setAppUserModelId('RiceCall');
   app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
 });
 

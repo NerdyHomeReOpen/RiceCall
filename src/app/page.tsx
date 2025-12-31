@@ -506,6 +506,11 @@ const RootPageComponent: React.FC = React.memo(() => {
       });
     };
     const interval = setInterval(() => refresh(), REFRESH_REGION_INFO_INTERVAL);
+
+    // TEST: remove after on finished
+    ipc.notification.clear();
+    ipc.notification.show('1', '123', { content: 'hello world' });
+    ipc.notification.showSystemNotify('4', '123', 'Hello world');
     refresh();
     return () => clearInterval(interval);
   }, [region, userId]);
