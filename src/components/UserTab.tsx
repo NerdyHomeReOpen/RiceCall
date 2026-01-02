@@ -190,7 +190,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ user, currentServer, curre
     {
       id: 'member-management',
       label: t('member-management'),
-      show: !isSelf && isSuperior && Permission.isMember(memberPermission) && (!!channelCategoryId ? Permission.isServerAdmin(permissionLevel) : Permission.isChannelAdmin(permissionLevel)),
+      show: !isSelf && isSuperior && Permission.isMember(memberPermission) && (!!channelCategoryId ? Permission.isChannelAdmin(permissionLevel) : Permission.isServerAdmin(permissionLevel)),
       icon: 'submenu',
       hasSubmenu: true,
       submenuItems: [
