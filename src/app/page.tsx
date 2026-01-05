@@ -83,7 +83,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       id: 'feedback',
       label: t('feedback'),
       icon: 'feedback',
-      onClick: () => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'),
+      onClick: () => window.open('https://ricecall.com/feedback', '_blank'),
     },
     {
       id: 'language-select',
@@ -105,22 +105,22 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
         {
           id: 'faq',
           label: t('faq'),
-          onClick: () => window.open('https://ricecall.com.tw/#faq', '_blank'),
+          onClick: () => window.open('https://ricecall.com/#faq', '_blank'),
         },
         {
           id: 'agreement',
           label: t('agreement'),
-          onClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
+          onClick: () => window.open('https://ricecall.com/terms', '_blank'),
         },
         // {
-        //   id: 'specification',
-        //   label: t('specification'),
-        //   onClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
+        //   id: 'privacy-policy',
+        //   label: t('privacy-policy'),
+        //   onClick: () => window.open('https://ricecall.com/privacy-policy', '_blank'),
         // },
         {
           id: 'contact-us',
           label: t('contact-us'),
-          onClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
+          onClick: () => window.open('https://ricecall.com/contact', '_blank'),
         },
         {
           id: 'about-us',

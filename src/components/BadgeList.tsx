@@ -16,7 +16,14 @@ interface BadgeListProps {
 
 const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21, grid = false }) => {
   // Variables
-  const filteredBadges = useMemo(() => badges.slice(0, maxDisplay).sort((a, b) => a.order - b.order), [badges, maxDisplay]);
+  const filteredBadges = useMemo(
+    () =>
+      badges
+        .filter((b) => b.showTo <= 0 || b.showTo >= Date.now())
+        .slice(0, maxDisplay)
+        .sort((a, b) => a.order - b.order),
+    [badges, maxDisplay],
+  );
 
   return (
     <div className={`${badgeStyle['badge-viewer-wrapper']} ${grid ? badgeStyle['grid'] : ''}`}>

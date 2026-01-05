@@ -70,7 +70,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
   };
 
   const handleForgotPassword = () => {
-    window.open('https://ricecall.com.tw/forget', '_blank');
+    window.open('https://ricecall.com/forget', '_blank');
   };
 
   // Effects

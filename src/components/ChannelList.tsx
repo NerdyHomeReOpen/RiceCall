@@ -122,7 +122,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
       icon: 'report',
       disabled: true,
       onClick: () => {
-        /* TODO: handleOpenReport */
+        // window.open('https://ricecall.com/report-server', '_blank');
       },
     },
     {

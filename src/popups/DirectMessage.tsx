@@ -169,6 +169,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     setIsAtBottom(true);
   }, []);
 
+  const handleReport = () => {
+    // window.open('https://ricecall.com/report-user', '_blank');
+  };
+
   // Effects
   useEffect(() => {
     editor?.on('selectionUpdate', syncStyles);
@@ -297,7 +301,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               <div className={`${styles['invite-temp-group']} disabled`} />
             </>
           )}
-          <div className={`${styles['report']} disabled`} />
+          <div className={`${styles['report']} disabled`} onClick={handleReport} />
         </div>
       </div>
       <div className={popupStyles['popup-body']}>

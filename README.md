@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <a title="Crowdin" target="_blank" href="https://discord.gg/adCWzv6wwS"><img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord"/></a>
-    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.14-green"/></a>
+    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.15-green"/></a>
     <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/ricecall/localized.svg"></a>
   </div>
 </div>
@@ -42,7 +42,7 @@ Thank you for your support and participation!
 
 Please read the documentation before downloading.
 
-> [Official Website Download](https://ricecall.com.tw)  
+> [Official Website Download](https://ricecall.com)  
 > [GitHub Download](https://github.com/NerdyHomeReOpen/RiceCall/releases/tag/latest)
 
 ## Technical Architecture
