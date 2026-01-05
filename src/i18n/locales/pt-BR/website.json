@@ -268,7 +268,7 @@
     },
     "forget": {
       "forgetTitle": "Esqueci minha senha",
-      "enterAccount": "Por favor, insira o número da sua conta e enviaremos um link para redefinir a senha para o endereço de e-mail cadastrado.",
+      "enterAccount": "Por favor, informe o seu usuário da sua conta que enviaremos um link para redefinir a sua senha para o endereço de e-mail cadastrado.",
       "account": "número de conta",
       "sendEmail": "Enviar link de redefinição",
       "sendingEmail": "Enviando...",
