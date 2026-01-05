@@ -405,7 +405,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                 </div>
                 <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                   <div className={popupStyles['label']}>{t('server-link')}</div>
-                  <input name="link" type="text" value={`https://ricecall.com.tw/join?sid=${serverSpecialId || serverDisplayId}`} readOnly />
+                  <input name="link" type="text" value={`https://ricecall.com/join?sid=${serverSpecialId || serverDisplayId}`} readOnly />
                 </div>
                 <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                   <div className={popupStyles['label']}>{t('description')}</div>

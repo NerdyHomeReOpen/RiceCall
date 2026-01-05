@@ -42,7 +42,7 @@ Thank you for your support and participation!
 
 Please read the documentation before downloading.
 
-> [Official Website Download](https://ricecall.com.tw)  
+> [Official Website Download](https://ricecall.com)  
 > [GitHub Download](https://github.com/NerdyHomeReOpen/RiceCall/releases/tag/latest)
 
 ## Technical Architecture
