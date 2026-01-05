@@ -1,12 +1,12 @@
 {
   "name": "ricecall",
-  "version": "0.3.14",
+  "version": "0.3.15",
   "private": false,
   "description": "Ricecall",
   "author": {
     "name": "RiceCall Group",
-    "email": "support@ricecall.com.tw",
-    "url": "https://ricecall.com.tw"
+    "email": "support@ricecall.com",
+    "url": "https://ricecall.com"
   },
   "main": "./build/main.js",
   "engines": {
