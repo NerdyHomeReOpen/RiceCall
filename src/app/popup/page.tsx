@@ -36,6 +36,7 @@ import MemberInvitation from '@/popups/MemberInvitation';
 import ImageCropper from '@/popups/ImageCropper';
 import InviteMember from '@/popups/InviteMember';
 import SearchUser from '@/popups/SearchUser';
+import ServerAnnouncement from '@/popups/serverAnnouncement';
 import ServerApplication from '@/popups/ServerApplication';
 import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';
@@ -270,6 +271,11 @@ const defaultPopup: Record<Types.PopupType, Omit<Popup, 'id' | 'node' | 'title'>
     buttons: ['close'],
     hideHeader: false,
   },
+  serverAnnouncement: {
+    type: 'serverAnnouncement',
+    buttons: ['close'],
+    hideHeader: true,
+  },
   serverApplication: {
     type: 'serverApplication',
     buttons: ['close'],
@@ -358,6 +364,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: t('member-application-setting'),
       memberInvitation: t('member-invitation'),
       searchUser: t('search-user'),
+      serverAnnouncement: t('announcement'),
       serverApplication: t('server-application'),
       serverBroadcast: t('server-broadcast'),
       serverSetting: initialData?.server?.name || t('server-setting'),
@@ -400,6 +407,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
       memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
       searchUser: () => <SearchUser id={id} {...initialData} />,
+      serverAnnouncement: () => <ServerAnnouncement id={id} {...initialData} />,
       serverApplication: () => <ServerApplication id={id} {...initialData} />,
       serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
       serverSetting: () => <ServerSetting id={id} {...initialData} />,
