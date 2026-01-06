@@ -18,20 +18,20 @@
   cursor: pointer;
   display: flex;
   padding: 5px 15px;
-  background-color: #eee;
-  border: solid 1px var(--border);
-  color: #888;
+  color: #fff;
+  background: #4aabf0;
+  border: 1px solid #50a1db;
   border-radius: 5px;
   align-items: center;
   justify-content: center;
   transition: background-color 0.2s ease;
 
-  &:hover {
-    background-color: #ddd;
+  &:not(.disabled):hover {
+    background-color: #2082c9;
   }
 
-  &:active {
-    background-color: #ddd;
+  &:not(.disabled):active {
+    background-color: #2082c9;
   }
 }
 
