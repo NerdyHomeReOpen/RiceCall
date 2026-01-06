@@ -3,6 +3,9 @@ import React, { useState, useEffect } from 'react';
 // CSS
 import styles from '@/styles/actionLink.module.css';
 
+// Providers
+import { useTranslation } from 'react-i18next';
+
 // Type
 import type { Server } from '@/types';
 
@@ -48,7 +51,11 @@ interface InviteServerProps {
 }
 
 export const InviteServer: React.FC<InviteServerProps> = React.memo(({ displayId }) => {
+  const { t } = useTranslation();
+
   const [server, setServer] = useState<Server>(Default.server());
+
+  const formatedContent = t('server-invitation-content').split('<server>');
 
   useEffect(() => {
     if (!displayId) return;
@@ -64,10 +71,11 @@ export const InviteServer: React.FC<InviteServerProps> = React.memo(({ displayId
     <div className={styles['invitation-container']}>
       <div className={styles['invitation-headers']}>
         <div className={styles['icon']} />
-        <div className={styles['title']}>進群邀請：</div>
+        <div className={styles['title']}>{t('join-server-invitation')}</div>
       </div>
       <div className={styles['invitation-contents']}>
-        我正在 <span className={styles['server-name']}>{server.name}</span> 樂翻天，麻吉趕快一起來玩！
+        {formatedContent[0]} <span className={styles['server-name']}>{server.name}</span>
+        {formatedContent[1]}
         <JoinServerLink serverId={server.serverId} displayId={server.specialId || server.displayId} content={'進入...'} />
       </div>
     </div>
