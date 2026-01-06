@@ -1,6 +1,6 @@
 .headers {
   background-color: var(--footer-background);
-  border-bottom: solid 1px #b1b0b0;
+  border-bottom: solid 1px var(--border-secondary);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -19,12 +19,11 @@
 .tabs span {
   font-size: 14px;
   padding: 5px 30px;
-  background-color: #ffffff;
-  border: solid 0.5px #b1b0b0;
+  background-color: var(--background);
+  border: solid 1px var(--border-secondary);
   border-bottom: none;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;
-  /* box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.5); */
 }
 
 .action-bars {
