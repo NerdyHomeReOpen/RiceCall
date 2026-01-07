@@ -105,9 +105,9 @@
   align-items: center;
   justify-content: center;
   width: 100%;
-  min-height: 225px;
-  padding-top: 30px;
-  padding-bottom: 60px;
+  height: 257px;
+  padding-top: 10px;
+  padding-bottom: 30px;
   color: #fff;
   background-image: url('/im/wallpaper.webp');
   background-size: cover;
@@ -222,23 +222,33 @@
 }
 
 .user-signature {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: center;
-  max-width: 75%;
-  overflow: auto;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
   color: #fff;
   text-align: center;
   cursor: text;
   user-select: text;
-  -webkit-box-orient: vertical;
+  max-width: 60%;
+  max-height: 2.8em;
+  display: block;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scrollbar-gutter: stable;
+  word-break: break-word;
+  white-space: normal;
+  min-height: 15px;
+  max-height: 30px;
+}
+
+.user-signature::-webkit-scrollbar {
+  width: 6px;
 }
 
 .user-signature::-webkit-scrollbar-thumb {
-  display: none;
+  background: transparent;
+  border-radius: 3px;
+}
+
+.user-signature:hover::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.4);
 }
 
 .tabs {
