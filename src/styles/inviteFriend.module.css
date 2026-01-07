@@ -1,11 +1,11 @@
 /* Headers */
 .header {
   display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   max-height: 45px;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
   border-bottom: 1px solid var(--border);
 }
 
@@ -14,16 +14,16 @@
 }
 
 .confirm-button {
-  text-align: center;
-  cursor: pointer;
   display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 5px 15px;
   color: #fff;
+  text-align: center;
+  cursor: pointer;
   background: #4aabf0;
   border: 1px solid #50a1db;
   border-radius: 5px;
-  align-items: center;
-  justify-content: center;
   transition: background-color 0.2s ease;
 
   &:not(.disabled):hover {
@@ -40,17 +40,17 @@
   align-items: center;
   padding: 10px;
   padding-top: 0;
-  padding-bottom: 0;
   padding-right: 0;
+  padding-bottom: 0;
+  margin-right: 10px;
   border: 1px solid var(--border);
   border-radius: 5px;
-  margin-right: 10px;
 }
 
 .search-bar .search-input {
   flex: 1;
-  padding: 5px;
   width: 125px;
+  padding: 5px;
 }
 
 .search-bar .search-icon {
@@ -68,10 +68,10 @@
 /* Body */
 .friend-group-list {
   display: flex;
-  flex-direction: column;
   flex: 1;
-  min-height: 0;
+  flex-direction: column;
   min-width: 0;
+  min-height: 0;
   padding: 10px;
 }
 
@@ -82,29 +82,29 @@
 
 .friend-group-list .friend-group-tab {
   display: flex;
+  gap: 2px;
   align-items: center;
-  border-radius: 3px;
   height: 25px;
   padding: 5px;
-  gap: 2px;
+  border-radius: 3px;
 }
 
 .friend-group-details {
   display: flex;
   flex-direction: row;
-  align-items: center;
   gap: 5px;
+  align-items: center;
 }
 
 .friend-group-list .friend-group-tab .toggle-icon {
-  content: '';
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
+  content: '';
   background-image: url('/channel/channelIcon.webp');
   background-repeat: no-repeat;
-  background-size: auto;
   background-position: 0 0;
+  background-size: auto;
 }
 
 .friend-group-list .friend-group-tab .toggle-icon.expanded {
@@ -116,12 +116,12 @@
 }
 
 .friend-tab {
+  position: relative;
   display: flex;
+  gap: 5px;
   align-items: center;
   justify-content: flex-start;
-  position: relative;
   padding: 5px;
-  gap: 5px;
   border-radius: 3px;
 }
 
@@ -134,37 +134,37 @@
 }
 
 .friend-tab .name-text {
-  font-weight: bold;
   overflow: hidden;
-  white-space: nowrap;
   text-overflow: ellipsis;
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .friend-tab .signature {
-  color: var(--text-color-quaternary);
-  overflow: hidden;
   min-height: 18px;
-  white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
+  color: var(--text-color-quaternary);
+  white-space: nowrap;
 }
 
 .friend-tab .server-name-text {
+  min-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 18px;
   color: #3a9abe;
   white-space: nowrap;
-  overflow: hidden;
-  min-height: 18px;
-  line-height: 18px;
-  text-overflow: ellipsis;
 }
 
 .friend-tab .location-icon {
-  content: '';
-  min-height: 18px;
   min-width: 16px;
+  min-height: 18px;
+  content: '';
   background-image: url('/mylocation.webp');
-  background-size: auto;
   background-repeat: no-repeat;
   background-position: center center;
+  background-size: auto;
 }
 
 .friend-info {
@@ -174,11 +174,11 @@
 }
 
 .avatar-picture {
+  position: relative;
   width: 25px;
   height: 25px;
-  background-size: cover;
   background-position: center;
-  position: relative;
+  background-size: cover;
 }
 
 /* Utils */
@@ -201,6 +201,6 @@ input.disabled {
 
 .space-between {
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
 }

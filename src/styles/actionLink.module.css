@@ -1,7 +1,7 @@
 .actionLink {
-  cursor: pointer;
-  color: var(--text-link);
   font-weight: bold;
+  color: var(--text-link);
+  cursor: pointer;
 
   &:hover {
     color: #013880;
@@ -17,20 +17,20 @@
   background: #fff;
   border: solid 1px #ccc;
   border-radius: 10px;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 5px 1px rgb(0 0 0 / 10%);
 }
 
 .invitation-container::before {
-  content: '';
   position: absolute;
-  left: -2px;
   top: 50%;
+  left: -2px;
   width: 5px;
   height: 10px;
+  content: '';
   background: #fff;
   border: solid 1px #ccc;
-  transform: translateX(-50%);
   border-radius: 50% 0 0 50%;
+  transform: translateX(-50%);
 }
 
 .invitation-headers {
@@ -44,8 +44,8 @@
   width: 15px;
   height: 15px;
   background-image: url('/im/invitenotify.webp');
-  background-position: center center;
   background-repeat: no-repeat;
+  background-position: center center;
   background-size: contain;
 }
 
