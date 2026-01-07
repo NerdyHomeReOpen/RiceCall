@@ -1,19 +1,12 @@
 import React, { useState, useEffect } from 'react';
-
-// CSS
-import styles from '@/styles/actionLink.module.css';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// Type
-import type { Server } from '@/types';
+import type * as Types from '@/types';
 
-// Utils
-import Default from '@/utils/default';
+import * as Default from '@/utils/default';
 
-// Services
-import ipc from '@/services/ipc.service';
+import styles from '@/styles/actionLink.module.css';
 
 interface JoinServerLinkProps {
   serverId: string;
@@ -22,7 +15,7 @@ interface JoinServerLinkProps {
 }
 
 export const JoinServerLink: React.FC<JoinServerLinkProps> = React.memo(({ serverId, displayId, content }) => {
-  const [targetServerId, setTargetServerId] = useState<Server['serverId']>(serverId);
+  const [targetServerId, setTargetServerId] = useState<Types.Server['serverId']>(serverId);
 
   const handleJoinServer = () => {
     if (serverId === '') return;
@@ -32,7 +25,7 @@ export const JoinServerLink: React.FC<JoinServerLinkProps> = React.memo(({ serve
   useEffect(() => {
     if (serverId) return;
     const refresh = async () => {
-      ipc.data.searchServer(displayId).then((server) => {
+      ipc.data.searchServer({ query: displayId }).then((server) => {
         if (server) setTargetServerId(server[0].serverId);
       });
     };
@@ -46,6 +39,8 @@ export const JoinServerLink: React.FC<JoinServerLinkProps> = React.memo(({ serve
   );
 });
 
+JoinServerLink.displayName = 'JoinServerLink';
+
 interface InviteServerProps {
   displayId: string;
 }
@@ -53,14 +48,14 @@ interface InviteServerProps {
 export const InviteServer: React.FC<InviteServerProps> = React.memo(({ displayId }) => {
   const { t } = useTranslation();
 
-  const [server, setServer] = useState<Server>(Default.server());
+  const [server, setServer] = useState<Types.Server>(Default.server());
 
   const formatedContent = t('server-invitation-content').split('<server>');
 
   useEffect(() => {
     if (!displayId) return;
     const refresh = async () => {
-      ipc.data.searchServer(displayId).then((server) => {
+      ipc.data.searchServer({ query: displayId }).then((server) => {
         if (server) setServer(server[0]);
       });
     };
@@ -83,8 +78,6 @@ export const InviteServer: React.FC<InviteServerProps> = React.memo(({ displayId
 });
 
 InviteServer.displayName = 'InviteServer';
-
-JoinServerLink.displayName = 'JoinServerLink';
 
 interface ActionLinkProps {
   type: 'joinServer' | 'invitation';
@@ -113,4 +106,5 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ type, data, content 
 });
 
 ActionLink.displayName = 'ActionLink';
+
 export default ActionLink;
