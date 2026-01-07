@@ -1,5 +1,6 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -7,20 +8,19 @@ import type * as Types from '@/types';
 import * as Popup from '@/utils/popup';
 import * as Default from '@/utils/default';
 
-import { MAX_FILE_SIZE } from '@/constant';
+import { MAX_FILE_SIZE, SERVER_TYPES } from '@/constant';
 
 import styles from '@/styles/createServer.module.css';
 import popupStyles from '@/styles/popup.module.css';
 import settingStyles from '@/styles/setting.module.css';
 
-interface CreateServerPopupProps {
-  user: Types.User;
-  servers: Types.Server[];
-}
-
-const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, servers }) => {
+const CreateServerPopup: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const servers = useAppSelector((state) => state.servers.data);
 
   // Refs
   const isUploadingRef = useRef<boolean>(false);
@@ -40,31 +40,50 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
     return maxGroups - servers.filter((s) => s.owned).length;
   }, [userLevel, servers]);
   const canSubmit = remainingServers > 0 && serverName.trim();
-  const serverTypes = [
-    { value: 'game', name: t('game') },
-    { value: 'entertainment', name: t('entertainment') },
-    { value: 'other', name: t('other') },
-  ];
 
   // Handlers
-  const handleClose = () => {
+  const handleImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const image = e.target.files?.[0];
+    if (!image || isUploadingRef.current) return;
+    image.arrayBuffer().then((arrayBuffer) => {
+      Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+        isUploadingRef.current = true;
+        if (imageUnit8Array.length > MAX_FILE_SIZE) {
+          Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          isUploadingRef.current = false;
+          return;
+        }
+        ipc.data.uploadImage({ folder: 'server', imageName: serverAvatar, imageUnit8Array }).then((response) => {
+          if (response) {
+            setServerAvatar(response.imageName);
+            setServerAvatarUrl(response.imageUrl);
+          }
+          isUploadingRef.current = false;
+        });
+      });
+    });
+  };
+
+  const handleServerNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setServerName(e.target.value);
+  };
+
+  const handleServerSloganChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setServerSlogan(e.target.value);
+  };
+
+  const handlePreviousBtnClick = () => {
+    setSection(0);
+  };
+
+  const handleConfirmBtnClick = () => {
+    if (!canSubmit) return;
+    Popup.createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
     ipc.window.close();
   };
 
-  const handleUploadImage = (imageUnit8Array: Uint8Array) => {
-    isUploadingRef.current = true;
-    if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-      isUploadingRef.current = false;
-      return;
-    }
-    ipc.data.uploadImage({ folder: 'server', imageName: serverAvatar, imageUnit8Array }).then((response) => {
-      if (response) {
-        setServerAvatar(response.imageName);
-        setServerAvatarUrl(response.imageUrl);
-      }
-      isUploadingRef.current = false;
-    });
+  const handleCloseBtnClick = () => {
+    ipc.window.close();
   };
 
   return (
@@ -79,7 +98,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
             <div className={`${styles['message']}`}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
             <div className={styles['select-type-text']}>{t('please-select-server-type')}</div>
             <div className={styles['button-group']}>
-              {serverTypes.map((type) => (
+              {SERVER_TYPES.map((type) => (
                 <div
                   key={type.value}
                   className={`${styles['button']} ${serverType === type.value ? styles['selected'] : ''}`}
@@ -88,14 +107,14 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                     setSection(1);
                   }}
                 >
-                  {type.name}
+                  {t(type.tKey)}
                 </div>
               ))}
             </div>
           </div>
         </div>
         <div className={popupStyles['popup-footer']}>
-          <div className={popupStyles['button']} onClick={handleClose}>
+          <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
             {t('cancel')}
           </div>
         </div>
@@ -109,20 +128,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
           <div className={`${settingStyles['content']} ${popupStyles['col']}`} style={{ justifyContent: 'space-evenly' }}>
             <div className={styles['avatar-wrapper']}>
               <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
-              <input
-                name="avatar"
-                type="file"
-                id="avatar-upload"
-                style={{ display: 'none' }}
-                accept="image/png, image/jpg, image/jpeg, image/webp, image/gif"
-                onChange={(e) => {
-                  const image = e.target.files?.[0];
-                  if (!image || isUploadingRef.current) return;
-                  image.arrayBuffer().then((arrayBuffer) => {
-                    Popup.openImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
-                  });
-                }}
-              />
+              <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
               <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popupStyles['button']}>
                 {t('upload-avatar')}
               </label>
@@ -138,32 +144,25 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ user, 
                 <div className={popupStyles['label']} style={{ width: '100px' }}>
                   {t('server-name')}
                 </div>
-                <input name="server-name" type="text" placeholder={t('server-name-placeholder')} maxLength={32} onChange={(e) => setServerName(e.target.value)} />
+                <input name="server-name" type="text" placeholder={t('server-name-placeholder')} maxLength={32} onChange={handleServerNameChange} />
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <div className={popupStyles['label']} style={{ width: '100px' }}>
                   {t('server-slogan')}
                 </div>
-                <input name="server-slogan" type="text" placeholder={t('server-slogan-placeholder')} maxLength={32} onChange={(e) => setServerSlogan(e.target.value)} />
+                <input name="server-slogan" type="text" placeholder={t('server-slogan-placeholder')} maxLength={32} onChange={handleServerSloganChange} />
               </div>
             </div>
           </div>
         </div>
         <div className={popupStyles['popup-footer']}>
-          <div className={popupStyles['button']} onClick={() => setSection(0)}>
+          <div className={popupStyles['button']} onClick={handlePreviousBtnClick}>
             {t('previous')}
           </div>
-          <div
-            className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
-            onClick={() => {
-              if (!canSubmit) return;
-              Popup.createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
-              handleClose();
-            }}
-          >
+          <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
             {t('confirm')}
           </div>
-          <div className={popupStyles['button']} onClick={handleClose}>
+          <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
             {t('cancel')}
           </div>
         </div>

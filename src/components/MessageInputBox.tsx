@@ -24,15 +24,15 @@ import markdown from '@/styles/markdown.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 interface MessageInputBoxProps {
-  onSendMessage?: (message: string) => void;
+  onMessageSend?: (message: string) => void;
   disabled?: boolean;
   maxLength?: number;
 }
 
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMessage, disabled = false, maxLength = 2000 }) => {
+const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageSend, disabled = false, maxLength = 2000 }) => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
+  const { showEmojiPicker } = useContextMenu();
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -68,28 +68,13 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
   const isCloseToMaxLength = textLength >= maxLength - 100;
   const isWarning = textLength > maxLength;
 
-  // Handlers
+  // Functions
   const syncStyles = useCallback(() => {
     fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
     textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
   }, [editor]);
 
-  const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
-    isUploadingRef.current = true;
-    if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-      isUploadingRef.current = false;
-      return;
-    }
-    ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
-      if (response) {
-        editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
-        syncStyles();
-      }
-      isUploadingRef.current = false;
-    });
-  };
-
+  // Handlers
   const handleEmojiSelect = (code: string) => {
     editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
     syncStyles();
@@ -109,36 +94,38 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
-    contextMenu.showEmojiPicker(
-      x,
-      y,
-      'right-top',
-      e.currentTarget as HTMLElement,
-      true,
-      false,
-      fontSizeRef.current,
-      textColorRef.current,
-      handleEmojiSelect,
-      handleFontSizeChange,
-      handleTextColorChange,
-    );
+    showEmojiPicker(x, y, 'right-top', e.currentTarget as HTMLElement, true, fontSizeRef.current, textColorRef.current, handleEmojiSelect, handleFontSizeChange, handleTextColorChange);
   };
 
-  const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+  const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
     for (const item of items) {
       if (item.type.startsWith('image/')) {
         const image = item.getAsFile();
         if (!image || isUploadingRef.current) return;
         image.arrayBuffer().then((arrayBuffer) => {
-          handleUploadImage(new Uint8Array(arrayBuffer), image.name);
+          const imageUnit8Array = new Uint8Array(arrayBuffer);
+          isUploadingRef.current = true;
+          if (imageUnit8Array.length > MAX_FILE_SIZE) {
+            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            isUploadingRef.current = false;
+            return;
+          }
+          ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+            if (response) {
+              editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
+              syncStyles();
+            }
+            isUploadingRef.current = false;
+          });
         });
       }
     }
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (disabled) return;
     if (isWarning) return;
     if (isComposingRef.current) return;
@@ -146,17 +133,17 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInput.trim().length === 0) return;
-      onSendMessage?.(messageInput);
+      onMessageSend?.(messageInput);
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
       syncStyles();
     }
   };
 
-  const handleCompositionStart = () => {
+  const handleInputCompositionStart = () => {
     isComposingRef.current = true;
   };
 
-  const handleCompositionEnd = () => {
+  const handleInputCompositionEnd = () => {
     isComposingRef.current = false;
   };
 
@@ -177,10 +164,10 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
         editor={editor}
         className={`${styles['textarea']} ${markdown['markdown-content']}`}
         style={{ wordBreak: 'break-all', border: 'none' }}
-        onPaste={handlePaste}
-        onKeyDown={handleKeyDown}
-        onCompositionStart={handleCompositionStart}
-        onCompositionEnd={handleCompositionEnd}
+        onPaste={handleInputPaste}
+        onKeyDown={handleInputKeyDown}
+        onCompositionStart={handleInputCompositionStart}
+        onCompositionEnd={handleInputCompositionEnd}
         maxLength={maxLength}
       />
       {isCloseToMaxLength && (

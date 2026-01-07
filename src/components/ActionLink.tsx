@@ -23,7 +23,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
   const displayId = new URL(href).searchParams.get('sid');
 
   // Handlers
-  const handleJoinServer = () => {
+  const handleLinkClick = () => {
     window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
@@ -50,7 +50,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
         {t('server-invitation-content.prefix')}
         <span className={styles['server-name']}>{server.name}</span>
         {t('server-invitation-content.suffix')}
-        <span className={styles['actionLink']} onClick={handleJoinServer}>
+        <span className={styles['actionLink']} onClick={handleLinkClick}>
           {t('join-server')}
         </span>
       </span>

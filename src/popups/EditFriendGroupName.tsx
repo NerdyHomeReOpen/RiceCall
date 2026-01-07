@@ -9,11 +9,10 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditFriendGroupNamePopupProps {
-  friendGroupId: Types.FriendGroup['friendGroupId'];
   friendGroup: Types.FriendGroup;
 }
 
-const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ friendGroupId, friendGroup }) => {
+const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ friendGroup }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -21,10 +20,21 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
   const [friendGroupName, setFriendGroupName] = useState<string>(friendGroup.name);
 
   // Variables
+  const { friendGroupId } = friendGroup;
   const canSubmit = friendGroupName.trim();
 
   // Handlers
-  const handleClose = () => {
+  const handleFriendGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFriendGroupName(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    if (!canSubmit) return;
+    Popup.editFriendGroup(friendGroupId, { name: friendGroupName });
+    handleCloseBtnClick();
+  };
+
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -34,22 +44,15 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('please-input-friend-group-name')}</div>
-            <input name="friend-group-name" type="text" value={friendGroupName} maxLength={32} onChange={(e) => setFriendGroupName(e.target.value)} />
+            <input name="friend-group-name" type="text" value={friendGroupName} maxLength={32} onChange={handleFriendGroupNameChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div
-          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            if (!canSubmit) return;
-            Popup.editFriendGroup(friendGroupId, { name: friendGroupName });
-            handleClose();
-          }}
-        >
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

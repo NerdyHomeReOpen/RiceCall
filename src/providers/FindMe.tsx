@@ -2,8 +2,8 @@ import { createContext, useContext, useRef } from 'react';
 
 interface FindMeContextType {
   findMe: () => void;
-  handleCategoryExpanded: React.RefObject<() => void>;
-  handleChannelExpanded: React.RefObject<() => void>;
+  expandCategoryHandlerRef: React.RefObject<() => void>;
+  expandChannelHandlerRef: React.RefObject<() => void>;
   userTabRef: React.RefObject<HTMLDivElement | null>;
 }
 
@@ -19,14 +19,14 @@ export const useFindMeContext = () => {
 
 const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
   // Refs
-  const handleCategoryExpanded = useRef<() => void>(() => {});
-  const handleChannelExpanded = useRef<() => void>(() => {});
+  const expandCategoryHandlerRef = useRef<() => void>(() => {});
+  const expandChannelHandlerRef = useRef<() => void>(() => {});
   const userTabRef = useRef<HTMLDivElement>(null);
 
-  // Handlers
+  // Functions
   const findMe = () => {
-    handleCategoryExpanded.current();
-    handleChannelExpanded.current();
+    expandCategoryHandlerRef.current();
+    expandChannelHandlerRef.current();
 
     setTimeout(() => {
       userTabRef.current?.scrollIntoView({
@@ -36,18 +36,7 @@ const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
     }, 100);
   };
 
-  return (
-    <FindMeContext.Provider
-      value={{
-        findMe,
-        handleCategoryExpanded,
-        handleChannelExpanded,
-        userTabRef,
-      }}
-    >
-      {children}
-    </FindMeContext.Provider>
-  );
+  return <FindMeContext.Provider value={{ findMe, expandCategoryHandlerRef, expandChannelHandlerRef, userTabRef }}>{children}</FindMeContext.Provider>;
 };
 
 FindMeProvider.displayName = 'FindMeProvider';

@@ -33,12 +33,12 @@ const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, mess
   const formattedMessageContents = TagConverter.fromTags(t(message, parameter));
 
   // Handlers
-  const handleSubmit = () => {
+  const handleSubmitBtnClick = () => {
     ipc.popup.submit(id);
     ipc.window.close();
   };
 
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -53,10 +53,10 @@ const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, mess
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleSubmit}>
+        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

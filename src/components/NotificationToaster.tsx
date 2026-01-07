@@ -18,7 +18,7 @@ const NotificationToaster: React.FC = React.memo(() => {
   const filteredNotifications = useMemo(() => notifications.filter((notification) => !closedNotificationIds.has(notification.notificationId)), [notifications, closedNotificationIds]);
 
   // Handlers
-  const handleCloseNotification = () => {
+  const handleCloseBtnClick = () => {
     const notificationId = filteredNotifications[showNotificationIndex]?.notificationId ?? 0;
     setClosedNotificationIds((prev) => prev.add(notificationId));
     setShow(false);
@@ -40,7 +40,7 @@ const NotificationToaster: React.FC = React.memo(() => {
   return (
     <div className={`${styles['notification-toaster']} ${show ? styles['show'] : ''}`}>
       <MarkdownContent markdownText={filteredNotifications[showNotificationIndex]?.content ?? ''} selectable={false} />
-      <div className={styles['notification-toaster-close']} onClick={handleCloseNotification} />
+      <div className={styles['notification-toaster-close']} onClick={handleCloseBtnClick} />
     </div>
   );
 });

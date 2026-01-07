@@ -70,7 +70,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId
   const friendHasNote = friendNote !== '' && friendNote !== null;
   const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: -1, userId });
 
-  // Handlers
+  // Functions
   const getFriendTabContextMenuItems = () =>
     new CtxMenuBuilder()
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, targetId))
@@ -91,6 +91,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId
       .addDeleteFriendApplicationOption({ isSelf, isPending }, () => Popup.deleteFriendApplication(targetId))
       .build();
 
+  // Handlers
   const handleServerNameClick = () => {
     if (isLoading || !friendCurrentServer) return;
     if (friendCurrentServer.serverId === userCurrentServerId) {

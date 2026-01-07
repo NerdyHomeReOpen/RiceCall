@@ -26,7 +26,25 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   const { userId: targetId, name: targetName, avatarUrl: targetAvatarUrl, displayId: targetDisplayId, contribution: targetContribution } = target;
 
   // Handlers
-  const handleClose = () => {
+  const handleInvitationDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setInvitationDesc(e.target.value);
+  };
+
+  const handleSubmitBtnClick = () => {
+    Popup.sendMemberInvitation(targetId, serverId, { description: invitationDesc });
+    handleCloseBtnClick();
+  };
+
+  const handleModifyBtnClick = () => {
+    setSection(2);
+  };
+
+  const handleSubmitEditBtnClick = () => {
+    Popup.editMemberInvitation(targetId, serverId, { description: invitationDesc });
+    handleCloseBtnClick();
+  };
+
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -51,50 +69,38 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
           <div className={popupStyles['split']} />
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 0 ? {} : { display: 'none' }}>
             <div className={popupStyles['label']}>{t('note')}</div>
-            <textarea rows={2} value={invitationDesc} onChange={(e) => setInvitationDesc(e.target.value)} />
+            <textarea rows={2} value={invitationDesc} onChange={handleInvitationDescChange} />
           </div>
           <div className={popupStyles['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
             {t('member-invitation-sent')}
           </div>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 2 ? {} : { display: 'none' }}>
             <div className={popupStyles['label']}>{t('note')}</div>
-            <textarea rows={2} value={invitationDesc} onChange={(e) => setInvitationDesc(e.target.value)} />
+            <textarea rows={2} value={invitationDesc} onChange={handleInvitationDescChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div
-          className={popupStyles['button']}
-          onClick={() => {
-            Popup.sendMemberInvitation(targetId, serverId, { description: invitationDesc });
-            handleClose();
-          }}
-        >
+        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
       <div className={popupStyles['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => setSection(2)}>
+        <div className={popupStyles['button']} onClick={handleModifyBtnClick}>
           {t('modify')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
       <div className={popupStyles['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div
-          className={popupStyles['button']}
-          onClick={() => {
-            Popup.editMemberInvitation(targetId, serverId, { description: invitationDesc });
-            handleClose();
-          }}
-        >
+        <div className={popupStyles['button']} onClick={handleSubmitEditBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

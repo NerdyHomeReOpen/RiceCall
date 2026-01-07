@@ -13,7 +13,7 @@ interface BadgeItemProps {
 
 const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direction }) => {
   // Hooks
-  const contextMenu = useContextMenu();
+  const { showBadgeInfoCard } = useContextMenu();
 
   // Refs
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
@@ -25,7 +25,7 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direc
     const y = position === 'left-top' || position === 'right-top' ? top : bottom;
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     hoverTimerRef.current = setTimeout(() => {
-      contextMenu.showBadgeInfoCard(x, y, direction, badge);
+      showBadgeInfoCard(x, y, direction, badge);
     }, 200);
   };
 

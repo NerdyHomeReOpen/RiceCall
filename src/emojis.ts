@@ -1,13 +1,9 @@
 import emojiData from 'emoji.json';
 import twemoji from 'twemoji';
 
-export interface Emoji {
-  code: string;
-  alt: string;
-  path: string;
-}
+import type * as Types from '@/types';
 
-export const defEmojis: Emoji[] = [
+export const defEmojis: Types.Emoji[] = [
   { code: '1', alt: '微笑', path: '/smiles/1.gif' },
   { code: '2', alt: '開懷笑', path: '/smiles/2.gif' },
   { code: '3', alt: '眨眼', path: '/smiles/3.gif' },

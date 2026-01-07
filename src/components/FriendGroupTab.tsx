@@ -16,10 +16,10 @@ interface FriendGroupTabProps {
   friendGroup: Types.FriendGroup;
   selectedItemId: string | null;
   setSelectedItemId: (id: string | null) => void;
-  searchQuery: string;
+  query: string;
 }
 
-const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup, selectedItemId, setSelectedItemId, searchQuery }) => {
+const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup, selectedItemId, setSelectedItemId, query }) => {
   // Hooks
   const { showContextMenu } = useContextMenu();
 
@@ -45,19 +45,20 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
         return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroupId && f.relationStatus !== 0).sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)); // Other
     }
   }, [friendGroupId, friends]);
-  const filteredFriendGroupFriends = useMemo(() => friendGroupFriends.filter((f) => f.name.includes(searchQuery)), [friendGroupFriends, searchQuery]);
+  const filteredFriendGroupFriends = useMemo(() => friendGroupFriends.filter((f) => f.name.includes(query)), [friendGroupFriends, query]);
   const friendsOnlineCount = friendGroupFriends.filter((f) => f.status !== 'offline').length;
   const isSelected = selectedItemId === friendGroupId;
   const isStranger = friendGroupId === 'stranger';
   const isBlacklist = friendGroupId === 'blacklist';
 
-  // Handlers
+  // Functions
   const getFriendGroupTabContextMenuItems = () =>
     new CtxMenuBuilder()
       .addEditFriendGroupNameOption({ friendGroupId }, () => Popup.openEditFriendGroupName(userId, friendGroupId))
       .addDeleteFriendGroupOption({ friendGroupId }, () => Popup.deleteFriendGroup(friendGroupId, friendGroupName))
       .build();
 
+  // Handlers
   const handleTabClick = () => {
     setExpanded((prev) => !prev);
   };

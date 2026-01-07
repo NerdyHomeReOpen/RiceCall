@@ -24,7 +24,6 @@ interface ContextMenuContextType {
     position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
     anchorEl?: HTMLElement | null,
     showFontbar?: boolean,
-    isUserInfo?: boolean,
     fontSize?: string,
     textColor?: string,
     onEmojiSelect?: (code: string, full: string) => void,
@@ -80,7 +79,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [statusDropdown, setStatusDropdown] = React.useState<ReactNode | null>(null);
   const [embedLinkInput, setEmbedLinkInput] = React.useState<ReactNode | null>(null);
 
-  // Handlers
+  // Functions
   const showContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => {
     setContextMenu(<ContextMenu items={items} onClose={closeContextMenu} x={x} y={y} direction={direction} />);
     setIsContextMenuVisible(true);
@@ -137,7 +136,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
     anchorEl?: HTMLElement | null,
     showFontbar?: boolean,
-    isUserInfo?: boolean,
     fontSize?: string,
     textColor?: string,
     onEmojiSelect?: (code: string, full: string) => void,
@@ -151,7 +149,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         direction={direction}
         anchorEl={anchorEl}
         showFontbar={showFontbar}
-        isUserInfo={isUserInfo}
         fontSize={fontSize}
         textColor={textColor}
         onEmojiSelect={onEmojiSelect}

@@ -28,102 +28,6 @@ import { SHOW_FRAME_ORIGIN, MESSAGE_VIERER_DEVIATION } from '@/constant';
 import styles from '@/styles/server.module.css';
 import messageStyles from '@/styles/message.module.css';
 
-interface MessageInputBoxGuardProps {
-  lastJoinChannelTime: number;
-  lastMessageTime: number;
-  permissionLevel: number;
-  isChannelForbidText: boolean;
-  isChannelForbidGuestText: boolean;
-  channelGuestTextGapTime: number;
-  channelGuestTextWaitTime: number;
-  channelGuestTextMaxLength: number;
-  isChannelTextMuted: boolean;
-  onSendMessage: (msg: string) => void;
-}
-
-const MessageInputBoxGuard = React.memo(
-  ({
-    lastJoinChannelTime,
-    lastMessageTime,
-    permissionLevel,
-    isChannelForbidText,
-    isChannelForbidGuestText,
-    channelGuestTextGapTime,
-    channelGuestTextWaitTime,
-    channelGuestTextMaxLength,
-    isChannelTextMuted,
-    onSendMessage,
-  }: MessageInputBoxGuardProps) => {
-    // States
-    const [now, setNow] = useState(Date.now());
-
-    // Effects
-    useEffect(() => {
-      const interval = setInterval(() => setNow(Date.now()), 1000);
-      return () => clearInterval(interval);
-    }, []);
-
-    const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
-    const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
-
-    const isForbidByMutedText = isChannelTextMuted;
-    const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && isChannelForbidText;
-    const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && isChannelForbidGuestText;
-    const isForbidByForbidGuestTextGap = !Permission.isMember(permissionLevel) && leftGapTime > 0;
-    const isForbidByForbidGuestTextWait = !Permission.isMember(permissionLevel) && leftWaitTime > 0;
-    const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-    const maxLength = !Permission.isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
-
-    return <MessageInputBox disabled={disabled} maxLength={maxLength} onSendMessage={onSendMessage} />;
-  },
-);
-
-MessageInputBoxGuard.displayName = 'MessageInputBoxGuard';
-
-interface VolumeSliderProps {
-  value: number;
-  muted: boolean;
-  onChange: (value: number) => void;
-  onToggleMute: () => void;
-  railCls: string;
-  btnCls: string;
-}
-
-const VolumeSlider = React.memo(
-  function VolumeSlider({ value, muted, onChange, onToggleMute, railCls, btnCls }: VolumeSliderProps) {
-    // Refs
-    const sliderRef = useRef<HTMLInputElement>(null);
-    const isBtnHoveredRef = useRef<boolean>(false);
-
-    return (
-      <div className={railCls}>
-        <div className={styles['slider-container']}>
-          <input ref={sliderRef} type="range" min="0" max="100" value={value} onChange={(e) => onChange(parseInt(e.target.value))} className={styles['slider']} />
-        </div>
-        <div
-          className={`${btnCls} ${muted ? styles['muted'] : styles['active']}`}
-          onClick={onToggleMute}
-          onMouseEnter={() => (isBtnHoveredRef.current = true)}
-          onMouseLeave={() => (isBtnHoveredRef.current = false)}
-          onWheel={(e) => {
-            if (!isBtnHoveredRef.current) return;
-            const newValue = parseInt(sliderRef.current!.value);
-            if (e.deltaY > 0) {
-              sliderRef.current!.value = (newValue - 4).toString();
-            } else {
-              sliderRef.current!.value = (newValue + 4).toString();
-            }
-            onChange(parseInt(sliderRef.current!.value));
-          }}
-        />
-      </div>
-    );
-  },
-  (prev, next) => prev.value === next.value && prev.muted === next.muted,
-);
-
-VolumeSlider.displayName = 'VolumeSlider';
-
 interface ServerPageProps {
   display: boolean;
 }
@@ -236,7 +140,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     return { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled };
   }, [queueUsers, userId, permissionLevel]);
 
-  // Handlers
+  // Functions
   const getMicText = () => {
     if (isMicTaken) return t('mic-taken');
     if (isQueuing) return t('mic-queued');
@@ -270,10 +174,15 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     dispatch(clearActionMessages());
   };
 
+  const clearUnreadMessageNotification = () => {
+    setIsAtBottom(true);
+    setUnreadMessageCount(0);
+  };
+
   const scrollToBottom = useCallback(() => {
     if (!messageAreaRef.current) return;
     messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
-    setIsAtBottom(true);
+    clearUnreadMessageNotification();
   }, []);
 
   const updateShowFrameState = useCallback(
@@ -310,7 +219,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
       )
       .build();
 
-  const handleClickMicButton = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMicBtnClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isCurrentChannelQueueMode) {
       if (!isIdling) {
         const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
@@ -354,6 +263,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     }
   };
 
+  // Handlers
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingSidebarRef.current = true;
@@ -439,14 +349,49 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     showContextMenu(x, y, 'right-top', getContextMenuItems3());
   };
 
-  const handleSendMessage = (message: string) => {
+  const handleMessageSend = (message: string) => {
     Popup.sendChannelMessage(currentServerId, currentChannelId, { type: 'general', content: message });
     setLastMessageTime(Date.now());
   };
 
   const handleNewMessageAlertClick = () => {
-    scrollToBottom();
-    setUnreadMessageCount(0);
+    clearUnreadMessageNotification();
+  };
+
+  const handleWidgetMoreBtnClick = () => {
+    setIsWidgetExpanded(true);
+  };
+
+  const handleCloseActionMessageBtnClick = () => {
+    setShowActionMessage(false);
+  };
+
+  const handleMixingBtnClick = () => {
+    toggleMixMode();
+  };
+
+  const handleMicVolumeChange = (value: number) => {
+    changeMicVolume(value);
+  };
+
+  const handleMicVolumeBtnClick = () => {
+    toggleMicMuted();
+  };
+
+  const handleMicModeDropdownBtnClick = () => {
+    setIsMicModeMenuVisible(true);
+  };
+
+  const handleSpeakerVolumeChange = (value: number) => {
+    changeSpeakerVolume(value);
+  };
+
+  const handleSpeakerVolumeBtnClick = () => {
+    toggleSpeakerMuted();
+  };
+
+  const handleRecordModeBtnClick = () => {
+    toggleRecording();
   };
 
   // Effects
@@ -510,6 +455,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   }, []);
 
   useEffect(() => {
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') scrollToBottom();
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [scrollToBottom]);
+
+  useEffect(() => {
     if (!messageAreaRef.current || channelMessages.length === 0) return;
 
     const lastMessage = channelMessages[channelMessages.length - 1];
@@ -521,14 +474,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
       setUnreadMessageCount((prev) => prev + 1);
     }
   }, [channelMessages, userId, scrollToBottom]);
-
-  useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') scrollToBottom();
-    };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
-  }, [scrollToBottom]);
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
@@ -597,30 +542,30 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
               onPointerMove={handleAnnAreaHandleMove}
             />
             <div className={styles['widget-close']}>
-              <div className={styles['widget-bar-item']} onClick={() => setIsWidgetExpanded(true)}>
-                <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`}></span>
+              <div className={styles['widget-bar-item']} onClick={handleWidgetMoreBtnClick}>
+                <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`} />
               </div>
             </div>
             <div className={`${styles['widget-bar']} ${isWidgetExpanded ? styles['widget-bar-expanded'] : ''}`}>
               <div className={`${styles['widget-bar-item']} ${isCentralAreaModeAnnouncement ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetAnnClick}>
-                <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`}></div>
+                <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`} />
                 <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
               </div>
-              <div className={styles['widget-bar-spliter']}></div>
+              <div className={styles['widget-bar-spliter']} />
               <div className={`${styles['widget-bar-item']} ${isCentralAreaModeShow ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetShowClick}>
-                <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`}></div>
+                <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`} />
                 <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
               </div>
-              <div className={styles['widget-bar-spliter']}></div>
+              <div className={styles['widget-bar-spliter']} />
               <div className={styles['widget-bar-item']} onClick={handleWidgetMoreClick}>
-                <div className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`}></div>
+                <div className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`} />
                 <span className={styles['widget-bar-item-text']}>{t('more')}</span>
               </div>
             </div>
             <div className={styles['bottom-area']}>
               <div ref={messageAreaRef} className={styles['message-area']} onScroll={handleScroll} onContextMenu={handleMessageAreaContextMenu}>
                 <ChannelMessageContent messages={channelMessages} />
-                <div style={{ minHeight: '10px' }}></div>
+                <div style={{ minHeight: '10px' }} />
                 {unreadMessageCount > 0 && (
                   <div className={messageStyles['new-message-alert']} onClick={handleNewMessageAlertClick}>
                     {t('has-new-message', { 0: unreadMessageCount })}
@@ -630,7 +575,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
               <div className={styles['input-area']}>
                 <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
                   <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} />
-                  <div className={styles['close-button']} onClick={() => setShowActionMessage(false)}></div>
+                  <div className={styles['close-button']} onClick={handleCloseActionMessageBtnClick} />
                 </div>
                 <MessageInputBoxGuard
                   lastJoinChannelTime={lastJoinChannelTime}
@@ -642,7 +587,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
                   channelGuestTextWaitTime={currentChannelGuestTextWaitTime}
                   channelGuestTextMaxLength={currentChannelGuestTextMaxLength}
                   isChannelTextMuted={isCurrentChannelTextMuted}
-                  onSendMessage={handleSendMessage}
+                  onMessageSend={handleMessageSend}
                 />
               </div>
             </div>
@@ -653,7 +598,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
                 {currentChannelVoiceMode === 'queue' ? t('queue-speech') : currentChannelVoiceMode === 'free' ? t('free-speech') : currentChannelVoiceMode === 'admin' ? t('admin-speech') : ''}
               </div>
             </div>
-            <div className={getMicBtnClass()} onClick={handleClickMicButton}>
+            <div className={getMicBtnClass()} onClick={handleMicBtnClick}>
               <div className={`${styles['mic-icon']} ${isMicTaken ? styles[`level${volumeLevel}`] : ''}`} />
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <div className={styles['mic-text']} style={{ fontSize: isIdling ? '1.3rem' : '1.1rem' }}>
@@ -663,14 +608,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
               </div>
             </div>
             <div className={styles['buttons']}>
-              <div className={`${styles['bkg-mode-btn']} ${isMixModeActive ? styles['active'] : ''}`} onClick={() => toggleMixMode()} title={isMixModeActive ? t('mixing-on') : t('mixing-off')}>
+              <div className={`${styles['bkg-mode-btn']} ${isMixModeActive ? styles['active'] : ''}`} onClick={handleMixingBtnClick} title={isMixModeActive ? t('mixing-on') : t('mixing-off')}>
                 {t('mixing')}
               </div>
               <div className={styles['saperator-1']} />
               <div className={styles['mic-volume-container']}>
                 <div className={`${styles['mic-btn']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
-                <VolumeSlider value={micVolume} muted={isMicMuted} onChange={changeMicVolume} onToggleMute={toggleMicMuted} railCls={styles['volume-slider']} btnCls={styles['mic-btn']} />
-                <div className={styles['mic-mode-dropdown-btn']} onClick={() => setIsMicModeMenuVisible(true)}>
+                <VolumeSlider value={micVolume} muted={isMicMuted} onChange={handleMicVolumeChange} onClick={handleMicVolumeBtnClick} railCls={styles['volume-slider']} btnCls={styles['mic-btn']} />
+                <div className={styles['mic-mode-dropdown-btn']} onClick={handleMicModeDropdownBtnClick}>
                   {isMicModeMenuVisible ? <MicModeMenu /> : ''}
                 </div>
               </div>
@@ -679,14 +624,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
                 <VolumeSlider
                   value={speakerVolume}
                   muted={isSpeakerMuted}
-                  onChange={changeSpeakerVolume}
-                  onToggleMute={toggleSpeakerMuted}
+                  onChange={handleSpeakerVolumeChange}
+                  onClick={handleSpeakerVolumeBtnClick}
                   railCls={styles['volume-slider']}
                   btnCls={styles['speaker-btn']}
                 />
               </div>
               <div className={`${styles['record-mode']} ${isRecording ? styles['active'] : ''}`}>
-                <div className={`${styles['record-mode-btn']} ${isRecording ? styles['active'] : ''}`} onClick={toggleRecording} />
+                <div className={`${styles['record-mode-btn']} ${isRecording ? styles['active'] : ''}`} onClick={handleRecordModeBtnClick} />
                 <div className={`${styles['record-mode-text']} ${isRecording ? styles['active'] : ''}`}>{Language.getFormatTimeFromSecond(recordTime)}</div>
               </div>
             </div>
@@ -702,3 +647,117 @@ ServerPageComponent.displayName = 'ServerPageComponent';
 const ServerPage = dynamic(() => Promise.resolve(ServerPageComponent), { ssr: false });
 
 export default ServerPage;
+
+interface MessageInputBoxGuardProps {
+  lastJoinChannelTime: number;
+  lastMessageTime: number;
+  permissionLevel: number;
+  isChannelForbidText: boolean;
+  isChannelForbidGuestText: boolean;
+  channelGuestTextGapTime: number;
+  channelGuestTextWaitTime: number;
+  channelGuestTextMaxLength: number;
+  isChannelTextMuted: boolean;
+  onMessageSend: (msg: string) => void;
+}
+
+const MessageInputBoxGuard = React.memo(
+  ({
+    lastJoinChannelTime,
+    lastMessageTime,
+    permissionLevel,
+    isChannelForbidText,
+    isChannelForbidGuestText,
+    channelGuestTextGapTime,
+    channelGuestTextWaitTime,
+    channelGuestTextMaxLength,
+    isChannelTextMuted,
+    onMessageSend,
+  }: MessageInputBoxGuardProps) => {
+    // States
+    const [now, setNow] = useState(Date.now());
+
+    // Effects
+    useEffect(() => {
+      const interval = setInterval(() => setNow(Date.now()), 1000);
+      return () => clearInterval(interval);
+    }, []);
+
+    const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
+    const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
+    const isForbidByMutedText = isChannelTextMuted;
+    const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && isChannelForbidText;
+    const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && isChannelForbidGuestText;
+    const isForbidByForbidGuestTextGap = !Permission.isMember(permissionLevel) && leftGapTime > 0;
+    const isForbidByForbidGuestTextWait = !Permission.isMember(permissionLevel) && leftWaitTime > 0;
+    const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
+    const maxLength = !Permission.isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
+
+    return <MessageInputBox disabled={disabled} maxLength={maxLength} onMessageSend={onMessageSend} />;
+  },
+);
+
+MessageInputBoxGuard.displayName = 'MessageInputBoxGuard';
+
+interface VolumeSliderProps {
+  value: number;
+  muted: boolean;
+  onChange: (value: number) => void;
+  onClick: () => void;
+  railCls: string;
+  btnCls: string;
+}
+
+const VolumeSlider = React.memo(
+  function VolumeSlider({ value, muted, onChange, onClick, railCls, btnCls }: VolumeSliderProps) {
+    // Refs
+    const sliderRef = useRef<HTMLInputElement>(null);
+    const isBtnHoveredRef = useRef<boolean>(false);
+
+    // Handlers
+    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      onChange(parseInt(e.target.value));
+    };
+
+    const handleBtnClick = () => {
+      onClick();
+    };
+
+    const handleBtnMouseDown = () => {
+      isBtnHoveredRef.current = true;
+    };
+
+    const handleBtnMouseUp = () => {
+      isBtnHoveredRef.current = false;
+    };
+
+    const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+      if (!isBtnHoveredRef.current) return;
+      const newValue = parseInt(sliderRef.current!.value);
+      if (e.deltaY > 0) {
+        sliderRef.current!.value = (newValue - 4).toString();
+      } else {
+        sliderRef.current!.value = (newValue + 4).toString();
+      }
+      onChange(parseInt(sliderRef.current!.value));
+    };
+
+    return (
+      <div className={railCls}>
+        <div className={styles['slider-container']}>
+          <input ref={sliderRef} type="range" min="0" max="100" value={value} onChange={handleSliderChange} className={styles['slider']} />
+        </div>
+        <div
+          className={`${btnCls} ${muted ? styles['muted'] : styles['active']}`}
+          onClick={handleBtnClick}
+          onMouseEnter={handleBtnMouseDown}
+          onMouseLeave={handleBtnMouseUp}
+          onWheel={handleBtnWheel}
+        />
+      </div>
+    );
+  },
+  (prev, next) => prev.value === next.value && prev.muted === next.muted,
+);
+
+VolumeSlider.displayName = 'VolumeSlider';

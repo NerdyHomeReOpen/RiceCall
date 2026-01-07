@@ -16,7 +16,7 @@ interface ServerAnnouncementPopupProps {
 const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.memo(({ announcement }) => {
   const { t } = useTranslation();
 
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -27,7 +27,7 @@ const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.me
           <span>{t('announcement')}</span>
         </div>
         <div className={styles['action-bars']}>
-          <div className={styles['close-btn']} onClick={() => handleClose()} />
+          <div className={styles['close-btn']} onClick={handleCloseBtnClick} />
         </div>
       </div>
       <div className={styles['containers']}>

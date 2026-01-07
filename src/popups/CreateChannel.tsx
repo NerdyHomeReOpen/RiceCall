@@ -26,7 +26,17 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleClose = () => {
+  const handleChannelNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setChannelName(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    if (!canSubmit) return;
+    Popup.createChannel(serverId, { name: channelName, categoryId: parentChannelId || null });
+    ipc.window.close();
+  };
+
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -40,22 +50,15 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
           </div>
           <div className={popupStyles['input-box']}>
             <div className={popupStyles['label']}>{t('channel-name')}</div>
-            <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannelName(e.target.value)} />
+            <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={handleChannelNameChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div
-          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            if (!canSubmit) return;
-            Popup.createChannel(serverId, { name: channelName, categoryId: parentChannelId || null });
-            handleClose();
-          }}
-        >
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
-
-import type * as Types from '@/types';
 
 import * as Popup from '@/utils/popup';
 
 import popupStyles from '@/styles/popup.module.css';
 
-interface SearchUserPopupProps {
-  userId: Types.User['userId'];
-}
-
-const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) => {
+const SearchUserPopup: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
 
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+
   // States
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [query, setQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
   // Variables
-  const canSubmit = searchQuery.trim();
+  const { userId } = user;
+  const canSubmit = query.trim();
 
-  // Handlers
-  const handleSearchUser = (query: string) => {
+  // Functions
+  const searchUser = (query: string) => {
     ipc.data.searchUser({ query }).then((users) => {
       if (!users.length) {
         setError(t('user-not-found'));
@@ -41,14 +40,25 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
     });
   };
 
-  const handleClose = () => {
+  // Handlers
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    if (!canSubmit) return;
+    searchUser(query);
+    ipc.window.close();
+  };
+
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
   // Effects
   useEffect(() => {
     setError(null);
-  }, [searchQuery]);
+  }, [query]);
 
   return (
     <div className={popupStyles['popup-wrapper']}>
@@ -56,7 +66,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={{ position: 'relative' }}>
             <div className={popupStyles['label']}>{t('please-input-user-account')}</div>
-            <input name="search-query" type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} required />
+            <input name="search-query" type="text" value={query} onChange={handleQueryChange} required />
             {error && (
               <div style={{ position: 'absolute', top: '2rem', right: '0' }} className={`${popupStyles['label']} ${popupStyles['error-message']}`}>
                 {`(${t(error)})`}
@@ -66,17 +76,10 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ userId }) 
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div
-          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => {
-            if (!canSubmit) return;
-            handleSearchUser(searchQuery);
-            handleClose();
-          }}
-        >
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

@@ -896,7 +896,7 @@
   flex-direction: column;
   width: 60%;
   height: 80%;
-  padding: 10px;
+  padding: 0 10px;
   overflow-y: auto;
   background-color: var(--background);
   border: 1px solid var(--border);
@@ -936,7 +936,7 @@
   gap: 10px;
   align-items: center;
   justify-content: flex-start;
-  padding: 10px;
+  padding: 10px 0;
   font-size: 1.2rem;
   font-weight: bold;
   background-color: var(--background);
@@ -951,7 +951,7 @@
 
 .announcement-datail-date {
   flex: 1;
-  font-size: 0.8rem;
+  font-size: 0.9rem;
   color: #999;
   text-align: right;
 }

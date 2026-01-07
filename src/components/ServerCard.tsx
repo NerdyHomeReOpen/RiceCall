@@ -45,7 +45,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   const { userId, currentServerId: userCurrentServerId } = user;
   const isOwner = serverOwnerId === userId && serverOwned;
 
-  // Handles
+  // Functions
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinServerOption(handleServerCardClick)
@@ -54,6 +54,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
       .addTerminateSelfMembershipOption({ permissionLevel: serverPermissionLevel }, () => Popup.terminateMember(userId, serverId, t('self')))
       .build();
 
+  // Handles
   const handleServerCardClick = () => {
     if (isLoading) return;
     if (server.serverId === userCurrentServerId) {

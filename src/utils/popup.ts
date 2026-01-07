@@ -283,8 +283,8 @@ export function editMemberInvitation(receiverId: Types.Member['userId'], serverI
   ipc.socket.send('editMemberInvitation', { receiverId, serverId, update });
 }
 
-export function rejectFriendApplication(senderId: Types.User['userId'], applicationName: Types.FriendApplication['name']) {
-  openAlertDialog(t('confirm-reject-friend-application', { 0: applicationName }), () => ipc.socket.send('rejectFriendApplication', { senderId }));
+export function rejectFriendApplication(senderId: Types.User['userId'], senderName: Types.FriendApplication['name']) {
+  openAlertDialog(t('confirm-reject-friend-application', { 0: senderName }), () => ipc.socket.send('rejectFriendApplication', { senderId }));
 }
 
 export function rejectAllFriendApplication(friendApplications: Types.FriendApplication[]) {

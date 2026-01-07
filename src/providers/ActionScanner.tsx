@@ -27,7 +27,7 @@ interface ActionScannerProviderProps {
 
 const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   // Hooks
-  const webRTC = useWebRTC();
+  const { pressSpeakKey, releaseSpeakKey, changeSpeakerVolume, toggleSpeakerMuted, toggleMicMuted, speakerVolume } = useWebRTC();
 
   // Refs
   const idleCheck = useRef<boolean>(false);
@@ -65,36 +65,36 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const startSpeak = useCallback(() => {
     if (isSpeakingRef.current) return;
     isSpeakingRef.current = true;
-    webRTC.pressSpeakKey();
-  }, [webRTC]);
+    pressSpeakKey();
+  }, [pressSpeakKey]);
 
   const stopSpeak = useCallback(() => {
     if (!isSpeakingRef.current) return;
     isSpeakingRef.current = false;
-    webRTC.releaseSpeakKey();
-  }, [webRTC]);
+    releaseSpeakKey();
+  }, [releaseSpeakKey]);
 
   const toggleMainWindows = useCallback(() => {
     // TODO: key detection in background
   }, []);
 
   const toggleUpVolume = useCallback(() => {
-    const newValue = Math.min(100, webRTC.speakerVolume + BASE_VOLUME);
-    webRTC.changeSpeakerVolume(newValue);
-  }, [webRTC]);
+    const newValue = Math.min(100, speakerVolume + BASE_VOLUME);
+    changeSpeakerVolume(newValue);
+  }, [changeSpeakerVolume, speakerVolume]);
 
   const toggleDownVolume = useCallback(() => {
-    const newValue = Math.max(0, webRTC.speakerVolume - BASE_VOLUME);
-    webRTC.changeSpeakerVolume(newValue);
-  }, [webRTC]);
+    const newValue = Math.max(0, speakerVolume - BASE_VOLUME);
+    changeSpeakerVolume(newValue);
+  }, [changeSpeakerVolume, speakerVolume]);
 
   const toggleSpeakerMute = useCallback(() => {
-    webRTC.toggleSpeakerMuted();
-  }, [webRTC]);
+    toggleSpeakerMuted();
+  }, [toggleSpeakerMuted]);
 
   const toggleMicMute = useCallback(() => {
-    webRTC.toggleMicMuted();
-  }, [webRTC]);
+    toggleMicMuted();
+  }, [toggleMicMuted]);
 
   const setIsManualIdling = useCallback((value: boolean) => {
     isManualIdlingRef.current = value;

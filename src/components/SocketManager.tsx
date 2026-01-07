@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
@@ -23,7 +23,7 @@ import { setQueueUsers, clearQueueUsers } from '@/store/slices/queueUsersSlice';
 import { setRecommendServers } from '@/store/slices/recommendServersSlice';
 import { setServers, addServers, updateServers, removeServers } from '@/store/slices/serversSlice';
 import { setLatency, setIsSocketConnected } from '@/store/slices/socketSlice';
-import { updateUser } from '@/store/slices/userSlice';
+import { setUser, updateUser } from '@/store/slices/userSlice';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
@@ -32,7 +32,7 @@ import * as Popup from '@/utils/popup';
 
 import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
-const SocketManager = () => {
+const SocketManager: React.FC = React.memo(() => {
   // Hooks
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((state) => state.user.data);
@@ -53,6 +53,20 @@ const SocketManager = () => {
   const { userId, currentServerId, currentChannelId } = currentUser;
 
   // Effects
+  useEffect(() => {
+    if (currentUser.userId) return;
+
+    const userId = localStorage.getItem('userId');
+    if (!userId) return;
+
+    ipc.data.userHotReload({ userId }).then((user) => {
+      if (user) {
+        dispatch(setUser(user));
+        dispatch(setIsSocketConnected(true));
+      }
+    });
+  }, [currentUser, dispatch]);
+
   useEffect(() => {
     const language = navigator.language;
     const match = LANGUAGES.find(({ code }) => code.includes(language));
@@ -181,14 +195,7 @@ const SocketManager = () => {
         return acc;
       }, []);
       dispatch(addFriendActivities(newActives));
-      dispatch(updateUser({ ...currentUser, ...args[0].update }));
-      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId); // For hot reload
-    });
-    return () => unsub();
-  }, [currentUser, dispatch]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
+      // Clear state when current server is changed
       const newCurrentServerId = args[0].update.currentServerId;
       if (newCurrentServerId !== undefined && newCurrentServerId !== currentUser.currentServerId) {
         dispatch(clearChannels());
@@ -199,6 +206,8 @@ const SocketManager = () => {
         dispatch(clearQueueUsers());
         dispatch(clearChannelEvents());
       }
+      dispatch(updateUser({ ...currentUser, ...args[0].update }));
+      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId); // For hot reload
     });
     return () => unsub();
   }, [currentUser, dispatch]);
@@ -480,6 +489,8 @@ const SocketManager = () => {
   }, []);
 
   return null;
-};
+});
+
+SocketManager.displayName = 'SocketManager';
 
 export default SocketManager;

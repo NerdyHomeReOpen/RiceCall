@@ -18,7 +18,7 @@ const FriendList: React.FC = React.memo(() => {
   const friendGroups = useAppSelector((state) => state.friendGroups.data);
 
   // States
-  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [query, setQuery] = useState<string>('');
   const [selectedTabId, setSelectedTabId] = useState<'friend' | 'recent'>('friend');
   const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
@@ -34,35 +34,56 @@ const FriendList: React.FC = React.memo(() => {
   const isSelectedFriendList = selectedTabId === 'friend';
   const isSelectedRecentList = selectedTabId === 'recent';
 
+  // Handlers
+  const handleFriendTabClick = () => {
+    setSelectedTabId('friend');
+  };
+
+  const handleRecentTabClick = () => {
+    setSelectedTabId('recent');
+  };
+
+  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+  };
+
+  const handleCreateFriendGroupBtnClick = () => {
+    Popup.openCreateFriendGroup();
+  };
+
+  const handleAddFriendBtnClick = () => {
+    Popup.openSearchUser(userId);
+  };
+
   return (
     <>
       <div className={styles['navigate-tabs']}>
-        <div className={`${styles['tab']} ${isSelectedFriendList ? styles['selected'] : ''}`} onClick={() => setSelectedTabId('friend')}>
+        <div className={`${styles['tab']} ${isSelectedFriendList ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div className={`${styles['tab']} ${isSelectedRecentList ? styles['selected'] : ''}`} onClick={() => setSelectedTabId('recent')}>
+        <div className={`${styles['tab']} ${isSelectedRecentList ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
       <div className={styles['search-bar']}>
         <div className={styles['search-icon']} />
-        <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} />
+        <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
         <div className={styles['prev-icon']} />
         <div className={styles['next-icon']} />
       </div>
       <div className={styles['scroll-view']} style={isSelectedFriendList ? {} : { display: 'none' }}>
         <div className={styles['friend-group-list']}>
           {filteredFriendGroups.map((friendGroup) => (
-            <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} searchQuery={searchQuery} />
+            <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} query={query} />
           ))}
         </div>
       </div>
-      <div className={styles['recent-list']} style={isSelectedRecentList ? {} : { display: 'none' }}></div>
+      <div className={styles['recent-list']} style={isSelectedRecentList ? {} : { display: 'none' }} />
       <div className={styles['sidebar-footer']}>
-        <div className={styles['button']} datatype="addGroup" onClick={() => Popup.openCreateFriendGroup()}>
+        <div className={styles['button']} datatype="addGroup" onClick={handleCreateFriendGroupBtnClick}>
           {t('create-friend-group')}
         </div>
-        <div className={styles['button']} datatype="addFriend" onClick={() => Popup.openSearchUser(userId)}>
+        <div className={styles['button']} datatype="addFriend" onClick={handleAddFriendBtnClick}>
           {t('add-friend')}
         </div>
       </div>

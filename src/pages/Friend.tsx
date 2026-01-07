@@ -79,12 +79,13 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
   // Variables
   const { userId, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
 
-  // Handlers
+  // Functions
   const changeSignature = (signature: Types.User['signature']) => {
     if (signature === userSignature) return;
     ipc.socket.send('editUser', { update: { signature } });
   };
 
+  // Handlers
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingSidebarRef.current = true;
@@ -116,8 +117,9 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (_, full) => {
+    showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, undefined, undefined, (_, full) => {
       signatureInputRef.current?.focus();
       document.execCommand('insertText', false, full);
     });

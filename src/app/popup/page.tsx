@@ -8,6 +8,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import SocketManager from '@/components/SocketManager';
+
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
 import ApproveFriend from '@/popups/ApproveFriend';
@@ -57,33 +59,28 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handlers
-  const maximize = () => {
+  const handleMaximizeBtnClick = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
   };
 
-  const unmaximize = () => {
+  const handleUnmaximizeBtnClick = () => {
     if (!isFullscreen) return;
     ipc.window.unmaximize();
   };
 
-  const minimize = () => {
+  const handleMinimizeBtnClick = () => {
     ipc.window.minimize();
   };
 
-  const close = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
   // Effects
   useEffect(() => {
-    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
-    return () => unsub();
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (
@@ -93,9 +90,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
           <div className={header['title']}>{title}</div>
         </div>
         <div className={header['buttons']}>
-          {buttons.includes('minimize') && <div className={header['minimize']} onClick={minimize} />}
-          {buttons.includes('maxsize') && (isFullscreen ? <div className={header['restore']} onClick={unmaximize} /> : <div className={header['maxsize']} onClick={maximize} />)}
-          {buttons.includes('close') && <div className={header['close']} onClick={close} />}
+          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimizeBtnClick} />}
+          {buttons.includes('maxsize') &&
+            (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={header['maxsize']} onClick={handleMaximizeBtnClick} />)}
+          {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} />}
         </div>
       </div>
     </header>
@@ -450,6 +448,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
+      <SocketManager />
       {!hideHeader && (
         <Header
           title={title}

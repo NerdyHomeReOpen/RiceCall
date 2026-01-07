@@ -68,7 +68,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueMember, sel
   const isSelected = selectedItemId === `queue-${memberUserId}`;
   const memberHasVip = memberVip > 0;
 
-  // Handlers
+  // Functions
   const getStatusIcon = () => {
     if (isUserMuted || isMemberVoiceMuted || isControlled) return 'muted';
     if (isUserSpeaking) return 'play';
@@ -124,6 +124,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueMember, sel
       )
       .build();
 
+  // Handlers
   const handleTabClick = () => {
     if (isSelected) setSelectedItemId(null);
     else setSelectedItemId(`queue-${memberUserId}`);

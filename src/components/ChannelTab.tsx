@@ -27,7 +27,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, expanded = 
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { handleChannelExpanded } = useFindMeContext();
+  const { expandChannelHandlerRef } = useFindMeContext();
 
   // Selectors
   const user = useAppSelector((state) => state.user.data);
@@ -59,7 +59,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, expanded = 
   const needsPassword = !Permission.isChannelMod(permissionLevel) && isPrivateChannel;
   const filteredChannelMembers = [...channelMembers].sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt);
 
-  // Handlers
+  // Functions
   const getTabContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinChannelOption({ canJoin, isInChannel }, () => Popup.connectChannel(currentServerId, channelId, canJoin, needsPassword))
@@ -82,6 +82,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, expanded = 
       .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => Popup.editServer(currentServerId, { receptionLobbyId: channelId }))
       .build();
 
+  // Handlers
   const handleTabClick = () => {
     if (isSelected) setSelectedItemId(null);
     else setSelectedItemId(`channel-${channelId}`);
@@ -137,10 +138,10 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, expanded = 
   // Effect
   useEffect(() => {
     if (!isInChannel) return;
-    handleChannelExpanded.current = () => {
+    expandChannelHandlerRef.current = () => {
       setExpanded((prev) => ({ ...prev, [channelId]: true }));
     };
-  }, [channelId, handleChannelExpanded, setExpanded, isInChannel]);
+  }, [channelId, expandChannelHandlerRef, setExpanded, isInChannel]);
 
   return (
     <>
