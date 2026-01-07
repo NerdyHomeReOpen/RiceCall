@@ -35,6 +35,11 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
   const [loadingServerId, setLoadingServerId] = useState<string>('');
   const [loadingTimeStamp, setLoadingTimeStamp] = useState<number>(500);
 
+  // Handlers
+  const handleCloseLoading = () => {
+    setIsLoading(false);
+  };
+
   return (
     <LoadingContext.Provider
       value={{
@@ -50,8 +55,8 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
         <div className={homeStyles['loading-wrapper']}>
           <div className={homeStyles['loading-box']}>
             <div className={homeStyles['loading-title-contain']}>{t('connecting-server', { '0': loadingServerId })}</div>
-            <div className={homeStyles['loading-gif']}></div>
-            <div className={homeStyles['loading-close-btn']} onClick={() => setIsLoading(false)} />
+            <div className={homeStyles['loading-gif']} />
+            <div className={homeStyles['loading-close-btn']} onClick={handleCloseLoading} />
           </div>
         </div>
       )}

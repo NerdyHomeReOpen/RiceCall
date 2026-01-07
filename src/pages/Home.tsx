@@ -17,29 +17,9 @@ import { useLoading } from '@/providers/Loading';
 import * as Popup from '@/utils/popup';
 import * as Language from '@/utils/language';
 
-import { ANNOUNCEMENT_SLIDE_INTERVAL, RECOMMEND_SERVER_CATEGORY_TABS } from '@/constant';
+import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constant';
 
 import styles from '@/styles/home.module.css';
-
-interface SearchResultItemProps {
-  server: Types.Server;
-  onClick: () => void;
-}
-
-const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, onClick }) => (
-  <div className={styles['item']} onClick={onClick}>
-    <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
-    <div className={styles['server-info-text']}>
-      <div className={styles['server-name-text']}>{server.name}</div>
-      <div className={styles['server-id-box']}>
-        <div className={styles['id-icon']} />
-        <div className={styles['server-id-text']}>{server.specialId || server.displayId}</div>
-      </div>
-    </div>
-  </div>
-));
-
-SearchResultItem.displayName = 'SearchResultItem';
 
 interface HomePageProps {
   display: boolean;
@@ -60,8 +40,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   // Refs
   const canSearchRef = useRef<boolean>(true);
   const searchRef = useRef<HTMLDivElement>(null);
-  const searchInputRef = useRef<HTMLInputElement>(null);
-  const searchQueryRef = useRef<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
+  const queryRef = useRef<string>('');
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const timerRef = useRef<NodeJS.Timeout | number | null>(null);
@@ -73,36 +53,29 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const [section, setSection] = useState<'home' | 'personal-exclusive'>('home');
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
-  const [selectReommendServerCategory, setSelectRecommendServerCategory] = useState<string>('all');
 
   // Variables
   const { userId, currentServerId } = user;
   const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
   const isSelectedHome = section === 'home';
   const isSelectedPersonalExclusive = section === 'personal-exclusive';
+  const hasInput = !!inputRef.current?.value.trim();
   const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
   const filteredAnns = useMemo(() => [...announcements].sort((a, b) => b.timestamp - a.timestamp), [announcements]);
-  const filteredRecommendServers = useMemo(
-    () => recommendServers.filter((server) => !server.tags.includes('official') && (selectReommendServerCategory === 'all' || server.tags.includes(selectReommendServerCategory))),
-    [recommendServers, selectReommendServerCategory],
-  );
+  const filteredRecommendServers = useMemo(() => recommendServers.filter((server) => !server.tags.includes('official')), [recommendServers]);
   const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official')), [recommendServers]);
 
-  // Handlers
-  const searchServer = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const query = e.target.value;
-
+  // Functions
+  const searchServers = async (query: string) => {
     if (!query) {
       clearSearchState(true);
       return;
     }
 
-    if (!canSearchRef.current) return;
-
     ipc.data.searchServer({ query }).then((serverResults) => {
-      const q = searchQueryRef.current;
+      const q = queryRef.current;
 
       clearSearchState();
 
@@ -128,20 +101,20 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
       setPersonalResults(personal);
       setRelatedResults(related);
     });
-    searchQueryRef.current = query;
+    queryRef.current = query;
     canSearchRef.current = false;
 
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     searchTimerRef.current = setTimeout(() => {
       canSearchRef.current = true;
-      if (searchQueryRef.current !== searchInputRef.current?.value) {
-        searchServer(e);
+      if (queryRef.current !== inputRef.current?.value) {
+        searchServers(inputRef.current?.value || '');
       }
     }, 500);
   };
 
-  const clearSearchState = (clearSearchQuery: boolean = false) => {
-    if (clearSearchQuery && searchInputRef.current) searchInputRef.current.value = '';
+  const clearSearchState = (clearQuery: boolean = false) => {
+    if (clearQuery && inputRef.current) inputRef.current.value = '';
     setExactMatch(null);
     setPersonalResults([]);
     setRelatedResults([]);
@@ -162,20 +135,51 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
     [currentServerId, isLoading, setSelectedTabId, setIsLoading, setLoadingServerId],
   );
 
-  const nextAnn = () => {
+  // Handlers
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (canSearchRef.current) searchServers(e.target.value);
+  };
+
+  const handleSearchInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
+    if (canSearchRef.current) searchServers(e.target.value);
+  };
+
+  const handleSearchInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key !== 'Enter' || !exactMatch) return;
+    selectServer(exactMatch);
+  };
+
+  const handleClearSearchInputBtnClick = () => {
+    clearSearchState(true);
+  };
+
+  const handleServerSelect = (server: Types.Server) => {
+    selectServer(server);
+  };
+
+  const handleNextAnnBtnClick = () => {
     setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length);
   };
 
-  const prevAnn = () => {
+  const handlePrevAnnBtnClick = () => {
     setSelectedAnnIndex((prev) => (prev === 0 ? filteredAnns.length - 1 : prev - 1));
   };
 
-  const defaultAnnouncement = (ann: Types.Announcement) => (
-    <>
-      <Image loading="lazy" src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
-      <span>{ann.title}</span>
-    </>
-  );
+  const handleCreateServerClick = () => {
+    Popup.openCreateServer(userId);
+  };
+
+  const handlePersonalExclusiveSectionBtnClick = () => {
+    setSection('personal-exclusive');
+  };
+
+  const handleHomeSectionBtnClick = () => {
+    setSection('home');
+  };
+
+  const handleBackBtnClick = () => {
+    setSection('home');
+  };
 
   // Effects
   useEffect(() => {
@@ -227,32 +231,29 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
           <div className={styles['forward-btn']} />
           <div className={styles['search-bar']} ref={searchRef}>
             <input
-              ref={searchInputRef}
+              ref={inputRef}
               placeholder={t('search-server-placeholder')}
               className={styles['search-input']}
-              onFocus={searchServer}
-              onChange={searchServer}
-              onKeyDown={(e) => {
-                if (e.key !== 'Enter' || !exactMatch) return;
-                selectServer(exactMatch);
-              }}
+              onFocus={handleSearchInputFocus}
+              onChange={handleSearchInputChange}
+              onKeyDown={handleSearchInputKeyDown}
             />
-            <div className={styles['search-input-clear-btn']} onClick={() => clearSearchState(true)} style={searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
-            <div className={styles['search-input-icon']} style={!searchInputRef.current?.value.trim() ? {} : { display: 'none' }} />
+            <div className={styles['search-input-clear-btn']} onClick={handleClearSearchInputBtnClick} style={hasInput ? {} : { display: 'none' }} />
+            <div className={styles['search-input-icon']} style={hasInput ? {} : { display: 'none' }} />
             <div className={styles['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
               {exactMatch && (
                 <>
                   <div className={`${styles['header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
-                    {t('quick-enter-server', { '0': searchQueryRef.current })}
+                    {t('quick-enter-server', { '0': queryRef.current })}
                   </div>
-                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onClick={() => selectServer(exactMatch)} />
+                  <SearchResultItem key={exactMatch.serverId} server={exactMatch} onServerSelect={handleServerSelect} />
                 </>
               )}
               {personalResults.length > 0 && (
                 <>
                   <div className={styles['header-text']}>{t('personal-exclusive')}</div>
                   {personalResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => selectServer(server)} />
+                    <SearchResultItem key={server.serverId} server={server} onServerSelect={handleServerSelect} />
                   ))}
                 </>
               )}
@@ -260,32 +261,29 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
                 <>
                   <div className={styles['header-text']}>{t('related-search')}</div>
                   {relatedResults.map((server) => (
-                    <SearchResultItem key={server.serverId} server={server} onClick={() => selectServer(server)} />
+                    <SearchResultItem key={server.serverId} server={server} onServerSelect={handleServerSelect} />
                   ))}
                 </>
               )}
-              <div className={`${styles['item']} ${styles['input-empty-item']}`} style={!searchInputRef.current?.value.trim() ? {} : { display: 'none' }}>
-                {t('search-empty')}
-              </div>
             </div>
           </div>
         </div>
         <div className={styles['mid']}>
-          <div className={`${styles['navegate-tab']} ${isSelectedHome ? styles['active'] : ''}`} data-key="60060" onClick={() => setSection('home')}>
+          <div className={`${styles['navegate-tab']} ${isSelectedHome ? styles['active'] : ''}`} data-key="60060" onClick={handleHomeSectionBtnClick}>
             {t('home')}
           </div>
         </div>
         <div className={styles['right']}>
-          <div className={styles['navegate-tab']} data-key="30014" onClick={() => Popup.openCreateServer(userId)}>
+          <div className={styles['navegate-tab']} data-key="30014" onClick={handleCreateServerClick}>
             {t('create-server')}
           </div>
           {!isSelectedPersonalExclusive && (
-            <div className={styles['navegate-tab']} data-key="60004" onClick={() => setSection('personal-exclusive')}>
+            <div className={styles['navegate-tab']} data-key="60004" onClick={handlePersonalExclusiveSectionBtnClick}>
               {t('personal-exclusive')}
             </div>
           )}
           {isSelectedPersonalExclusive && (
-            <div className={styles['navegate-tab']} data-key="60005" onClick={() => setSection('home')}>
+            <div className={styles['navegate-tab']} data-key="60005" onClick={handleBackBtnClick}>
               {t('back')}
             </div>
           )}
@@ -298,24 +296,26 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
               {filteredAnns.length > 0 ? (
                 filteredAnns.map((ann) => (
                   <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => setSelectedAnn(ann)}>
-                    {!ann.attachmentUrl ? defaultAnnouncement(ann) : null}
+                    {!ann.attachmentUrl ? <DefaultAnnouncement announcement={ann} /> : null}
                   </div>
                 ))
               ) : (
-                <div className={styles['banner']}>{defaultAnnouncement({} as Types.Announcement)}</div>
+                <div className={styles['banner']}>
+                  <DefaultAnnouncement announcement={{} as Types.Announcement} />
+                </div>
               )}
             </div>
             {filteredAnns.length > 0 && (
               <>
                 <div className={styles['number-list']}>
                   {filteredAnns.map((_, index) => (
-                    <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)}></nav>
+                    <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)} />
                   ))}
                 </div>
-                <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={prevAnn}>
+                <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnnBtnClick}>
                   {'◀'}
                 </nav>
-                <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={nextAnn}>
+                <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnnBtnClick}>
                   {'▶'}
                 </nav>
               </>
@@ -324,38 +324,22 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
         </div>
         <div className={styles['home-wrapper']}>
           <div className={styles['server-list-title']}>{t('recommend-server')}</div>
-          <div className={styles['recommend-server-tabs']}>
-            {RECOMMEND_SERVER_CATEGORY_TABS.map((tab) => (
-              <div
-                key={tab.key}
-                data-category={tab.key}
-                className={`${styles['recommend-server-tab']} ${selectReommendServerCategory === tab.key ? styles['active'] : ''}`}
-                onClick={() => setSelectRecommendServerCategory(tab.key)}
-              >
-                {t(tab.tKey)}
-              </div>
-            ))}
-          </div>
           <section className={styles['servers-container']}>
-            {filteredRecommendServers.length > 0 && (
-              <div className={styles['server-list']}>
-                {filteredRecommendServers.map((server) => (
-                  <RecommendServerCard key={server.serverId} user={user} recommendServer={server} />
-                ))}
-              </div>
-            )}
+            <div className={styles['server-list']}>
+              {filteredRecommendServers.map((server) => (
+                <RecommendServerCard key={server.serverId} recommendServer={server} />
+              ))}
+            </div>
           </section>
         </div>
         <div className={styles['home-wrapper']}>
           <div className={styles['server-list-title']}>{t('official-server')}</div>
           <section className={styles['servers-container']}>
-            {filteredOfficialServers.length > 0 && (
-              <div className={styles['server-list']}>
-                {filteredOfficialServers.map((server) => (
-                  <RecommendServerCard key={server.serverId} user={user} recommendServer={server} />
-                ))}
-              </div>
-            )}
+            <div className={styles['server-list']}>
+              {filteredOfficialServers.map((server) => (
+                <RecommendServerCard key={server.serverId} recommendServer={server} />
+              ))}
+            </div>
           </section>
         </div>
       </main>
@@ -363,15 +347,15 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
         {selectedAnn && (
           <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
             <div className={styles['announcement-detail-header']}>
-              <div className={styles['announcement-type']} data-category={selectedAnn?.category}>
-                {t(`${selectedAnn?.category}`)}
+              <div className={styles['announcement-type']} data-category={selectedAnn.category}>
+                {t(`${selectedAnn.category}`)}
               </div>
-              <div className={styles['announcement-detail-title']}>{selectedAnn?.title}</div>
-              <div className={styles['announcement-datail-date']}>{selectedAnn && Language.getFormatDate(selectedAnn.timestamp)}</div>
+              <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
+              <div className={styles['announcement-datail-date']}>{Language.getFormatDate(selectedAnn.timestamp)}</div>
             </div>
             {selectedAnn.attachmentUrl && <Image className={styles['banner']} src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />}
             <div className={styles['announcement-detail-content']}>
-              <MarkdownContent markdownText={selectedAnn?.content ?? ''} />
+              <MarkdownContent markdownText={selectedAnn.content} />
             </div>
           </div>
         )}
@@ -395,3 +379,43 @@ HomePageComponent.displayName = 'HomePageComponent';
 const HomePage = dynamic(() => Promise.resolve(HomePageComponent), { ssr: false });
 
 export default HomePage;
+
+interface SearchResultItemProps {
+  server: Types.Server;
+  onServerSelect: (server: Types.Server) => void;
+}
+
+const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, onServerSelect }) => {
+  // Handlers
+  const handleClick = () => {
+    onServerSelect(server);
+  };
+
+  return (
+    <div className={styles['item']} onClick={handleClick}>
+      <Image className={styles['server-avatar-picture']} src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
+      <div className={styles['server-info-text']}>
+        <div className={styles['server-name-text']}>{server.name}</div>
+        <div className={styles['server-id-box']}>
+          <div className={styles['id-icon']} />
+          <div className={styles['server-id-text']}>{server.specialId || server.displayId}</div>
+        </div>
+      </div>
+    </div>
+  );
+});
+
+SearchResultItem.displayName = 'SearchResultItem';
+
+interface DefaultAnnouncementProps {
+  announcement: Types.Announcement;
+}
+
+const DefaultAnnouncement: React.FC<DefaultAnnouncementProps> = React.memo(({ announcement }) => (
+  <>
+    <Image loading="lazy" src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
+    <span>{announcement.title}</span>
+  </>
+));
+
+DefaultAnnouncement.displayName = 'DefaultAnnouncement';

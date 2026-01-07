@@ -80,7 +80,7 @@ interface WebRTCProviderProps {
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Hooks
-  const soundPlayer = useSoundPlayer();
+  const { playSound } = useSoundPlayer();
 
   // Refs
   const rafIdListRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
@@ -88,7 +88,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
   const speakerRef = useRef<HTMLAudioElement | null>(null);
-  const soundPlayerRef = useRef(soundPlayer);
+  const playSoundRef = useRef(playSound);
 
   // Nodes
   const micNodesRef = useRef<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null }>({ stream: null, source: null, gain: null });
@@ -767,7 +767,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const pressSpeakKey = useCallback(() => {
     if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
-    soundPlayerRef.current.playSound('startSpeaking');
+    playSoundRef.current?.('startSpeaking');
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = true;
     });
@@ -777,7 +777,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const releaseSpeakKey = useCallback(() => {
     if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
-    soundPlayerRef.current.playSound('stopSpeaking');
+    playSoundRef.current?.('stopSpeaking');
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = false;
     });

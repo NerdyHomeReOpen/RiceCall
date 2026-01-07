@@ -511,12 +511,12 @@
   min-width: 0;
 }
 
-.user-activity-top>div:first-child,
-.user-activity-top>div:nth-child(2) {
+.user-activity-top > div:first-child,
+.user-activity-top > div:nth-child(2) {
   flex-shrink: 0;
 }
 
-.user-activity-top>div:last-child {
+.user-activity-top > div:last-child {
   flex-shrink: 0;
   margin-left: auto;
 }

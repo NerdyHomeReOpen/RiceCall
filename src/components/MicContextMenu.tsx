@@ -1,84 +1,11 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
+import { cleanMenu } from '@/utils';
+
 import styles from '@/styles/contextMenu.module.css';
-import { useTranslation } from 'react-i18next';
-
-/**
- * Clean the menu items by removing duplicate separators and ensuring that separators are not placed at the beginning or end of the menu.
- * @param items - The menu items to clean.
- * @returns The cleaned menu items.
- */
-export function cleanMenu(items: Types.ContextMenuItem[]): Types.ContextMenuItem[] {
-  const preFiltered = items.filter((item) => item.id === 'separator' || item.show !== false);
-  const result: Types.ContextMenuItem[] = [];
-
-  for (let i = 0; i < preFiltered.length; i++) {
-    const cur = preFiltered[i];
-    if (cur.id === 'separator') {
-      if (result.length === 0) continue;
-      const hasVisibleAfter = preFiltered.slice(i + 1).some((it) => it.id !== 'separator');
-      if (!hasVisibleAfter) continue;
-      if (result[result.length - 1].id === 'separator') continue;
-    }
-    result.push(cur);
-  }
-
-  return result;
-}
-
-interface MicContextMenuItemProps {
-  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
-  item: Types.ContextMenuItem;
-  onClose: () => void;
-}
-
-const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
-  // Hooks
-  const { t } = useTranslation();
-
-  // States
-  const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
-
-  // Variables
-  const { id, label, disabled, hasSubmenu, icon, submenuItems, onClick } = item;
-
-  // Handlers
-  const handleClick = () => {
-    if (disabled) return;
-    onClick?.();
-    onClose();
-  };
-
-  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!hasSubmenu || !submenuItems) return;
-    const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
-    const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
-    const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
-    setSubMenu(<MicContextMenu items={submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
-  };
-
-  const handleMouseLeave = () => {
-    if (hasSubmenu) setSubMenu(null);
-  };
-
-  return (
-    <div
-      key={id}
-      className={`${styles['option']} ${hasSubmenu ? styles['has-submenu'] : ''} ${disabled ? styles['disabled'] : ''}`}
-      data-type={icon || ''}
-      onClick={handleClick}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      {t(label)}
-      {hasSubmenu && subMenu}
-    </div>
-  );
-});
-
-MicContextMenuItem.displayName = 'MicContextMenuItem';
 
 interface MicContextMenuProps {
   x: number;
@@ -146,3 +73,55 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
 MicContextMenu.displayName = 'MicContextMenu';
 
 export default MicContextMenu;
+
+interface MicContextMenuItemProps {
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
+  item: Types.ContextMenuItem;
+  onClose: () => void;
+}
+
+const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
+  // Hooks
+  const { t } = useTranslation();
+
+  // States
+  const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
+
+  // Variables
+  const { id, label, disabled, hasSubmenu, icon, submenuItems, onClick } = item;
+
+  // Handlers
+  const handleClick = () => {
+    if (disabled) return;
+    onClick?.();
+    onClose();
+  };
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!hasSubmenu || !submenuItems) return;
+    const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
+    const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
+    const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
+    setSubMenu(<MicContextMenu items={submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
+  };
+
+  const handleMouseLeave = () => {
+    if (hasSubmenu) setSubMenu(null);
+  };
+
+  return (
+    <div
+      key={id}
+      className={`${styles['option']} ${hasSubmenu ? styles['has-submenu'] : ''} ${disabled ? styles['disabled'] : ''}`}
+      data-type={icon || ''}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {t(label)}
+      {hasSubmenu && subMenu}
+    </div>
+  );
+});
+
+MicContextMenuItem.displayName = 'MicContextMenuItem';

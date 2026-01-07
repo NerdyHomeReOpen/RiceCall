@@ -26,7 +26,7 @@ interface CategoryTabProps {
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded = { [category.channelId]: true }, selectedItemId, setExpanded = () => {}, setSelectedItemId }) => {
   // Hooks
   const { showContextMenu } = useContextMenu();
-  const { handleCategoryExpanded } = useFindMeContext();
+  const { expandCategoryHandlerRef } = useFindMeContext();
 
   // Selectors
   const user = useAppSelector((state) => state.user.data);
@@ -61,7 +61,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded
   const filteredCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
   const filteredCategoryMembers = [...categoryMembers].sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt);
 
-  // Handlers
+  // Functions
   const getTabContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinChannelOption({ canJoin, isInChannel }, () => Popup.connectChannel(currentServerId, categoryId, canJoin, needsPassword))
@@ -84,6 +84,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded
       .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => Popup.editServer(currentServerId, { receptionLobbyId: categoryId }))
       .build();
 
+  // Handlers
   const handleTabClick = () => {
     if (isSelected) setSelectedItemId(null);
     else setSelectedItemId(`category-${categoryId}`);
@@ -139,10 +140,10 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded
   // Effect
   useEffect(() => {
     if (!isInCategory) return;
-    handleCategoryExpanded.current = () => {
+    expandCategoryHandlerRef.current = () => {
       setExpanded((prev) => ({ ...prev, [categoryId]: true }));
     };
-  }, [categoryId, handleCategoryExpanded, setExpanded, isInCategory]);
+  }, [categoryId, expandCategoryHandlerRef, setExpanded, isInCategory]);
 
   return (
     <>

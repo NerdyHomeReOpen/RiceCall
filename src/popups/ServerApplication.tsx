@@ -15,12 +15,12 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
   // Hooks
   const { t } = useTranslation();
 
-  const handleOpenShowFrame = () => {
+  const handleShowFrameBtnClick = () => {
     ipc.popup.submit('serverApplication', 'openShowFrame');
     ipc.window.close();
   };
 
-  const handleOpenChannelEvent = () => {
+  const handleChannelEventBtnClick = () => {
     ipc.popup.submit('serverApplication', 'openChannelEvent');
     ipc.window.close();
   };
@@ -30,29 +30,29 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
       <div className={popupStyles['popup-body']}>
         <div className={styles['middle-area']}>
           <div className={`${styles['button-item-box']} disabled`}>
-            <div className={styles['button-item-icon']}></div>
+            <div className={styles['button-item-icon']} />
             <div className={styles['button-item-text']}>{t('vote')}</div>
           </div>
-          <div className={styles['button-item-box']} onClick={handleOpenChannelEvent}>
-            <div className={styles['button-item-icon']}></div>
+          <div className={styles['button-item-box']} onClick={handleChannelEventBtnClick}>
+            <div className={styles['button-item-icon']} />
             <div className={styles['button-item-text']}>{t('channel-event')}</div>
           </div>
-          <div className={styles['button-item-box']} onClick={handleOpenShowFrame}>
-            <div className={styles['button-item-icon']}></div>
+          <div className={styles['button-item-box']} onClick={handleShowFrameBtnClick}>
+            <div className={styles['button-item-icon']} />
             <div className={styles['button-item-text']}>{t('send-flower')}</div>
           </div>
           <div className={`${styles['button-item-box']} disabled`}>
-            <div className={styles['button-item-icon']}></div>
+            <div className={styles['button-item-icon']} />
             <div className={styles['button-item-text']}>{t('scratch-card')}</div>
           </div>
           <div className={`${styles['button-item-box']} ${server.isShowAvailable ? '' : 'disabled'}`}>
-            <div className={styles['button-item-icon']}></div>
+            <div className={styles['button-item-icon']} />
             <div className={styles['button-item-text']}>{t('show-room')}</div>
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={styles['placeholder']}></div>
+        <div className={styles['placeholder']} />
       </div>
     </div>
   );

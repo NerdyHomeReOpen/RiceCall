@@ -23,15 +23,20 @@ const ImageViewerProvider = ({ children }: ImageViewerProviderProps) => {
   // States
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Handlers
-  const handleSelectImage = (image: string) => {
+  // Functions
+  const selectImage = (image: string) => {
     setSelectedImage(image);
   };
 
+  // Handlers
+  const handleUnselectImage = () => {
+    setSelectedImage(null);
+  };
+
   return (
-    <ImageViewerContext.Provider value={{ selectImage: handleSelectImage }}>
+    <ImageViewerContext.Provider value={{ selectImage }}>
       {children}
-      <div className={`${styles['image-viewer']} ${selectedImage ? styles['visible'] : styles['hidden']}`} onClick={() => setSelectedImage(null)}>
+      <div className={`${styles['image-viewer']} ${selectedImage ? styles['visible'] : styles['hidden']}`} onClick={handleUnselectImage}>
         {selectedImage && <Image loading="lazy" src={selectedImage} alt="image" onClick={(e) => e.stopPropagation()} width={-1} height={-1} />}
       </div>
     </ImageViewerContext.Provider>

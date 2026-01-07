@@ -10,11 +10,10 @@ import styles from '@/styles/message.module.css';
 type MessageGroup = (Types.DirectMessage & { contents: string[] }) | (Types.PromptMessage & { contents: string[] });
 
 interface DirectMessageContentProps {
-  user: Types.User;
   messages: (Types.DirectMessage | Types.PromptMessage)[];
 }
 
-const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ user, messages }) => {
+const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages }) => {
   // Refs
   const messagesViewerRef = useRef<HTMLDivElement>(null);
 
@@ -41,11 +40,7 @@ const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ 
   return (
     <div ref={messagesViewerRef} className={styles['message-viewer-wrapper']}>
       {messageGroups.map((messageGroup, index) =>
-        messageGroup.type === 'dm' ? (
-          <DirectMessageTab key={index} user={user} messageGroup={messageGroup} />
-        ) : (
-          <PromptMessageTab key={index} user={user} messageGroup={messageGroup} messageType={messageGroup.type} />
-        ),
+        messageGroup.type === 'dm' ? <DirectMessageTab key={index} messageGroup={messageGroup} /> : <PromptMessageTab key={index} messageGroup={messageGroup} messageType={messageGroup.type} />,
       )}
     </div>
   );

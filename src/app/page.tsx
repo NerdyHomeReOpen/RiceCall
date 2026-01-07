@@ -30,9 +30,9 @@ import { useActionScanner } from '@/providers/ActionScanner';
 import * as Popup from '@/utils/popup';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
-import headerStyles from '@/styles/header.module.css';
-
 import { LANGUAGES } from '@/constant';
+
+import headerStyles from '@/styles/header.module.css';
 
 type Tab = {
   id: 'home' | 'friends' | 'server';
@@ -63,6 +63,7 @@ const Header: React.FC = React.memo(() => {
   const hasFriendApplication = friendApplications.length !== 0;
   const hasMemberInvitation = memberInvitations.length !== 0;
   const hasSystemNotification = systemNotifications.length !== 0;
+
   const mainTabs: Tab[] = useMemo(
     () => [
       { id: 'home', label: t('home') },
@@ -72,21 +73,7 @@ const Header: React.FC = React.memo(() => {
     [currentServerName, t],
   );
 
-  // Handlers
-  const maximize = () => {
-    if (isFullscreen) return;
-    ipc.window.maximize();
-  };
-
-  const unmaximize = () => {
-    if (!isFullscreen) return;
-    ipc.window.unmaximize();
-  };
-
-  const minimize = () => {
-    ipc.window.minimize();
-  };
-
+  // Functions
   const logout = () => {
     ipc.auth.logout();
     localStorage.removeItem('token');
@@ -97,11 +84,6 @@ const Header: React.FC = React.memo(() => {
     ipc.exit();
   };
 
-  const close = () => {
-    if (isCloseToTray) ipc.window.close();
-    else ipc.exit();
-  };
-
   const changeLanguage = (language: Types.LanguageKey) => {
     ipc.language.set(language);
     i18n.changeLanguage(language);
@@ -110,7 +92,7 @@ const Header: React.FC = React.memo(() => {
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
       .addSystemSettingOption(() => Popup.openSystemSetting(userId))
-      .addChangeThemeOption(Popup.openChangeTheme)
+      .addChangeThemeOption(() => Popup.openChangeTheme())
       .addFeedbackOption(() => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'))
       .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
       .addHelpCenterOption(
@@ -123,10 +105,11 @@ const Header: React.FC = React.memo(() => {
         },
         () => {},
       )
-      .addLogoutOption(logout)
-      .addExitOption(exit)
+      .addLogoutOption(() => logout())
+      .addExitOption(() => exit())
       .build();
 
+  // TODO: Make a NotificationMenuBuilder
   const getNotificationMenuItems = () => [
     {
       id: 'no-unread-notify',
@@ -168,7 +151,29 @@ const Header: React.FC = React.memo(() => {
     },
   ];
 
+  // Handlers
+  const handleMaximizeBtnClick = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximizeBtnClick = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
+  };
+
+  const handleMinimizeBtnClick = () => {
+    ipc.window.minimize();
+  };
+
+  const handleCloseBtnClick = () => {
+    if (isCloseToTray) ipc.window.close();
+    else ipc.exit();
+  };
+
   const handleStatusDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
     showStatusDropdown(x, y, 'right-bottom', (status) => {
       setIsManualIdling(status !== 'online');
@@ -188,6 +193,10 @@ const Header: React.FC = React.memo(() => {
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
     showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
+  };
+
+  const handleNameClick = () => {
+    Popup.openUserInfo(userId, userId);
   };
 
   // Effects
@@ -212,7 +221,7 @@ const Header: React.FC = React.memo(() => {
   return (
     <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
       <div className={headerStyles['title-box']}>
-        <div className={headerStyles['name-box']} onClick={() => Popup.openUserInfo(userId, userId)}>
+        <div className={headerStyles['name-box']} onClick={handleNameClick}>
           {userName}
         </div>
         <div className={headerStyles['status-box']} onClick={handleStatusDropdownClick}>
@@ -233,9 +242,9 @@ const Header: React.FC = React.memo(() => {
         </div>
         <div className={headerStyles['spliter']} />
         <div className={headerStyles['menu']} onClick={handleMenuClick} />
-        <div className={headerStyles['minimize']} onClick={minimize} />
-        {isFullscreen ? <div className={headerStyles['restore']} onClick={unmaximize} /> : <div className={headerStyles['maxsize']} onClick={maximize} />}
-        <div className={headerStyles['close']} onClick={close} />
+        <div className={headerStyles['minimize']} onClick={handleMinimizeBtnClick} />
+        {isFullscreen ? <div className={headerStyles['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyles['maxsize']} onClick={handleMaximizeBtnClick} />}
+        <div className={headerStyles['close']} onClick={handleCloseBtnClick} />
       </div>
     </header>
   );
@@ -250,15 +259,15 @@ interface TabItemProps {
 
 const TabItem = React.memo(({ tab, currentServerId }: TabItemProps) => {
   // Hooks
-  const mainTab = useMainTab();
+  const { selectedTabId, setSelectedTabId } = useMainTab();
 
   // Variables
   const { id: tabId, label: tabLabel } = tab;
-  const isSelected = tabId === mainTab.selectedTabId;
+  const isSelected = tabId === selectedTabId;
 
   // Handlers
   const handleTabClick = () => {
-    mainTab.setSelectedTabId(tabId);
+    setSelectedTabId(tabId);
   };
 
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {

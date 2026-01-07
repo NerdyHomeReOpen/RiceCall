@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -9,23 +10,35 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditNicknamePopupProps {
-  userId: Types.User['userId'];
   serverId: Types.Server['serverId'];
   member: Types.Member;
 }
 
-const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId, member }) => {
+const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
 
   // States
   const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
   // Variables
+  const { userId } = user;
   const { name: memberName } = member;
 
   // Handlers
-  const handleClose = () => {
+  const handleConfirmBtnClick = () => {
+    Popup.editMember(userId, serverId, { nickname: memberNickname || null });
+    ipc.window.close();
+  };
+
+  const handleApplyBtnClick = () => {
+    Popup.editMember(userId, serverId, { nickname: memberNickname || null });
+  };
+
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -46,19 +59,13 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div
-          className={popupStyles['button']}
-          onClick={() => {
-            Popup.editMember(userId, serverId, { nickname: memberNickname || null });
-            handleClose();
-          }}
-        >
+        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
-        <div className={popupStyles['button']} onClick={() => Popup.editMember(userId, serverId, { nickname: memberNickname || null })}>
+        <div className={popupStyles['button']} onClick={handleApplyBtnClick}>
           {t('apply')}
         </div>
       </div>

@@ -82,7 +82,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, canJoin, 
   const isDraggable = !isSelf && isSuperior && Permission.isChannelMod(permissionLevel);
   const memberHasVip = memberVip > 0;
 
-  // Handlers
+  // Functions
   const getStatusIcon = () => {
     if (isUserMuted || isMemberVoiceMuted) return 'muted';
     if (isUserSpeaking) return 'play';
@@ -132,6 +132,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, canJoin, 
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior, channelCategoryId }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
+  // Handlers
   const handleTabClick = () => {
     if (isSelected) setSelectedItemId(null);
     else setSelectedItemId(`user-${memberUserId}`);
@@ -157,6 +158,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, canJoin, 
   };
 
   const handleTabMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     hoverTimerRef.current = setTimeout(() => {

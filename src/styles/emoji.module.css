@@ -232,7 +232,7 @@
   border: none;
 }
 
-.emoji-tab-btn+.emoji-tab-btn {
+.emoji-tab-btn + .emoji-tab-btn {
   margin-left: 0;
 }
 

@@ -10,10 +10,10 @@ import styles from '@/styles/register.module.css';
 
 interface RegisterPageProps {
   display: boolean;
-  setSection: (section: 'login' | 'register') => void;
+  onBackToLoginBtnClick: () => void;
 }
 
-const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, setSection }) => {
+const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, onBackToLoginBtnClick }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -43,7 +43,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     !usernameError &&
     !emailError;
 
-  // Handlers
+  // Functions
   function validateAccount(value: string): string {
     value = value.trim();
     if (!value) return t('account-required');
@@ -82,6 +82,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     return '';
   }
 
+  // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'account') {
@@ -102,7 +103,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     }
   };
 
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+  const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'account') {
       setAccountError(validateAccount(value));
@@ -117,7 +118,9 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     }
   };
 
-  const submit = async () => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
     if (!account.trim()) {
       setAccountError(t('please-input-account'));
     }
@@ -138,18 +141,22 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     await ipc.auth.register({ account, password, email, username, locale: i18n.language ?? 'zh-TW' }).then((res) => {
       if (res.success) {
-        Popup.openAlertDialog(t(res.message, { '0': email }), () => setSection('login'));
+        Popup.openAlertDialog(t(res.message, { '0': email }), onBackToLoginBtnClick);
       }
     });
 
     setIsLoading(false);
   };
 
+  const handleBackToLoginBtnClick = () => {
+    onBackToLoginBtnClick();
+  };
+
   return (
     <main className={styles['register']} style={display ? {} : { display: 'none' }}>
       <main className={styles['register-body']}>
         <div className={styles['app-logo']} />
-        <div className={styles['form-wrapper']}>
+        <form className={styles['form-wrapper']} onSubmit={handleSubmit}>
           {isLoading ? (
             <>
               <div className={styles['loading-indicator']}>{`${t('registering')}...`}</div>
@@ -165,7 +172,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     name="account"
                     value={account}
                     onChange={handleInputChange}
-                    onBlur={handleBlur}
+                    onBlur={handleInputBlur}
                     placeholder={t('please-input-account')}
                     className={styles['input']}
                     style={accountError ? { borderColor: 'var(--text-warning)' } : {}}
@@ -181,7 +188,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     name="password"
                     value={password}
                     onChange={handleInputChange}
-                    onBlur={handleBlur}
+                    onBlur={handleInputBlur}
                     placeholder={t('please-input-password')}
                     className={styles['input']}
                     style={passwordError ? { borderColor: 'var(--text-warning)' } : {}}
@@ -197,7 +204,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     name="confirmPassword"
                     value={confirmPassword}
                     onChange={handleInputChange}
-                    onBlur={handleBlur}
+                    onBlur={handleInputBlur}
                     placeholder={t('please-input-password-again')}
                     className={styles['input']}
                     style={confirmPasswordError ? { borderColor: 'var(--text-warning)' } : {}}
@@ -213,7 +220,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     name="email"
                     value={email}
                     onChange={handleInputChange}
-                    onBlur={handleBlur}
+                    onBlur={handleInputBlur}
                     placeholder={t('please-input-email')}
                     className={styles['input']}
                     style={emailError ? { borderColor: 'var(--text-warning)' } : {}}
@@ -228,7 +235,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     name="username"
                     value={username}
                     onChange={handleInputChange}
-                    onBlur={handleBlur}
+                    onBlur={handleInputBlur}
                     placeholder={t('please-input-nickname')}
                     className={styles['input']}
                     style={usernameError ? { borderColor: 'var(--text-warning)' } : {}}
@@ -236,15 +243,15 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                 </div>
                 {usernameError ? <div className={styles['warn-text']}>{usernameError}</div> : <div className={styles['hint-text']}>{t('nickname-hint')}</div>}
               </div>
-              <button className={styles['submit-button']} onClick={submit} disabled={!canSubmit}>
+              <button className={styles['submit-button']} onClick={handleSubmit} disabled={!canSubmit}>
                 {t('register')}
               </button>
             </>
           )}
-        </div>
+        </form>
       </main>
       <div className={styles['register-footer']}>
-        <div className={styles['back-to-login']} onClick={() => setSection('login')}>
+        <div className={styles['back-to-login']} onClick={handleBackToLoginBtnClick}>
           {t('back-to-login')}
         </div>
       </div>

@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
@@ -13,13 +14,15 @@ import { ALLOWED_MESSAGE_KEYS } from '@/constant';
 import styles from '@/styles/message.module.css';
 
 interface DirectMessageProps {
-  user: Types.User;
   messageGroup: Types.DirectMessage & { contents: string[] };
 }
 
-const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ user, messageGroup }) => {
+const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }) => {
   // Hooks
   const { t } = useTranslation();
+
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
 
   // Variables
   const { userId } = user;

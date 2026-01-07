@@ -17,11 +17,11 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as Popup from '@/utils/popup';
 import { fromTags, toTags } from '@/utils/tagConverter';
 
+import { FONT_LIST, MAX_FILE_SIZE } from '@/constant';
+
 import popupStyles from '@/styles/popup.module.css';
 import settingStyles from '@/styles/setting.module.css';
 import markdownStyles from '@/styles/markdown.module.css';
-
-import { FONT_LIST, MAX_FILE_SIZE } from '@/constant';
 
 interface AnnouncementEditorProps {
   announcement: string;
@@ -32,7 +32,7 @@ interface AnnouncementEditorProps {
 const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, showPreview = false, onChange }) => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
+  const { showColorPicker, showEmojiPicker, showEmbedLinkInput } = useContextMenu();
   const editor = useEditor({
     extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode],
     content: fromTags(announcement),
@@ -54,7 +54,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const [fontFamily, setFontFamily] = useState('Arial');
   const [textColor, setTextColor] = useState('#000000');
 
-  // Handlers
+  // Functions
   const syncStyles = useCallback(() => {
     setIsBold(editor?.isActive('bold') || false);
     setIsItalic(editor?.isActive('italic') || false);
@@ -67,22 +67,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     setTextColor(editor?.getAttributes('textStyle').color || '#000000');
   }, [editor]);
 
-  const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
-    isUploadingRef.current = true;
-    if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-      isUploadingRef.current = false;
-      return;
-    }
-    ipc.data.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
-      if (response) {
-        editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
-        syncStyles();
-      }
-      isUploadingRef.current = false;
-    });
-  };
-
+  // Handlers
   const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const fontFamily = e.target.value;
     editor?.chain().setFontFamily(fontFamily).focus().run();
@@ -99,6 +84,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleTextAlignLeftClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     editor?.chain().setTextAlign('left').focus().run();
     setIsTextAlignLeft(editor?.isActive({ textAlign: 'left' }) || false);
     syncStyles();
@@ -106,6 +92,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleTextAlignCenterClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     editor?.chain().setTextAlign('center').focus().run();
     setIsTextAlignCenter(editor?.isActive({ textAlign: 'center' }) || false);
     syncStyles();
@@ -113,6 +100,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleTextAlignRightClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     editor?.chain().setTextAlign('right').focus().run();
     setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
     syncStyles();
@@ -120,6 +108,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleBoldClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     editor?.chain().toggleBold().focus().run();
     setIsBold(editor?.isActive('bold') || false);
     syncStyles();
@@ -127,6 +116,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleItalicClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     editor?.chain().toggleItalic().focus().run();
     setIsItalic(editor?.isActive('italic') || false);
     syncStyles();
@@ -134,6 +124,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleUnderlineClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     editor?.chain().toggleUnderline().focus().run();
     setIsUnderline(editor?.isActive('underline') || false);
     syncStyles();
@@ -141,8 +132,9 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleTextColorClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    contextMenu.showColorPicker(x, y, 'right-bottom', (color) => {
+    showColorPicker(x, y, 'right-bottom', (color) => {
       editor?.chain().setColor(color).focus().run();
       setTextColor(color);
       syncStyles();
@@ -151,8 +143,9 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    contextMenu.showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, false, undefined, undefined, (code) => {
+    showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, undefined, undefined, (code) => {
       editor?.chain().insertEmoji({ code }).focus().run();
       syncStyles();
     });
@@ -160,8 +153,9 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleEmbedLinkInputClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    contextMenu.showEmbedLinkInput(x, y, 'right-bottom', (linkUrl) => {
+    showEmbedLinkInput(x, y, 'right-bottom', (linkUrl) => {
       const isYouTube = linkUrl.trim().includes('youtube.com/');
       const isTwitch = linkUrl.trim().includes('twitch.tv/');
       const isKick = linkUrl.trim().includes('kick.com/');
@@ -194,7 +188,20 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
         const image = item.getAsFile();
         if (!image || isUploadingRef.current) return;
         image.arrayBuffer().then((arrayBuffer) => {
-          handleUploadImage(new Uint8Array(arrayBuffer), image.name);
+          const imageUnit8Array = new Uint8Array(arrayBuffer);
+          isUploadingRef.current = true;
+          if (imageUnit8Array.length > MAX_FILE_SIZE) {
+            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            isUploadingRef.current = false;
+            return;
+          }
+          ipc.data.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+            if (response) {
+              editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
+              syncStyles();
+            }
+            isUploadingRef.current = false;
+          });
         });
       }
     }

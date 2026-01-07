@@ -23,7 +23,16 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
   const { targetId, name: targetName } = friend;
 
   // Handlers
-  const handleClose = () => {
+  const handleFriendNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFriendNote(e.target.value);
+  };
+
+  const handleSaveBtnClick = () => {
+    Popup.editFriend(targetId, { note: friendNote });
+    handleCloseBtnClick();
+  };
+
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -33,21 +42,15 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('friend-note-name')}</div>
-            <input className={popupStyles['input']} type="text" value={friendNote} placeholder={targetName} onChange={(e) => setFriendNote(e.target.value)} />
+            <input className={popupStyles['input']} type="text" value={friendNote} placeholder={targetName} onChange={handleFriendNoteChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div
-          className={popupStyles['button']}
-          onClick={() => {
-            Popup.editFriend(targetId, { note: friendNote });
-            handleClose();
-          }}
-        >
-          {t('confirm')}
+        <div className={popupStyles['button']} onClick={handleSaveBtnClick}>
+          {t('save')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

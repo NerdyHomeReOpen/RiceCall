@@ -244,7 +244,7 @@ export type Theme = {
 };
 
 export type Emoji = {
-  id: number;
+  code: string;
   alt: string;
   path: string;
 };
@@ -570,6 +570,15 @@ export type SFUCreateConsumerReturnType = {
   producerId: string;
   kind: mediasoupClient.types.MediaKind;
   rtpParameters: any;
+};
+
+export type Staff = {
+  title: string;
+  contact: string;
+  github: string;
+  discord: string;
+  ricecall: string;
+  email: string;
 };
 
 export * from './database';

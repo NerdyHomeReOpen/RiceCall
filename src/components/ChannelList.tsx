@@ -65,6 +65,7 @@ const ChannelList: React.FC = React.memo(() => {
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const filteredChannels = [...channels].filter((c) => !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt));
   const onlineMemberMap = useMemo(() => new Map(onlineMembers.map((om) => [om.userId, om] as const)), [onlineMembers]);
+
   const queueMembers = useMemo<Types.QueueMember[]>(
     () =>
       queueUsers
@@ -79,7 +80,7 @@ const ChannelList: React.FC = React.memo(() => {
     [queueUsers, onlineMemberMap],
   );
 
-  // Handlers
+  // Functions
   const getServerSettingContextMenuItems = () =>
     new CtxMenuBuilder()
       .addApplyMemberOption({ permissionLevel }, () => Popup.applyMember(userId, currentServerId, currentServerReceiveApply))
@@ -108,6 +109,7 @@ const ChannelList: React.FC = React.memo(() => {
     setSelectedItemId(`user-${userId}`);
   };
 
+  // Handlers
   const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingQueueListRef.current = true;
@@ -118,7 +120,7 @@ const ChannelList: React.FC = React.memo(() => {
     queueListRef.current.style.maxHeight = `${e.clientY - queueListRef.current.offsetTop}px`;
   };
 
-  const handleInviteFriendsClick = () => {
+  const handleInviteFriendClick = () => {
     Popup.openInviteFriend(userId, currentServerId);
   };
 
@@ -171,14 +173,14 @@ const ChannelList: React.FC = React.memo(() => {
         </div>
         <div className={styles['base-info-wrapper']}>
           <div className={styles['box']}>
-            {!!isCurrentServerVerified && <div className={styles['verify-icon']} title={t('official-verified-server')}></div>}
+            {!!isCurrentServerVerified && <div className={styles['verify-icon']} title={t('official-verified-server')} />}
             <div className={styles['name-text']}>{currentServerName} </div>
           </div>
           <div className={styles['box']}>
             <div className={styles['id-text']}>{currentServerSpecialId || currentServerDisplayId}</div>
             <div className={styles['member-text']}>{onlineMembers.length}</div>
             <div className={styles['options']}>
-              <div className={styles['invitation-icon']} onClick={handleInviteFriendsClick} />
+              <div className={styles['invitation-icon']} onClick={handleInviteFriendClick} />
               <div className={styles['saperator-1']} />
               <div className={styles['setting-icon']} onClick={handleServerSettingClick}>
                 <div className={`${header['overlay']} ${hasNewMemberApplications ? header['new'] : ''}`} />

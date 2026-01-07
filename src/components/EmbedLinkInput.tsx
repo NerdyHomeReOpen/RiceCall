@@ -25,6 +25,20 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
   const [pickerY, setPickerY] = useState<number>(y);
   const [linkUrl, setLinkUrl] = useState<string>('');
 
+  // Handlers
+  const handleLinkUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setLinkUrl(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    onSubmit(linkUrl);
+    onClose();
+  };
+
+  const handleCloseBtnClick = () => {
+    onClose();
+  };
+
   // Effects
   useEffect(() => {
     if (!embedLinkInputRef.current) return;
@@ -63,19 +77,13 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
     <div ref={embedLinkInputRef} className={`context-menu-container ${settingStyles['input-dropdown']} ${popupStyles['col']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
       <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
         <div className={popupStyles['label']}>{t('link')}</div>
-        <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={(e) => setLinkUrl(e.target.value)} />
+        <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={handleLinkUrlChange} />
       </div>
       <div className={popupStyles['row']} style={{ justifyContent: 'space-between' }}>
-        <div
-          className={popupStyles['button']}
-          onClick={() => {
-            onSubmit(linkUrl);
-            onClose();
-          }}
-        >
+        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={onClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

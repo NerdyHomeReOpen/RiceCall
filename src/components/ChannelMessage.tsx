@@ -66,7 +66,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     [messageContents, t],
   );
 
-  // Handlers
+  // Functions
   const getMemberManagementSubmenuItems = () =>
     new CtxMenuBuilder()
       .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior }, () => Popup.terminateMember(senderUserId, currentServerId, senderName))
@@ -98,6 +98,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior, channelCategoryId }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
+  // Handlers
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();

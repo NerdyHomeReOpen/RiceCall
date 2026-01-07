@@ -1,6 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -15,28 +16,31 @@ import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 import homeStyles from '@/styles/home.module.css';
 
 interface RecommendServerCardProps {
-  user: Types.User;
   recommendServer: Types.RecommendServer;
 }
 
-const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ user, recommendServer }) => {
+const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ recommendServer }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
   const { setSelectedTabId } = useMainTab();
 
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+
   // Variables
   const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
   const { userId, currentServerId: userCurrentServerId } = user;
 
-  // Handles
+  // Functions
   const getServerCardContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinServerOption(handleServerCardClick)
       .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
       .build();
 
+  // Handlers
   const handleServerCardClick = () => {
     if (isLoading) return;
     if (serverId === userCurrentServerId) {

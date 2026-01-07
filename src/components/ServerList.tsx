@@ -23,6 +23,11 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) =>
   const displayedServers = expanded ? servers : servers.slice(0, 6);
   const canExpand = servers.length > 6;
 
+  // Handlers
+  const handleExpandBtnClick = () => {
+    setExpanded((prev) => !prev);
+  };
+
   return (
     <>
       <div className={homeStyles['server-list-title']}>{title}</div>
@@ -32,9 +37,13 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) =>
             <ServerCard key={server.serverId} server={server} />
           ))}
         </div>
-        {canExpand && (
-          <div className={`${homeStyles['view-more-btn']} ${expanded ? homeStyles['more-icon'] : homeStyles['less-icon']}`} onClick={() => setExpanded((prev) => !prev)}>
-            {expanded ? t('view-less') : t('view-more')}
+        {!canExpand ? null : expanded ? (
+          <div className={`${homeStyles['view-more-btn']} ${homeStyles['more-icon']}`} onClick={handleExpandBtnClick}>
+            {t('view-less')}
+          </div>
+        ) : (
+          <div className={`${homeStyles['view-more-btn']} ${homeStyles['less-icon']}`} onClick={handleExpandBtnClick}>
+            {t('view-more')}
           </div>
         )}
       </div>

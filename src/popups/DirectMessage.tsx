@@ -9,6 +9,7 @@ import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
 import { ChatEnter } from '@/extensions/ChatEnter';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -32,19 +33,16 @@ import messageStyles from '@/styles/message.module.css';
 import vipStyles from '@/styles/vip.module.css';
 
 interface DirectMessagePopupProps {
-  userId: Types.User['userId'];
-  targetId: Types.User['userId'];
-  user: Types.User;
   friend: Types.Friend | null;
   target: Types.User;
   event: 'directMessage' | 'shakeWindow';
   message: Types.DirectMessage;
 }
 
-const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ userId, targetId, user, friend: friendData, target, event, message }) => {
+const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ friend: friendData, target, event, message }) => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
+  const { showEmojiPicker } = useContextMenu();
   const editor = useEditor({
     extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode, ChatEnter],
     content: '',
@@ -60,6 +58,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const cooldownRef = useRef<number>(0);
   const messageAreaRef = useRef<HTMLDivElement>(null);
 
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+
   // States
   const [messageInput, setMessageInput] = useState<string>('');
   const [targetCurrentServer, setTargetCurrentServer] = useState<Types.Server | null>(null);
@@ -70,9 +71,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
 
   // Variables
-  const { avatarUrl: userAvatarUrl } = user;
+  const { userId, avatarUrl: userAvatarUrl } = user;
   const {
-    userId: targetUserId,
+    userId: targetId,
     name: targetName,
     avatarUrl: targetAvatarUrl,
     level: targetLevel,
@@ -92,26 +93,64 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
   const isBlocked = friend?.isBlocked;
   const isOnline = targetStatus !== 'offline';
 
-  // Handlers
+  // Functions
   const syncStyles = useCallback(() => {
     fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
     textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
   }, [editor]);
 
-  const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
-    isUploadingRef.current = true;
-    if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-      isUploadingRef.current = false;
-      return;
-    }
-    ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
-      if (response) {
-        editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
-        syncStyles();
+  const scrollToBottom = useCallback(() => {
+    if (!messageAreaRef.current) return;
+    messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
+    setIsAtBottom(true);
+  }, []);
+
+  // Handlers
+  const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const items = e.clipboardData.items;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const image = item.getAsFile();
+        if (!image || isUploadingRef.current) return;
+        image.arrayBuffer().then((arrayBuffer) => {
+          const imageUnit8Array = new Uint8Array(arrayBuffer);
+          isUploadingRef.current = true;
+          if (imageUnit8Array.length > MAX_FILE_SIZE) {
+            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            isUploadingRef.current = false;
+            return;
+          }
+          ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+            if (response) {
+              editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
+              syncStyles();
+            }
+            isUploadingRef.current = false;
+          });
+        });
       }
-      isUploadingRef.current = false;
-    });
+    }
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (isWarning) return;
+    if (isComposingRef.current) return;
+    if (e.shiftKey || e.ctrlKey) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (messageInput.trim().length === 0) return;
+      Popup.sendMessage(targetId, { type: 'dm', content: messageInput });
+      editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+      syncStyles();
+    }
+  };
+
+  const handleInputCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+
+  const handleInputCompositionEnd = () => {
+    isComposingRef.current = false;
   };
 
   const handleEmojiSelect = (code: string) => {
@@ -133,7 +172,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     localStorage.setItem('dm-textColor', color);
   };
 
-  const handleSendShakeWindow = () => {
+  const handleShakeWindowBtnClick = () => {
     if (cooldown > 0) return;
     if (isFriend) ipc.socket.send('shakeWindow', { targetId });
     else setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
@@ -151,14 +190,47 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     setIsAtBottom(isBottom);
   };
 
-  const handleScrollToBottom = useCallback(() => {
-    if (!messageAreaRef.current) return;
-    messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
-    setIsAtBottom(true);
-  }, []);
+  const handleNewMessageAlertClick = () => {
+    scrollToBottom();
+  };
 
-  const handleReport = () => {
+  const handleApplyFriendBtnClick = () => {
+    Popup.openApplyFriend(userId, targetId);
+  };
+
+  const handleBlockUserBtnClick = () => {
+    Popup.blockUser(targetId, targetName);
+  };
+
+  const handleUnblockUserBtnClick = () => {
+    Popup.unblockUser(targetId, targetName);
+  };
+
+  const handleReportBtnClick = () => {
     // window.open('https://ricecall.com/report-user', '_blank');
+  };
+
+  const handleTargetAvatarClick = () => {
+    Popup.openUserInfo(userId, targetId);
+  };
+
+  const handleUserAvatarClick = () => {
+    Popup.openUserInfo(userId, userId);
+  };
+
+  const handleServerNameClick = () => {
+    if (targetCurrentServer) handleServerSelect(targetCurrentServer);
+  };
+
+  const handleMessageHistoryBtnClick = () => {
+    Popup.openChatHistory(userId, targetId);
+  };
+
+  const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
+    showEmojiPicker(x, y, 'right-top', e.currentTarget as HTMLElement, true, fontSizeRef.current, textColorRef.current, handleEmojiSelect, handleFontSizeChange, handleTextColorChange);
   };
 
   // Effects
@@ -197,21 +269,21 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
     const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
 
     if (lastMessage.type !== 'dm' || lastMessage.userId === userId) {
-      setTimeout(() => handleScrollToBottom(), 50);
+      setTimeout(() => scrollToBottom(), 50);
     } else if (isBottom) {
-      setTimeout(() => handleScrollToBottom(), 50);
+      setTimeout(() => scrollToBottom(), 50);
     } else {
       setUnreadMessageCount((prev) => prev + 1);
     }
-  }, [directMessages, userId, handleScrollToBottom]);
+  }, [directMessages, userId, scrollToBottom]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') handleScrollToBottom();
+      if (e.key === 'Escape') scrollToBottom();
     };
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
-  }, [handleScrollToBottom]);
+  }, [scrollToBottom]);
 
   useEffect(() => {
     if (isAtBottom) setUnreadMessageCount(0);
@@ -219,11 +291,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: Types.User['userId']; update: Partial<Types.Friend> }[]) => {
-      const match = args.find((i) => String(i.targetId) === String(targetUserId));
+      const match = args.find((i) => String(i.targetId) === String(targetId));
       if (match) setFriend((prev) => (prev ? { ...prev, ...match.update } : Default.friend(match.update)));
     });
     return () => unsub();
-  }, [targetUserId]);
+  }, [targetId]);
 
   useEffect(() => {
     const onDirectMessage = (...args: Types.DirectMessage[]) => {
@@ -282,28 +354,20 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
         <div className={styles['direct-option-buttons']}>
           <div className={`${styles['file-share']} disabled`} />
           {!isFriend ? (
-            <div className={styles['apply-friend']} onClick={() => Popup.openApplyFriend(userId, targetId)} />
+            <div className={styles['apply-friend']} onClick={handleApplyFriendBtnClick} />
           ) : (
             <>
-              {!isBlocked ? (
-                <div className={styles['block-user']} onClick={() => Popup.blockUser(targetId, targetName)} />
-              ) : (
-                <div className={styles['un-block-user']} onClick={() => Popup.unblockUser(targetId, targetName)} />
-              )}
+              {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUserBtnClick} /> : <div className={styles['un-block-user']} onClick={handleUnblockUserBtnClick} />}
               <div className={`${styles['invite-temp-group']} disabled`} />
             </>
           )}
-          <div className={`${styles['report']} disabled`} onClick={handleReport} />
+          <div className={`${styles['report']} disabled`} onClick={handleReportBtnClick} />
         </div>
       </div>
       <div className={popupStyles['popup-body']}>
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
-            <div
-              className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`}
-              style={{ backgroundImage: `url(${targetAvatarUrl})` }}
-              onClick={() => Popup.openUserInfo(userId, targetId)}
-            />
+            <div className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`} style={{ backgroundImage: `url(${targetAvatarUrl})` }} onClick={handleTargetAvatarClick} />
             {targetVip > 0 && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${targetVip}`]}`} />}
             <div className={styles['user-state-box']}>
               <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} showTooltip={false} />
@@ -312,13 +376,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={() => Popup.openUserInfo(userId, userId)} />
+            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={handleUserAvatarClick} />
           </div>
         </div>
         <div className={styles['main-content']}>
           <div className={styles['action-body']}>
             {isFriend && isOnline && targetCurrentServer ? (
-              <div className={`${styles['action-area']} ${styles['clickable']}`} onClick={() => handleServerSelect(targetCurrentServer)}>
+              <div className={`${styles['action-area']} ${styles['clickable']}`} onClick={handleServerNameClick}>
                 <div className={`${styles['action-icon']} ${styles['in-server']}`} />
                 <div className={styles['action-title']}>{targetCurrentServerName}</div>
               </div>
@@ -339,10 +403,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             ) : null}
           </div>
           <div ref={messageAreaRef} onScroll={handleScroll} className={styles['message-area']}>
-            <DirectMessageContent messages={directMessages} user={user} />
-            <div style={{ minHeight: '10px' }}></div>
+            <DirectMessageContent messages={directMessages} />
+            <div style={{ minHeight: '10px' }} />
             {unreadMessageCount > 0 && (
-              <div className={messageStyles['new-message-alert']} onClick={handleScrollToBottom}>
+              <div className={messageStyles['new-message-alert']} onClick={handleNewMessageAlertClick}>
                 {t('has-new-message', { 0: unreadMessageCount })}
               </div>
             )}
@@ -351,32 +415,12 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
             <div className={styles['top-bar']}>
               <div className={styles['buttons']}>
                 <div className={`${styles['button']} ${styles['font']} disabled`} />
-                <div
-                  className={`${styles['button']} ${styles['emoji']}`}
-                  onMouseDown={(e) => {
-                    e.preventDefault();
-                    const x = e.currentTarget.getBoundingClientRect().left;
-                    const y = e.currentTarget.getBoundingClientRect().top;
-                    contextMenu.showEmojiPicker(
-                      x,
-                      y,
-                      'right-top',
-                      e.currentTarget as HTMLElement,
-                      true,
-                      false,
-                      fontSizeRef.current,
-                      textColorRef.current,
-                      (code) => handleEmojiSelect(code),
-                      (size) => handleFontSizeChange(size),
-                      (color) => handleTextColorChange(color),
-                    );
-                  }}
-                />
+                <div className={`${styles['button']} ${styles['emoji']}`} onMouseDown={handleEmojiPickerClick} />
                 <div className={`${styles['button']} ${styles['screen-shot']} disabled`} />
-                <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={handleSendShakeWindow} />
+                <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={handleShakeWindowBtnClick} />
               </div>
               <div className={styles['buttons']}>
-                <div className={`${styles['history-message']} disabled`} onClick={() => Popup.openChatHistory(userId, targetId)}>
+                <div className={`${styles['history-message']} disabled`} onClick={handleMessageHistoryBtnClick}>
                   {t('message-history')}
                 </div>
               </div>
@@ -386,32 +430,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ user
               placeholder={t('input-message')}
               className={`${styles['input']} ${markdownStyles['markdown-content']} ${isWarning ? styles['warning'] : ''}`}
               style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
-              onPaste={(e) => {
-                const items = e.clipboardData.items;
-                for (const item of items) {
-                  if (item.type.startsWith('image/')) {
-                    const image = item.getAsFile();
-                    if (!image || isUploadingRef.current) return;
-                    image.arrayBuffer().then((arrayBuffer) => {
-                      handleUploadImage(new Uint8Array(arrayBuffer), image.name);
-                    });
-                  }
-                }
-              }}
-              onKeyDown={(e) => {
-                if (isWarning) return;
-                if (isComposingRef.current) return;
-                if (e.shiftKey || e.ctrlKey) return;
-                if (e.key === 'Enter') {
-                  e.preventDefault();
-                  if (messageInput.trim().length === 0) return;
-                  Popup.sendMessage(targetId, { type: 'dm', content: messageInput });
-                  editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
-                  syncStyles();
-                }
-              }}
-              onCompositionStart={() => (isComposingRef.current = true)}
-              onCompositionEnd={() => (isComposingRef.current = false)}
+              onPaste={handleInputPaste}
+              onKeyDown={handleInputKeyDown}
+              onCompositionStart={handleInputCompositionStart}
+              onCompositionEnd={handleInputCompositionEnd}
               maxLength={MAX_INPUT_LENGTH}
             />
           </div>
