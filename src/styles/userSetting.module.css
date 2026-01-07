@@ -226,16 +226,15 @@
   text-align: center;
   cursor: text;
   user-select: text;
-  max-width: 60%;
-  max-height: 2.8em;
+  max-width: 70%;
+  min-height: 15px;
+  max-height: 30px;
   display: block;
   overflow-y: auto;
   overflow-x: hidden;
   scrollbar-gutter: stable;
   word-break: break-word;
   white-space: normal;
-  min-height: 15px;
-  max-height: 30px;
 }
 
 .user-signature::-webkit-scrollbar {
