@@ -43,7 +43,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
 
     // Variables
     const currentChannel = channels.find((c) => c.channelId === user.currentChannelId) || Default.channel();
-    const { userId } = user;
+    const { userId, currentServerId: userCurrentServerId } = user;
     const { serverId } = server;
     const { channelId: currentChannelId, name: currentChannelName, isLobby: isCurrentChannelLobby } = currentChannel;
     const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, currentChannel.permissionLevel);
@@ -103,6 +103,11 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(
     useEffect(() => {
       serverOnlineMembersRef.current = serverOnlineMembers;
     }, [serverOnlineMembers]);
+
+    useEffect(() => {
+      if (userCurrentServerId === serverId) return;
+      ipc.window.close();
+    }, [userCurrentServerId, serverId]);
 
     useEffect(() => {
       const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
