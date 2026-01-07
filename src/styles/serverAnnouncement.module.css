@@ -1,6 +1,5 @@
 .headers {
   background-color: var(--footer-background);
-  border-bottom: solid 1px var(--border-secondary);
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -20,7 +19,7 @@
   font-size: 14px;
   padding: 5px 30px;
   background-color: var(--background);
-  border: solid 1px var(--border-secondary);
+  border: solid 1px var(--border);
   border-bottom: none;
   border-top-left-radius: 5px;
   border-top-right-radius: 5px;

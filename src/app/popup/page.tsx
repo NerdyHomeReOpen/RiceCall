@@ -36,7 +36,7 @@ import MemberInvitation from '@/popups/MemberInvitation';
 import ImageCropper from '@/popups/ImageCropper';
 import InviteMember from '@/popups/InviteMember';
 import SearchUser from '@/popups/SearchUser';
-import ServerAnnouncement from '@/popups/serverAnnouncement';
+import ServerAnnouncement from '@/popups/ServerAnnouncement';
 import ServerApplication from '@/popups/ServerApplication';
 import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';

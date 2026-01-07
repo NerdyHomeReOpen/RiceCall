@@ -2,9 +2,9 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-import AnnouncementEditor from '@/components/AnnouncementEditor';
-
 import type * as Types from '@/types';
+
+import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 import popupStyles from '@/styles/popup.module.css';
 import styles from '@/styles/serverAnnouncement.module.css';
@@ -17,7 +17,6 @@ const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.me
   const { t } = useTranslation();
 
   const handleClose = () => {
-    console.log('click');
     ipc.window.close();
   };
 
