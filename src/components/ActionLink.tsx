@@ -33,7 +33,7 @@ export const JoinServerLink: React.FC<JoinServerLinkProps> = React.memo(({ serve
   }, [serverId, displayId]);
 
   return (
-    <span className={styles['actionLink']} onClick={() => handleJoinServer()}>
+    <span className={styles['actionLink']} onClick={handleJoinServer}>
       {content}
     </span>
   );
