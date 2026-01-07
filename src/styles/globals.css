@@ -157,7 +157,6 @@ input[type='checkbox'] {
   min-width: 19px;
   min-height: 19px;
   appearance: none;
-  cursor: pointer;
   background-position: 0 0;
   background-size: inherit;
   border: none;

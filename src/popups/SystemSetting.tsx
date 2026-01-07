@@ -201,22 +201,22 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('general-setting')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`}>
               <input name="autoLogin" type="checkbox" checked={autoLogin} onChange={(e) => setSystemSettings((prev) => ({ ...prev, autoLogin: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('auto-login-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="autoLaunch" type="checkbox" checked={autoLaunch} onChange={(e) => setSystemSettings((prev) => ({ ...prev, autoLaunch: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('auto-launch-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="alwaysOnTop" type="checkbox" checked={alwaysOnTop} onChange={(e) => setSystemSettings((prev) => ({ ...prev, alwaysOnTop: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('always-on-top-label')}</div>
-            </div>
+            </label>
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('status-setting')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="status-auto-idle" type="checkbox" checked={statusAutoIdle} onChange={(e) => setSystemSettings((prev) => ({ ...prev, statusAutoIdle: e.target.checked }))} />
               <div className={popupStyles['label']}>
                 {t('status-auto-idle-label-1')}
@@ -231,37 +231,37 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 />
                 {t('status-auto-idle-label-2')}
               </div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`}>
               <input name="status-auto-dnd" type="checkbox" checked={statusAutoDnd} onChange={(e) => setSystemSettings((prev) => ({ ...prev, statusAutoDnd: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('status-auto-dnd-label') + ' ' + t('soon')}</div>
-            </div>
+            </label>
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('channel-setting')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="channel-classic-mode" type="radio" checked={channelUIMode === 'classic'} onChange={() => setSystemSettings((prev) => ({ ...prev, channelUIMode: 'classic' }))} />
               <div className={popupStyles['label']}>{t('channel-ui-mode-classic-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="channel-three-line-mode" type="radio" checked={channelUIMode === 'three-line'} onChange={() => setSystemSettings((prev) => ({ ...prev, channelUIMode: 'three-line' }))} />
               <div className={popupStyles['label']}>{t('channel-ui-mode-three-line-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`}>
               <input name="channel-auto-mode" type="radio" checked={channelUIMode === 'auto'} onChange={() => setSystemSettings((prev) => ({ ...prev, channelUIMode: 'auto' }))} />
               <div className={popupStyles['label']}>{t('channel-ui-mode-auto-label')}</div>
-            </div>
+            </label>
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('close-setting')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="close-to-tray" type="radio" checked={closeToTray} onChange={() => setSystemSettings((prev) => ({ ...prev, closeToTray: true }))} />
               <div className={popupStyles['label']}>{t('close-to-tray-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="close-to-exit" type="radio" checked={!closeToTray} onChange={() => setSystemSettings((prev) => ({ ...prev, closeToTray: false }))} />
               <div className={popupStyles['label']}>{t('close-to-exit-label')}</div>
-            </div>
+            </label>
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('font-setting')}</div>
             </div>
@@ -374,15 +374,15 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               <input name="mix-setting-manual" type="radio" checked={!autoMixSetting} onChange={() => setSystemSettings((prev) => ({ ...prev, autoMixSetting: false }))} />
               <div className={popupStyles['label']}>{t('mix-setting-manual-label')}</div>
             </div> */}
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="echo-cancellation" type="checkbox" checked={echoCancellation} onChange={(e) => setSystemSettings((prev) => ({ ...prev, echoCancellation: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('echo-cancellation-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="noise-cancellation" type="checkbox" checked={noiseCancellation} onChange={(e) => setSystemSettings((prev) => ({ ...prev, noiseCancellation: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('noise-cancellation-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input
                 name="microphone-amplification"
                 type="checkbox"
@@ -390,7 +390,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 onChange={(e) => setSystemSettings((prev) => ({ ...prev, microphoneAmplification: e.target.checked }))}
               />
               <div className={popupStyles['label']}>{t('microphone-amplification-label')}</div>
-            </div>
+            </label>
             {/* <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('mix-mode-setting') + ' ' + t('soon')}</div>
             </div>
@@ -415,10 +415,10 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('default-speaking-mode')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="default-speaking-auto" type="radio" checked={speakingMode === 'key'} onChange={() => setSystemSettings((prev) => ({ ...prev, speakingMode: 'key' }))} />
               <div className={popupStyles['label']}>{t('default-speaking-mode-key-label')}</div>
-            </div>
+            </label>
             {speakingMode == 'key' && (
               <>
                 <div key={'speakingKey'} className={popupStyles['input-box']}>
@@ -439,10 +439,10 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 <div className={popupStyles['label']}>{t('setting-speaking-key-description')}</div>
               </>
             )}
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="default-speaking-auto" type="radio" checked={speakingMode === 'auto'} onChange={() => setSystemSettings((prev) => ({ ...prev, speakingMode: 'auto' }))} />
               <div className={popupStyles['label']}>{t('default-speaking-mode-auto-label')}</div>
-            </div>
+            </label>
           </div>
         </div>
         <div className={settingStyles['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
@@ -450,7 +450,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('anti-spam-setting')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input
                 name="forbid-friend-applications"
                 type="checkbox"
@@ -458,12 +458,12 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 onChange={(e) => setUserSettings((prev) => ({ ...prev, forbidFriendApplications: e.target.checked }))}
               />
               <div className={popupStyles['label']}>{t('forbid-friend-applications-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="forbid-shake-messages" type="checkbox" checked={!!forbidShakeMessages} onChange={(e) => setUserSettings((prev) => ({ ...prev, forbidShakeMessages: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('forbid-shake-messages-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input
                 name="forbid-member-invitations"
                 type="checkbox"
@@ -471,8 +471,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 onChange={(e) => setUserSettings((prev) => ({ ...prev, forbidMemberInvitations: e.target.checked }))}
               />
               <div className={popupStyles['label']}>{t('forbid-member-invitations-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input
                 name="forbid-stranger-messages"
                 type="checkbox"
@@ -480,23 +480,23 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 onChange={(e) => setUserSettings((prev) => ({ ...prev, forbidStrangerMessages: e.target.checked }))}
               />
               <div className={popupStyles['label']}>{t('forbid-stranger-messages-label')}</div>
-            </div>
+            </label>
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('privacy-setting')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="share-current-server" type="checkbox" checked={!!shareCurrentServer} onChange={(e) => setUserSettings((prev) => ({ ...prev, shareCurrentServer: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('share-current-server-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="share-recent-servers" type="checkbox" checked={!!shareRecentServers} onChange={(e) => setUserSettings((prev) => ({ ...prev, shareRecentServers: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('share-recent-servers-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="share-joined-servers" type="checkbox" checked={!!shareJoinedServers} onChange={(e) => setUserSettings((prev) => ({ ...prev, shareJoinedServers: e.target.checked }))} />
               <div className={popupStyles['label']}>{t('share-joined-servers-label')}</div>
-            </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            </label>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input
                 name="share-favorite-servers"
                 type="checkbox"
@@ -504,14 +504,14 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 onChange={(e) => setUserSettings((prev) => ({ ...prev, shareFavoriteServers: e.target.checked }))}
               />
               <div className={popupStyles['label']}>{t('share-favorite-servers-label')}</div>
-            </div>
+            </label>
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('message-history-setting')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']} disabled`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']} disabled`}>
               <input name="not-save-message-history" type="checkbox" checked={true} onChange={() => setUserSettings((prev) => ({ ...prev, notSaveMessageHistory: true }))} />
               <div className={popupStyles['label']}>{t('not-save-message-history-label') + t('soon')}</div>
-            </div>
+            </label>
           </div>
         </div>
         <div className={settingStyles['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
@@ -628,7 +628,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
         </div>
         <div className={settingStyles['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
           <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input
                 name="disable-sound-effect-all"
                 type="checkbox"
@@ -636,7 +636,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                 onChange={(e) => setSystemSettings((prev) => ({ ...prev, disableAllSoundEffect: e.target.checked }))}
               />
               <div className={popupStyles['label']}>{t('disable-all-sound-effect-label')}</div>
-            </div>
+            </label>
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('sound-effect-setting')}</div>
             </div>
@@ -716,7 +716,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
               <div className={popupStyles['label']}>{t('update-setting')}</div>
             </div>
             <div className={popupStyles['row']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <input
                   name="auto-check-for-updates"
                   type="checkbox"
@@ -724,7 +724,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
                   onChange={(e) => setSystemSettings((prev) => ({ ...prev, autoCheckForUpdates: e.target.checked }))}
                 />
                 <div className={popupStyles['label']}>{t('auto-check-for-updates-label')}</div>
-              </div>
+              </label>
               <div className={popupStyles['button']} onClick={() => handleCheckForUpdates()}>
                 {t('check-for-updates')}
               </div>

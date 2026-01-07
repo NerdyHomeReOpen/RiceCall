@@ -308,7 +308,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
             <div className={popupStyles['label']}>{t('channel-audio-quality')}</div>
             <div className={popupStyles['col']}>
               <div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                   <input
                     name="bitrate-64000"
                     type="radio"
@@ -317,11 +317,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     readOnly={!Permission.isChannelMod(permissionLevel)}
                   />
                   <div className={popupStyles['label']}>{t('chat-mode')}</div>
-                </div>
+                </label>
                 <div className={popupStyles['hint-text']}>{t('chat-mode-description')}</div>
               </div>
               <div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                   <input
                     name="bitrate-256000"
                     type="radio"
@@ -330,7 +330,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                     readOnly={!Permission.isChannelMod(permissionLevel)}
                   />
                   <div className={popupStyles['label']}>{t('entertainment-mode')}</div>
-                </div>
+                </label>
                 <div className={popupStyles['hint-text']}>{t('entertainment-mode-description')}</div>
               </div>
             </div>
@@ -359,7 +359,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <div className={popupStyles['label']}>{t('access-permission')}</div>
             </div>
             <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -368,8 +368,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('anyone-can-access-label')}</div>
-              </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
+              </label>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -378,8 +378,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('forbid-guest-access-label')}</div>
-              </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
+              </label>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -388,8 +388,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('message-only-label')}</div>
-              </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
+              </label>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input
                   type="radio"
                   name="visibility"
@@ -398,7 +398,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('require-password-label')}</div>
-              </div>
+              </label>
               {channelVisibility === 'private' && Permission.isChannelMod(permissionLevel) && (
                 <div className={popupStyles['input-box']}>
                   <input
@@ -421,7 +421,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <div className={popupStyles['label']}>{t('speaking-permission')}</div>
             </div>
             <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <input
                   name="forbidGuestQueue"
                   type="checkbox"
@@ -430,8 +430,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('forbid-guest-queue-label')}</div>
-              </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              </label>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <input
                   name="forbidGuestVoice"
                   type="checkbox"
@@ -440,7 +440,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('forbid-guest-voice-label')}</div>
-              </div>
+              </label>
             </div>
           </div>
         </div>
@@ -450,7 +450,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
               <div className={popupStyles['label']}>{t('text-permission')}</div>
             </div>
             <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <input
                   name="forbid-text"
                   type="checkbox"
@@ -459,8 +459,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('forbid-only-admin-text-label')}</div>
-              </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              </label>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <input
                   name="forbid-guest-text"
                   type="checkbox"
@@ -469,8 +469,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('forbid-guest-text-label')}</div>
-              </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              </label>
+              <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <input
                   name="forbid-guest-url"
                   type="checkbox"
@@ -479,7 +479,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
                   readOnly={!Permission.isChannelMod(permissionLevel)}
                 />
                 <div className={popupStyles['label']}>{t('forbid-guest-url-label')}</div>
-              </div>
+              </label>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <div className={popupStyles['label']}>
                   {t('guest-text-max-length-label')}
