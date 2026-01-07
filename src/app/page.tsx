@@ -331,7 +331,7 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (currentServerId && selectedTabIdRef.current !== 'server') setSelectedTabId('server');
-    else if (selectedTabIdRef.current === 'server') setSelectedTabId('home');
+    else if (!currentServerId && selectedTabIdRef.current === 'server') setSelectedTabId('home');
     setIsLoading(false);
     setLoadingServerId('');
   }, [currentServerId, setIsLoading, setLoadingServerId, setSelectedTabId]);
