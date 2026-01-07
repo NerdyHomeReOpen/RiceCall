@@ -1,0 +1,53 @@
+.headers {
+  background-color: var(--footer-background);
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  -webkit-app-region: drag;
+  position: relative;
+}
+
+.tabs {
+  display: flex;
+  flex-direction: row;
+  margin-left: 10px;
+  margin-top: 5px;
+}
+
+.tabs span {
+  font-size: 14px;
+  padding: 5px 30px;
+  background-color: var(--background);
+  border: solid 1px var(--border);
+  border-bottom: none;
+  border-top-left-radius: 5px;
+  border-top-right-radius: 5px;
+}
+
+.action-bars {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px;
+  -webkit-app-region: no-drag;
+}
+
+.close-btn {
+  display: block;
+  width: 14px;
+  height: 14px;
+  cursor: pointer;
+  background-position: 0 0;
+  background-size: cover;
+  background-image: url('/im/btn-close.webp');
+  background-repeat: no-repeat;
+}
+
+.close-btn:hover {
+  background-position: -14px 0;
+}
+
+.close-btn:active {
+  background-position: -28px 0;
+}

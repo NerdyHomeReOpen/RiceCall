@@ -158,6 +158,7 @@ const PopupSize: Record<Types.PopupType, { height: number; width: number }> = {
   memberApplicationSetting: { height: 220, width: 380 },
   memberInvitation: { height: 550, width: 500 },
   searchUser: { height: 200, width: 380 },
+  serverAnnouncement: { height: 400, width: 600 },
   serverApplication: { height: 150, width: 320 },
   serverSetting: { height: 520, width: 600 },
   serverBroadcast: { height: 300, width: 450 },

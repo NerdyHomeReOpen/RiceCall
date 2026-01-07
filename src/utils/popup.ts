@@ -148,3 +148,7 @@ export function handleOpenServerApplication(userId: Types.User['userId'], server
   ipc.popup.open('serverApplication', 'serverApplication', { userId, serverId });
   ipc.popup.onSubmit('serverApplication', onSubmit);
 }
+
+export function handleOpenServerAnnouncement(announcement: Types.Server['announcement']) {
+  ipc.popup.open('serverAnnouncement', 'serverAnnouncement', { announcement });
+}

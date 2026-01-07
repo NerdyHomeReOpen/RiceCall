@@ -548,7 +548,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(
 
     useEffect(() => {
       setUnreadMessageCount(0);
-    }, [currentServerId]);
+      if (currentServerId) Popup.handleOpenServerAnnouncement(currentServerAnnouncement);
+    }, [currentServerId, currentServerAnnouncement]);
 
     useEffect(() => {
       const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {

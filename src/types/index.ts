@@ -230,6 +230,7 @@ export type PopupType =
   | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'searchUser'
+  | 'serverAnnouncement'
   | 'serverApplication'
   | 'serverBroadcast'
   | 'serverSetting'
