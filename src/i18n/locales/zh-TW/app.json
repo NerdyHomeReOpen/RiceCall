@@ -487,7 +487,10 @@
   "server-application": "語音群應用",
   "server-broadcast": "群廣播",
   "server-info": "查看群資料",
-  "server-invitation-content": "我正在 <server> 樂翻天，麻吉趕快一起來玩！",
+  "server-invitation-content": {
+    "prefix": "我正在",
+    "suffix": "樂翻天，麻吉趕快一起來玩！"
+  },
   "server-link": "語音群連結",
   "server-name": "群名稱",
   "server-name-placeholder": "6-30個字元組成，首尾輸入的空格無效，不能包含不雅詞彙。",

@@ -181,6 +181,18 @@ export async function friendVerification({ userId }: { userId: string }) {
   return { userId, friendApplications };
 }
 
+export async function inviteFriend({ userId, serverId }: { userId: string; serverId: string }) {
+  const serverPromise = DataService.server({ userId, serverId });
+  const friendsPromise = DataService.friends({ userId });
+  const friendGroupsPromise = DataService.friendGroups({ userId });
+
+  const [server, friends, friendGroups] = await Promise.all([serverPromise, friendsPromise, friendGroupsPromise]).catch((error) => {
+    throw error;
+  });
+
+  return { userId, server, friends, friendGroups };
+}
+
 export async function inviteMember({ userId, serverId }: { userId: string; serverId: string }) {
   const targetPromise = DataService.member({ userId, serverId });
   const memberInvitationPromise = DataService.memberInvitation({ serverId, receiverId: userId });

@@ -91,18 +91,9 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     li: ({ ...props }: any) => <li {...props} />,
     blockquote: ({ ...props }: any) => <blockquote {...props} />,
     a: ({ ...props }: any) => {
-      const href = props.href;
-      const isCustom = props.customlink === 'true';
-      const children = props.children;
-      const type = props.type ?? 'joinServer';
-
-      if (isCustom) return <ActionLink type={type} data={href} content={children} />;
-
-      return (
-        <a href={href} target="_blank" rel="noreferrer">
-          {children}
-        </a>
-      );
+      const isInvitelink = /^https?:\/\/ricecall(\.com|\.com\.tw)\/join(?:\?|$)/.test(props.href);
+      if (isInvitelink) return <ActionLink href={props.href} />;
+      return <a {...props} target="_blank" rel="noreferrer" />;
     },
     table: ({ ...props }: any) => <table className={markdown['table-wrapper']} {...props} />,
     th: ({ ...props }: any) => <th {...props} />,

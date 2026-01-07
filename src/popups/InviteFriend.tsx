@@ -1,31 +1,23 @@
 import React, { useMemo, useRef, useState } from 'react';
-
-// CSS
-import popup from '@/styles/popup.module.css';
-import styles from '@/styles/inviteFriend.module.css';
-import vip from '@/styles/vip.module.css';
-
-// Types
-import type { Server, Friend, FriendGroup } from '@/types';
-
-// Providers
 import { useTranslation } from 'react-i18next';
+import ipc from '@/ipc';
 
-// Services
-import ipc from '@/services/ipc.service';
+import type * as Types from '@/types';
 
-// Utils
-import { handleOpenAlertDialog } from '@/utils/popup';
-import Default from '@/utils/default';
+import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
 
-// Constants
+import styles from '@/styles/inviteFriend.module.css';
+import popupStyles from '@/styles/popup.module.css';
+import vipStyles from '@/styles/vip.module.css';
+
 import { INVITATION_BASE_URL } from '@/constant';
 
 interface FriendTabProps {
-  server: Server;
-  friend: Friend;
-  selectedUserIdSet: Set<string>;
-  onSelected: (id: string) => void;
+  server: Types.Server;
+  friend: Types.Friend;
+  selectedUserIdSet: Set<Types.User['userId']>;
+  onSelected: (id: Types.User['userId']) => void;
 }
 
 const FriendTab: React.FC<FriendTabProps> = React.memo(({ server, friend, selectedUserIdSet, onSelected }) => {
@@ -51,8 +43,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ server, friend, select
       <input type="checkbox" className={`${isSameCurrentServer ? styles['disabled'] : ''}`} disabled={isSameCurrentServer} checked={selectedUserIdSet.has(targetId)} readOnly />
       <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friendAvatarUrl})` }} />
       <div className={styles['friend-info']}>
-        {friendVip > 0 && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
-        <div className={`${styles['name-text']} ${friendVip > 0 ? vip['vip-name-color'] : ''}`}>
+        {friendVip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${friendVip}`]}`} />}
+        <div className={`${styles['name-text']} ${friendVip > 0 ? vipStyles['vip-name-color'] : ''}`}>
           {friendNote || friendName} {friendNote !== '' ? `(${friendName})` : ''}
         </div>
         {isSameCurrentServer ? <span style={{ marginLeft: '10px' }}>({t('already-in-server')})</span> : null}
@@ -64,12 +56,12 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ server, friend, select
 FriendTab.displayName = 'FriendTab';
 
 interface FriendGroupTabProps {
-  server: Server;
-  friends: Friend[];
+  server: Types.Server;
+  friends: Types.Friend[];
   searchQuery: string;
-  friendGroup: FriendGroup;
-  selectedUserIdSet: Set<string>;
-  onSelected: (id: string) => void;
+  friendGroup: Types.FriendGroup;
+  selectedUserIdSet: Set<Types.User['userId']>;
+  onSelected: (id: Types.User['userId']) => void;
 }
 
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ server, friendGroup, friends, searchQuery, selectedUserIdSet, onSelected }) => {
@@ -134,9 +126,9 @@ FriendGroupTab.displayName = 'FriendGroupTab';
 
 interface InviteFriendPopupProps {
   userId: string;
-  server: Server;
-  friends: Friend[];
-  friendGroups: FriendGroup[];
+  server: Types.Server;
+  friends: Types.Friend[];
+  friendGroups: Types.FriendGroup[];
 }
 
 const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId, server, friends, friendGroups }) => {
@@ -173,7 +165,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId
 
   const handleInviteFriend = () => {
     if (selectedUserIds.length === 0) return;
-    handleOpenAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
+    Popup.handleOpenAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
       const invitationLink = `${INVITATION_BASE_URL}?sid=${server.specialId || server.displayId}`;
       const formatedMessage = `<a href='${invitationLink}' type='invitation' customLink='true' >${invitationLink}</a>`;
       for (const userId of selectedUserIds) {
@@ -188,8 +180,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId
   };
 
   return (
-    <div className={popup['popup-wrapper']}>
-      {/* Header */}
+    <div className={popupStyles['popup-wrapper']}>
       <div className={styles['header']}>
         <div className={styles['options-content']}>
           <div className={styles['search-bar']}>
@@ -201,10 +192,9 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId
           {t('invite')}
         </div>
       </div>
-      {/* Body */}
-      <div className={`${popup['popup-body']}`}>
+      <div className={`${popupStyles['popup-body']}`}>
         <div className={styles['friend-group-list']}>
-          <div className={`${popup['row']} ${styles['space-between']}`}>
+          <div className={`${popupStyles['row']} ${styles['space-between']}`}>
             <div className={styles['checkbox']}>
               <input
                 ref={allSelectRef}
@@ -214,10 +204,10 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ userId
                   if (e.target.checked) setSelectedUserIds(filteredFriendsNotInServer.map((f) => f.targetId));
                   else setSelectedUserIds([]);
                 }}
-              />{' '}
+              />
               {t('select-all')}
             </div>
-            {` ${t('invite-total-for', { 0: selectedUserIds.length })}`}
+            {t('invite-total-for', { 0: selectedUserIds.length })}
           </div>
           <div className={styles['scroll-view']}>
             {filteredFriendGroups.map((friendGroup) => (

@@ -36,7 +36,7 @@
 .invitation-headers {
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  align-items: center;
   justify-content: flex-start;
 }
 
@@ -50,7 +50,7 @@
 }
 
 .invitation-headers .title {
-  margin-left: 10px;
+  margin-left: 5px;
   font-size: 14px;
   color: #999;
 }
