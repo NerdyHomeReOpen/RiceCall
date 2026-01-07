@@ -177,6 +177,13 @@
   width: 100%;
 }
 
+.hasInput .label {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  align-items: center;
+}
+
 .input-box.row,
 .input-box.col {
   gap: 0;

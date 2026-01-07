@@ -216,7 +216,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
             <div className={popupStyles['header']}>
               <div className={popupStyles['label']}>{t('status-setting')}</div>
             </div>
-            <label className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <label className={`${popupStyles['input-box']} ${popupStyles['row']} ${popupStyles['hasInput']}`}>
               <input name="status-auto-idle" type="checkbox" checked={statusAutoIdle} onChange={(e) => setSystemSettings((prev) => ({ ...prev, statusAutoIdle: e.target.checked }))} />
               <div className={popupStyles['label']}>
                 {t('status-auto-idle-label-1')}
