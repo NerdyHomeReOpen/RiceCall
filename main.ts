@@ -152,6 +152,7 @@ const PopupSize: Record<Types.PopupType, { height: number; width: number }> = {
   editFriendGroupName: { height: 200, width: 380 },
   friendVerification: { height: 550, width: 500 },
   imageCropper: { height: 520, width: 610 },
+  inviteFriend: { height: 400, width: 500 },
   inviteMember: { height: 300, width: 490 },
   kickMemberFromChannel: { height: 250, width: 400 },
   kickMemberFromServer: { height: 250, width: 400 },

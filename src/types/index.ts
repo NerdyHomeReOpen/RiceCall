@@ -224,6 +224,7 @@ export type PopupType =
   | 'editNickname'
   | 'friendVerification'
   | 'imageCropper'
+  | 'inviteFriend'
   | 'inviteMember'
   | 'kickMemberFromChannel'
   | 'kickMemberFromServer'

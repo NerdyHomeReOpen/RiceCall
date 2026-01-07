@@ -26,8 +26,8 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ user, messageG
 
   // Variables
   const { userId } = user;
-  const { contents: messageContents, parameter: messageParameter, contentMetadata: messageContentNetadata } = messageGroup;
-  const { targetId: senderUserId } = messageContentNetadata;
+  const { contents: messageContents, parameter: messageParameter, contentMetadata: messageContentMetadata } = messageGroup;
+  const { targetId: senderUserId } = messageContentMetadata;
   const escapedMessageParameter = Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, TagConverter.escapeHtml(value)]));
   const formattedMessagesContents = useMemo(
     () =>
