@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 
 import styles from '@/styles/badgeInfoCard.module.css';
 
-interface BadgeInfoCardProps {
+export interface BadgeInfoCardProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';

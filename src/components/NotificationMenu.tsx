@@ -6,42 +6,7 @@ import type * as Types from '@/types';
 import styles from '@/styles/notificationMenu.module.css';
 import contextMenuStyles from '@/styles/contextMenu.module.css';
 
-interface NotificationMenuItemProps {
-  item: Types.NotificationMenuItem;
-  onClose: () => void;
-}
-
-const NotificationMenuItem: React.FC<NotificationMenuItemProps> = React.memo(({ item, onClose }) => {
-  // Variables
-  const { label, showContentLength, showContent, contentType, contents, icon, className, disabled, onClick } = item;
-
-  // Handlers
-  const handleClick = () => {
-    if (disabled) return;
-    onClick?.();
-    onClose();
-  };
-
-  return (
-    <>
-      <div className={`${styles['option']} ${className && styles[className]} ${disabled ? contextMenuStyles['disabled'] : ''}`} data-type={icon || ''} onClick={handleClick}>
-        {showContentLength ? `${label} (${contents ? contents.length : 0})` : label}
-      </div>
-      {showContent && contents && (
-        <div className={styles['contents']}>
-          {contents
-            .slice(0, 3)
-            .map((content, index) => (contentType === 'image' ? <Image key={index} src={content} alt={content} width={32} height={32} loading="lazy" draggable="false" /> : content))}
-          {contents.length > 3 && <span>...({contents.length - 3})</span>}
-        </div>
-      )}
-    </>
-  );
-});
-
-NotificationMenuItem.displayName = 'NotificationMenuItem';
-
-interface NotificationMenuProps {
+export interface NotificationMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -107,3 +72,38 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
 NotificationMenu.displayName = 'NotificationMenu';
 
 export default NotificationMenu;
+
+interface NotificationMenuItemProps {
+  item: Types.NotificationMenuItem;
+  onClose: () => void;
+}
+
+const NotificationMenuItem: React.FC<NotificationMenuItemProps> = React.memo(({ item, onClose }) => {
+  // Variables
+  const { label, showContentLength, showContent, contentType, contents, icon, className, disabled, onClick } = item;
+
+  // Handlers
+  const handleClick = () => {
+    if (disabled) return;
+    onClick?.();
+    onClose();
+  };
+
+  return (
+    <>
+      <div className={`${styles['option']} ${className && styles[className]} ${disabled ? contextMenuStyles['disabled'] : ''}`} data-type={icon || ''} onClick={handleClick}>
+        {showContentLength ? `${label} (${contents ? contents.length : 0})` : label}
+      </div>
+      {showContent && contents && (
+        <div className={styles['contents']}>
+          {contents
+            .slice(0, 3)
+            .map((content, index) => (contentType === 'image' ? <Image key={index} src={content} alt={content} width={32} height={32} loading="lazy" draggable="false" /> : content))}
+          {contents.length > 3 && <span>...({contents.length - 3})</span>}
+        </div>
+      )}
+    </>
+  );
+});
+
+NotificationMenuItem.displayName = 'NotificationMenuItem';

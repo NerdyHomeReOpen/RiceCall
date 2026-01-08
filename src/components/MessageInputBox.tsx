@@ -10,12 +10,14 @@ import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
 import { ChatEnter } from '@/extensions/ChatEnter';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Popup from '@/utils/popup';
-import { toTags } from '@/utils/tagConverter';
+import * as Permission from '@/utils/permission';
+import * as TagConverter from '@/utils/tagConverter';
 
 import { MAX_FILE_SIZE } from '@/constant';
 
@@ -25,11 +27,9 @@ import emoji from '@/styles/emoji.module.css';
 
 interface MessageInputBoxProps {
   onMessageSend?: (message: string) => void;
-  disabled?: boolean;
-  maxLength?: number;
 }
 
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageSend, disabled = false, maxLength = 2000 }) => {
+const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageSend }) => {
   // Hooks
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
@@ -50,46 +50,69 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
       ChatEnter,
     ],
     content: '',
-    onUpdate: ({ editor }) => setMessageInput(toTags(editor.getHTML())),
+    onUpdate: ({ editor }) => (messageInputRef.current = TagConverter.toTags(editor.getHTML())),
     immediatelyRender: true,
   });
 
+  // Selectors
+  const user = useAppSelector((state) => state.user.data);
+  const currentServer = useAppSelector((state) => state.currentServer.data);
+  const currentChannel = useAppSelector((state) => state.currentChannel.data);
+
   // Refs
+  const messageInputRef = useRef<string>('');
   const isUploadingRef = useRef<boolean>(false);
   const isComposingRef = useRef<boolean>(false);
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
 
   // States
-  const [messageInput, setMessageInput] = useState<string>('');
+  const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
+  const [lastMessageTime, setLastMessageTime] = useState<number>(0);
 
   // Variables
+  const {
+    channelId: currentChannelId,
+    guestTextGapTime: channelGuestTextGapTime,
+    guestTextWaitTime: channelGuestTextWaitTime,
+    guestTextMaxLength: channelGuestTextMaxLength,
+    forbidText: isChannelForbidText,
+    forbidGuestText: isChannelForbidGuestText,
+    isTextMuted: isChannelTextMuted,
+  } = currentChannel;
+  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const textLength = editor?.getText().length || 0;
-  const isCloseToMaxLength = textLength >= maxLength - 100;
-  const isWarning = textLength > maxLength;
+  const isCloseToMaxLength = textLength >= channelGuestTextMaxLength - 100;
+  const isWarning = textLength > channelGuestTextMaxLength;
+  const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - (Date.now() - lastMessageTime) : 0;
+  const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
+  const isForbidByMutedText = isChannelTextMuted;
+  const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && isChannelForbidText;
+  const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && isChannelForbidGuestText;
+  const isForbidByForbidGuestTextWait = !Permission.isMember(permissionLevel) && leftWaitTime > 0;
+  const isForbidByForbidGuestTextGap = !Permission.isMember(permissionLevel) && leftGapTime > 0;
+  const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
+  const maxLength = !Permission.isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
 
   // Functions
-  const syncStyles = useCallback(() => {
-    fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
-    textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
+  const setStyles = useCallback(() => {
+    editor?.chain().setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
   }, [editor]);
 
   // Handlers
   const handleEmojiSelect = (code: string) => {
     editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
-    syncStyles();
+    setStyles();
   };
 
   const handleFontSizeChange = (size: string) => {
     fontSizeRef.current = size;
     editor?.chain().setFontSize(size).focus().run();
-    syncStyles();
   };
 
   const handleTextColorChange = (color: string) => {
     textColorRef.current = color;
     editor?.chain().setColor(color).focus().run();
-    syncStyles();
   };
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -116,7 +139,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
           ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
-              syncStyles();
+              setStyles();
             }
             isUploadingRef.current = false;
           });
@@ -132,10 +155,11 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
     if (e.shiftKey || e.ctrlKey) return;
     if (e.key === 'Enter') {
       e.preventDefault();
-      if (messageInput.trim().length === 0) return;
-      onMessageSend?.(messageInput);
+      if (messageInputRef.current.trim().length === 0) return;
+      onMessageSend?.(messageInputRef.current);
+      setLastMessageTime(Date.now());
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
-      syncStyles();
+      setStyles();
     }
   };
 
@@ -149,16 +173,18 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
 
   // Effects
   useEffect(() => {
-    editor?.on('selectionUpdate', syncStyles);
-  }, [editor, syncStyles]);
+    editor?.on('selectionUpdate', setStyles);
+  }, [editor, setStyles]);
 
   useEffect(() => {
-    if (!editor) return;
-    editor.view.dispatch(editor.state.tr);
-  }, [editor]);
+    if (currentChannelId) {
+      setLastJoinChannelTime(Date.now());
+      setLastMessageTime(0);
+    }
+  }, [currentChannelId]);
 
   return (
-    <div className={`${styles['message-input-box']} ${disabled ? styles['disabled'] : ''} ${isWarning ? styles['warning'] : ''}`}>
+    <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
       <div className={emoji['emoji-icon']} onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}

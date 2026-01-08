@@ -6,7 +6,7 @@ import { STATUS_OPTIONS } from '@/constant';
 
 import headerStyles from '@/styles/header.module.css';
 
-interface StatusDropdownProps {
+export interface StatusDropdownProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';

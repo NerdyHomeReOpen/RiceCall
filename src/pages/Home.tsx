@@ -28,8 +28,8 @@ interface HomePageProps {
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   // Hooks
   const { t } = useTranslation();
-  const { setSelectedTabId } = useMainTab();
-  const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
+  const { selectTab } = useMainTab();
+  const { isLoading, loadServer } = useLoading();
 
   // Selectors
   const user = useAppSelector((state) => state.user.data);
@@ -44,7 +44,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const queryRef = useRef<string>('');
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-  const timerRef = useRef<NodeJS.Timeout | number | null>(null);
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
   // States
   const [exactMatch, setExactMatch] = useState<Types.Server | null>(null);
@@ -115,24 +115,23 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
 
   const clearSearchState = (clearQuery: boolean = false) => {
     if (clearQuery && inputRef.current) inputRef.current.value = '';
-    setExactMatch(null);
-    setPersonalResults([]);
-    setRelatedResults([]);
+    setExactMatch((prev) => (prev ? null : prev));
+    setPersonalResults((prev) => (prev.length ? [] : prev));
+    setRelatedResults((prev) => (prev.length ? [] : prev));
   };
 
   const selectServer = useCallback(
     (server: Types.Server) => {
       if (isLoading) return;
       if (server.serverId === currentServerId) {
-        setSelectedTabId('server');
+        selectTab('server');
         return;
       }
-      setIsLoading(true);
-      setLoadingServerId(server.specialId || server.displayId);
+      loadServer(server.specialId || server.displayId);
       ipc.socket.send('connectServer', { serverId: server.serverId });
       clearSearchState();
     },
-    [currentServerId, isLoading, setSelectedTabId, setIsLoading, setLoadingServerId],
+    [currentServerId, isLoading, loadServer, selectTab],
   );
 
   // Handlers
@@ -193,11 +192,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   }, [selectedAnnIndex, filteredAnns]);
 
   useEffect(() => {
-    if (timerRef.current) clearTimeout(timerRef.current);
-    timerRef.current = setTimeout(() => setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length), ANNOUNCEMENT_SLIDE_INTERVAL);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+    intervalRef.current = setInterval(() => setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length), ANNOUNCEMENT_SLIDE_INTERVAL);
     return () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-      timerRef.current = null;
+      if (intervalRef.current) clearInterval(intervalRef.current);
+      intervalRef.current = null;
     };
   }, [filteredAnns]);
 

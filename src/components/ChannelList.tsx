@@ -3,8 +3,6 @@ import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 
-import type * as Types from '@/types';
-
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
 import QueueUserTab from '@/components/QueueUserTab';
@@ -59,26 +57,14 @@ const ChannelList: React.FC = React.memo(() => {
   const { channelId: currentChannelId, name: currentChannelName, voiceMode: currentChannelVoiceMode, isLobby: isCurrentChannelLobby } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
   const hasNewMemberApplications = Permission.isServerAdmin(permissionLevel) && memberApplications.length > 0;
-  const isSelectedAllChannelList = selectedTabId === 'all';
-  const isSelectedCurrentChannelList = selectedTabId === 'current';
+  const isAllTab = useMemo(() => selectedTabId === 'all', [selectedTabId]);
+  const isCurrentTab = useMemo(() => selectedTabId === 'current', [selectedTabId]);
   const connectStatus = 4 - Math.floor(Number(latency) / 50);
-  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
-  const filteredChannels = [...channels].filter((c) => !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt));
-  const onlineMemberMap = useMemo(() => new Map(onlineMembers.map((om) => [om.userId, om] as const)), [onlineMembers]);
-
-  const queueMembers = useMemo<Types.QueueMember[]>(
-    () =>
-      queueUsers
-        .reduce<Types.QueueMember[]>((acc, qm) => {
-          if (qm.position < 0 || qm.leftTime <= 0) return acc;
-          const online = onlineMemberMap.get(qm.userId);
-          if (!online) return acc;
-          acc.push({ ...qm, ...online });
-          return acc;
-        }, [])
-        .sort((a, b) => a.position - b.position),
-    [queueUsers, onlineMemberMap],
+  const movableServerUserIds = useMemo(
+    () => onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId),
+    [onlineMembers, userId, permissionLevel],
   );
+  const filteredChannels = useMemo(() => [...channels].filter((c) => !c.categoryId).sort((a, b) => (a.order !== b.order ? a.order - b.order : a.createdAt - b.createdAt)), [channels]);
 
   // Functions
   const getServerSettingContextMenuItems = () =>
@@ -152,9 +138,11 @@ const ChannelList: React.FC = React.memo(() => {
 
   // Effects
   useEffect(() => {
-    for (const channel of channels) {
-      setExpanded((prev) => ({ ...prev, [channel.channelId]: prev[channel.channelId] != undefined ? prev[channel.channelId] : true }));
-    }
+    setExpanded((prev) => {
+      const next = { ...prev };
+      channels.forEach((c) => (next[c.channelId] = next[c.channelId] != undefined ? next[c.channelId] : true));
+      return next;
+    });
   }, [channels]);
 
   useEffect(() => {
@@ -200,18 +188,18 @@ const ChannelList: React.FC = React.memo(() => {
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
           <div ref={queueListRef} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
             <div className={styles['queue-list']}>
-              {queueMembers.map((queueMember) => (
-                <QueueUserTab key={queueMember.userId} queueMember={queueMember} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+              {queueUsers.map((queueUser) => (
+                <QueueUserTab key={queueUser.userId} queueUser={queueUser} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
               ))}
             </div>
           </div>
           <div className={styles['saperator-2']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
         </>
       )}
-      <div className={styles['section-title-text']}>{isSelectedCurrentChannelList ? t('current-channel') : t('all-channel')}</div>
+      <div className={styles['section-title-text']}>{isCurrentTab ? t('current-channel') : t('all-channel')}</div>
       <div className={styles['scroll-view']} onContextMenu={handleChannelListContextMenu}>
         <div className={styles['channel-list']}>
-          {isSelectedCurrentChannelList ? (
+          {isCurrentTab ? (
             <ChannelTab key={currentChannelId} channel={currentChannel} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
           ) : (
             filteredChannels.map((item) =>
@@ -226,10 +214,10 @@ const ChannelList: React.FC = React.memo(() => {
       </div>
       <div className={styles['saperator-3']} />
       <div className={styles['sidebar-footer']}>
-        <div className={`${styles['navegate-tab']} ${isSelectedCurrentChannelList ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
+        <div className={`${styles['navegate-tab']} ${isCurrentTab ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
           {t('current-channel')}
         </div>
-        <div className={`${styles['navegate-tab']} ${isSelectedAllChannelList ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
+        <div className={`${styles['navegate-tab']} ${isAllTab ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
           {t('all-channel')}
         </div>
       </div>

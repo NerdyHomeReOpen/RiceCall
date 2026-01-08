@@ -298,3 +298,18 @@ export function memberInvitation(overrides: Partial<Types.MemberInvitation> = {}
     ...overrides,
   };
 }
+
+export function queueMember(overrides: Partial<Types.QueueMember> = {}): Types.QueueMember {
+  return {
+    ...defaultTableMember,
+    ...defaultTableUser,
+    ...defaultTableServerBlocked,
+    ...defaultTableChannelMute,
+    ...defaultTableServerPermission,
+    badges: '[]',
+    position: 0,
+    leftTime: 0,
+    isQueueControlled: false,
+    ...overrides,
+  };
+}

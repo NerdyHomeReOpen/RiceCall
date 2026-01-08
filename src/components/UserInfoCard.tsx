@@ -13,7 +13,7 @@ import styles from '@/styles/userInfoCard.module.css';
 import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
-interface UserInfoCardProps {
+export interface UserInfoCardProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';

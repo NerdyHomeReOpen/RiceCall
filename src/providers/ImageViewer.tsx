@@ -1,4 +1,4 @@
-import React, { useContext, createContext, ReactNode, useState } from 'react';
+import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 
 import styles from '@/styles/imageViewer.module.css';
@@ -24,17 +24,19 @@ const ImageViewerProvider = ({ children }: ImageViewerProviderProps) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Functions
-  const selectImage = (image: string) => {
+  const selectImage = useCallback((image: string) => {
     setSelectedImage(image);
-  };
+  }, []);
 
   // Handlers
   const handleUnselectImage = () => {
     setSelectedImage(null);
   };
 
+  const contextValue = useMemo(() => ({ selectImage }), [selectImage]);
+
   return (
-    <ImageViewerContext.Provider value={{ selectImage }}>
+    <ImageViewerContext.Provider value={contextValue}>
       {children}
       <div className={`${styles['image-viewer']} ${selectedImage ? styles['visible'] : styles['hidden']}`} onClick={handleUnselectImage}>
         {selectedImage && <Image loading="lazy" src={selectedImage} alt="image" onClick={(e) => e.stopPropagation()} width={-1} height={-1} />}
