@@ -1,4 +1,4 @@
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext, useMemo, useRef, useCallback } from 'react';
 
 interface FindMeContextType {
   findMe: () => void;
@@ -24,7 +24,7 @@ const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
   const userTabRef = useRef<HTMLDivElement>(null);
 
   // Functions
-  const findMe = () => {
+  const findMe = useCallback(() => {
     expandCategoryHandlerRef.current();
     expandChannelHandlerRef.current();
 
@@ -34,9 +34,11 @@ const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
         block: 'center',
       });
     }, 100);
-  };
+  }, []);
 
-  return <FindMeContext.Provider value={{ findMe, expandCategoryHandlerRef, expandChannelHandlerRef, userTabRef }}>{children}</FindMeContext.Provider>;
+  const contextValue = useMemo(() => ({ findMe, expandCategoryHandlerRef, expandChannelHandlerRef, userTabRef }), [findMe]);
+
+  return <FindMeContext.Provider value={contextValue}>{children}</FindMeContext.Provider>;
 };
 
 FindMeProvider.displayName = 'FindMeProvider';

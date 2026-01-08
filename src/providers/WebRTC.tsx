@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState, useContext, createContext, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useContext, createContext, useCallback, useMemo } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import ipc from '@/ipc';
 
@@ -159,8 +159,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   // Volume Percent
   const volumePercentRef = useRef<{ [userId: string]: number }>({});
-  const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
 
+  // Functions
   const detectSpeaking = useCallback((targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array<ArrayBuffer>) => {
     analyserNode.getByteTimeDomainData(dataArray);
     let sum = 0;
@@ -180,7 +180,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const now = performance.now();
     if (now - lastRefreshRef.current >= 10) {
       lastRefreshRef.current = now;
-      setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
     }
 
     rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray));
@@ -287,11 +286,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
 
     delete volumePercentRef.current[userId];
-    setVolumePercent((prev) => {
-      const newState = { ...prev };
-      delete newState[userId];
-      return newState;
-    });
   }, []);
 
   const initSpeakerAudio = useCallback(
@@ -832,14 +826,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
   }, [changeSpeakerVolume]);
 
+  const getVolumePercent = useCallback((targetId: string | 'user') => volumePercentRef.current[targetId] ?? 0, []);
+
   const isSpeaking = useCallback(
-    (targetId: string | 'user') => (targetId === 'user' ? isMicTaken && volumePercent['user'] > voiceThreshold : !!volumePercent[targetId]),
-    [isMicTaken, volumePercent, voiceThreshold],
+    (targetId: string | 'user') => (targetId === 'user' ? isMicTaken && getVolumePercent('user') > voiceThreshold : !!getVolumePercent(targetId)),
+    [isMicTaken, getVolumePercent, voiceThreshold],
   );
 
   const isMuted = useCallback((targetId: string | 'user') => mutedIds.includes(targetId), [mutedIds]);
-
-  const getVolumePercent = useCallback((targetId: string | 'user') => volumePercent[targetId] ?? 0, [volumePercent]);
 
   // Effects
   useEffect(() => {
@@ -984,48 +978,82 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     return () => unsub();
   }, [unconsumeOne]);
 
-  return (
-    <WebRTCContext.Provider
-      value={{
-        startMixing,
-        stopMixing,
-        startRecording,
-        stopRecording,
-        muteUser,
-        unmuteUser,
-        pressSpeakKey,
-        releaseSpeakKey,
-        takeMic,
-        releaseMic,
-        toggleMixMode,
-        toggleRecording,
-        toggleSpeakerMuted,
-        toggleMicMuted,
-        changeBitrate,
-        changeMicVolume,
-        changeMixVolume,
-        changeSpeakerVolume,
-        changeVoiceThreshold,
-        isSpeaking,
-        isMuted,
-        getVolumePercent,
-        isMicTaken,
-        isSpeakKeyPressed,
-        isMixModeActive,
-        isMicMuted,
-        isSpeakerMuted,
-        isRecording,
-        micVolume,
-        mixVolume,
-        speakerVolume,
-        speakingMode,
-        voiceThreshold,
-        recordTime,
-      }}
-    >
-      {children}
-    </WebRTCContext.Provider>
+  const contextValue = useMemo(
+    () => ({
+      startMixing,
+      stopMixing,
+      startRecording,
+      stopRecording,
+      muteUser,
+      unmuteUser,
+      pressSpeakKey,
+      releaseSpeakKey,
+      takeMic,
+      releaseMic,
+      toggleMixMode,
+      toggleRecording,
+      toggleSpeakerMuted,
+      toggleMicMuted,
+      changeBitrate,
+      changeMicVolume,
+      changeMixVolume,
+      changeSpeakerVolume,
+      changeVoiceThreshold,
+      isSpeaking,
+      isMuted,
+      getVolumePercent,
+      isMicTaken,
+      isSpeakKeyPressed,
+      isMixModeActive,
+      isMicMuted,
+      isSpeakerMuted,
+      isRecording,
+      micVolume,
+      mixVolume,
+      speakerVolume,
+      speakingMode,
+      voiceThreshold,
+      recordTime,
+    }),
+    [
+      startMixing,
+      stopMixing,
+      startRecording,
+      stopRecording,
+      muteUser,
+      unmuteUser,
+      pressSpeakKey,
+      releaseSpeakKey,
+      takeMic,
+      releaseMic,
+      toggleMixMode,
+      toggleRecording,
+      toggleSpeakerMuted,
+      toggleMicMuted,
+      changeBitrate,
+      changeMicVolume,
+      changeMixVolume,
+      changeSpeakerVolume,
+      changeVoiceThreshold,
+      isSpeaking,
+      isMuted,
+      getVolumePercent,
+      isMicTaken,
+      isSpeakKeyPressed,
+      isMixModeActive,
+      isMicMuted,
+      isSpeakerMuted,
+      isRecording,
+      micVolume,
+      mixVolume,
+      speakerVolume,
+      speakingMode,
+      voiceThreshold,
+      recordTime,
+    ],
   );
+
+  return <WebRTCContext.Provider value={contextValue}>{children}</WebRTCContext.Provider>;
 };
 
 WebRTCProvider.displayName = 'WebRTCProvider';

@@ -7,7 +7,7 @@ import { cleanMenu } from '@/utils';
 
 import styles from '@/styles/contextMenu.module.css';
 
-interface MicContextMenuProps {
+export interface MicContextMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';

@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useRef, useCallback } from 'react';
+import { createContext, ReactNode, useContext, useEffect, useRef, useCallback, useMemo } from 'react';
 import ipc from '@/ipc';
 
 import Logger from '@/utils/logger';
@@ -142,7 +142,9 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
-  return <SoundPlayerContext.Provider value={{ playSound }}>{children}</SoundPlayerContext.Provider>;
+  const contextValue = useMemo(() => ({ playSound }), [playSound]);
+
+  return <SoundPlayerContext.Provider value={contextValue}>{children}</SoundPlayerContext.Provider>;
 };
 
 SoundPlayerProvider.displayName = 'SoundPlayerProvider';

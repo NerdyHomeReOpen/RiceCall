@@ -1,7 +1,7 @@
-import React, { useContext, createContext, ReactNode, useState } from 'react';
+import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 
 interface MainTabContextType {
-  setSelectedTabId: (tabId: 'home' | 'friends' | 'server') => void;
+  selectTab: (tabId: 'home' | 'friends' | 'server') => void;
   selectedTabId: 'home' | 'friends' | 'server';
 }
 
@@ -21,7 +21,14 @@ const MainTabProvider = ({ children }: MainTabProviderProps) => {
   // States
   const [selectedTabId, setSelectedTabId] = useState<'home' | 'friends' | 'server'>('home');
 
-  return <MainTabContext.Provider value={{ setSelectedTabId, selectedTabId }}>{children}</MainTabContext.Provider>;
+  // Functions
+  const selectTab = useCallback((tabId: 'home' | 'friends' | 'server') => {
+    setSelectedTabId(tabId);
+  }, []);
+
+  const contextValue = useMemo(() => ({ selectTab, selectedTabId }), [selectTab, selectedTabId]);
+
+  return <MainTabContext.Provider value={contextValue}>{children}</MainTabContext.Provider>;
 };
 
 MainTabProvider.displayName = 'MainTabProvider';

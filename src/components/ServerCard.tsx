@@ -23,8 +23,8 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
-  const { setSelectedTabId } = useMainTab();
+  const { isLoading, loadServer } = useLoading();
+  const { selectTab } = useMainTab();
 
   // Selectors
   const user = useAppSelector((state) => state.user.data);
@@ -58,11 +58,10 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   const handleServerCardClick = () => {
     if (isLoading) return;
     if (server.serverId === userCurrentServerId) {
-      setSelectedTabId('server');
+      selectTab('server');
       return;
     }
-    setIsLoading(true);
-    setLoadingServerId(server.specialId || server.displayId);
+    loadServer(server.specialId || server.displayId);
     ipc.socket.send('connectServer', { serverId });
   };
 

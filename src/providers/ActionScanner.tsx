@@ -1,4 +1,4 @@
-import React, { useContext, createContext, ReactNode, useRef, useEffect, useCallback, useState } from 'react';
+import React, { useContext, createContext, ReactNode, useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import ipc from '@/ipc';
 
 import { useWebRTC } from '@/providers/WebRTC';
@@ -273,7 +273,9 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     return () => unsub();
   }, []);
 
-  return <ActionScannerContext.Provider value={{ isIdling, isManualIdling: isManualIdlingRef.current, setIsManualIdling }}>{children}</ActionScannerContext.Provider>;
+  const contextValue = useMemo(() => ({ isIdling, isManualIdling: isManualIdlingRef.current, setIsManualIdling }), [isIdling, setIsManualIdling]);
+
+  return <ActionScannerContext.Provider value={contextValue}>{children}</ActionScannerContext.Provider>;
 };
 
 ActionScannerProvider.displayName = 'ActionScannerProvider';

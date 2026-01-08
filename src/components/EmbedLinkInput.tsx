@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import settingStyles from '@/styles/setting.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
-interface EmbedLinkInputProps {
+export interface EmbedLinkInputProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';

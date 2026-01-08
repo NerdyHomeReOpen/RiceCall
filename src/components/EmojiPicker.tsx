@@ -10,7 +10,7 @@ import { defEmojis, otherEmojis } from '@/emojis';
 import emojiStyles from '@/styles/emoji.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
-interface EmojiPickerProps {
+export interface EmojiPickerProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';

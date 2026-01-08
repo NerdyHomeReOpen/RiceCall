@@ -3,7 +3,7 @@ import { ColorResult, SketchPicker } from 'react-color';
 
 import styles from '@/styles/color.module.css';
 
-interface ColorPickerProps {
+export interface ColorPickerProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';

@@ -1,15 +1,12 @@
-import React, { useContext, createContext, ReactNode, useState } from 'react';
+import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import homeStyles from '@/styles/home.module.css';
 
 interface LoadingContextType {
-  setIsLoading: (value: boolean) => void;
-  setLoadingServerId: (value: string) => void;
-  setLoadingTimeStamp: (value: number) => void;
   isLoading: boolean;
-  loadingServerId: string;
-  loadingTimeStamp: number;
+  loadServer: (displayId: string) => void;
+  stopLoading: () => void;
 }
 
 const LoadingContext = createContext<LoadingContextType | null>(null);
@@ -33,24 +30,26 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
   // States
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingServerId, setLoadingServerId] = useState<string>('');
-  const [loadingTimeStamp, setLoadingTimeStamp] = useState<number>(500);
+
+  // Functions
+  const loadServer = useCallback((displayId: string) => {
+    setIsLoading(true);
+    setLoadingServerId(displayId);
+  }, []);
+
+  const stopLoading = useCallback(() => {
+    setIsLoading(false);
+  }, []);
 
   // Handlers
   const handleCloseLoading = () => {
-    setIsLoading(false);
+    stopLoading();
   };
 
+  const contextValue = useMemo(() => ({ loadServer, stopLoading, isLoading }), [loadServer, stopLoading, isLoading]);
+
   return (
-    <LoadingContext.Provider
-      value={{
-        setIsLoading,
-        setLoadingServerId,
-        setLoadingTimeStamp,
-        isLoading,
-        loadingServerId,
-        loadingTimeStamp,
-      }}
-    >
+    <LoadingContext.Provider value={contextValue}>
       {isLoading && (
         <div className={homeStyles['loading-wrapper']}>
           <div className={homeStyles['loading-box']}>

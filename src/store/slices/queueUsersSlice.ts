@@ -17,14 +17,11 @@ export const queueUsersSlice = createSlice({
     setQueueUsers: (state, action: PayloadAction<Types.QueueUser[]>) => {
       state.data = action.payload;
     },
-    addQueueUsers: (state, action: PayloadAction<Types.QueueUser[]>) => {
-      state.data = state.data.concat(action.payload);
-    },
     clearQueueUsers: (state) => {
       state.data = [];
     },
   },
 });
 
-export const { setQueueUsers, addQueueUsers, clearQueueUsers } = queueUsersSlice.actions;
+export const { setQueueUsers, clearQueueUsers } = queueUsersSlice.actions;
 export default queueUsersSlice.reducer;

@@ -259,7 +259,7 @@ interface TabItemProps {
 
 const TabItem = React.memo(({ tab, currentServerId }: TabItemProps) => {
   // Hooks
-  const { selectedTabId, setSelectedTabId } = useMainTab();
+  const { selectedTabId, selectTab } = useMainTab();
 
   // Variables
   const { id: tabId, label: tabLabel } = tab;
@@ -267,7 +267,7 @@ const TabItem = React.memo(({ tab, currentServerId }: TabItemProps) => {
 
   // Handlers
   const handleTabClick = () => {
-    setSelectedTabId(tabId);
+    selectTab(tabId);
   };
 
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -295,8 +295,8 @@ TabItem.displayName = 'TabItem';
 const RootPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
-  const { selectedTabId, setSelectedTabId } = useMainTab();
-  const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
+  const { selectedTabId, selectTab } = useMainTab();
+  const { isLoading, loadServer, stopLoading } = useLoading();
   const dispatch = useAppDispatch();
 
   // Refs
@@ -339,11 +339,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user, dispatch]);
 
   useEffect(() => {
-    if (currentServerId && selectedTabIdRef.current !== 'server') setSelectedTabId('server');
-    else if (!currentServerId && selectedTabIdRef.current === 'server') setSelectedTabId('home');
-    setIsLoading(false);
-    setLoadingServerId('');
-  }, [currentServerId, setIsLoading, setLoadingServerId, setSelectedTabId]);
+    if (currentServerId && selectedTabIdRef.current !== 'server') selectTab('server');
+    else if (!currentServerId && selectedTabIdRef.current === 'server') selectTab('home');
+    stopLoading();
+  }, [currentServerId, stopLoading, selectTab]);
 
   useEffect(() => {
     const onTriggerHandleServerSelect = ({ key, newValue }: StorageEvent) => {
@@ -351,16 +350,15 @@ const RootPageComponent: React.FC = React.memo(() => {
       const { serverDisplayId, serverId } = JSON.parse(newValue);
       if (isLoading) return;
       if (serverId === currentServerId) {
-        setSelectedTabId('server');
+        selectTab('server');
         return;
       }
-      setIsLoading(true);
-      setLoadingServerId(serverDisplayId);
+      loadServer(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
     };
     window.addEventListener('storage', onTriggerHandleServerSelect);
     return () => window.removeEventListener('storage', onTriggerHandleServerSelect);
-  }, [currentServerId, isLoading, setIsLoading, setLoadingServerId, setSelectedTabId]);
+  }, [currentServerId, isLoading, loadServer, selectTab]);
 
   useEffect(() => {
     switch (selectedTabId) {

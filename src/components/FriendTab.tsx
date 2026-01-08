@@ -30,8 +30,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { setSelectedTabId } = useMainTab();
-  const { isLoading, setIsLoading, setLoadingServerId } = useLoading();
+  const { selectTab } = useMainTab();
+  const { isLoading, loadServer } = useLoading();
 
   // Selectors
   const user = useAppSelector((state) => state.user.data);
@@ -95,11 +95,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId
   const handleServerNameClick = () => {
     if (isLoading || !friendCurrentServer) return;
     if (friendCurrentServer.serverId === userCurrentServerId) {
-      setSelectedTabId('server');
+      selectTab('server');
       return;
     }
-    setIsLoading(true);
-    setLoadingServerId(friendCurrentServer.specialId || friendCurrentServer.displayId);
+    loadServer(friendCurrentServer.specialId || friendCurrentServer.displayId);
     ipc.socket.send('connectServer', { serverId: friendCurrentServer.serverId });
   };
 

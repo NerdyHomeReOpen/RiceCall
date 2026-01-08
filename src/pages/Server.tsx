@@ -83,8 +83,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const [speakingMode, setSpeakingMode] = useState<Types.SpeakingMode>('key');
   const [speakingKey, setSpeakingKey] = useState<string>('');
   const [channelUIMode, setChannelUIMode] = useState<Types.ChannelUIMode>('three-line');
-  const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
-  const [lastMessageTime, setLastMessageTime] = useState<number>(0);
   const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
@@ -99,13 +97,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     announcement: currentChannelAnnouncement,
     bitrate: currentChannelBitrate,
     voiceMode: currentChannelVoiceMode,
-    forbidText: isCurrentChannelForbidText,
     forbidQueue: isCurrentChannelQueueForbidden,
-    forbidGuestText: isCurrentChannelGuestTextForbidden,
-    guestTextGapTime: currentChannelGuestTextGapTime,
-    guestTextWaitTime: currentChannelGuestTextWaitTime,
-    guestTextMaxLength: currentChannelGuestTextMaxLength,
-    isTextMuted: isCurrentChannelTextMuted,
     isVoiceMuted: isCurrentChannelVoiceMuted,
   } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
@@ -351,7 +343,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
 
   const handleMessageSend = (message: string) => {
     Popup.sendChannelMessage(currentServerId, currentChannelId, { type: 'general', content: message });
-    setLastMessageTime(Date.now());
   };
 
   const handleNewMessageAlertClick = () => {
@@ -415,14 +406,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     if (actionMessages.length === 0) setShowActionMessage(false);
     else setShowActionMessage(true);
   }, [actionMessages]);
-
-  useEffect(() => {
-    if (currentChannelId) {
-      setLastJoinChannelTime(Date.now());
-      setLastMessageTime(0);
-      setUnreadMessageCount(0);
-    }
-  }, [currentChannelId]);
 
   useEffect(() => {
     if (currentServerId && currentServerAnnouncement) Popup.openServerAnnouncement(currentServerAnnouncement);
@@ -577,18 +560,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
                   <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} />
                   <div className={styles['close-button']} onClick={handleCloseActionMessageBtnClick} />
                 </div>
-                <MessageInputBoxGuard
-                  lastJoinChannelTime={lastJoinChannelTime}
-                  lastMessageTime={lastMessageTime}
-                  permissionLevel={permissionLevel}
-                  isChannelForbidText={isCurrentChannelForbidText}
-                  isChannelForbidGuestText={isCurrentChannelGuestTextForbidden}
-                  channelGuestTextGapTime={currentChannelGuestTextGapTime}
-                  channelGuestTextWaitTime={currentChannelGuestTextWaitTime}
-                  channelGuestTextMaxLength={currentChannelGuestTextMaxLength}
-                  isChannelTextMuted={isCurrentChannelTextMuted}
-                  onMessageSend={handleMessageSend}
-                />
+                <MessageInputBox onMessageSend={handleMessageSend} />
               </div>
             </div>
           </div>
@@ -647,57 +619,6 @@ ServerPageComponent.displayName = 'ServerPageComponent';
 const ServerPage = dynamic(() => Promise.resolve(ServerPageComponent), { ssr: false });
 
 export default ServerPage;
-
-interface MessageInputBoxGuardProps {
-  lastJoinChannelTime: number;
-  lastMessageTime: number;
-  permissionLevel: number;
-  isChannelForbidText: boolean;
-  isChannelForbidGuestText: boolean;
-  channelGuestTextGapTime: number;
-  channelGuestTextWaitTime: number;
-  channelGuestTextMaxLength: number;
-  isChannelTextMuted: boolean;
-  onMessageSend: (msg: string) => void;
-}
-
-const MessageInputBoxGuard = React.memo(
-  ({
-    lastJoinChannelTime,
-    lastMessageTime,
-    permissionLevel,
-    isChannelForbidText,
-    isChannelForbidGuestText,
-    channelGuestTextGapTime,
-    channelGuestTextWaitTime,
-    channelGuestTextMaxLength,
-    isChannelTextMuted,
-    onMessageSend,
-  }: MessageInputBoxGuardProps) => {
-    // States
-    const [now, setNow] = useState(Date.now());
-
-    // Effects
-    useEffect(() => {
-      const interval = setInterval(() => setNow(Date.now()), 1000);
-      return () => clearInterval(interval);
-    }, []);
-
-    const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - Math.floor((now - lastMessageTime) / 1000) : 0;
-    const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - Math.floor((now - lastJoinChannelTime) / 1000) : 0;
-    const isForbidByMutedText = isChannelTextMuted;
-    const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && isChannelForbidText;
-    const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && isChannelForbidGuestText;
-    const isForbidByForbidGuestTextGap = !Permission.isMember(permissionLevel) && leftGapTime > 0;
-    const isForbidByForbidGuestTextWait = !Permission.isMember(permissionLevel) && leftWaitTime > 0;
-    const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-    const maxLength = !Permission.isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
-
-    return <MessageInputBox disabled={disabled} maxLength={maxLength} onMessageSend={onMessageSend} />;
-  },
-);
-
-MessageInputBoxGuard.displayName = 'MessageInputBoxGuard';
 
 interface VolumeSliderProps {
   value: number;

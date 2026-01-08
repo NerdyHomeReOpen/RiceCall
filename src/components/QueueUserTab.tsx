@@ -10,6 +10,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useWebRTC } from '@/providers/WebRTC';
 
 import * as Popup from '@/utils/popup';
+import * as Default from '@/utils/default';
 import * as Permission from '@/utils/permission';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
@@ -18,27 +19,33 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 interface QueueUserTabProps {
-  queueMember: Types.QueueMember;
+  queueUser: Types.QueueUser;
   selectedItemId: string | null;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueMember, selectedItemId, setSelectedItemId }) => {
+const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, selectedItemId, setSelectedItemId }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { isMuted, isSpeaking, unmuteUser, muteUser } = useWebRTC();
+
+  // Refs
+  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Selectors
   const user = useAppSelector((state) => state.user.data);
   const currentServer = useAppSelector((state) => state.currentServer.data);
   const currentChannel = useAppSelector((state) => state.currentChannel.data);
   const friends = useAppSelector((state) => state.friends.data);
-
-  // Refs
-  const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const onlineMembers = useAppSelector((state) => state.onlineMembers.data);
 
   // Variables
+  const queueMember = useMemo(() => {
+    const onlineMember = onlineMembers.find((om) => om.userId === queueUser.userId);
+    return !onlineMember ? Default.queueMember() : { ...queueUser, ...onlineMember };
+  }, [onlineMembers, queueUser]);
+
   const { userId } = user;
   const { serverId: currentServerId, lobbyId: currentServerLobbyId } = currentServer;
   const { channelId: currentChannelId, categoryId: currentChannelCategoryId } = currentChannel;
