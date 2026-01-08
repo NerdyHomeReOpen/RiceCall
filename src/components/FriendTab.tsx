@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
+import React, { useEffect, useState, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
+
+import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useMainTab } from '@/providers/MainTab';
@@ -22,79 +25,67 @@ import vip from '@/styles/vip.module.css';
 
 interface FriendTabProps {
   friend: Types.Friend;
-  selectedItemId: string | null;
-  setSelectedItemId: (id: string | null) => void;
 }
 
-const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId, setSelectedItemId }) => {
+const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { selectTab } = useMainTab();
   const { isLoading, loadServer } = useLoading();
+  const dispatch = useAppDispatch();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const friendGroups = useAppSelector((state) => state.friendGroups.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      currentServerId: state.user.data.currentServerId,
+    }),
+    shallowEqual,
+  );
+
+  const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-${friend.targetId}`, shallowEqual);
 
   // States
   const [friendCurrentServer, setFriendCurrentServer] = useState<Types.Server | null>(null);
 
   // Variables
-  const { userId, currentServerId: userCurrentServerId } = user;
-  const {
-    targetId,
-    name: friendName,
-    note: friendNote,
-    avatarUrl: friendAvatarUrl,
-    signature: friendSignature,
-    vip: friendVip,
-    level: friendLevel,
-    xp: friendXp,
-    requiredXp: friendRequiredXp,
-    badges: friendBadges,
-    status: friendStatus,
-    relationStatus: friendRelationStatus,
-    isBlocked: isFriendBlocked,
-    currentServerId: friendCurrentServerId,
-    shareCurrentServer: friendShareCurrentServer,
-  } = friend;
-  const isSelf = targetId === userId;
-  const isOffline = friendStatus === 'offline';
-  const isOnline = !isOffline;
-  const isStranger = friendRelationStatus === 0;
-  const isPending = friendRelationStatus === 1;
-  const isFriend = friendRelationStatus === 2;
-  const isSelected = selectedItemId === targetId;
-  const friendHasVip = friendVip > 0;
-  const friendHasNote = friendNote !== '' && friendNote !== null;
-  const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: -1, userId });
+  const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: -1, userId: user.userId }), [t, user.userId]);
+  const isSelf = friend.targetId === user.userId;
+  const isOnline = friend.status === 'online';
+  const isOffline = friend.status === 'offline';
+  const isStranger = friend.relationStatus === 0;
+  const isPending = friend.relationStatus === 1;
+  const isFriend = friend.relationStatus === 2;
+  const hasVip = friend.vip > 0;
+  const hasNote = friend.note !== '' && friend.note !== null;
 
   // Functions
   const getFriendTabContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, targetId))
-      .addViewProfileOption(() => Popup.openUserInfo(userId, targetId))
-      .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(userId, targetId))
-      .addEditNoteOption({ isSelf, isFriend }, () => Popup.openEditFriendNote(userId, targetId))
+      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, friend.targetId))
+      .addViewProfileOption(() => Popup.openUserInfo(user.userId, friend.targetId))
+      .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(user.userId, friend.targetId))
+      .addEditNoteOption({ isSelf, isFriend }, () => Popup.openEditFriendNote(user.userId, friend.targetId))
       .addSeparator()
       .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => {}, onNotifyFriendOnlineClick: () => {} }, () => {})
       .addEditFriendFriendGroupOption(
-        { isSelf, isStranger, isBlocked: isFriendBlocked },
+        { isSelf, isStranger, isBlocked: friend.isBlocked },
         () => {},
         new CtxMenuBuilder()
-          .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => Popup.editFriend(targetId, { friendGroupId }))
+          .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => Popup.editFriend(friend.targetId, { friendGroupId }))
           .build(),
       )
-      .addBlockUserOption({ isSelf, isBlocked: isFriendBlocked }, () => (isFriendBlocked ? Popup.unblockUser(targetId, friendName) : Popup.blockUser(targetId, friendName)))
-      .addDeleteFriendOption({ isSelf, isFriend }, () => Popup.deleteFriend(targetId, friendName))
-      .addDeleteFriendApplicationOption({ isSelf, isPending }, () => Popup.deleteFriendApplication(targetId))
+      .addBlockUserOption({ isSelf, isBlocked: friend.isBlocked }, () => (friend.isBlocked ? Popup.unblockUser(friend.targetId, friend.name) : Popup.blockUser(friend.targetId, friend.name)))
+      .addDeleteFriendOption({ isSelf, isFriend }, () => Popup.deleteFriend(friend.targetId, friend.name))
+      .addDeleteFriendApplicationOption({ isSelf, isPending }, () => Popup.deleteFriendApplication(friend.targetId))
       .build();
 
   // Handlers
   const handleServerNameClick = () => {
     if (isLoading || !friendCurrentServer) return;
-    if (friendCurrentServer.serverId === userCurrentServerId) {
+    if (friendCurrentServer.serverId === user.currentServerId) {
       selectTab('server');
       return;
     }
@@ -103,12 +94,12 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId
   };
 
   const handleTabClick = () => {
-    if (isSelected) setSelectedItemId(null);
-    else setSelectedItemId(targetId);
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`friend-${friend.targetId}`));
   };
 
   const handleTabDoubleClick = () => {
-    Popup.openDirectMessage(userId, targetId);
+    Popup.openDirectMessage(user.userId, friend.targetId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -120,42 +111,36 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId
 
   // Effects
   useEffect(() => {
-    if (!targetId || !friendCurrentServerId || isFriendBlocked || !isFriend || !friendShareCurrentServer) {
+    if (!friend.targetId || friend.isBlocked || !friend.shareCurrentServer || !friendCurrentServer || !isFriend) {
       setFriendCurrentServer(null);
       return;
     }
-    ipc.data.server({ userId: targetId, serverId: friendCurrentServerId }).then((server) => {
+    ipc.data.server({ userId: friend.targetId, serverId: friendCurrentServer.serverId }).then((server) => {
       if (server) setFriendCurrentServer(server);
     });
-  }, [targetId, friendCurrentServerId, isFriendBlocked, isFriend, friendShareCurrentServer]);
+  }, [friend.targetId, friend.isBlocked, friend.shareCurrentServer, friendCurrentServer, isFriend]);
 
   return (
-    <div
-      key={targetId}
-      className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`}
-      onClick={handleTabClick}
-      onDoubleClick={handleTabDoubleClick}
-      onContextMenu={handleTabContextMenu}
-    >
+    <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>
       <Image
         className={styles['avatar-picture']}
-        style={{ filter: isFriend && isOnline && !isFriendBlocked ? '' : 'grayscale(100%)' }}
-        src={friendAvatarUrl}
-        alt={friendName}
+        style={{ filter: isFriend && !isOffline && !friend.isBlocked ? '' : 'grayscale(100%)' }}
+        src={friend.avatarUrl}
+        alt={friend.name}
         width={40}
         height={40}
         loading="lazy"
         draggable="false"
-        datatype={isFriend && !isOnline && !isOffline && !isFriendBlocked ? friendStatus : ''}
+        datatype={isFriend && !isOnline && !isOffline && !friend.isBlocked ? friend.status : ''}
       />
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>
-          {friendHasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${friendVip}`]}`} />}
-          <div className={`${styles['name-text']} ${friendHasVip ? vip['vip-name-color'] : ''}`}>
-            {friendNote || friendName} {friendHasNote ? `(${friendName})` : ''}
+          {hasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${friend.vip}`]}`} />}
+          <div className={`${styles['name-text']} ${hasVip ? vip['vip-name-color'] : ''}`}>
+            {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
           </div>
-          <LevelIcon level={friendLevel} xp={friendXp} requiredXp={friendRequiredXp} showTooltip={false} />
-          <BadgeList badges={JSON.parse(friendBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
+          <LevelIcon level={friend.level} xp={friend.xp} requiredXp={friend.requiredXp} showTooltip={false} />
+          <BadgeList badges={JSON.parse(friend.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
         {isPending ? (
           <div className={styles['signature']}>{`(${t('pending')})`}</div>
@@ -165,7 +150,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedItemId
             <div className={styles['server-name-text']}>{friendCurrentServer.name}</div>
           </div>
         ) : (
-          <div className={styles['signature']}>{friendSignature}</div>
+          <div className={styles['signature']}>{friend.signature}</div>
         )}
       </div>
     </div>

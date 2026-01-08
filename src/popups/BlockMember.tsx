@@ -21,7 +21,6 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   const [blockType, setBlockType] = useState<'block-permanent' | 'block-ip'>('block-permanent');
 
   // Variables
-  const { userId, name: memberName, nickname: memberNickname } = member;
   const blockTypeOptions = [
     { key: 'block-permanent', label: t('block-permanent'), disabled: false },
     { key: 'block-ip', label: t('block-ip'), disabled: true },
@@ -33,7 +32,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.blockUserFromServer(userId, serverId, -1);
+    Popup.blockUserFromServer(member.userId, serverId, -1);
     ipc.window.close();
   };
 
@@ -47,7 +46,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
           <div className={popupStyles['col']}>
-            <div className={popupStyles['label']}>{t('confirm-block-user', { '0': memberNickname || memberName })}</div>
+            <div className={popupStyles['label']}>{t('confirm-block-user', { '0': member.nickname || member.name })}</div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <div className={popupStyles['label']}>{t('block-type')}</div>

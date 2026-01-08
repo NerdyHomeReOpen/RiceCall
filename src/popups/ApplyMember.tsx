@@ -22,7 +22,6 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   const [applicationDesc, setApplicationDesc] = useState<Types.MemberApplication['description']>(memberApplication?.description || '');
 
   // Variables
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
   const isSendSection = section === 0;
   const isSentSection = section === 1;
   const isEditSection = section === 2;
@@ -37,12 +36,12 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   };
 
   const handleSubmitBtnClick = () => {
-    Popup.sendMemberApplication(serverId, { description: applicationDesc });
+    Popup.sendMemberApplication(server.serverId, { description: applicationDesc });
     ipc.window.close();
   };
 
   const handleSubmitEditBtnClick = () => {
-    Popup.editMemberApplication(serverId, { description: applicationDesc });
+    Popup.editMemberApplication(server.serverId, { description: applicationDesc });
     ipc.window.close();
   };
 
@@ -56,16 +55,16 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
         <div className={`${popupStyles['content']} ${popupStyles['col']}`}>
           <div className={popupStyles['row']}>
             <div className={popupStyles['avatar-wrapper']}>
-              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
             </div>
             <div className={popupStyles['info-wrapper']}>
-              <div className={popupStyles['link-text']}>{serverName}</div>
-              <div className={popupStyles['sub-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+              <div className={popupStyles['link-text']}>{server.name}</div>
+              <div className={popupStyles['sub-text']}>{`ID: ${server.specialId || server.displayId}`}</div>
             </div>
           </div>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('apply-member-note')}</div>
-            <div className={popupStyles['hint-text']}>{serverApplyNotice || t('none')}</div>
+            <div className={popupStyles['hint-text']}>{server.applyNotice || t('none')}</div>
           </div>
           <div className={popupStyles['split']} />
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={isSendSection ? {} : { display: 'none' }}>

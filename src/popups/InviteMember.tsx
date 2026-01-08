@@ -22,16 +22,13 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   const [section, setSection] = useState<number>(memberInvitation ? 1 : 0); // 0: send, 1: sent, 2: edit
   const [invitationDesc, setInvitationDesc] = useState<string>(memberInvitation?.description || '');
 
-  // Variables
-  const { userId: targetId, name: targetName, avatarUrl: targetAvatarUrl, displayId: targetDisplayId, contribution: targetContribution } = target;
-
   // Handlers
   const handleInvitationDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInvitationDesc(e.target.value);
   };
 
   const handleSubmitBtnClick = () => {
-    Popup.sendMemberInvitation(targetId, serverId, { description: invitationDesc });
+    Popup.sendMemberInvitation(target.userId, serverId, { description: invitationDesc });
     handleCloseBtnClick();
   };
 
@@ -40,7 +37,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   };
 
   const handleSubmitEditBtnClick = () => {
-    Popup.editMemberInvitation(targetId, serverId, { description: invitationDesc });
+    Popup.editMemberInvitation(target.userId, serverId, { description: invitationDesc });
     handleCloseBtnClick();
   };
 
@@ -55,14 +52,14 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
           <div className={popupStyles['label']}>{t('invite-member-label')}</div>
           <div className={popupStyles['row']}>
             <div className={popupStyles['avatar-wrapper']}>
-              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
+              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${target.avatarUrl})` }} />
             </div>
             <div className={popupStyles['info-wrapper']}>
               <div className={popupStyles['link-text']}>
-                {targetName} ({targetDisplayId})
+                {target.name} ({target.displayId})
               </div>
               <div className={popupStyles['sub-text']}>
-                {t('contribution')}: {targetContribution}
+                {t('contribution')}: {target.contribution}
               </div>
             </div>
           </div>

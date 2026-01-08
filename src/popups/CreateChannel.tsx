@@ -14,7 +14,7 @@ interface CreateChannelPopupProps {
   parent: Types.Channel | null;
 }
 
-const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serverId, parent: parentData }) => {
+const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serverId, parent }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -22,7 +22,6 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
   const [channelName, setChannelName] = useState<string>(Default.channel().name);
 
   // Variables
-  const { channelId: parentChannelId, name: parentChannelName } = parentData || {};
   const canSubmit = channelName.trim();
 
   // Handlers
@@ -32,7 +31,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.createChannel(serverId, { name: channelName, categoryId: parentChannelId || null });
+    Popup.createChannel(serverId, { name: channelName, categoryId: parent?.categoryId || null });
     ipc.window.close();
   };
 
@@ -46,7 +45,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
         <div className={`${popupStyles['dialog-content']} ${popupStyles['col']}`}>
           <div className={popupStyles['input-box']}>
             <div className={popupStyles['label']}>{t('parent-channel')}</div>
-            <div className={popupStyles['label']}>{parentChannelName || t('none')}</div>
+            <div className={popupStyles['label']}>{parent?.name || t('none')}</div>
           </div>
           <div className={popupStyles['input-box']}>
             <div className={popupStyles['label']}>{t('channel-name')}</div>

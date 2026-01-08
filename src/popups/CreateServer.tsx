@@ -1,4 +1,5 @@
 import React, { useMemo, useRef, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -19,8 +20,14 @@ const CreateServerPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const servers = useAppSelector((state) => state.servers.data);
+  const user = useAppSelector(
+    (state) => ({
+      level: state.user.data.level,
+    }),
+    shallowEqual,
+  );
+
+  const servers = useAppSelector((state) => state.servers.data, shallowEqual);
 
   // Refs
   const isUploadingRef = useRef<boolean>(false);
@@ -34,11 +41,10 @@ const CreateServerPopup: React.FC = React.memo(() => {
   const [serverAvatarUrl, setServerAvatarUrl] = useState<Types.Server['avatarUrl']>(Default.server().avatarUrl);
 
   // Variables
-  const { level: userLevel } = user;
   const remainingServers = useMemo(() => {
-    const maxGroups = userLevel >= 16 ? 5 : userLevel >= 6 && userLevel < 16 ? 4 : 3;
+    const maxGroups = user.level >= 16 ? 5 : user.level >= 6 && user.level < 16 ? 4 : 3;
     return maxGroups - servers.filter((s) => s.owned).length;
-  }, [userLevel, servers]);
+  }, [user.level, servers]);
   const canSubmit = remainingServers > 0 && serverName.trim();
 
   // Handlers

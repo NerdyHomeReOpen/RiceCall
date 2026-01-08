@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -55,9 +56,35 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
   });
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const currentChannel = useAppSelector((state) => state.currentChannel.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      serverId: state.currentServer.data.serverId,
+      permissionLevel: state.currentServer.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentChannel = useAppSelector(
+    (state) => ({
+      channelId: state.currentChannel.data.channelId,
+      permissionLevel: state.currentChannel.data.permissionLevel,
+      guestTextMaxLength: state.currentChannel.data.guestTextMaxLength,
+      guestTextGapTime: state.currentChannel.data.guestTextGapTime,
+      guestTextWaitTime: state.currentChannel.data.guestTextWaitTime,
+      isTextMuted: state.currentChannel.data.isTextMuted,
+      forbidText: state.currentChannel.data.forbidText,
+      forbidGuestText: state.currentChannel.data.forbidGuestText,
+    }),
+    shallowEqual,
+  );
 
   // Refs
   const messageInputRef = useRef<string>('');
@@ -71,28 +98,19 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
 
   // Variables
-  const {
-    channelId: currentChannelId,
-    guestTextGapTime: channelGuestTextGapTime,
-    guestTextWaitTime: channelGuestTextWaitTime,
-    guestTextMaxLength: channelGuestTextMaxLength,
-    forbidText: isChannelForbidText,
-    forbidGuestText: isChannelForbidGuestText,
-    isTextMuted: isChannelTextMuted,
-  } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const textLength = editor?.getText().length || 0;
-  const isCloseToMaxLength = textLength >= channelGuestTextMaxLength - 100;
-  const isWarning = textLength > channelGuestTextMaxLength;
-  const leftGapTime = channelGuestTextGapTime ? channelGuestTextGapTime - (Date.now() - lastMessageTime) : 0;
-  const leftWaitTime = channelGuestTextWaitTime ? channelGuestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
-  const isForbidByMutedText = isChannelTextMuted;
-  const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && isChannelForbidText;
-  const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && isChannelForbidGuestText;
+  const isCloseToMaxLength = textLength >= currentChannel.guestTextMaxLength - 100;
+  const isWarning = textLength > currentChannel.guestTextMaxLength;
+  const leftGapTime = currentChannel.guestTextGapTime ? currentChannel.guestTextGapTime - (Date.now() - lastMessageTime) : 0;
+  const leftWaitTime = currentChannel.guestTextWaitTime ? currentChannel.guestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
+  const isForbidByMutedText = currentChannel.isTextMuted;
+  const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && currentChannel.forbidText;
+  const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && currentChannel.forbidGuestText;
   const isForbidByForbidGuestTextWait = !Permission.isMember(permissionLevel) && leftWaitTime > 0;
   const isForbidByForbidGuestTextGap = !Permission.isMember(permissionLevel) && leftGapTime > 0;
   const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-  const maxLength = !Permission.isMember(permissionLevel) ? channelGuestTextMaxLength : 3000;
+  const maxLength = !Permission.isMember(permissionLevel) ? currentChannel.guestTextMaxLength : 3000;
 
   // Functions
   const setStyles = useCallback(() => {
@@ -177,11 +195,11 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
   }, [editor, setStyles]);
 
   useEffect(() => {
-    if (currentChannelId) {
+    if (currentChannel.channelId) {
       setLastJoinChannelTime(Date.now());
       setLastMessageTime(0);
     }
-  }, [currentChannelId]);
+  }, [currentChannel.channelId]);
 
   return (
     <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
@@ -198,7 +216,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
       />
       {isCloseToMaxLength && (
         <div className={styles['message-input-length-text']}>
-          {editor?.getText().length}/{maxLength}
+          {textLength}/{maxLength}
         </div>
       )}
     </div>

@@ -26,8 +26,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   const [cardY, setCardY] = useState(y);
 
   // Variables
-  const { name: badgeName, description: badgeDescription, iconUrl: badgeIconUrl, showTo: badgeShowTo, displayNickname: badgeDisplayNickname } = badge;
-  const isPermanent = badgeShowTo <= 0;
+  const isPermanent = badge.showTo <= 0;
 
   // Effects
   useEffect(() => {
@@ -67,15 +66,15 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
     <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['badge-info-card']}`} style={display ? { top: cardY, left: cardX } : { opacity: 0 }}>
       <div className={styles['badge-info-wrapper']}>
         <div className={styles['badge-avatar-box']}>
-          <Image src={badgeIconUrl} alt={badgeName} width={64} height={64} loading="lazy" draggable="false" />
+          <Image src={badge.iconUrl} alt={badge.name} width={64} height={64} loading="lazy" draggable="false" />
           <div className={styles['badge-rarity-text']}>{`[${t('rare')}]`}</div>
         </div>
         <div className={styles['badge-description-box']}>
-          <div className={styles['badge-name']}>{t(badgeName)}</div>
-          <div className={styles['badge-description']}>{t(badgeDescription, { nickname: badgeDisplayNickname })}</div>
+          <div className={styles['badge-name']}>{t(badge.name)}</div>
+          <div className={styles['badge-description']}>{t(badge.description, { nickname: badge.displayNickname })}</div>
         </div>
       </div>
-      <div className={styles['badge-show-time']}>{t('show-to', { '0': isPermanent ? t('permanent') : new Date(badgeShowTo).toLocaleDateString() })}</div>
+      <div className={styles['badge-show-time']}>{t('show-to', { '0': isPermanent ? t('permanent') : new Date(badge.showTo).toLocaleDateString() })}</div>
     </div>
   );
 });

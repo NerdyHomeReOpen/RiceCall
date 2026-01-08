@@ -1,5 +1,6 @@
 import dynamic from 'next/dynamic';
-import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector, useAppDispatch } from '@/store/hook';
 import ipc from '@/ipc';
@@ -61,13 +62,41 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const dispatch = useAppDispatch();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const currentChannel = useAppSelector((state) => state.currentChannel.data);
-  const queueUsers = useAppSelector((state) => state.queueUsers.data);
-  const channelMessages = useAppSelector((state) => state.channelMessages.data);
-  const actionMessages = useAppSelector((state) => state.actionMessages.data);
-  const channelEvents = useAppSelector((state) => state.channelEvents.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      serverId: state.currentServer.data.serverId,
+      permissionLevel: state.currentServer.data.permissionLevel,
+      announcement: state.currentServer.data.announcement,
+    }),
+    shallowEqual,
+  );
+
+  const currentChannel = useAppSelector(
+    (state) => ({
+      channelId: state.currentChannel.data.channelId,
+      permissionLevel: state.currentChannel.data.permissionLevel,
+      announcement: state.currentChannel.data.announcement,
+      voiceMode: state.currentChannel.data.voiceMode,
+      bitrate: state.currentChannel.data.bitrate,
+      forbidQueue: state.currentChannel.data.forbidQueue,
+      isVoiceMuted: state.currentChannel.data.isVoiceMuted,
+    }),
+    shallowEqual,
+  );
+
+  const isQueueControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled), shallowEqual);
+  const queuePosition = useAppSelector((state) => state.queueUsers.data.find((q) => q.userId === user.userId)?.position, shallowEqual);
+  const channelMessages = useAppSelector((state) => state.channelMessages.data, shallowEqual);
+  const actionMessages = useAppSelector((state) => state.actionMessages.data, shallowEqual);
+  const channelEvents = useAppSelector((state) => state.channelEvents.data, shallowEqual);
 
   // Refs
   const isResizingSidebarRef = useRef<boolean>(false);
@@ -76,7 +105,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const annAreaRef = useRef<HTMLDivElement>(null);
   const showAreaRef = useRef<HTMLIFrameElement>(null);
   const messageAreaRef = useRef<HTMLDivElement>(null);
-  const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Types.Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
 
   // States
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
@@ -90,47 +118,20 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const [centralAreaMode, setCentralAreaMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
   // Variables
-  const { userId } = user;
-  const { serverId: currentServerId, announcement: currentServerAnnouncement } = currentServer;
-  const {
-    channelId: currentChannelId,
-    announcement: currentChannelAnnouncement,
-    bitrate: currentChannelBitrate,
-    voiceMode: currentChannelVoiceMode,
-    forbidQueue: isCurrentChannelQueueForbidden,
-    isVoiceMuted: isCurrentChannelVoiceMuted,
-  } = currentChannel;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const queuePosition = useMemo(() => (queueUsers.find((m) => m.userId === userId)?.position ?? 0) + 1, [queueUsers, userId]);
-  const isCurrentChannelFreeMode = currentChannelVoiceMode === 'free';
-  const isCurrentChannelAdminMode = currentChannelVoiceMode === 'admin';
-  const isCurrentChannelQueueMode = currentChannelVoiceMode === 'queue';
-  const isCentralAreaModeNone = centralAreaMode === 'none';
-  const isCentralAreaModeAnnouncement = centralAreaMode === 'announcement';
-  const isCentralAreaModeShow = centralAreaMode === 'show';
+  const isCurrentChannelFreeMode = currentChannel.voiceMode === 'free';
+  const isCurrentChannelAdminMode = currentChannel.voiceMode === 'admin';
+  const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
+  const isCentralAreaNoneMode = centralAreaMode === 'none';
+  const isCentralAreaAnnouncementMode = centralAreaMode === 'announcement';
+  const isCentralAreaShowMode = centralAreaMode === 'show';
   const isChannelUIClassicMode = channelUIMode === 'classic';
   const isChannelUIThreeLineMode = channelUIMode === 'three-line';
   const volumeLevel = isSpeaking('user') ? Math.ceil(getVolumePercent('user') / 10) - 1 : 0;
-  const { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled } = useMemo(() => {
-    let isMicTaken = false;
-    let isQueuing = false;
-    let isControlled = false;
-    let isCurrentChannelQueueControlled = false;
-    for (const m of queueUsers) {
-      if (m.isQueueControlled) isCurrentChannelQueueControlled = true;
-      if (m.userId !== userId) continue;
-      if (m.position <= 0) {
-        isMicTaken = true;
-        if (!Permission.isChannelMod(permissionLevel) && m.isQueueControlled) {
-          isControlled = true;
-        }
-      } else if (m.position > 0) {
-        isQueuing = true;
-      }
-    }
-    const isIdling = !isMicTaken && !isQueuing;
-    return { isMicTaken, isQueuing, isIdling, isControlled, isCurrentChannelQueueControlled };
-  }, [queueUsers, userId, permissionLevel]);
+  const isControlled = !Permission.isChannelMod(permissionLevel) && isQueueControlled;
+  const isQueuing = queuePosition !== undefined && queuePosition > 0;
+  const isMicTaken = queuePosition === 0;
+  const isIdling = !isMicTaken && !isQueuing;
 
   // Functions
   const getMicText = () => {
@@ -142,7 +143,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const getMicSubText = () => {
     if (isIdling) return '';
     if (isQueuing) return t('in-queue-position', { '0': queuePosition });
-    if (isCurrentChannelVoiceMuted) return t('mic-forbidden');
+    if (currentChannel.isVoiceMuted) return t('mic-forbidden');
     if (isControlled) return t('mic-controlled');
     if (speakingMode === 'key' && !isSpeakKeyPressed) {
       return t('press-key-to-speak', { '0': speakingKey });
@@ -156,7 +157,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     let className = styles['mic-button'];
     if (isMicTaken) className += ` ${styles['speaking']}`;
     if (isQueuing) className += ` ${styles['queuing']}`;
-    if (isCurrentChannelVoiceMuted || isControlled) className += ` ${styles['muted']}`;
+    if (currentChannel.isVoiceMuted || isControlled) className += ` ${styles['muted']}`;
     if (!isCurrentChannelQueueMode || (!Permission.isChannelMod(permissionLevel) && isIdling)) className += ` ${styles['no-selection']}`;
     return className;
   };
@@ -177,40 +178,38 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     clearUnreadMessageNotification();
   }, []);
 
-  const updateShowFrameState = useCallback(
-    (userId: string, anchorId: string | null, channelMode: Types.Channel['voiceMode']) => {
-      if (!showAreaRef.current?.contentWindow) return;
-      prevStateRef.current = { userId, anchorId, channelMode };
-      showAreaRef.current.contentWindow.postMessage({ uid: userId, aid: anchorId, channelMode: channelMode }, SHOW_FRAME_ORIGIN);
-    },
-    [showAreaRef],
-  );
-
   const getContextMenuItems1 = () => new CtxMenuBuilder().addCloseAnnouncementOption({ permissionLevel }, () => setCentralAreaMode('none')).build();
 
   const getContextMenuItems2 = () =>
     new CtxMenuBuilder()
       .addCleanUpMessageOption({ permissionLevel }, () => clearMessages())
-      .addOpenChannelEventOption({ permissionLevel }, () => Popup.openChannelEvent(userId, currentServer.serverId, channelEvents))
+      .addOpenChannelEventOption({ permissionLevel }, () => Popup.openChannelEvent(user.userId, currentServer.serverId, channelEvents))
       .addOpenAnnouncementOption({ permissionLevel }, () => setCentralAreaMode('announcement'))
       .build();
 
   const getContextMenuItems3 = () =>
     new CtxMenuBuilder()
-      .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Popup.editChannel(currentServerId, currentChannelId, { voiceMode: 'free' }))
-      .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Popup.editChannel(currentServerId, currentChannelId, { voiceMode: 'admin' }))
+      .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Popup.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
+      .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Popup.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
       .addQueueSpeechOption(
         { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
-        () => Popup.editChannel(currentServerId, currentChannelId, { voiceMode: 'queue' }),
+        () => Popup.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),
         new CtxMenuBuilder()
-          .addForbidQueueOption({ permissionLevel, isForbidQueue: isCurrentChannelQueueForbidden }, () =>
-            Popup.editChannel(currentServerId, currentChannelId, { forbidQueue: !isCurrentChannelQueueForbidden }),
+          .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannel.forbidQueue }, () =>
+            Popup.editChannel(currentServer.serverId, currentChannel.channelId, { forbidQueue: !currentChannel.forbidQueue }),
           )
-          .addControlQueueOption({ permissionLevel, isQueueControlled: isCurrentChannelQueueControlled }, () => Popup.controlQueue(currentServerId, currentChannelId))
+          .addControlQueueOption({ permissionLevel, isQueueControlled }, () => Popup.controlQueue(currentServer.serverId, currentChannel.channelId))
           .build(),
       )
       .build();
 
+  const getResizableAreaRef = () => {
+    if (isCentralAreaAnnouncementMode) return annAreaRef;
+    if (isCentralAreaShowMode) return showAreaRef;
+    return null;
+  };
+
+  // Handlers
   const handleMicBtnClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isCurrentChannelQueueMode) {
       if (!isIdling) {
@@ -220,7 +219,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
             id: 'untake-mic',
             label: t('untake-mic'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Popup.leaveQueue(currentServerId, currentChannelId),
+            onClick: () => Popup.leaveQueue(currentServer.serverId, currentChannel.channelId),
           },
         ]);
       } else if (Permission.isChannelMod(permissionLevel)) {
@@ -230,7 +229,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
             id: 'take-mic-in-queue',
             label: t('take-mic-in-queue'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Popup.joinQueue(currentServerId, currentChannelId),
+            onClick: () => Popup.joinQueue(currentServer.serverId, currentChannel.channelId),
           },
           {
             id: 'separator',
@@ -240,22 +239,21 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
             id: 'take-mic-directly',
             label: t('take-mic-directly'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Popup.joinQueue(currentServerId, currentChannelId, -2),
+            onClick: () => Popup.joinQueue(currentServer.serverId, currentChannel.channelId, -2),
           },
         ]);
       } else {
-        Popup.joinQueue(currentServerId, currentChannelId);
+        Popup.joinQueue(currentServer.serverId, currentChannel.channelId);
       }
     } else {
       if (isMicTaken) {
-        Popup.leaveQueue(currentServerId, currentChannelId);
+        Popup.leaveQueue(currentServer.serverId, currentChannel.channelId);
       } else {
-        Popup.joinQueue(currentServerId, currentChannelId);
+        Popup.joinQueue(currentServer.serverId, currentChannel.channelId);
       }
     }
   };
 
-  // Handlers
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingSidebarRef.current = true;
@@ -264,12 +262,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const handleSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     if (!isResizingSidebarRef.current || !sidebarRef.current) return;
     sidebarRef.current.style.width = `${e.clientX}px`;
-  };
-
-  const getResizableAreaRef = () => {
-    if (isCentralAreaModeAnnouncement) return annAreaRef;
-    if (isCentralAreaModeShow) return showAreaRef;
-    return null;
   };
 
   const handleAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -295,27 +287,22 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     setIsAtBottom(isBottom);
   };
 
-  const handleShowFrameLoad = () => {
-    const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
-    updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
-  };
-
   const handleWidgetAnnClick = () => {
-    if (isCentralAreaModeAnnouncement) setCentralAreaMode('none');
+    if (isCentralAreaAnnouncementMode) setCentralAreaMode('none');
     else setCentralAreaMode('announcement');
     setIsWidgetExpanded(false);
   };
 
   const handleWidgetShowClick = () => {
-    if (isCentralAreaModeShow) setCentralAreaMode('none');
+    if (isCentralAreaShowMode) setCentralAreaMode('none');
     else setCentralAreaMode('show');
     setIsWidgetExpanded(false);
   };
 
   const handleWidgetMoreClick = () => {
-    Popup.openServerApplication(userId, currentServerId, (action) => {
+    Popup.openServerApplication(user.userId, currentServer.serverId, (action) => {
       if (action === 'openShowFrame') setCentralAreaMode('show');
-      if (action === 'openChannelEvent') Popup.openChannelEvent(userId, currentServerId, channelEvents);
+      if (action === 'openChannelEvent') Popup.openChannelEvent(user.userId, currentServer.serverId, channelEvents);
     });
     setIsWidgetExpanded(false);
   };
@@ -342,7 +329,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   };
 
   const handleMessageSend = (message: string) => {
-    Popup.sendChannelMessage(currentServerId, currentChannelId, { type: 'general', content: message });
+    Popup.sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: message });
   };
 
   const handleNewMessageAlertClick = () => {
@@ -387,20 +374,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
 
   // Effects
   useEffect(() => {
-    const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
-    if (prevStateRef.current.userId === userId && prevStateRef.current.anchorId === anchorId && prevStateRef.current.channelMode === currentChannelVoiceMode) return;
-    updateShowFrameState(userId, anchorId, currentChannelVoiceMode);
-  }, [userId, queueUsers, currentChannelVoiceMode, updateShowFrameState]);
+    changeBitrate(currentChannel.bitrate);
+  }, [currentChannel.bitrate, changeBitrate]);
 
   useEffect(() => {
-    changeBitrate(currentChannelBitrate);
-  }, [currentChannelBitrate, changeBitrate]);
-
-  useEffect(() => {
-    if (isMicTaken && !isControlled) takeMic(currentChannelId);
+    if (isMicTaken && !isControlled) takeMic(currentChannel.channelId);
     else releaseMic();
     stopMixing();
-  }, [isMicTaken, isControlled, currentChannelId, takeMic, releaseMic, stopMixing]);
+  }, [isMicTaken, isControlled, currentChannel.channelId, takeMic, releaseMic, stopMixing]);
 
   useEffect(() => {
     if (actionMessages.length === 0) setShowActionMessage(false);
@@ -408,8 +389,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   }, [actionMessages]);
 
   useEffect(() => {
-    if (currentServerId && currentServerAnnouncement) Popup.openServerAnnouncement(currentServerAnnouncement);
-  }, [currentServerId, currentServerAnnouncement]);
+    if (currentServer.serverId && currentServer.announcement) Popup.openServerAnnouncement(currentServer.announcement);
+  }, [currentServer.serverId, currentServer.announcement]);
 
   useEffect(() => {
     if (isAtBottom) setUnreadMessageCount(0);
@@ -451,12 +432,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     const lastMessage = channelMessages[channelMessages.length - 1];
     const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
 
-    if (isBottom || lastMessage.type !== 'general' || lastMessage.userId === userId) {
+    if (isBottom || lastMessage.type !== 'general' || lastMessage.userId === user.userId) {
       setTimeout(() => scrollToBottom(), 50);
     } else {
       setUnreadMessageCount((prev) => prev + 1);
     }
-  }, [channelMessages, userId, scrollToBottom]);
+  }, [channelMessages, user.userId, scrollToBottom]);
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
@@ -490,37 +471,30 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
         <main className={styles['content']}>
           <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
-            {!isCentralAreaModeNone &&
-              (isCentralAreaModeAnnouncement ? (
+            {!isCentralAreaNoneMode &&
+              (isCentralAreaAnnouncementMode ? (
                 <div
                   ref={annAreaRef}
                   className={styles['announcement-area']}
                   style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
                   onContextMenu={handleAnnAreaContextMenu}
                 >
-                  <MarkdownContent markdownText={currentChannelAnnouncement || currentServerAnnouncement} imageSize={'big'} />
+                  <MarkdownContent markdownText={currentChannel.announcement || currentServer.announcement} imageSize={'big'} />
                 </div>
-              ) : isCentralAreaModeShow ? (
-                <iframe
-                  ref={showAreaRef}
-                  className={styles['rcshow-area']}
-                  style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
-                  id="showFrame"
-                  src={SHOW_FRAME_ORIGIN}
-                  height="100%"
-                  width="100%"
-                  onLoad={handleShowFrameLoad}
-                />
+              ) : isCentralAreaShowMode ? (
+                <div style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
+                  <ShowFrame />
+                </div>
               ) : null)}
             <div
               className="resize-handle-vertical"
-              style={isChannelUIClassicMode && !isCentralAreaModeNone ? {} : { display: 'none' }}
+              style={isChannelUIClassicMode && !isCentralAreaNoneMode ? {} : { display: 'none' }}
               onPointerDown={handleAnnAreaHandleDown}
               onPointerMove={handleAnnAreaHandleMove}
             />
             <div
               className="resize-handle"
-              style={isChannelUIThreeLineMode && !isCentralAreaModeNone ? {} : { display: 'none' }}
+              style={isChannelUIThreeLineMode && !isCentralAreaNoneMode ? {} : { display: 'none' }}
               onPointerDown={handleAnnAreaHandleDown}
               onPointerMove={handleAnnAreaHandleMove}
             />
@@ -530,12 +504,12 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
               </div>
             </div>
             <div className={`${styles['widget-bar']} ${isWidgetExpanded ? styles['widget-bar-expanded'] : ''}`}>
-              <div className={`${styles['widget-bar-item']} ${isCentralAreaModeAnnouncement ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetAnnClick}>
+              <div className={`${styles['widget-bar-item']} ${isCentralAreaAnnouncementMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetAnnClick}>
                 <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`} />
                 <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
               </div>
               <div className={styles['widget-bar-spliter']} />
-              <div className={`${styles['widget-bar-item']} ${isCentralAreaModeShow ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetShowClick}>
+              <div className={`${styles['widget-bar-item']} ${isCentralAreaShowMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetShowClick}>
                 <div className={`${styles['widget-bar-item-icon']} ${styles['rcshow-icon']}`} />
                 <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
               </div>
@@ -567,7 +541,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
           <div className={styles['button-area']}>
             <div className={styles['buttons']}>
               <div className={styles['voice-mode-dropdown']} style={Permission.isChannelMod(permissionLevel) ? {} : { display: 'none' }} onClick={handleVoiceModeDropdownClick}>
-                {currentChannelVoiceMode === 'queue' ? t('queue-speech') : currentChannelVoiceMode === 'free' ? t('free-speech') : currentChannelVoiceMode === 'admin' ? t('admin-speech') : ''}
+                {currentChannel.voiceMode === 'queue' ? t('queue-speech') : currentChannel.voiceMode === 'free' ? t('free-speech') : currentChannel.voiceMode === 'admin' ? t('admin-speech') : ''}
               </div>
             </div>
             <div className={getMicBtnClass()} onClick={handleMicBtnClick}>
@@ -682,3 +656,56 @@ const VolumeSlider = React.memo(
 );
 
 VolumeSlider.displayName = 'VolumeSlider';
+
+const ShowFrame: React.FC = React.memo(() => {
+  // Refs
+  const showFrameRef = useRef<HTMLIFrameElement>(null);
+  const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Types.Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
+
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentChannel = useAppSelector(
+    (state) => ({
+      channelId: state.currentChannel.data.channelId,
+      permissionLevel: state.currentChannel.data.permissionLevel,
+      voiceMode: state.currentChannel.data.voiceMode,
+    }),
+    shallowEqual,
+  );
+
+  const queueUsers = useAppSelector((state) => state.queueUsers.data, shallowEqual);
+
+  // Functions
+  const updateShowFrameState = useCallback(
+    (userId: string, anchorId: string | null, channelMode: Types.Channel['voiceMode']) => {
+      if (!showFrameRef.current?.contentWindow) return;
+      prevStateRef.current = { userId, anchorId, channelMode };
+      showFrameRef.current.contentWindow.postMessage({ uid: userId, aid: anchorId, channelMode: channelMode }, SHOW_FRAME_ORIGIN);
+    },
+    [showFrameRef],
+  );
+
+  // Handlers
+  const handleShowFrameLoad = () => {
+    const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+    updateShowFrameState(user.userId, anchorId, currentChannel.voiceMode);
+  };
+
+  //Effects
+  useEffect(() => {
+    const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
+    if (prevStateRef.current.userId === user.userId && prevStateRef.current.anchorId === anchorId && prevStateRef.current.channelMode === currentChannel.voiceMode) return;
+    updateShowFrameState(user.userId, anchorId, currentChannel.voiceMode);
+  }, [user.userId, queueUsers, currentChannel.voiceMode, updateShowFrameState]);
+
+  return <iframe ref={showFrameRef} className={styles['rcshow-area']} id="showFrame" src={SHOW_FRAME_ORIGIN} height="100%" width="100%" onLoad={handleShowFrameLoad} />;
+});
+
+ShowFrame.displayName = 'ShowFrame';

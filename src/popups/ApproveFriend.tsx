@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -18,7 +19,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
   const { t } = useTranslation();
 
   // Selectors
-  const friendGroups = useAppSelector((state) => state.friendGroups.data);
+  const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   // States
   const [friendNotes, setFriendNotes] = useState<string>('');

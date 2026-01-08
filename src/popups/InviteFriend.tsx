@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -23,21 +24,26 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ server
   const { t } = useTranslation();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const friends = useAppSelector((state) => state.friends.data);
-  const friendGroups = useAppSelector((state) => state.friendGroups.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
+
+  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
+  const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   // States
   const [query, setQuery] = useState<string>('');
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
   // Variables
-  const { userId } = user;
   const selectedUserIdSet = useMemo(() => new Set(selectedUserIds), [selectedUserIds]);
-  const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: 0, userId });
+  const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: 0, userId: user.userId }), [t, user.userId]);
   const filteredFriends = useMemo(() => friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.name.includes(query)), [friends, query]);
-  const filteredFriendGroups = useMemo(() => [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order), [defaultFriendGroup, friendGroups]);
-  const isAllSelected = filteredFriends.every((f) => selectedUserIdSet.has(f.targetId));
+  const sortedFriendGroups = useMemo(() => [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order), [defaultFriendGroup, friendGroups]);
+  const isAllSelected = useMemo(() => filteredFriends.every((f) => selectedUserIdSet.has(f.targetId)), [filteredFriends, selectedUserIdSet]);
 
   // Handlers
   const handleSelect = (userId: Types.User['userId']) => {
@@ -89,7 +95,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ server
             {t('invite-total-for', { 0: selectedUserIds.length })}
           </div>
           <div className={styles['scroll-view']}>
-            {filteredFriendGroups.map((friendGroup) => (
+            {sortedFriendGroups.map((friendGroup) => (
               <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
             ))}
           </div>
@@ -112,19 +118,14 @@ interface FriendGroupTabProps {
 
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, friendGroup, selectedUserIdSet, onSelect }) => {
   // States
-  const [expanded, setExpanded] = useState<boolean>(true);
+  const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
   // Variables
-  const { friendGroupId, name: friendGroupName } = friendGroup;
   const friendGroupFriends = useMemo(() => {
-    switch (friendGroupId) {
-      case '':
-        return friends.filter((f) => !f.friendGroupId);
-      default:
-        return friends.filter((f) => f.friendGroupId === friendGroupId);
-    }
-  }, [friendGroupId, friends]);
-  const isAllSelected = friendGroupFriends.every((f) => selectedUserIdSet.has(f.targetId));
+    if (friendGroup.friendGroupId) return friends.filter((f) => f.friendGroupId === friendGroup.friendGroupId);
+    else return friends.filter((f) => !f.friendGroupId);
+  }, [friendGroup.friendGroupId, friends]);
+  const isAllSelected = useMemo(() => friendGroupFriends.every((f) => selectedUserIdSet.has(f.targetId)), [friendGroupFriends, selectedUserIdSet]);
 
   // Functions
   const handleSelectAllChange = () => {
@@ -133,7 +134,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, fri
   };
 
   const handleTabClick = () => {
-    setExpanded((prev) => !prev);
+    setIsExpanded((prev) => !prev);
   };
 
   const handleSelect = (userId: Types.User['userId']) => {
@@ -141,21 +142,21 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, fri
   };
 
   return (
-    <div key={friendGroupId}>
+    <>
       <div className={`${styles['friend-group-tab']}`}>
         <input type="checkbox" checked={isAllSelected} onChange={handleSelectAllChange} />
-        <div className={`${styles['friend-group-details']} ${selectedUserIdSet.has(friendGroupId) ? styles['selected'] : ''}`} onClick={handleTabClick}>
-          <div className={`${styles['toggle-icon']} ${expanded ? styles['expanded'] : ''}`} />
-          <div className={styles['tab-label']}>{friendGroupName}</div>
+        <div className={`${styles['friend-group-details']} ${selectedUserIdSet.has(friendGroup.friendGroupId) ? styles['selected'] : ''}`} onClick={handleTabClick}>
+          <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
+          <div className={styles['tab-label']}>{friendGroup.name}</div>
           <div className={styles['tab-count']}>{`(${friendGroupFriends.length})`}</div>
         </div>
       </div>
-      <div className={styles['tab-content']} style={expanded ? {} : { display: 'none' }}>
+      <div className={styles['tab-content']} style={isExpanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
           <FriendTab key={friend.targetId} friend={friend} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
         ))}
       </div>
-    </div>
+    </>
   );
 });
 
@@ -169,22 +170,23 @@ interface FriendTabProps {
 
 const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserIdSet, onSelect }) => {
   // Variables
-  const { targetId, name: friendName, note: friendNote, avatarUrl: friendAvatarUrl, vip: friendVip } = friend;
-  const isSelected = selectedUserIdSet.has(targetId);
+  const isSelected = selectedUserIdSet.has(friend.targetId);
+  const hasVip = friend.vip > 0;
+  const hasNote = !!friend.note;
 
   // Handlers
   const handleTabClick = () => {
-    onSelect(targetId);
+    onSelect(friend.targetId);
   };
 
   return (
-    <div key={targetId} className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
+    <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <input type="checkbox" checked={isSelected} readOnly />
-      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friendAvatarUrl})` }} />
+      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} />
       <div className={styles['friend-info']}>
-        {friendVip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${friendVip}`]}`} />}
-        <div className={`${styles['name-text']} ${friendVip > 0 ? vipStyles['vip-name-color'] : ''}`}>
-          {friendNote || friendName} {friendNote !== '' ? `(${friendName})` : ''}
+        {hasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${friend.vip}`]}`} />}
+        <div className={`${styles['name-text']} ${hasVip ? vipStyles['vip-name-color'] : ''}`}>
+          {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
         </div>
       </div>
     </div>

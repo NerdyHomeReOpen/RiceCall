@@ -38,9 +38,8 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
     refresh();
   }, [displayId]);
 
-  return !displayId ? (
-    <span>{href}</span>
-  ) : (
+  if (!displayId) return <span>{href}</span>;
+  return (
     <span className={styles['invitation-container']}>
       <span className={styles['invitation-headers']}>
         <span className={styles['icon']} />

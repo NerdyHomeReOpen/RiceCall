@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 
@@ -29,73 +30,88 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const { showContextMenu } = useContextMenu();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const currentChannel = useAppSelector((state) => state.currentChannel.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      serverId: state.currentServer.data.serverId,
+      permissionLevel: state.currentServer.data.permissionLevel,
+      lobbyId: state.currentServer.data.lobbyId,
+    }),
+    shallowEqual,
+  );
+
+  const currentChannel = useAppSelector(
+    (state) => ({
+      channelId: state.currentChannel.data.channelId,
+      permissionLevel: state.currentChannel.data.permissionLevel,
+      categoryId: state.currentChannel.data.categoryId,
+    }),
+    shallowEqual,
+  );
 
   // Variables
-  const { userId } = user;
-  const { serverId: currentServerId, lobbyId: currentServerLobbyId } = currentServer;
-  const { channelId: currentChannelId, categoryId: channelCategoryId, permissionLevel: channelPermissionLevel } = currentChannel;
-  const {
-    userId: senderUserId,
-    name: senderName,
-    nickname: senderNickname,
-    vip: senderVip,
-    gender: senderGender,
-    permissionLevel: senderPermissionLevel,
-    currentChannelId: senderCurrentChannelId,
-    contents: messageContents,
-    timestamp: messageTimestamp,
-  } = messageGroup;
-
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channelPermissionLevel);
-  const isSelf = senderUserId === userId;
-  const isInLobby = senderCurrentChannelId === currentServerLobbyId;
-  const isSuperior = permissionLevel > senderPermissionLevel;
-  const senderHasVip = senderVip > 0;
-  const formattedTimestamp = Language.getFormatTimestamp(t, messageTimestamp);
+  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
+  const isSelf = messageGroup.userId === user.userId;
+  const isInLobby = messageGroup.currentChannelId === currentServer.lobbyId;
+  const isLowerLevel = messageGroup.permissionLevel < permissionLevel;
+  const hasVip = messageGroup.vip > 0;
+  const formattedTimestamp = Language.getFormatTimestamp(t, messageGroup.timestamp);
   const formattedMessageContents = useMemo(
     () =>
-      messageContents.map((content) =>
+      messageGroup.contents.map((content) =>
         content
           .split(' ')
           .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
           .join(' '),
       ),
-    [messageContents, t],
+    [messageGroup.contents, t],
   );
 
   // Functions
   const getMemberManagementSubmenuItems = () =>
     new CtxMenuBuilder()
-      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior }, () => Popup.terminateMember(senderUserId, currentServerId, senderName))
-      .addSetChannelModOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior, channelCategoryId }, () =>
-        Permission.isChannelMod(senderPermissionLevel)
-          ? Popup.editChannelPermission(senderUserId, currentServerId, currentChannelId, { permissionLevel: 2 })
-          : Popup.editChannelPermission(senderUserId, currentServerId, currentChannelId, { permissionLevel: 3 }),
+      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel }, () =>
+        Popup.terminateMember(messageGroup.userId, currentServer.serverId, messageGroup.name),
       )
-      .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior, channelCategoryId }, () =>
-        Permission.isChannelAdmin(senderPermissionLevel)
-          ? Popup.editChannelPermission(senderUserId, currentServerId, channelCategoryId || currentChannelId, { permissionLevel: 2 })
-          : Popup.editChannelPermission(senderUserId, currentServerId, channelCategoryId || currentChannelId, { permissionLevel: 4 }),
+      .addSetChannelModOption({ permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId }, () =>
+        Permission.isChannelMod(messageGroup.permissionLevel)
+          ? Popup.editChannelPermission(messageGroup.userId, currentServer.serverId, currentChannel.channelId, { permissionLevel: 2 })
+          : Popup.editChannelPermission(messageGroup.userId, currentServer.serverId, currentChannel.channelId, { permissionLevel: 3 }),
       )
-      .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior }, () =>
-        Permission.isServerAdmin(senderPermissionLevel)
-          ? Popup.editServerPermission(senderUserId, currentServerId, { permissionLevel: 2 })
-          : Popup.editServerPermission(senderUserId, currentServerId, { permissionLevel: 5 }),
+      .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId }, () =>
+        Permission.isChannelAdmin(messageGroup.permissionLevel)
+          ? Popup.editChannelPermission(messageGroup.userId, currentServer.serverId, currentChannel.categoryId || currentChannel.channelId, { permissionLevel: 2 })
+          : Popup.editChannelPermission(messageGroup.userId, currentServer.serverId, currentChannel.categoryId || currentChannel.channelId, { permissionLevel: 4 }),
+      )
+      .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel }, () =>
+        Permission.isServerAdmin(messageGroup.permissionLevel)
+          ? Popup.editServerPermission(messageGroup.userId, currentServer.serverId, { permissionLevel: 2 })
+          : Popup.editServerPermission(messageGroup.userId, currentServer.serverId, { permissionLevel: 5 }),
       )
       .build();
 
   const getMessageContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, senderUserId))
-      .addViewProfileOption(() => Popup.openUserInfo(userId, senderUserId))
-      .addKickUserFromChannelOption({ permissionLevel, isSelf, isSuperior, isInLobby }, () => Popup.openKickMemberFromChannel(senderUserId, currentServerId, currentChannelId))
-      .addKickUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openKickMemberFromServer(senderUserId, currentServerId))
-      .addBlockUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openBlockMember(senderUserId, currentServerId))
-      .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior }, () => Popup.openInviteMember(senderUserId, currentServerId))
-      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: senderPermissionLevel, isSelf, isSuperior, channelCategoryId }, () => {}, getMemberManagementSubmenuItems())
+      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, messageGroup.userId))
+      .addViewProfileOption(() => Popup.openUserInfo(user.userId, messageGroup.userId))
+      .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => Popup.openKickMemberFromChannel(messageGroup.userId, currentServer.serverId, currentChannel.channelId))
+      .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openKickMemberFromServer(messageGroup.userId, currentServer.serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(messageGroup.userId, currentServer.serverId))
+      .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel }, () =>
+        Popup.openInviteMember(messageGroup.userId, currentServer.serverId),
+      )
+      .addMemberManagementOption(
+        { permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId },
+        () => {},
+        getMemberManagementSubmenuItems(),
+      )
       .build();
 
   // Handlers
@@ -107,16 +123,16 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   };
 
   const handleUsernameClick = () => {
-    Popup.openUserInfo(userId, senderUserId);
+    Popup.openUserInfo(user.userId, messageGroup.userId);
   };
 
   return (
     <div className={styles['message-box']}>
       <div className={`${styles['details']}`} onContextMenu={handleMessageContextMenu}>
-        {Permission.isChannelMod(senderPermissionLevel) && <div className={`${permission[senderGender]} ${permission[`lv-${senderPermissionLevel}`]}`} />}
-        {senderHasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${senderVip}`]}`} />}
-        <div className={`${styles['username-text']} ${senderHasVip ? `${vip['vip-name-color']}` : ''}`} onClick={handleUsernameClick}>
-          {senderNickname || senderName}
+        {Permission.isChannelMod(messageGroup.permissionLevel) && <div className={`${permission[messageGroup.gender]} ${permission[`lv-${messageGroup.permissionLevel}`]}`} />}
+        {hasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${messageGroup.vip}`]}`} />}
+        <div className={`${styles['username-text']} ${hasVip ? `${vip['vip-name-color']}` : ''}`} onClick={handleUsernameClick}>
+          {messageGroup.nickname || messageGroup.name}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>

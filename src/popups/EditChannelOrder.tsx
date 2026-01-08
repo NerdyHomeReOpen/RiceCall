@@ -1,12 +1,14 @@
 import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import { setSelectedItemId } from '@/store/slices/uiSlice';
+
 import * as Popup from '@/utils/popup';
-import * as Default from '@/utils/default';
 
 import styles from '@/styles/editChannelOrder.module.css';
 import serverPage from '@/styles/server.module.css';
@@ -21,9 +23,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   // Hooks
   const { t } = useTranslation();
 
-  // Selectors
-  const user = useAppSelector((state) => state.user.data);
-
   // Refs
   const orderMapRef = useRef<Record<string, number>>(
     channelsData.reduce(
@@ -35,28 +34,33 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     ),
   );
 
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
+
   // States
   const [channels, setChannels] = useState<(Types.Channel | Types.Category)[]>(channelsData.filter((c) => !c.isLobby));
   const [selectedChannel, setSelectedChannel] = useState<Types.Channel | Types.Category | null>(null);
   const [categoryChildren, setCategoryChildren] = useState<(Types.Channel | Types.Category)[]>([]);
-  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
 
   // Variables
-  const { userId } = user;
-  const { channelId: selectedChannelId, isLobby: isSelectedChannelLobby } = selectedChannel ?? Default.channel();
-  const currentIndex = categoryChildren.findIndex((c) => c.channelId === selectedChannelId);
+  const currentIndex = categoryChildren.findIndex((c) => c.channelId === selectedChannel?.channelId);
   const firstChannel = categoryChildren[0];
   const lastChannel = categoryChildren[categoryChildren.length - 1];
   const isSelected = !!selectedChannel;
-  const isFirst = firstChannel?.channelId === selectedChannelId;
-  const isLast = lastChannel?.channelId === selectedChannelId;
-  const canRename = isSelected && !isSelectedChannelLobby;
-  const canDelete = isSelected && !isSelectedChannelLobby;
-  const canMoveUp = isSelected && !isFirst && !isSelectedChannelLobby && currentIndex > 0;
-  const canMoveDown = isSelected && !isLast && !isSelectedChannelLobby && currentIndex < categoryChildren.length - 1;
-  const canTop = isSelected && !isFirst && !isSelectedChannelLobby;
-  const canBottom = isSelected && !isLast && !isSelectedChannelLobby;
-  const canAdd = !isSelectedChannelLobby && !selectedChannel?.categoryId;
+  const isFirst = firstChannel?.channelId === selectedChannel?.channelId;
+  const isLast = lastChannel?.channelId === selectedChannel?.channelId;
+  const canRename = isSelected && !selectedChannel?.isLobby;
+  const canDelete = isSelected && !selectedChannel?.isLobby;
+  const canMoveUp = isSelected && !isFirst && !selectedChannel?.isLobby && currentIndex > 0;
+  const canMoveDown = isSelected && !isLast && !selectedChannel?.isLobby && currentIndex < categoryChildren.length - 1;
+  const canTop = isSelected && !isFirst && !selectedChannel?.isLobby;
+  const canBottom = isSelected && !isLast && !selectedChannel?.isLobby;
+  const canAdd = !selectedChannel?.isLobby && !selectedChannel?.categoryId;
   const editedChannels = useMemo(() => {
     return channels
       .filter((c) => !c.categoryId)
@@ -118,17 +122,17 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   // Handlers
   const handleAddChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Popup.openCreateChannel(userId, serverId, selectedChannelId);
+    Popup.openCreateChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleChangeChannelNameBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Popup.openEditChannelName(userId, serverId, selectedChannelId);
+    Popup.openEditChannelName(user.userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleDeleteChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Popup.deleteChannel(userId, serverId, selectedChannelId);
+    Popup.deleteChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleMoveUpBtnClick = (e: React.MouseEvent) => {
@@ -151,6 +155,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     changeOrder(currentIndex, categoryChildren.length - 1);
   };
 
+  const handleSelect = (channel: Types.Channel | Types.Category) => {
+    setSelectedChannel(channel);
+    setCategoryChildren(channels.filter((c) => c.categoryId === channel.channelId));
+  };
+
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
     Popup.editChannels(serverId, editedChannels);
@@ -162,17 +171,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   };
 
   // Effects
-  useEffect(() => {
-    if (channels.length === 0) return;
-    setExpanded((prev) => {
-      const next: Record<string, boolean> = { ...prev };
-      for (const channel of channels) {
-        if (next[channel.channelId] === undefined) next[channel.channelId] = true;
-      }
-      return next;
-    });
-  }, [channels]);
-
   useEffect(() => {
     const onClick = (e: PointerEvent) => {
       const target = e.target as HTMLElement;
@@ -236,20 +234,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         <div className={styles['body']}>
           <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
             {filteredChannels.map((c) =>
-              c.type === 'category' ? (
-                <CategoryTab
-                  key={c.channelId}
-                  category={c}
-                  selectedChannel={selectedChannel}
-                  setSelectedChannel={setSelectedChannel}
-                  channels={channels}
-                  setCategoryChildren={setCategoryChildren}
-                  expanded={expanded}
-                  setExpanded={setExpanded}
-                />
-              ) : (
-                <ChannelTab key={c.channelId} channel={c} selectedChannel={selectedChannel} setSelectedChannel={setSelectedChannel} channels={channels} setCategoryChildren={setCategoryChildren} />
-              ),
+              c.type === 'category' ? <CategoryTab key={c.channelId} category={c} onSelect={handleSelect} /> : <ChannelTab key={c.channelId} channel={c} onSelect={handleSelect} />,
             )}
           </div>
         </div>
@@ -272,50 +257,54 @@ export default EditChannelOrderPopup;
 
 interface CategoryTabProps {
   category: Types.Category;
-  channels: (Types.Channel | Types.Category)[];
-  setCategoryChildren: React.Dispatch<React.SetStateAction<(Types.Channel | Types.Category)[]>>;
-  selectedChannel: Types.Channel | Types.Category | null;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<Types.Channel | Types.Category | null>>;
-  expanded: Record<string, boolean>;
-  setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
+  onSelect: (channel: Types.Channel | Types.Category) => void;
 }
 
-const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, channels, selectedChannel, setSelectedChannel, setCategoryChildren, expanded, setExpanded }) => {
+const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, onSelect }) => {
+  // Hooks
+  const dispatch = useAppDispatch();
+
+  // Selectors
+  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
+
+  // States
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
   // Variables
-  const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, isLobby: isCategoryLobby, order: categoryOrder } = category;
-  const categoryChildren = channels?.filter((c) => c.categoryId === categoryId);
-  const isSelected = selectedChannel?.channelId === categoryId;
+  const categoryChildren = channels?.filter((c) => c.categoryId === category.channelId);
 
   // Handlers
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedChannel(selectedChannel?.channelId === categoryId ? null : category);
-    setCategoryChildren(categoryChildren.sort((a, b) => a.order - b.order));
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`category-${category.channelId}`));
+    onSelect(category);
   };
 
   const handleTabExpandedClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }));
+    setIsExpanded(!isExpanded);
   };
 
   return (
-    <div key={categoryId}>
+    <div key={category.channelId}>
       <div className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
         <div
-          className={`${serverPage['tab-icon']} ${expanded[categoryId] ? serverPage['expanded'] : ''} ${serverPage[categoryVisibility]} ${isCategoryLobby ? serverPage['lobby'] : ''}`}
+          className={`${serverPage['tab-icon']} ${isExpanded ? serverPage['expanded'] : ''} ${serverPage[category.visibility]} ${category.isLobby ? serverPage['lobby'] : ''}`}
           onClick={handleTabExpandedClick}
         />
         <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
-          {categoryName}
-          <div className={styles['channel-tab-index-text']}>{`(${categoryOrder})`}</div>
+          {category.name}
+          <div className={styles['channel-tab-index-text']}>{`(${category.order})`}</div>
         </div>
       </div>
-      <div className={serverPage['channel-list']} style={expanded[categoryId] ? {} : { display: 'none' }}>
+      <div className={serverPage['channel-list']} style={isExpanded ? {} : { display: 'none' }}>
         {categoryChildren
           .sort((a, b) => a.order - b.order)
           .filter((c) => c.type === 'channel')
           .map((c) => (
-            <ChannelTab key={c.channelId} channel={c} channels={channels} selectedChannel={selectedChannel} setSelectedChannel={setSelectedChannel} setCategoryChildren={setCategoryChildren} />
+            <ChannelTab key={c.channelId} channel={c} onSelect={onSelect} />
           ))}
       </div>
     </div>
@@ -326,31 +315,30 @@ CategoryTab.displayName = 'CategoryTab';
 
 interface ChannelTabProps {
   channel: Types.Channel;
-  channels: (Types.Channel | Types.Category)[];
-  setCategoryChildren: React.Dispatch<React.SetStateAction<(Types.Channel | Types.Category)[]>>;
-  selectedChannel: Types.Channel | Types.Category | null;
-  setSelectedChannel: React.Dispatch<React.SetStateAction<Types.Channel | Types.Category | null>>;
+  onSelect: (channel: Types.Channel) => void;
 }
 
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, channels, selectedChannel, setSelectedChannel, setCategoryChildren }) => {
-  // Variables
-  const { channelId, name: channelName, visibility: channelVisibility, isLobby: isChannelLobby, order: channelOrder, categoryId: channelCategoryId } = channel;
-  const categoryChildren = channels?.filter((c) => c.categoryId === channelCategoryId);
-  const isSelected = selectedChannel?.channelId === channelId;
+const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect }) => {
+  // Hooks
+  const dispatch = useAppDispatch();
+
+  // Selectors
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 
   // Handlers
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setSelectedChannel(selectedChannel?.channelId === channelId ? null : channel);
-    setCategoryChildren(categoryChildren.sort((a, b) => a.order - b.order));
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`channel-${channel.channelId}`));
+    onSelect(channel);
   };
 
   return (
-    <div key={channelId} className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
-      <div className={`${serverPage['tab-icon']} ${serverPage[channelVisibility]} ${isChannelLobby ? serverPage['lobby'] : ''}`} />
+    <div className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
+      <div className={`${serverPage['tab-icon']} ${serverPage[channel.visibility]} ${channel.isLobby ? serverPage['lobby'] : ''}`} />
       <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
-        {channelName}
-        <div className={styles['channel-tab-index-text']}>{`(${channelOrder})`}</div>
+        {channel.name}
+        <div className={styles['channel-tab-index-text']}>{`(${channel.order})`}</div>
       </div>
     </div>
   );

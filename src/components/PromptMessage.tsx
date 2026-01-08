@@ -20,19 +20,20 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   const { t } = useTranslation();
 
   // Variables
-  const { contents: messageContents, parameter: messageParameter } = messageGroup;
-  const escapedMessageParameter = Object.fromEntries(Object.entries(messageParameter).map(([key, value]) => [key, TagConverter.escapeHtml(value)]));
+  const escapedMessageParameter = Object.fromEntries(Object.entries(messageGroup.parameter).map(([key, value]) => [key, TagConverter.escapeHtml(value)]));
   const formattedMessagesContents = useMemo(
     () =>
-      messageContents.map((content) =>
+      messageGroup.contents.map((content) =>
         content
           .split(' ')
           .map((c) =>
-            c.startsWith('message:') ? t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: Language.getPermissionText(t, parseInt(messageParameter.userPermissionLevel)) } }) : c,
+            c.startsWith('message:')
+              ? t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: Language.getPermissionText(t, parseInt(messageGroup.parameter.userPermissionLevel)) } })
+              : c,
           )
           .join(' '),
       ),
-    [messageContents, escapedMessageParameter, messageParameter, t],
+    [messageGroup.contents, escapedMessageParameter, messageGroup.parameter, t],
   );
 
   return (

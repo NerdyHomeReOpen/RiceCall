@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -27,28 +28,33 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   const { selectTab } = useMainTab();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      currentServerId: state.user.data.currentServerId,
+    }),
+    shallowEqual,
+  );
 
   // Variables
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, slogan: serverSlogan, online: serverOnline } = recommendServer;
-  const { userId, currentServerId: userCurrentServerId } = user;
+  const hasOnline = recommendServer.online >= 0;
 
   // Functions
   const getServerCardContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinServerOption(handleServerCardClick)
-      .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
+      .addViewServerInfoOption(() => Popup.openServerSetting(user.userId, recommendServer.serverId))
       .build();
 
   // Handlers
   const handleServerCardClick = () => {
     if (isLoading) return;
-    if (serverId === userCurrentServerId) {
+    if (recommendServer.serverId === user.currentServerId) {
       selectTab('server');
       return;
     }
-    loadServer(serverSpecialId || serverDisplayId);
-    ipc.socket.send('connectServer', { serverId });
+    loadServer(recommendServer.specialId || recommendServer.displayId);
+    ipc.socket.send('connectServer', { serverId: recommendServer.serverId });
   };
 
   const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -60,16 +66,16 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
 
   return (
     <div className={homeStyles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <Image className={homeStyles['server-avatar-picture']} src={serverAvatarUrl} alt={serverName} width={70} height={70} loading="lazy" draggable="false" />
+      <Image className={homeStyles['server-avatar-picture']} src={recommendServer.avatarUrl} alt={recommendServer.name} width={70} height={70} loading="lazy" draggable="false" />
       <div className={homeStyles['server-info-text']}>
-        <div className={homeStyles['server-name-text']}>{serverName}</div>
+        <div className={homeStyles['server-name-text']}>{recommendServer.name}</div>
         <div className={homeStyles['server-id-box']}>
-          <div className={homeStyles['server-id-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+          <div className={homeStyles['server-id-text']}>{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>
         </div>
-        <div className={homeStyles['server-slogen']}>{serverSlogan}</div>
-        {serverOnline >= 0 && (
+        <div className={homeStyles['server-slogen']}>{recommendServer.slogan}</div>
+        {hasOnline && (
           <div className={homeStyles['server-online']}>
-            {t('online')}: {serverOnline}
+            {t('online')}: {recommendServer.online}
           </div>
         )}
       </div>

@@ -87,39 +87,35 @@ const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ dire
   // States
   const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
 
-  // Variables
-  const { id, label, disabled, hasSubmenu, icon, submenuItems, onClick } = item;
-
   // Handlers
   const handleClick = () => {
-    if (disabled) return;
-    onClick?.();
+    if (item.disabled) return;
+    item.onClick?.();
     onClose();
   };
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!hasSubmenu || !submenuItems) return;
+    if (!item.hasSubmenu || !item.submenuItems) return;
     const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
     const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
     const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
-    setSubMenu(<MicContextMenu items={submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
+    setSubMenu(<MicContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
   };
 
   const handleMouseLeave = () => {
-    if (hasSubmenu) setSubMenu(null);
+    if (item.hasSubmenu) setSubMenu(null);
   };
 
   return (
     <div
-      key={id}
-      className={`${styles['option']} ${hasSubmenu ? styles['has-submenu'] : ''} ${disabled ? styles['disabled'] : ''}`}
-      data-type={icon || ''}
+      className={`${styles['option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? styles['disabled'] : ''}`}
+      data-type={item.icon || ''}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
-      {t(label)}
-      {hasSubmenu && subMenu}
+      {t(item.label)}
+      {item.hasSubmenu && subMenu}
     </div>
   );
 });

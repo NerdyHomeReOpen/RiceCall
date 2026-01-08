@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -18,24 +17,17 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ server
   // Hooks
   const { t } = useTranslation();
 
-  // Selectors
-  const user = useAppSelector((state) => state.user.data);
-
   // States
   const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
-  // Variables
-  const { userId } = user;
-  const { name: memberName } = member;
-
   // Handlers
   const handleConfirmBtnClick = () => {
-    Popup.editMember(userId, serverId, { nickname: memberNickname || null });
+    Popup.editMember(member.userId, serverId, { nickname: memberNickname || null });
     ipc.window.close();
   };
 
   const handleApplyBtnClick = () => {
-    Popup.editMember(userId, serverId, { nickname: memberNickname || null });
+    Popup.editMember(member.userId, serverId, { nickname: memberNickname || null });
   };
 
   const handleCloseBtnClick = () => {
@@ -50,7 +42,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ server
             <div className={popupStyles['label']} style={{ minWidth: '2rem' }}>
               {t('nickname')}:
             </div>
-            <div className={popupStyles['label']}>{memberName}</div>
+            <div className={popupStyles['label']}>{member.name}</div>
           </div>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('please-enter-the-member-nickname')}</div>
