@@ -1,11 +1,14 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '@/store/hook';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
+
+import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -32,9 +35,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-
-  // Selectors
-  const user = useAppSelector((state) => state.user.data);
+  const dispatch = useAppDispatch();
 
   // Refs
   const startXRef = useRef<number>(0);
@@ -42,12 +43,22 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   const isResizingModeratorColumn = useRef<boolean>(false);
   const isResizingBlockMemberColumn = useRef<boolean>(false);
 
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+
   // States
   const [channel, setChannel] = useState<Types.Channel>(channelData);
   const [channelMembers, setChannelMembers] = useState<Types.Member[]>(channelMembersData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [showPreview, setShowPreview] = useState<boolean>(false);
-  const [selectedItemId, setSelectedItemId] = useState<string>('');
   const [moderatorSortDirection, setModeratorSortDirection] = useState<1 | -1>(-1);
   const [blockMemberSortDirection, setBlockMemberSortDirection] = useState<1 | -1>(-1);
   const [moderatorSortField, setModeratorSortField] = useState<keyof Types.Member>('permissionLevel');
@@ -58,39 +69,16 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
   // Variables
-  const { userId } = user;
-  const { serverId, lobbyId: serverLobbyId, receptionLobbyId: serverReceptionLobbyId } = server;
-  const {
-    channelId,
-    name: channelName,
-    announcement: channelAnnouncement,
-    visibility: channelVisibility,
-    password: channelPassword,
-    userLimit: channelUserLimit,
-    voiceMode: channelVoiceMode,
-    queueTime: channelQueueTime,
-    forbidText: channelForbidText,
-    forbidGuestText: channelForbidGuestText,
-    forbidGuestVoice: channelForbidGuestVoice,
-    forbidGuestQueue: channelForbidGuestQueue,
-    forbidGuestUrl: channelForbidGuestUrl,
-    guestTextMaxLength: channelGuestTextMaxLength,
-    guestTextWaitTime: channelGuestTextWaitTime,
-    guestTextGapTime: channelGuestTextGapTime,
-    bitrate: channelBitrate,
-    categoryId: channelCategoryId,
-  } = channel;
   const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, channel.permissionLevel);
   const isReadOnly = !Permission.isChannelMod(permissionLevel);
-  const isLobby = serverLobbyId === channelId;
-  const isReceptionLobby = serverReceptionLobbyId === channelId;
-  const canSubmit = channelName.trim();
+  const isLobby = server.lobbyId === channel.channelId;
+  const isReceptionLobby = server.receptionLobbyId === channel.channelId;
+  const canSubmit = channel.name.trim();
 
   const { totalModeratorsCount, sortedModerators } = useMemo(() => {
     const total = channelMembers.filter((m) => Permission.isChannelMod(m.permissionLevel) && !Permission.isServerAdmin(m.permissionLevel));
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(moderatorQuery.toLowerCase()) || m.name.toLowerCase().includes(moderatorQuery.toLowerCase()));
     const sorted = filtered.sort(Sorter(moderatorSortField, moderatorSortDirection));
-
     return { totalModeratorsCount: total.length, filteredModerators: filtered, sortedModerators: sorted };
   }, [channelMembers, moderatorQuery, moderatorSortField, moderatorSortDirection]);
 
@@ -98,7 +86,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
     const total = channelMembers.filter((m) => m.blockedUntil === -1 || m.blockedUntil > Date.now());
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(blockMemberQuery.toLowerCase()) || m.name.toLowerCase().includes(blockMemberQuery.toLowerCase()));
     const sorted = filtered.sort(Sorter(blockMemberSortField, blockMemberSortDirection));
-
     return { totalBlockMembersCount: total.length, filteredBlockMembers: filtered, sortedBlockMembers: sorted };
   }, [channelMembers, blockMemberQuery, blockMemberSortField, blockMemberSortDirection]);
 
@@ -114,10 +101,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             `${t('channel-management')} (${totalModeratorsCount})`,
             `${t('blacklist-management')} (${totalBlockMembersCount})`,
           ]
-        : channelVisibility !== 'readonly'
+        : isReadOnly
           ? [t('channel-info'), t('channel-announcement')]
           : [t('channel-info')],
-    [channelVisibility, permissionLevel, t, totalModeratorsCount, totalBlockMembersCount],
+    [isReadOnly, permissionLevel, t, totalModeratorsCount, totalBlockMembersCount],
   );
 
   // Handlers
@@ -246,7 +233,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.editChannel(serverId, channelId, ObjDiff(channel, channelData));
+    Popup.editChannel(server.serverId, channel.channelId, ObjDiff(channel, channel));
     ipc.window.close();
   };
 
@@ -275,10 +262,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   useEffect(() => {
     const unsub = ipc.socket.on('channelMemberUpdate', (...args: { userId: string; serverId: string; channelId: string; update: Partial<Types.Member> }[]) => {
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}#${i.channelId}`, i.update] as const));
-      setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}#${channelId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}#${channelId}`) } : m)));
+      setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}#${channel.channelId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}#${channel.channelId}`) } : m)));
     });
     return () => unsub();
-  }, [channelId]);
+  }, [channel.channelId]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverMemberRemove', (...args: { userId: string; serverId: string }[]) => {
@@ -305,37 +292,36 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             <div className={popupStyles['row']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                 <div className={popupStyles['label']}>{t('channel-name')}</div>
-                <input name="channel-name" type="text" value={isLobby ? t(`${channelName}`) : channelName} maxLength={32} disabled={isLobby} onChange={handleChannelNameChange} readOnly={isReadOnly} />
+                <input
+                  name="channel-name"
+                  type="text"
+                  value={isLobby ? t(`${channel.name}`) : channel.name}
+                  maxLength={32}
+                  disabled={isLobby}
+                  onChange={handleChannelNameChange}
+                  readOnly={isReadOnly}
+                />
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                 <div className={popupStyles['label']}>{t('user-limit')}</div>
-                <input
-                  name="user-limit"
-                  type="number"
-                  value={channelUserLimit}
-                  min={0}
-                  max={999}
-                  disabled={channelVisibility === 'readonly' || isLobby}
-                  onChange={handleUserLimitChange}
-                  readOnly={isReadOnly}
-                />
+                <input name="user-limit" type="number" value={channel.userLimit} min={0} max={999} disabled={isReadOnly || isLobby} onChange={handleUserLimitChange} readOnly={isReadOnly} />
               </div>
             </div>
             <div className={popupStyles['row']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                 <div className={popupStyles['label']}>{t('channel-mode')}</div>
                 <div className={popupStyles['select-box']}>
-                  <select value={channelVoiceMode} onChange={handleVoiceModeChange} datatype={isReadOnly ? 'read-only' : ''}>
+                  <select value={channel.voiceMode} onChange={handleVoiceModeChange} datatype={isReadOnly ? 'read-only' : ''}>
                     <option value="free">{t('free-speech')}</option>
                     <option value="admin">{t('admin-speech')}</option>
                     <option value="queue">{t('queue-speech')}</option>
                   </select>
                 </div>
               </div>
-              {channelVoiceMode === 'queue' && (
+              {channel.voiceMode === 'queue' && (
                 <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                   <div className={popupStyles['label']}>{t('queue-time')}</div>
-                  <input name="queue-time" type="number" value={channelQueueTime} min={10} max={3600} onChange={handleQueueTimeChange} readOnly={isReadOnly} />
+                  <input name="queue-time" type="number" value={channel.queueTime} min={10} max={3600} onChange={handleQueueTimeChange} readOnly={isReadOnly} />
                 </div>
               )}
             </div>
@@ -346,14 +332,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             <div className={popupStyles['col']}>
               <div>
                 <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                  <input name="bitrate-64000" type="radio" checked={channelBitrate === 64000} onChange={handleBitrateChange} readOnly={isReadOnly} />
+                  <input name="bitrate-64000" type="radio" checked={channel.bitrate === 64000} onChange={handleBitrateChange} readOnly={isReadOnly} />
                   <div className={popupStyles['label']}>{t('chat-mode')}</div>
                 </div>
                 <div className={popupStyles['hint-text']}>{t('chat-mode-description')}</div>
               </div>
               <div>
                 <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                  <input name="bitrate-256000" type="radio" checked={channelBitrate === 256000} onChange={handleBitrateChange} readOnly={isReadOnly} />
+                  <input name="bitrate-256000" type="radio" checked={channel.bitrate === 256000} onChange={handleBitrateChange} readOnly={isReadOnly} />
                   <div className={popupStyles['label']}>{t('entertainment-mode')}</div>
                 </div>
                 <div className={popupStyles['hint-text']}>{t('entertainment-mode-description')}</div>
@@ -371,7 +357,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 </div>
               )}
             </div>
-            <AnnouncementEditor announcement={channelAnnouncement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} />
+            <AnnouncementEditor announcement={channel.announcement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} />
           </div>
         </div>
         <div className={settingStyles['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
@@ -381,27 +367,27 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             </div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channelVisibility === 'public'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" checked={channel.visibility === 'public'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('anyone-can-access-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channelVisibility === 'member'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" checked={channel.visibility === 'member'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('forbid-guest-access-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channelVisibility === 'readonly'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" checked={channel.visibility === 'readonly'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('message-only-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channelVisibility === 'private'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" checked={channel.visibility === 'private'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('require-password-label')}</div>
               </div>
-              {channelVisibility === 'private' && !isReadOnly && (
+              {channel.visibility === 'private' && !isReadOnly && (
                 <div className={popupStyles['input-box']}>
                   <input
                     name="channel-password"
                     type="text"
-                    value={channelPassword}
+                    value={channel.password}
                     maxLength={4}
                     placeholder={t('require-password-placeholder')}
                     onChange={handlePasswordChange}
@@ -419,11 +405,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             </div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <input name="forbidGuestQueue" type="checkbox" checked={channelForbidGuestQueue} onChange={handleForbidGuestQueueChange} readOnly={isReadOnly} />
+                <input name="forbidGuestQueue" type="checkbox" checked={channel.forbidGuestQueue} onChange={handleForbidGuestQueueChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('forbid-guest-queue-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <input name="forbidGuestVoice" type="checkbox" checked={channelForbidGuestVoice} onChange={handleForbidGuestVoiceChange} readOnly={isReadOnly} />
+                <input name="forbidGuestVoice" type="checkbox" checked={channel.forbidGuestVoice} onChange={handleForbidGuestVoiceChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('forbid-guest-voice-label')}</div>
               </div>
             </div>
@@ -436,15 +422,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             </div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <input name="forbid-text" type="checkbox" checked={channelForbidText} onChange={handleForbidTextChange} readOnly={isReadOnly} />
+                <input name="forbid-text" type="checkbox" checked={channel.forbidText} onChange={handleForbidTextChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('forbid-only-admin-text-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <input name="forbid-guest-text" type="checkbox" checked={channelForbidGuestText} onChange={handleForbidGuestTextChange} readOnly={isReadOnly} />
+                <input name="forbid-guest-text" type="checkbox" checked={channel.forbidGuestText} onChange={handleForbidGuestTextChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('forbid-guest-text-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <input name="forbid-guest-url" type="checkbox" checked={channelForbidGuestUrl} onChange={handleForbidGuestUrlChange} readOnly={isReadOnly} />
+                <input name="forbid-guest-url" type="checkbox" checked={channel.forbidGuestUrl} onChange={handleForbidGuestUrlChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('forbid-guest-url-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
@@ -453,7 +439,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   <input
                     name="guest-text-max-length"
                     type="number"
-                    value={channelGuestTextMaxLength}
+                    value={channel.guestTextMaxLength}
                     min={0}
                     max={3000}
                     onChange={handleGuestTextMaxLengthChange}
@@ -469,7 +455,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   <input
                     name="guest-text-wait-time"
                     type="number"
-                    value={channelGuestTextWaitTime}
+                    value={channel.guestTextWaitTime}
                     min={0}
                     max={1000}
                     onChange={handleGuestTextWaitTimeChange}
@@ -485,7 +471,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                   <input
                     name="guest-text-gap-time"
                     type="number"
-                    value={channelGuestTextGapTime}
+                    value={channel.guestTextGapTime}
                     min={0}
                     max={1000}
                     onChange={handleGuestTextGapTimeChange}
@@ -522,50 +508,42 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 <tbody className={settingStyles['table-container']}>
                   {sortedModerators.map((moderator) => {
                     // Variables
-                    const {
-                      userId: moderatorUserId,
-                      name: moderatorName,
-                      nickname: moderatorNickname,
-                      gender: moderatorGender,
-                      permissionLevel: moderatorPermissionLevel,
-                      joinAt: moderatorJoinAt,
-                      contribution: moderatorContribution,
-                    } = moderator;
-                    const isSelf = moderatorUserId === userId;
-                    const isSuperior = permissionLevel > moderatorPermissionLevel;
+                    const isSelf = moderator.userId === user.userId;
+                    const isLowerLevel = moderator.permissionLevel < permissionLevel;
+                    const isSelected = selectedItemId === `member-${moderator.userId}`;
 
                     // Handlers
                     const getMemberManagementSubmenuItems = () =>
                       new CtxMenuBuilder()
-                        .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isSuperior }, () =>
-                          Popup.terminateMember(moderatorUserId, serverId, moderatorName),
+                        .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
+                          Popup.terminateMember(moderator.userId, server.serverId, moderator.name),
                         )
-                        .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isSuperior, channelCategoryId }, () =>
-                          Permission.isChannelMod(moderatorPermissionLevel)
-                            ? Popup.editChannelPermission(moderatorUserId, serverId, channelId, { permissionLevel: 2 })
-                            : Popup.editChannelPermission(moderatorUserId, serverId, channelId, { permissionLevel: 3 }),
+                        .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
+                          Permission.isChannelMod(moderator.permissionLevel)
+                            ? Popup.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
+                            : Popup.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
                         )
-                        .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isSuperior, channelCategoryId }, () =>
-                          Permission.isChannelAdmin(moderatorPermissionLevel)
-                            ? Popup.editChannelPermission(moderatorUserId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
-                            : Popup.editChannelPermission(moderatorUserId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
+                        .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
+                          Permission.isChannelAdmin(moderator.permissionLevel)
+                            ? Popup.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
+                            : Popup.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
                         )
-                        .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isSuperior }, () =>
-                          Permission.isServerAdmin(moderatorPermissionLevel)
-                            ? Popup.editServerPermission(moderatorUserId, serverId, { permissionLevel: 2 })
-                            : Popup.editServerPermission(moderatorUserId, serverId, { permissionLevel: 5 }),
+                        .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
+                          Permission.isServerAdmin(moderator.permissionLevel)
+                            ? Popup.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
+                            : Popup.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
                         )
                         .build();
 
                     const getContextMenuItems = () =>
                       new CtxMenuBuilder()
-                        .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, moderatorUserId))
-                        .addViewProfileOption(() => Popup.openUserInfo(userId, moderatorUserId))
-                        .addEditNicknameOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openEditNickname(moderatorUserId, serverId))
-                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openBlockMember(moderatorUserId, serverId))
+                        .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, moderator.userId))
+                        .addViewProfileOption(() => Popup.openUserInfo(user.userId, moderator.userId))
+                        .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(moderator.userId, server.serverId))
+                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(moderator.userId, server.serverId))
                         .addSeparator()
                         .addMemberManagementOption(
-                          { permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isSuperior, channelCategoryId },
+                          { permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId },
                           () => {},
                           getMemberManagementSubmenuItems(),
                         )
@@ -573,8 +551,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
 
                     // Handlers
                     const handleClick = () => {
-                      if (selectedItemId === `member-${moderatorUserId}`) setSelectedItemId('');
-                      else setSelectedItemId(`member-${moderatorUserId}`);
+                      if (isSelected) dispatch(setSelectedItemId(null));
+                      else dispatch(setSelectedItemId(`member-${moderator.userId}`));
                     };
 
                     const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
@@ -585,14 +563,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                     };
 
                     return (
-                      <tr key={moderatorUserId} className={`${selectedItemId === `member-${moderatorUserId}` ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+                      <tr key={moderator.userId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
                         <td style={{ width: `${moderatorColumnWidths[0]}px` }}>
-                          <div className={`${permissionStyles[moderatorGender]} ${permissionStyles[`lv-${moderatorPermissionLevel}`]}`} />
-                          <div className={`${popupStyles['name']} ${moderatorNickname ? popupStyles['highlight'] : ''}`}>{moderatorNickname || moderatorName}</div>
+                          <div className={`${permissionStyles[moderator.gender]} ${permissionStyles[`lv-${moderator.permissionLevel}`]}`} />
+                          <div className={`${popupStyles['name']} ${moderator.nickname ? popupStyles['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
                         </td>
-                        <td style={{ width: `${moderatorColumnWidths[1]}px` }}>{Language.getPermissionText(t, moderatorPermissionLevel)}</td>
-                        <td style={{ width: `${moderatorColumnWidths[2]}px` }}>{moderatorContribution}</td>
-                        <td style={{ width: `${moderatorColumnWidths[3]}px` }}>{new Date(moderatorJoinAt).toLocaleDateString()}</td>
+                        <td style={{ width: `${moderatorColumnWidths[1]}px` }}>{Language.getPermissionText(t, moderator.permissionLevel)}</td>
+                        <td style={{ width: `${moderatorColumnWidths[2]}px` }}>{moderator.contribution}</td>
+                        <td style={{ width: `${moderatorColumnWidths[3]}px` }}>{new Date(moderator.joinAt).toLocaleDateString()}</td>
                       </tr>
                     );
                   })}
@@ -633,21 +611,21 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                 <tbody className={settingStyles['table-container']}>
                   {sortedBlockMembers.map((member) => {
                     // Variables
-                    const { userId: memberUserId, name: memberName, nickname: memberNickname, blockedUntil: memberBlockedUntil } = member;
-                    const isSelf = memberUserId === userId;
-                    const isSelected = selectedItemId === `blocked-${memberUserId}`;
+                    const isSelf = member.userId === user.userId;
+                    const isSelected = selectedItemId === `blocked-${member.userId}`;
+                    const isBlockedPermanently = member.blockedUntil === -1;
 
                     // Functions
                     const getContextMenuItems = () =>
                       new CtxMenuBuilder()
-                        .addViewProfileOption(() => Popup.openUserInfo(userId, memberUserId))
-                        .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => Popup.unblockUserFromChannel(memberUserId, serverId, channelId, memberName))
+                        .addViewProfileOption(() => Popup.openUserInfo(user.userId, member.userId))
+                        .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => Popup.unblockUserFromChannel(member.userId, server.serverId, channel.channelId, member.name))
                         .build();
 
                     // Functions
                     const handleClick = () => {
-                      if (isSelected) setSelectedItemId('');
-                      else setSelectedItemId(`blocked-${memberUserId}`);
+                      if (isSelected) dispatch(setSelectedItemId(null));
+                      else dispatch(setSelectedItemId(`blocked-${member.userId}`));
                     };
 
                     const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
@@ -658,9 +636,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                     };
 
                     return (
-                      <tr key={memberUserId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
-                        <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{memberNickname || memberName}</td>
-                        <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>{memberBlockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(memberBlockedUntil).toLocaleString()}`}</td>
+                      <tr key={member.userId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+                        <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
+                        <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>{isBlockedPermanently ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
                       </tr>
                     );
                   })}

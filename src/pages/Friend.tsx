@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useMemo, useRef } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -21,35 +22,41 @@ import vipStyles from '@/styles/vip.module.css';
 import emojiStyles from '@/styles/emoji.module.css';
 
 interface FriendActivityProps {
-  userId: Types.User['userId'];
   friendActivity: Types.FriendActivity;
 }
 
-const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ userId, friendActivity }) => {
+const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivity }) => {
   // Hooks
   const { t } = useTranslation();
 
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
+
   // Variables
-  const { userId: friendUserId, name: friendName, avatarUrl: friendAvatarUrl, vip: friendVip, timestamp: ActivityTimestamp, content: ActivityContent } = friendActivity;
-  const friendHasVip = friendVip > 0;
+  const hasVip = friendActivity.vip > 0;
 
   // Handlers
   const handleUserNameClick = () => {
-    Popup.openUserInfo(userId, friendUserId);
+    Popup.openUserInfo(user.userId, friendActivity.userId);
   };
 
   return (
     <div className={friendStyles['user-activity']}>
-      <Image className={friendStyles['user-avatar']} src={friendAvatarUrl} alt={friendName} width={30} height={30} loading="lazy" draggable="false" />
+      <Image className={friendStyles['user-avatar']} src={friendActivity.avatarUrl} alt={friendActivity.name} width={30} height={30} loading="lazy" draggable="false" />
       <div className={friendStyles['right-info']}>
         <div className={friendStyles['user-activity-top']}>
-          {friendHasVip && <div className={`${friendStyles['vip-icon']} ${vipStyles['vip-icon']} ${vipStyles[`vip-${friendVip}`]}`} />}
+          {hasVip && <div className={`${friendStyles['vip-icon']} ${vipStyles['vip-icon']} ${vipStyles[`vip-${friendActivity.vip}`]}`} />}
           <div className={friendStyles['user-name']} onClick={handleUserNameClick}>
-            {friendName}
+            {friendActivity.name}
           </div>
-          <div className={friendStyles['timestamp']}>{Language.getFormatTimeDiff(t, ActivityTimestamp)}</div>
+          <div className={friendStyles['timestamp']}>{Language.getFormatTimeDiff(t, friendActivity.timestamp)}</div>
         </div>
-        <div className={friendStyles['signature']}>{ActivityContent}</div>
+        <div className={friendStyles['signature']}>{friendActivity.content}</div>
       </div>
     </div>
   );
@@ -66,22 +73,37 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
 
-  // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const friendActivities = useAppSelector((state) => state.friendActivities.data);
-
   // Refs
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizingSidebarRef = useRef<boolean>(false);
   const signatureInputRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef<boolean>(false);
 
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      avatarUrl: state.user.data.avatarUrl,
+      name: state.user.data.name,
+      signature: state.user.data.signature,
+      vip: state.user.data.vip,
+      badges: state.user.data.badges,
+      level: state.user.data.level,
+      xp: state.user.data.xp,
+      requiredXp: state.user.data.requiredXp,
+    }),
+    shallowEqual,
+  );
+
+  const friendActivities = useAppSelector((state) => state.friendActivities.data, shallowEqual);
+
   // Variables
-  const { userId, signature: userSignature, avatarUrl: userAvatarUrl, xp: userXP, requiredXp: userRequiredXP, level: userLevel, vip: userVip, badges: userBadges } = user;
+  const userHasVip = user.vip > 0;
+  const userBadges = useMemo(() => (typeof user.badges === 'string' ? JSON.parse(user.badges) : user.badges), [user.badges]);
 
   // Functions
   const changeSignature = (signature: Types.User['signature']) => {
-    if (signature === userSignature) return;
+    if (signature === user.signature) return;
     ipc.socket.send('editUser', { update: { signature } });
   };
 
@@ -127,8 +149,8 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
 
   // Effects
   useEffect(() => {
-    signatureInputRef.current!.value = userSignature;
-  }, [userSignature]);
+    signatureInputRef.current!.value = user.signature;
+  }, [user.signature]);
 
   useEffect(() => {
     const onPointerup = () => {
@@ -141,24 +163,24 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
   return (
     <main className={friendStyles['friend']} style={display ? {} : { display: 'none' }}>
       <header className={friendStyles['friend-header']}>
-        <Image className={friendStyles['avatar-picture']} src={userAvatarUrl} alt={user.name} width={40} height={40} loading="lazy" draggable="false" />
+        <Image className={friendStyles['avatar-picture']} src={user.avatarUrl} alt={user.name} width={40} height={40} loading="lazy" draggable="false" />
         <div className={friendStyles['base-info-wrapper']}>
           <div className={friendStyles['box']}>
             <div className={friendStyles['level-icon']} />
-            <LevelIcon level={userLevel} xp={userXP} requiredXp={userRequiredXP} showTooltip={true} />
+            <LevelIcon level={user.level} xp={user.xp} requiredXp={user.requiredXp} showTooltip={true} />
             <div className={friendStyles['wealth-icon']} />
-            <div className={friendStyles['wealth-value-text']}>0</div>
-            {userVip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${userVip}`]}`} />}
+            <div className={friendStyles['wealth-value-text']}>{'0'}</div>
+            {userHasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${user.vip}`]}`} />}
           </div>
           <div className={friendStyles['box']}>
-            <BadgeList badges={JSON.parse(userBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
+            <BadgeList badges={userBadges} position="left-bottom" direction="right-bottom" maxDisplay={5} />
           </div>
         </div>
         <div className={friendStyles['signature-wrapper']}>
           <textarea
             ref={signatureInputRef}
             className={friendStyles['signature-input']}
-            defaultValue={userSignature}
+            defaultValue={user.signature}
             maxLength={100}
             placeholder={t('signature-placeholder')}
             onBlur={handleSignatureInputBlur}
@@ -179,7 +201,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
           <div className={`${friendStyles['scroll-view']} ${friendStyles['friend-active-wrapper']}`}>
             <div className={friendStyles['friend-active-list']}>
               {friendActivities.map((friendActivity, index) => (
-                <FriendActivity key={index} userId={userId} friendActivity={friendActivity} />
+                <FriendActivity key={index} friendActivity={friendActivity} />
               ))}
             </div>
           </div>

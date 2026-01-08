@@ -79,27 +79,24 @@ interface NotificationMenuItemProps {
 }
 
 const NotificationMenuItem: React.FC<NotificationMenuItemProps> = React.memo(({ item, onClose }) => {
-  // Variables
-  const { label, showContentLength, showContent, contentType, contents, icon, className, disabled, onClick } = item;
-
   // Handlers
   const handleClick = () => {
-    if (disabled) return;
-    onClick?.();
+    if (item.disabled) return;
+    item.onClick?.();
     onClose();
   };
 
   return (
     <>
-      <div className={`${styles['option']} ${className && styles[className]} ${disabled ? contextMenuStyles['disabled'] : ''}`} data-type={icon || ''} onClick={handleClick}>
-        {showContentLength ? `${label} (${contents ? contents.length : 0})` : label}
+      <div className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? contextMenuStyles['disabled'] : ''}`} data-type={item.icon || ''} onClick={handleClick}>
+        {item.showContentLength ? `${item.label} (${item.contents ? item.contents.length : 0})` : item.label}
       </div>
-      {showContent && contents && (
+      {item.showContent && item.contents && (
         <div className={styles['contents']}>
-          {contents
+          {item.contents
             .slice(0, 3)
-            .map((content, index) => (contentType === 'image' ? <Image key={index} src={content} alt={content} width={32} height={32} loading="lazy" draggable="false" /> : content))}
-          {contents.length > 3 && <span>...({contents.length - 3})</span>}
+            .map((content, index) => (item.contentType === 'image' ? <Image key={index} src={content} alt={content} width={32} height={32} loading="lazy" draggable="false" /> : content))}
+          {item.contents.length > 3 && <span>...({item.contents.length - 3})</span>}
         </div>
       )}
     </>

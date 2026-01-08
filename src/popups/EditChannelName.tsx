@@ -21,7 +21,6 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   const [channelName, setChannelName] = useState<string>(channel.name);
 
   // Variables
-  const { channelId } = channel;
   const canSubmit = channelName.trim();
 
   // Handlers
@@ -31,7 +30,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.editChannel(serverId, channelId, { name: channelName });
+    Popup.editChannel(serverId, channel.channelId, { name: channelName });
     handleCloseBtnClick();
   };
 

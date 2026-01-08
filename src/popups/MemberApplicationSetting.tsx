@@ -20,9 +20,6 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
   const [serverReceiveApplication, setServerReceiveApplication] = useState<boolean>(server.receiveApply);
   const [serverApplyNote, setServerApplyNote] = useState<string>(server.applyNotice);
 
-  // Variables
-  const { serverId } = server;
-
   // Handlers
   const handleReceiveApplicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setServerReceiveApplication(e.target.checked);
@@ -33,7 +30,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.editServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
+    Popup.editServer(server.serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
     ipc.window.close();
   };
 

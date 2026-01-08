@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 
@@ -22,33 +23,36 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   const { t } = useTranslation();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
 
   // Variables
-  const { userId } = user;
-  const { userId: senderUserId, name: senderName, contents: messageContents, timestamp: messageTimestamp } = messageGroup;
-  const formattedTimestamp = Language.getFormatTimestamp(t, messageTimestamp);
+  const formattedTimestamp = Language.getFormatTimestamp(t, messageGroup.timestamp);
   const formattedMessageContents = useMemo(
     () =>
-      messageContents.map((content) =>
+      messageGroup.contents.map((content) =>
         content
           .split(' ')
           .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
           .join(' '),
       ),
-    [messageContents, t],
+    [messageGroup.contents, t],
   );
 
   // Handlers
   const handleUsernameClick = () => {
-    Popup.openUserInfo(userId, senderUserId);
+    Popup.openUserInfo(user.userId, messageGroup.userId);
   };
 
   return (
     <div className={styles['message-box']}>
       <div className={styles['details']}>
         <div className={styles['username-text']} onClick={handleUsernameClick}>
-          {senderName}
+          {messageGroup.name}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
       </div>

@@ -1,20 +1,21 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useAppSelector } from '@/store/hook';
-
-import type * as Types from '@/types';
 
 import MarkdownContent from '@/components/MarkdownContent';
 
 import styles from '@/styles/notificationToaster.module.css';
 
 const NotificationToaster: React.FC = React.memo(() => {
+  // Selectors
+  const notifications = useAppSelector((state) => state.notifications.data, shallowEqual);
+
   // States
   const [show, setShow] = useState(false);
-  const [closedNotificationIds, setClosedNotificationIds] = useState<Set<Types.Notification['notificationId']>>(new Set());
+  const [closedNotificationIds, setClosedNotificationIds] = useState<Set<number>>(new Set());
   const [showNotificationIndex, setShowNotificationIndex] = useState<number>(0);
 
   // Variables
-  const notifications = useAppSelector((state) => state.notifications.data);
   const filteredNotifications = useMemo(() => notifications.filter((notification) => !closedNotificationIds.has(notification.notificationId)), [notifications, closedNotificationIds]);
 
   // Handlers

@@ -25,9 +25,6 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
   const [reason, setReason] = useState<string>('');
   const [otherReason, setOtherReason] = useState<string>('');
 
-  // Variables
-  const { userId, name: memberName, nickname: memberNickname } = member;
-
   // Handlers
   const getLengthOptions = () => {
     switch (formatType) {
@@ -84,7 +81,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.blockUserFromServer(userId, serverId, Date.now() + getBlockTime());
+    Popup.blockUserFromServer(member.userId, serverId, Date.now() + getBlockTime());
     ipc.window.close();
   };
 
@@ -98,7 +95,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
           <div className={popupStyles['col']}>
-            <div className={popupStyles['label']}>{t('confirm-kick-user-from-server', { '0': memberNickname || memberName })}</div>
+            <div className={popupStyles['label']}>{t('confirm-kick-user-from-server', { '0': member.nickname || member.name })}</div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                 <div className={popupStyles['label']}>{t('kick-time')}</div>

@@ -98,8 +98,8 @@ export function openMemberInvitation(userId: Types.User['userId']) {
   ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
 }
 
-export function openSearchUser(userId: Types.User['userId']) {
-  ipc.popup.open('searchUser', 'searchUser', { userId });
+export function openSearchUser() {
+  ipc.popup.open('searchUser', 'searchUser', {});
 }
 
 export async function openApplyFriend(userId: Types.User['userId'], targetId: Types.User['userId']) {
@@ -158,9 +158,9 @@ export function openServerAnnouncement(announcement: Types.Server['announcement'
   ipc.popup.open('serverAnnouncement', 'serverAnnouncement', { announcement });
 }
 
-export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, needsPassword: boolean) {
+export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, isPasswordNeeded: boolean) {
   if (!canJoin) return;
-  if (needsPassword) openChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
+  if (isPasswordNeeded) openChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
   else ipc.socket.send('connectChannel', { serverId, channelId });
 }
 

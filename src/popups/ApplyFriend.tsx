@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -19,8 +20,14 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ target, 
   const { t } = useTranslation();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const friendGroups = useAppSelector((state) => state.friendGroups.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
+
+  const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   // States
   const [section, setSection] = useState<number>(friendApplication ? 1 : 0); // 0: send, 1: sent, 2: edit
@@ -28,15 +35,13 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ target, 
   const [applicationDesc, setApplicationDesc] = useState<Types.FriendApplication['description']>(friendApplication?.description || '');
 
   // Variables
-  const { userId } = user;
-  const { userId: targetId, name: targetName, displayId: targetDisplayId, avatarUrl: targetAvatarUrl } = target;
   const isSendSection = section === 0;
   const isSentSection = section === 1;
   const isEditSection = section === 2;
 
   // Handlers
   const handleTargetNameClick = () => {
-    Popup.openUserInfo(userId, targetId);
+    Popup.openUserInfo(user.userId, target.userId);
   };
 
   const handleCreateFriendGroupBtnClick = () => {
@@ -56,12 +61,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ target, 
   };
 
   const handleSubmitBtnClick = () => {
-    Popup.sendFriendApplication(targetId, { description: applicationDesc }, friendGroupId || null);
+    Popup.sendFriendApplication(target.userId, { description: applicationDesc }, friendGroupId || null);
     ipc.window.close();
   };
 
   const handleSubmitEditBtnClick = () => {
-    Popup.editFriendApplication(targetId, { description: applicationDesc });
+    Popup.editFriendApplication(target.userId, { description: applicationDesc });
     ipc.window.close();
   };
 
@@ -76,13 +81,13 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ target, 
           <div className={popupStyles['label']}>{t('apply-friend-label')}</div>
           <div className={popupStyles['row']}>
             <div className={popupStyles['avatar-wrapper']}>
-              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${targetAvatarUrl})` }} />
+              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${target.avatarUrl})` }} />
             </div>
             <div className={popupStyles['info-wrapper']}>
               <div className={popupStyles['link-text']} onClick={handleTargetNameClick}>
-                {targetName}
+                {target.name}
               </div>
-              <div className={popupStyles['sub-text']}>{targetDisplayId}</div>
+              <div className={popupStyles['sub-text']}>{target.displayId}</div>
             </div>
           </div>
           <div className={popupStyles['split']} />

@@ -19,16 +19,13 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
   // States
   const [friendNote, setFriendNote] = useState<string>(friend.note);
 
-  // Variables
-  const { targetId, name: targetName } = friend;
-
   // Handlers
   const handleFriendNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFriendNote(e.target.value);
   };
 
   const handleSaveBtnClick = () => {
-    Popup.editFriend(targetId, { note: friendNote });
+    Popup.editFriend(friend.targetId, { note: friendNote });
     handleCloseBtnClick();
   };
 
@@ -42,7 +39,7 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('friend-note-name')}</div>
-            <input className={popupStyles['input']} type="text" value={friendNote} placeholder={targetName} onChange={handleFriendNoteChange} />
+            <input className={popupStyles['input']} type="text" value={friendNote} placeholder={friend.name} onChange={handleFriendNoteChange} />
           </div>
         </div>
       </div>

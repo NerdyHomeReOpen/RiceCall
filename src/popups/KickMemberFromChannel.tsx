@@ -26,10 +26,6 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   const [reason, setReason] = useState<string>('');
   const [otherReason, setOtherReason] = useState<string>('');
 
-  // Variables
-  const { channelId, name: channelName } = channel;
-  const { userId, name: memberName, nickname: memberNickname } = member;
-
   // Functions
   const getLengthOptions = () => {
     switch (formatType) {
@@ -87,7 +83,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.blockUserFromChannel(userId, serverId, channelId, Date.now() + getBlockTime());
+    Popup.blockUserFromChannel(member.userId, serverId, channel.channelId, Date.now() + getBlockTime());
     ipc.window.close();
   };
 
@@ -102,7 +98,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
           <div className={popupStyles['col']}>
             <div className={popupStyles['label']} style={{ minWidth: '0' }}>
-              {t('confirm-kick-user-from-channel', { '0': memberNickname || memberName, '1': channelName })}
+              {t('confirm-kick-user-from-channel', { '0': member.nickname || member.name, '1': channel.name })}
             </div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>

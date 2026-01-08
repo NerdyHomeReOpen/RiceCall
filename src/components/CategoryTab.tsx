@@ -1,7 +1,10 @@
-import React, { useEffect } from 'react';
-import { useAppSelector } from '@/store/hook';
+import React, { useEffect, useState } from 'react';
+import { shallowEqual } from 'react-redux';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
+
+import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import ChannelTab from '@/components/ChannelTab';
 import UserTab from '@/components/UserTab';
@@ -17,88 +20,105 @@ import styles from '@/styles/server.module.css';
 
 interface CategoryTabProps {
   category: Types.Category;
-  expanded?: Record<string, boolean>;
-  selectedItemId: string | null;
-  setExpanded?: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
-  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded = { [category.channelId]: true }, selectedItemId, setExpanded = () => {}, setSelectedItemId }) => {
+const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   // Hooks
   const { showContextMenu } = useContextMenu();
   const { expandCategoryHandlerRef } = useFindMeContext();
+  const dispatch = useAppDispatch();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const currentChannel = useAppSelector((state) => state.currentChannel.data);
-  const channels = useAppSelector((state) => state.channels.data);
-  const onlineMembers = useAppSelector((state) => state.onlineMembers.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      serverId: state.currentServer.data.serverId,
+      permissionLevel: state.currentServer.data.permissionLevel,
+      receptionLobbyId: state.currentServer.data.receptionLobbyId,
+    }),
+    shallowEqual,
+  );
+
+  const currentChannel = useAppSelector(
+    (state) => ({
+      channelId: state.currentChannel.data.channelId,
+      permissionLevel: state.currentChannel.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
+  const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
+
+  // States
+  const [isExpanded, setIsExpanded] = useState(true);
 
   // Variables
-  const { userId } = user;
-  const { serverId: currentServerId, receptionLobbyId: currentServerReceptionLobbyId } = currentServer;
-  const { channelId: currentChannelId } = currentChannel;
-  const { channelId: categoryId, name: categoryName, visibility: categoryVisibility, userLimit: categoryUserLimit } = category;
   const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, category.permissionLevel);
-  const categoryChannels = channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === categoryId);
-  const categoryMembers = onlineMembers.filter((om) => om.currentChannelId === categoryId);
-  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
-  const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
-  const isInChannel = currentChannelId === categoryId;
-  const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannelId);
-  const isReceptionLobby = currentServerReceptionLobbyId === categoryId;
-  const isMemberChannel = categoryVisibility === 'member';
-  const isPrivateChannel = categoryVisibility === 'private';
-  const isReadonlyChannel = categoryVisibility === 'readonly';
-  const isFull = categoryUserLimit && categoryUserLimit <= categoryMembers.length;
-  const isSelected = selectedItemId === `category-${categoryId}`;
+  const categoryChannels = channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === category.channelId);
+  const categoryMembers = onlineMembers.filter((om) => om.currentChannelId === category.channelId);
+  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
+  const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
+  const isInChannel = currentChannel.channelId === category.channelId;
+  const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannel.channelId);
+  const isReceptionLobby = currentServer.receptionLobbyId === category.channelId;
+  const isMemberChannel = category.visibility === 'member';
+  const isPrivateChannel = category.visibility === 'private';
+  const isReadonlyChannel = category.visibility === 'readonly';
+  const isFull = category.userLimit && category.userLimit <= categoryMembers.length;
   const isDraggable = Permission.isChannelMod(permissionLevel) && movableCategoryUserIds.length > 0;
-  const isExpandable = expanded[categoryId];
+  const isPasswordNeeded = !Permission.isChannelMod(permissionLevel) && isPrivateChannel;
   const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !Permission.isMember(permissionLevel)) && (!isFull || Permission.isServerAdmin(permissionLevel));
-  const needsPassword = !Permission.isChannelMod(permissionLevel) && isPrivateChannel;
   const filteredCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
   const filteredCategoryMembers = [...categoryMembers].sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt);
 
   // Functions
   const getTabContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addJoinChannelOption({ canJoin, isInChannel }, () => Popup.connectChannel(currentServerId, categoryId, canJoin, needsPassword))
-      .addViewOrEditOption(() => Popup.openChannelSetting(userId, currentServerId, categoryId))
+      .addJoinChannelOption({ canJoin, isInChannel }, () => Popup.connectChannel(currentServer.serverId, category.channelId, canJoin, isPasswordNeeded))
+      .addViewOrEditOption(() => Popup.openChannelSetting(user.userId, currentServer.serverId, category.channelId))
       .addSeparator()
-      .addCreateChannelOption({ permissionLevel }, () => Popup.openCreateChannel(userId, currentServerId, ''))
-      .addCreateSubChannelOption({ permissionLevel }, () => Popup.openCreateChannel(userId, currentServerId, categoryId))
-      .addDeleteChannelOption({ permissionLevel }, () => Popup.deleteChannel(currentServerId, categoryId, categoryName))
+      .addCreateChannelOption({ permissionLevel }, () => Popup.openCreateChannel(user.userId, currentServer.serverId, ''))
+      .addCreateSubChannelOption({ permissionLevel }, () => Popup.openCreateChannel(user.userId, currentServer.serverId, category.channelId))
+      .addDeleteChannelOption({ permissionLevel }, () => Popup.deleteChannel(currentServer.serverId, category.channelId, category.name))
       .addSeparator()
-      .addBroadcastOption({ permissionLevel }, () => Popup.openServerBroadcast(currentServerId, categoryId))
+      .addBroadcastOption({ permissionLevel }, () => Popup.openServerBroadcast(currentServer.serverId, category.channelId))
       .addSeparator()
       .addMoveAllUserToChannelOption({ isInChannel, currentPermissionLevel, permissionLevel, movableUserIds: movableCategoryUserIds }, () =>
-        Popup.moveAllUsersToChannel(movableCategoryUserIds, currentServerId, categoryId),
+        Popup.moveAllUsersToChannel(movableCategoryUserIds, currentServer.serverId, category.channelId),
       )
-      .addEditChannelOrderOption({ permissionLevel }, () => Popup.openEditChannelOrder(userId, currentServerId))
+      .addEditChannelOrderOption({ permissionLevel }, () => Popup.openEditChannelOrder(user.userId, currentServer.serverId))
       .addSeparator()
-      .addKickChannelUsersFromServerOption({ permissionLevel, movableUserIds: movableCategoryUserIds }, () => Popup.kickUsersFromServer(movableCategoryUserIds, currentServerId))
-      .addKickAllUsersFromServerOption({ permissionLevel, movableUserIds: movableServerUserIds }, () => Popup.kickUsersFromServer(movableServerUserIds, currentServerId))
+      .addKickChannelUsersFromServerOption({ permissionLevel, movableUserIds: movableCategoryUserIds }, () => Popup.kickUsersFromServer(movableCategoryUserIds, currentServer.serverId))
+      .addKickAllUsersFromServerOption({ permissionLevel, movableUserIds: movableServerUserIds }, () => Popup.kickUsersFromServer(movableServerUserIds, currentServer.serverId))
       .addSeparator()
-      .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => Popup.editServer(currentServerId, { receptionLobbyId: categoryId }))
+      .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => Popup.editServer(currentServer.serverId, { receptionLobbyId: category.channelId }))
       .build();
 
   // Handlers
   const handleTabClick = () => {
-    if (isSelected) setSelectedItemId(null);
-    else setSelectedItemId(`category-${categoryId}`);
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`category-${category.channelId}`));
   };
 
   const handleTabDoubleClick = () => {
-    Popup.connectChannel(currentServerId, categoryId, canJoin, needsPassword);
+    Popup.connectChannel(currentServer.serverId, category.channelId, canJoin, isPasswordNeeded);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
     e.dataTransfer.setData('type', 'moveAllUsers');
     e.dataTransfer.setData('userIds', movableCategoryUserIds.join(','));
-    e.dataTransfer.setData('currentChannelId', categoryId);
+    e.dataTransfer.setData('currentChannelId', category.channelId);
   };
 
   const handleTabDragOver = (e: React.DragEvent) => {
@@ -111,17 +131,17 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded
     e.preventDefault();
     const moveType = e.dataTransfer.getData('type');
     const currentChannelId = e.dataTransfer.getData('currentChannelId');
-    if (!moveType || !currentChannelId || currentChannelId === categoryId || isReadonlyChannel) return;
+    if (!moveType || !currentChannelId || currentChannelId === category.channelId || isReadonlyChannel) return;
     switch (moveType) {
       case 'moveUser':
         const targetUserId = e.dataTransfer.getData('userId');
         if (!targetUserId) return;
-        Popup.moveUserToChannel(targetUserId, currentServerId, categoryId);
+        Popup.moveUserToChannel(targetUserId, currentServer.serverId, category.channelId);
         break;
       case 'moveAllUsers':
         const targetUserIds = e.dataTransfer.getData('userIds');
         if (!targetUserIds) return;
-        Popup.moveAllUsersToChannel(targetUserIds.split(','), currentServerId, categoryId);
+        Popup.moveAllUsersToChannel(targetUserIds.split(','), currentServer.serverId, category.channelId);
         break;
     }
   };
@@ -134,16 +154,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded
   };
 
   const handleTabExpandedClick = () => {
-    setExpanded((prev) => ({ ...prev, [categoryId]: !prev[categoryId] }));
+    setIsExpanded(!isExpanded);
   };
 
   // Effect
   useEffect(() => {
     if (!isInCategory) return;
-    expandCategoryHandlerRef.current = () => {
-      setExpanded((prev) => ({ ...prev, [categoryId]: true }));
-    };
-  }, [categoryId, expandCategoryHandlerRef, setExpanded, isInCategory]);
+    expandCategoryHandlerRef.current = () => setIsExpanded(true);
+  }, [expandCategoryHandlerRef, isInCategory]);
 
   return (
     <>
@@ -157,19 +175,19 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, expanded
         onDrop={handleTabDrop}
         onContextMenu={handleTabContextMenu}
       >
-        <div className={`${styles['tab-icon']} ${isExpandable ? styles['expanded'] : ''} ${styles[categoryVisibility]}`} onClick={handleTabExpandedClick} />
-        <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{categoryName}</div>
-        {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length}${categoryUserLimit > 0 ? `/${categoryUserLimit}` : ''})`}</div>}
-        {!isExpandable && isInCategory && <div className={styles['my-location-icon']} />}
+        <div className={`${styles['tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]}`} onClick={handleTabExpandedClick} />
+        <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{category.name}</div>
+        {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length}${category.userLimit > 0 ? `/${category.userLimit}` : ''})`}</div>}
+        {!isExpanded && isInCategory && <div className={styles['my-location-icon']} />}
       </div>
-      <div className={styles['user-list']} style={isExpandable ? {} : { display: 'none' }}>
+      <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
         {filteredCategoryMembers.map((member) => (
-          <UserTab key={member.userId} member={member} channel={category} canJoin={canJoin} needsPassword={needsPassword} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} />
+          <UserTab key={member.userId} member={member} channel={category} canJoin={canJoin} isPasswordNeeded={isPasswordNeeded} />
         ))}
       </div>
-      <div className={styles['channel-list']} style={isExpandable ? {} : { display: 'none' }}>
+      <div className={styles['channel-list']} style={isExpanded ? {} : { display: 'none' }}>
         {filteredCategoryChannels.map((channel) => (
-          <ChannelTab key={channel.channelId} channel={channel} expanded={expanded} selectedItemId={selectedItemId} setExpanded={setExpanded} setSelectedItemId={setSelectedItemId} />
+          <ChannelTab key={channel.channelId} channel={channel} />
         ))}
       </div>
     </>

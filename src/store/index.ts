@@ -20,6 +20,7 @@ import recommendServersReducer from './slices/recommendServersSlice';
 import serversReducer from './slices/serversSlice';
 import socketReducer from './slices/socketSlice';
 import systemNotificationsReducer from './slices/systemNotificationsSlice';
+import uiReducer from './slices/uiSlice';
 import userReducer from './slices/userSlice';
 
 export const store = configureStore({
@@ -44,6 +45,7 @@ export const store = configureStore({
     servers: serversReducer,
     socket: socketReducer,
     systemNotifications: systemNotificationsReducer,
+    ui: uiReducer,
     user: userReducer,
   },
   // middleware 預設已包含 Thunk，這對處理 IPC/Socket 非同步非常有用

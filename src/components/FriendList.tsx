@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 
@@ -14,25 +15,24 @@ const FriendList: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const friendGroups = useAppSelector((state) => state.friendGroups.data);
+  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
+  const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   // States
   const [query, setQuery] = useState<string>('');
   const [selectedTabId, setSelectedTabId] = useState<'friend' | 'recent'>('friend');
-  const [selectedItemId, setSelectedItemId] = useState<string | null>(null);
 
   // Variables
-  const { userId } = user;
-  const defaultFriendGroup = Default.friendGroup({ name: t('my-friends'), order: -1, userId });
-  const strangerFriendGroup = Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000, userId });
-  const blacklistFriendGroup = Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001, userId });
-  const filteredFriendGroups = useMemo(
+  const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: -1 }), [t]);
+  const strangerFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000 }), [t]);
+  const blacklistFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001 }), [t]);
+  const sortedFriendGroups = useMemo(
     () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order),
     [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],
   );
-  const isSelectedFriendList = selectedTabId === 'friend';
-  const isSelectedRecentList = selectedTabId === 'recent';
+  const filteredFriends = useMemo(() => friends.filter((f) => f.name.toLowerCase().includes(query.toLowerCase())), [friends, query]);
+  const isFriendTab = selectedTabId === 'friend';
+  const isRecentTab = selectedTabId === 'recent';
 
   // Handlers
   const handleFriendTabClick = () => {
@@ -52,16 +52,16 @@ const FriendList: React.FC = React.memo(() => {
   };
 
   const handleAddFriendBtnClick = () => {
-    Popup.openSearchUser(userId);
+    Popup.openSearchUser();
   };
 
   return (
     <>
       <div className={styles['navigate-tabs']}>
-        <div className={`${styles['tab']} ${isSelectedFriendList ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
+        <div className={`${styles['tab']} ${isFriendTab ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div className={`${styles['tab']} ${isSelectedRecentList ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
+        <div className={`${styles['tab']} ${isRecentTab ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
@@ -71,14 +71,14 @@ const FriendList: React.FC = React.memo(() => {
         <div className={styles['prev-icon']} />
         <div className={styles['next-icon']} />
       </div>
-      <div className={styles['scroll-view']} style={isSelectedFriendList ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={isFriendTab ? {} : { display: 'none' }}>
         <div className={styles['friend-group-list']}>
-          {filteredFriendGroups.map((friendGroup) => (
-            <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} selectedItemId={selectedItemId} setSelectedItemId={setSelectedItemId} query={query} />
+          {sortedFriendGroups.map((friendGroup) => (
+            <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} />
           ))}
         </div>
       </div>
-      <div className={styles['recent-list']} style={isSelectedRecentList ? {} : { display: 'none' }} />
+      <div className={styles['recent-list']} style={isRecentTab ? {} : { display: 'none' }} />
       <div className={styles['sidebar-footer']}>
         <div className={styles['button']} datatype="addGroup" onClick={handleCreateFriendGroupBtnClick}>
           {t('create-friend-group')}

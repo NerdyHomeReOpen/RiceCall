@@ -1,4 +1,5 @@
 import React from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 
@@ -15,7 +16,7 @@ const MemberInvitationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   // Selectors
-  const memberInvitations = useAppSelector((state) => state.memberInvitations.data);
+  const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
 
   // Handlers
   const handleRejectAllBtnClick = () => {
@@ -48,37 +49,38 @@ MemberInvitationPopup.displayName = 'MemberInvitationPopup';
 
 export default MemberInvitationPopup;
 
-function MemberInvitationItem({ invitation }: { invitation: Types.MemberInvitation }) {
+interface MemberInvitationItemProps {
+  invitation: Types.MemberInvitation;
+}
+
+const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ invitation }) => {
   // Hooks
   const { t } = useTranslation();
 
-  // Variables
-  const { serverId, avatarUrl: serverAvatarUrl, name: serverName, createdAt: invitationCreatedAt, description: invitationDescription } = invitation;
-
   // Handlers
   const handleAcceptBtnClick = () => {
-    Popup.acceptMemberInvitation(serverId);
+    Popup.acceptMemberInvitation(invitation.serverId);
   };
 
   const handleRejectBtnClick = () => {
-    Popup.rejectMemberInvitation(serverId);
+    Popup.rejectMemberInvitation(invitation.serverId);
   };
 
   return (
     <div className={styles['application']}>
-      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${invitation.avatarUrl})` }} />
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>
-          <div className={styles['user-name-text']}>{serverName}</div>
-          <div className={styles['time-text']} title={Language.getFormatTimestamp(t, invitationCreatedAt)}>
-            {Language.getFormatTimeDiff(t, invitationCreatedAt)}
+          <div className={styles['user-name-text']}>{invitation.name}</div>
+          <div className={styles['time-text']} title={Language.getFormatTimestamp(t, invitation.createdAt)}>
+            {Language.getFormatTimeDiff(t, invitation.createdAt)}
           </div>
         </div>
         <div className={styles['application-content-box']}>
           <div className={popupStyles['col']}>
             <div className={styles['content-text']}>{t('invite-you-to-be-member')}</div>
             <div className={styles['content-text']}>
-              {t('note')}: {invitationDescription}
+              {t('note')}: {invitation.description}
             </div>
           </div>
           <div className={popupStyles['row']} style={{ alignSelf: 'flex-end' }}>
@@ -95,4 +97,6 @@ function MemberInvitationItem({ invitation }: { invitation: Types.MemberInvitati
       </div>
     </div>
   );
-}
+});
+
+MemberInvitationItem.displayName = 'MemberInvitationItem';

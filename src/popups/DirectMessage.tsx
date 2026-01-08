@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -59,7 +60,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   const messageAreaRef = useRef<HTMLDivElement>(null);
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      avatarUrl: state.user.data.avatarUrl,
+    }),
+    shallowEqual,
+  );
 
   // States
   const [messageInput, setMessageInput] = useState<string>('');
@@ -71,27 +78,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
 
   // Variables
-  const { userId, avatarUrl: userAvatarUrl } = user;
-  const {
-    userId: targetId,
-    name: targetName,
-    avatarUrl: targetAvatarUrl,
-    level: targetLevel,
-    xp: targetXp,
-    requiredXp: targetRequiredXp,
-    vip: targetVip,
-    status: targetStatus,
-    currentServerId: targetCurrentServerId,
-    badges: targetBadges,
-    shareCurrentServer: targetShareCurrentServer,
-    isVerified: isTargetVerified,
-  } = target;
-  const { name: targetCurrentServerName } = targetCurrentServer || {};
   const textLength = editor?.getText().length || 0;
   const isWarning = textLength > MAX_INPUT_LENGTH;
   const isFriend = friend?.relationStatus === 2;
   const isBlocked = friend?.isBlocked;
-  const isOnline = targetStatus !== 'offline';
+  const isOffline = target.status === 'offline';
+  const hasVip = target.vip > 0;
+  const badges = typeof target.badges === 'string' ? JSON.parse(target.badges) : target.badges;
+  const hasBadges = badges.length > 0;
 
   // Functions
   const syncStyles = useCallback(() => {
@@ -139,7 +133,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInput.trim().length === 0) return;
-      Popup.sendMessage(targetId, { type: 'dm', content: messageInput });
+      Popup.sendMessage(target.userId, { type: 'dm', content: messageInput });
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
       syncStyles();
     }
@@ -174,7 +168,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
 
   const handleShakeWindowBtnClick = () => {
     if (cooldown > 0) return;
-    if (isFriend) ipc.socket.send('shakeWindow', { targetId });
+    if (isFriend) ipc.socket.send('shakeWindow', { targetId: target.userId });
     else setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
     setCooldown(SHAKE_COOLDOWN);
     cooldownRef.current = SHAKE_COOLDOWN;
@@ -195,15 +189,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleApplyFriendBtnClick = () => {
-    Popup.openApplyFriend(userId, targetId);
+    Popup.openApplyFriend(user.userId, target.userId);
   };
 
   const handleBlockUserBtnClick = () => {
-    Popup.blockUser(targetId, targetName);
+    Popup.blockUser(target.userId, target.name);
   };
 
   const handleUnblockUserBtnClick = () => {
-    Popup.unblockUser(targetId, targetName);
+    Popup.unblockUser(target.userId, target.name);
   };
 
   const handleReportBtnClick = () => {
@@ -211,11 +205,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleTargetAvatarClick = () => {
-    Popup.openUserInfo(userId, targetId);
+    Popup.openUserInfo(user.userId, target.userId);
   };
 
   const handleUserAvatarClick = () => {
-    Popup.openUserInfo(userId, userId);
+    Popup.openUserInfo(user.userId, user.userId);
   };
 
   const handleServerNameClick = () => {
@@ -223,7 +217,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleMessageHistoryBtnClick = () => {
-    Popup.openChatHistory(userId, targetId);
+    Popup.openChatHistory(user.userId, target.userId);
   };
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -249,18 +243,18 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   }, []);
 
   useEffect(() => {
-    if (!targetId || !targetCurrentServerId || isBlocked || !isFriend || !targetShareCurrentServer) {
+    if (!target.userId || !target.shareCurrentServer || isBlocked || !isFriend || !targetCurrentServer) {
       setTargetCurrentServer(null);
       return;
     }
-    ipc.data.server({ userId: targetId, serverId: targetCurrentServerId }).then((server) => {
+    ipc.data.server({ userId: target.userId, serverId: targetCurrentServer.serverId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
-  }, [targetId, targetCurrentServerId, isBlocked, isFriend, targetShareCurrentServer]);
+  }, [target.userId, target.shareCurrentServer, targetCurrentServer, isBlocked, isFriend]);
 
   useEffect(() => {
-    if (!friend) ipc.socket.send('stranger', { targetId });
-  }, [friend, targetId]);
+    if (!friend) ipc.socket.send('stranger', { targetId: target.userId });
+  }, [friend, target.userId]);
 
   useEffect(() => {
     if (!messageAreaRef.current || directMessages.length === 0) return;
@@ -268,14 +262,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     const lastMessage = directMessages[directMessages.length - 1];
     const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
 
-    if (lastMessage.type !== 'dm' || lastMessage.userId === userId) {
+    if (lastMessage.type !== 'dm' || lastMessage.userId === user.userId) {
       setTimeout(() => scrollToBottom(), 50);
     } else if (isBottom) {
       setTimeout(() => scrollToBottom(), 50);
     } else {
       setUnreadMessageCount((prev) => prev + 1);
     }
-  }, [directMessages, userId, scrollToBottom]);
+  }, [directMessages, user.userId, scrollToBottom]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -291,19 +285,19 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: Types.User['userId']; update: Partial<Types.Friend> }[]) => {
-      const match = args.find((i) => String(i.targetId) === String(targetId));
+      const match = args.find((i) => String(i.targetId) === String(target.userId));
       if (match) setFriend((prev) => (prev ? { ...prev, ...match.update } : Default.friend(match.update)));
     });
     return () => unsub();
-  }, [targetId]);
+  }, [target.userId]);
 
   useEffect(() => {
     const onDirectMessage = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
-        const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
-        const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
+        const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
+        const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
         // Check if the message array is in the current conversation
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
         if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
@@ -312,15 +306,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     if (event === 'directMessage') onDirectMessage(message);
     const unsub = ipc.socket.on('directMessage', onDirectMessage);
     return () => unsub();
-  }, [event, message, userId, targetId]);
+  }, [event, message, user.userId, target.userId]);
 
   useEffect(() => {
     const onShakeWindow = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
-        const user1Id = userId.localeCompare(targetId) < 0 ? userId : targetId;
-        const user2Id = userId.localeCompare(targetId) < 0 ? targetId : userId;
+        const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
+        const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
         // Check if the message array is in the current conversation
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
         if (isCurrentConversation) {
@@ -345,7 +339,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     if (event === 'shakeWindow') onShakeWindow(message);
     const unsub = ipc.socket.on('shakeWindow', onShakeWindow);
     return () => unsub();
-  }, [event, message, userId, targetId]);
+  }, [event, message, user.userId, target.userId]);
 
   return (
     <div className={popupStyles['popup-wrapper']}>
@@ -367,32 +361,36 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
       <div className={popupStyles['popup-body']}>
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
-            <div className={`${styles['avatar-picture']} ${isFriend && isOnline ? '' : styles['offline']}`} style={{ backgroundImage: `url(${targetAvatarUrl})` }} onClick={handleTargetAvatarClick} />
-            {targetVip > 0 && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${targetVip}`]}`} />}
+            <div
+              className={`${styles['avatar-picture']} ${isFriend && !isOffline ? '' : styles['offline']}`}
+              style={{ backgroundImage: `url(${target.avatarUrl})` }}
+              onClick={handleTargetAvatarClick}
+            />
+            {hasVip && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${target.vip}`]}`} />}
             <div className={styles['user-state-box']}>
-              <LevelIcon level={targetLevel} xp={targetXp} requiredXp={targetRequiredXp} showTooltip={false} />
-              {targetBadges.length > 0 ? <div className={styles['user-friend-split']} /> : ''}
-              <BadgeList badges={JSON.parse(targetBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} grid={true} />
+              <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={false} />
+              {hasBadges ? <div className={styles['user-friend-split']} /> : ''}
+              <BadgeList badges={JSON.parse(target.badges)} position="left-bottom" direction="right-bottom" maxDisplay={13} grid={true} />
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${userAvatarUrl})` }} onClick={handleUserAvatarClick} />
+            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${user.avatarUrl})` }} onClick={handleUserAvatarClick} />
           </div>
         </div>
         <div className={styles['main-content']}>
           <div className={styles['action-body']}>
-            {isFriend && isOnline && targetCurrentServer ? (
+            {isFriend && !isOffline && targetCurrentServer ? (
               <div className={`${styles['action-area']} ${styles['clickable']}`} onClick={handleServerNameClick}>
                 <div className={`${styles['action-icon']} ${styles['in-server']}`} />
-                <div className={styles['action-title']}>{targetCurrentServerName}</div>
+                <div className={styles['action-title']}>{targetCurrentServer.name}</div>
               </div>
-            ) : !isFriend || !isOnline ? (
+            ) : !isFriend || isOffline ? (
               <div className={styles['action-area']}>
                 {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
-                {isFriend && !isOnline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
+                {isFriend && isOffline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
               </div>
             ) : null}
-            {isTargetVerified ? (
+            {target.isVerified ? (
               <div className={styles['action-area']}>
                 <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
                 <div className={`${styles['official-title-box']} ${styles['action-title']}`}>

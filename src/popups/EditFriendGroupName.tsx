@@ -20,7 +20,6 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
   const [friendGroupName, setFriendGroupName] = useState<string>(friendGroup.name);
 
   // Variables
-  const { friendGroupId } = friendGroup;
   const canSubmit = friendGroupName.trim();
 
   // Handlers
@@ -30,7 +29,7 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.editFriendGroup(friendGroupId, { name: friendGroupName });
+    Popup.editFriendGroup(friendGroup.friendGroupId, { name: friendGroupName });
     handleCloseBtnClick();
   };
 

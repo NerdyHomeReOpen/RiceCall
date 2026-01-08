@@ -1,5 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -27,42 +28,35 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   const { selectTab } = useMainTab();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      currentServerId: state.user.data.currentServerId,
+    }),
+    shallowEqual,
+  );
 
   // Variables
-  const {
-    serverId,
-    name: serverName,
-    avatarUrl: serverAvatarUrl,
-    displayId: serverDisplayId,
-    specialId: serverSpecialId,
-    slogan: serverSlogan,
-    favorite: serverFavorite,
-    ownerId: serverOwnerId,
-    owned: serverOwned,
-    permissionLevel: serverPermissionLevel,
-  } = server;
-  const { userId, currentServerId: userCurrentServerId } = user;
-  const isOwner = serverOwnerId === userId && serverOwned;
+  const isOwned = server.ownerId === user.userId && server.owned;
 
   // Functions
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinServerOption(handleServerCardClick)
-      .addViewServerInfoOption(() => Popup.openServerSetting(userId, serverId))
-      .addFavoriteServerOption({ isFavorite: serverFavorite }, () => Popup.favoriteServer(serverId))
-      .addTerminateSelfMembershipOption({ permissionLevel: serverPermissionLevel }, () => Popup.terminateMember(userId, serverId, t('self')))
+      .addViewServerInfoOption(() => Popup.openServerSetting(user.userId, server.serverId))
+      .addFavoriteServerOption({ isFavorite: server.favorite }, () => Popup.favoriteServer(server.serverId))
+      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel }, () => Popup.terminateMember(user.userId, server.serverId, t('self')))
       .build();
 
   // Handles
   const handleServerCardClick = () => {
     if (isLoading) return;
-    if (server.serverId === userCurrentServerId) {
+    if (server.serverId === user.currentServerId) {
       selectTab('server');
       return;
     }
     loadServer(server.specialId || server.displayId);
-    ipc.socket.send('connectServer', { serverId });
+    ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
   const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -74,13 +68,13 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
 
   return (
     <div className={homeStyles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <Image className={homeStyles['server-avatar-picture']} src={serverAvatarUrl} alt={serverName} width={70} height={70} loading="lazy" draggable="false" />
+      <Image className={homeStyles['server-avatar-picture']} src={server.avatarUrl} alt={server.name} width={70} height={70} loading="lazy" draggable="false" />
       <div className={homeStyles['server-info-text']}>
-        <div className={homeStyles['server-name-text']}>{serverName}</div>
+        <div className={homeStyles['server-name-text']}>{server.name}</div>
         <div className={homeStyles['server-id-box']}>
-          <div className={`${homeStyles['server-id-text']} ${isOwner ? homeStyles['is-owner'] : ''}`}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+          <div className={`${homeStyles['server-id-text']} ${isOwned ? homeStyles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
         </div>
-        <div className={homeStyles['server-slogen']}>{serverSlogan}</div>
+        <div className={homeStyles['server-slogen']}>{server.slogan}</div>
       </div>
     </div>
   );

@@ -1,10 +1,11 @@
 import React, { useMemo, useRef } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '@/store/hook';
-
-import type * as Types from '@/types';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 
 import BadgeList from '@/components/BadgeList';
+
+import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useWebRTC } from '@/providers/WebRTC';
@@ -19,113 +20,132 @@ import vip from '@/styles/vip.module.css';
 import permission from '@/styles/permission.module.css';
 
 interface QueueUserTabProps {
-  queueUser: Types.QueueUser;
-  selectedItemId: string | null;
-  setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  queueUserId: string;
 }
 
-const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, selectedItemId, setSelectedItemId }) => {
+const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { isMuted, isSpeaking, unmuteUser, muteUser } = useWebRTC();
+  const dispatch = useAppDispatch();
 
   // Refs
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const currentChannel = useAppSelector((state) => state.currentChannel.data);
-  const friends = useAppSelector((state) => state.friends.data);
-  const onlineMembers = useAppSelector((state) => state.onlineMembers.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      serverId: state.currentServer.data.serverId,
+      permissionLevel: state.currentServer.data.permissionLevel,
+      lobbyId: state.currentServer.data.lobbyId,
+    }),
+    shallowEqual,
+  );
+
+  const currentChannel = useAppSelector(
+    (state) => ({
+      channelId: state.currentChannel.data.channelId,
+      permissionLevel: state.currentChannel.data.permissionLevel,
+      categoryId: state.currentChannel.data.categoryId,
+    }),
+    shallowEqual,
+  );
+
+  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
+  const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
+  const queueUsers = useAppSelector((state) => state.queueUsers.data, shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`, shallowEqual);
 
   // Variables
-  const queueMember = useMemo(() => {
-    const onlineMember = onlineMembers.find((om) => om.userId === queueUser.userId);
-    return !onlineMember ? Default.queueMember() : { ...queueUser, ...onlineMember };
-  }, [onlineMembers, queueUser]);
-
-  const { userId } = user;
-  const { serverId: currentServerId, lobbyId: currentServerLobbyId } = currentServer;
-  const { channelId: currentChannelId, categoryId: currentChannelCategoryId } = currentChannel;
-  const {
-    userId: memberUserId,
-    name: memberName,
-    permissionLevel: memberPermission,
-    nickname: memberNickname,
-    gender: memberGender,
-    badges: memberBadges,
-    vip: memberVip,
-    isTextMuted: isMemberTextMuted,
-    isVoiceMuted: isMemberVoiceMuted,
-    currentChannelId: memberCurrentChannelId,
-    position: memberPosition,
-    leftTime: memberLeftTime,
-    isQueueControlled,
-  } = queueMember;
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const isSelf = memberUserId === userId;
-  const isInLobby = memberCurrentChannelId === currentServerLobbyId;
-  const isUserSpeaking = isSelf ? isSpeaking('user') : isSpeaking(memberUserId);
-  const isUserMuted = isSelf ? isMuted('user') : isMuted(memberUserId);
-  const isControlled = memberPosition === 0 && isQueueControlled && !Permission.isChannelMod(memberPermission);
-  const isFriend = useMemo(() => friends.some((f) => f.targetId === memberUserId && f.relationStatus === 2), [friends, memberUserId]);
-  const isSuperior = permissionLevel > memberPermission;
-  const isSelected = selectedItemId === `queue-${memberUserId}`;
-  const memberHasVip = memberVip > 0;
+  const queueMember = useMemo(() => {
+    const onlineMember = onlineMembers.find((om) => om.userId === queueUserId);
+    const queueUser = queueUsers.find((qu) => qu.userId === queueUserId);
+    if (!onlineMember || !queueUser) return Default.queueMember();
+    return { ...queueUser, ...onlineMember };
+  }, [onlineMembers, queueUsers, queueUserId]);
+  const isSelf = queueMember.userId === user.userId;
+  const isInLobby = queueMember.currentChannelId === currentServer.lobbyId;
+  const hasVip = queueMember.vip > 0;
+  const isOnMic = queueMember.position === 0;
+  const isMemberSpeaking = isSelf ? isSpeaking('user') : isSpeaking(queueMember.userId);
+  const isMemberMuted = isSelf ? isMuted('user') : isMuted(queueMember.userId);
+  const isControlled = isOnMic && queueMember.isQueueControlled && !Permission.isChannelMod(permissionLevel);
+  const isFriend = useMemo(() => friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === 2), [friends, queueMember.userId]);
+  const isLowerLevel = queueMember.permissionLevel < permissionLevel;
 
   // Functions
   const getStatusIcon = () => {
-    if (isUserMuted || isMemberVoiceMuted || isControlled) return 'muted';
-    if (isUserSpeaking) return 'play';
+    if (isMemberMuted || queueMember.isVoiceMuted || isControlled) return 'muted';
+    if (isMemberSpeaking) return 'play';
     return '';
   };
 
   const getMemberManagementSubmenuItems = () =>
     new CtxMenuBuilder()
-      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior }, () => Popup.terminateMember(memberUserId, currentServerId, memberName))
-      .addSetChannelModOption({ permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior, channelCategoryId: currentChannelCategoryId }, () =>
-        Permission.isChannelMod(memberPermission)
-          ? Popup.editChannelPermission(memberUserId, currentServerId, currentChannelId, { permissionLevel: 2 })
-          : Popup.editChannelPermission(memberUserId, currentServerId, currentChannelId, { permissionLevel: 3 }),
+      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
+        Popup.terminateMember(queueMember.userId, currentServer.serverId, queueMember.name),
       )
-      .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior, channelCategoryId: currentChannelCategoryId }, () =>
-        Permission.isChannelAdmin(memberPermission)
-          ? Popup.editChannelPermission(memberUserId, currentServerId, currentChannelCategoryId || currentChannelId, { permissionLevel: 2 })
-          : Popup.editChannelPermission(memberUserId, currentServerId, currentChannelCategoryId || currentChannelId, { permissionLevel: 4 }),
+      .addSetChannelModOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId }, () =>
+        Permission.isChannelMod(queueMember.permissionLevel)
+          ? Popup.editChannelPermission(queueMember.userId, currentServer.serverId, currentChannel.channelId, { permissionLevel: 2 })
+          : Popup.editChannelPermission(queueMember.userId, currentServer.serverId, currentChannel.channelId, { permissionLevel: 3 }),
       )
-      .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior }, () =>
-        Permission.isServerAdmin(memberPermission)
-          ? Popup.editServerPermission(memberUserId, currentServerId, { permissionLevel: 2 })
-          : Popup.editServerPermission(memberUserId, currentServerId, { permissionLevel: 5 }),
+      .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId }, () =>
+        Permission.isChannelAdmin(queueMember.permissionLevel)
+          ? Popup.editChannelPermission(queueMember.userId, currentServer.serverId, currentChannel.categoryId || currentChannel.channelId, { permissionLevel: 2 })
+          : Popup.editChannelPermission(queueMember.userId, currentServer.serverId, currentChannel.categoryId || currentChannel.channelId, { permissionLevel: 4 }),
+      )
+      .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
+        Permission.isServerAdmin(queueMember.permissionLevel)
+          ? Popup.editServerPermission(queueMember.userId, currentServer.serverId, { permissionLevel: 2 })
+          : Popup.editServerPermission(queueMember.userId, currentServer.serverId, { permissionLevel: 5 }),
       )
       .build();
 
   const getTabContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addIncreaseQueueTimeOption({ queuePosition: memberPosition, permissionLevel }, () => Popup.increaseUserQueueTime(memberUserId, currentServerId, currentChannelId))
-      .addMoveUpQueueOption({ queuePosition: memberPosition, permissionLevel }, () => Popup.moveUserQueuePositionUp(memberUserId, currentServerId, currentChannelId, memberPosition - 1))
-      .addMoveDownQueueOption({ queuePosition: memberPosition, permissionLevel }, () => Popup.moveUserQueuePositionDown(memberUserId, currentServerId, currentChannelId, memberPosition + 1))
-      .addRemoveFromQueueOption({ permissionLevel }, () => Popup.removeUserFromQueue(memberUserId, currentServerId, currentChannelId, memberNickname || memberName))
-      .addClearQueueOption({ permissionLevel }, () => Popup.clearQueue(currentServerId, currentChannelId))
+      .addIncreaseQueueTimeOption({ queuePosition: queueMember.position, permissionLevel }, () => Popup.increaseUserQueueTime(queueMember.userId, currentServer.serverId, currentChannel.channelId))
+      .addMoveUpQueueOption({ queuePosition: queueMember.position, permissionLevel }, () =>
+        Popup.moveUserQueuePositionUp(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.position - 1),
+      )
+      .addMoveDownQueueOption({ queuePosition: queueMember.position, permissionLevel }, () =>
+        Popup.moveUserQueuePositionDown(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.position + 1),
+      )
+      .addRemoveFromQueueOption({ permissionLevel }, () => Popup.removeUserFromQueue(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.name))
+      .addClearQueueOption({ permissionLevel }, () => Popup.clearQueue(currentServer.serverId, currentChannel.channelId))
       .addSeparator()
-      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(userId, memberUserId))
-      .addViewProfileOption(() => Popup.openUserInfo(userId, memberUserId))
-      .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(userId, memberUserId))
-      .addSetMuteOption({ isSelf, isMuted: isUserMuted }, () => (isUserMuted ? unmuteUser(memberUserId) : muteUser(memberUserId)))
-      .addEditNicknameOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openEditNickname(memberUserId, currentServerId))
+      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, queueMember.userId))
+      .addViewProfileOption(() => Popup.openUserInfo(user.userId, queueMember.userId))
+      .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(user.userId, queueMember.userId))
+      .addSetMuteOption({ isSelf, isMuted: isMemberMuted }, () => (isMemberMuted ? unmuteUser(queueMember.userId) : muteUser(queueMember.userId)))
+      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(queueMember.userId, currentServer.serverId))
       .addSeparator()
-      .addForbidVoiceOption({ isSelf, isSuperior, isVoiceMuted: isMemberVoiceMuted }, () => Popup.forbidUserVoiceInChannel(memberUserId, currentServerId, currentChannelId, !isMemberVoiceMuted))
-      .addForbidTextOption({ isSelf, isSuperior, isTextMuted: isMemberTextMuted }, () => Popup.forbidUserTextInChannel(memberUserId, currentServerId, currentChannelId, !isMemberTextMuted))
-      .addKickUserFromChannelOption({ permissionLevel, isSelf, isSuperior, isInLobby }, () => Popup.openKickMemberFromChannel(memberUserId, currentServerId, currentChannelId))
-      .addKickUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openKickMemberFromServer(memberUserId, currentServerId))
-      .addBlockUserFromServerOption({ permissionLevel, isSelf, isSuperior }, () => Popup.openBlockMember(memberUserId, currentServerId))
+      .addForbidVoiceOption({ isSelf, isLowerLevel, isVoiceMuted: queueMember.isVoiceMuted }, () =>
+        Popup.forbidUserVoiceInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isVoiceMuted),
+      )
+      .addForbidTextOption({ isSelf, isLowerLevel, isTextMuted: queueMember.isTextMuted }, () =>
+        Popup.forbidUserTextInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isTextMuted),
+      )
+      .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => Popup.openKickMemberFromChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId))
+      .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openKickMemberFromServer(queueMember.userId, currentServer.serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(queueMember.userId, currentServer.serverId))
       .addSeparator()
-      .addTerminateSelfMembershipOption({ permissionLevel }, () => Popup.terminateMember(userId, currentServerId, t('self')))
-      .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior }, () => Popup.openInviteMember(memberUserId, currentServerId))
+      .addTerminateSelfMembershipOption({ permissionLevel }, () => Popup.terminateMember(user.userId, currentServer.serverId, t('self')))
+      .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
+        Popup.openInviteMember(queueMember.userId, currentServer.serverId),
+      )
       .addMemberManagementOption(
-        { permissionLevel, targetPermissionLevel: memberPermission, isSelf, isSuperior, channelCategoryId: currentChannelCategoryId },
+        { permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId },
         () => {},
         getMemberManagementSubmenuItems(),
       )
@@ -133,13 +153,13 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, selec
 
   // Handlers
   const handleTabClick = () => {
-    if (isSelected) setSelectedItemId(null);
-    else setSelectedItemId(`queue-${memberUserId}`);
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`queue-${queueMember.userId}`));
   };
 
   const handleTabDoubleClick = () => {
     if (isSelf) return;
-    Popup.openDirectMessage(userId, memberUserId);
+    Popup.openDirectMessage(user.userId, queueMember.userId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -172,12 +192,12 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUser, selec
       onContextMenu={handleTabContextMenu}
     >
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
-      <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-      <div className={`${styles['user-queue-position']}`}>{memberPosition + 1}.</div>
-      {memberHasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${memberVip}`]}`} />}
-      <div className={`${styles['user-tab-name']} ${memberNickname ? styles['member'] : ''} ${memberHasVip ? vip['vip-name-color'] : ''}`}>{memberNickname || memberName}</div>
-      <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
-      {memberPosition === 0 && <div className={styles['queue-seconds-remaining-box']}>{memberLeftTime}s</div>}
+      <div className={`${permission[queueMember.gender]} ${permission[`lv-${queueMember.permissionLevel}`]}`} />
+      <div className={`${styles['user-queue-position']}`}>{queueMember.position + 1}.</div>
+      {hasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${queueMember.vip}`]}`} />}
+      <div className={`${styles['user-tab-name']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? vip['vip-name-color'] : ''}`}>{queueMember.nickname || queueMember.name}</div>
+      <BadgeList badges={JSON.parse(queueMember.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
+      {isOnMic && <div className={styles['queue-seconds-remaining-box']}>{queueMember.leftTime}s</div>}
     </div>
   );
 });

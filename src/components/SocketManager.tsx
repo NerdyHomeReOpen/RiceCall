@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
@@ -34,27 +35,35 @@ import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
 const SocketManager: React.FC = React.memo(() => {
   // Hooks
-  const dispatch = useAppDispatch();
-  const currentUser = useAppSelector((state) => state.user.data);
-  const currentFriends = useAppSelector((state) => state.friends.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const currentOnlineMembers = useAppSelector((state) => state.onlineMembers.data);
-  const currentChannel = useAppSelector((state) => state.currentChannel.data);
   const { playSound } = useSoundPlayer();
+  const dispatch = useAppDispatch();
 
   // Refs
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const popupOffSubmitRef = useRef<() => void>(() => {});
 
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      currentServerId: state.user.data.currentServerId,
+      currentChannelId: state.user.data.currentChannelId,
+      signature: state.user.data.signature,
+    }),
+    shallowEqual,
+  );
+
+  const currentFriends = useAppSelector((state) => state.friends.data, shallowEqual);
+  const currentServer = useAppSelector((state) => state.currentServer.data, shallowEqual);
+  const currentOnlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
+  const currentChannel = useAppSelector((state) => state.currentChannel.data, shallowEqual);
+
   // States
   const [region, setRegion] = useState<Types.LanguageKey>('en-US');
 
-  // Variables
-  const { userId, currentServerId, currentChannelId } = currentUser;
-
   // Effects
   useEffect(() => {
-    if (currentUser.userId) return;
+    if (user.userId) return;
 
     const userId = localStorage.getItem('userId');
     if (!userId) return;
@@ -65,7 +74,7 @@ const SocketManager: React.FC = React.memo(() => {
         dispatch(setIsSocketConnected(true));
       }
     });
-  }, [currentUser, dispatch]);
+  }, [user.userId, dispatch]);
 
   useEffect(() => {
     const language = navigator.language;
@@ -75,32 +84,32 @@ const SocketManager: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!user.userId) return;
     const refresh = async () => {
-      ipc.data.servers({ userId }).then((servers) => {
+      ipc.data.servers({ userId: user.userId }).then((servers) => {
         if (servers) dispatch(setServers(servers));
       });
-      ipc.data.friends({ userId }).then((friends) => {
+      ipc.data.friends({ userId: user.userId }).then((friends) => {
         if (friends) dispatch(setFriends(friends));
       });
-      ipc.data.friendActivities({ userId }).then((friendActivities) => {
+      ipc.data.friendActivities({ userId: user.userId }).then((friendActivities) => {
         if (friendActivities) dispatch(setFriendActivities(friendActivities));
       });
-      ipc.data.friendGroups({ userId }).then((friendGroups) => {
+      ipc.data.friendGroups({ userId: user.userId }).then((friendGroups) => {
         if (friendGroups) dispatch(setFriendGroups(friendGroups));
       });
-      ipc.data.friendApplications({ receiverId: userId }).then((friendApplications) => {
+      ipc.data.friendApplications({ receiverId: user.userId }).then((friendApplications) => {
         if (friendApplications) dispatch(setFriendApplications(friendApplications));
       });
-      ipc.data.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
+      ipc.data.memberInvitations({ receiverId: user.userId }).then((memberInvitations) => {
         if (memberInvitations) dispatch(setMemberInvitations(memberInvitations));
       });
     };
     refresh();
-  }, [userId, dispatch]);
+  }, [user.userId, dispatch]);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!user.userId) return;
     const refresh = async () => {
       ipc.data.announcements({ region }).then((announcements) => {
         if (announcements) dispatch(setAnnouncements(announcements));
@@ -115,11 +124,11 @@ const SocketManager: React.FC = React.memo(() => {
     const interval = setInterval(() => refresh(), REFRESH_REGION_INFO_INTERVAL);
     refresh();
     return () => clearInterval(interval);
-  }, [region, userId, dispatch]);
+  }, [region, user.userId, dispatch]);
 
   useEffect(() => {
-    if (!userId) return;
-    if (!currentServerId) {
+    if (!user.userId) return;
+    if (!user.currentServerId) {
       dispatch(clearCurrentServer());
       dispatch(clearChannels());
       dispatch(clearOnlineMembers());
@@ -131,35 +140,37 @@ const SocketManager: React.FC = React.memo(() => {
       return;
     }
     const refresh = async () => {
-      ipc.data.server({ userId, serverId: currentServerId }).then((server) => {
+      if (!user.currentServerId) return;
+      ipc.data.server({ userId: user.userId, serverId: user.currentServerId }).then((server) => {
         if (server) dispatch(setCurrentServer(server));
       });
-      ipc.data.channels({ userId, serverId: currentServerId }).then((channels) => {
+      ipc.data.channels({ userId: user.userId, serverId: user.currentServerId }).then((channels) => {
         if (channels) dispatch(setChannels(channels));
       });
-      ipc.data.serverOnlineMembers({ serverId: currentServerId }).then((serverOnlineMembers) => {
+      ipc.data.serverOnlineMembers({ serverId: user.currentServerId }).then((serverOnlineMembers) => {
         if (serverOnlineMembers) dispatch(setOnlineMembers(serverOnlineMembers));
       });
-      ipc.data.memberApplications({ serverId: currentServerId }).then((serverMemberApplications) => {
+      ipc.data.memberApplications({ serverId: user.currentServerId }).then((serverMemberApplications) => {
         if (serverMemberApplications) dispatch(setMemberApplications(serverMemberApplications));
       });
     };
     refresh();
-  }, [userId, currentServerId, dispatch]);
+  }, [user.userId, user.currentServerId, dispatch]);
 
   useEffect(() => {
-    if (!userId) return;
-    if (!currentServerId || !currentChannelId) {
+    if (!user.userId) return;
+    if (!user.currentServerId || !user.currentChannelId) {
       dispatch(clearCurrentChannel());
       return;
     }
     const refresh = async () => {
-      ipc.data.channel({ userId, serverId: currentServerId, channelId: currentChannelId }).then((channel) => {
+      if (!user.currentServerId || !user.currentChannelId) return;
+      ipc.data.channel({ userId: user.userId, serverId: user.currentServerId, channelId: user.currentChannelId }).then((channel) => {
         if (channel) dispatch(setCurrentChannel(channel));
       });
     };
     refresh();
-  }, [userId, currentServerId, currentChannelId, dispatch]);
+  }, [user.userId, user.currentServerId, user.currentChannelId, dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('connect', () => {
@@ -189,15 +200,15 @@ const SocketManager: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
       // Add activity when signature is updated
       const newActives = args.reduce<Types.FriendActivity[]>((acc, curr) => {
-        if (curr.update.signature && currentUser.signature !== curr.update.signature) {
-          acc.push(Default.friendActivity({ ...currentUser, content: curr.update.signature, timestamp: Date.now() }));
+        if (curr.update.signature && user.signature !== curr.update.signature) {
+          acc.push(Default.friendActivity({ ...user, content: curr.update.signature, timestamp: Date.now() }));
         }
         return acc;
       }, []);
       dispatch(addFriendActivities(newActives));
       // Clear state when current server is changed
       const newCurrentServerId = args[0].update.currentServerId;
-      if (newCurrentServerId !== undefined && newCurrentServerId !== currentUser.currentServerId) {
+      if (newCurrentServerId !== undefined && newCurrentServerId !== user.currentServerId) {
         dispatch(clearChannels());
         dispatch(clearOnlineMembers());
         dispatch(clearMemberApplications());
@@ -206,11 +217,11 @@ const SocketManager: React.FC = React.memo(() => {
         dispatch(clearQueueUsers());
         dispatch(clearChannelEvents());
       }
-      dispatch(updateUser({ ...currentUser, ...args[0].update }));
+      dispatch(updateUser({ ...user, ...args[0].update }));
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId); // For hot reload
     });
     return () => unsub();
-  }, [currentUser, dispatch]);
+  }, [user, dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendAdd', (...args: { data: Types.Friend }[]) => {

@@ -1,4 +1,5 @@
 import React from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 
@@ -15,7 +16,7 @@ const FriendVerificationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   // Selectors
-  const friendApplications = useAppSelector((state) => state.friendApplications.data);
+  const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
 
   // Handlers
   const handleRejectAllBtnClick = () => {
@@ -57,44 +58,45 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
   const { t } = useTranslation();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-
-  // Variables
-  const { userId } = user;
-  const { senderId, avatarUrl: senderAvatarUrl, name: senderName, createdAt: applicationCreatedAt, description: applicationDescription } = application;
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
 
   // Handlers
   const handleSenderAvatarClick = () => {
-    Popup.openUserInfo(userId, senderId);
+    Popup.openUserInfo(user.userId, application.senderId);
   };
 
   const handleAcceptBtnClick = () => {
-    Popup.openApproveFriend(userId, senderId);
+    Popup.openApproveFriend(user.userId, application.senderId);
   };
 
   const handleRejectBtnClick = () => {
-    Popup.rejectFriendApplication(userId, senderName);
+    Popup.rejectFriendApplication(user.userId, application.name);
   };
 
   const handleDirectMessageBtnClick = () => {
-    Popup.openDirectMessage(userId, senderId);
+    Popup.openDirectMessage(user.userId, application.senderId);
   };
 
   return (
-    <div key={senderId} className={styles['application']}>
-      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${senderAvatarUrl})` }} onClick={handleSenderAvatarClick} />
+    <div className={styles['application']}>
+      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${application.avatarUrl})` }} onClick={handleSenderAvatarClick} />
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>
-          <div className={styles['user-name-text']}>{senderName}</div>
-          <div className={styles['time-text']} title={Language.getFormatTimestamp(t, applicationCreatedAt)}>
-            {Language.getFormatTimeDiff(t, applicationCreatedAt)}
+          <div className={styles['user-name-text']}>{application.name}</div>
+          <div className={styles['time-text']} title={Language.getFormatTimestamp(t, application.createdAt)}>
+            {Language.getFormatTimeDiff(t, application.createdAt)}
           </div>
         </div>
         <div className={styles['application-content-box']}>
           <div className={popupStyles['col']}>
             <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
             <div className={styles['content-text']}>
-              {t('note')}: {applicationDescription}
+              {t('note')}: {application.description}
             </div>
           </div>
           <div className={popupStyles['row']} style={{ alignSelf: 'flex-end' }}>

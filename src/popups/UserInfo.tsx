@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -34,75 +35,59 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
 
-  // Selectors
-  const user = useAppSelector((state) => state.user.data);
-
   // Refs
   const signatureInputRef = useRef<HTMLInputElement>(null);
   const isUploadingRef = useRef<boolean>(false);
 
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
+
   // States
   const [target, setTarget] = useState(targetData);
-  const [serversView, setServersView] = useState('joined');
+  const [serversView, setServersView] = useState<'joined' | 'favorite'>('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
   const [countries, setCountries] = useState<string[]>([]);
 
   // Variables
-  const { userId } = user;
-  const {
-    userId: targetId,
-    name: targetName,
-    displayId: targetDisplayId,
-    avatarUrl: targetAvatarUrl,
-    gender: targetGender,
-    signature: targetSignature,
-    about: targetAbout,
-    level: targetLevel,
-    xp: targetXP,
-    requiredXp: targetRequiredXp,
-    vip: targetVip,
-    birthYear: targetBirthYear,
-    birthMonth: targetBirthMonth,
-    birthDay: targetBirthDay,
-    country: targetCountry,
-    badges: targetBadges,
-    isVerified: targetIsVerified,
-    shareFavoriteServers: targetShareFavoriteServers,
-    shareJoinedServers: targetShareJoinedServers,
-    shareRecentServers: targetShareRecentServers,
-  } = target;
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
   const currentDay = new Date().getDate();
   const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
   const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
-  const dayOptions = Array.from({ length: new Date(targetBirthYear, targetBirthMonth, 0).getDate() }, (_, i) => i + 1);
-  const isSelf = userId === targetId;
+  const dayOptions = Array.from({ length: new Date(target.birthYear, target.birthMonth, 0).getDate() }, (_, i) => i + 1);
+  const isSelf = user.userId === target.userId;
   const isFriend = friend?.relationStatus === 2;
-  const canSubmit = targetName.trim() && targetGender.trim() && targetCountry.trim() && targetBirthYear && targetBirthMonth && targetBirthDay;
+  const isAboutTab = selectedTabId === 'about';
+  const isGroupsTab = selectedTabId === 'groups';
+  const isUserSettingTab = selectedTabId === 'userSetting';
+  const isJoinedServersView = serversView === 'joined';
+  const isFavoriteServersView = serversView === 'favorite';
+  const canSubmit = target.name.trim() && target.gender.trim() && target.country.trim() && target.birthYear && target.birthMonth && target.birthDay;
+  const badges = typeof target.badges === 'string' ? JSON.parse(target.badges) : target.badges;
+
   const joinedServers = useMemo(() => {
     return targetServers.filter((s) => Permission.isMember(s.permissionLevel) && !Permission.isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
+
   const favoriteServers = useMemo(() => {
     return targetServers.filter((s) => s.favorite && !Permission.isStaff(s.permissionLevel)).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
+
   const recentServers = useMemo(() => {
     return targetServers
       .filter((s) => s.recent)
       .sort((a, b) => b.timestamp - a.timestamp)
       .slice(0, 4);
   }, [targetServers]);
-  const filteredBadges = useMemo(
-    () =>
-      JSON.parse(targetBadges)
-        .slice(0, 13)
-        .sort((a: Types.Badge, b: Types.Badge) => a.order - b.order),
-    [targetBadges],
-  );
 
   // Functions
   const getUserAge = () => {
-    const birthDate = new Date(targetBirthYear, targetBirthMonth - 1, targetBirthDay);
+    const birthDate = new Date(target.birthYear, target.birthMonth - 1, target.birthDay);
     let age = currentYear - birthDate.getFullYear();
     const monthDiff = currentMonth - birthDate.getMonth();
     if (monthDiff < 0 || (monthDiff === 0 && currentDay < birthDate.getDate())) age--;
@@ -140,7 +125,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
             isUploadingRef.current = false;
             return;
           }
-          ipc.data.uploadImage({ folder: 'user', imageName: userId, imageUnit8Array }).then((response) => {
+          ipc.data.uploadImage({ folder: 'user', imageName: target.userId, imageUnit8Array }).then((response) => {
             if (response) {
               setTarget((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
               Popup.editUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
@@ -154,7 +139,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   };
 
   const handleAccountTextClick = () => {
-    navigator.clipboard.writeText(targetId);
+    navigator.clipboard.writeText(target.userId);
   };
 
   const handleAboutTabClick = () => {
@@ -175,7 +160,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   };
 
   const handleConfirmBtnClick = () => {
-    if (!countries.includes(targetCountry)) {
+    if (!countries.includes(target.country)) {
       Popup.openErrorDialog(t('invalid-country'), () => {});
       return;
     }
@@ -184,11 +169,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   };
 
   const handleApplyFriendBtnClick = () => {
-    Popup.openApplyFriend(userId, targetId);
+    Popup.openApplyFriend(user.userId, target.userId);
   };
 
   const handleChatBtnClick = () => {
-    Popup.openDirectMessage(userId, targetId);
+    Popup.openDirectMessage(user.userId, target.userId);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -224,7 +209,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   };
 
   const handleServersViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setServersView(e.target.value);
+    setServersView(e.target.value as 'joined' | 'favorite');
   };
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -256,14 +241,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   }, []);
 
   useEffect(() => {
-    const daysInMonth = new Date(targetBirthYear, targetBirthMonth, 0).getDate();
-    if (targetBirthDay > daysInMonth) {
+    const daysInMonth = new Date(target.birthYear, target.birthMonth, 0).getDate();
+    if (target.birthDay > daysInMonth) {
       setTarget((prev) => ({ ...prev, birthDay: daysInMonth }));
     }
-    if (isFutureDate(targetBirthYear, targetBirthMonth, targetBirthDay)) {
+    if (isFutureDate(target.birthYear, target.birthMonth, target.birthDay)) {
       setTarget((prev) => ({ ...prev, birthYear: currentYear, birthMonth: currentMonth, birthDay: currentDay }));
     }
-  }, [targetBirthYear, targetBirthMonth, targetBirthDay, currentYear, currentMonth, currentDay, isFutureDate]);
+  }, [target.birthYear, target.birthMonth, target.birthDay, currentYear, currentMonth, currentDay, isFutureDate]);
 
   return (
     <div className={`${popupStyles['popup-wrapper']} ${styles['user-profile']}`}>
@@ -273,39 +258,34 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
             <div className={styles['minimize-btn']} onClick={handleMinimizeBtnClick} />
             <div className={styles['close-btn']} onClick={handleCloseBtnClick} />
           </div>
-          <div className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`} style={{ backgroundImage: `url(${targetAvatarUrl})` }} onClick={handleAvatarClick} />
+          <div className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`} style={{ backgroundImage: `url(${target.avatarUrl})` }} onClick={handleAvatarClick} />
           <div className={`${popupStyles['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
-            <p className={styles['user-name-text']}>{targetName}</p>
-            {targetVip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${targetVip}`]}`} />}
-            <LevelIcon level={targetLevel} xp={targetXP} requiredXp={targetRequiredXp} showTooltip={true} />
-            {targetIsVerified ? <div className={styles['official-icon']} title={t('is-official')} /> : null}
+            <p className={styles['user-name-text']}>{target.name}</p>
+            {target.vip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${target.vip}`]}`} />}
+            <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={true} />
+            {target.isVerified ? <div className={styles['official-icon']} title={t('is-official')} /> : null}
           </div>
           <p className={styles['user-account-text']} onClick={handleAccountTextClick}>
-            @{targetDisplayId}
+            @{target.displayId}
           </p>
           <p className={styles['user-info-text']}>
-            {t(targetGender === 'Male' ? 'male' : 'female')} · {getUserAge()} · {t(targetCountry, { ns: 'country' })}
+            {t(target.gender.toLowerCase())} · {getUserAge()} · {t(target.country, { ns: 'country' })}
           </p>
-          <p className={styles['user-signature']}>{targetSignature}</p>
+          <p className={styles['user-signature']}>{target.signature}</p>
           <div className={styles['tabs']}>
             <div
-              className={`${styles['tab']} ${styles['about']} ${
-                selectedTabId === 'userSetting' ? `${styles['selected']} ${styles['editable']}` : ''
-              } ${selectedTabId === 'about' ? styles['selected'] : ''}`}
+              className={`${styles['tab']} ${styles['about']} ${isUserSettingTab ? `${styles['selected']} ${styles['editable']}` : ''} ${isAboutTab ? styles['selected'] : ''}`}
               onClick={handleAboutTabClick}
             >
               {t('about-me')}
             </div>
-            <div
-              className={`${styles['tab']} ${styles['groups']} ${selectedTabId === 'userSetting' ? styles['editable'] : ''} ${selectedTabId === 'groups' ? styles['selected'] : ''}`}
-              onClick={handleGroupsTabClick}
-            >
+            <div className={`${styles['tab']} ${styles['groups']} ${isUserSettingTab ? styles['editable'] : ''} ${isGroupsTab ? styles['selected'] : ''}`} onClick={handleGroupsTabClick}>
               {t('servers')}
             </div>
           </div>
         </div>
-        <div className={styles['edit-tab-bar']} style={isSelf && selectedTabId !== 'groups' ? {} : { display: 'none' }}>
-          {selectedTabId === 'userSetting' ? (
+        <div className={styles['edit-tab-bar']} style={isSelf && !isGroupsTab ? {} : { display: 'none' }}>
+          {isUserSettingTab ? (
             <>
               <div className={`${popupStyles['button']} ${popupStyles['blue']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
                 {t('confirm')}
@@ -320,22 +300,22 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
             </div>
           )}
         </div>
-        <div className={styles['content']} style={selectedTabId === 'about' ? {} : { display: 'none' }}>
-          {targetAbout && (
+        <div className={styles['content']} style={isAboutTab ? {} : { display: 'none' }}>
+          {target.about && (
             <div className={styles['user-about-me']}>
-              <div className={styles['user-about-me-text']}>{targetAbout}</div>
+              <div className={styles['user-about-me-text']}>{target.about}</div>
             </div>
           )}
           <div className={styles['user-profile-content']}>
             <div className={popupStyles['label']}>{t('recent-servers')}</div>
             <div className={styles['server-list']}>
-              {!isSelf && !targetShareRecentServers ? (
+              {!isSelf && !target.shareRecentServers ? (
                 <div className={styles['user-recent-visits-private']}>
                   {t('not-public-recent-servers.top')}
                   <br />
                   {t('not-public-recent-servers.bottom')}
                 </div>
-              ) : recentServers.length === 0 ? (
+              ) : !recentServers.length ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
               ) : (
                 recentServers.map((server) => <RecentServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
@@ -343,7 +323,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
             </div>
             <div className={popupStyles['label']}>{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
-              {filteredBadges.map((badge: Types.Badge) => (
+              {badges.map((badge: Types.Badge) => (
                 <div key={badge.badgeId} className={styles['badge-item']}>
                   <BadgeItem key={badge.badgeId} badge={badge} position="left-top" direction="right-top" />
                 </div>
@@ -351,7 +331,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
             </div>
           </div>
         </div>
-        <div className={styles['content']} style={selectedTabId === 'groups' ? {} : { display: 'none' }}>
+        <div className={styles['content']} style={isGroupsTab ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
             <div className={popupStyles['select-box']}>
               <select value={serversView} onChange={handleServersViewChange}>
@@ -359,27 +339,27 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
                 <option value="favorite">{t('favorited-servers')}</option>
               </select>
             </div>
-            <div className={styles['server-list']} style={serversView === 'joined' ? {} : { display: 'none' }}>
-              {!isSelf && !targetShareJoinedServers ? (
+            <div className={styles['server-list']} style={isJoinedServersView ? {} : { display: 'none' }}>
+              {!isSelf && !target.shareJoinedServers ? (
                 <div className={styles['user-recent-visits-private']}>
                   {t('not-public-joined-servers.top')}
                   <br />
                   {t('not-public-joined-servers.bottom')}
                 </div>
-              ) : joinedServers.length === 0 ? (
+              ) : !joinedServers.length ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
               ) : (
                 joinedServers.map((server) => <JoinedServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
               )}
             </div>
-            <div className={styles['server-list']} style={serversView === 'favorite' ? {} : { display: 'none' }}>
-              {!isSelf && !targetShareFavoriteServers ? (
+            <div className={styles['server-list']} style={isFavoriteServersView ? {} : { display: 'none' }}>
+              {!isSelf && !target.shareFavoriteServers ? (
                 <div className={styles['user-recent-visits-private']}>
                   {t('not-public-favorite-servers.top')}
                   <br />
                   {t('not-public-favorite-servers.bottom')}
                 </div>
-              ) : favoriteServers.length === 0 ? (
+              ) : !favoriteServers.length ? (
                 <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
               ) : (
                 favoriteServers.map((server) => <FavoriteServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
@@ -387,18 +367,18 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
             </div>
           </div>
         </div>
-        <div className={styles['content']} style={selectedTabId === 'userSetting' ? {} : { display: 'none' }}>
+        <div className={styles['content']} style={isUserSettingTab ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
             <div className={popupStyles['col']}>
               <div className={popupStyles['row']}>
                 <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                   <div className={popupStyles['label']}>{t('nickname')}</div>
-                  <input name="name" type="text" value={targetName} maxLength={32} onChange={handleNameChange} />
+                  <input name="name" type="text" value={target.name} maxLength={32} onChange={handleNameChange} />
                 </div>
                 <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                   <div className={popupStyles['label']}>{t('gender')}</div>
                   <div className={popupStyles['select-box']} style={{ width: '100%' }}>
-                    <select value={targetGender} onChange={handleGenderChange}>
+                    <select value={target.gender} onChange={handleGenderChange}>
                       <option value="Male">{t('male')}</option>
                       <option value="Female">{t('female')}</option>
                     </select>
@@ -409,7 +389,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
                 <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                   <div className={popupStyles['label']}>{t('country')}</div>
                   <div className={popupStyles['select-box']} style={{ width: '100%' }}>
-                    <select value={targetCountry} onChange={handleCountryChange}>
+                    <select value={target.country} onChange={handleCountryChange}>
                       {countries.map((country) => (
                         <option key={country} value={country}>
                           {t(country, { ns: 'country' })}
@@ -423,7 +403,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
                     <div className={popupStyles['label']}>{t('birthdate')}</div>
                     <div className={popupStyles['row']}>
                       <div className={popupStyles['select-box']} style={{ width: '100%' }}>
-                        <select id="birthYear" value={targetBirthYear} onChange={handleBirthYearChange}>
+                        <select id="birthYear" value={target.birthYear} onChange={handleBirthYearChange}>
                           {yearOptions.map((year) => (
                             <option key={year} value={year} disabled={year > currentYear}>
                               {year}
@@ -432,18 +412,18 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
                         </select>
                       </div>
                       <div className={popupStyles['select-box']} style={{ width: '100%' }}>
-                        <select id="birthMonth" value={targetBirthMonth} onChange={handleBirthMonthChange}>
+                        <select id="birthMonth" value={target.birthMonth} onChange={handleBirthMonthChange}>
                           {monthOptions.map((month) => (
-                            <option key={month} value={month} disabled={targetBirthYear === currentYear && month > currentMonth}>
+                            <option key={month} value={month} disabled={target.birthYear === currentYear && month > currentMonth}>
                               {month.toString().padStart(2, '0')}
                             </option>
                           ))}
                         </select>
                       </div>
                       <div className={popupStyles['select-box']} style={{ width: '100%' }}>
-                        <select id="birthDay" value={targetBirthDay} onChange={handleBirthDayChange}>
+                        <select id="birthDay" value={target.birthDay} onChange={handleBirthDayChange}>
                           {dayOptions.map((day) => (
-                            <option key={day} value={day} disabled={targetBirthYear === currentYear && targetBirthMonth === currentMonth && day > currentDay}>
+                            <option key={day} value={day} disabled={target.birthYear === currentYear && target.birthMonth === currentMonth && day > currentDay}>
                               {day.toString().padStart(2, '0')}
                             </option>
                           ))}
@@ -460,7 +440,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
                     ref={signatureInputRef}
                     name="signature"
                     type="text"
-                    value={targetSignature}
+                    value={target.signature}
                     maxLength={100}
                     onChange={handleSignatureChange}
                     style={{ paddingRight: '28px', width: '100%' }}
@@ -470,7 +450,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                 <div className={popupStyles['label']}>{t('about-me')}</div>
-                <textarea name="about" value={targetAbout} maxLength={200} onChange={handleAboutChange} />
+                <textarea name="about" value={target.about} maxLength={200} onChange={handleAboutChange} />
               </div>
             </div>
           </div>
@@ -508,14 +488,16 @@ interface RecentServerCardProps {
 
 const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
 
   // Variables
-  const { userId } = user;
-  const { userId: targetId } = target;
-  const { serverId, avatarUrl: serverAvatarUrl, name: serverName, ownerId: serverOwnerId, specialId: serverSpecialId, displayId: serverDisplayId } = server;
-  const isSelf = userId === targetId;
-  const isOwner = serverOwnerId === targetId;
+  const isSelf = user.userId === target.userId;
+  const isOwned = server.ownerId === target.userId && server.owned;
 
   // Handlers
   const handleServerDoubleClick = () => {
@@ -523,13 +505,13 @@ const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, 
   };
 
   return (
-    <div key={serverId} className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={serverAvatarUrl} alt={serverName} width={35} height={35} loading="lazy" draggable="false" />
+    <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
+      <Image src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
       <div className={styles['server-info-box']}>
-        <div className={styles['server-name-text']}>{serverName}</div>
+        <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <div className={`${isSelf && isOwner ? styles['is-owner'] : ''}`} />
-          <div className={styles['display-id-text']}>{serverSpecialId || serverDisplayId}</div>
+          <div className={`${isSelf && isOwned ? styles['is-owner'] : ''}`} />
+          <div className={styles['display-id-text']}>{server.specialId || server.displayId}</div>
         </div>
       </div>
     </div>
@@ -545,23 +527,19 @@ interface JoinedServerCardProps {
 }
 
 const JoinedServerCard: React.FC<JoinedServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  // Variables
-  const { gender: targetGender } = target;
-  const { serverId, avatarUrl: serverAvatarUrl, name: serverName, permissionLevel: serverPermissionLevel, contribution: serverContribution } = server;
-
   // Handlers
   const handleServerDoubleClick = () => {
     onServerSelect(server);
   };
 
   return (
-    <div key={serverId} className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={serverAvatarUrl} alt={serverName} width={35} height={35} loading="lazy" draggable="false" />
+    <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
+      <Image src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
       <div className={styles['server-info-box']}>
-        <div className={styles['server-name-text']}>{serverName}</div>
+        <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${serverPermissionLevel}`]}`} />
-          <div className={styles['contribution-value-text']}>{serverContribution}</div>
+          <div className={`${permissionStyles[target.gender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
+          <div className={styles['contribution-value-text']}>{server.contribution}</div>
         </div>
       </div>
     </div>
@@ -577,25 +555,21 @@ interface FavoriteServerCardProps {
 }
 
 const FavoriteServerCard: React.FC<FavoriteServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  // Variables
-  const { gender: targetGender } = target;
-  const { serverId, avatarUrl: serverAvatarUrl, name: serverName, permissionLevel: serverPermissionLevel, contribution: serverContribution } = server;
-
   // Handlers
   const handleServerDoubleClick = () => {
     onServerSelect(server);
   };
 
   return (
-    <div key={serverId} className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={serverAvatarUrl} alt={serverName} width={35} height={35} loading="lazy" draggable="false" />
+    <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
+      <Image src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
       <div className={styles['server-info-box']}>
-        <div className={styles['server-name-text']}>{serverName}</div>
+        <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className={`${permissionStyles[targetGender]} ${permissionStyles[`lv-${serverPermissionLevel}`]}`} />
+          <div className={`${permissionStyles[target.gender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
           <div className={styles['contribution-box']}>
             <div className={styles['contribution-icon']} />
-            <div className={styles['contribution-value-text']}>{serverContribution}</div>
+            <div className={styles['contribution-value-text']}>{server.contribution}</div>
           </div>
         </div>
       </div>

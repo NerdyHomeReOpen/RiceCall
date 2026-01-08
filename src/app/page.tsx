@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useRef, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
@@ -46,31 +47,43 @@ const Header: React.FC = React.memo(() => {
   const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const friendApplications = useAppSelector((state) => state.friendApplications.data);
-  const memberInvitations = useAppSelector((state) => state.memberInvitations.data);
-  const systemNotifications = useAppSelector((state) => state.systemNotifications.data);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      name: state.user.data.name,
+      status: state.user.data.status,
+      currentServerId: state.currentServer.data.serverId,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      name: state.currentServer.data.name,
+    }),
+    shallowEqual,
+  );
+
+  const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
+  const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
+  const systemNotifications = useAppSelector((state) => state.systemNotifications.data, shallowEqual);
 
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [isCloseToTray, setIsCloseToTray] = useState(true);
 
   // Variables
-  const { userId, name: userName, status: userStatus } = user;
-  const { serverId: currentServerId, name: currentServerName } = currentServer;
-  const hasNotification = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotifications.length !== 0;
-  const hasFriendApplication = friendApplications.length !== 0;
-  const hasMemberInvitation = memberInvitations.length !== 0;
-  const hasSystemNotification = systemNotifications.length !== 0;
+  const hasNotification = !!friendApplications.length || !!memberInvitations.length || !!systemNotifications.length;
+  const hasFriendApplication = !!friendApplications.length;
+  const hasMemberInvitation = !!memberInvitations.length;
+  const hasSystemNotification = !!systemNotifications.length;
 
   const mainTabs: Tab[] = useMemo(
     () => [
       { id: 'home', label: t('home') },
       { id: 'friends', label: t('friends') },
-      { id: 'server', label: currentServerName },
+      { id: 'server', label: currentServer.name },
     ],
-    [currentServerName, t],
+    [currentServer.name, t],
   );
 
   // Functions
@@ -91,7 +104,7 @@ const Header: React.FC = React.memo(() => {
 
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addSystemSettingOption(() => Popup.openSystemSetting(userId))
+      .addSystemSettingOption(() => Popup.openSystemSetting(user.userId))
       .addChangeThemeOption(() => Popup.openChangeTheme())
       .addFeedbackOption(() => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'))
       .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
@@ -126,7 +139,7 @@ const Header: React.FC = React.memo(() => {
       showContentLength: true,
       showContent: true,
       contents: friendApplications.map((fa) => fa.avatarUrl),
-      onClick: () => Popup.openFriendVerification(userId),
+      onClick: () => Popup.openFriendVerification(user.userId),
     },
     {
       id: 'member-invitation',
@@ -137,7 +150,7 @@ const Header: React.FC = React.memo(() => {
       showContentLength: true,
       showContent: true,
       contents: memberInvitations.map((mi) => mi.avatarUrl),
-      onClick: () => Popup.openMemberInvitation(userId),
+      onClick: () => Popup.openMemberInvitation(user.userId),
     },
     {
       id: 'system-notify',
@@ -167,6 +180,7 @@ const Header: React.FC = React.memo(() => {
   };
 
   const handleCloseBtnClick = () => {
+    const isCloseToTray = ipc.systemSettings.closeToTray.get();
     if (isCloseToTray) ipc.window.close();
     else ipc.exit();
   };
@@ -196,7 +210,7 @@ const Header: React.FC = React.memo(() => {
   };
 
   const handleNameClick = () => {
-    Popup.openUserInfo(userId, userId);
+    Popup.openUserInfo(user.userId, user.userId);
   };
 
   // Effects
@@ -208,13 +222,7 @@ const Header: React.FC = React.memo(() => {
   }, [isIdling, isManualIdling, user.status]);
 
   useEffect(() => {
-    const changeCloseToTray = (enable: boolean) => {
-      setIsCloseToTray(enable);
-    };
-
-    changeCloseToTray(ipc.systemSettings.closeToTray.get());
-
-    const unsubs = [ipc.systemSettings.closeToTray.onUpdate(changeCloseToTray), ipc.window.onMaximize(() => setIsFullscreen(true)), ipc.window.onUnmaximize(() => setIsFullscreen(false))];
+    const unsubs = [ipc.window.onMaximize(() => setIsFullscreen(true)), ipc.window.onUnmaximize(() => setIsFullscreen(false))];
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
@@ -222,16 +230,16 @@ const Header: React.FC = React.memo(() => {
     <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
       <div className={headerStyles['title-box']}>
         <div className={headerStyles['name-box']} onClick={handleNameClick}>
-          {userName}
+          {user.name}
         </div>
         <div className={headerStyles['status-box']} onClick={handleStatusDropdownClick}>
-          <div className={headerStyles['status-display']} datatype={userStatus} />
+          <div className={headerStyles['status-display']} datatype={user.status} />
           <div className={headerStyles['status-triangle']} />
         </div>
       </div>
       <div className={headerStyles['main-tabs']}>
         {mainTabs.map((tab) => (
-          <TabItem key={tab.id} tab={tab} currentServerId={currentServerId} />
+          <TabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} />
         ))}
       </div>
       <div className={headerStyles['buttons']}>
@@ -254,7 +262,7 @@ Header.displayName = 'Header';
 
 interface TabItemProps {
   tab: Tab;
-  currentServerId: string;
+  currentServerId: string | null;
 }
 
 const TabItem = React.memo(({ tab, currentServerId }: TabItemProps) => {
@@ -262,25 +270,25 @@ const TabItem = React.memo(({ tab, currentServerId }: TabItemProps) => {
   const { selectedTabId, selectTab } = useMainTab();
 
   // Variables
-  const { id: tabId, label: tabLabel } = tab;
-  const isSelected = tabId === selectedTabId;
+  const isSelected = tab.id === selectedTabId;
 
   // Handlers
   const handleTabClick = () => {
-    selectTab(tabId);
+    selectTab(tab.id);
   };
 
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
+    if (!currentServerId) return;
     Popup.leaveServer(currentServerId);
   };
 
-  if (tabId === 'server' && !currentServerId) return null;
+  if (tab.id === 'server' && !currentServerId) return null;
   return (
-    <div key={`tabs-${tabId}`} data-tab-id={tabId} className={`${headerStyles['tab']} ${isSelected ? headerStyles['selected'] : ''}`} onClick={handleTabClick}>
-      <div className={headerStyles['tab-lable']}>{tabLabel}</div>
+    <div key={`tabs-${tab.id}`} data-tab-id={tab.id} className={`${headerStyles['tab']} ${isSelected ? headerStyles['selected'] : ''}`} onClick={handleTabClick}>
+      <div className={headerStyles['tab-lable']}>{tab.label}</div>
       <div className={headerStyles['tab-bg']} />
-      {tabId === 'server' && (
+      {tab.id === 'server' && (
         <svg className={`${headerStyles['tab-close']} themeTabClose`} onClick={handleCloseButtonClick} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
           <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
@@ -303,17 +311,29 @@ const RootPageComponent: React.FC = React.memo(() => {
   const selectedTabIdRef = useRef<'home' | 'friends' | 'server'>(selectedTabId);
 
   // Selectors
-  const user = useAppSelector((state) => state.user.data);
-  const currentServer = useAppSelector((state) => state.currentServer.data);
-  const serverOnlineMembers = useAppSelector((state) => state.onlineMembers.data);
-  const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected);
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      name: state.user.data.name,
+      currentServerId: state.currentServer.data.serverId,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      name: state.currentServer.data.name,
+    }),
+    shallowEqual,
+  );
+
+  const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length, shallowEqual);
+  const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   // Variables
-  const { userId, name: userName, currentServerId } = user;
-  const { name: currentServerName } = currentServer;
-  const isSelectedHomePage = useMemo(() => selectedTabId === 'home', [selectedTabId]);
-  const isSelectedFriendsPage = useMemo(() => selectedTabId === 'friends', [selectedTabId]);
-  const isSelectedServerPage = useMemo(() => selectedTabId === 'server', [selectedTabId]);
+  const isSelectedHomePage = selectedTabId === 'home';
+  const isSelectedFriendsPage = selectedTabId === 'friends';
+  const isSelectedServerPage = selectedTabId === 'server';
 
   // Effects
   useEffect(() => {
@@ -339,17 +359,17 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user, dispatch]);
 
   useEffect(() => {
-    if (currentServerId && selectedTabIdRef.current !== 'server') selectTab('server');
-    else if (!currentServerId && selectedTabIdRef.current === 'server') selectTab('home');
+    if (user.currentServerId && selectedTabIdRef.current !== 'server') selectTab('server');
+    else if (!user.currentServerId && selectedTabIdRef.current === 'server') selectTab('home');
     stopLoading();
-  }, [currentServerId, stopLoading, selectTab]);
+  }, [user.currentServerId, stopLoading, selectTab]);
 
   useEffect(() => {
     const onTriggerHandleServerSelect = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
       if (isLoading) return;
-      if (serverId === currentServerId) {
+      if (serverId === user.currentServerId) {
         selectTab('server');
         return;
       }
@@ -358,14 +378,14 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
     window.addEventListener('storage', onTriggerHandleServerSelect);
     return () => window.removeEventListener('storage', onTriggerHandleServerSelect);
-  }, [currentServerId, isLoading, loadServer, selectTab]);
+  }, [user.currentServerId, isLoading, loadServer, selectTab]);
 
   useEffect(() => {
     switch (selectedTabId) {
       case 'home':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-home-page'),
-          state: `${t('rpc:user', { '0': userName })}`,
+          state: `${t('rpc:user', { '0': user.name })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -377,7 +397,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       case 'friends':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-friend-page'),
-          state: `${t('rpc:user', { '0': userName })}`,
+          state: `${t('rpc:user', { '0': user.name })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -388,8 +408,8 @@ const RootPageComponent: React.FC = React.memo(() => {
         break;
       case 'server':
         ipc.discord.updatePresence({
-          details: `${t('in')} ${currentServerName}`,
-          state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
+          details: `${t('in')} ${currentServer.name}`,
+          state: `${t('rpc:chat-with-members', { '0': onlineMembersLength.toString() })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -399,7 +419,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         });
         break;
     }
-  }, [selectedTabId, userName, currentServerName, serverOnlineMembers.length, t]);
+  }, [selectedTabId, user.name, currentServer.name, onlineMembersLength, t]);
 
   return (
     <WebRTCProvider>
@@ -407,7 +427,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         <ExpandedProvider>
           <SocketManager />
           <Header />
-          {!userId || !isSocketConnected ? (
+          {!user.userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
             <>
