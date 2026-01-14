@@ -60,6 +60,19 @@
   box-shadow: 0 2px 2px var(--shadow);
 }
 
+.user-tab-avatar-picture {
+  position: relative;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  object-fit: cover;
+  background-image: url('/logo_server_def.webp');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+  box-shadow: 0 2px 2px var(--shadow);
+}
+
 .avatar-picture::before {
   position: absolute;
   top: -1px;

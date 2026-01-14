@@ -295,6 +295,7 @@ const ChannelList: React.FC<ChannelListProps> = React.memo(({ user, currentServe
               selectedItemId={selectedItemId}
               setExpanded={() => {}}
               setSelectedItemId={setSelectedItemId}
+              filterWithJoinTime={false}
             />
           ) : (
             filteredChannels.map((item) =>

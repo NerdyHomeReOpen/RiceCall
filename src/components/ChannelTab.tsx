@@ -26,10 +26,11 @@ interface ChannelTabProps {
   selectedItemId: string | null;
   setExpanded: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
   setSelectedItemId: React.Dispatch<React.SetStateAction<string | null>>;
+  filterWithJoinTime?: boolean;
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(
-  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId }) => {
+  ({ user, currentServer, currentChannel, friends, queueUsers, serverOnlineMembers, channel, expanded, selectedItemId, setExpanded, setSelectedItemId, filterWithJoinTime = true }) => {
     // Hooks
     const { t } = useTranslation();
     const contextMenu = useContextMenu();
@@ -60,10 +61,21 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
     const isFull = channelUserLimit && channelUserLimit <= channelMembers.length;
     const isSelected = selectedItemId === `channel-${channelId}`;
     const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !Permission.isMember(permissionLevel)) && (!isFull || Permission.isServerAdmin(permissionLevel));
-    const filteredChannelMembers = useMemo(
-      () => channelMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name)),
-      [channelMembers],
-    );
+    const filteredChannelMembers = useMemo(() => {
+      const friendsList = new Set(friends.map((f) => f.targetId));
+      return filterWithJoinTime
+        ? channelMembers.filter(Boolean).sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name))
+        : channelMembers.filter(Boolean).sort((a, b) => {
+            if (a.userId === userId && b.userId !== userId) return -1;
+            if (b.userId === userId && a.userId !== userId) return 1;
+
+            const aIsFriend = friendsList.has(a.userId);
+            const bIsFriend = friendsList.has(b.userId);
+            if (aIsFriend !== bIsFriend) return aIsFriend ? -1 : 1;
+
+            return b.permissionLevel - a.permissionLevel || a.lastJoinChannelAt - b.lastJoinChannelAt || (a.nickname || a.name).localeCompare(b.nickname || b.name);
+          });
+    }, [channelMembers, filterWithJoinTime, friends, userId]);
 
     // Handlers
     const getContextMenuItems = () => [
@@ -265,6 +277,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(
               selectedItemId={selectedItemId}
               setSelectedItemId={setSelectedItemId}
               handleConnectChannel={handleConnectChannel}
+              displayUserPicture={!filterWithJoinTime}
             />
           ))}
         </div>
