@@ -105,20 +105,20 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
           .sort(Sorter(sortField as keyof Types.MemberApplication, sortDirection)),
       [memberApplications, searchText, sortField, sortDirection],
     );
-    const settingPages = Permission.isServerAdmin(permissionLevel)
-      ? [
-          t('server-info'),
-          t('server-announcement'),
-          t('member-management'),
-          t('access-permission'),
-          `${t('member-application-management')} (${totalApplications})`,
-          `${t('blacklist-management')} (${totalBlockMembers})`,
-        ]
-      : Permission.isMember(permissionLevel)
-        ? [t('server-info'), t('server-announcement'), t('member-management')]
-        : [t('server-info'), t('server-announcement')];
 
     // Handlers
+    const settingPages = () => {
+      const pages: string[] = [t('server-info')];
+      if (user.currentServerId === serverId || serverVisibility === 'public' || Permission.isMember(permissionLevel)) pages.push(t('server-announcement'));
+      if (Permission.isMember(permissionLevel)) pages.push(t('member-management'));
+      if (Permission.isServerAdmin(permissionLevel)) {
+        pages.push(t('access-permission'));
+        pages.push(`${t('member-application-management')} (${totalApplications})`);
+        pages.push(`${t('blacklist-management')} (${totalBlockMembers})`);
+      }
+      return pages;
+    };
+
     const handleApproveMemberApplication = (userId: Types.User['userId'], serverId: Types.Server['serverId']) => {
       ipc.socket.send('approveMemberApplication', { userId, serverId });
     };
@@ -305,7 +305,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
         <div className={popupStyles['popup-body']}>
           <div className={settingStyles['left']}>
             <div className={settingStyles['tabs']}>
-              {settingPages.map((title, index) => (
+              {settingPages().map((title, index) => (
                 <div className={`${settingStyles['tab']} ${activeTabIndex === index ? settingStyles['active'] : ''}`} onClick={() => setActiveTabIndex(index)} key={index}>
                   {title}
                 </div>
@@ -396,11 +396,15 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(
                     <input name="created-at" type="text" value={new Date(serverCreatedAt).toLocaleString()} readOnly />
                   </div>
                   <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
-                      <div className={popupStyles['label']}>{t('wealth')}</div>
-                      <div className={settingStyles['wealth-coin-icon']} />
-                    </div>
-                    <input name="wealth" type="text" value={serverWealth} readOnly />
+                    {Permission.isMember(permissionLevel) ? (
+                      <>
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                          <div className={popupStyles['label']}>{t('wealth')}</div>
+                          <div className={settingStyles['wealth-coin-icon']} />
+                        </div>
+                        <input name="wealth" type="text" value={serverWealth} readOnly />
+                      </>
+                    ) : null}
                   </div>
                 </div>
                 <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>

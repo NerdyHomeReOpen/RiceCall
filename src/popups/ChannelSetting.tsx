@@ -102,21 +102,20 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
     [channelMembers, searchText, sortField, sortDirection],
   );
 
-  const settingPages = Permission.isChannelMod(permissionLevel)
-    ? [
-        t('channel-info'),
-        t('channel-announcement'),
-        t('access-permission'),
-        t('speaking-permission'),
-        t('text-permission'),
-        `${t('channel-management')} (${totalModerators})`,
-        `${t('blacklist-management')} (${totalBlockMembers})`,
-      ]
-    : user.currentChannelId === channelId || (channelVisibility !== 'private' && channelVisibility !== 'readonly')
-      ? [t('channel-info'), t('channel-announcement')]
-      : [t('channel-info')];
-
   // Handlers
+  const settingPages = () => {
+    const pages: string[] = [t('channel-info')];
+    if (user.currentChannelId === channelId || channelVisibility === 'public' || Permission.isMember(permissionLevel)) pages.push(t('channel-announcement'));
+    if (Permission.isChannelMod(permissionLevel)) {
+      pages.push(t('access-permission'));
+      pages.push(t('speaking-permission'));
+      pages.push(t('text-permission'));
+      pages.push(`${t('channel-management')} (${totalModerators})`);
+      pages.push(`${t('blacklist-management')} (${totalBlockMembers})`);
+    }
+    return pages;
+  };
+
   const handleEditChannel = (serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>) => {
     ipc.socket.send('editChannel', { serverId, channelId, update });
     ipc.window.close();
@@ -236,7 +235,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ us
       <div className={popupStyles['popup-body']}>
         <div className={settingStyles['left']}>
           <div className={settingStyles['tabs']}>
-            {settingPages.map((title, index) => (
+            {settingPages().map((title, index) => (
               <div className={`${settingStyles['tab']} ${activeTabIndex === index ? settingStyles['active'] : ''}`} onClick={() => setActiveTabIndex(index)} key={index}>
                 {title}
               </div>
