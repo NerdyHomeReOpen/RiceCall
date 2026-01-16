@@ -186,7 +186,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ userId, target
                 const image = (e.target as HTMLInputElement).files?.[0];
                 if (!image || isUploadingRef.current) return;
                 image.arrayBuffer().then((arrayBuffer) => {
-                  Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                  if (image.type === 'image/gif') {
+                    handleUploadImage(new Uint8Array(arrayBuffer));
+                  } else {
+                    Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
+                  }
                 });
               };
               fileInput.click();
