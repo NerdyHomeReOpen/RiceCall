@@ -323,8 +323,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect })
     <div className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <div
         className={`${serverPage['tab-icon']} ${isExpanded ? serverPage['expanded'] : ''} ${serverPage[channel.visibility]} ${channel.isLobby ? serverPage['lobby'] : ''}`}
-          onClick={handleTabExpandedClick}
-        />
+        onClick={handleTabExpandedClick}
+      />
       <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
         {channel.name}
         <div className={styles['channel-tab-index-text']}>{`(${channel.order})`}</div>
