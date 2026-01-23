@@ -40,7 +40,10 @@ const SearchUserPopup: React.FC = React.memo(() => {
       ipc.data.friend({ userId: user.userId, targetId: target.userId }).then((friend) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
-        else Popup.openApplyFriend(user.userId, target.userId);
+        else {
+          Popup.openApplyFriend(user.userId, target.userId);
+          ipc.window.close();
+        }
       });
     });
   };
@@ -53,7 +56,6 @@ const SearchUserPopup: React.FC = React.memo(() => {
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
     searchUser(query);
-    ipc.window.close();
   };
 
   const handleCloseBtnClick = () => {
