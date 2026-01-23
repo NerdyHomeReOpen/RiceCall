@@ -76,12 +76,12 @@ function createWebRTCStore(initial: WebRTCStateSnapshot) {
 
     set: (patch: Partial<WebRTCStateSnapshot>) => {
       const changed: Key[] = [];
-      const next = { ...snap };
+      const next: WebRTCStateSnapshot = { ...snap };
 
       (Object.keys(patch) as Key[]).forEach((k) => {
         const v = patch[k];
-        if (!Object.is(next[k], v)) {
-          (next as any)[k] = v;
+        if (v !== undefined && !Object.is(next[k], v)) {
+          (next as Record<Key, WebRTCStateSnapshot[Key]>)[k] = v;
           changed.push(k);
         }
       });
@@ -91,10 +91,8 @@ function createWebRTCStore(initial: WebRTCStateSnapshot) {
       emitKeys(changed);
     },
 
-    // per-id getter
     getId: (k: IdKey, id: string) => !!snap[k]?.[id],
 
-    // per-id setter（只通知該 id）
     setId: (k: IdKey, id: string, value: boolean) => {
       const cur = !!snap[k]?.[id];
       if (cur === value) return;
