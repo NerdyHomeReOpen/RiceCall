@@ -713,12 +713,12 @@ export function configureTray() {
   setTrayDetail();
 }
 
-app.on('ready', async () => {
+// React DevTools
+export function configureReactDevTools() {
   if (DEV) {
-    const reactDevToolsPath = process.env.REACT_DEV_TOOLS_PATH || '';
-
+    const reactDevToolsPath = env.REACT_DEV_TOOLS_PATH || '';
     try {
-      await session.defaultSession.extensions.loadExtension(reactDevToolsPath, {
+      session.defaultSession.extensions.loadExtension(reactDevToolsPath, {
         allowFileAccess: true,
       });
       new Logger('System').info('React DevTools loaded successfully');
@@ -726,7 +726,9 @@ app.on('ready', async () => {
       new Logger('System').error(`Cannot load React DevTools: ${err}`);
     }
   }
-  
+}
+
+app.on('ready', async () => {
   // Load env
   loadEnv(store.get('server', 'prod'));
 
@@ -737,6 +739,7 @@ app.on('ready', async () => {
   configureAutoUpdater();
   configureDiscordRPC();
   configureTray();
+  configureReactDevTools();
 
   if (!store.get('dontShowDisclaimer')) createPopup('aboutus', 'aboutUs', {});
   createAuthWindow().then((authWindow) => authWindow.showInactive());

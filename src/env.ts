@@ -12,6 +12,7 @@ const EnvSchema = z.object({
   API_URL: z.string(),
   WS_URL: z.string(),
   CROWDIN_DISTRIBUTION_HASH: z.string().optional(),
+  REACT_DEV_TOOLS_PATH: z.string().optional(),
 });
 
 export function loadEnv(server: 'dev' | 'prod' = 'prod') {
