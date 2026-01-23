@@ -1,13 +1,15 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import React, { useEffect } from 'react';
+import { Provider } from 'react-redux';
+import { store } from '@/store';
 import i18n from '@/i18n';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
 import ContextMenuProvider from '@/providers/ContextMenu';
-import MainTabProvider from '@/providers/MainTab';
 import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
@@ -18,7 +20,7 @@ interface ProvidersProps {
   children: React.ReactNode;
 }
 
-const Providers = ({ children }: ProvidersProps) => {
+const ProvidersComponent = ({ children }: ProvidersProps) => {
   // Effects
   useEffect(() => {
     const changeFont = (font: string | null) => {
@@ -68,7 +70,7 @@ const Providers = ({ children }: ProvidersProps) => {
   }, []);
 
   return (
-    <MainTabProvider>
+    <Provider store={store}>
       <LoadingProvider>
         <ContextMenuProvider>
           <SoundPlayerProvider>
@@ -76,10 +78,12 @@ const Providers = ({ children }: ProvidersProps) => {
           </SoundPlayerProvider>
         </ContextMenuProvider>
       </LoadingProvider>
-    </MainTabProvider>
+    </Provider>
   );
 };
 
-Providers.displayName = 'Providers';
+ProvidersComponent.displayName = 'ProvidersComponent';
+
+const Providers = dynamic(() => Promise.resolve(ProvidersComponent), { ssr: false });
 
 export default Providers;

@@ -253,6 +253,8 @@
   justify-content: space-between;
   width: 100%;
   padding: 10px 15px;
+  font-size: 0.9rem;
+  color: var(--text-color-quaternary);
   background-color: var(--footer-background);
   border-top: 1px solid var(--border);
 }
@@ -262,8 +264,6 @@
 .change-server {
   display: flex;
   align-items: flex-end;
-  font-size: 0.9rem;
-  color: var(--text-color-quaternary);
   text-decoration: none;
   cursor: pointer;
 }

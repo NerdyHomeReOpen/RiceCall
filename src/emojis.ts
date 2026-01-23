@@ -1,13 +1,9 @@
 import emojiData from 'emoji.json';
 import twemoji from 'twemoji';
 
-export interface Emoji {
-  code: string;
-  alt: string;
-  path: string;
-}
+import type * as Types from '@/types';
 
-export const defEmojis: Emoji[] = [
+export const defEmojis: Types.Emoji[] = [
   { code: '1', alt: '微笑', path: '/smiles/1.gif' },
   { code: '2', alt: '開懷笑', path: '/smiles/2.gif' },
   { code: '3', alt: '眨眼', path: '/smiles/3.gif' },
@@ -70,7 +66,7 @@ export const defEmojis: Emoji[] = [
   { code: '61', alt: '帶血的刀', path: '/smiles/61.gif' },
 ];
 
-export const otherEmojis: Array<Emoji & { char: string }> = emojiData
+export const otherEmojis: Types.Emoji[] = emojiData
   .filter((e) => e.codes.length <= 5)
   .map((emoji) => {
     const code = twemoji.convert.toCodePoint(emoji.char);
@@ -78,8 +74,7 @@ export const otherEmojis: Array<Emoji & { char: string }> = emojiData
       code,
       alt: emoji.name,
       path: `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`,
-      char: emoji.char,
     };
   });
 
-export const emojis: Emoji[] = [...defEmojis, ...otherEmojis.map(({ code, alt, path }) => ({ code, alt, path }))];
+export const emojis: Types.Emoji[] = [...defEmojis, ...otherEmojis];

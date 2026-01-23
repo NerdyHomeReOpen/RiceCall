@@ -513,7 +513,7 @@
   "share-joined-servers-label": "公開我加入的語音群",
   "share-recent-servers-label": "公開我最近訪問的語音群",
   "show-room": "秀場",
-  "show-to": "展示至",
+  "show-to": "展示至: {{0}}",
   "signature": "簽名",
   "signature-placeholder": "點擊更改簽名",
   "sing": "歌唱",

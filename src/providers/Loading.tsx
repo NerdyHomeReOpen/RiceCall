@@ -1,15 +1,12 @@
-import React, { useContext, createContext, ReactNode, useState } from 'react';
+import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import homeStyles from '@/styles/home.module.css';
 
 interface LoadingContextType {
-  setIsLoading: (value: boolean) => void;
-  setLoadingServerId: (value: string) => void;
-  setLoadingTimeStamp: (value: number) => void;
-  isLoading: boolean;
-  loadingServerId: string;
-  loadingTimeStamp: number;
+  getIsLoading: () => boolean;
+  loadServer: (displayId: string) => void;
+  stopLoading: () => void;
 }
 
 const LoadingContext = createContext<LoadingContextType | null>(null);
@@ -33,25 +30,36 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
   // States
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingServerId, setLoadingServerId] = useState<string>('');
-  const [loadingTimeStamp, setLoadingTimeStamp] = useState<number>(500);
+
+  // Functions
+  const getIsLoading = useCallback(() => {
+    return isLoading;
+  }, [isLoading]);
+
+  const loadServer = useCallback((displayId: string) => {
+    setIsLoading(true);
+    setLoadingServerId(displayId);
+  }, []);
+
+  const stopLoading = useCallback(() => {
+    setIsLoading(false);
+  }, []);
+
+  // Handlers
+  const handleCloseLoading = () => {
+    stopLoading();
+  };
+
+  const contextValue = useMemo(() => ({ getIsLoading, loadServer, stopLoading }), [getIsLoading, loadServer, stopLoading]);
 
   return (
-    <LoadingContext.Provider
-      value={{
-        setIsLoading,
-        setLoadingServerId,
-        setLoadingTimeStamp,
-        isLoading,
-        loadingServerId,
-        loadingTimeStamp,
-      }}
-    >
+    <LoadingContext.Provider value={contextValue}>
       {isLoading && (
         <div className={homeStyles['loading-wrapper']}>
           <div className={homeStyles['loading-box']}>
             <div className={homeStyles['loading-title-contain']}>{t('connecting-server', { '0': loadingServerId })}</div>
-            <div className={homeStyles['loading-gif']}></div>
-            <div className={homeStyles['loading-close-btn']} onClick={() => setIsLoading(false)} />
+            <div className={homeStyles['loading-gif']} />
+            <div className={homeStyles['loading-close-btn']} onClick={handleCloseLoading} />
           </div>
         </div>
       )}

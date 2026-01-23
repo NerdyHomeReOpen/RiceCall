@@ -1,12 +1,18 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useCallback } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
+import { shallowEqual } from 'react-redux';
+import { useTranslation } from 'react-i18next';
+import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import { setIsSocketConnected } from '@/store/slices/socketSlice';
+import { setUser } from '@/store/slices/userSlice';
+
+import SocketManager from '@/components/SocketManager';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
 import NotificationToaster from '@/components/NotificationToaster';
 
@@ -17,175 +23,110 @@ import ServerPage from '@/pages/Server';
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
-import { useTranslation } from 'react-i18next';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
-import { useSoundPlayer } from '@/providers/SoundPlayer';
 import { useActionScanner } from '@/providers/ActionScanner';
 
 import * as Popup from '@/utils/popup';
-import * as Default from '@/utils/default';
+import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+
+import { LANGUAGES } from '@/constant';
 
 import headerStyles from '@/styles/header.module.css';
 
-import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
+type Tab = {
+  id: 'home' | 'friends' | 'server';
+  label: string;
+};
 
 interface HeaderProps {
-  user: Types.User;
-  currentServer: Types.Server;
-  friendApplications: Types.FriendApplication[];
-  memberInvitations: Types.MemberInvitation[];
-  systemNotifications: string[];
+  selectedTab: 'home' | 'friends' | 'server';
+  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendApplications, memberInvitations, systemNotifications }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) => {
   // Hooks
-  const mainTab = useMainTab();
-  const contextMenu = useContextMenu();
-  const actionScanner = useActionScanner();
   const { t, i18n } = useTranslation();
+  const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
+  const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
 
-  // Refs
-  const isCloseToTray = useRef<boolean>(true);
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      name: state.user.data.name,
+      status: state.user.data.status,
+      currentServerId: state.currentServer.data.serverId,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      name: state.currentServer.data.name,
+    }),
+    shallowEqual,
+  );
+
+  const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
+  const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
+  const systemNotifications = useAppSelector((state) => state.systemNotifications.data, shallowEqual);
 
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Variables
-  const { userId, name: userName, status: userStatus } = user;
-  const { serverId: currentServerId, name: currentServerName } = currentServer;
-  const hasNotification = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotifications.length !== 0;
-  const hasFriendApplication = friendApplications.length !== 0;
-  const hasMemberInvitation = memberInvitations.length !== 0;
-  const hasSystemNotification = systemNotifications.length !== 0;
-  const mainTabs: { id: 'home' | 'friends' | 'server'; label: string }[] = [
-    { id: 'home', label: t('home') },
-    { id: 'friends', label: t('friends') },
-    { id: 'server', label: currentServerName },
-  ];
+  const hasNotification = !!friendApplications.length || !!memberInvitations.length || !!systemNotifications.length;
+  const hasFriendApplication = !!friendApplications.length;
+  const hasMemberInvitation = !!memberInvitations.length;
+  const hasSystemNotification = !!systemNotifications.length;
 
-  // Handlers
-  const getContextMenuItems = () => [
-    {
-      id: 'system-setting',
-      label: t('system-setting'),
-      icon: 'setting',
-      onClick: () => Popup.handleOpenSystemSetting(userId),
-    },
-    {
-      id: 'change-theme',
-      label: t('change-theme'),
-      icon: 'skin',
-      onClick: Popup.handleOpenChangeTheme,
-    },
-    {
-      id: 'feedback',
-      label: t('feedback'),
-      icon: 'feedback',
-      onClick: () => window.open('https://ricecall.com/feedback', '_blank'),
-    },
-    {
-      id: 'language-select',
-      label: t('language-select'),
-      icon: 'submenu-left',
-      hasSubmenu: true,
-      submenuItems: LANGUAGES.map((language) => ({
-        id: `language-select-${language.code}`,
-        label: language.label,
-        onClick: () => handleLanguageChange(language.code),
-      })),
-    },
-    {
-      id: 'help-center',
-      label: t('help-center'),
-      icon: 'submenu-left',
-      hasSubmenu: true,
-      submenuItems: [
-        {
-          id: 'faq',
-          label: t('faq'),
-          onClick: () => window.open('https://ricecall.com/#faq', '_blank'),
-        },
-        {
-          id: 'agreement',
-          label: t('agreement'),
-          onClick: () => window.open('https://ricecall.com/terms', '_blank'),
-        },
-        // {
-        //   id: 'privacy-policy',
-        //   label: t('privacy-policy'),
-        //   onClick: () => window.open('https://ricecall.com/privacy-policy', '_blank'),
-        // },
-        {
-          id: 'contact-us',
-          label: t('contact-us'),
-          onClick: () => window.open('https://ricecall.com/contact', '_blank'),
-        },
-        {
-          id: 'about-us',
-          label: t('about-ricecall'),
-          onClick: Popup.handleOpenAboutUs,
-        },
-      ],
-    },
-    {
-      id: 'logout',
-      label: t('logout'),
-      icon: 'logout',
-      onClick: handleLogout,
-    },
-    {
-      id: 'exit',
-      label: t('exit'),
-      icon: 'exit',
-      onClick: handleExit,
-    },
-  ];
+  const mainTabs: Tab[] = useMemo(
+    () => [
+      { id: 'home', label: t('home') },
+      { id: 'friends', label: t('friends') },
+      { id: 'server', label: currentServer.name },
+    ],
+    [currentServer.name, t],
+  );
 
-  const handleLeaveServer = (serverId: Types.Server['serverId']) => {
-    ipc.socket.send('disconnectServer', { serverId });
-  };
-
-  const handleChangeStatus = (status: Types.User['status']) => {
-    actionScanner.setIsManualIdling(status !== 'online');
-    ipc.socket.send('editUser', { update: { status } });
-  };
-
-  const handleLogout = () => {
+  // Functions
+  const logout = () => {
     ipc.auth.logout();
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
   };
 
-  const handleExit = () => {
+  const exit = () => {
     ipc.exit();
   };
 
-  const handleMaximize = () => {
-    if (isFullscreen) return;
-    ipc.window.maximize();
-  };
-
-  const handleUnmaximize = () => {
-    if (!isFullscreen) return;
-    ipc.window.unmaximize();
-  };
-
-  const handleMinimize = () => {
-    ipc.window.minimize();
-  };
-
-  const handleClose = () => {
-    if (isCloseToTray.current) ipc.window.close();
-    else ipc.exit();
-  };
-
-  const handleLanguageChange = (language: Types.LanguageKey) => {
+  const changeLanguage = (language: Types.LanguageKey) => {
     ipc.language.set(language);
     i18n.changeLanguage(language);
   };
 
+  const getContextMenuItems = () =>
+    new CtxMenuBuilder()
+      .addSystemSettingOption(() => Popup.openSystemSetting(user.userId))
+      .addChangeThemeOption(() => Popup.openChangeTheme())
+      .addFeedbackOption(() => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'))
+      .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
+      .addHelpCenterOption(
+        {
+          onFaqClick: () => window.open('https://ricecall.com.tw/#faq', '_blank'),
+          onAgreementClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
+          onSpecificationClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
+          onContactUsClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
+          onAboutUsClick: () => Popup.openAboutUs,
+        },
+        () => {},
+      )
+      .addLogoutOption(() => logout())
+      .addExitOption(() => exit())
+      .build();
+
+  // TODO: Make a NotificationMenuBuilder
   const getNotificationMenuItems = () => [
     {
       id: 'no-unread-notify',
@@ -202,7 +143,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       showContentLength: true,
       showContent: true,
       contents: friendApplications.map((fa) => fa.avatarUrl),
-      onClick: () => Popup.handleOpenFriendVerification(userId),
+      onClick: () => Popup.openFriendVerification(user.userId),
     },
     {
       id: 'member-invitation',
@@ -213,7 +154,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       showContentLength: true,
       showContent: true,
       contents: memberInvitations.map((mi) => mi.avatarUrl),
-      onClick: () => Popup.handleOpenMemberInvitation(userId),
+      onClick: () => Popup.openMemberInvitation(user.userId),
     },
     {
       id: 'system-notify',
@@ -227,109 +168,99 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
     },
   ];
 
+  // Handlers
+  const handleMaximizeBtnClick = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximizeBtnClick = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
+  };
+
+  const handleMinimizeBtnClick = () => {
+    ipc.window.minimize();
+  };
+
+  const handleCloseBtnClick = () => {
+    const isCloseToTray = ipc.systemSettings.closeToTray.get();
+    if (isCloseToTray) ipc.window.close();
+    else ipc.exit();
+  };
+
+  const handleStatusDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+    showStatusDropdown(x, y, 'right-bottom', (status) => {
+      setIsManualIdling(status !== 'online');
+      Popup.editUserStatus(status);
+    });
+  };
+
+  const handleMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+    showContextMenu(x + 50, y, 'left-bottom', getContextMenuItems());
+  };
+
+  const handleNotificationMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+    showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
+  };
+
+  const handleNameClick = () => {
+    Popup.openUserInfo(user.userId, user.userId);
+  };
+
+  const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
+    onTabSelect(tabId);
+  };
+
   // Effects
   useEffect(() => {
-    const next = actionScanner.isIdling ? 'idle' : 'online';
-    if (user.status !== next && !actionScanner.isManualIdling) {
-      ipc.socket.send('editUser', { update: { status: next } });
+    const next = isIdling ? 'idle' : 'online';
+    if (user.status !== next && !isManualIdling) {
+      Popup.editUserStatus(next);
     }
-  }, [actionScanner.isIdling, actionScanner.isManualIdling, user.status]);
+  }, [isIdling, isManualIdling, user.status]);
 
   useEffect(() => {
-    const changeCloseToTray = (enable: boolean) => {
-      isCloseToTray.current = enable;
-    };
-    changeCloseToTray(isCloseToTray.current);
-    const unsub = ipc.systemSettings.closeToTray.onUpdate(changeCloseToTray);
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
-    return () => unsub();
+    const unsubs = [ipc.window.onMaximize(() => setIsFullscreen(true)), ipc.window.onUnmaximize(() => setIsFullscreen(false))];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (
     <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
       <div className={headerStyles['title-box']}>
-        <div className={headerStyles['name-box']} onClick={() => Popup.handleOpenUserInfo(userId, userId)}>
-          {userName}
+        <div className={headerStyles['name-box']} onClick={handleNameClick}>
+          {user.name}
         </div>
-        <div
-          className={headerStyles['status-box']}
-          onClick={(e) => {
-            const x = e.currentTarget.getBoundingClientRect().left;
-            const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showStatusDropdown(x, y, 'right-bottom', (status) => {
-              handleChangeStatus(status);
-            });
-          }}
-        >
-          <div className={headerStyles['status-display']} datatype={userStatus} />
+        <div className={headerStyles['status-box']} onClick={handleStatusDropdownClick}>
+          <div className={headerStyles['status-display']} datatype={user.status} />
           <div className={headerStyles['status-triangle']} />
         </div>
       </div>
       <div className={headerStyles['main-tabs']}>
-        {mainTabs.map((tab) =>
-          tab.id === 'server' && !currentServerId ? null : (
-            <div
-              key={`tabs-${tab.id}`}
-              data-tab-id={tab.id}
-              className={`${headerStyles['tab']} ${tab.id === mainTab.selectedTabId ? headerStyles['selected'] : ''}`}
-              onClick={() => mainTab.setSelectedTabId(tab.id)}
-            >
-              <div className={headerStyles['tab-lable']}>{tab.label}</div>
-              <div className={headerStyles['tab-bg']} />
-              {tab.id === 'server' && (
-                <svg
-                  className={`${headerStyles['tab-close']} themeTabClose`}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleLeaveServer(currentServerId);
-                  }}
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                >
-                  <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
-                  <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-              )}
-            </div>
-          ),
-        )}
+        {mainTabs.map((tab) => (
+          <TabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
+        ))}
       </div>
       <div className={headerStyles['buttons']}>
         <div className={headerStyles['gift']} />
         <div className={headerStyles['game']} />
-        <div
-          className={headerStyles['notice']}
-          onClick={(e) => {
-            const x = e.currentTarget.getBoundingClientRect().left;
-            const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
-          }}
-        >
+        <div className={headerStyles['notice']} onClick={handleNotificationMenuClick}>
           <div className={`${headerStyles['overlay']} ${hasNotification && headerStyles['new']}`} />
         </div>
         <div className={headerStyles['spliter']} />
-        <div
-          className={headerStyles['menu']}
-          onClick={(e) => {
-            const x = e.currentTarget.getBoundingClientRect().right + 50;
-            const y = e.currentTarget.getBoundingClientRect().bottom;
-            contextMenu.showContextMenu(x, y, 'left-bottom', getContextMenuItems());
-          }}
-        />
-        <div className={headerStyles['minimize']} onClick={handleMinimize} />
-        {isFullscreen ? <div className={headerStyles['restore']} onClick={handleUnmaximize} /> : <div className={headerStyles['maxsize']} onClick={handleMaximize} />}
-        <div className={headerStyles['close']} onClick={handleClose} />
+        <div className={headerStyles['menu']} onClick={handleMenuClick} />
+        <div className={headerStyles['minimize']} onClick={handleMinimizeBtnClick} />
+        {isFullscreen ? <div className={headerStyles['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyles['maxsize']} onClick={handleMaximizeBtnClick} />}
+        <div className={headerStyles['close']} onClick={handleCloseBtnClick} />
       </div>
     </header>
   );
@@ -337,96 +268,85 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
 
 Header.displayName = 'Header';
 
+interface TabItemProps {
+  tab: Tab;
+  currentServerId: string | null;
+  isSelected: boolean;
+  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
+}
+
+const TabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: TabItemProps) => {
+  // Handlers
+  const handleTabClick = () => {
+    onTabSelect(tab.id);
+  };
+
+  const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
+    e.stopPropagation();
+    if (!currentServerId) return;
+    Popup.leaveServer(currentServerId);
+  };
+
+  if (tab.id === 'server' && !currentServerId) return null;
+  return (
+    <div key={`tabs-${tab.id}`} data-tab-id={tab.id} className={`${headerStyles['tab']} ${isSelected ? headerStyles['selected'] : ''}`} onClick={handleTabClick}>
+      <div className={headerStyles['tab-lable']}>{tab.label}</div>
+      <div className={headerStyles['tab-bg']} />
+      {tab.id === 'server' && (
+        <svg className={`${headerStyles['tab-close']} themeTabClose`} onClick={handleCloseButtonClick} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
+          <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
+          <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
+        </svg>
+      )}
+    </div>
+  );
+});
+
+TabItem.displayName = 'TabItem';
+
 const RootPageComponent: React.FC = React.memo(() => {
   // Hooks
-  const mainTab = useMainTab();
-  const loadingBox = useLoading();
-  const soundPlayer = useSoundPlayer();
   const { t } = useTranslation();
-
-  // Refs
-  const setSelectedTabIdRef = useRef(mainTab.setSelectedTabId);
-  const selectedTabIdRef = useRef(mainTab.selectedTabId);
-  const loadingBoxRef = useRef(loadingBox);
-  const popupOffSubmitRef = useRef<(() => void) | null>(null);
-  const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const userRef = useRef<Types.User>(Default.user());
-  const currentServerRef = useRef<Types.Server>(Default.server());
-  const currentChannelRef = useRef<Types.Channel>(Default.channel());
-  const friendsRef = useRef<Types.Friend[]>([]);
-  const serverOnlineMembersRef = useRef<Types.OnlineMember[]>([]);
+  const { getIsLoading, loadServer, stopLoading } = useLoading();
+  const dispatch = useAppDispatch();
 
   // States
-  const [user, setUser] = useState<Types.User>(Default.user());
-  const [friends, setFriends] = useState<Types.Friend[]>([]);
-  const [friendActivities, setFriendActivities] = useState<Types.FriendActivity[]>([]);
-  const [friendGroups, setFriendGroups] = useState<Types.FriendGroup[]>([]);
-  const [friendApplications, setFriendApplications] = useState<Types.FriendApplication[]>([]);
-  const [memberInvitations, setMemberInvitations] = useState<Types.MemberInvitation[]>([]);
-  const [currentServer, setCurrentServer] = useState<Types.Server>(Default.server());
-  const [servers, setServers] = useState<Types.Server[]>([]);
-  const [serverOnlineMembers, setServerOnlineMembers] = useState<Types.OnlineMember[]>([]);
-  const [serverMemberApplications, setServerMemberApplications] = useState<Types.MemberApplication[]>([]);
-  const [currentChannel, setCurrentChannel] = useState<Types.Channel>(Default.channel());
-  const [channels, setChannels] = useState<Types.Channel[]>([]);
-  const [channelEvents, setChannelEvents] = useState<Types.ChannelEvent[]>([]);
-  const [channelMessages, setChannelMessages] = useState<Types.ChannelMessage[]>([]);
-  const [actionMessages, setActionMessages] = useState<Types.PromptMessage[]>([]);
-  const [systemNotifications, setSystemNotifications] = useState<string[]>([]);
-  const [queueUsers, setQueueUsers] = useState<Types.QueueUser[]>([]);
-  const [announcements, setAnnouncements] = useState<Types.Announcement[]>([]);
-  const [notifications, setNotifications] = useState<Types.Notification[]>([]);
-  const [recommendServers, setRecommendServers] = useState<Types.RecommendServer[]>([]);
-  const [latency, setLatency] = useState<number>(0);
-  const [isSocketConnected, setIsSocketConnected] = useState(false);
-  const [region, setRegion] = useState<Types.LanguageKey>('en-US');
+  const [selectedTab, setSelectedTab] = useState<'home' | 'friends' | 'server'>('home');
+
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      name: state.user.data.name,
+      currentServerId: state.currentServer.data.serverId,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      name: state.currentServer.data.name,
+    }),
+    shallowEqual,
+  );
+
+  const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length, shallowEqual);
+  const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   // Variables
-  const { userId, name: userName, currentServerId, currentChannelId } = user;
-  const { name: currentServerName } = currentServer;
+  const isSelectedHomePage = selectedTab === 'home';
+  const isSelectedFriendsPage = selectedTab === 'friends';
+  const isSelectedServerPage = selectedTab === 'server';
 
   // Handlers
-  const handleClearMessages = useCallback(() => {
-    setChannelMessages([]);
-  }, []);
+  const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
+    setSelectedTab(tabId);
+  };
 
   // Effects
   useEffect(() => {
-    const language = navigator.language;
-
-    const match = LANGUAGES.find(({ code }) => code.includes(language));
-    if (!match) return setRegion('en-US');
-
-    setRegion(match.code);
-  }, []);
-
-  useEffect(() => {
-    friendsRef.current = friends;
-  }, [friends]);
-
-  useEffect(() => {
-    userRef.current = user;
-  }, [user]);
-
-  useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
-
-  useEffect(() => {
-    currentServerRef.current = currentServer;
-  }, [currentServer]);
-
-  useEffect(() => {
-    currentChannelRef.current = currentChannel;
-  }, [currentChannel]);
-
-  useEffect(() => {
-    serverOnlineMembersRef.current = serverOnlineMembers;
-  }, [serverOnlineMembers]);
-
-  useEffect(() => {
-    selectedTabIdRef.current = mainTab.selectedTabId;
-  }, [mainTab.selectedTabId]);
 
   useEffect(() => {
     if (user.userId) return;
@@ -436,491 +356,36 @@ const RootPageComponent: React.FC = React.memo(() => {
 
     ipc.data.userHotReload({ userId }).then((user) => {
       if (user) {
-        setUser(user);
-        setIsSocketConnected(true);
+        dispatch(setUser(user));
+        dispatch(setIsSocketConnected(true));
       }
     });
-  }, [user]);
+  }, [user, dispatch]);
 
   useEffect(() => {
-    if (currentServerId && selectedTabIdRef.current !== 'server') setSelectedTabIdRef.current('server');
-    else if (selectedTabIdRef.current === 'server') setSelectedTabIdRef.current('home');
-    loadingBoxRef.current.setIsLoading(false);
-    loadingBoxRef.current.setLoadingServerId('');
-  }, [currentServerId]);
+    if (user.currentServerId) setSelectedTab('server');
+    else if (!user.currentServerId) setSelectedTab('home');
+    stopLoading();
+  }, [user.currentServerId, stopLoading]);
 
   useEffect(() => {
     const onTriggerHandleServerSelect = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
-      if (loadingBox.isLoading) return;
-      if (serverId === currentServerId) {
-        mainTab.setSelectedTabId('server');
-        return;
-      }
-      loadingBox.setIsLoading(true);
-      loadingBox.setLoadingServerId(serverDisplayId);
+      if (getIsLoading() || user.currentServerId === serverId) return;
+      loadServer(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
     };
     window.addEventListener('storage', onTriggerHandleServerSelect);
     return () => window.removeEventListener('storage', onTriggerHandleServerSelect);
-  }, [currentServerId, mainTab, loadingBox]);
+  }, [user.currentServerId, getIsLoading, loadServer]);
 
   useEffect(() => {
-    if (!userId) return;
-    const refresh = async () => {
-      ipc.data.servers({ userId }).then((servers) => {
-        if (servers) setServers(servers);
-      });
-      ipc.data.friends({ userId }).then((friends) => {
-        if (friends) setFriends(friends);
-      });
-      ipc.data.friendActivities({ userId }).then((friendActivities) => {
-        if (friendActivities) setFriendActivities(friendActivities);
-      });
-      ipc.data.friendGroups({ userId }).then((friendGroups) => {
-        if (friendGroups) setFriendGroups(friendGroups);
-      });
-      ipc.data.friendApplications({ receiverId: userId }).then((friendApplications) => {
-        if (friendApplications) setFriendApplications(friendApplications);
-      });
-      ipc.data.memberInvitations({ receiverId: userId }).then((memberInvitations) => {
-        if (memberInvitations) setMemberInvitations(memberInvitations);
-      });
-      setSystemNotifications([]); // TODO: Implement system notification
-    };
-    refresh();
-  }, [userId]);
-
-  useEffect(() => {
-    if (!userId) return;
-    const refresh = async () => {
-      ipc.data.announcements({ region }).then((announcements) => {
-        if (announcements) setAnnouncements(announcements);
-      });
-      ipc.data.notifications({ region }).then((notifications) => {
-        if (notifications) setNotifications(notifications);
-      });
-      ipc.data.recommendServers({ region }).then((recommendServerList) => {
-        if (recommendServerList) setRecommendServers(recommendServerList);
-      });
-    };
-    const interval = setInterval(() => refresh(), REFRESH_REGION_INFO_INTERVAL);
-    refresh();
-    return () => clearInterval(interval);
-  }, [region, userId]);
-
-  useEffect(() => {
-    if (!userId) return;
-    if (!currentServerId) {
-      setCurrentServer(Default.server());
-      setChannels([]);
-      setServerOnlineMembers([]);
-      setServerMemberApplications([]);
-      setActionMessages([]);
-      setChannelMessages([]);
-      setQueueUsers([]);
-      setChannelEvents([]);
-      return;
-    }
-    const refresh = async () => {
-      ipc.data.server({ userId, serverId: currentServerId }).then((server) => {
-        if (server) setCurrentServer(server);
-      });
-      ipc.data.channels({ userId, serverId: currentServerId }).then((channels) => {
-        if (channels) setChannels(channels);
-      });
-      ipc.data.serverOnlineMembers({ serverId: currentServerId }).then((serverOnlineMembers) => {
-        if (serverOnlineMembers) setServerOnlineMembers(serverOnlineMembers);
-      });
-      ipc.data.memberApplications({ serverId: currentServerId }).then((serverMemberApplications) => {
-        if (serverMemberApplications) setServerMemberApplications(serverMemberApplications);
-      });
-    };
-    refresh();
-  }, [userId, currentServerId]);
-
-  useEffect(() => {
-    if (!userId) return;
-    if (!currentServerId || !currentChannelId) {
-      setCurrentChannel(Default.channel());
-      return;
-    }
-    const refresh = async () => {
-      ipc.data.channel({ userId, serverId: currentServerId, channelId: currentChannelId }).then((channel) => {
-        if (channel) setCurrentChannel(channel);
-      });
-    };
-    refresh();
-  }, [userId, currentServerId, currentChannelId]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('connect', () => {
-      ipc.popup.close('errorDialog');
-      if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
-      setIsSocketConnected(true);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('disconnect', () => {
-      if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
-      disconnectTimerRef.current = setTimeout(() => setIsSocketConnected(false), 30000);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('heartbeat', (...args: { seq: number; latency: number }[]) => {
-      setLatency(args[0].latency);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
-      // Add activity when signature is updated
-      const newActives = args.reduce<Types.FriendActivity[]>((acc, curr) => {
-        if (curr.update.signature && userRef.current.signature !== curr.update.signature) {
-          acc.push(Default.friendActivity({ ...userRef.current, content: curr.update.signature, timestamp: Date.now() }));
-        }
-        return acc;
-      }, []);
-      setFriendActivities((prev) => [...newActives, ...prev]);
-
-      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
-      setUser((prev) => ({ ...prev, ...args[0].update }));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
-      const newCurrentServerId = args[0].update.currentServerId;
-      if (newCurrentServerId !== undefined && newCurrentServerId !== currentServerId) {
-        setChannels([]);
-        setServerOnlineMembers([]);
-        setServerMemberApplications([]);
-        setActionMessages([]);
-        setChannelMessages([]);
-        setQueueUsers([]);
-        setChannelEvents([]);
-      }
-    });
-    return () => unsub();
-  }, [currentServerId]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendAdd', (...args: { data: Types.Friend }[]) => {
-      const add = new Set(args.map((i) => `${i.data.targetId}`));
-      setFriends((prev) => prev.filter((f) => !add.has(`${f.targetId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Types.Friend> }[]) => {
-      // Add activity when signature is updated
-      const newActivities = args.reduce<Types.FriendActivity[]>((acc, curr) => {
-        const targetFriend = friendsRef.current.find((f) => f.targetId === curr.targetId && f.relationStatus === 2);
-        if (targetFriend && curr.update.signature && targetFriend.signature !== curr.update.signature) {
-          acc.push(Default.friendActivity({ ...targetFriend, content: curr.update.signature, timestamp: Date.now() }));
-        }
-        return acc;
-      }, []);
-      setFriendActivities((prev) => [...newActivities, ...prev]);
-
-      const update = new Map(args.map((i) => [`${i.targetId}`, i.update] as const));
-      setFriends((prev) => prev.map((f) => (update.has(`${f.targetId}`) ? { ...f, ...update.get(`${f.targetId}`) } : f)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendRemove', (...args: { targetId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.targetId}`));
-      setFriends((prev) => prev.filter((f) => !remove.has(`${f.targetId}`)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupAdd', (...args: { data: Types.FriendGroup }[]) => {
-      const add = new Set(args.map((i) => `${i.data.friendGroupId}`));
-      setFriendGroups((prev) => prev.filter((fg) => !add.has(`${fg.friendGroupId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupUpdate', (...args: { friendGroupId: string; update: Partial<Types.FriendGroup> }[]) => {
-      const update = new Map(args.map((i) => [`${i.friendGroupId}`, i.update] as const));
-      setFriendGroups((prev) => prev.map((fg) => (update.has(`${fg.friendGroupId}`) ? { ...fg, ...update.get(`${fg.friendGroupId}`) } : fg)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupRemove', (...args: { friendGroupId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.friendGroupId}`));
-      setFriendGroups((prev) => prev.filter((fg) => !remove.has(`${fg.friendGroupId}`)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationAdd', (...args: { data: Types.FriendApplication }[]) => {
-      const add = new Set(args.map((i) => `${i.data.senderId}`));
-      setFriendApplications((prev) => prev.filter((fa) => !add.has(`${fa.senderId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationUpdate', (...args: { senderId: string; update: Partial<Types.FriendApplication> }[]) => {
-      const update = new Map(args.map((i) => [`${i.senderId}`, i.update] as const));
-      setFriendApplications((prev) => prev.map((a) => (update.has(`${a.senderId}`) ? { ...a, ...update.get(`${a.senderId}`) } : a)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationRemove', (...args: { senderId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.senderId}`));
-      setFriendApplications((prev) => prev.filter((fa) => !remove.has(`${fa.senderId}`)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverAdd', (...args: { data: Types.Server }[]) => {
-      const add = new Set(args.map((i) => `${i.data.serverId}`));
-      setServers((prev) => prev.filter((s) => !add.has(`${s.serverId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Types.Server> }[]) => {
-      // Update current server
-      const currentServerUpdate = args.filter((i) => i.serverId === currentServerRef.current.serverId).reduce<Partial<Types.Server>>((acc, curr) => ({ ...acc, ...curr.update }), {});
-      setCurrentServer((prev) => ({ ...prev, ...currentServerUpdate }));
-
-      const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
-      setServers((prev) => prev.map((s) => (update.has(`${s.serverId}`) ? { ...s, ...update.get(`${s.serverId}`) } : s)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverRemove', (...args: { serverId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.serverId}`));
-      setServers((prev) => prev.filter((s) => !remove.has(`${s.serverId}`)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: Types.OnlineMember }[]) => {
-      // Add channel events
-      const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
-        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.data.userId && om.serverId === curr.data.serverId);
-        if (!originMember) {
-          acc.push({ ...curr.data, type: 'join' as Types.ChannelEvent['type'], prevChannelId: null, nextChannelId: curr.data.currentChannelId, timestamp: Date.now() });
-        }
-        return acc;
-      }, []);
-      setChannelEvents((prev) => [...newChannelEvents, ...prev]);
-
-      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setServerOnlineMembers((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.OnlineMember> }[]) => {
-      // Add channel events
-      const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
-        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
-        if (originMember && curr.update.currentChannelId) {
-          acc.push({ ...originMember, type: 'move' as Types.ChannelEvent['type'], prevChannelId: originMember.currentChannelId, nextChannelId: curr.update.currentChannelId, timestamp: Date.now() });
-        }
-        return acc;
-      }, []);
-      setChannelEvents((prev) => [...newChannelEvents, ...prev]);
-
-      const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
-      setServerOnlineMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
-      // Add channel events
-      const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
-        const originMember = serverOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
-        if (originMember) {
-          acc.push({ ...originMember, type: 'leave' as Types.ChannelEvent['type'], prevChannelId: originMember.currentChannelId, nextChannelId: null, timestamp: Date.now() });
-        }
-        return acc;
-      }, []);
-      setChannelEvents((prev) => [...newChannelEvents, ...prev]);
-
-      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-      setServerOnlineMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args: { data: Types.MemberApplication }[]) => {
-      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setServerMemberApplications((prev) => args.map((i) => i.data).concat(prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`))));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberApplicationRemove', (...args: { userId: string; serverId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-      setServerMemberApplications((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
-      const add = new Set(args.map((i) => `${i.data.channelId}`));
-      setChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
-      // Update current channel
-      const currentChannelUpdate = args.filter((i) => i.channelId === currentChannelRef.current.channelId).reduce<Partial<Types.Channel>>((acc, curr) => ({ ...acc, ...curr.update }), {});
-      setCurrentChannel((prev) => ({ ...prev, ...currentChannelUpdate }));
-
-      const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-      setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelRemove', (...args: { channelId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.channelId}`));
-      setChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationAdd', (...args: { data: Types.MemberInvitation }[]) => {
-      const add = new Set(args.map((i) => `${i.data.serverId}`));
-      setMemberInvitations((prev) => prev.filter((mi) => !add.has(`${mi.serverId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationUpdate', (...args: { serverId: string; update: Partial<Types.MemberInvitation> }[]) => {
-      const update = new Map(args.map((i) => [`${i.serverId}`, i.update] as const));
-      setMemberInvitations((prev) => prev.map((mi) => (update.has(`${mi.serverId}`) ? { ...mi, ...update.get(`${mi.serverId}`) } : mi)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationRemove', (...args: { serverId: string }[]) => {
-      const remove = new Set(args.map((i) => i.serverId));
-      setMemberInvitations((prev) => prev.filter((mi) => !remove.has(mi.serverId)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelMessage', (...args: Types.ChannelMessage[]) => {
-      setChannelMessages((prev) => [...prev, ...args]);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('actionMessage', (...args: Types.PromptMessage[]) => {
-      setActionMessages((prev) => [...prev, ...args]);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('queueMembersSet', (...args: Types.QueueUser[]) => {
-      setQueueUsers(args);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('playSound', (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
-      args.forEach((s) => soundPlayer.playSound(s));
-    });
-    return () => unsub();
-  }, [soundPlayer]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('openPopup', (...args: { type: Types.PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
-      args.forEach((p) => {
-        loadingBoxRef.current.setIsLoading(false);
-        loadingBoxRef.current.setLoadingServerId('');
-        ipc.popup.open(p.type, p.id, p.initialData, p.force);
-        popupOffSubmitRef.current?.();
-        popupOffSubmitRef.current = ipc.popup.onSubmit(p.id, () => {
-          if (p.id === 'logout') {
-            ipc.auth.logout();
-            localStorage.removeItem('token');
-            localStorage.removeItem('userId');
-          }
-        });
-      });
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('error', (error: Error) => {
-      Popup.handleOpenErrorDialog(error.message, () => {});
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('shakeWindow', (...args: any[]) => {
-      const initialData: Record<string, unknown> | undefined = args[0].initialData;
-      if (!initialData) return;
-      ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'shakeWindow', message: args[0] }, false);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('directMessage', (...args: any[]) => {
-      const initialData: Record<string, unknown> | undefined = args[0].initialData;
-      if (!initialData) return;
-      ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'directMessage', message: args[0] }, false);
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    switch (mainTab.selectedTabId) {
+    switch (selectedTab) {
       case 'home':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-home-page'),
-          state: `${t('rpc:user', { '0': userName })}`,
+          state: `${t('rpc:user', { '0': user.name })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -932,7 +397,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       case 'friends':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-friend-page'),
-          state: `${t('rpc:user', { '0': userName })}`,
+          state: `${t('rpc:user', { '0': user.name })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -943,8 +408,8 @@ const RootPageComponent: React.FC = React.memo(() => {
         break;
       case 'server':
         ipc.discord.updatePresence({
-          details: `${t('in')} ${currentServerName}`,
-          state: `${t('rpc:chat-with-members', { '0': serverOnlineMembers.length.toString() })}`,
+          details: `${t('in')} ${currentServer.name}`,
+          state: `${t('rpc:chat-with-members', { '0': onlineMembersLength.toString() })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RC Voice',
           smallImageKey: 'home_icon',
@@ -954,36 +419,22 @@ const RootPageComponent: React.FC = React.memo(() => {
         });
         break;
     }
-  }, [mainTab.selectedTabId, userName, currentServerName, serverOnlineMembers.length, t]);
+  }, [selectedTab, user.name, currentServer.name, onlineMembersLength, t]);
 
   return (
     <WebRTCProvider>
       <ActionScannerProvider>
         <ExpandedProvider>
-          <Header user={user} currentServer={currentServer} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotifications={systemNotifications} />
-          {!userId || !isSocketConnected ? (
+          <SocketManager />
+          <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
+          {!user.userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage user={user} servers={servers} announcements={announcements} recommendServers={recommendServers} display={mainTab.selectedTabId === 'home'} />
-              <FriendPage user={user} friends={friends} friendActivities={friendActivities} friendGroups={friendGroups} display={mainTab.selectedTabId === 'friends'} />
-              <ServerPage
-                user={user}
-                currentServer={currentServer}
-                currentChannel={currentChannel}
-                friends={friends}
-                queueUsers={queueUsers}
-                serverOnlineMembers={serverOnlineMembers}
-                serverMemberApplications={serverMemberApplications}
-                channels={channels}
-                channelMessages={channelMessages}
-                actionMessages={actionMessages}
-                channelEvents={channelEvents}
-                onClearMessages={handleClearMessages}
-                display={mainTab.selectedTabId === 'server'}
-                latency={latency}
-              />
-              <NotificationToaster notifications={notifications} />
+              <HomePage display={isSelectedHomePage} />
+              <FriendPage display={isSelectedFriendsPage} />
+              <ServerPage display={isSelectedServerPage} />
+              <NotificationToaster />
             </>
           )}
         </ExpandedProvider>

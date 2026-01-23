@@ -1,10 +1,9 @@
 import React, { useRef } from 'react';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-
-import styles from '@/styles/badge.module.css';
 
 interface BadgeItemProps {
   badge: Types.Badge;
@@ -14,30 +13,39 @@ interface BadgeItemProps {
 
 const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direction }) => {
   // Hooks
-  const contextMenu = useContextMenu();
+  const { showBadgeInfoCard } = useContextMenu();
 
   // Refs
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Handlers
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    const { left, right, top, bottom } = e.currentTarget.getBoundingClientRect();
+    const x = position === 'left-top' || position === 'left-bottom' ? left : right;
+    const y = position === 'left-top' || position === 'right-top' ? top : bottom;
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => {
+      showBadgeInfoCard(x, y, direction, badge);
+    }, 200);
+  };
+
+  const handleMouseLeave = () => {
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = null;
+  };
+
   return (
-    <div
+    <Image
       className="badge-info-card-container"
-      onMouseEnter={(e) => {
-        const { left, right, top, bottom } = e.currentTarget.getBoundingClientRect();
-        const x = position === 'left-top' || position === 'left-bottom' ? left : right;
-        const y = position === 'left-top' || position === 'right-top' ? top : bottom;
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = setTimeout(() => {
-          contextMenu.showBadgeInfoCard(x, y, direction, badge);
-        }, 200);
-      }}
-      onMouseLeave={() => {
-        if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-        hoverTimerRef.current = null;
-      }}
-    >
-      <div className={styles['badge-image']} style={{ backgroundImage: `url(${badge.iconUrl})` }} />
-    </div>
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      src={badge.iconUrl}
+      alt={badge.name}
+      width={16}
+      height={16}
+      loading="lazy"
+      draggable="false"
+    />
   );
 });
 

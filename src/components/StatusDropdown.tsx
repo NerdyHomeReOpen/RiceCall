@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import type * as Types from '@/types';
 
@@ -24,7 +24,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
   const [dropdownY, setDropdownY] = useState(y);
 
   // Effects
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!dropdownRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = dropdownRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
@@ -60,15 +60,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
   return (
     <div ref={dropdownRef} className={`context-menu-container ${headerStyles['status-dropdown']}`} style={display ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
       {STATUS_OPTIONS.map((status) => (
-        <div
-          key={status}
-          className={headerStyles['option']}
-          datatype={status}
-          onClick={() => {
-            onStatusSelect(status);
-            onClose();
-          }}
-        />
+        <StatusItem key={status} status={status} onStatusSelect={onStatusSelect} onClose={onClose} />
       ))}
     </div>
   );
@@ -77,3 +69,21 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
 StatusDropdown.displayName = 'StatusDropdown';
 
 export default StatusDropdown;
+
+interface StatusItemProps {
+  status: Types.User['status'];
+  onStatusSelect: (status: Types.User['status']) => void;
+  onClose: () => void;
+}
+
+const StatusItem: React.FC<StatusItemProps> = React.memo(({ status, onStatusSelect, onClose }) => {
+  // Handlers
+  const handleClick = () => {
+    onStatusSelect(status);
+    onClose();
+  };
+
+  return <div key={status} className={headerStyles['option']} datatype={status} onClick={handleClick} />;
+});
+
+StatusItem.displayName = 'StatusItem';

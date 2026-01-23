@@ -48,19 +48,19 @@
   background-size: auto;
 }
 
-.context-menu .option[data-type='setting']::before {
+.context-menu .option[data-type='system-setting']::before {
   background-image: url('/set.webp');
 }
 
-.context-menu .option[data-type='message']::before {
+.context-menu .option[data-type='feedback']::before {
   background-image: url('/message.webp');
 }
 
-.context-menu .option[data-type='skin']::before {
+.context-menu .option[data-type='change-theme']::before {
   background-image: url('/skin.webp');
 }
 
-.context-menu .option[data-type='exit']::before {
+.context-menu .option[data-type='logout']::before {
   background-image: url('/exit.webp');
 }
 
@@ -79,19 +79,19 @@
   background-image: url('/ctrl/icon_menu_checked.webp');
 }
 
-.context-menu .option[data-type='memberManagement']::before {
+.context-menu .option[data-type='member-management']::before {
   background-image: url('/channel/icon_membermgr.webp');
 }
 
-.context-menu .option[data-type='applyMember']::before {
+.context-menu .option[data-type='apply-member']::before {
   background-image: url('/channel/icon_memberapply.webp');
 }
 
-.context-menu .option[data-type='editGroupcard']::before {
+.context-menu .option[data-type='edit-nickname']::before {
   background-image: url('/channel/icon_editGroupcard.webp');
 }
 
-.context-menu .option[data-type='locateme']::before {
+.context-menu .option[data-type='locate-me']::before {
   background-image: url('/channel/icon_locateme.webp');
 }
 
@@ -99,11 +99,11 @@
   background-image: url('/channel/icon_report.webp');
 }
 
-.context-menu .option[data-type='uncollect']::before {
+.context-menu .option[data-type='unfavorite-server']::before {
   background-image: url('/channel/icon_uncollect.webp');
 }
 
-.context-menu .option[data-type='collect']::before {
+.context-menu .option[data-type='favorite-server']::before {
   background-image: url('/channel/icon_collect.webp');
 }
 

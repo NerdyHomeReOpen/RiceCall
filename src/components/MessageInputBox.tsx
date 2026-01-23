@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
@@ -10,12 +11,14 @@ import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
 import { ChatEnter } from '@/extensions/ChatEnter';
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Popup from '@/utils/popup';
-import { toTags } from '@/utils/tagConverter';
+import * as Permission from '@/utils/permission';
+import * as TagConverter from '@/utils/tagConverter';
 
 import { MAX_FILE_SIZE } from '@/constant';
 
@@ -23,16 +26,10 @@ import styles from '@/styles/messageInputBox.module.css';
 import markdown from '@/styles/markdown.module.css';
 import emoji from '@/styles/emoji.module.css';
 
-interface MessageInputBoxProps {
-  onSendMessage?: (message: string) => void;
-  disabled?: boolean;
-  maxLength?: number;
-}
-
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMessage, disabled = false, maxLength = 2000 }) => {
+const MessageInputBox: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
-  const contextMenu = useContextMenu();
+  const { showEmojiPicker } = useContextMenu();
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -50,132 +47,172 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onSendMess
       ChatEnter,
     ],
     content: '',
-    onUpdate: ({ editor }) => setMessageInput(toTags(editor.getHTML())),
+    onUpdate: ({ editor }) => (messageInputRef.current = TagConverter.toTags(editor.getHTML())),
     immediatelyRender: true,
   });
 
+  // Selectors
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+      permissionLevel: state.user.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentServer = useAppSelector(
+    (state) => ({
+      serverId: state.currentServer.data.serverId,
+      permissionLevel: state.currentServer.data.permissionLevel,
+    }),
+    shallowEqual,
+  );
+
+  const currentChannel = useAppSelector(
+    (state) => ({
+      channelId: state.currentChannel.data.channelId,
+      permissionLevel: state.currentChannel.data.permissionLevel,
+      guestTextMaxLength: state.currentChannel.data.guestTextMaxLength,
+      guestTextGapTime: state.currentChannel.data.guestTextGapTime,
+      guestTextWaitTime: state.currentChannel.data.guestTextWaitTime,
+      isTextMuted: state.currentChannel.data.isTextMuted,
+      forbidText: state.currentChannel.data.forbidText,
+      forbidGuestText: state.currentChannel.data.forbidGuestText,
+    }),
+    shallowEqual,
+  );
+
   // Refs
+  const messageInputRef = useRef<string>('');
   const isUploadingRef = useRef<boolean>(false);
   const isComposingRef = useRef<boolean>(false);
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
 
   // States
-  const [messageInput, setMessageInput] = useState<string>('');
+  const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
+  const [lastMessageTime, setLastMessageTime] = useState<number>(0);
 
   // Variables
+  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const textLength = editor?.getText().length || 0;
-  const isCloseToMaxLength = textLength >= maxLength - 100;
-  const isWarning = textLength > maxLength;
+  const isCloseToMaxLength = textLength >= currentChannel.guestTextMaxLength - 100;
+  const isWarning = textLength > currentChannel.guestTextMaxLength;
+  const leftGapTime = currentChannel.guestTextGapTime ? currentChannel.guestTextGapTime - (Date.now() - lastMessageTime) : 0;
+  const leftWaitTime = currentChannel.guestTextWaitTime ? currentChannel.guestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
+  const isForbidByMutedText = currentChannel.isTextMuted;
+  const isForbidByForbidText = !Permission.isChannelMod(permissionLevel) && currentChannel.forbidText;
+  const isForbidByForbidGuestText = !Permission.isMember(permissionLevel) && currentChannel.forbidGuestText;
+  const isForbidByForbidGuestTextWait = !Permission.isMember(permissionLevel) && leftWaitTime > 0;
+  const isForbidByForbidGuestTextGap = !Permission.isMember(permissionLevel) && leftGapTime > 0;
+  const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
+  const maxLength = !Permission.isMember(permissionLevel) ? currentChannel.guestTextMaxLength : 3000;
 
-  // Handlers
-  const syncStyles = useCallback(() => {
-    fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
-    textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
+  // Functions
+  const setStyles = useCallback(() => {
+    editor?.chain().setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
   }, [editor]);
 
-  const handleUploadImage = (imageUnit8Array: Uint8Array, imageName: string) => {
-    isUploadingRef.current = true;
-    if (imageUnit8Array.length > MAX_FILE_SIZE) {
-      Popup.handleOpenAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-      isUploadingRef.current = false;
-      return;
-    }
-    ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
-      if (response) {
-        editor?.chain().insertImage({ src: response.imageUrl, alt: imageName }).focus().run();
-        syncStyles();
-      }
-      isUploadingRef.current = false;
-    });
-  };
-
+  // Handlers
   const handleEmojiSelect = (code: string) => {
     editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
-    syncStyles();
+    setStyles();
   };
 
   const handleFontSizeChange = (size: string) => {
     fontSizeRef.current = size;
     editor?.chain().setFontSize(size).focus().run();
-    syncStyles();
   };
 
   const handleTextColorChange = (color: string) => {
     textColorRef.current = color;
     editor?.chain().setColor(color).focus().run();
-    syncStyles();
+  };
+
+  const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
+    showEmojiPicker(x, y, 'right-top', e.currentTarget as HTMLElement, true, fontSizeRef.current, textColorRef.current, handleEmojiSelect, handleFontSizeChange, handleTextColorChange);
+  };
+
+  const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
+    const items = e.clipboardData.items;
+    for (const item of items) {
+      if (item.type.startsWith('image/')) {
+        const image = item.getAsFile();
+        if (!image || isUploadingRef.current) return;
+        image.arrayBuffer().then((arrayBuffer) => {
+          const imageUnit8Array = new Uint8Array(arrayBuffer);
+          isUploadingRef.current = true;
+          if (imageUnit8Array.length > MAX_FILE_SIZE) {
+            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            isUploadingRef.current = false;
+            return;
+          }
+          ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+            if (response) {
+              editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
+              setStyles();
+            }
+            isUploadingRef.current = false;
+          });
+        });
+      }
+    }
+  };
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (disabled) return;
+    if (isWarning) return;
+    if (isComposingRef.current) return;
+    if (e.shiftKey || e.ctrlKey) return;
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (messageInputRef.current.trim().length === 0) return;
+      Popup.sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: messageInputRef.current });
+      setLastMessageTime(Date.now());
+      editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+      setStyles();
+    }
+  };
+
+  const handleInputCompositionStart = () => {
+    isComposingRef.current = true;
+  };
+
+  const handleInputCompositionEnd = () => {
+    isComposingRef.current = false;
   };
 
   // Effects
   useEffect(() => {
-    editor?.on('selectionUpdate', syncStyles);
-  }, [editor, syncStyles]);
+    editor?.on('selectionUpdate', setStyles);
+  }, [editor, setStyles]);
 
   useEffect(() => {
-    if (!editor) return;
-    editor.view.dispatch(editor.state.tr);
-  }, [editor]);
+    if (currentChannel.channelId) {
+      setLastJoinChannelTime(Date.now());
+      setLastMessageTime(0);
+    }
+  }, [currentChannel.channelId]);
 
   return (
-    <div className={`${styles['message-input-box']} ${disabled ? styles['disabled'] : ''} ${isWarning ? styles['warning'] : ''}`}>
-      <div
-        className={emoji['emoji-icon']}
-        onMouseDown={(e) => {
-          e.preventDefault();
-          const x = e.currentTarget.getBoundingClientRect().left;
-          const y = e.currentTarget.getBoundingClientRect().top;
-          contextMenu.showEmojiPicker(
-            x,
-            y,
-            'right-top',
-            e.currentTarget as HTMLElement,
-            true,
-            false,
-            fontSizeRef.current,
-            textColorRef.current,
-            (code) => handleEmojiSelect(code),
-            (size) => handleFontSizeChange(size),
-            (color) => handleTextColorChange(color),
-          );
-        }}
-      />
+    <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
+      <div className={emoji['emoji-icon']} onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}
         className={`${styles['textarea']} ${markdown['markdown-content']}`}
         style={{ wordBreak: 'break-all', border: 'none' }}
-        onPaste={(e) => {
-          const items = e.clipboardData.items;
-          for (const item of items) {
-            if (item.type.startsWith('image/')) {
-              const image = item.getAsFile();
-              if (!image || isUploadingRef.current) return;
-              image.arrayBuffer().then((arrayBuffer) => {
-                handleUploadImage(new Uint8Array(arrayBuffer), image.name);
-              });
-            }
-          }
-        }}
-        onKeyDown={(e) => {
-          if (disabled) return;
-          if (isWarning) return;
-          if (isComposingRef.current) return;
-          if (e.shiftKey || e.ctrlKey) return;
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            if (messageInput.trim().length === 0) return;
-            onSendMessage?.(messageInput);
-            editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
-            syncStyles();
-          }
-        }}
-        onCompositionStart={() => (isComposingRef.current = true)}
-        onCompositionEnd={() => (isComposingRef.current = false)}
+        onPaste={handleInputPaste}
+        onKeyDown={handleInputKeyDown}
+        onCompositionStart={handleInputCompositionStart}
+        onCompositionEnd={handleInputCompositionEnd}
         maxLength={maxLength}
       />
       {isCloseToMaxLength && (
         <div className={styles['message-input-length-text']}>
-          {editor?.getText().length}/{maxLength}
+          {textLength}/{maxLength}
         </div>
       )}
     </div>

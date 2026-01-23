@@ -1,31 +1,11 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
+import { cleanMenu } from '@/utils';
+
 import styles from '@/styles/contextMenu.module.css';
-
-/**
- * Clean the menu items by removing duplicate separators and ensuring that separators are not placed at the beginning or end of the menu.
- * @param items - The menu items to clean.
- * @returns The cleaned menu items.
- */
-export function cleanMenu(items: Types.ContextMenuItem[]): Types.ContextMenuItem[] {
-  const preFiltered = items.filter((item) => item.id === 'separator' || item.show !== false);
-  const result: Types.ContextMenuItem[] = [];
-
-  for (let i = 0; i < preFiltered.length; i++) {
-    const cur = preFiltered[i];
-    if (cur.id === 'separator') {
-      if (result.length === 0) continue;
-      const hasVisibleAfter = preFiltered.slice(i + 1).some((it) => it.id !== 'separator');
-      if (!hasVisibleAfter) continue;
-      if (result[result.length - 1].id === 'separator') continue;
-    }
-    result.push(cur);
-  }
-
-  return result;
-}
 
 interface ContextMenuProps {
   x: number;
@@ -41,12 +21,14 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
 
   // State
   const [display, setDisplay] = useState(false);
-  const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
 
+  // Variables
+  const filteredItems = useMemo(() => cleanMenu(items).filter((item) => item?.show ?? true), [items]);
+
   // Effect
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!menuRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
@@ -81,38 +63,9 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
 
   return (
     <div ref={menuRef} className={`context-menu-container ${styles['context-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
-      {cleanMenu(items)
-        .filter((item) => item?.show ?? true)
-        .map((item, index) => {
-          if (item.id === 'separator') {
-            return <div className={styles['separator']} key={index} />;
-          }
-          return (
-            <div
-              key={index}
-              className={`${styles['option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? styles['disabled'] : ''}`}
-              data-type={item.icon || ''}
-              onClick={() => {
-                if (item.disabled) return;
-                item.onClick?.();
-                onClose();
-              }}
-              onMouseEnter={(e) => {
-                if (!item.hasSubmenu || !item.submenuItems) return;
-                const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
-                const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
-                const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
-                setSubMenu(<ContextMenu items={item.submenuItems} onClose={onClose} x={x} y={y} direction={direction} />);
-              }}
-              onMouseLeave={() => {
-                if (item.hasSubmenu) setSubMenu(null);
-              }}
-            >
-              {item.label}
-              {item.hasSubmenu && subMenu}
-            </div>
-          );
-        })}
+      {filteredItems.map((item, index) =>
+        item.id === 'separator' ? <div key={index} className={styles['separator']} /> : <ContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />,
+      )}
     </div>
   );
 });
@@ -120,3 +73,52 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
 ContextMenu.displayName = 'ContextMenu';
 
 export default ContextMenu;
+
+interface ContextMenuItemProps {
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
+  item: Types.ContextMenuItem;
+  onClose: () => void;
+}
+
+const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
+  // Hooks
+  const { t } = useTranslation();
+
+  // States
+  const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
+
+  // Handlers
+  const handleClick = () => {
+    if (item.disabled) return;
+    item.onClick?.();
+    onClose();
+  };
+
+  const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!item.hasSubmenu || !item.submenuItems) return;
+    const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
+    const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
+    const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
+    setSubMenu(<ContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
+  };
+
+  const handleMouseLeave = () => {
+    if (item.hasSubmenu) setSubMenu(null);
+  };
+
+  return (
+    <div
+      key={item.id}
+      className={`${styles['option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? styles['disabled'] : ''}`}
+      data-type={item.icon || item.id || ''}
+      onClick={handleClick}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
+      {t(item.label)}
+      {item.hasSubmenu && subMenu}
+    </div>
+  );
+});
+
+ContextMenuItem.displayName = 'ContextMenuItem';

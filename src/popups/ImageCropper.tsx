@@ -27,7 +27,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   const [cropBox, setCropBox] = useState({ x: 100, y: 100, size: INITIAL_CROP_SIZE });
   const [draggingBox, setDraggingBox] = useState(false);
 
-  // Handlers
+  // Functions
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -65,19 +65,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     }
   }, [cropBox]);
 
-  const handleCrop = async () => {
-    const canvas = previewRef.current;
-    if (!canvas) return;
-
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const arrayBuffer = await blob.arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
-      ipc.popup.submit(id, uint8Array);
-      handleClose();
-    }, 'image/webp');
-  };
-
+  // Handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     const rect = canvasRef.current!.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -135,7 +123,20 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     setCropBox({ x: newX, y: newY, size: clampedSize });
   };
 
-  const handleClose = () => {
+  const handleUploadBtnClick = async () => {
+    const canvas = previewRef.current;
+    if (!canvas) return;
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      ipc.popup.submit(id, uint8Array);
+      ipc.window.close();
+    }, 'image/webp');
+  };
+
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -206,10 +207,10 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']}`} onClick={handleCrop}>
+        <div className={`${popupStyles['button']}`} onClick={handleUploadBtnClick}>
           {t('upload')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('close')}
         </div>
       </div>

@@ -9,12 +9,3 @@
     width: 100%;
   }
 }
-
-.badge-image {
-  width: 17px;
-  height: 17px;
-  image-rendering: auto;
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
-}

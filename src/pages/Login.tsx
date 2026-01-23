@@ -7,10 +7,11 @@ import styles from '@/styles/login.module.css';
 
 interface LoginPageProps {
   display: boolean;
-  setSection: (section: 'login' | 'register' | 'change-server') => void;
+  onRegisterBtnClick: () => void;
+  onChangeServerBtnClick: () => void;
 }
 
-const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setSection }) => {
+const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRegisterBtnClick, onChangeServerBtnClick }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -25,6 +26,10 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
   const [accounts, setAccounts] = useState<Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [showAccountselectBox, setShowAccountselectBox] = useState<boolean>(false);
+
+  const deleteAccount = (account: string) => {
+    ipc.accounts.delete(account);
+  };
 
   // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +53,18 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
     }
   };
 
-  const handleSubmit = async () => {
+  const handleAccountSelectClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation();
+    setShowAccountselectBox((prev) => !prev);
+  };
+
+  const handleForgotPasswordClick = () => {
+    window.open('https://ricecall.com/forget', '_blank');
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
+    e.preventDefault();
+
     if (!account || !password) return;
 
     setIsLoading(true);
@@ -58,19 +74,18 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
         if (rememberAccount) ipc.accounts.add(account, { autoLogin, rememberAccount, password });
         if (autoLogin) localStorage.setItem('token', res.token);
         localStorage.setItem('login-account', account);
-        setSection('login');
       }
     });
 
     setIsLoading(false);
   };
 
-  const handleDeleteAccount = (account: string) => {
-    ipc.accounts.delete(account);
+  const handleChangeServerBtnClick = () => {
+    onChangeServerBtnClick();
   };
 
-  const handleForgotPassword = () => {
-    window.open('https://ricecall.com/forget', '_blank');
+  const handleRegisterBtnClick = () => {
+    onRegisterBtnClick();
   };
 
   // Effects
@@ -103,13 +118,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
     <main className={styles['login']} style={display ? {} : { display: 'none' }}>
       <main className={styles['login-body']}>
         <div className={styles['app-logo']} />
-        <form
-          className={styles['form-wrapper']}
-          onSubmit={(e) => {
-            e.preventDefault();
-            handleSubmit();
-          }}
-        >
+        <form className={styles['form-wrapper']} onSubmit={handleSubmit}>
           {isLoading ? (
             <>
               <div className={styles['loading-indicator']}>{`${t('logining')}...`}</div>
@@ -121,13 +130,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
                 <div className={styles['label']}>{t('account')}</div>
                 <div className={styles['input-box']} ref={comboRef}>
                   <input type="text" name="account" value={account} onChange={handleInputChange} placeholder={t('please-input-account')} className={styles['input']} />
-                  <div
-                    className={styles['combo-arrow']}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setShowAccountselectBox((prev) => !prev);
-                    }}
-                  />
+                  <div className={styles['combo-arrow']} onClick={handleAccountSelectClick} />
                   <div className={styles['account-select-box']} style={showAccountselectBox ? {} : { display: 'none' }}>
                     {Object.entries(accounts).map(([account, { autoLogin, rememberAccount, password }]) => (
                       <div
@@ -146,7 +149,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
                           className={styles['account-select-delete-btn']}
                           onClick={(e) => {
                             e.stopPropagation();
-                            handleDeleteAccount(account);
+                            deleteAccount(account);
                           }}
                         />
                       </div>
@@ -178,18 +181,16 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
         </form>
       </main>
       <div className={styles['login-footer']}>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <div className={styles['create-account']} onClick={() => setSection('register')}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+          <div className={styles['create-account']} onClick={handleRegisterBtnClick}>
             {t('register-account')}
           </div>
-          <div className={styles['change-server']} onClick={() => setSection('change-server')}>
-            {'/'}
-          </div>
-          <div className={styles['change-server']} onClick={() => setSection('change-server')}>
+          {'/'}
+          <div className={styles['change-server']} onClick={handleChangeServerBtnClick}>
             {t('change-server')}
           </div>
         </div>
-        <div className={styles['forget-password']} onClick={() => handleForgotPassword()}>
+        <div className={styles['forget-password']} onClick={handleForgotPasswordClick}>
           {t('forgot-password')}
         </div>
       </div>

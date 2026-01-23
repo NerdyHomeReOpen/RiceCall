@@ -19,12 +19,17 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
   const canSubmit = friendGroupName.trim();
 
   // Handlers
-  const handleCreateFriendGroup = (preset: Partial<Types.FriendGroup>) => {
-    ipc.socket.send('createFriendGroup', { preset });
+  const handleFriendGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFriendGroupName(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    if (!canSubmit) return;
+    ipc.socket.send('createFriendGroup', { preset: { name: friendGroupName } });
     ipc.window.close();
   };
 
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -34,15 +39,15 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('please-input-friend-group-name')}</div>
-            <input name="friend-group-name" type="text" maxLength={32} onChange={(e) => setFriendGroupName(e.target.value)} />
+            <input name="friend-group-name" type="text" maxLength={32} onChange={handleFriendGroupNameChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={() => (canSubmit ? handleCreateFriendGroup({ name: friendGroupName }) : null)}>
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

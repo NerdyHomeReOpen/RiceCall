@@ -1,10 +1,10 @@
-import { createContext, useContext, useRef } from 'react';
+import { createContext, useContext, useMemo, useRef, useCallback } from 'react';
 
 interface FindMeContextType {
   findMe: () => void;
-  handleCategoryExpanded: React.RefObject<() => void>;
-  handleChannelExpanded: React.RefObject<() => void>;
-  userTabRef: React.RefObject<HTMLDivElement | null>;
+  setExpandedCategoryHandlerRef: (handler: () => void) => void;
+  setExpandedChannelHandlerRef: (handler: () => void) => void;
+  setCurrentUserRef: (ref: HTMLDivElement | null) => void;
 }
 
 const FindMeContext = createContext<FindMeContextType | null>(null);
@@ -19,35 +19,41 @@ export const useFindMeContext = () => {
 
 const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
   // Refs
-  const handleCategoryExpanded = useRef<() => void>(() => {});
-  const handleChannelExpanded = useRef<() => void>(() => {});
-  const userTabRef = useRef<HTMLDivElement>(null);
+  const expandedCategoryHandlerRef = useRef<() => void>(null);
+  const expandedChannelHandlerRef = useRef<() => void>(null);
+  const currentUserRef = useRef<HTMLDivElement>(null);
 
-  // Handlers
-  const findMe = () => {
-    handleCategoryExpanded.current();
-    handleChannelExpanded.current();
+  // Functions
+  const findMe = useCallback(() => {
+    expandedCategoryHandlerRef.current?.();
+    expandedChannelHandlerRef.current?.();
 
     setTimeout(() => {
-      userTabRef.current?.scrollIntoView({
+      currentUserRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
       });
     }, 100);
-  };
+  }, []);
 
-  return (
-    <FindMeContext.Provider
-      value={{
-        findMe,
-        handleCategoryExpanded,
-        handleChannelExpanded,
-        userTabRef,
-      }}
-    >
-      {children}
-    </FindMeContext.Provider>
+  const setExpandedCategoryHandlerRef = useCallback((handler: () => void) => {
+    expandedCategoryHandlerRef.current = handler;
+  }, []);
+
+  const setExpandedChannelHandlerRef = useCallback((handler: () => void) => {
+    expandedChannelHandlerRef.current = handler;
+  }, []);
+
+  const setCurrentUserRef = useCallback((ref: HTMLDivElement | null) => {
+    currentUserRef.current = ref;
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({ findMe, setExpandedCategoryHandlerRef, setExpandedChannelHandlerRef, setCurrentUserRef }),
+    [findMe, setExpandedCategoryHandlerRef, setExpandedChannelHandlerRef, setCurrentUserRef],
   );
+
+  return <FindMeContext.Provider value={contextValue}>{children}</FindMeContext.Provider>;
 };
 
 FindMeProvider.displayName = 'FindMeProvider';

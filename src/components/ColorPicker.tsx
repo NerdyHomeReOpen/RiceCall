@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { SketchPicker } from 'react-color';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+import { ColorResult, SketchPicker } from 'react-color';
 
 import styles from '@/styles/color.module.css';
 
@@ -20,8 +20,14 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
   const [pickerY, setPickerY] = useState<number>(y);
   const [color, setColor] = useState<string>('#FFFFFF');
 
+  // Handlers
+  const handleColorChange = (color: ColorResult) => {
+    setColor(color.hex);
+    onColorSelect(color.hex);
+  };
+
   // Effects
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!colorPickerRef.current) return;
     const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = colorPickerRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
@@ -61,7 +67,7 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
       style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}
       onMouseDown={(e) => e.stopPropagation()}
     >
-      <SketchPicker disableAlpha={true} color={color} onChange={(color) => setColor(color.hex)} onChangeComplete={(color) => onColorSelect(color.hex)} />
+      <SketchPicker disableAlpha={true} color={color} onChange={handleColorChange} />
     </div>
   );
 });

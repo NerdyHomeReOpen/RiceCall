@@ -1,4 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
+
+import type * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -13,7 +15,6 @@ interface EmojiPickerProps {
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   anchorEl?: HTMLElement | null;
   showFontbar?: boolean;
-  isUserInfo?: boolean;
   fontSize?: string;
   textColor?: string;
   onEmojiSelect?: (code: string, full: string) => void;
@@ -22,21 +23,11 @@ interface EmojiPickerProps {
 }
 
 const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
-  ({
-    x,
-    y,
-    direction,
-    anchorEl,
-    showFontbar = false,
-    isUserInfo = false,
-    fontSize: propFontSize = '13px',
-    textColor: propTextColor = '#000000',
-    onEmojiSelect,
-    onFontSizeChange,
-    onTextColorChange,
-  }) => {
+  ({ x, y, direction, anchorEl, showFontbar = false, fontSize: propFontSize = '13px', textColor: propTextColor = '#000000', onEmojiSelect, onFontSizeChange, onTextColorChange }) => {
+    // Hooks
+    const { showColorPicker } = useContextMenu();
+
     // Refs
-    const contextMenu = useContextMenu();
     const emojiPickerRef = useRef<HTMLDivElement>(null);
 
     // States
@@ -47,16 +38,49 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     const [fontSize, setFontSize] = useState<string>(propFontSize);
     const [selectedColor, setSelectedColor] = useState<string>(propTextColor);
 
+    // Handlers
+    const handleFontSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+      const size = e.target.value;
+      setFontSize(size);
+      onFontSizeChange?.(size);
+    };
+
+    const handleColorPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
+      showColorPicker(x, y, 'left-top', (color) => {
+        setSelectedColor(color);
+        onTextColorChange?.(color);
+      });
+    };
+
+    const handleDefTabClick = () => {
+      setActiveTab('def');
+    };
+
+    const handleOtherTabClick = () => {
+      setActiveTab('other');
+    };
+
+    const handleVipTabClick = () => {
+      setActiveTab('vip');
+    };
+
+    const handleEmojiSelect = (code: string, full: string) => {
+      onEmojiSelect?.(code, full);
+    };
+
     // Effects
-    useEffect(() => {
+    useLayoutEffect(() => {
       setFontSize(propFontSize);
     }, [propFontSize]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       setSelectedColor(propTextColor);
     }, [propTextColor]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (!emojiPickerRef.current) return;
 
       const recalc = () => {
@@ -130,13 +154,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
             <div className={emojiStyles['emoji-font-icon']} aria-hidden="true" />
             <div className={`${popupStyles['select-box']} ${emojiStyles['font-select-box']}`}>
               <div className={popupStyles['select-box']}>
-                <select
-                  value={fontSize}
-                  onChange={(e) => {
-                    setFontSize(e.target.value);
-                    onFontSizeChange?.(e.target.value);
-                  }}
-                >
+                <select value={fontSize} onChange={handleFontSizeChange}>
                   {Array.from({ length: 17 }, (_, i) => (
                     <option key={i} value={`${i + 8}px`}>
                       {i + 8}px
@@ -145,18 +163,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
                 </select>
               </div>
             </div>
-            <div
-              className={`${emojiStyles['color-select-box']}`}
-              onMouseDown={(e) => {
-                e.preventDefault();
-                const x = e.currentTarget.getBoundingClientRect().right;
-                const y = e.currentTarget.getBoundingClientRect().top;
-                contextMenu.showColorPicker(x, y, 'left-top', (color) => {
-                  setSelectedColor(color);
-                  onTextColorChange?.(color);
-                });
-              }}
-            >
+            <div className={`${emojiStyles['color-select-box']}`} onMouseDown={handleColorPickerClick}>
               <div className={emojiStyles['color-swatch']} style={{ backgroundColor: selectedColor }} />
             </div>
           </div>
@@ -165,27 +172,14 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'def' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
             <div className={emojiStyles['emoji-grid']}>
               {defEmojis.map((e) => (
-                <div
-                  key={`def-${e.code}`}
-                  className={emojiStyles['emoji']}
-                  style={{ backgroundImage: `url(${e.path})` }}
-                  onMouseDown={(ev) => ev.preventDefault()}
-                  onClick={() => onEmojiSelect?.(e.code, `:${e.code}:`)}
-                />
+                <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'other' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
             <div className={emojiStyles['emoji-grid']}>
               {otherEmojis.map((e) => (
-                <div
-                  key={`other-${e.code}`}
-                  className={emojiStyles['emoji']}
-                  style={{ backgroundImage: `url(${e.path})` }}
-                  onMouseDown={(ev) => ev.preventDefault()}
-                  onClick={() => onEmojiSelect?.(e.code, `:${e.code}:`)}
-                  title={e.alt}
-                />
+                <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
@@ -194,33 +188,9 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
           </div>
         </div>
         <div className={emojiStyles['emoji-tabs']} role="tablist">
-          <button
-            id="btn-def"
-            className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-def']} ${isUserInfo ? emojiStyles['user-info-emoji'] : ''}`}
-            role="tab"
-            aria-selected={activeTab === 'def'}
-            onClick={() => setActiveTab('def')}
-          >
-            <span className={emojiStyles['emoji-tab-label']}>def</span>
-          </button>
-          <button
-            id="btn-other"
-            className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-other']} ${isUserInfo ? emojiStyles['user-info-emoji'] : ''}`}
-            role="tab"
-            aria-selected={activeTab === 'other'}
-            onClick={() => setActiveTab('other')}
-          >
-            <span className={emojiStyles['emoji-tab-label']}>other</span>
-          </button>
-          <button
-            id="btn-vip"
-            className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-vip']} ${isUserInfo ? emojiStyles['user-info-emoji'] : ''}`}
-            role="tab"
-            aria-selected={activeTab === 'vip'}
-            onClick={() => setActiveTab('vip')}
-          >
-            <span className={emojiStyles['emoji-tab-label']}>vip</span>
-          </button>
+          <button id="btn-def" className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-def']}`} role="tab" aria-selected={activeTab === 'def'} onClick={handleDefTabClick} />
+          <button id="btn-other" className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-other']}`} role="tab" aria-selected={activeTab === 'other'} onClick={handleOtherTabClick} />
+          <button id="btn-vip" className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-vip']}`} role="tab" aria-selected={activeTab === 'vip'} onClick={handleVipTabClick} />
         </div>
       </div>
     );
@@ -230,3 +200,23 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
 EmojiPicker.displayName = 'EmojiPicker';
 
 export default EmojiPicker;
+
+interface EmojiItemProps {
+  emoji: Types.Emoji;
+  onEmojiSelect?: (code: string, full: string) => void;
+}
+
+const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }) => {
+  // Handlers
+  const handleClick = () => {
+    onEmojiSelect?.(emoji.code, `:${emoji.code}:`);
+  };
+
+  return (
+    <div className={emojiStyles['emoji']}>
+      <img src={emoji.path} alt={emoji.alt} width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
+    </div>
+  );
+});
+
+EmojiItem.displayName = 'EmojiItem';

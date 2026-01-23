@@ -8,6 +8,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import SocketManager from '@/components/SocketManager';
+
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
 import ApproveFriend from '@/popups/ApproveFriend';
@@ -57,33 +59,28 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handlers
-  const handleMaximize = () => {
+  const handleMaximizeBtnClick = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
   };
 
-  const handleUnmaximize = () => {
+  const handleUnmaximizeBtnClick = () => {
     if (!isFullscreen) return;
     ipc.window.unmaximize();
   };
 
-  const handleMinimize = () => {
+  const handleMinimizeBtnClick = () => {
     ipc.window.minimize();
   };
 
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
   // Effects
   useEffect(() => {
-    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
-    return () => unsub();
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (
@@ -93,9 +90,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
           <div className={header['title']}>{title}</div>
         </div>
         <div className={header['buttons']}>
-          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimize} />}
-          {buttons.includes('maxsize') && (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />)}
-          {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
+          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimizeBtnClick} />}
+          {buttons.includes('maxsize') &&
+            (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={header['maxsize']} onClick={handleMaximizeBtnClick} />)}
+          {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} />}
         </div>
       </div>
     </header>
@@ -333,10 +331,14 @@ const PopupPageComponent: React.FC = React.memo(() => {
   const [initialData, setInitialData] = useState<any | null>(null);
 
   // Variables
-  const { title, buttons, node, hideHeader } = useMemo<Popup>(() => {
-    if (!id || !type || !initialData) return { id: '', type: 'dialogAlert', title: '', buttons: ['close'], node: () => null, hideHeader: true };
+  const { buttons, hideHeader } = useMemo(() => {
+    if (!type) return { buttons: [], hideHeader: true };
+    return defaultPopup[type];
+  }, [type]);
 
-    const title = {
+  const title = useMemo(() => {
+    if (!type) return '';
+    return {
       aboutus: t('about-ricecall'),
       applyFriend: t('apply-friend'),
       applyMember: t('apply-member'),
@@ -378,9 +380,12 @@ const PopupPageComponent: React.FC = React.memo(() => {
       systemSetting: t('system-setting'),
       userInfo: t('user-info'),
       userSetting: t('user-setting'),
-    };
+    }[type];
+  }, [type, initialData, t]);
 
-    const node = {
+  const node = useMemo<() => React.ReactNode | null>(() => {
+    if (!type || !initialData) return () => null;
+    return {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,
       applyMember: () => <ApplyMember id={id} {...initialData} />,
@@ -422,15 +427,8 @@ const PopupPageComponent: React.FC = React.memo(() => {
       systemSetting: () => <SystemSetting id={id} {...initialData} />,
       userInfo: () => <UserInfo id={id} {...initialData} />,
       userSetting: () => <UserInfo id={id} {...initialData} />,
-    };
-
-    return {
-      ...defaultPopup[type],
-      id,
-      title: title[type],
-      node: node[type],
-    };
-  }, [id, type, initialData, t]);
+    }[type];
+  }, [id, type, initialData]);
 
   // Effects
   useEffect(() => {
@@ -450,6 +448,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
+      <SocketManager />
       {!hideHeader && (
         <Header
           title={title}

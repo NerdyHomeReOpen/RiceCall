@@ -4,7 +4,11 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/utils/popup';
+
 import popupStyles from '@/styles/popup.module.css';
+
+import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constant';
 
 interface KickMemberFromChannelPopupProps {
   serverId: Types.Server['serverId'];
@@ -18,29 +22,11 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
 
   // States
   const [formatType, setFormatType] = useState<string>('hours');
-  const [selectTime, setSelectTime] = useState<number>(1);
-  const [selectReason, setSelectReason] = useState<string>('');
+  const [time, setTime] = useState<number>(1);
+  const [reason, setReason] = useState<string>('');
   const [otherReason, setOtherReason] = useState<string>('');
 
-  // Variables
-  const { userId, name: memberName, nickname: memberNickname } = member;
-  const formatTypeOptions = [
-    { key: 'seconds', label: t('second') },
-    { key: 'minutes', label: t('minute') },
-    { key: 'hours', label: t('hour') },
-    { key: 'days', label: t('day') },
-    { key: 'month', label: t('month') },
-    { key: 'years', label: t('year') },
-  ];
-  const kickReasonOptions = [
-    { key: 'spam', label: t('reason-spam') },
-    { key: 'abuse', label: t('reason-abuse') },
-    { key: 'harassment', label: t('reason-harassment') },
-    { key: 'inappropriate-content', label: t('reason-inappropriate-content') },
-    { key: 'other', label: t('reason-other') },
-  ];
-
-  // Handlers
+  // Functions
   const getLengthOptions = () => {
     switch (formatType) {
       case 'seconds':
@@ -63,28 +49,45 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   const getBlockTime = () => {
     switch (formatType) {
       case 'seconds':
-        return 1000 * selectTime;
+        return 1000 * time;
       case 'minutes':
-        return 1000 * 60 * selectTime;
+        return 1000 * 60 * time;
       case 'hours':
-        return 1000 * 60 * 60 * selectTime;
+        return 1000 * 60 * 60 * time;
       case 'days':
-        return 1000 * 60 * 60 * 24 * selectTime;
+        return 1000 * 60 * 60 * 24 * time;
       case 'month':
-        return 1000 * 60 * 60 * 24 * 30 * selectTime;
+        return 1000 * 60 * 60 * 24 * 30 * time;
       case 'years':
-        return 1000 * 60 * 60 * 24 * 30 * 12 * selectTime;
+        return 1000 * 60 * 60 * 24 * 30 * 12 * time;
       default:
         return 1000;
     }
   };
 
-  const handleBlockUserFromChannel = (userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], blockUntil: number) => {
-    ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId, blockUntil });
+  // Handlers
+  const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTime(parseInt(e.target.value));
+  };
+
+  const handleFormatTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormatType(e.target.value);
+  };
+
+  const handleReasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setReason(e.target.value);
+  };
+
+  const handleOtherReasonChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOtherReason(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    Popup.blockUserFromChannel(member.userId, serverId, channel.channelId, Date.now() + getBlockTime());
     ipc.window.close();
   };
 
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -95,14 +98,14 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
           <div className={popupStyles['col']}>
             <div className={popupStyles['label']} style={{ minWidth: '0' }}>
-              {t('confirm-kick-user-from-channel', { '0': memberNickname || memberName, '1': channel.name })}
+              {t('confirm-kick-user-from-channel', { '0': member.nickname || member.name, '1': channel.name })}
             </div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
                 <div className={popupStyles['label']}>{t('kick-time')}</div>
                 <div className={`${popupStyles['row']}`}>
                   <div className={popupStyles['select-box']}>
-                    <select value={selectTime} onChange={(e) => setSelectTime(parseInt(e.target.value))}>
+                    <select value={time} onChange={handleTimeChange}>
                       {getLengthOptions().map((option) => (
                         <option key={option} value={option}>
                           {option}
@@ -111,10 +114,10 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                     </select>
                   </div>
                   <div className={popupStyles['select-box']}>
-                    <select value={formatType} onChange={(e) => setFormatType(e.target.value)}>
-                      {formatTypeOptions.map((option) => (
-                        <option key={option.key} value={option.key}>
-                          {option.label}
+                    <select value={formatType} onChange={handleFormatTypeChange}>
+                      {KICK_TIME_FORMAT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {t(option.tKey)}
                         </option>
                       ))}
                     </select>
@@ -125,17 +128,23 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
                 <div className={popupStyles['label']}>{t('kick-reason')}</div>
                 <div className={`${popupStyles['row']}`}>
                   <div className={popupStyles['select-box']}>
-                    <select value={selectReason} onChange={(e) => setSelectReason(e.target.value)}>
-                      {kickReasonOptions.map((option) => (
-                        <option key={option.key} value={option.key}>
-                          {option.label}
+                    <select value={reason} onChange={handleReasonChange}>
+                      {KICK_REASON_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {t(option.tKey)}
                         </option>
                       ))}
                     </select>
                   </div>
-                  {selectReason === 'other' && (
+                  {reason === 'other' && (
                     <div className={popupStyles['input-box']}>
-                      <input type="text" value={otherReason} placeholder={`${t('reason')}(${t('limit-text', { 0: '20' })})`} maxLength={20} onChange={(e) => setOtherReason(e.target.value)} />
+                      <input
+                        type="text"
+                        value={otherReason}
+                        placeholder={`${t('reason')}(${t('limit-text', { 0: KICK_REASON_OTHER_MAX_LENGTH.toString() })})`}
+                        maxLength={KICK_REASON_OTHER_MAX_LENGTH}
+                        onChange={handleOtherReasonChange}
+                      />
                     </div>
                   )}
                 </div>
@@ -145,10 +154,10 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleBlockUserFromChannel(userId, serverId, channel.channelId, Date.now() + getBlockTime())}>
+        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
