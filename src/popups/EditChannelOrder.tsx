@@ -7,6 +7,7 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import { setSelectedItemId } from '@/store/slices/uiSlice';
+import { setChannels } from '@/store/slices/channelsSlice';
 
 import * as Popup from '@/utils/popup';
 
@@ -22,6 +23,7 @@ interface EditChannelOrderPopupProps {
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ serverId, channels: channelsData }) => {
   // Hooks
   const { t } = useTranslation();
+  const dispatch = useAppDispatch();
 
   // Refs
   const orderMapRef = useRef<Record<string, number>>(
@@ -41,9 +43,9 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     }),
     shallowEqual,
   );
+  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
 
   // States
-  const [channels, setChannels] = useState<(Types.Channel | Types.Category)[]>(channelsData.filter((c) => !c.isLobby));
   const [selectedChannel, setSelectedChannel] = useState<Types.Channel | Types.Category | null>(null);
   const [categoryChildren, setCategoryChildren] = useState<(Types.Channel | Types.Category)[]>([]);
 
@@ -115,7 +117,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         newChannels[index].order = child.order;
       }
     }
-    setChannels(newChannels.sort((a, b) => a.order - b.order));
+    dispatch(setChannels(newChannels.sort((a, b) => a.order - b.order)));
     setCategoryChildren(newCategoryChildren.sort((a, b) => a.order - b.order));
   };
 
@@ -179,30 +181,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     };
     window.addEventListener('click', onClick);
     return () => window.removeEventListener('click', onClick);
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
-      const add = new Set(args.map((i) => `${i.data.channelId}`));
-      setChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
-      const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-      setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelRemove', (...args: { channelId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.channelId}`));
-      setChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
-    });
-    return () => unsub();
   }, []);
 
   return (
@@ -325,6 +303,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect })
   // Selectors
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 
+  // States
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+
   // Handlers
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -333,9 +314,17 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect })
     onSelect(channel);
   };
 
+  const handleTabExpandedClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsExpanded(!isExpanded);
+  };
+
   return (
     <div className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
-      <div className={`${serverPage['tab-icon']} ${serverPage[channel.visibility]} ${channel.isLobby ? serverPage['lobby'] : ''}`} />
+      <div
+        className={`${serverPage['tab-icon']} ${isExpanded ? serverPage['expanded'] : ''} ${serverPage[channel.visibility]} ${channel.isLobby ? serverPage['lobby'] : ''}`}
+          onClick={handleTabExpandedClick}
+        />
       <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
         {channel.name}
         <div className={styles['channel-tab-index-text']}>{`(${channel.order})`}</div>
