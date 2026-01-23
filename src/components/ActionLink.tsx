@@ -49,7 +49,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
         {t('server-invitation-content.prefix')}
         <span className={styles['server-name']}>{server.name}</span>
         {t('server-invitation-content.suffix')}
-        <span className={styles['actionLink']} onClick={handleLinkClick}>
+        <span className={styles['action-link']} onClick={handleLinkClick}>
           {t('join-server')}
         </span>
       </span>

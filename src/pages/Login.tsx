@@ -181,7 +181,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
         </form>
       </main>
       <div className={styles['login-footer']}>
-        <div style={{ display: 'flex', gap: '10px' }}>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <div className={styles['create-account']} onClick={handleRegisterBtnClick}>
             {t('register-account')}
           </div>
