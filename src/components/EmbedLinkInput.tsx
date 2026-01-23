@@ -1,10 +1,10 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import settingStyles from '@/styles/setting.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
-export interface EmbedLinkInputProps {
+interface EmbedLinkInputProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -40,7 +40,7 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
   };
 
   // Effects
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!embedLinkInputRef.current) return;
     const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = embedLinkInputRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;

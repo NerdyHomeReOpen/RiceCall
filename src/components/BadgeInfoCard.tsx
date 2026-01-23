@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 
 import styles from '@/styles/badgeInfoCard.module.css';
 
-export interface BadgeInfoCardProps {
+interface BadgeInfoCardProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -29,7 +29,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   const isPermanent = badge.showTo <= 0;
 
   // Effects
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!cardRef.current) return;
     const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;

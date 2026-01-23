@@ -1,4 +1,4 @@
-import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import type * as Types from '@/types';
 
@@ -9,7 +9,7 @@ import { defEmojis, otherEmojis } from '@/emojis';
 import emojiStyles from '@/styles/emoji.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
-export interface EmojiPickerProps {
+interface EmojiPickerProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -72,11 +72,11 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     };
 
     // Effects
-    useEffect(() => {
+    useLayoutEffect(() => {
       setFontSize(propFontSize);
     }, [propFontSize]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       setSelectedColor(propTextColor);
     }, [propTextColor]);
 

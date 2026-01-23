@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-import { useWebRTC } from '@/providers/WebRTC';
+import { useWebRTC, useWebRTCStore } from '@/providers/WebRTC';
 
 import * as Color from '@/utils/color';
 
@@ -12,10 +12,12 @@ import popup from '@/styles/popup.module.css';
 const MicModeMenu: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
-  const { getVolumePercent, voiceThreshold, speakingMode, changeVoiceThreshold } = useWebRTC();
+  const { changeVoiceThreshold } = useWebRTC();
+  const voiceThreshold = useWebRTCStore('voiceThreshold');
+  const speakingMode = useWebRTCStore('speakingMode');
+  const volumePercent = useWebRTCStore('volumePercent');
 
   // Variables
-  const volumePercent = getVolumePercent('user');
   const volumeThreshold = voiceThreshold;
   const isActive = volumePercent > volumeThreshold;
   const activeColor = isActive ? Color.getLerpColor('#0fb300', '#be0000', Math.pow(volumePercent / 100, 2)) : 'gray';

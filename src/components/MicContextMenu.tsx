@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
@@ -7,7 +7,7 @@ import { cleanMenu } from '@/utils';
 
 import styles from '@/styles/contextMenu.module.css';
 
-export interface MicContextMenuProps {
+interface MicContextMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -28,7 +28,7 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
   const filteredItems = useMemo(() => cleanMenu(items).filter((item) => item?.show ?? true), [items]);
 
   // Effect
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!menuRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import type * as Types from '@/types';
 
@@ -6,7 +6,7 @@ import { STATUS_OPTIONS } from '@/constant';
 
 import headerStyles from '@/styles/header.module.css';
 
-export interface StatusDropdownProps {
+interface StatusDropdownProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -24,7 +24,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
   const [dropdownY, setDropdownY] = useState(y);
 
   // Effects
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!dropdownRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = dropdownRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;

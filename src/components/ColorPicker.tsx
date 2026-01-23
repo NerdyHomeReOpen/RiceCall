@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 import { ColorResult, SketchPicker } from 'react-color';
 
 import styles from '@/styles/color.module.css';
 
-export interface ColorPickerProps {
+interface ColorPickerProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -27,7 +27,7 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
   };
 
   // Effects
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!colorPickerRef.current) return;
     const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = colorPickerRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;

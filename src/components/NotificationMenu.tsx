@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import Image from 'next/image';
 
 import type * as Types from '@/types';
@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 import styles from '@/styles/notificationMenu.module.css';
 import contextMenuStyles from '@/styles/contextMenu.module.css';
 
-export interface NotificationMenuProps {
+interface NotificationMenuProps {
   x: number;
   y: number;
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
@@ -27,7 +27,7 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
   const filteredItems = useMemo(() => items.filter((item) => item?.show ?? true), [items]);
 
   // Effect
-  useEffect(() => {
+  useLayoutEffect(() => {
     if (!menuRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
