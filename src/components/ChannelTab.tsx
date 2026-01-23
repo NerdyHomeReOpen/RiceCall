@@ -111,7 +111,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
 
   // Handlers
   const handleTabClick = () => {
-    dispatch(setSelectedItemId(`channel-${channel.channelId}`));
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`channel-${channel.channelId}`));
   };
 
   const handleTabDoubleClick = () => {
@@ -158,8 +159,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   };
 
   const handleTabExpandedClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`channel-${channel.channelId}`));
+    setIsExpanded(!isExpanded);
   };
 
   // Effect
