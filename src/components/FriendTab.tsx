@@ -13,7 +13,6 @@ import LevelIcon from '@/components/LevelIcon';
 import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
 import * as Popup from '@/utils/popup';
@@ -31,7 +30,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { selectTab } = useMainTab();
   const { getIsLoading, loadServer } = useLoading();
   const dispatch = useAppDispatch();
 
@@ -84,11 +82,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
 
   // Handlers
   const handleServerNameClick = () => {
-    if (getIsLoading() || !friendCurrentServer) return;
-    if (friendCurrentServer.serverId === user.currentServerId) {
-      selectTab('server');
-      return;
-    }
+    if (getIsLoading() || !friendCurrentServer || user.currentServerId === friendCurrentServer.serverId) return;
     loadServer(friendCurrentServer.specialId || friendCurrentServer.displayId);
     ipc.socket.send('connectServer', { serverId: friendCurrentServer.serverId });
   };

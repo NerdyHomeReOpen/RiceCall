@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppDispatch, useAppSelector } from '@/store/hook';
@@ -24,7 +24,6 @@ import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/FindMe';
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 import { useActionScanner } from '@/providers/ActionScanner';
 
@@ -40,7 +39,12 @@ type Tab = {
   label: string;
 };
 
-const Header: React.FC = React.memo(() => {
+interface HeaderProps {
+  selectedTab: 'home' | 'friends' | 'server';
+  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
+}
+
+const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) => {
   // Hooks
   const { t, i18n } = useTranslation();
   const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
@@ -213,6 +217,10 @@ const Header: React.FC = React.memo(() => {
     Popup.openUserInfo(user.userId, user.userId);
   };
 
+  const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
+    onTabSelect(tabId);
+  };
+
   // Effects
   useEffect(() => {
     const next = isIdling ? 'idle' : 'online';
@@ -239,7 +247,7 @@ const Header: React.FC = React.memo(() => {
       </div>
       <div className={headerStyles['main-tabs']}>
         {mainTabs.map((tab) => (
-          <TabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} />
+          <TabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
         ))}
       </div>
       <div className={headerStyles['buttons']}>
@@ -263,18 +271,14 @@ Header.displayName = 'Header';
 interface TabItemProps {
   tab: Tab;
   currentServerId: string | null;
+  isSelected: boolean;
+  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
 }
 
-const TabItem = React.memo(({ tab, currentServerId }: TabItemProps) => {
-  // Hooks
-  const { selectedTabId, selectTab } = useMainTab();
-
-  // Variables
-  const isSelected = tab.id === selectedTabId;
-
+const TabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: TabItemProps) => {
   // Handlers
   const handleTabClick = () => {
-    selectTab(tab.id);
+    onTabSelect(tab.id);
   };
 
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -303,12 +307,11 @@ TabItem.displayName = 'TabItem';
 const RootPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
-  const { selectedTabId, selectTab } = useMainTab();
   const { getIsLoading, loadServer, stopLoading } = useLoading();
   const dispatch = useAppDispatch();
 
-  // Refs
-  const selectedTabIdRef = useRef<'home' | 'friends' | 'server'>(selectedTabId);
+  // States
+  const [selectedTab, setSelectedTab] = useState<'home' | 'friends' | 'server'>('home');
 
   // Selectors
   const user = useAppSelector(
@@ -331,18 +334,19 @@ const RootPageComponent: React.FC = React.memo(() => {
   const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   // Variables
-  const isSelectedHomePage = selectedTabId === 'home';
-  const isSelectedFriendsPage = selectedTabId === 'friends';
-  const isSelectedServerPage = selectedTabId === 'server';
+  const isSelectedHomePage = selectedTab === 'home';
+  const isSelectedFriendsPage = selectedTab === 'friends';
+  const isSelectedServerPage = selectedTab === 'server';
+
+  // Handlers
+  const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
+    setSelectedTab(tabId);
+  };
 
   // Effects
   useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
-
-  useEffect(() => {
-    selectedTabIdRef.current = selectedTabId;
-  }, [selectedTabId]);
 
   useEffect(() => {
     if (user.userId) return;
@@ -359,29 +363,25 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user, dispatch]);
 
   useEffect(() => {
-    if (user.currentServerId && selectedTabIdRef.current !== 'server') selectTab('server');
-    else if (!user.currentServerId && selectedTabIdRef.current === 'server') selectTab('home');
+    if (user.currentServerId ) setSelectedTab('server');
+    else if (!user.currentServerId ) setSelectedTab('home');
     stopLoading();
-  }, [user.currentServerId, stopLoading, selectTab]);
+  }, [user.currentServerId, stopLoading]);
 
   useEffect(() => {
     const onTriggerHandleServerSelect = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
-      if (getIsLoading()) return;
-      if (serverId === user.currentServerId) {
-        selectTab('server');
-        return;
-      }
+      if (getIsLoading() || user.currentServerId === serverId) return;
       loadServer(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
     };
     window.addEventListener('storage', onTriggerHandleServerSelect);
     return () => window.removeEventListener('storage', onTriggerHandleServerSelect);
-  }, [user.currentServerId, getIsLoading, loadServer, selectTab]);
+  }, [user.currentServerId, getIsLoading, loadServer]);
 
   useEffect(() => {
-    switch (selectedTabId) {
+    switch (selectedTab) {
       case 'home':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-home-page'),
@@ -419,14 +419,14 @@ const RootPageComponent: React.FC = React.memo(() => {
         });
         break;
     }
-  }, [selectedTabId, user.name, currentServer.name, onlineMembersLength, t]);
+  }, [selectedTab, user.name, currentServer.name, onlineMembersLength, t]);
 
   return (
     <WebRTCProvider>
       <ActionScannerProvider>
         <ExpandedProvider>
           <SocketManager />
-          <Header />
+          <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
           {!user.userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (

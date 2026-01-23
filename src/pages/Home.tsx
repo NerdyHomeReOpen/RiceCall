@@ -12,7 +12,6 @@ import ServerList from '@/components/ServerList';
 import MarkdownContent from '@/components/MarkdownContent';
 import RecommendServerCard from '@/components/RecommendServerCard';
 
-import { useMainTab } from '@/providers/MainTab';
 import { useLoading } from '@/providers/Loading';
 
 import * as Popup from '@/utils/popup';
@@ -29,7 +28,6 @@ interface HomePageProps {
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   // Hooks
   const { t } = useTranslation();
-  const { selectTab } = useMainTab();
   const { getIsLoading, loadServer } = useLoading();
 
   // Refs
@@ -129,16 +127,12 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
 
   const selectServer = useCallback(
     (server: Types.Server) => {
-      if (getIsLoading()) return;
-      if (server.serverId === user.currentServerId) {
-        selectTab('server');
-        return;
-      }
+      if (getIsLoading() || user.currentServerId === server.serverId) return;
       loadServer(server.specialId || server.displayId);
       ipc.socket.send('connectServer', { serverId: server.serverId });
       clearSearchState();
     },
-    [user.currentServerId, getIsLoading, loadServer, selectTab],
+    [user.currentServerId, getIsLoading, loadServer],
   );
 
   // Handlers

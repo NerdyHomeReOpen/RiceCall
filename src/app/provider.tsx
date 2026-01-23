@@ -10,7 +10,6 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import ContextMenuProvider from '@/providers/ContextMenu';
-import MainTabProvider from '@/providers/MainTab';
 import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
@@ -72,15 +71,13 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
 
   return (
     <Provider store={store}>
-      <MainTabProvider>
-        <LoadingProvider>
-          <ContextMenuProvider>
-            <SoundPlayerProvider>
-              <ImageViewerProvider>{children}</ImageViewerProvider>
-            </SoundPlayerProvider>
-          </ContextMenuProvider>
-        </LoadingProvider>
-      </MainTabProvider>
+      <LoadingProvider>
+        <ContextMenuProvider>
+          <SoundPlayerProvider>
+            <ImageViewerProvider>{children}</ImageViewerProvider>
+          </SoundPlayerProvider>
+        </ContextMenuProvider>
+      </LoadingProvider>
     </Provider>
   );
 };

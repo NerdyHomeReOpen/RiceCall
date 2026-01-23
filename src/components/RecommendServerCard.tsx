@@ -9,7 +9,6 @@ import type * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
-import { useMainTab } from '@/providers/MainTab';
 
 import * as Popup from '@/utils/popup';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
@@ -25,7 +24,6 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { getIsLoading, loadServer } = useLoading();
-  const { selectTab } = useMainTab();
 
   // Selectors
   const user = useAppSelector(
@@ -48,11 +46,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
 
   // Handlers
   const handleServerCardClick = () => {
-    if (getIsLoading()) return;
-    if (recommendServer.serverId === user.currentServerId) {
-      selectTab('server');
-      return;
-    }
+    if (getIsLoading() || user.currentServerId === recommendServer.serverId) return;
     loadServer(recommendServer.specialId || recommendServer.displayId);
     ipc.socket.send('connectServer', { serverId: recommendServer.serverId });
   };
