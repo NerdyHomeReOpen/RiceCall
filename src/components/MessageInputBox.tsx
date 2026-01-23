@@ -26,11 +26,7 @@ import styles from '@/styles/messageInputBox.module.css';
 import markdown from '@/styles/markdown.module.css';
 import emoji from '@/styles/emoji.module.css';
 
-interface MessageInputBoxProps {
-  onMessageSend?: (message: string) => void;
-}
-
-const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageSend }) => {
+const MessageInputBox: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
@@ -174,7 +170,7 @@ const MessageInputBox: React.FC<MessageInputBoxProps> = React.memo(({ onMessageS
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInputRef.current.trim().length === 0) return;
-      onMessageSend?.(messageInputRef.current);
+      Popup.sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: messageInputRef.current });
       setLastMessageTime(Date.now());
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
       setStyles();

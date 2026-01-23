@@ -16,7 +16,7 @@ import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 import MicModeMenu from '@/components/MicModeMenu';
 
-import { useWebRTC } from '@/providers/WebRTC';
+import { useWebRTC, useWebRTCStore } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Permission from '@/utils/permission';
@@ -36,28 +36,14 @@ interface ServerPageProps {
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) => {
   // Hooks
   const { t } = useTranslation();
-  const {
-    isSpeakKeyPressed,
-    isMixModeActive,
-    isMicMuted,
-    isSpeakerMuted,
-    isRecording,
-    micVolume,
-    speakerVolume,
-    recordTime,
-    isSpeaking,
-    getVolumePercent,
-    changeBitrate,
-    takeMic,
-    releaseMic,
-    stopMixing,
-    toggleMixMode,
-    toggleMicMuted,
-    toggleSpeakerMuted,
-    toggleRecording,
-    changeMicVolume,
-    changeSpeakerVolume,
-  } = useWebRTC();
+  const { changeBitrate, takeMic, releaseMic, stopMixing, toggleMixMode, toggleRecording } = useWebRTC();
+  const isSpeakKeyPressed = useWebRTCStore('isSpeakKeyPressed');
+  const isMixModeActive = useWebRTCStore('isMixModeActive');
+  const isMicMuted = useWebRTCStore('isMicMuted');
+  const isSpeakerMuted = useWebRTCStore('isSpeakerMuted');
+  const isRecording = useWebRTCStore('isRecording');
+  const recordTime = useWebRTCStore('recordTime');
+  const volumeLevel = useWebRTCStore('volumeLevel');
   const { showContextMenu, showMicContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
@@ -127,10 +113,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const isCentralAreaShowMode = centralAreaMode === 'show';
   const isChannelUIClassicMode = channelUIMode === 'classic';
   const isChannelUIThreeLineMode = channelUIMode === 'three-line';
-  const volumeLevel = isSpeaking('user') ? Math.ceil(getVolumePercent('user') / 10) - 1 : 0;
   const isControlled = !Permission.isChannelMod(permissionLevel) && isQueueControlled;
   const isQueuing = queuePosition !== undefined && queuePosition > 0;
-  const isMicTaken = queuePosition === 0;
+  const isMicTaken = queuePosition !== undefined && queuePosition <= 0;
   const isIdling = !isMicTaken && !isQueuing;
 
   // Functions
@@ -149,7 +134,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
       return t('press-key-to-speak', { '0': speakingKey });
     }
     if (isMixModeActive) return t('speaking-with-mix');
-    if (micVolume === 0) return t('mic-muted');
+    if (isMicMuted) return t('mic-muted');
     return t('speaking');
   };
 
@@ -328,10 +313,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     showContextMenu(x, y, 'right-top', getContextMenuItems3());
   };
 
-  const handleMessageSend = (message: string) => {
-    Popup.sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: message });
-  };
-
   const handleNewMessageAlertClick = () => {
     clearUnreadMessageNotification();
   };
@@ -348,24 +329,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     toggleMixMode();
   };
 
-  const handleMicVolumeChange = (value: number) => {
-    changeMicVolume(value);
-  };
-
-  const handleMicVolumeBtnClick = () => {
-    toggleMicMuted();
-  };
-
   const handleMicModeDropdownBtnClick = () => {
     setIsMicModeMenuVisible(true);
-  };
-
-  const handleSpeakerVolumeChange = (value: number) => {
-    changeSpeakerVolume(value);
-  };
-
-  const handleSpeakerVolumeBtnClick = () => {
-    toggleSpeakerMuted();
   };
 
   const handleRecordModeBtnClick = () => {
@@ -534,7 +499,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
                   <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} />
                   <div className={styles['close-button']} onClick={handleCloseActionMessageBtnClick} />
                 </div>
-                <MessageInputBox onMessageSend={handleMessageSend} />
+                <MessageInputBox />
               </div>
             </div>
           </div>
@@ -560,21 +525,14 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
               <div className={styles['saperator-1']} />
               <div className={styles['mic-volume-container']}>
                 <div className={`${styles['mic-btn']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
-                <VolumeSlider value={micVolume} muted={isMicMuted} onChange={handleMicVolumeChange} onClick={handleMicVolumeBtnClick} railCls={styles['volume-slider']} btnCls={styles['mic-btn']} />
+                <MicVolumeSlider />
                 <div className={styles['mic-mode-dropdown-btn']} onClick={handleMicModeDropdownBtnClick}>
                   {isMicModeMenuVisible ? <MicModeMenu /> : ''}
                 </div>
               </div>
               <div className={styles['speaker-volume-container']}>
                 <div className={`${styles['speaker-btn']} ${isSpeakerMuted ? styles['muted'] : ''}`} />
-                <VolumeSlider
-                  value={speakerVolume}
-                  muted={isSpeakerMuted}
-                  onChange={handleSpeakerVolumeChange}
-                  onClick={handleSpeakerVolumeBtnClick}
-                  railCls={styles['volume-slider']}
-                  btnCls={styles['speaker-btn']}
-                />
+                <SpeakerVolumeSlider />
               </div>
               <div className={`${styles['record-mode']} ${isRecording ? styles['active'] : ''}`}>
                 <div className={`${styles['record-mode-btn']} ${isRecording ? styles['active'] : ''}`} onClick={handleRecordModeBtnClick} />
@@ -594,68 +552,111 @@ const ServerPage = dynamic(() => Promise.resolve(ServerPageComponent), { ssr: fa
 
 export default ServerPage;
 
-interface VolumeSliderProps {
-  value: number;
-  muted: boolean;
-  onChange: (value: number) => void;
-  onClick: () => void;
-  railCls: string;
-  btnCls: string;
-}
+const MicVolumeSlider = React.memo(() => {
+  // Hooks
+  const { changeMicVolume, toggleMicMuted } = useWebRTC();
+  const isMicMuted = useWebRTCStore('isMicMuted');
+  const micVolume = useWebRTCStore('micVolume');
 
-const VolumeSlider = React.memo(
-  function VolumeSlider({ value, muted, onChange, onClick, railCls, btnCls }: VolumeSliderProps) {
-    // Refs
-    const sliderRef = useRef<HTMLInputElement>(null);
-    const isBtnHoveredRef = useRef<boolean>(false);
+  // Refs
+  const sliderRef = useRef<HTMLInputElement>(null);
+  const isBtnHoveredRef = useRef<boolean>(false);
 
-    // Handlers
-    const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      onChange(parseInt(e.target.value));
-    };
+  // Handlers
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    changeMicVolume(parseInt(e.target.value));
+  };
 
-    const handleBtnClick = () => {
-      onClick();
-    };
+  const handleBtnClick = () => {
+    toggleMicMuted();
+  };
 
-    const handleBtnMouseDown = () => {
-      isBtnHoveredRef.current = true;
-    };
+  const handleBtnMouseDown = () => {
+    isBtnHoveredRef.current = true;
+  };
 
-    const handleBtnMouseUp = () => {
-      isBtnHoveredRef.current = false;
-    };
+  const handleBtnMouseUp = () => {
+    isBtnHoveredRef.current = false;
+  };
 
-    const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-      if (!isBtnHoveredRef.current) return;
-      const newValue = parseInt(sliderRef.current!.value);
-      if (e.deltaY > 0) {
-        sliderRef.current!.value = (newValue - 4).toString();
-      } else {
-        sliderRef.current!.value = (newValue + 4).toString();
-      }
-      onChange(parseInt(sliderRef.current!.value));
-    };
+  const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    if (!isBtnHoveredRef.current) return;
+    const newValue = parseInt(sliderRef.current!.value);
+    if (e.deltaY > 0) sliderRef.current!.value = (newValue - 4).toString();
+    else sliderRef.current!.value = (newValue + 4).toString();
+    changeMicVolume(parseInt(sliderRef.current!.value));
+  };
 
-    return (
-      <div className={railCls}>
-        <div className={styles['slider-container']}>
-          <input ref={sliderRef} type="range" min="0" max="100" value={value} onChange={handleSliderChange} className={styles['slider']} />
-        </div>
-        <div
-          className={`${btnCls} ${muted ? styles['muted'] : styles['active']}`}
-          onClick={handleBtnClick}
-          onMouseEnter={handleBtnMouseDown}
-          onMouseLeave={handleBtnMouseUp}
-          onWheel={handleBtnWheel}
-        />
+  return (
+    <div className={styles['volume-slider']}>
+      <div className={styles['slider-container']}>
+        <input ref={sliderRef} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
       </div>
-    );
-  },
-  (prev, next) => prev.value === next.value && prev.muted === next.muted,
-);
+      <div
+        className={`${styles['mic-btn']} ${isMicMuted ? styles['muted'] : styles['active']}`}
+        onClick={handleBtnClick}
+        onMouseEnter={handleBtnMouseDown}
+        onMouseLeave={handleBtnMouseUp}
+        onWheel={handleBtnWheel}
+      />
+    </div>
+  );
+});
 
-VolumeSlider.displayName = 'VolumeSlider';
+MicVolumeSlider.displayName = 'MicVolumeSlider';
+
+const SpeakerVolumeSlider = React.memo(() => {
+  // Hooks
+  const { changeSpeakerVolume, toggleSpeakerMuted } = useWebRTC();
+  const isSpeakerMuted = useWebRTCStore('isSpeakerMuted');
+  const speakerVolume = useWebRTCStore('speakerVolume');
+
+  // Refs
+  const sliderRef = useRef<HTMLInputElement>(null);
+  const isBtnHoveredRef = useRef<boolean>(false);
+
+  // Handlers
+  const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    changeSpeakerVolume(parseInt(e.target.value));
+  };
+
+  const handleBtnClick = () => {
+    toggleSpeakerMuted();
+  };
+
+  const handleBtnMouseDown = () => {
+    isBtnHoveredRef.current = true;
+  };
+
+  const handleBtnMouseUp = () => {
+    isBtnHoveredRef.current = false;
+  };
+
+  const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
+    if (!isBtnHoveredRef.current) return;
+    const newValue = parseInt(sliderRef.current!.value);
+    if (e.deltaY > 0) sliderRef.current!.value = (newValue - 4).toString();
+    else sliderRef.current!.value = (newValue + 4).toString();
+    changeSpeakerVolume(parseInt(sliderRef.current!.value));
+  };
+
+  return (
+    <div className={styles['volume-slider']}>
+      <div className={styles['slider-container']}>
+        <input ref={sliderRef} type="range" min="0" max="100" value={speakerVolume} onChange={handleSliderChange} className={styles['slider']} />
+      </div>
+      <div
+        className={`${styles['speaker-btn']} ${isSpeakerMuted ? styles['muted'] : styles['active']}`}
+        onClick={handleBtnClick}
+        onMouseEnter={handleBtnMouseDown}
+        onMouseLeave={handleBtnMouseUp}
+        onWheel={handleBtnWheel}
+      />
+    </div>
+  );
+});
+
+SpeakerVolumeSlider.displayName = 'SpeakerVolumeSlider';
 
 const ShowFrame: React.FC = React.memo(() => {
   // Refs

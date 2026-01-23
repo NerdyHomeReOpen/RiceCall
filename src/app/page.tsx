@@ -363,8 +363,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user, dispatch]);
 
   useEffect(() => {
-    if (user.currentServerId ) setSelectedTab('server');
-    else if (!user.currentServerId ) setSelectedTab('home');
+    if (user.currentServerId) setSelectedTab('server');
+    else if (!user.currentServerId) setSelectedTab('home');
     stopLoading();
   }, [user.currentServerId, stopLoading]);
 

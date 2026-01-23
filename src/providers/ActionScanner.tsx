@@ -5,8 +5,6 @@ import { useWebRTC } from '@/providers/WebRTC';
 
 import Logger from '@/utils/logger';
 
-const BASE_VOLUME = 5;
-
 type ActionScannerContextType = {
   isIdling: boolean;
   isManualIdling: boolean;
@@ -27,7 +25,7 @@ interface ActionScannerProviderProps {
 
 const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   // Hooks
-  const { pressSpeakKey, releaseSpeakKey, changeSpeakerVolume, toggleSpeakerMuted, toggleMicMuted, speakerVolume } = useWebRTC();
+  const { pressSpeakKey, releaseSpeakKey, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted, toggleMicMuted } = useWebRTC();
 
   // Refs
   const idleCheck = useRef<boolean>(false);
@@ -79,14 +77,12 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   }, []);
 
   const toggleUpVolume = useCallback(() => {
-    const newValue = Math.min(100, speakerVolume + BASE_VOLUME);
-    changeSpeakerVolume(newValue);
-  }, [changeSpeakerVolume, speakerVolume]);
+    addSpeakerVolume();
+  }, [addSpeakerVolume]);
 
   const toggleDownVolume = useCallback(() => {
-    const newValue = Math.max(0, speakerVolume - BASE_VOLUME);
-    changeSpeakerVolume(newValue);
-  }, [changeSpeakerVolume, speakerVolume]);
+    subtractSpeakerVolume();
+  }, [subtractSpeakerVolume]);
 
   const toggleSpeakerMute = useCallback(() => {
     toggleSpeakerMuted();

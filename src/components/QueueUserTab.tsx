@@ -8,7 +8,7 @@ import BadgeList from '@/components/BadgeList';
 import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useWebRTC } from '@/providers/WebRTC';
+import { useWebRTC, useWebRTCIsMuted, useWebRTCIsSpeaking } from '@/providers/WebRTC';
 
 import * as Popup from '@/utils/popup';
 import * as Default from '@/utils/default';
@@ -27,7 +27,9 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
-  const { isMuted, isSpeaking, unmuteUser, muteUser } = useWebRTC();
+  const { unmuteUser, muteUser } = useWebRTC();
+  const isSpeaking = useWebRTCIsSpeaking(queueUserId);
+  const isMuted = useWebRTCIsMuted(queueUserId);
   const dispatch = useAppDispatch();
 
   // Refs
@@ -62,31 +64,28 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
-  const queueUsers = useAppSelector((state) => state.queueUsers.data, shallowEqual);
+  const queueUser = useAppSelector((state) => state.queueUsers.data.find((qu) => qu.userId === queueUserId), shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`, shallowEqual);
 
   // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const queueMember = useMemo(() => {
     const onlineMember = onlineMembers.find((om) => om.userId === queueUserId);
-    const queueUser = queueUsers.find((qu) => qu.userId === queueUserId);
     if (!onlineMember || !queueUser) return Default.queueMember();
     return { ...queueUser, ...onlineMember };
-  }, [onlineMembers, queueUsers, queueUserId]);
+  }, [onlineMembers, queueUser, queueUserId]);
   const isSelf = queueMember.userId === user.userId;
   const isInLobby = queueMember.currentChannelId === currentServer.lobbyId;
   const hasVip = queueMember.vip > 0;
   const isOnMic = queueMember.position === 0;
-  const isMemberSpeaking = isSelf ? isSpeaking('user') : isSpeaking(queueMember.userId);
-  const isMemberMuted = isSelf ? isMuted('user') : isMuted(queueMember.userId);
   const isControlled = isOnMic && queueMember.isQueueControlled && !Permission.isChannelMod(permissionLevel);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === 2), [friends, queueMember.userId]);
   const isLowerLevel = queueMember.permissionLevel < permissionLevel;
 
   // Functions
   const getStatusIcon = () => {
-    if (isMemberMuted || queueMember.isVoiceMuted || isControlled) return 'muted';
-    if (isMemberSpeaking) return 'play';
+    if (isMuted || queueMember.isVoiceMuted || isControlled) return 'muted';
+    if (isSpeaking) return 'play';
     return '';
   };
 
@@ -127,7 +126,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, queueMember.userId))
       .addViewProfileOption(() => Popup.openUserInfo(user.userId, queueMember.userId))
       .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(user.userId, queueMember.userId))
-      .addSetMuteOption({ isSelf, isMuted: isMemberMuted }, () => (isMemberMuted ? unmuteUser(queueMember.userId) : muteUser(queueMember.userId)))
+      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? unmuteUser(queueMember.userId) : muteUser(queueMember.userId)))
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(queueMember.userId, currentServer.serverId))
       .addSeparator()
       .addForbidVoiceOption({ isSelf, isLowerLevel, isVoiceMuted: queueMember.isVoiceMuted }, () =>

@@ -9,7 +9,7 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
-import { useWebRTC } from '@/providers/WebRTC';
+import { useWebRTC, useWebRTCIsMuted, useWebRTCIsSpeaking } from '@/providers/WebRTC';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
@@ -33,7 +33,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
-  const { isMuted, isSpeaking, unmuteUser, muteUser } = useWebRTC();
+  const { unmuteUser, muteUser } = useWebRTC();
+  const isSpeaking = useWebRTCIsSpeaking(member.userId);
+  const isMuted = useWebRTCIsMuted(member.userId);
   const { setCurrentUserRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
@@ -77,8 +79,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const isSelf = member.userId === user.userId;
   const isInSameChannel = member.currentChannelId === currentChannel.channelId;
   const isInLobby = member.currentChannelId === currentServer.lobbyId;
-  const isMemberSpeaking = isSelf ? isSpeaking('user') : isSpeaking(member.userId);
-  const isMemberMuted = isSelf ? isMuted('user') : isMuted(member.userId);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === member.userId && f.relationStatus === 2), [friends, member.userId]);
   const isLowerLevel = member.permissionLevel < permissionLevel;
   const isEqualOrLowerLevel = member.permissionLevel <= permissionLevel;
@@ -88,8 +88,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
 
   // Functions
   const getStatusIcon = () => {
-    if (isMemberMuted || member.isVoiceMuted) return 'muted';
-    if (isMemberSpeaking) return 'play';
+    if (isMuted || member.isVoiceMuted) return 'muted';
+    if (isSpeaking) return 'play';
     return '';
   };
 
@@ -122,7 +122,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, member.userId))
       .addViewProfileOption(() => Popup.openUserInfo(user.userId, member.userId))
       .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(user.userId, member.userId))
-      .addSetMuteOption({ isSelf, isMuted: isMemberMuted }, () => (isMemberMuted ? unmuteUser(member.userId) : muteUser(member.userId)))
+      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? unmuteUser(member.userId) : muteUser(member.userId)))
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(member.userId, currentServer.serverId))
       .addSeparator()
       .addMoveToChannelOption({ currentPermissionLevel, permissionLevel, isSelf, isInSameChannel, isEqualOrLowerLevel }, () =>
