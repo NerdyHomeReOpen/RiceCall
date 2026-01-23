@@ -447,7 +447,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
                   <MarkdownContent markdownText={currentChannel.announcement || currentServer.announcement} imageSize={'big'} />
                 </div>
               ) : isCentralAreaShowMode ? (
-                <div style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
+                <div ref={showAreaRef} style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
                   <ShowFrame />
                 </div>
               ) : null)}
