@@ -22,7 +22,7 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session } from 'electron';
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
 import { initMainI18n, t } from './src/i18n.main.js';
@@ -714,6 +714,19 @@ export function configureTray() {
 }
 
 app.on('ready', async () => {
+  if (DEV) {
+    const reactDevToolsPath = process.env.REACT_DEV_TOOLS_PATH || '';
+
+    try {
+      await session.defaultSession.extensions.loadExtension(reactDevToolsPath, {
+        allowFileAccess: true,
+      });
+      new Logger('System').info('React DevTools loaded successfully');
+    } catch (err) {
+      new Logger('System').error(`Cannot load React DevTools: ${err}`);
+    }
+  }
+  
   // Load env
   loadEnv(store.get('server', 'prod'));
 
