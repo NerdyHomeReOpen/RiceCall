@@ -25,7 +25,7 @@ interface CategoryTabProps {
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   // Hooks
   const { showContextMenu } = useContextMenu();
-  const { expandCategoryHandlerRef } = useFindMeContext();
+  const { setExpandedCategoryHandlerRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
   // Selectors
@@ -160,8 +160,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   // Effect
   useEffect(() => {
     if (!isInCategory) return;
-    expandCategoryHandlerRef.current = () => setIsExpanded(true);
-  }, [expandCategoryHandlerRef, isInCategory]);
+    setExpandedCategoryHandlerRef(() => setIsExpanded(true));
+  }, [isInCategory, setExpandedCategoryHandlerRef]);
 
   return (
     <>

@@ -26,7 +26,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { expandChannelHandlerRef } = useFindMeContext();
+  const { setExpandedChannelHandlerRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
   // Selectors
@@ -165,8 +165,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   // Effect
   useEffect(() => {
     if (!isInChannel) return;
-    expandChannelHandlerRef.current = () => setIsExpanded(true);
-  }, [expandChannelHandlerRef, isInChannel]);
+    setExpandedChannelHandlerRef(() => setIsExpanded(true));
+  }, [isInChannel, setExpandedChannelHandlerRef]);
 
   return (
     <>

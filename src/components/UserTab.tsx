@@ -34,7 +34,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { isMuted, isSpeaking, unmuteUser, muteUser } = useWebRTC();
-  const { userTabRef: findMeUserTabRef } = useFindMeContext();
+  const { setCurrentUserRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
   // Refs
@@ -191,8 +191,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   // Effects
   useEffect(() => {
     if (!isSelf) return;
-    findMeUserTabRef.current = userTabRef.current;
-  }, [findMeUserTabRef, isSelf]);
+    setCurrentUserRef(userTabRef.current);
+  }, [isSelf, setCurrentUserRef]);
 
   return (
     <div

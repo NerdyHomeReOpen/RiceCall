@@ -2,9 +2,9 @@ import { createContext, useContext, useMemo, useRef, useCallback } from 'react';
 
 interface FindMeContextType {
   findMe: () => void;
-  expandCategoryHandlerRef: React.RefObject<() => void>;
-  expandChannelHandlerRef: React.RefObject<() => void>;
-  userTabRef: React.RefObject<HTMLDivElement | null>;
+  setExpandedCategoryHandlerRef: (handler: () => void) => void;
+  setExpandedChannelHandlerRef: (handler: () => void) => void;
+  setCurrentUserRef: (ref: HTMLDivElement | null) => void;
 }
 
 const FindMeContext = createContext<FindMeContextType | null>(null);
@@ -19,24 +19,39 @@ export const useFindMeContext = () => {
 
 const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
   // Refs
-  const expandCategoryHandlerRef = useRef<() => void>(() => {});
-  const expandChannelHandlerRef = useRef<() => void>(() => {});
-  const userTabRef = useRef<HTMLDivElement>(null);
+  const expandedCategoryHandlerRef = useRef<() => void>(null);
+  const expandedChannelHandlerRef = useRef<() => void>(null);
+  const currentUserRef = useRef<HTMLDivElement>(null);
 
   // Functions
   const findMe = useCallback(() => {
-    expandCategoryHandlerRef.current();
-    expandChannelHandlerRef.current();
+    expandedCategoryHandlerRef.current?.();
+    expandedChannelHandlerRef.current?.();
 
     setTimeout(() => {
-      userTabRef.current?.scrollIntoView({
+      currentUserRef.current?.scrollIntoView({
         behavior: 'smooth',
         block: 'center',
       });
     }, 100);
   }, []);
 
-  const contextValue = useMemo(() => ({ findMe, expandCategoryHandlerRef, expandChannelHandlerRef, userTabRef }), [findMe]);
+  const setExpandedCategoryHandlerRef = useCallback((handler: () => void) => {
+    expandedCategoryHandlerRef.current = handler;
+  }, []);
+
+  const setExpandedChannelHandlerRef = useCallback((handler: () => void) => {
+    expandedChannelHandlerRef.current = handler;
+  }, []);
+
+  const setCurrentUserRef = useCallback((ref: HTMLDivElement | null) => {
+    currentUserRef.current = ref;
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({ findMe, setExpandedCategoryHandlerRef, setExpandedChannelHandlerRef, setCurrentUserRef }),
+    [findMe, setExpandedCategoryHandlerRef, setExpandedChannelHandlerRef, setCurrentUserRef],
+  );
 
   return <FindMeContext.Provider value={contextValue}>{children}</FindMeContext.Provider>;
 };
