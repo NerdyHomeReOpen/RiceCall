@@ -110,7 +110,7 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ direction,
     <div
       key={item.id}
       className={`${styles['option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? styles['disabled'] : ''}`}
-      data-type={item.icon || item.id || ''}
+      data-type={item.icon || ''}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}

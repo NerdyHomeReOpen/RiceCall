@@ -163,13 +163,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     clearUnreadMessageNotification();
   }, []);
 
-  const getContextMenuItems1 = () => new CtxMenuBuilder().addCloseAnnouncementOption({ permissionLevel }, () => setCentralAreaMode('none')).build();
+  const getContextMenuItems1 = () => new CtxMenuBuilder().addCloseAnnouncementOption(() => setCentralAreaMode('none')).build();
 
   const getContextMenuItems2 = () =>
     new CtxMenuBuilder()
-      .addCleanUpMessageOption({ permissionLevel }, () => clearMessages())
-      .addOpenChannelEventOption({ permissionLevel }, () => Popup.openChannelEvent(user.userId, currentServer.serverId, channelEvents))
-      .addOpenAnnouncementOption({ permissionLevel }, () => setCentralAreaMode('announcement'))
+      .addCleanUpMessageOption(() => clearMessages())
+      .addOpenChannelEventOption(() => Popup.openChannelEvent(user.userId, currentServer.serverId, channelEvents))
+      .addOpenAnnouncementOption(() => setCentralAreaMode('announcement'))
       .build();
 
   const getContextMenuItems3 = () =>

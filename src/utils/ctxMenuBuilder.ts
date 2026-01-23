@@ -139,6 +139,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'member-management',
       label: 'member-management',
+      icon: 'member-management',
       show: Permission.isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
@@ -150,6 +151,7 @@ export default class ContextMenuClass {
       id: 'edit-nickname',
       label: 'edit-nickname',
       show: (params.isSelf || (Permission.isServerAdmin(params.permissionLevel) && params.isLowerLevel)) && Permission.isMember(params.permissionLevel),
+      icon: 'edit-nickname',
       onClick: onClick,
     });
     return this;
@@ -159,6 +161,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'locate-me',
       label: 'locate-me',
+      icon: 'locate-me',
       onClick: onClick,
     });
     return this;
@@ -168,6 +171,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'report',
       label: 'report',
+      icon: 'report',
       onClick: onClick,
     });
     return this;
@@ -177,6 +181,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'favorite-server',
       label: params.isFavorite ? 'unfavorite' : 'favorite',
+      icon: params.isFavorite ? 'unfavorite-server' : 'favorite-server',
       onClick: onClick,
     });
     return this;
@@ -186,6 +191,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'system-setting',
       label: 'system-setting',
+      icon: 'system-setting',
       onClick: onClick,
     });
     return this;
@@ -195,6 +201,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'change-theme',
       label: 'change-theme',
+      icon: 'change-theme',
       onClick: onClick,
     });
     return this;
@@ -204,6 +211,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'feedback',
       label: 'feedback',
+      icon: 'feedback',
       onClick: onClick,
     });
     return this;
@@ -246,54 +254,11 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addFAQOption(onClick: () => void): this {
-    this.options.push({
-      id: 'faq',
-      label: 'faq',
-      onClick: onClick,
-    });
-    return this;
-  }
-
-  addAgreementOption(onClick: () => void): this {
-    this.options.push({
-      id: 'agreement',
-      label: 'agreement',
-      onClick: onClick,
-    });
-    return this;
-  }
-
-  addSpecificationOption(onClick: () => void): this {
-    this.options.push({
-      id: 'specification',
-      label: 'specification',
-      onClick: onClick,
-    });
-    return this;
-  }
-
-  addContactUsOption(onClick: () => void): this {
-    this.options.push({
-      id: 'contact-us',
-      label: 'contact-us',
-      onClick: onClick,
-    });
-    return this;
-  }
-  addAboutUsOption(onClick: () => void): this {
-    this.options.push({
-      id: 'about-us',
-      label: 'about-us',
-      onClick: onClick,
-    });
-    return this;
-  }
-
   addLogoutOption(onClick: () => void): this {
     this.options.push({
       id: 'logout',
       label: 'logout',
+      icon: 'logout',
       onClick: onClick,
     });
     return this;
@@ -303,6 +268,7 @@ export default class ContextMenuClass {
     this.options.push({
       id: 'exit',
       label: 'exit',
+      icon: 'exit',
       onClick: onClick,
     });
     return this;
@@ -662,41 +628,37 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addOpenAnnouncementOption(params: { permissionLevel: Types.Permission }, onClick: () => void): this {
+  addOpenAnnouncementOption(onClick: () => void): this {
     this.options.push({
       id: 'open-announcement',
       label: 'open-announcement',
-      show: Permission.isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
     return this;
   }
 
-  addCloseAnnouncementOption(params: { permissionLevel: Types.Permission }, onClick: () => void): this {
+  addCloseAnnouncementOption(onClick: () => void): this {
     this.options.push({
       id: 'close-announcement',
       label: 'close-announcement',
-      show: Permission.isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
     return this;
   }
 
-  addCleanUpMessageOption(params: { permissionLevel: Types.Permission }, onClick: () => void): this {
+  addCleanUpMessageOption(onClick: () => void): this {
     this.options.push({
       id: 'clean-up-message',
       label: 'clean-up-message',
-      show: Permission.isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
     return this;
   }
 
-  addOpenChannelEventOption(params: { permissionLevel: Types.Permission }, onClick: () => void): this {
+  addOpenChannelEventOption(onClick: () => void): this {
     this.options.push({
       id: 'channel-event',
       label: 'channel-event',
-      show: Permission.isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
     return this;
