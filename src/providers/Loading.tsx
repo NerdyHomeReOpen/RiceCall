@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import homeStyles from '@/styles/home.module.css';
 
 interface LoadingContextType {
-  isLoading: boolean;
+  getIsLoading: () => boolean;
   loadServer: (displayId: string) => void;
   stopLoading: () => void;
 }
@@ -32,6 +32,10 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
   const [loadingServerId, setLoadingServerId] = useState<string>('');
 
   // Functions
+  const getIsLoading = useCallback(() => {
+    return isLoading;
+  }, [isLoading]);
+
   const loadServer = useCallback((displayId: string) => {
     setIsLoading(true);
     setLoadingServerId(displayId);
@@ -46,7 +50,7 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
     stopLoading();
   };
 
-  const contextValue = useMemo(() => ({ loadServer, stopLoading, isLoading }), [loadServer, stopLoading, isLoading]);
+  const contextValue = useMemo(() => ({ getIsLoading, loadServer, stopLoading }), [getIsLoading, loadServer, stopLoading]);
 
   return (
     <LoadingContext.Provider value={contextValue}>

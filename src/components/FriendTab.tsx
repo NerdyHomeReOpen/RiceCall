@@ -32,7 +32,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { selectTab } = useMainTab();
-  const { isLoading, loadServer } = useLoading();
+  const { getIsLoading, loadServer } = useLoading();
   const dispatch = useAppDispatch();
 
   // Selectors
@@ -84,7 +84,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
 
   // Handlers
   const handleServerNameClick = () => {
-    if (isLoading || !friendCurrentServer) return;
+    if (getIsLoading() || !friendCurrentServer) return;
     if (friendCurrentServer.serverId === user.currentServerId) {
       selectTab('server');
       return;

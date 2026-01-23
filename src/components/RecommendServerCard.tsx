@@ -24,7 +24,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { isLoading, loadServer } = useLoading();
+  const { getIsLoading, loadServer } = useLoading();
   const { selectTab } = useMainTab();
 
   // Selectors
@@ -48,7 +48,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
 
   // Handlers
   const handleServerCardClick = () => {
-    if (isLoading) return;
+    if (getIsLoading()) return;
     if (recommendServer.serverId === user.currentServerId) {
       selectTab('server');
       return;

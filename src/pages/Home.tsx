@@ -30,7 +30,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   // Hooks
   const { t } = useTranslation();
   const { selectTab } = useMainTab();
-  const { isLoading, loadServer } = useLoading();
+  const { getIsLoading, loadServer } = useLoading();
 
   // Refs
   const canSearchRef = useRef<boolean>(true);
@@ -129,7 +129,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
 
   const selectServer = useCallback(
     (server: Types.Server) => {
-      if (isLoading) return;
+      if (getIsLoading()) return;
       if (server.serverId === user.currentServerId) {
         selectTab('server');
         return;
@@ -138,7 +138,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
       ipc.socket.send('connectServer', { serverId: server.serverId });
       clearSearchState();
     },
-    [user.currentServerId, isLoading, loadServer, selectTab],
+    [user.currentServerId, getIsLoading, loadServer, selectTab],
   );
 
   // Handlers

@@ -304,7 +304,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
   const { selectedTabId, selectTab } = useMainTab();
-  const { isLoading, loadServer, stopLoading } = useLoading();
+  const { getIsLoading, loadServer, stopLoading } = useLoading();
   const dispatch = useAppDispatch();
 
   // Refs
@@ -368,7 +368,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     const onTriggerHandleServerSelect = ({ key, newValue }: StorageEvent) => {
       if (key !== 'trigger-handle-server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
-      if (isLoading) return;
+      if (getIsLoading()) return;
       if (serverId === user.currentServerId) {
         selectTab('server');
         return;
@@ -378,7 +378,7 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
     window.addEventListener('storage', onTriggerHandleServerSelect);
     return () => window.removeEventListener('storage', onTriggerHandleServerSelect);
-  }, [user.currentServerId, isLoading, loadServer, selectTab]);
+  }, [user.currentServerId, getIsLoading, loadServer, selectTab]);
 
   useEffect(() => {
     switch (selectedTabId) {
