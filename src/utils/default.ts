@@ -19,7 +19,7 @@ const defaultTableUser: Types.table_users = {
   birthDay: 0,
   isVerified: false,
   status: 'online',
-  gender: 'Male',
+  gender: 'male',
   currentChannelId: null,
   currentServerId: null,
   lastActiveAt: 0,

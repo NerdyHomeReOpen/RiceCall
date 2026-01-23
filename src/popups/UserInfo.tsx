@@ -379,8 +379,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
                   <div className={popupStyles['label']}>{t('gender')}</div>
                   <div className={popupStyles['select-box']} style={{ width: '100%' }}>
                     <select value={target.gender} onChange={handleGenderChange}>
-                      <option value="Male">{t('male')}</option>
-                      <option value="Female">{t('female')}</option>
+                      <option value="male">{t('male')}</option>
+                      <option value="female">{t('female')}</option>
                     </select>
                   </div>
                 </div>
