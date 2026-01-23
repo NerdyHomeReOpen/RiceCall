@@ -105,14 +105,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
 
   // Effects
   useEffect(() => {
-    if (!friend.targetId || friend.isBlocked || !friend.shareCurrentServer || !friendCurrentServer || !isFriend) {
+    if (!friend.targetId || friend.isBlocked || !friend.shareCurrentServer || !friend.currentServerId || !isFriend) {
       setFriendCurrentServer(null);
       return;
     }
-    ipc.data.server({ userId: friend.targetId, serverId: friendCurrentServer.serverId }).then((server) => {
+    ipc.data.server({ userId: friend.targetId, serverId: friend.currentServerId }).then((server) => {
       if (server) setFriendCurrentServer(server);
     });
-  }, [friend.targetId, friend.isBlocked, friend.shareCurrentServer, friendCurrentServer, isFriend]);
+  }, [friend.targetId, friend.isBlocked, friend.shareCurrentServer, friend.currentServerId, isFriend]);
 
   return (
     <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>

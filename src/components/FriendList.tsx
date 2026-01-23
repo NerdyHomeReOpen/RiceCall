@@ -23,7 +23,7 @@ const FriendList: React.FC = React.memo(() => {
   const [selectedTabId, setSelectedTabId] = useState<'friend' | 'recent'>('friend');
 
   // Variables
-  const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: -1 }), [t]);
+  const defaultFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'default', name: t('my-friends'), order: -1 }), [t]);
   const strangerFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000 }), [t]);
   const blacklistFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001 }), [t]);
   const sortedFriendGroups = useMemo(
