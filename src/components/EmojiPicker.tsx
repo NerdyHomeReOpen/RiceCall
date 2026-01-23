@@ -1,5 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
-import Image from 'next/image';
+import React, { useEffect, useLayoutEffect, useRef, useState } from 'react';
 
 import type * as Types from '@/types';
 
@@ -68,6 +67,10 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       setActiveTab('vip');
     };
 
+    const handleEmojiSelect = (code: string, full: string) => {
+      onEmojiSelect?.(code, full);
+    };
+
     // Effects
     useEffect(() => {
       setFontSize(propFontSize);
@@ -77,7 +80,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       setSelectedColor(propTextColor);
     }, [propTextColor]);
 
-    useEffect(() => {
+    useLayoutEffect(() => {
       if (!emojiPickerRef.current) return;
 
       const recalc = () => {
@@ -169,14 +172,14 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'def' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
             <div className={emojiStyles['emoji-grid']}>
               {defEmojis.map((e) => (
-                <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={onEmojiSelect} />
+                <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'other' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
             <div className={emojiStyles['emoji-grid']}>
               {otherEmojis.map((e) => (
-                <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={onEmojiSelect} />
+                <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
@@ -211,7 +214,7 @@ const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }
 
   return (
     <div className={emojiStyles['emoji']}>
-      <Image src={emoji.path} alt={emoji.alt} width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
+      <img src={emoji.path} alt={emoji.alt} width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
     </div>
   );
 });
