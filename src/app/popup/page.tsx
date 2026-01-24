@@ -19,7 +19,7 @@ import ChannelEvent from '@/popups/ChannelEvent';
 import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
-import ChatHistory from '@/popups/chatHistory';
+import ChatHistory from '@/popups/ChatHistory';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
