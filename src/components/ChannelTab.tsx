@@ -20,9 +20,10 @@ import styles from '@/styles/server.module.css';
 
 interface ChannelTabProps {
   channel: Types.Channel;
+  sortChannelMembersWithRules?: boolean;
 }
 
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
+const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannelMembersWithRules = false }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
@@ -56,6 +57,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
     shallowEqual,
   );
 
+  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
+
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 
@@ -74,7 +77,25 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
     () => channelMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId),
     [channelMembers, user.userId, permissionLevel],
   );
-  const sortedChannelMembers = useMemo(() => [...channelMembers].sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt), [channelMembers]);
+  const sortedChannelMembers = useMemo(() => {
+    const friendIds = new Set(friends.map((f) => f.targetId));
+    return [...channelMembers].sort((a, b) => {
+      if (!sortChannelMembersWithRules) return b.lastJoinChannelAt - a.lastJoinChannelAt;
+
+      // Self first
+      if (a.userId === user.userId && b.userId !== user.userId) return -1;
+      if (b.userId === user.userId && a.userId !== user.userId) return 1;
+
+      // Friends next
+      const aIsFriend = friendIds.has(a.userId);
+      const bIsFriend = friendIds.has(b.userId);
+      if (aIsFriend !== bIsFriend) return aIsFriend ? -1 : 1;
+
+      // Then by permission level and last joined time
+      return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
+    });
+  }, [channelMembers, user, friends, sortChannelMembersWithRules]);
+
   const isInChannel = currentChannel.channelId === channel.channelId;
   const isLobby = currentServer.lobbyId === channel.channelId;
   const isReceptionLobby = currentServer.receptionLobbyId === channel.channelId;
