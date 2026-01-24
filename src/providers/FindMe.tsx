@@ -1,7 +1,7 @@
 import { createContext, useContext, useMemo, useRef, useCallback } from 'react';
 
 interface FindMeContextType {
-  findMe: () => void;
+  findMe: (useSmooth?: boolean) => void;
   setExpandedCategoryHandlerRef: (handler: () => void) => void;
   setExpandedChannelHandlerRef: (handler: () => void) => void;
   setCurrentUserRef: (ref: HTMLDivElement | null) => void;
@@ -24,13 +24,13 @@ const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
   const currentUserRef = useRef<HTMLDivElement>(null);
 
   // Functions
-  const findMe = useCallback(() => {
+  const findMe = useCallback((useSmooth: boolean = true) => {
     expandedCategoryHandlerRef.current?.();
     expandedChannelHandlerRef.current?.();
 
     setTimeout(() => {
       currentUserRef.current?.scrollIntoView({
-        behavior: 'smooth',
+        behavior: useSmooth ? 'smooth' : 'auto',
         block: 'center',
       });
     }, 100);

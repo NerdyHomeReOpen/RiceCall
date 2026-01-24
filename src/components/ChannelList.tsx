@@ -157,6 +157,11 @@ const ChannelList: React.FC = React.memo(() => {
     return () => document.removeEventListener('pointerup', onPointerup);
   }, []);
 
+  useEffect(() => {
+    if (isCurrentTab) return;
+    findMe();
+  }, [isCurrentTab, findMe]);
+
   return (
     <>
       <div className={styles['sidebar-header']}>
