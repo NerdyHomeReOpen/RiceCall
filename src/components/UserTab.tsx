@@ -161,9 +161,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
 
   const handleTabDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
-    e.dataTransfer.setData('type', 'moveUser');
-    e.dataTransfer.setData('userId', member.userId);
-    e.dataTransfer.setData('currentChannelId', currentChannel.channelId);
+    e.dataTransfer.setData('moveUserEvent/userIds', JSON.stringify([...member.userId]));
+    e.dataTransfer.setData('moveUserEvent/currentChannelId', currentChannel.channelId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -116,9 +116,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
 
   const handleTabDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
-    e.dataTransfer.setData('type', 'moveAllUsers');
-    e.dataTransfer.setData('userIds', movableCategoryUserIds.join(','));
-    e.dataTransfer.setData('currentChannelId', category.channelId);
+    e.dataTransfer.setData('moveUserEvent/userIds', JSON.stringify(movableCategoryUserIds));
+    e.dataTransfer.setData('moveUserEvent/currentChannelId', category.channelId);
   };
 
   const handleTabDragOver = (e: React.DragEvent) => {
@@ -129,21 +128,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const handleTabDrop = (e: React.DragEvent) => {
     if (isReadonlyChannel) return;
     e.preventDefault();
-    const moveType = e.dataTransfer.getData('type');
-    const currentChannelId = e.dataTransfer.getData('currentChannelId');
-    if (!moveType || !currentChannelId || currentChannelId === category.channelId || isReadonlyChannel) return;
-    switch (moveType) {
-      case 'moveUser':
-        const targetUserId = e.dataTransfer.getData('userId');
-        if (!targetUserId) return;
-        Popup.moveUserToChannel(targetUserId, currentServer.serverId, category.channelId);
-        break;
-      case 'moveAllUsers':
-        const targetUserIds = e.dataTransfer.getData('userIds');
-        if (!targetUserIds) return;
-        Popup.moveAllUsersToChannel(targetUserIds.split(','), currentServer.serverId, category.channelId);
-        break;
-    }
+    const userIds = JSON.parse(e.dataTransfer.getData('moveUserEvent/userIds')) as string[];
+    const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
+    if (!currentChannelId || !userIds || userIds.length === 0) return;
+    if (currentChannelId === category.channelId || isReadonlyChannel) return;
+    if (userIds.length === 1) Popup.moveUserToChannel(userIds[0], currentServer.serverId, category.channelId);
+    else Popup.moveAllUsersToChannel(userIds, currentServer.serverId, category.channelId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

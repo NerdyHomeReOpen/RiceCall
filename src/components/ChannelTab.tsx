@@ -142,9 +142,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
 
   const handleTabDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
-    e.dataTransfer.setData('type', 'moveAllUsers');
-    e.dataTransfer.setData('userIds', movableChannelUserIds.join(','));
-    e.dataTransfer.setData('currentChannelId', channel.channelId);
+    e.dataTransfer.setData('moveUserEvent/userIds', JSON.stringify(movableChannelUserIds));
+    e.dataTransfer.setData('moveUserEvent/currentChannelId', channel.channelId);
   };
 
   const handleTabDragOver = (e: React.DragEvent) => {
@@ -155,21 +154,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
   const handleTabDrop = (e: React.DragEvent) => {
     if (isReadonlyChannel) return;
     e.preventDefault();
-    const moveType = e.dataTransfer.getData('type');
-    const currentChannelId = e.dataTransfer.getData('currentChannelId');
-    if (!moveType || !currentChannelId || currentChannelId === channel.channelId || isReadonlyChannel) return;
-    switch (moveType) {
-      case 'moveUser':
-        const targetUserId = e.dataTransfer.getData('userId');
-        if (!targetUserId) return;
-        Popup.moveUserToChannel(targetUserId, currentServer.serverId, channel.channelId);
-        break;
-      case 'moveAllUsers':
-        const targetUserIds = e.dataTransfer.getData('userIds');
-        if (!targetUserIds) return;
-        Popup.moveAllUsersToChannel(targetUserIds.split(','), currentServer.serverId, channel.channelId);
-        break;
-    }
+    const userIds = JSON.parse(e.dataTransfer.getData('moveUserEvent/userIds')) as string[];
+    const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
+    if (!currentChannelId || !userIds || userIds.length === 0) return;
+    if (currentChannelId === channel.channelId || isReadonlyChannel) return;
+    if (userIds.length === 1) Popup.moveUserToChannel(userIds[0], currentServer.serverId, channel.channelId);
+    else Popup.moveAllUsersToChannel(userIds, currentServer.serverId, channel.channelId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
