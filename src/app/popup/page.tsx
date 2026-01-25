@@ -44,6 +44,64 @@ import UserInfo from '@/popups/UserInfo';
 
 import header from '@/styles/header.module.css';
 
+async function hydrateUserInfoInitialData(initialData: any): Promise<any> {
+  // UserInfo/UserSetting popups expect `target` and `targetServers`.
+  // On Electron those are often passed eagerly; on web we may only have ids.
+  if (!initialData || typeof initialData !== 'object') return initialData;
+
+  const userId = initialData.userId;
+  const targetId = initialData.targetId;
+  if (!userId || !targetId) return initialData;
+
+  const hasTarget = initialData.target && typeof initialData.target === 'object';
+  const hasTargetServers = Array.isArray(initialData.targetServers);
+  if (hasTarget && hasTargetServers) return initialData;
+
+  try {
+    const [target, targetServers] = await Promise.all([
+      hasTarget ? Promise.resolve(initialData.target) : ipc.data.user({ userId: targetId }),
+      hasTargetServers ? Promise.resolve(initialData.targetServers) : ipc.data.servers({ userId: targetId }),
+    ]);
+
+    // Don't replace existing values with null-ish results.
+    return {
+      ...initialData,
+      target: target ?? initialData.target ?? null,
+      targetServers: targetServers ?? initialData.targetServers ?? [],
+    };
+  } catch {
+    return {
+      ...initialData,
+      target: initialData.target ?? null,
+      targetServers: initialData.targetServers ?? [],
+    };
+  }
+}
+
+function getWebInitialData(id: string): any | null {
+  try {
+    const key = `ricecall:popup:initialData:${id}`;
+    // New tab/window does not share sessionStorage with the opener.
+    const raw = sessionStorage.getItem(key) ?? localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    // Best-effort cleanup to avoid stale data reuse.
+    try {
+      sessionStorage.removeItem(key);
+    } catch {
+      // ignore
+    }
+    try {
+      localStorage.removeItem(key);
+    } catch {
+      // ignore
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 interface HeaderProps {
   title: string;
   buttons: ('minimize' | 'maxsize' | 'close')[];
@@ -429,8 +487,22 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (!id) return;
-    setInitialData(ipc.initialData.get(id));
-  }, [id]);
+    const isElectron = typeof (window as any).require === 'function';
+    const raw = isElectron ? ipc.initialData.get(id) : getWebInitialData(id);
+    // Some popups (notably userInfo/userSetting) need extra data beyond ids.
+    if ((type === 'userInfo' || type === 'userSetting') && !isElectron) {
+      hydrateUserInfoInitialData(raw).then((hydrated) => setInitialData(hydrated));
+    } else {
+      setInitialData(raw);
+    }
+  }, [id, type]);
+
+  const missingInitialData = useMemo(() => {
+    // Most popups expect an object to spread as props; null/undefined will crash.
+    // In web mode, opening in a new tab + refresh can make initialData unavailable.
+    if (!type || !id) return false;
+    return initialData == null || typeof initialData !== 'object';
+  }, [type, id, initialData]);
 
   return (
     <>
@@ -441,7 +513,18 @@ const PopupPageComponent: React.FC = React.memo(() => {
           titleBoxIcon={type === 'changeTheme' ? header['title-box-skin-icon'] : type === 'directMessage' ? header['title-box-direct-message-icon'] : undefined}
         />
       )}
-      {node && node()}
+      {missingInitialData ? (
+        <div style={{ padding: 16, fontFamily: 'system-ui, sans-serif' }}>
+          <h3 style={{ margin: '0 0 8px 0' }}>Popup data missing</h3>
+          <div style={{ opacity: 0.85, lineHeight: 1.4 }}>
+            This popup was opened in a new tab/window, but its initial data wasn’t available.
+            <br />
+            Please close this tab and try opening the popup again.
+          </div>
+        </div>
+      ) : (
+        node && node()
+      )}
     </>
   );
 });

@@ -120,6 +120,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   // Mic
   const isMicTakenRef = useRef<boolean>(false);
+  const isTakingMicRef = useRef<boolean>(false); // Guard against concurrent takeMic calls
   const isSpeakKeyPressedRef = useRef<boolean>(false);
   const isMicMutedRef = useRef<boolean>(false);
   const micVolumeRef = useRef<number>(100);
@@ -214,6 +215,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       audioContextRef.current.close();
     }
     const audioContext = new AudioContext();
+    // Resume AudioContext if suspended (required for browsers after user interaction policy)
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
     await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
     audioContextRef.current = audioContext;
 
@@ -357,9 +362,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
       if (!audioContextRef.current || !inputDesRef.current || !inputAnalyserRef.current) {
-        initAudioContext();
+        new Logger('WebRTC').info('initMicAudio: AudioContext not ready, initializing...');
+        await initAudioContext();
         return initMicAudio(stream);
       }
+
+      new Logger('WebRTC').info('initMicAudio: Setting up mic audio nodes');
 
       // Remove existing mic audio
       removeMicAudio();
@@ -382,6 +390,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(inputAnalyserRef.current);
 
       // Start speaking detection
+      new Logger('WebRTC').info('initMicAudio: Starting detectSpeaking for user');
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('user', inputAnalyserRef.current, dataArray);
 
@@ -787,12 +796,59 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const takeMic = useCallback(
     async (channelId: string) => {
-      if (isMicTakenRef.current) return;
-      await setupSend(channelId);
-      setIsMicTaken(true);
-      isMicTakenRef.current = true;
+      // Guard against concurrent calls
+      if (isMicTakenRef.current || isTakingMicRef.current) return;
+      isTakingMicRef.current = true;
+
+      try {
+        // Ensure AudioContext is initialized
+        if (!audioContextRef.current || !inputDesRef.current) {
+          new Logger('WebRTC').info('takeMic: AudioContext not ready, initializing...');
+          await initAudioContext();
+        }
+
+        // Resume AudioContext if suspended
+        if (audioContextRef.current?.state === 'suspended') {
+          new Logger('WebRTC').info('takeMic: Resuming suspended AudioContext');
+          await audioContextRef.current.resume();
+        }
+
+        new Logger('WebRTC').info(`takeMic: AudioContext state = ${audioContextRef.current?.state}`);
+
+        // Get microphone stream first
+        new Logger('WebRTC').info('takeMic: Getting microphone stream...');
+        const stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            channelCount: 2,
+            echoCancellation: echoCancellation,
+            noiseSuppression: noiseCancellation,
+            autoGainControl: false,
+            ...(inputAudioDevice ? { deviceId: { exact: inputAudioDevice } } : {}),
+          },
+        }).catch((err) => {
+          new Logger('WebRTC').error(`Access input device failed: ${err}`);
+          return null;
+        });
+
+        if (!stream) {
+          isTakingMicRef.current = false;
+          return;
+        }
+        new Logger('WebRTC').info(`takeMic: Got microphone stream with ${stream.getAudioTracks().length} audio tracks`);
+
+        // Initialize mic audio (this will connect the stream to inputDesRef)
+        await initMicAudio(stream);
+
+        // Now setup send transport (inputDesRef.current should have audio tracks)
+        await setupSend(channelId);
+        setIsMicTaken(true);
+        isMicTakenRef.current = true;
+        new Logger('WebRTC').info('takeMic: Mic taken successfully');
+      } finally {
+        isTakingMicRef.current = false;
+      }
     },
-    [setupSend],
+    [setupSend, initAudioContext, initMicAudio, echoCancellation, noiseCancellation, inputAudioDevice],
   );
 
   const releaseMic = useCallback(() => {
@@ -853,15 +909,53 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   useEffect(() => {
     initLocalStorage();
-    initAudioContext();
-  }, [initAudioContext, initLocalStorage]);
+    // Note: initAudioContext is called on first user interaction, not on mount
+    // This is required by browser autoplay policy
+  }, [initLocalStorage]);
 
+  // Initialize AudioContext on user interaction (required for browsers)
+  useEffect(() => {
+    const initAudioOnInteraction = async () => {
+      if (!audioContextRef.current) {
+        await initAudioContext();
+      } else if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+    };
+    document.addEventListener('click', initAudioOnInteraction, { once: true });
+    document.addEventListener('keydown', initAudioOnInteraction, { once: true });
+    return () => {
+      document.removeEventListener('click', initAudioOnInteraction);
+      document.removeEventListener('keydown', initAudioOnInteraction);
+    };
+  }, []);
+
+  // Effect for handling device/settings changes when mic is already taken
+  // Note: Initial mic setup is handled by takeMic()
+  const prevMicSettingsRef = useRef<{ inputAudioDevice: string | null; echoCancellation: boolean; noiseCancellation: boolean } | null>(null);
   useEffect(() => {
     if (!isMicTaken) {
       removeMicAudio();
+      prevMicSettingsRef.current = null;
       return;
     }
 
+    // Check if this is a settings change (not initial setup)
+    const prevSettings = prevMicSettingsRef.current;
+    const currentSettings = { inputAudioDevice, echoCancellation, noiseCancellation };
+    
+    // Store current settings for next comparison
+    prevMicSettingsRef.current = currentSettings;
+
+    // Skip if settings haven't changed (initial setup is handled by takeMic)
+    if (!prevSettings) return;
+    if (
+      prevSettings.inputAudioDevice === inputAudioDevice &&
+      prevSettings.echoCancellation === echoCancellation &&
+      prevSettings.noiseCancellation === noiseCancellation
+    ) return;
+
+    // Re-acquire mic with new settings
     navigator.mediaDevices
       .getUserMedia({
         audio: {

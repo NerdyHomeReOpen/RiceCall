@@ -13,6 +13,7 @@ import NotificationToaster from '@/components/NotificationToaster';
 import FriendPage from '@/pages/Friend';
 import HomePage from '@/pages/Home';
 import ServerPage from '@/pages/Server';
+import LoginPage from '@/pages/Login';
 
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
@@ -55,10 +56,15 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   // Variables
   const { userId, name: userName, status: userStatus } = user;
   const { serverId: currentServerId, name: currentServerName } = currentServer;
-  const hasNotification = friendApplications.length !== 0 || memberInvitations.length !== 0 || systemNotifications.length !== 0;
-  const hasFriendApplication = friendApplications.length !== 0;
-  const hasMemberInvitation = memberInvitations.length !== 0;
-  const hasSystemNotification = systemNotifications.length !== 0;
+  // In web mode (or during initial render), these arrays can briefly be undefined if upstream data isn't ready.
+  // Guard here to avoid hard crashes like "Cannot read properties of undefined (reading 'length')".
+  const safeFriendApplications = friendApplications ?? [];
+  const safeMemberInvitations = memberInvitations ?? [];
+  const safeSystemNotifications = systemNotifications ?? [];
+  const hasNotification = safeFriendApplications.length !== 0 || safeMemberInvitations.length !== 0 || safeSystemNotifications.length !== 0;
+  const hasFriendApplication = safeFriendApplications.length !== 0;
+  const hasMemberInvitation = safeMemberInvitations.length !== 0;
+  const hasSystemNotification = safeSystemNotifications.length !== 0;
   const mainTabs: { id: 'home' | 'friends' | 'server'; label: string }[] = [
     { id: 'home', label: t('home') },
     { id: 'friends', label: t('friends') },
@@ -153,9 +159,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
   };
 
   const handleLogout = () => {
+    // ipc.auth.logout() now handles localStorage cleanup internally
+    // to ensure it happens before any reload interrupts execution
     ipc.auth.logout();
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
   };
 
   const handleExit = () => {
@@ -201,7 +207,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       contentType: 'image',
       showContentLength: true,
       showContent: true,
-      contents: friendApplications.map((fa) => fa.avatarUrl),
+      contents: safeFriendApplications.map((fa) => fa.avatarUrl),
       onClick: () => Popup.handleOpenFriendVerification(userId),
     },
     {
@@ -212,7 +218,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       contentType: 'image',
       showContentLength: true,
       showContent: true,
-      contents: memberInvitations.map((mi) => mi.avatarUrl),
+      contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
       onClick: () => Popup.handleOpenMemberInvitation(userId),
     },
     {
@@ -222,7 +228,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ user, currentServer, friendA
       show: hasSystemNotification,
       showContentLength: true,
       showContent: false,
-      contents: memberInvitations.map((mi) => mi.avatarUrl),
+      contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
       onClick: () => {},
     },
   ];
@@ -384,6 +390,8 @@ const RootPageComponent: React.FC = React.memo(() => {
   // Variables
   const { userId, name: userName, currentServerId, currentChannelId } = user;
   const { name: currentServerName } = currentServer;
+  const isWebMode = typeof window !== 'undefined' && !(window as any).require;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   // Handlers
   const handleClearMessages = useCallback(() => {
@@ -411,6 +419,16 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
+
+  // Web-mode: establish socket.io connection directly (Electron does this in main process).
+  useEffect(() => {
+    if (!isWebMode) return;
+    if (!token) return;
+    ipc.socketClient?.connect(token);
+    return () => {
+      ipc.socketClient?.disconnect();
+    };
+  }, [isWebMode, token]);
 
   useEffect(() => {
     currentServerRef.current = currentServer;
@@ -961,7 +979,9 @@ const RootPageComponent: React.FC = React.memo(() => {
       <ActionScannerProvider>
         <ExpandedProvider>
           <Header user={user} currentServer={currentServer} friendApplications={friendApplications} memberInvitations={memberInvitations} systemNotifications={systemNotifications} />
-          {!userId || !isSocketConnected ? (
+          {!userId ? (
+            <LoginPage display={true} setSection={() => {}} />
+          ) : !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
             <>

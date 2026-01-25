@@ -26,13 +26,14 @@ import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage } f
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
 import { initMainI18n, t } from './src/i18n.main.js';
-import { connectSocket, disconnectSocket } from './src/socket.js';
+import { connectSocket, disconnectSocket, setSocketTargetWindow } from './src/socket.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
 import * as AuthService from './src/auth.service.js';
 import * as DataService from './src/data.service.js';
 import * as PopupLoader from './src/popupLoader.js';
 import Logger from './src/logger.js';
 import { LANGUAGES } from './src/constant.js';
+import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -123,48 +124,6 @@ const store = new Store<Types.StoreType>({
     server: 'prod',
   },
 });
-
-const PopupSize: Record<Types.PopupType, { height: number; width: number }> = {
-  aboutus: { height: 750, width: 500 },
-  applyFriend: { height: 375, width: 490 },
-  approveFriend: { height: 250, width: 400 },
-  applyMember: { height: 300, width: 490 },
-  blockMember: { height: 250, width: 400 },
-  channelEvent: { height: 400, width: 500 },
-  channelSetting: { height: 520, width: 600 },
-  channelPassword: { height: 200, width: 380 },
-  changeTheme: { height: 335, width: 480 },
-  chatHistory: { height: 547, width: 714 },
-  createServer: { height: 436, width: 478 },
-  createChannel: { height: 200, width: 380 },
-  createFriendGroup: { height: 200, width: 380 },
-  directMessage: { height: 550, width: 650 },
-  dialogAlert: { height: 200, width: 380 },
-  dialogAlert2: { height: 200, width: 380 },
-  dialogSuccess: { height: 200, width: 380 },
-  dialogWarning: { height: 200, width: 380 },
-  dialogError: { height: 200, width: 380 },
-  dialogInfo: { height: 200, width: 380 },
-  editChannelOrder: { height: 550, width: 500 },
-  editChannelName: { height: 200, width: 380 },
-  editNickname: { height: 200, width: 380 },
-  editFriendNote: { height: 200, width: 380 },
-  editFriendGroupName: { height: 200, width: 380 },
-  friendVerification: { height: 550, width: 500 },
-  imageCropper: { height: 520, width: 610 },
-  inviteMember: { height: 300, width: 490 },
-  kickMemberFromChannel: { height: 250, width: 400 },
-  kickMemberFromServer: { height: 250, width: 400 },
-  memberApplicationSetting: { height: 220, width: 380 },
-  memberInvitation: { height: 550, width: 500 },
-  searchUser: { height: 200, width: 380 },
-  serverApplication: { height: 150, width: 320 },
-  serverSetting: { height: 520, width: 600 },
-  serverBroadcast: { height: 300, width: 450 },
-  systemSetting: { height: 520, width: 600 },
-  userInfo: { height: 630, width: 440 },
-  userSetting: { height: 700, width: 500 },
-};
 
 // Constants
 export const START_TIMESTAMP = Date.now();
@@ -364,6 +323,9 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     return { action: 'deny' };
   });
 
+  // Set this window as the target for socket events
+  setSocketTargetWindow(mainWindow);
+
   return mainWindow;
 }
 
@@ -436,7 +398,8 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
 
 export async function createPopup(type: Types.PopupType, id: string, initialData: unknown, force = true, title?: string): Promise<BrowserWindow> {
   const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
-  const canResize = type === 'directMessage';
+  const behavior = POPUP_BEHAVIORS[type] ?? { resizable: false, maximizable: false, fullscreenable: false };
+  const size = POPUP_SIZES[type] ?? { width: 400, height: 300 };
 
   // If force is true, destroy the popup
   if (force) {
@@ -460,16 +423,16 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
 
   popups[id] = new BrowserWindow({
     title: fullTitle,
-    width: PopupSize[type].width,
-    height: PopupSize[type].height,
-    minWidth: PopupSize[type].width,
-    minHeight: PopupSize[type].height,
+    width: size.width,
+    height: size.height,
+    minWidth: size.width,
+    minHeight: size.height,
     thickFrame: true,
     titleBarStyle: 'hidden',
-    maximizable: canResize,
-    resizable: canResize,
+    maximizable: behavior.maximizable,
+    resizable: behavior.resizable,
     fullscreen: false,
-    fullscreenable: canResize,
+    fullscreenable: behavior.fullscreenable,
     hasShadow: true,
     icon: APP_ICON,
     show: false,
@@ -754,14 +717,27 @@ app.on('ready', async () => {
   });
 
   ipcMain.handle('auth-logout', async () => {
+    new Logger('Auth').info('Logout: starting...');
     token = '';
     isLogin = false;
-    mainWindow?.reload();
-    mainWindow?.hide();
-    authWindow?.showInactive();
+    // Close popups and disconnect socket first
     closePopups();
     disconnectSocket();
+    // Hide main window
+    new Logger('Auth').info('Logout: hiding mainWindow...');
+    mainWindow?.hide();
+    new Logger('Auth').info(`Logout: mainWindow visible = ${mainWindow?.isVisible()}`);
+    // Load auth page explicitly (not reload, which might load wrong URL)
+    new Logger('Auth').info('Logout: loading auth page in authWindow...');
+    const authUrl = DEV ? `${BASE_URI}/auth` : `${BASE_URI}/auth.html`;
+    new Logger('Auth').info(`Logout: authUrl = ${authUrl}`);
+    authWindow?.loadURL(authUrl);
+    authWindow?.show();
+    new Logger('Auth').info(`Logout: authWindow visible = ${authWindow?.isVisible()}`);
+    // Note: We do NOT reload mainWindow here to avoid having two active windows
+    // The mainWindow will be reloaded when user logs in again via auth-login
     setTrayDetail();
+    new Logger('Auth').info('Logout: done');
   });
 
   ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string; locale: string }) => {

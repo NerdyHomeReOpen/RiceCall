@@ -56,8 +56,32 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, setS
     await ipc.auth.login({ account, password }).then((res) => {
       if (res.success) {
         if (rememberAccount) ipc.accounts.add(account, { autoLogin, rememberAccount, password });
-        if (autoLogin) localStorage.setItem('token', res.token);
+        // Persist token for web-mode API calls (and keep existing autoLogin behavior).
+        localStorage.setItem('token', res.token);
+        // Persist userId for app bootstrapping. In web mode we don't have Electron main to set it.
+        try {
+          const payload = res.token.split('.')[1];
+          if (payload) {
+            const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
+            const userId = json?.userId || json?.uid || json?.id;
+            if (userId) localStorage.setItem('userId', String(userId));
+          }
+        } catch {
+          // ignore if token isn't a JWT
+        }
         localStorage.setItem('login-account', account);
+        // In the app router root, `LoginPage` is rendered with a no-op `setSection`,
+        // so we need to actively trigger a UI transition in web mode.
+        try {
+          // Notify any listeners that rely on storage changes.
+          window.dispatchEvent(new StorageEvent('storage', { key: 'userId', newValue: localStorage.getItem('userId') }));
+        } catch {
+          // ignore
+        }
+        // Ensure we land on the root app (and re-run boot logic) without requiring a manual refresh.
+        if (typeof window !== 'undefined') {
+          window.location.assign('/');
+        }
         setSection('login');
       }
     });

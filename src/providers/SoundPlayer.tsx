@@ -42,42 +42,42 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
     if (sound === 'enterVoiceChannel') {
       if (!enterVoiceChannelSoundRef.current && !force) return;
-      audioRef.current = new Audio('./sounds/JoinVoiceChannel.mp3');
+      audioRef.current = new Audio('/sounds/JoinVoiceChannel.mp3');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
     if (sound === 'leaveVoiceChannel') {
       if (!leaveVoiceChannelSoundRef.current && !force) return;
-      audioRef.current = new Audio('./sounds/LeaveVoiceChannel.mp3');
+      audioRef.current = new Audio('/sounds/LeaveVoiceChannel.mp3');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
     if (sound === 'receiveChannelMessage') {
       if (!receiveChannelMessageSoundRef.current && !force) return;
-      audioRef.current = new Audio('./sounds/ReceiveChannelMsg.mp3');
+      audioRef.current = new Audio('/sounds/ReceiveChannelMsg.mp3');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
     if (sound === 'receiveDirectMessage') {
       if (!receiveDirectMessageSoundRef.current && !force) return;
-      audioRef.current = new Audio('./sounds/ReceiveDirectMsg.mp3');
+      audioRef.current = new Audio('/sounds/ReceiveDirectMsg.mp3');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
     if (sound === 'startSpeaking') {
       if (!startSpeakingSoundRef.current && !force) return;
-      audioRef.current = new Audio('./sounds/MicKeyDown.mp3');
+      audioRef.current = new Audio('/sounds/MicKeyDown.mp3');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
     if (sound === 'stopSpeaking') {
       if (!stopSpeakingSoundRef.current && !force) return;
-      audioRef.current = new Audio('./sounds/MicKeyUp.mp3');
+      audioRef.current = new Audio('/sounds/MicKeyUp.mp3');
       audioRef.current.setSinkId(outputDeviceIdRef.current || '');
       audioRef.current.volume = 0.5;
       audioRef.current.play();

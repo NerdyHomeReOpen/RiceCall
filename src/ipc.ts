@@ -2,6 +2,15 @@
 import * as Types from '@/types';
 
 import { Logger } from '@/utils/logger';
+import { getApiClient } from '@/platform/api';
+import { getDataClient, type DataClient } from '@/platform/data';
+import packageJson from '../package.json';
+import { closeInAppPopup, minimizeInAppPopup } from '@/platform/popup/inAppPopupHost';
+import { getPopupController } from '@/platform/popup';
+
+// Web-mode realtime: use socket.io-client directly in the browser.
+// This mirrors Electron main's `src/socket.ts` behavior (query token, websocket transport).
+import { io as webIo, type Socket as WebSocketIO } from 'socket.io-client';
 
 // Safe reference to electron's ipcRenderer
 let ipcRenderer: any = null;
@@ -18,6 +27,29 @@ if (typeof window !== 'undefined' && window.require) {
 
 const isElectron = !!ipcRenderer;
 
+const isWeb = typeof window !== 'undefined' && !isElectron;
+
+// Debug: log which mode we're in
+if (typeof window !== 'undefined') {
+  new Logger('IPC').info(`Mode: isElectron=${isElectron}, isWeb=${isWeb}, ipcRenderer=${!!ipcRenderer}`);
+}
+
+let webSocket: WebSocketIO | null = null;
+let webSeq = 0;
+let webHeartbeatInterval: number | null = null;
+
+// In pure-web mode, use a lightweight HTTP client to talk to backend directly.
+const api = !isElectron ? getApiClient() : null;
+
+// Platform-agnostic data client (lazy initialized)
+let dataClient: DataClient | null = null;
+function getDataClientSingleton(): DataClient {
+  if (!dataClient) {
+    dataClient = getDataClient();
+  }
+  return dataClient;
+}
+
 const ipc = {
   exit: () => {
     if (!isElectron) return;
@@ -26,184 +58,199 @@ const ipc = {
 
   socket: {
     send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => {
-      if (!isElectron) return;
-      ipcRenderer.send(event, ...args);
+      if (isElectron) {
+        ipcRenderer.send(event, ...args);
+        return;
+      }
+      if (!webSocket) return;
+      (webSocket as any).emit(event, ...args);
     },
     on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) => {
-      if (!isElectron) return () => {};
-      const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
-      ipcRenderer.on(event, listener);
-      return () => ipcRenderer.removeListener(event, listener);
+      if (isElectron) {
+        const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
+        ipcRenderer.on(event, listener);
+        return () => ipcRenderer.removeListener(event, listener);
+      }
+      if (!webSocket) return () => {};
+      const listener = (...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
+      (webSocket as any).on(event, listener);
+      return () => (webSocket as any).off(event, listener);
     },
     emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => {
-      if (!isElectron) return Promise.resolve(null as ReturnType<Types.ClientToServerEventsWithAck[T]>);
+      if (isElectron) {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
+            if (ack?.ok) resolve(ack.data);
+            else reject(new Error(ack?.error || 'unknown error'));
+          });
+        });
+      }
+      if (!webSocket) return Promise.reject(new Error('socket not connected'));
       return new Promise((resolve, reject) => {
-        ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
-          if (ack?.ok) resolve(ack.data);
-          else reject(new Error(ack?.error || 'unknown error'));
+        (webSocket as any).timeout(5000).emit(event, payload, (err: unknown, ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
+          if (err) return reject(err);
+          if (ack?.ok) return resolve(ack.data);
+          reject(new Error(ack?.error || 'unknown error'));
         });
       });
     },
   },
 
+  // Expose a minimal connect/disconnect for web mode.
+  // In Electron this is managed in main; renderer learns via `connect|disconnect` events.
+  socketClient: {
+    connect: (token: string) => {
+      if (!isWeb) return;
+      if (!token) return;
+
+      const wsUrl = process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_BASE_URL;
+      if (!wsUrl) {
+        new Logger('Socket').warn('Missing NEXT_PUBLIC_WS_URL (or NEXT_PUBLIC_API_BASE_URL fallback) for web socket connection');
+        return;
+      }
+
+      // Clean up existing
+      try {
+        webSocket?.removeAllListeners();
+        webSocket?.disconnect();
+      } catch {
+        // ignore
+      }
+      webSocket = null;
+
+      webSeq = 0;
+
+      webSocket = webIo(wsUrl, {
+        transports: ['websocket'],
+        reconnection: true,
+        reconnectionDelay: 1000,
+        reconnectionDelayMax: 20000,
+        timeout: 10000,
+        autoConnect: false,
+        query: { token },
+      });
+
+      const sendHeartbeat = () => {
+        (webSocket as any)
+          ?.timeout(5000)
+          .emit('heartbeat', { seq: ++webSeq }, (err: unknown) => {
+            if (err) return;
+          });
+      };
+
+      // bubble basic connection lifecycle to match Electron main behavior
+      webSocket.on('connect', () => {
+        if (webHeartbeatInterval) window.clearInterval(webHeartbeatInterval);
+        sendHeartbeat();
+        webHeartbeatInterval = window.setInterval(sendHeartbeat, 30000);
+      });
+
+      webSocket.on('disconnect', () => {
+        if (webHeartbeatInterval) window.clearInterval(webHeartbeatInterval);
+        webHeartbeatInterval = null;
+      });
+
+      webSocket.connect();
+    },
+    disconnect: () => {
+      if (!isWeb) return;
+      try {
+        webSocket?.removeAllListeners();
+        webSocket?.disconnect();
+      } finally {
+        webSocket = null;
+        if (webHeartbeatInterval) window.clearInterval(webHeartbeatInterval);
+        webHeartbeatInterval = null;
+      }
+    },
+  },
+
   auth: {
     login: async (formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> => {
-      if (!isElectron) return { success: false };
+      if (!isElectron) {
+        try {
+          const res = await api!.post<{ token?: string }>('/account/login', {
+            ...formData,
+            // maintain current backend contract
+            version: packageJson.version,
+          });
+          if (!res?.token) return { success: false };
+          return { success: true, token: res.token };
+        } catch (e) {
+          new Logger('Auth').warn(`Web login failed: ${String(e)}`);
+          return { success: false };
+        }
+      }
       return await ipcRenderer.invoke('auth-login', formData);
     },
 
     logout: async (): Promise<void> => {
-      if (!isElectron) return;
+      new Logger('IPC').info(`logout called: isElectron=${isElectron}`);
+      
+      // Always clear localStorage first (before any reload that might interrupt execution)
+      try {
+        localStorage.removeItem('token');
+        localStorage.removeItem('userId');
+      } catch {
+        // ignore
+      }
+      
+      if (!isElectron) {
+        // Web mode: disconnect socket and redirect
+        new Logger('IPC').info('logout: Web mode, disconnecting socket...');
+        ipc.socketClient.disconnect();
+        // Redirect to auth page
+        if (typeof window !== 'undefined') {
+          window.location.href = '/auth';
+        }
+        return;
+      }
+      new Logger('IPC').info('logout: Electron mode, invoking auth-logout...');
       return await ipcRenderer.invoke('auth-logout');
     },
 
     register: async (formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> => {
-      if (!isElectron) return { success: false };
+      if (!isElectron) {
+        try {
+          await api!.post('/account/register', {
+            ...formData,
+          });
+          return { success: true, message: 'ok' };
+        } catch (e) {
+          new Logger('Auth').warn(`Web register failed: ${String(e)}`);
+          return { success: false };
+        }
+      }
       return await ipcRenderer.invoke('auth-register', formData);
     },
 
     autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
-      if (!isElectron) return { success: false };
+      if (!isElectron) {
+        try {
+          const res = await api!.post<{ token?: string }>('/token/verify', {
+            token,
+            version: packageJson.version,
+          });
+          if (!res?.token) return { success: false };
+          return { success: true, token: res.token };
+        } catch (e) {
+          new Logger('Auth').warn(`Web autoLogin failed: ${String(e)}`);
+          return { success: false };
+        }
+      }
       return await ipcRenderer.invoke('auth-auto-login', token);
     },
   },
 
-  data: {
-    user: async (params: { userId: string }): Promise<Types.User | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user', params);
+  // Data operations are delegated to the platform-agnostic DataClient.
+  // Uses Proxy to auto-forward all method calls - no manual mapping needed.
+  // Adding new data methods only requires updating dataService.ts!
+  data: new Proxy({} as DataClient, {
+    get(_target, prop: string) {
+      const client = getDataClientSingleton();
+      return (client as unknown as Record<string, unknown>)[prop];
     },
-
-    userHotReload: async (params: { userId: string }): Promise<Types.User | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user-hot-reload', params);
-    },
-
-    friend: async (params: { userId: string; targetId: string }): Promise<Types.Friend | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friend', params);
-    },
-
-    friends: async (params: { userId: string }): Promise<Types.Friend[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friends', params);
-    },
-
-    friendActivities: async (params: { userId: string }): Promise<Types.FriendActivity[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendActivities', params);
-    },
-
-    friendGroup: async (params: { userId: string; friendGroupId: string }): Promise<Types.FriendGroup | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendGroup', params);
-    },
-
-    friendGroups: async (params: { userId: string }): Promise<Types.FriendGroup[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendGroups', params);
-    },
-
-    friendApplication: async (params: { receiverId: string; senderId: string }): Promise<Types.FriendApplication | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendApplication', params);
-    },
-
-    friendApplications: async (params: { receiverId: string }): Promise<Types.FriendApplication[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendApplications', params);
-    },
-
-    server: async (params: { userId: string; serverId: string }): Promise<Types.Server | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-server', params);
-    },
-
-    servers: async (params: { userId: string }): Promise<Types.Server[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-servers', params);
-    },
-
-    serverMembers: async (params: { serverId: string }): Promise<Types.Member[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverMembers', params);
-    },
-
-    serverOnlineMembers: async (params: { serverId: string }): Promise<Types.OnlineMember[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverOnlineMembers', params);
-    },
-
-    channel: async (params: { userId: string; serverId: string; channelId: string }): Promise<Types.Channel | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-channel', params);
-    },
-
-    channels: async (params: { userId: string; serverId: string }): Promise<Types.Channel[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channels', params);
-    },
-
-    channelMembers: async (params: { serverId: string; channelId: string }): Promise<Types.Member[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channelMembers', params);
-    },
-
-    member: async (params: { userId: string; serverId: string; channelId?: string }): Promise<Types.Member | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-member', params);
-    },
-
-    memberApplication: async (params: { userId: string; serverId: string }): Promise<Types.MemberApplication | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberApplication', params);
-    },
-
-    memberApplications: async (params: { serverId: string }): Promise<Types.MemberApplication[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberApplications', params);
-    },
-
-    memberInvitation: async (params: { receiverId: string; serverId: string }): Promise<Types.MemberInvitation | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberInvitation', params);
-    },
-
-    memberInvitations: async (params: { receiverId: string }): Promise<Types.MemberInvitation[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberInvitations', params);
-    },
-
-    notifications: async (params: { region: Types.LanguageKey }): Promise<Types.Notification[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-notifications', params);
-    },
-
-    announcements: async (params: { region: Types.LanguageKey }): Promise<Types.Announcement[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-announcements', params);
-    },
-
-    recommendServers: async (params: { region: Types.LanguageKey }): Promise<Types.RecommendServer[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-recommendServers', params);
-    },
-
-    uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-uploadImage', params);
-    },
-
-    searchServer: async (params: { query: string }): Promise<Types.Server[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchServer', params);
-    },
-
-    searchUser: async (params: { query: string }): Promise<Types.User[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchUser', params);
-    },
-  },
+  }),
 
   deepLink: {
     onDeepLink: (callback: (serverId: string) => void) => {
@@ -221,8 +268,18 @@ const ipc = {
     },
 
     minimize: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('window-control-minimize');
+      if (isElectron) {
+        ipcRenderer.send('window-control-minimize');
+        return;
+      }
+
+      // Web in-app popup mode: minimize the current popup instance.
+      try {
+        const id = new URL(window.location.href).searchParams.get('id') || (globalThis as any).__ricecallCurrentPopupId;
+        if (id) minimizeInAppPopup(id);
+      } catch {
+        // ignore
+      }
     },
 
     maximize: () => {
@@ -236,8 +293,19 @@ const ipc = {
     },
 
     close: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('window-control-close');
+      if (isElectron) {
+        ipcRenderer.send('window-control-close');
+        return;
+      }
+
+      // Web in-app popup mode: most popup components call `ipc.window.close()`.
+      // Emulate Electron by closing the current popup instance (from URL `?id=...`).
+      try {
+        const id = new URL(window.location.href).searchParams.get('id') || (globalThis as any).__ricecallCurrentPopupId;
+        if (id) closeInAppPopup(id);
+      } catch {
+        // ignore
+      }
     },
 
     onMaximize: (callback: () => void) => {
@@ -279,19 +347,26 @@ const ipc = {
     },
 
     submit: (to: string, data?: any) => {
-      if (!isElectron) return;
-      ipcRenderer.send('popup-submit', to, data);
+      if (isElectron) {
+        ipcRenderer.send('popup-submit', to, data);
+        return;
+      }
+      // Web in-app popup mode: delegate to the popup controller.
+      getPopupController().submit(to, data);
     },
 
     onSubmit: <T>(host: string, callback: (data: T) => void) => {
-      if (!isElectron) return () => {};
-      ipcRenderer.removeAllListeners('popup-submit');
-      const listener = (_: any, from: string, data: T) => {
-        if (from === host) callback(data);
+      if (isElectron) {
         ipcRenderer.removeAllListeners('popup-submit');
-      };
-      ipcRenderer.on('popup-submit', listener);
-      return () => ipcRenderer.removeListener('popup-submit', listener);
+        const listener = (_: any, from: string, data: T) => {
+          if (from === host) callback(data);
+          ipcRenderer.removeAllListeners('popup-submit');
+        };
+        ipcRenderer.on('popup-submit', listener);
+        return () => ipcRenderer.removeListener('popup-submit', listener);
+      }
+      // Web in-app popup mode: delegate to the popup controller.
+      return getPopupController().onSubmit(host, callback);
     },
   },
 
@@ -1059,7 +1134,7 @@ const ipc = {
       },
 
       get: (): boolean => {
-        if (!isElectron) return false;
+        if (!isElectron) return true; // Web mode: enable sound by default
         return ipcRenderer.sendSync('get-enter-voice-channel-sound');
       },
 
@@ -1078,7 +1153,7 @@ const ipc = {
       },
 
       get: (): boolean => {
-        if (!isElectron) return false;
+        if (!isElectron) return true; // Web mode: enable sound by default
         return ipcRenderer.sendSync('get-leave-voice-channel-sound');
       },
 
@@ -1097,7 +1172,7 @@ const ipc = {
       },
 
       get: (): boolean => {
-        if (!isElectron) return false;
+        if (!isElectron) return true; // Web mode: enable sound by default
         return ipcRenderer.sendSync('get-start-speaking-sound');
       },
 
@@ -1116,7 +1191,7 @@ const ipc = {
       },
 
       get: (): boolean => {
-        if (!isElectron) return false;
+        if (!isElectron) return true; // Web mode: enable sound by default
         return ipcRenderer.sendSync('get-stop-speaking-sound');
       },
 
@@ -1135,7 +1210,7 @@ const ipc = {
       },
 
       get: (): boolean => {
-        if (!isElectron) return false;
+        if (!isElectron) return true; // Web mode: enable sound by default
         return ipcRenderer.sendSync('get-receive-direct-message-sound');
       },
 
@@ -1154,7 +1229,7 @@ const ipc = {
       },
 
       get: (): boolean => {
-        if (!isElectron) return false;
+        if (!isElectron) return true; // Web mode: enable sound by default
         return ipcRenderer.sendSync('get-receive-channel-message-sound');
       },
 
