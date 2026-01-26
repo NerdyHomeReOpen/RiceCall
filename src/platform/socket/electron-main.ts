@@ -6,6 +6,9 @@ import { ClientToServerEventNames, ClientToServerEventWithAckNames } from './con
 
 const logger = new Logger('Socket');
 
+// Main window for sending events (set by main.ts)
+let mainWindow: BrowserWindow | null = null;
+
 // Bridge implementation for Electron Main Process
 const electronBridge: SocketPlatformBridge = {
   onUIMessage(callback) {
@@ -31,6 +34,15 @@ const electronBridge: SocketPlatformBridge = {
   },
 
   sendToUI(event, ...args) {
+    // CRITICAL: Sound events MUST ONLY be sent to the main window.
+    // Broadcasting to all windows will cause duplicate overlapping audio.
+    if (event === 'playSound') {
+      if (mainWindow && !mainWindow.isDestroyed()) {
+        mainWindow.webContents.send(event, ...args);
+      }
+      return;
+    }
+
     BrowserWindow.getAllWindows().forEach((window) => {
       if (!window.isDestroyed()) {
         window.webContents.send(event, ...args);
@@ -54,5 +66,7 @@ export function disconnectSocket() {
 }
 
 // Compatibility exports
-export function setMainWindow() {}
+export function setMainWindow(window: BrowserWindow | null) {
+  mainWindow = window;
+}
 export const socket: unknown = null; // Removed direct access

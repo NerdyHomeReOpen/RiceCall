@@ -324,7 +324,7 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
   });
 
   // Set this window as the main window for socket events
-  setMainWindow();
+  setMainWindow(mainWindow);
 
   return mainWindow;
 }
