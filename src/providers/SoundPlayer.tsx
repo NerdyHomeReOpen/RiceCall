@@ -32,7 +32,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
   const outputDeviceIdRef = useRef<string | null>(null);
 
   const playSound = useCallback((sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => {
-    new Logger('SoundPlayer').info(`Play sound: ${sound}`);
+    new Logger('SoundPlayer').info(`Play sound: ${sound} in ${window.location.href}`);
 
     if (disableAllSoundEffectRef.current && !force) return;
 

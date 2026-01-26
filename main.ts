@@ -26,7 +26,7 @@ import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, se
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
 import { initMainI18n, t } from './src/i18n.main.js';
-import { connectSocket, disconnectSocket, setSocketTargetWindow } from './src/socket.js';
+import { connectSocket, disconnectSocket, setMainWindow } from './src/platform/socket/electron-main.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
 import * as AuthService from './src/auth.service.js';
 import * as DataService from './src/data.service.js';
@@ -365,8 +365,8 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     return { action: 'deny' };
   });
 
-  // Set this window as the target for socket events
-  setSocketTargetWindow(mainWindow);
+  // Set this window as the main window for socket events
+  setMainWindow(mainWindow);
 
   return mainWindow;
 }

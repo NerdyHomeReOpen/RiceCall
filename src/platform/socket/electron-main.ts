@@ -1,14 +1,14 @@
 import { io, Socket } from 'socket.io-client';
 import { BrowserWindow, ipcMain } from 'electron';
-import type * as Types from './types';
-import { env } from './env.js';
-import Logger from './logger.js';
+import type * as Types from '@/types';
+import { env } from '@/env.js';
+import Logger from '@/logger.js';
 
-// Target window for sending events (set by main.ts)
-let targetWindow: BrowserWindow | null = null;
+// Main window for sending events (set by main.ts)
+let mainWindow: BrowserWindow | null = null;
 
-export function setSocketTargetWindow(window: BrowserWindow | null) {
-  targetWindow = window;
+export function setMainWindow(window: BrowserWindow | null) {
+  mainWindow = window;
 }
 
 /**
@@ -219,9 +219,16 @@ export function connectSocket(token: string) {
     ServerToClientEventNames.forEach((event) => {
       socket?.on(event, async (...args) => {
         if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
-        getTargetWindows().forEach((window) => {
-          window.webContents.send(event, ...args);
-        });
+
+        if (event === 'playSound') {
+          if (mainWindow && !mainWindow.isDestroyed()) {
+            mainWindow.webContents.send(event, ...args);
+          }
+        } else {
+          getTargetWindows().forEach((window) => {
+            window.webContents.send(event, ...args);
+          });
+        }
       });
     });
 
