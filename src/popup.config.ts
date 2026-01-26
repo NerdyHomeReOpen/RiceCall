@@ -106,7 +106,7 @@ export const POPUP_HEADERS: Record<Types.PopupType, PopupHeaderConfig> = {
   memberApplicationSetting: { buttons: ['close'], hideHeader: false },
   memberInvitation: { buttons: ['close'], hideHeader: false },
   searchUser: { buttons: ['close'], hideHeader: false },
-  serverAnnouncement: { buttons: ['close'], hideHeader: false },
+  serverAnnouncement: { buttons: ['close'], hideHeader: true },
   serverApplication: { buttons: ['close'], hideHeader: false },
   serverBroadcast: { buttons: ['close'], hideHeader: false },
   serverSetting: { buttons: ['close'], hideHeader: false },

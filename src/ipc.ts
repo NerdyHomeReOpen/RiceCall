@@ -20,12 +20,14 @@ import { getDataClient, type DataClient } from '@/platform/data';
 import { getPopupController } from '@/platform/popup';
 import { getSocketClient, type SocketClient } from '@/platform/socket';
 import { getWindowController, type WindowController } from '@/platform/window';
+import { getAuthController } from '@/platform/auth';
 
 // Lazy-initialized singletons
 let ipc: IpcRenderer | null = null;
 let dataClient: DataClient | null = null;
 let socketClient: SocketClient | null = null;
 let windowController: WindowController | null = null;
+let authController: any | null = null;
 
 function getIpc(): IpcRenderer {
   if (!ipc) ipc = getIpcRenderer();
@@ -46,6 +48,15 @@ function getWindow(): WindowController {
   if (!windowController) windowController = getWindowController();
   return windowController;
 }
+
+function getAuth(): any {
+  if (!authController) authController = getAuthController();
+  return authController;
+}
+
+// ============================================================================
+// IPC Facade Object
+// ============================================================================
 
 // ============================================================================
 // IPC Facade Object
@@ -94,26 +105,18 @@ const ipcFacade = {
     },
 
     logout: async (): Promise<void> => {
-      // Clear localStorage (works in both modes)
-      try {
-        localStorage.removeItem('token');
-        localStorage.removeItem('userId');
-      } catch {
-        // ignore
-      }
+      await getAuth().logout();
+    },
 
-      // Invoke logout handler
-      await getIpc().invoke('auth-logout');
-
-      // Socket disconnection is handled by the platform
-      // For Web: the handler will disconnect and redirect
+    loginSuccess: async (token: string): Promise<void> => {
+      await getAuth().loginSuccess(token);
     },
 
     register: async (formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> => {
       return await getIpc().invoke('auth-register', formData);
     },
 
-    autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
+    autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false; message?: string }> => {
       return await getIpc().invoke('auth-auto-login', token);
     },
   },

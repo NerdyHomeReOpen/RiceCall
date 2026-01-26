@@ -36,9 +36,10 @@ export function createAuthHandlers(): HandlerRegistration {
       },
 
       'auth-logout': async (ctx: HandlerContext): Promise<void> => {
-        // Clear stored credentials
+        // Clear all stored credentials and session markers
         ctx.storage.delete('token');
         ctx.storage.delete('userId');
+        ctx.storage.delete('login-account');
       },
 
       'auth-register': async (
@@ -56,15 +57,16 @@ export function createAuthHandlers(): HandlerRegistration {
 
       'auth-auto-login': async (ctx: HandlerContext, token: string): Promise<AuthResult> => {
         try {
-          const res = await ctx.api.post<{ token?: string }>('/token/verify', {
+          const res = await ctx.api.post<{ token?: string; message?: string }>('/token/verify', {
             token,
             version: packageJson.version,
           });
-          if (!res?.token) return { success: false };
+          if (!res?.token) return { success: false, message: res?.message || 'invalid-token' };
           return { success: true, token: res.token };
-        } catch (e) {
+        } catch (e: unknown) {
           console.error('[Auth] AutoLogin failed:', e);
-          return { success: false };
+          const errorMessage = e instanceof Error ? e.message : 'network-error';
+          return { success: false, message: errorMessage };
         }
       },
     },

@@ -123,49 +123,7 @@ const store = new Store<Types.StoreType>({
   },
 });
 
-const PopupSize: Record<Types.PopupType, { height: number; width: number }> = {
-  aboutus: { height: 750, width: 500 },
-  applyFriend: { height: 375, width: 490 },
-  approveFriend: { height: 250, width: 400 },
-  applyMember: { height: 300, width: 490 },
-  blockMember: { height: 250, width: 400 },
-  channelEvent: { height: 400, width: 500 },
-  channelSetting: { height: 520, width: 600 },
-  channelPassword: { height: 200, width: 380 },
-  changeTheme: { height: 335, width: 480 },
-  chatHistory: { height: 547, width: 714 },
-  createServer: { height: 436, width: 478 },
-  createChannel: { height: 200, width: 380 },
-  createFriendGroup: { height: 200, width: 380 },
-  directMessage: { height: 550, width: 650 },
-  dialogAlert: { height: 200, width: 380 },
-  dialogAlert2: { height: 200, width: 380 },
-  dialogSuccess: { height: 200, width: 380 },
-  dialogWarning: { height: 200, width: 380 },
-  dialogError: { height: 200, width: 380 },
-  dialogInfo: { height: 200, width: 380 },
-  editChannelOrder: { height: 550, width: 500 },
-  editChannelName: { height: 200, width: 380 },
-  editNickname: { height: 200, width: 380 },
-  editFriendNote: { height: 200, width: 380 },
-  editFriendGroupName: { height: 200, width: 380 },
-  friendVerification: { height: 550, width: 500 },
-  imageCropper: { height: 520, width: 610 },
-  inviteFriend: { height: 400, width: 500 },
-  inviteMember: { height: 300, width: 490 },
-  kickMemberFromChannel: { height: 250, width: 400 },
-  kickMemberFromServer: { height: 250, width: 400 },
-  memberApplicationSetting: { height: 220, width: 380 },
-  memberInvitation: { height: 550, width: 500 },
-  searchUser: { height: 200, width: 380 },
-  serverAnnouncement: { height: 400, width: 600 },
-  serverApplication: { height: 150, width: 320 },
-  serverSetting: { height: 520, width: 600 },
-  serverBroadcast: { height: 300, width: 450 },
-  systemSetting: { height: 520, width: 600 },
-  userInfo: { height: 630, width: 440 },
-  userSetting: { height: 700, width: 500 },
-};
+
 
 // Constants
 export const START_TIMESTAMP = Date.now();
@@ -366,7 +324,7 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
   });
 
   // Set this window as the main window for socket events
-  setMainWindow(mainWindow);
+  setMainWindow();
 
   return mainWindow;
 }

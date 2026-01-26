@@ -7,9 +7,7 @@ import { useTranslation } from 'react-i18next';
 import type * as Types from '@/types';
 import { POPUP_SIZES, POPUP_HEADERS, POPUP_TITLE_KEYS } from '@/popup.config';
 
-import ipc from '@/ipc';
-
-import { closeInAppPopup, restoreInAppPopup, subscribeInAppPopups, type InAppPopupInstance } from './inAppPopupHost';
+import { closeInAppPopup, focusInAppPopup, minimizeInAppPopup, restoreInAppPopup, subscribeInAppPopups, type InAppPopupInstance } from './inAppPopupHost';
 import { hydratePopupData, needsHydration } from './webPopupLoader';
 import { renderPopup } from './popupComponents.generated';
 
@@ -247,31 +245,62 @@ export function InAppPopupHost() {
             const effectiveData = hydratedData[p.id] ?? p.initialData;
             const title = getPopupTitle(p.type, effectiveData, t);
             return (
-              <button
+              <div
                 key={p.id}
-                type="button"
-                onClick={() => restoreInAppPopup(p.id)}
                 style={{
                   height: 28,
-                  maxWidth: 260,
-                  padding: '0 10px',
+                  maxWidth: 280,
+                  display: 'inline-flex',
+                  alignItems: 'center',
                   borderRadius: 8,
                   border: '1px solid rgba(255,255,255,0.14)',
                   background: 'rgba(0,0,0,0.55)',
-                  color: 'rgba(255,255,255,0.92)',
-                  fontFamily: 'system-ui, sans-serif',
-                  fontSize: 12,
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  cursor: 'pointer',
                   overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
                 }}
-                title={title}
               >
-                {title}
-              </button>
+                <button
+                  type="button"
+                  onClick={() => closeInAppPopup(p.id)}
+                  style={{
+                    width: 24,
+                    height: 28,
+                    border: 'none',
+                    borderRight: '1px solid rgba(255,255,255,0.1)',
+                    background: 'transparent',
+                    color: 'rgba(255,255,255,0.6)',
+                    cursor: 'pointer',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    fontSize: 16,
+                  }}
+                  onMouseOver={(e) => (e.currentTarget.style.color = 'white')}
+                  onMouseOut={(e) => (e.currentTarget.style.color = 'rgba(255,255,255,0.6)')}
+                  title={t('close')}
+                >
+                  ×
+                </button>
+                <button
+                  type="button"
+                  onClick={() => restoreInAppPopup(p.id)}
+                  style={{
+                    height: 28,
+                    padding: '0 10px',
+                    border: 'none',
+                    background: 'transparent',
+                    color: 'rgba(255,255,255,0.92)',
+                    fontFamily: 'system-ui, sans-serif',
+                    fontSize: 12,
+                    cursor: 'pointer',
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                  }}
+                  title={title}
+                >
+                  {title}
+                </button>
+              </div>
             );
           })}
         </div>
@@ -409,11 +438,11 @@ function DraggableWindow(props: {
   }, [onPosChange]);
 
   const handleMinimize = () => {
-    ipc.window.minimize();
+    minimizeInAppPopup(props.id);
   };
 
   const handleClose = () => {
-    ipc.window.close();
+    closeInAppPopup(props.id);
   };
 
   return (
@@ -439,6 +468,10 @@ function DraggableWindow(props: {
         cursor: isDragging ? 'move' : 'default',
       }}
       onPointerDown={(e) => {
+        // Bring to front and set as current
+        focusInAppPopup(props.id);
+        (globalThis as any).__ricecallCurrentPopupId = props.id;
+
         // Match Electron's drag-region behavior based on computed `-webkit-app-region`.
         const target = e.target as HTMLElement | null;
         if (!target) return;

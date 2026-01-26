@@ -8,6 +8,7 @@ import ipc from '@/ipc';
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
 import ChangeServerPage from '@/pages/ChangeServer';
+import * as Popup from '@/utils/popup';
 
 import headerStyles from '@/styles/header.module.css';
 
@@ -59,6 +60,9 @@ const Header: React.FC = React.memo(() => {
 Header.displayName = 'Header';
 
 const AuthPageComponent: React.FC = React.memo(() => {
+  // Hooks
+  const { t } = useTranslation();
+
   // States
   const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
 
@@ -84,12 +88,22 @@ const AuthPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     const autoLogin = async () => {
       const token = localStorage.getItem('token');
-      if (token) {
-        return await ipc.auth.autoLogin(token);
+      // Only attempt autoLogin if token actually exists and is not an empty string
+      if (token && token.length > 10) {
+        const res = await ipc.auth.autoLogin(token);
+        if (res && res.success) {
+          ipc.auth.loginSuccess(res.token);
+        } else if (res && !res.success) {
+          // Clear invalid token to stop the loop
+          localStorage.removeItem('token');
+          // Show the reason from server or a generic fallback
+          Popup.openErrorDialog(t(res.message || 'message:login-failed'), () => {});
+        }
+        return res;
       }
     };
     autoLogin();
-  }, []);
+  }, [t]);
 
   return (
     <>

@@ -455,15 +455,14 @@ const SocketManager: React.FC = React.memo(() => {
   }, [playSound]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('openPopup', (...args: { type: Types.PopupType; id: string; initialData?: unknown; force?: boolean }[]) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const unsub = ipc.socket.on('openPopup', (...args: { type: Types.PopupType; id: string; initialData?: any; force?: boolean }[]) => {
       args.forEach((p) => {
         ipc.popup.open(p.type, p.id, p.initialData, p.force);
         popupOffSubmitRef.current?.();
         popupOffSubmitRef.current = ipc.popup.onSubmit(p.id, () => {
           if (p.id === 'logout') {
             ipc.auth.logout();
-            localStorage.removeItem('token');
-            localStorage.removeItem('userId');
           }
         });
       });
@@ -473,6 +472,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error: Error) => {
+      // General error handling only, logout is handled via openPopup
       Popup.openErrorDialog(error.message, () => {});
     });
     return () => unsub();

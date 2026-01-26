@@ -86,6 +86,9 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
           // ignore if token isn't a JWT
         }
         localStorage.setItem('login-account', account);
+        
+        // Handle post-login actions (like redirection in web)
+        ipc.auth.loginSuccess(res.token);
       }
     });
 

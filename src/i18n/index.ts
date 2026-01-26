@@ -107,7 +107,7 @@ class CrowdinBackend {
 
         ns: ['app', 'rpc', 'message', 'country', 'badge', 'position'],
         defaultNS: 'app',
-        fallbackNS: false,
+        fallbackNS: ['message'],
 
         interpolation: { escapeValue: false },
         load: 'currentOnly' as const,
@@ -121,7 +121,7 @@ class CrowdinBackend {
 
       ns: ['app', 'rpc', 'message', 'country', 'badge', 'position'],
       defaultNS: 'app',
-      fallbackNS: false,
+      fallbackNS: ['message'],
 
       resources: {
         'en-US': { app: enUS_app, rpc: enUS_rpc, message: enUS_message, country: enUS_country, badge: enUS_badge, position: enUS_position },

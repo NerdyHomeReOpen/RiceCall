@@ -7,44 +7,10 @@ import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
+import { POPUP_HEADERS } from '@/popup.config';
+import { renderPopup } from '@/platform/popup/popupComponents.generated';
 
 import SocketManager from '@/components/SocketManager';
-
-import About from '@/popups/About';
-import ApplyFriend from '@/popups/ApplyFriend';
-import ApproveFriend from '@/popups/ApproveFriend';
-import ApplyMember from '@/popups/ApplyMember';
-import BlockMember from '@/popups/BlockMember';
-import ChannelEvent from '@/popups/ChannelEvent';
-import ChangeTheme from '@/popups/ChangeTheme';
-import ChannelPassword from '@/popups/ChannelPassword';
-import ChannelSetting from '@/popups/ChannelSetting';
-import ChatHistory from '@/popups/ChatHistory';
-import CreateChannel from '@/popups/CreateChannel';
-import CreateFriendGroup from '@/popups/CreateFriendGroup';
-import CreateServer from '@/popups/CreateServer';
-import Dialog from '@/popups/Dialog';
-import DirectMessage from '@/popups/DirectMessage';
-import EditChannelName from '@/popups/EditChannelName';
-import EditChannelOrder from '@/popups/EditChannelOrder';
-import EditNickname from '@/popups/EditNickname';
-import EditFriendNote from '@/popups/EditFriendNote';
-import EditFriendGroupName from '@/popups/EditFriendGroupName';
-import FriendVerification from '@/popups/FriendVerification';
-import KickMemberFromChannel from '@/popups/KickMemberFromChannel';
-import KickMemberFromServer from '@/popups/KickMemberFromServer';
-import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
-import MemberInvitation from '@/popups/MemberInvitation';
-import ImageCropper from '@/popups/ImageCropper';
-import InviteFriend from '@/popups/InviteFriend';
-import InviteMember from '@/popups/InviteMember';
-import SearchUser from '@/popups/SearchUser';
-import ServerAnnouncement from '@/popups/ServerAnnouncement';
-import ServerApplication from '@/popups/ServerApplication';
-import ServerSetting from '@/popups/ServerSetting';
-import ServerBroadcast from '@/popups/ServerBroadcast';
-import SystemSetting from '@/popups/SystemSetting';
-import UserInfo from '@/popups/UserInfo';
 
 import header from '@/styles/header.module.css';
 
@@ -160,224 +126,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
 Header.displayName = 'Header';
 
-const defaultPopup: Record<Types.PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
-  aboutus: {
-    type: 'aboutus',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  applyFriend: {
-    type: 'applyFriend',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  applyMember: {
-    type: 'applyMember',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  approveFriend: {
-    type: 'approveFriend',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  blockMember: {
-    type: 'blockMember',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  channelEvent: {
-    type: 'channelEvent',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  changeTheme: {
-    type: 'changeTheme',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  channelPassword: {
-    type: 'channelPassword',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  channelSetting: {
-    type: 'channelSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
 
-  chatHistory: {
-    type: 'chatHistory',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  createServer: {
-    type: 'createServer',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  createChannel: {
-    type: 'createChannel',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  createFriendGroup: {
-    type: 'createFriendGroup',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogAlert: {
-    type: 'dialogAlert',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogAlert2: {
-    type: 'dialogAlert2',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogError: {
-    type: 'dialogError',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogInfo: {
-    type: 'dialogInfo',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogSuccess: {
-    type: 'dialogSuccess',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogWarning: {
-    type: 'dialogWarning',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  directMessage: {
-    type: 'directMessage',
-    buttons: ['close', 'minimize', 'maxsize'],
-    hideHeader: false,
-  },
-  editChannelOrder: {
-    type: 'editChannelOrder',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editChannelName: {
-    type: 'editChannelName',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editFriendNote: {
-    type: 'editFriendNote',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editFriendGroupName: {
-    type: 'editFriendGroupName',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editNickname: {
-    type: 'editNickname',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  friendVerification: {
-    type: 'friendVerification',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-
-  imageCropper: {
-    type: 'imageCropper',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  inviteFriend: {
-    type: 'inviteFriend',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  inviteMember: {
-    type: 'inviteMember',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  kickMemberFromChannel: {
-    type: 'kickMemberFromChannel',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  kickMemberFromServer: {
-    type: 'kickMemberFromServer',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  memberApplicationSetting: {
-    type: 'memberApplicationSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  memberInvitation: {
-    type: 'memberInvitation',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  searchUser: {
-    type: 'searchUser',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  serverAnnouncement: {
-    type: 'serverAnnouncement',
-    buttons: ['close'],
-    hideHeader: true,
-  },
-  serverApplication: {
-    type: 'serverApplication',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  serverBroadcast: {
-    type: 'serverBroadcast',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  serverSetting: {
-    type: 'serverSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  systemSetting: {
-    type: 'systemSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  userInfo: {
-    type: 'userInfo',
-    buttons: ['close'],
-    hideHeader: true,
-  },
-  userSetting: {
-    type: 'userSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-};
-
-type Popup = {
-  id: string;
-  type: Types.PopupType;
-  title: string;
-  buttons: ('close' | 'minimize' | 'maxsize')[];
-  node: () => React.ReactNode | null;
-  hideHeader: boolean;
-};
 
 const PopupPageComponent: React.FC = React.memo(() => {
   // Hooks
@@ -391,7 +140,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
   // Variables
   const { buttons, hideHeader } = useMemo(() => {
     if (!type) return { buttons: [], hideHeader: true };
-    return defaultPopup[type];
+    return POPUP_HEADERS[type] ?? { buttons: ['close'], hideHeader: false };
   }, [type]);
 
   const title = useMemo(() => {
@@ -443,49 +192,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   const node = useMemo<() => React.ReactNode | null>(() => {
     if (!type || !initialData) return () => null;
-    return {
-      aboutus: () => <About id={id} {...initialData} />,
-      applyFriend: () => <ApplyFriend id={id} {...initialData} />,
-      applyMember: () => <ApplyMember id={id} {...initialData} />,
-      approveFriend: () => <ApproveFriend id={id} {...initialData} />,
-      blockMember: () => <BlockMember id={id} {...initialData} />,
-      changeTheme: () => <ChangeTheme id={id} {...initialData} />,
-      channelEvent: () => <ChannelEvent id={id} {...initialData} />,
-      channelPassword: () => <ChannelPassword id={id} {...initialData} />,
-      channelSetting: () => <ChannelSetting id={id} {...initialData} />,
-      chatHistory: () => <ChatHistory id={id} {...initialData} />,
-      createChannel: () => <CreateChannel id={id} {...initialData} />,
-      createFriendGroup: () => <CreateFriendGroup id={id} {...initialData} />,
-      createServer: () => <CreateServer id={id} {...initialData} />,
-      dialogAlert: () => <Dialog id={id} iconType="ALERT" {...initialData} />,
-      dialogAlert2: () => <Dialog id={id} iconType="ALERT" {...initialData} />,
-      dialogError: () => <Dialog id={id} iconType="ERROR" {...initialData} />,
-      dialogInfo: () => <Dialog id={id} iconType="INFO" {...initialData} />,
-      dialogSuccess: () => <Dialog id={id} iconType="SUCCESS" {...initialData} />,
-      dialogWarning: () => <Dialog id={id} iconType="WARNING" {...initialData} />,
-      directMessage: () => <DirectMessage id={id} {...initialData} />,
-      editChannelOrder: () => <EditChannelOrder id={id} {...initialData} />,
-      editChannelName: () => <EditChannelName id={id} {...initialData} />,
-      editFriendNote: () => <EditFriendNote id={id} {...initialData} />,
-      editFriendGroupName: () => <EditFriendGroupName id={id} {...initialData} />,
-      editNickname: () => <EditNickname id={id} {...initialData} />,
-      friendVerification: () => <FriendVerification id={id} {...initialData} />,
-      imageCropper: () => <ImageCropper id={id} {...initialData} />,
-      inviteFriend: () => <InviteFriend id={id} {...initialData} />,
-      inviteMember: () => <InviteMember id={id} {...initialData} />,
-      kickMemberFromChannel: () => <KickMemberFromChannel id={id} {...initialData} />,
-      kickMemberFromServer: () => <KickMemberFromServer id={id} {...initialData} />,
-      memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
-      memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
-      searchUser: () => <SearchUser id={id} {...initialData} />,
-      serverAnnouncement: () => <ServerAnnouncement id={id} {...initialData} />,
-      serverApplication: () => <ServerApplication id={id} {...initialData} />,
-      serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
-      serverSetting: () => <ServerSetting id={id} {...initialData} />,
-      systemSetting: () => <SystemSetting id={id} {...initialData} />,
-      userInfo: () => <UserInfo id={id} {...initialData} />,
-      userSetting: () => <UserInfo id={id} {...initialData} />,
-    }[type];
+    return () => renderPopup(type, id!, initialData);
   }, [id, type, initialData]);
 
   // Effects

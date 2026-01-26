@@ -76,10 +76,9 @@ export function minimizeInAppPopup(id: PopupId) {
 export function restoreInAppPopup(id: PopupId) {
   const idx = instances.findIndex((p) => p.id === id);
   if (idx < 0) return;
-  if (!instances[idx].minimized) return;
-  const next = [...instances];
-  next[idx] = { ...next[idx], minimized: false };
-  instances = next;
+  const item = { ...instances[idx], minimized: false };
+  // Restore and bring to front
+  instances = [...instances.filter((p) => p.id !== id), item];
   emit();
 }
 
@@ -98,6 +97,15 @@ export function closeInAppPopup(id: PopupId) {
   const next = instances.filter((p) => p.id !== id);
   if (next.length === instances.length) return;
   instances = next;
+  emit();
+}
+
+export function focusInAppPopup(id: PopupId) {
+  const idx = instances.findIndex((p) => p.id === id);
+  if (idx < 0) return;
+  const item = instances[idx];
+  // Move to end of array to increase z-index
+  instances = [...instances.filter((p) => p.id !== id), item];
   emit();
 }
 

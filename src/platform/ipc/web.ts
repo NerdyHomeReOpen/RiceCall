@@ -9,7 +9,7 @@ import type { IpcRenderer, HandlerRegistration, IpcStorage, HandlerContext } fro
 /**
  * Web storage adapter using localStorage.
  */
-export function createWebStorage(prefix: string = 'ricecall_'): IpcStorage {
+export function createWebStorage(prefix: string = ''): IpcStorage {
   return {
     get: <T>(key: string, defaultValue?: T): T | undefined => {
       try {
@@ -139,7 +139,16 @@ export function createWebBroadcast(channelName: string = 'ricecall_ipc'): {
       // Send to other tabs
       bc?.postMessage({ channel, args });
       // Also notify local listeners
-      localListeners.forEach((cb) => cb(channel, ...args));
+      localListeners.forEach((cb) => {
+        try {
+          if (typeof window !== 'undefined' && localStorage.getItem('ricecall:debug:ipc') === '1') {
+            console.log(`[WebIPC.Broadcast.Local] ${channel}`, args);
+          }
+          cb(channel, ...args);
+        } catch (e) {
+          console.error(`[WebIPC] Error in listener for ${channel}:`, e);
+        }
+      });
     },
     onBroadcast: (callback: (channel: string, ...args: any[]) => void): (() => void) => {
       localListeners.add(callback);

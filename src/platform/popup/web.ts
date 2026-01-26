@@ -1,58 +1,44 @@
+import { getIpcRenderer } from '@/platform/ipc';
 import type * as Types from '@/types';
 import type { PopupController, PopupId, PopupOpenOptions } from './types';
 import { closeAllInAppPopups, closeInAppPopup, openInAppPopup } from './inAppPopupHost';
 
-/**
- * Minimal web implementation.
- *
- * For this PoC we use a URL-based "popup" that reuses the existing `/popup` route.
- * It opens a new browser tab/window when possible, otherwise falls back to navigating.
- *
- * This keeps us close to the Electron model (a separate window), while still being web-native.
- */
 export class WebPopupController implements PopupController {
   open(type: Types.PopupType, id: PopupId, initialData: unknown, options?: PopupOpenOptions): void {
-    try {
-      if (typeof window !== 'undefined' && localStorage.getItem('ricecall:debug:popup') === '1') {
-        console.log('[WebPopupController.open]', { type, id, initialData, options });
-      }
-    } catch {
-      // ignore
-    }
+    console.log(`[WebPopup] Opening popup: ${type} (id: ${id})`, initialData);
     openInAppPopup(type, id, initialData, options);
   }
 
   close(id: PopupId): void {
+    console.log(`[WebPopup] Closing popup: ${id}`);
     closeInAppPopup(id);
   }
 
   closeAll(): void {
+    console.log(`[WebPopup] Closing all popups`);
     closeAllInAppPopups();
   }
 
   submit(to: PopupId, data?: unknown): void {
-    // Use BroadcastChannel for same-origin communication.
-    const channel = new BroadcastChannel(this.channelName());
-    channel.postMessage({ to, data: data ?? null });
-    channel.close();
+    console.log(`[WebPopup] Submitting result to: ${to}`, data);
+    // Use the global IPC broadcast to ensure the sender window ALSO receives the event
+    getIpcRenderer().send('popup-submit', to, data ?? null);
   }
 
   onSubmit<T>(host: PopupId, callback: (data: T) => void): () => void {
-    const channel = new BroadcastChannel(this.channelName());
-    const listener = (event: MessageEvent) => {
-      const msg = event.data as { to?: string; data?: T };
-      if (msg?.to === host) callback(msg.data as T);
+    console.log(`[WebPopup] Registering onSubmit listener for: ${host}`);
+    
+    const listener = (_: unknown, to: string, data: T) => {
+      if (to === host) {
+        console.log(`[WebPopup] Received submit for: ${host}`, data);
+        callback(data);
+      }
     };
-    channel.addEventListener('message', listener);
+
+    getIpcRenderer().on('popup-submit', listener);
     return () => {
-      channel.removeEventListener('message', listener);
-      channel.close();
+      console.log(`[WebPopup] Unregistering onSubmit listener for: ${host}`);
+      getIpcRenderer().removeListener('popup-submit', listener);
     };
   }
-
-  private channelName() {
-    return 'ricecall-popup-submit';
-  }
-
-  // Note: initialData storage is no longer needed for the in-app host.
 }
