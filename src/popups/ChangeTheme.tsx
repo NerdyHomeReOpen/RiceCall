@@ -15,22 +15,20 @@ import popupStyles from '@/styles/popup.module.css';
 
 const ChangeThemePopup: React.FC = React.memo(() => {
   // Hooks
-  const contextMenu = useContextMenu();
   const { t } = useTranslation();
 
   // Refs
   const isSelectingColorRef = useRef<boolean>(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const ImageInputRef = useRef<HTMLInputElement>(null);
   const colorSelectorRef = useRef<HTMLDivElement>(null);
 
   // States
-  const [hoveredThemeIndex, setHoveredThemeIndex] = useState<number | null>(null);
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [pickedColor, setPickedColor] = useState<Color.RGB>({ r: 0, g: 0, b: 0 });
   const [customThemes, setCustomThemes] = useState<Types.Theme[]>(Array.from({ length: 7 }));
 
   // Handlers
-  const handleSelectTheme = (event: React.MouseEvent<HTMLDivElement>) => {
+  const handleThemeSelect = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
     const computedStyle = window.getComputedStyle(clickedElement as Element);
     const headerImage = computedStyle.getPropertyValue('--header-image');
@@ -40,31 +38,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     ipc.customThemes.current.set({ headerImage, mainColor, secondaryColor });
   };
 
-  const handleSaveSelectedColor = () => {
-    const headerImage = () => {
-      const canvas = document.createElement('canvas');
-      canvas.width = 20;
-      canvas.height = 20;
-      const ctx = canvas.getContext('2d')!;
-      ctx.fillStyle = `rgb(${pickedColor.r} ${pickedColor.g} ${pickedColor.b})`;
-      ctx.fillRect(0, 0, 20, 20);
-      return canvas.toDataURL('webp', 1);
-    };
-    const visibleColor = Color.getVisibleColor(pickedColor);
-    const contrastColor = Color.getContrastColor(pickedColor);
-
-    const newTheme: Types.Theme = {
-      headerImage: `url(${headerImage()})`,
-      mainColor: Color.toRGBString(visibleColor),
-      secondaryColor: Color.toRGBString(contrastColor),
-    };
-
-    ipc.customThemes.current.set(newTheme);
-    ipc.customThemes.add(newTheme);
-    setShowColorPicker(false);
-  };
-
-  const handleRemoveCustom = (index: number) => {
+  const handleThemeRemove = (index: number) => {
     ipc.customThemes.delete(index);
   };
 
@@ -96,21 +70,63 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     };
   };
 
-  const handleUploadImage = async (imageUnit8Array: Uint8Array) => {
-    const blob = new Blob([imageUnit8Array], { type: 'image/webp' });
-    const imageUrl = URL.createObjectURL(blob);
-    const dominantColor = await Color.getDominantColor(imageUrl);
-    const visibleColor = Color.getVisibleColor(dominantColor);
-    const contrastColor = Color.getContrastColor(dominantColor);
+  const handleColorSaveBtnClick = () => {
+    const headerImage = () => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 20;
+      canvas.height = 20;
+      const ctx = canvas.getContext('2d')!;
+      ctx.fillStyle = `rgb(${pickedColor.r} ${pickedColor.g} ${pickedColor.b})`;
+      ctx.fillRect(0, 0, 20, 20);
+      return canvas.toDataURL('webp', 1);
+    };
+    const visibleColor = Color.getVisibleColor(pickedColor);
+    const contrastColor = Color.getContrastColor(pickedColor);
 
     const newTheme: Types.Theme = {
-      headerImage: `url(${imageUrl})`,
+      headerImage: `url(${headerImage()})`,
       mainColor: Color.toRGBString(visibleColor),
       secondaryColor: Color.toRGBString(contrastColor),
     };
 
     ipc.customThemes.current.set(newTheme);
     ipc.customThemes.add(newTheme);
+    setShowColorPicker(false);
+  };
+
+  const handleColorCancelBtnClick = () => {
+    setShowColorPicker(false);
+  };
+
+  const handleColorSelectBtnClick = () => {
+    setShowColorPicker((prev) => !prev);
+  };
+
+  const handleUploadImageBtnClick = () => {
+    ImageInputRef.current?.click();
+  };
+
+  const handleImageInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const image = e.target.files?.[0];
+    if (!image) return;
+    image.arrayBuffer().then((arrayBuffer) => {
+      Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+        const blob = new Blob([imageUnit8Array], { type: 'image/webp' });
+        const imageUrl = URL.createObjectURL(blob);
+        const dominantColor = await Color.getDominantColor(imageUrl);
+        const visibleColor = Color.getVisibleColor(dominantColor);
+        const contrastColor = Color.getContrastColor(dominantColor);
+
+        const newTheme: Types.Theme = {
+          headerImage: `url(${imageUrl})`,
+          mainColor: Color.toRGBString(visibleColor),
+          secondaryColor: Color.toRGBString(contrastColor),
+        };
+
+        ipc.customThemes.current.set(newTheme);
+        ipc.customThemes.add(newTheme);
+      });
+    });
   };
 
   // Effects
@@ -150,78 +166,26 @@ const ChangeThemePopup: React.FC = React.memo(() => {
               <div className={styles['theme-options']}>
                 <div className={styles['theme-slots-big']}>
                   {Array.from({ length: 4 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className={styles['theme']}
-                      data-theme-index={i}
-                      onClick={handleSelectTheme}
-                      onMouseEnter={() => setHoveredThemeIndex(i)}
-                      onMouseLeave={() => setHoveredThemeIndex(null)}
-                    >
-                      {hoveredThemeIndex === i && (
-                        <div className={styles['theme-description']}>
-                          {i === 0 && t('pink-memory')}
-                          {i === 1 && t('pure-childhood')}
-                          {i === 2 && t('cute-cat')}
-                          {i === 3 && t('that-year')}
-                        </div>
-                      )}
+                    <div key={i} className={styles['theme']} data-theme-index={i} onClick={handleThemeSelect}>
+                      <div className={styles['theme-description']}>
+                        {i === 0 && t('pink-memory')}
+                        {i === 1 && t('pure-childhood')}
+                        {i === 2 && t('cute-cat')}
+                        {i === 3 && t('that-year')}
+                      </div>
                     </div>
                   ))}
                 </div>
                 <div className={styles['theme-slots-small']}>
                   {Array.from({ length: 15 }, (_, i) => (
-                    <div key={i + 4} className={styles['theme']} data-theme-index={i + 4} onClick={handleSelectTheme} />
+                    <div key={i + 4} className={styles['theme']} data-theme-index={i + 4} onClick={handleThemeSelect} />
                   ))}
-                  <div className={styles['color-selector']} onClick={() => setShowColorPicker((prev) => !prev)} />
-                  {customThemes.slice(0, 7).map((customTheme, i) => {
-                    // Handlers
-                    const getContextMenuItems = () => [
-                      {
-                        id: 'delete',
-                        label: t('delete'),
-                        onClick: () => handleRemoveCustom(i),
-                      },
-                    ];
-
-                    return customTheme ? (
-                      <div
-                        key={`custom-${i}`}
-                        style={
-                          {
-                            'backgroundColor': customTheme.mainColor,
-                            'backgroundImage': customTheme.headerImage,
-                            '--main-color': customTheme.mainColor,
-                            '--secondary-color': customTheme.secondaryColor,
-                            '--header-image': customTheme.headerImage,
-                          } as React.CSSProperties
-                        }
-                        onClick={handleSelectTheme}
-                        onContextMenu={(e) => {
-                          e.preventDefault();
-                          const x = e.clientX;
-                          const y = e.clientY;
-                          contextMenu.showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-                        }}
-                      />
-                    ) : (
-                      <div key={`color-box-empty-${i}`} />
-                    );
-                  })}
-                  <div className={styles['image-selector']} onClick={() => fileInputRef.current?.click()} />
-                  <input
-                    type="file"
-                    ref={fileInputRef}
-                    style={{ display: 'none' }}
-                    accept="image/png, image/jpg, image/jpeg, image/webp"
-                    onChange={(e) => {
-                      const image = e.target.files?.[0];
-                      if (!image) return;
-                      image.arrayBuffer().then((arrayBuffer) => {
-                        Popup.handleOpenImageCropper(new Uint8Array(arrayBuffer), handleUploadImage);
-                      });
-                    }}
-                  />
+                  <div className={styles['color-selector']} onClick={handleColorSelectBtnClick} />
+                  {customThemes.slice(0, 7).map((customTheme, i) => (
+                    <CustomThemeItem key={`custom-${i}`} index={i} customTheme={customTheme} onThemeSelect={handleThemeSelect} onThemeRemove={handleThemeRemove} />
+                  ))}
+                  <div className={styles['image-selector']} onClick={handleUploadImageBtnClick} />
+                  <input type="file" ref={ImageInputRef} style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp" onInput={handleImageInput} />
                 </div>
                 {showColorPicker && (
                   <div className={styles['color-selector-box']}>
@@ -229,8 +193,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                     <div className={styles['color-selector-footer']}>
                       <div className={styles['color-selected-color']} style={{ backgroundColor: Color.toRGBString(pickedColor) }} />
                       <div className={styles['color-selected-btn']}>
-                        <div className={styles['color-selected-save']} onClick={handleSaveSelectedColor} />
-                        <div className={styles['color-selected-cancel']} onClick={() => setShowColorPicker(false)} />
+                        <div className={styles['color-selected-save']} onClick={handleColorSaveBtnClick} />
+                        <div className={styles['color-selected-cancel']} onClick={handleColorCancelBtnClick} />
                       </div>
                     </div>
                   </div>
@@ -247,3 +211,46 @@ const ChangeThemePopup: React.FC = React.memo(() => {
 ChangeThemePopup.displayName = 'ChangeThemePopup';
 
 export default ChangeThemePopup;
+
+interface CustomThemeItemProps {
+  index: number;
+  customTheme: Types.Theme;
+  onThemeSelect: (event: React.MouseEvent<HTMLDivElement>) => void;
+  onThemeRemove: (index: number) => void;
+}
+
+const CustomThemeItem: React.FC<CustomThemeItemProps> = React.memo(({ index, customTheme, onThemeSelect, onThemeRemove }) => {
+  // Hooks
+  const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+
+  // Handlers
+  const handleThemeSelect = (e: React.MouseEvent<HTMLDivElement>) => {
+    onThemeSelect(e);
+  };
+
+  const handleThemeContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    showContextMenu(x, y, 'right-bottom', (() => [{ id: 'delete', label: t('delete'), onClick: () => onThemeRemove(index) }])());
+  };
+
+  return customTheme ? (
+    <div
+      style={
+        {
+          'backgroundColor': customTheme.mainColor,
+          'backgroundImage': customTheme.headerImage,
+          '--main-color': customTheme.mainColor,
+          '--secondary-color': customTheme.secondaryColor,
+          '--header-image': customTheme.headerImage,
+        } as React.CSSProperties
+      }
+      onClick={handleThemeSelect}
+      onContextMenu={handleThemeContextMenu}
+    />
+  ) : null;
+});
+
+CustomThemeItem.displayName = 'CustomThemeItem';

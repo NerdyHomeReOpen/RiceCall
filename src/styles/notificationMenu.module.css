@@ -56,10 +56,7 @@
   padding: 3px 30px;
 }
 
-.notification-menu img {
-  max-width: 32px;
-  max-height: 32px;
-  background-size: cover;
+.notification-menu .image {
   border: solid 1px var(--border);
 }
 

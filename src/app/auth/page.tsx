@@ -16,11 +16,11 @@ const Header: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
   // Handlers
-  const handleMinimize = () => {
+  const handleMinimizeBtnClick = () => {
     ipc.window.minimize();
   };
 
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
@@ -49,8 +49,8 @@ const Header: React.FC = React.memo(() => {
         <div className={headerStyles['app-icon']} />
       </div>
       <div className={headerStyles['buttons']}>
-        <div className={headerStyles['minimize']} onClick={() => handleMinimize()} />
-        <div className={headerStyles['close']} onClick={() => handleClose()} />
+        <div className={headerStyles['minimize']} onClick={handleMinimizeBtnClick} />
+        <div className={headerStyles['close']} onClick={handleCloseBtnClick} />
       </div>
     </header>
   );
@@ -62,11 +62,27 @@ const AuthPageComponent: React.FC = React.memo(() => {
   // States
   const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
 
+  // Variables
+  const isDisplayLoginPage = section === 'login';
+  const isDisplayRegisterPage = section === 'register';
+  const isDisplayChangeServerPage = section === 'change-server';
+
+  // Handlers
+  const handleBackToLoginBtnClick = () => {
+    setSection('login');
+  };
+
+  const handleRegisterBtnClick = () => {
+    setSection('register');
+  };
+
+  const handleChangeServerBtnClick = () => {
+    setSection('change-server');
+  };
+
   // Effects
   useEffect(() => {
     const autoLogin = async () => {
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-
       const token = localStorage.getItem('token');
       if (token) {
         return await ipc.auth.autoLogin(token);
@@ -78,9 +94,9 @@ const AuthPageComponent: React.FC = React.memo(() => {
   return (
     <>
       <Header />
-      <LoginPage display={section === 'login'} setSection={setSection} />
-      <RegisterPage display={section === 'register'} setSection={setSection} />
-      <ChangeServerPage display={section === 'change-server'} setSection={setSection} />
+      <LoginPage display={isDisplayLoginPage} onRegisterBtnClick={handleRegisterBtnClick} onChangeServerBtnClick={handleChangeServerBtnClick} />
+      <RegisterPage display={isDisplayRegisterPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
+      <ChangeServerPage display={isDisplayChangeServerPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
     </>
   );
 });

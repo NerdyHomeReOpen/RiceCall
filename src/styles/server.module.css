@@ -49,14 +49,7 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 50px;
-  min-height: 50px;
   cursor: pointer;
-  object-fit: cover;
-  background-image: url('/logo_server_def.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
   box-shadow: 0 2px 2px var(--shadow);
 }
 
@@ -527,9 +520,9 @@
 }
 
 .widget-bar {
-  z-index: 1;
   position: absolute;
   right: 10px;
+  z-index: 1;
   display: flex;
   gap: 5px;
   align-items: center;
@@ -548,9 +541,9 @@
 }
 
 .widget-close {
-  z-index: 1;
   position: absolute;
   right: 15px;
+  z-index: 1;
   background: #fff;
   border-top: unset;
   border-bottom-right-radius: 5px;

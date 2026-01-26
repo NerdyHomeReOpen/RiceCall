@@ -25,13 +25,6 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 40px;
-  min-height: 40px;
-  object-fit: cover;
-  background-image: url('/im/SecretaryLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
 }
 
 .avatar-picture::before {
@@ -497,16 +490,6 @@
   gap: 10px;
   align-items: center;
   width: 100%;
-}
-
-.user-avatar {
-  min-width: 30px;
-  min-height: 30px;
-  cursor: pointer;
-  background-image: url('/im/IMLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
 }
 
 .right-info {

@@ -1,11 +1,9 @@
-import React, { useContext, createContext, ReactNode, useRef, useEffect, useCallback, useState } from 'react';
+import React, { useContext, createContext, ReactNode, useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import ipc from '@/ipc';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
 import Logger from '@/utils/logger';
-
-const BASE_VOLUME = 5;
 
 type ActionScannerContextType = {
   isIdling: boolean;
@@ -27,7 +25,7 @@ interface ActionScannerProviderProps {
 
 const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   // Hooks
-  const webRTC = useWebRTC();
+  const { pressSpeakKey, releaseSpeakKey, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted, toggleMicMuted } = useWebRTC();
 
   // Refs
   const idleCheck = useRef<boolean>(false);
@@ -65,36 +63,34 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const startSpeak = useCallback(() => {
     if (isSpeakingRef.current) return;
     isSpeakingRef.current = true;
-    webRTC.pressSpeakKey();
-  }, [webRTC]);
+    pressSpeakKey();
+  }, [pressSpeakKey]);
 
   const stopSpeak = useCallback(() => {
     if (!isSpeakingRef.current) return;
     isSpeakingRef.current = false;
-    webRTC.releaseSpeakKey();
-  }, [webRTC]);
+    releaseSpeakKey();
+  }, [releaseSpeakKey]);
 
   const toggleMainWindows = useCallback(() => {
     // TODO: key detection in background
   }, []);
 
   const toggleUpVolume = useCallback(() => {
-    const newValue = Math.min(100, webRTC.speakerVolume + BASE_VOLUME);
-    webRTC.changeSpeakerVolume(newValue);
-  }, [webRTC]);
+    addSpeakerVolume();
+  }, [addSpeakerVolume]);
 
   const toggleDownVolume = useCallback(() => {
-    const newValue = Math.max(0, webRTC.speakerVolume - BASE_VOLUME);
-    webRTC.changeSpeakerVolume(newValue);
-  }, [webRTC]);
+    subtractSpeakerVolume();
+  }, [subtractSpeakerVolume]);
 
   const toggleSpeakerMute = useCallback(() => {
-    webRTC.toggleSpeakerMuted();
-  }, [webRTC]);
+    toggleSpeakerMuted();
+  }, [toggleSpeakerMuted]);
 
   const toggleMicMute = useCallback(() => {
-    webRTC.toggleMicMuted();
-  }, [webRTC]);
+    toggleMicMuted();
+  }, [toggleMicMuted]);
 
   const setIsManualIdling = useCallback((value: boolean) => {
     isManualIdlingRef.current = value;
@@ -273,7 +269,9 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     return () => unsub();
   }, []);
 
-  return <ActionScannerContext.Provider value={{ isIdling, isManualIdling: isManualIdlingRef.current, setIsManualIdling }}>{children}</ActionScannerContext.Provider>;
+  const contextValue = useMemo(() => ({ isIdling, isManualIdling: isManualIdlingRef.current, setIsManualIdling }), [isIdling, setIsManualIdling]);
+
+  return <ActionScannerContext.Provider value={contextValue}>{children}</ActionScannerContext.Provider>;
 };
 
 ActionScannerProvider.displayName = 'ActionScannerProvider';

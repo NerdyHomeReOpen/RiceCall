@@ -121,3 +121,29 @@ export function getDominantColor(url: string): Promise<RGB> {
 export function toRGBString({ r, g, b }: RGB): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
+
+/**
+ * Get the interpolated color between two colors
+ * @param color1 - first color
+ * @param color2 - second color
+ * @param t - interpolation factor
+ * @returns interpolated color
+ */
+export function getLerpColor(color1: string, color2: string, t: number) {
+  const c1 = parseInt(color1.slice(1), 16);
+  const c2 = parseInt(color2.slice(1), 16);
+
+  const r1 = (c1 >> 16) & 0xff;
+  const g1 = (c1 >> 8) & 0xff;
+  const b1 = c1 & 0xff;
+
+  const r2 = (c2 >> 16) & 0xff;
+  const g2 = (c2 >> 8) & 0xff;
+  const b2 = c2 & 0xff;
+
+  const r = Math.round(r1 + (r2 - r1) * t);
+  const g = Math.round(g1 + (g2 - g1) * t);
+  const b = Math.round(b1 + (b2 - b1) * t);
+
+  return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
+}

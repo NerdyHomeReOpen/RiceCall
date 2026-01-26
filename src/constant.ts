@@ -9,13 +9,13 @@ export type RecommendServerCategory = {
 };
 
 export const FONT_LIST = [
-  // --- 推薦首選 ---
+  // Recommended Fonts
   {
     label: 'System Default',
     value: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", "LiHei Pro", sans-serif',
   },
 
-  // --- 無襯線字體 (Sans-serif) - 適合 UI 與標題 ---
+  // Sans-serif Fonts - Suitable for UI and titles
   {
     label: 'Arial',
     value: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
@@ -45,7 +45,7 @@ export const FONT_LIST = [
     value: 'Roboto, "Helvetica Neue", Arial, sans-serif',
   },
 
-  // --- 襯線字體 (Serif) - 適合文章閱讀 ---
+  // Serif Fonts - Suitable for reading articles
   {
     label: 'Times New Roman',
     value: '"Times New Roman", Times, serif',
@@ -63,7 +63,7 @@ export const FONT_LIST = [
     value: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
   },
 
-  // --- 等寬字體 (Monospace) - 適合程式碼 ---
+  // Monospace Fonts - Suitable for code
   {
     label: 'Consolas',
     value: 'Consolas, "Andale Mono", "Lucida Console", "Liberation Mono", Monaco, monospace',
@@ -77,7 +77,7 @@ export const FONT_LIST = [
     value: 'Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace',
   },
 
-  // --- 中文專用 (Traditional Chinese) ---
+  // Traditional Chinese Fonts
   {
     label: '微軟正黑體 (Microsoft JhengHei)',
     value: '"Microsoft JhengHei", "Heiti TC", sans-serif',
@@ -265,6 +265,33 @@ export const LANGUAGES: { code: Types.LanguageKey; label: string }[] = [
   { code: 'tr-TR', label: 'Türkçe' },
 ];
 export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds
+export const INVITATION_BASE_URL = 'https://ricecall.com/join';
 export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';
 export const REFRESH_REGION_INFO_INTERVAL = 1000 * 60 * 10; // 10 minutes
 export const MESSAGE_VIERER_DEVIATION = 100;
+export const SERVER_OPTIONS: { tKey: string; value: 'prod' | 'dev' }[] = [
+  { tKey: 'prod', value: 'prod' },
+  { tKey: 'dev', value: 'dev' },
+];
+
+export const KICK_TIME_FORMAT_OPTIONS = [
+  { tKey: 'second', value: 'seconds' },
+  { tKey: 'minute', value: 'minutes' },
+  { tKey: 'hour', value: 'hours' },
+  { tKey: 'day', value: 'days' },
+  { tKey: 'month', value: 'month' },
+  { tKey: 'year', value: 'years' },
+];
+export const KICK_REASON_OPTIONS = [
+  { tKey: 'reason-spam', value: 'spam' },
+  { tKey: 'reason-abuse', value: 'abuse' },
+  { tKey: 'reason-harassment', value: 'harassment' },
+  { tKey: 'reason-inappropriate-content', value: 'inappropriate-content' },
+  { tKey: 'reason-other', value: 'other' },
+];
+export const KICK_REASON_OTHER_MAX_LENGTH = 20;
+export const SERVER_TYPES: { tKey: string; value: Types.Server['type'] }[] = [
+  { tKey: 'game', value: 'game' },
+  { tKey: 'entertainment', value: 'entertainment' },
+  { tKey: 'other', value: 'other' },
+];

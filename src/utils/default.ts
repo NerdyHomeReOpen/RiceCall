@@ -19,7 +19,7 @@ const defaultTableUser: Types.table_users = {
   birthDay: 0,
   isVerified: false,
   status: 'online',
-  gender: 'Male',
+  gender: 'male',
   currentChannelId: null,
   currentServerId: null,
   lastActiveAt: 0,
@@ -295,6 +295,21 @@ export function memberInvitation(overrides: Partial<Types.MemberInvitation> = {}
   return {
     ...defaultTableMemberInvitations,
     ...defaultTableServer,
+    ...overrides,
+  };
+}
+
+export function queueMember(overrides: Partial<Types.QueueMember> = {}): Types.QueueMember {
+  return {
+    ...defaultTableMember,
+    ...defaultTableUser,
+    ...defaultTableServerBlocked,
+    ...defaultTableChannelMute,
+    ...defaultTableServerPermission,
+    badges: '[]',
+    position: 0,
+    leftTime: 0,
+    isQueueControlled: false,
     ...overrides,
   };
 }

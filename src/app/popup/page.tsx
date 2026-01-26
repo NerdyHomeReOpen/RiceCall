@@ -8,6 +8,8 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import SocketManager from '@/components/SocketManager';
+
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
 import ApproveFriend from '@/popups/ApproveFriend';
@@ -17,7 +19,7 @@ import ChannelEvent from '@/popups/ChannelEvent';
 import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
-import ChatHistory from '@/popups/chatHistory';
+import ChatHistory from '@/popups/ChatHistory';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
@@ -34,8 +36,10 @@ import KickMemberFromServer from '@/popups/KickMemberFromServer';
 import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
 import MemberInvitation from '@/popups/MemberInvitation';
 import ImageCropper from '@/popups/ImageCropper';
+import InviteFriend from '@/popups/InviteFriend';
 import InviteMember from '@/popups/InviteMember';
 import SearchUser from '@/popups/SearchUser';
+import ServerAnnouncement from '@/popups/ServerAnnouncement';
 import ServerApplication from '@/popups/ServerApplication';
 import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';
@@ -113,33 +117,28 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handlers
-  const handleMaximize = () => {
+  const handleMaximizeBtnClick = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
   };
 
-  const handleUnmaximize = () => {
+  const handleUnmaximizeBtnClick = () => {
     if (!isFullscreen) return;
     ipc.window.unmaximize();
   };
 
-  const handleMinimize = () => {
+  const handleMinimizeBtnClick = () => {
     ipc.window.minimize();
   };
 
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.window.close();
   };
 
   // Effects
   useEffect(() => {
-    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
-    return () => unsub();
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (
@@ -149,9 +148,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
           <div className={header['title']}>{title}</div>
         </div>
         <div className={header['buttons']}>
-          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimize} />}
-          {buttons.includes('maxsize') && (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />)}
-          {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
+          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimizeBtnClick} />}
+          {buttons.includes('maxsize') &&
+            (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={header['maxsize']} onClick={handleMaximizeBtnClick} />)}
+          {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} />}
         </div>
       </div>
     </header>
@@ -298,6 +298,11 @@ const defaultPopup: Record<Types.PopupType, Omit<Popup, 'id' | 'node' | 'title'>
     buttons: ['close'],
     hideHeader: false,
   },
+  inviteFriend: {
+    type: 'inviteFriend',
+    buttons: ['close'],
+    hideHeader: false,
+  },
   inviteMember: {
     type: 'inviteMember',
     buttons: ['close'],
@@ -327,6 +332,11 @@ const defaultPopup: Record<Types.PopupType, Omit<Popup, 'id' | 'node' | 'title'>
     type: 'searchUser',
     buttons: ['close'],
     hideHeader: false,
+  },
+  serverAnnouncement: {
+    type: 'serverAnnouncement',
+    buttons: ['close'],
+    hideHeader: true,
   },
   serverApplication: {
     type: 'serverApplication',
@@ -379,10 +389,14 @@ const PopupPageComponent: React.FC = React.memo(() => {
   const [initialData, setInitialData] = useState<any | null>(null);
 
   // Variables
-  const { title, buttons, node, hideHeader } = useMemo<Popup>(() => {
-    if (!id || !type || !initialData) return { id: '', type: 'dialogAlert', title: '', buttons: ['close'], node: () => null, hideHeader: true };
+  const { buttons, hideHeader } = useMemo(() => {
+    if (!type) return { buttons: [], hideHeader: true };
+    return defaultPopup[type];
+  }, [type]);
 
-    const title = {
+  const title = useMemo(() => {
+    if (!type) return '';
+    return {
       aboutus: t('about-ricecall'),
       applyFriend: t('apply-friend'),
       applyMember: t('apply-member'),
@@ -410,21 +424,26 @@ const PopupPageComponent: React.FC = React.memo(() => {
       editNickname: t('edit-nickname'),
       friendVerification: t('friend-verification'),
       imageCropper: t('image-cropper'),
+      inviteFriend: t('invite-friend-to-server'),
       inviteMember: t('invite-member'),
       kickMemberFromChannel: t('kick-channel'),
       kickMemberFromServer: t('kick-server'),
       memberApplicationSetting: t('member-application-setting'),
       memberInvitation: t('member-invitation'),
       searchUser: t('search-user'),
+      serverAnnouncement: t('announcement'),
       serverApplication: t('server-application'),
       serverBroadcast: t('server-broadcast'),
       serverSetting: initialData?.server?.name || t('server-setting'),
       systemSetting: t('system-setting'),
       userInfo: t('user-info'),
       userSetting: t('user-setting'),
-    };
+    }[type];
+  }, [type, initialData, t]);
 
-    const node = {
+  const node = useMemo<() => React.ReactNode | null>(() => {
+    if (!type || !initialData) return () => null;
+    return {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,
       applyMember: () => <ApplyMember id={id} {...initialData} />,
@@ -452,27 +471,22 @@ const PopupPageComponent: React.FC = React.memo(() => {
       editNickname: () => <EditNickname id={id} {...initialData} />,
       friendVerification: () => <FriendVerification id={id} {...initialData} />,
       imageCropper: () => <ImageCropper id={id} {...initialData} />,
+      inviteFriend: () => <InviteFriend id={id} {...initialData} />,
       inviteMember: () => <InviteMember id={id} {...initialData} />,
       kickMemberFromChannel: () => <KickMemberFromChannel id={id} {...initialData} />,
       kickMemberFromServer: () => <KickMemberFromServer id={id} {...initialData} />,
       memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
       memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
       searchUser: () => <SearchUser id={id} {...initialData} />,
+      serverAnnouncement: () => <ServerAnnouncement id={id} {...initialData} />,
       serverApplication: () => <ServerApplication id={id} {...initialData} />,
       serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
       serverSetting: () => <ServerSetting id={id} {...initialData} />,
       systemSetting: () => <SystemSetting id={id} {...initialData} />,
       userInfo: () => <UserInfo id={id} {...initialData} />,
       userSetting: () => <UserInfo id={id} {...initialData} />,
-    };
-
-    return {
-      ...defaultPopup[type],
-      id,
-      title: title[type],
-      node: node[type],
-    };
-  }, [id, type, initialData, t]);
+    }[type];
+  }, [id, type, initialData]);
 
   // Effects
   useEffect(() => {
@@ -506,6 +520,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
+      <SocketManager />
       {!hideHeader && (
         <Header
           title={title}
