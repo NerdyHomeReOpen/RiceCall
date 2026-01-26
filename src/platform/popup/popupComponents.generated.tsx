@@ -24,7 +24,7 @@ import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelEvent from '@/popups/ChannelEvent';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
-import ChatHistory from '@/popups/chatHistory';
+import ChatHistory from '@/popups/ChatHistory';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
@@ -37,12 +37,14 @@ import EditFriendNote from '@/popups/EditFriendNote';
 import EditNickname from '@/popups/EditNickname';
 import FriendVerification from '@/popups/FriendVerification';
 import ImageCropper from '@/popups/ImageCropper';
+import InviteFriend from '@/popups/InviteFriend';
 import InviteMember from '@/popups/InviteMember';
 import KickMemberFromChannel from '@/popups/KickMemberFromChannel';
 import KickMemberFromServer from '@/popups/KickMemberFromServer';
 import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
 import MemberInvitation from '@/popups/MemberInvitation';
 import SearchUser from '@/popups/SearchUser';
+import ServerAnnouncement from '@/popups/ServerAnnouncement';
 import ServerApplication from '@/popups/ServerApplication';
 import ServerBroadcast from '@/popups/ServerBroadcast';
 import ServerSetting from '@/popups/ServerSetting';
@@ -125,12 +127,14 @@ export const PopupComponentMap: Record<Types.PopupType, React.ComponentType<any>
   editNickname: EditNickname,
   friendVerification: FriendVerification,
   imageCropper: ImageCropper,
+  inviteFriend: InviteFriend,
   inviteMember: InviteMember,
   kickMemberFromChannel: KickMemberFromChannel,
   kickMemberFromServer: KickMemberFromServer,
   memberApplicationSetting: MemberApplicationSetting,
   memberInvitation: MemberInvitation,
   searchUser: SearchUser,
+  serverAnnouncement: ServerAnnouncement,
   serverApplication: ServerApplication,
   serverBroadcast: ServerBroadcast,
   serverSetting: ServerSetting,

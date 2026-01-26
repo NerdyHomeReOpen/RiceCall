@@ -740,6 +740,12 @@ app.on('ready', async () => {
   // Initialize i18n
   initMainI18n(store.get('language'));
 
+  // Initialize popup loader with system settings getter
+  PopupLoader.initPopupLoader({
+    data: DataService,
+    getSystemSettings: getSettings,
+  });
+
   // Configure
   configureAutoUpdater();
   configureDiscordRPC();
@@ -1069,7 +1075,7 @@ app.on('ready', async () => {
   ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
     new Logger('System').info(`Opening ${type} (${id})...`);
 
-    const loader = PopupLoader[type as keyof typeof PopupLoader];
+    const loader = PopupLoader.loaders[type as keyof typeof PopupLoader.loaders];
     if (loader)
       initialData = await loader(initialData).catch(() => {
         new Logger('System').error(`Cannot load ${type} data, aborting...`);

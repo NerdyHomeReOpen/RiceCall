@@ -5,12 +5,12 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
-import { POPUP_SIZES, POPUP_HEADERS, POPUP_TITLE_KEYS, type PopupHeaderButton } from '@/popup.config';
+import { POPUP_SIZES, POPUP_HEADERS, POPUP_TITLE_KEYS } from '@/popup.config';
 
 import ipc from '@/ipc';
 
 import { closeInAppPopup, restoreInAppPopup, subscribeInAppPopups, type InAppPopupInstance } from './inAppPopupHost';
-import { hydratePopupData, webPopupLoaders } from './webPopupLoader';
+import { hydratePopupData, needsHydration } from './webPopupLoader';
 import { renderPopup } from './popupComponents.generated';
 
 type Pos = { x: number; y: number };
@@ -89,8 +89,8 @@ function isPopupHydrated(type: Types.PopupType, data: any): boolean {
 
   // If there's a loader for this type, check if hydration is complete.
   // A simple heuristic: if loader exists, check that we have more than just IDs.
-  const loader = webPopupLoaders[type];
-  if (!loader) return true; // No loader = no hydration needed
+  const hasLoaderDefined = needsHydration(type);
+  if (!hasLoaderDefined) return true; // No loader = no hydration needed
 
   // Type-specific checks for required fields
   switch (type) {
@@ -101,7 +101,7 @@ function isPopupHydrated(type: Types.PopupType, data: any): boolean {
     case 'chatHistory':
       return !!data.user && !!data.target;
     case 'systemSetting':
-      return !!data.user && !!data.systemSettings;
+      return !!data.userSettings && !!data.systemSettings;
     case 'serverSetting':
       return !!data.user && !!data.server && Array.isArray(data.serverMembers);
     case 'channelSetting':
@@ -119,7 +119,7 @@ function isPopupHydrated(type: Types.PopupType, data: any): boolean {
     case 'memberInvitation':
       return Array.isArray(data.memberInvitations);
     case 'editChannelOrder':
-      return Array.isArray(data.serverChannels);
+      return Array.isArray(data.channels);
     case 'serverBroadcast':
       return !!data.user && !!data.server;
     default:
@@ -168,15 +168,15 @@ export function InAppPopupHost() {
     let cancelled = false;
 
     // Find popups that have a loader and haven't been hydrated yet
-    const needsHydration = popups.filter((p) => {
-      const hasLoader = !!webPopupLoaders[p.type];
+    const popupsNeedingHydration = popups.filter((p) => {
+      const hasLoaderDefined = needsHydration(p.type);
       const alreadyHydrated = hydratedData[p.id] !== undefined;
-      return hasLoader && !alreadyHydrated;
+      return hasLoaderDefined && !alreadyHydrated;
     });
 
-    if (needsHydration.length === 0) return;
+    if (popupsNeedingHydration.length === 0) return;
 
-    const tasks = needsHydration.map(async (p) => {
+    const tasks = popupsNeedingHydration.map(async (p) => {
       const hydrated = await hydratePopupData(p.type, p.initialData as Record<string, unknown>);
       return { id: p.id, hydrated };
     });

@@ -19,7 +19,7 @@ import NotificationToaster from '@/components/NotificationToaster';
 import FriendPage from '@/pages/Friend';
 import HomePage from '@/pages/Home';
 import ServerPage from '@/pages/Server';
-import LoginPage from '@/pages/Login';
+// import LoginPage from '@/pages/Login';
 
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
@@ -337,6 +337,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   // Variables
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const isWebMode = typeof window !== 'undefined' && !(window as any).require;
   const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const isSelectedHomePage = selectedTab === 'home';

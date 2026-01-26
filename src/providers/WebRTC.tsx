@@ -1001,11 +1001,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       document.removeEventListener('click', initAudioOnInteraction);
       document.removeEventListener('keydown', initAudioOnInteraction);
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Effect for handling device/settings changes when mic is already taken
   // Note: Initial mic setup is handled by takeMic()
-  const prevMicSettingsRef = useRef<{ inputAudioDevice: string | null; echoCancellation: boolean; noiseCancellation: boolean } | null>(null);
+  // const prevMicSettingsRef = useRef<{ inputAudioDevice: string | null; echoCancellation: boolean; noiseCancellation: boolean } | null>(null);
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
       new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);

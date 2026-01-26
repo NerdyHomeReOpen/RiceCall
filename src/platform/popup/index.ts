@@ -1,6 +1,6 @@
 import type { PopupController } from './types';
-import { ElectronPopupController } from './electronPopupController';
-import { WebPopupController } from './webPopupController';
+import { ElectronPopupController } from './electron';
+import { WebPopupController } from './web';
 
 let singleton: PopupController | null = null;
 

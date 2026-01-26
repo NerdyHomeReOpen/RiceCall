@@ -1,6 +1,6 @@
 import type { ApiClient } from './types';
-import { createWebApiClient } from './webApiClient';
-import { createElectronApiClient } from './electronApiClient';
+import { createWebApiClient } from './web';
+import { createElectronApiClient } from './electron';
 
 function isElectronRenderer(): boolean {
   return typeof window !== 'undefined' && typeof (window as unknown as { require?: unknown }).require === 'function';
