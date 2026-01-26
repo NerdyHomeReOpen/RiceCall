@@ -16,11 +16,7 @@ export function setSocketTargetWindow(window: BrowserWindow | null) {
  * Only sends to the main window, not to authWindow or popups.
  */
 function getTargetWindows(): BrowserWindow[] {
-  if (targetWindow && !targetWindow.isDestroyed()) {
-    return [targetWindow];
-  }
-  // Fallback to empty array instead of all windows
-  return [];
+  return BrowserWindow.getAllWindows();
 }
 
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
