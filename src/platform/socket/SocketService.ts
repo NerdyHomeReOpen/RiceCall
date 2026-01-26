@@ -104,8 +104,12 @@ export class SocketService {
   private setupUIBridge() {
     // Listen for UI -> Server messages
     this.bridge.onUIMessage((event, ...args) => {
+      console.log(`[DEBUG.SocketService] onUIMessage: event=${event}`, args);
       if (ClientToServerEventNames.includes(event)) {
         this.bridge.log('info', `UI -> Server: ${event} ${JSON.stringify(args)}`);
+        if (!this.socket) {
+          console.error(`[DEBUG.SocketService] Socket not initialized!`);
+        }
         this.socket?.emit(event, ...args);
       }
     });

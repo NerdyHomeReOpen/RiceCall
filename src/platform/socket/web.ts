@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getIpcRenderer } from '@/platform/ipc';
+import { getIpcRenderer, isElectron } from '@/platform/ipc';
 import { SocketService, SocketPlatformBridge } from './SocketService';
 import { ClientToServerEventNames } from './constants';
 
@@ -10,17 +10,22 @@ const webBridge: SocketPlatformBridge = {
     if (ipc.__bridgeInitialized) return;
     ipc.__bridgeInitialized = true;
     
-    // Listen to ALL broadcasts, but filter out system-originated ones
-    ipc.onBroadcast((channel: string, ...args: any[]) => {
-      // If the message is being broadcasted by the SocketService itself, ignore it
-      if (ipc._isSystemSending) return;
-
-      // Only forward events that are intended for the server
-      if (ClientToServerEventNames.includes(channel)) {
-        // In onBroadcast, rawArgs are exactly what was sent via broadcast()
-        // No event object wrapper here, so first arg is data
-        callback(channel, ...args);
+    ipc.onBroadcast((channel: string, event: any, ...args: any[]) => {
+      console.log(`[DEBUG.SocketBridge] Received broadcast: channel=${channel}, isRemote=${event?.isRemote}, _isSystemSending=${ipc._isSystemSending}`);
+      
+      // event is { isRemote: boolean }
+      // Filter out messages from other tabs or server-pushed events
+      if (event?.isRemote || ipc._isSystemSending) {
+        console.log(`[DEBUG.SocketBridge] Skipping broadcast: reason=${event?.isRemote ? 'remote' : 'system'}`);
+        return;
       }
+      
+      if (ClientToServerEventNames.includes(channel)) {
+        console.log(`[DEBUG.SocketBridge] Forwarding to Server: channel=${channel}`, args);
+        callback(channel, ...args);
+      } else {
+        console.log(`[DEBUG.SocketBridge] Not a server event: channel=${channel}`);
+      }      
     });
   },
 
@@ -58,22 +63,24 @@ const webBridge: SocketPlatformBridge = {
   }
 };
 
-const service = new SocketService(webBridge, () => process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_BASE_URL || '');
+const service = isElectron() ? null : new SocketService(webBridge, () => process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_BASE_URL || '');
 
 export function createWebSocketClient() {
   return {
     connect(token: string) {
-      service.connect(token);
+      service?.connect(token);
     },
     disconnect() {
-      service.disconnect();
+      service?.disconnect();
     },
     send(event: string, ...args: any[]) {
       getIpcRenderer().send(event, ...args);
     },
     on(event: string, callback: (...args: any[]) => void) {
-      getIpcRenderer().on(event, (_: unknown, ...args: any[]) => callback(...args));
-      return () => getIpcRenderer().removeListener(event, callback);
+      const ipc = getIpcRenderer();
+      const listener = (_: any, ...args: any[]) => callback(...args);
+      ipc.on(event, listener);
+      return () => ipc.removeListener(event, listener);
     },
     emit(event: string, payload: any) {
       return getIpcRenderer().invoke(event, payload).then((ack: any) => {

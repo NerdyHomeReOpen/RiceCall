@@ -30,13 +30,13 @@ function initWebIpc(): IpcRenderer {
   broadcastListeners = new Map();
 
   // Unified broadcast dispatcher for Web
-  onBroadcast((channel, ...args) => {
+  onBroadcast((channel, event, ...args) => {
+    console.log(`[DEBUG.IPC] onBroadcast received: channel=${channel}, isRemote=${event?.isRemote}`, args);
     const listeners = broadcastListeners?.get(channel);
     if (listeners) {
       listeners.forEach((cb) => {
         try {
-          // In Web mode, the first arg is a mock event object {}, then data
-          cb({}, ...args);
+          cb(event, ...args);
         } catch (e) {
           console.error(`[WebIPC] Error in listener for ${channel}:`, e);
         }
@@ -58,6 +58,7 @@ function initWebIpc(): IpcRenderer {
 
   const originalSend = ipcRenderer.send.bind(ipcRenderer);
   ipcRenderer.send = (channel: string, ...args: any[]) => {
+    console.log(`[DEBUG.IPC] ipc.send called: channel=${channel}`, args);
     // 1. Trigger local handlers (like auth-logout)
     originalSend(channel, ...args);
     // 2. Broadcast to UI listeners (including SocketBridge)

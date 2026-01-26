@@ -123,34 +123,38 @@ export function createWebIpcRenderer(
  */
 export function createWebBroadcast(channelName: string = 'ricecall_ipc'): {
   broadcast: (channel: string, ...args: any[]) => void;
-  onBroadcast: (callback: (channel: string, ...args: any[]) => void) => () => void;
+  onBroadcast: (callback: (channel: string, event: any, ...args: any[]) => void) => () => void;
 } {
   const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(channelName) : null;
-  const localListeners: Set<(channel: string, ...args: any[]) => void> = new Set();
+  const localListeners: Set<(channel: string, event: any, ...args: any[]) => void> = new Set();
 
   // Listen for broadcasts from other tabs
   bc?.addEventListener('message', (event) => {
     const { channel, args } = event.data;
-    localListeners.forEach((cb) => cb(channel, ...args));
+    localListeners.forEach((cb) => cb(channel, { isRemote: true }, ...args));
   });
 
   return {
     broadcast: (channel: string, ...args: any[]): void => {
-      // Send to other tabs
-      bc?.postMessage({ channel, args });
-      // Also notify local listeners
+      
+      try {
+        // Send to other tabs (may fail if args contains functions)
+        bc?.postMessage({ channel, args });
+      } catch {
+      }
+
       localListeners.forEach((cb) => {
         try {
           if (typeof window !== 'undefined' && localStorage.getItem('ricecall:debug:ipc') === '1') {
             console.log(`[WebIPC.Broadcast.Local] ${channel}`, args);
           }
-          cb(channel, ...args);
+          cb(channel, { isRemote: false }, ...args);
         } catch (e) {
           console.error(`[WebIPC] Error in listener for ${channel}:`, e);
         }
       });
     },
-    onBroadcast: (callback: (channel: string, ...args: any[]) => void): (() => void) => {
+    onBroadcast: (callback: (channel: string, event: any, ...args: any[]) => void): (() => void) => {
       localListeners.add(callback);
       return () => localListeners.delete(callback);
     },

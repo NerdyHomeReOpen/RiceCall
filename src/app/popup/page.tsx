@@ -13,6 +13,7 @@ import { renderPopup } from '@/platform/popup/popupComponents.generated';
 import SocketManager from '@/components/SocketManager';
 
 import header from '@/styles/header.module.css';
+import { isElectron } from '@/platform/ipc';
 
 async function hydrateUserInfoInitialData(initialData: any): Promise<any> {
   // UserInfo/UserSetting popups expect `target` and `targetServers`.
@@ -227,7 +228,10 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
-      <SocketManager />
+      {/* SocketManager is provided by the RootPage in web in-app mode. 
+          Only include it if we might be in a standalone popup window. */}
+      {isElectron() && <SocketManager />}
+      {!isElectron() && typeof window !== 'undefined' && window.opener && <SocketManager />}
       {!hideHeader && (
         <Header
           title={title}
