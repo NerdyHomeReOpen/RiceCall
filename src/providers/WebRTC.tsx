@@ -314,6 +314,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       audioContextRef.current.close();
     }
     const audioContext = new AudioContext();
+    // Resume AudioContext if suspended (required for browsers after user interaction policy)
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
     await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
     audioContextRef.current = audioContext;
 
@@ -458,9 +462,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
       if (!audioContextRef.current || !inputDesRef.current || !inputAnalyserRef.current) {
-        initAudioContext();
+        new Logger('WebRTC').info('initMicAudio: AudioContext not ready, initializing...');
+        await initAudioContext();
         return initMicAudio(stream);
       }
+
+      new Logger('WebRTC').info('initMicAudio: Setting up mic audio nodes');
 
       // Remove existing mic audio
       removeMicAudio();
@@ -483,6 +490,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(inputAnalyserRef.current);
 
       // Start speaking detection
+      new Logger('WebRTC').info('initMicAudio: Starting detectSpeaking for user');
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('user', inputAnalyserRef.current, dataArray);
 
@@ -974,9 +982,31 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Effects
   useEffect(() => {
     initLocalStorage();
-    initAudioContext();
-  }, [initAudioContext, initLocalStorage]);
+    // Note: initAudioContext is called on first user interaction, not on mount
+    // This is required by browser autoplay policy
+  }, [initLocalStorage]);
 
+  // Initialize AudioContext on user interaction (required for browsers)
+  useEffect(() => {
+    const initAudioOnInteraction = async () => {
+      if (!audioContextRef.current) {
+        await initAudioContext();
+      } else if (audioContextRef.current.state === 'suspended') {
+        await audioContextRef.current.resume();
+      }
+    };
+    document.addEventListener('click', initAudioOnInteraction, { once: true });
+    document.addEventListener('keydown', initAudioOnInteraction, { once: true });
+    return () => {
+      document.removeEventListener('click', initAudioOnInteraction);
+      document.removeEventListener('keydown', initAudioOnInteraction);
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // Effect for handling device/settings changes when mic is already taken
+  // Note: Initial mic setup is handled by takeMic()
+  // const prevMicSettingsRef = useRef<{ inputAudioDevice: string | null; echoCancellation: boolean; noiseCancellation: boolean } | null>(null);
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
       new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);

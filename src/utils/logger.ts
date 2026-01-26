@@ -1,5 +1,27 @@
 import chalk from 'chalk';
-import log from 'electron-log/renderer';
+
+type ElectronLogLike = {
+  info: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+};
+
+const isElectronRenderer = typeof window !== 'undefined' && typeof (window as unknown as { require?: unknown }).require === 'function';
+
+let log: ElectronLogLike = {
+  info: () => {},
+  warn: () => {},
+  error: () => {},
+};
+
+if (isElectronRenderer) {
+  try {
+    // Use Electron's `window.require` so this module never gets bundled into the pure-web build.
+    log = (window as unknown as { require: (id: string) => unknown }).require('electron-log/renderer') as ElectronLogLike;
+  } catch {
+    // ignore
+  }
+}
 
 /**
  * Logger class

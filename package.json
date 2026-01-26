@@ -32,7 +32,8 @@
     "build:dmg": "npm run next:build && npm run electron:build:dmg",
     "build:action": "npm run next:build && npm run electron:prep",
     "format": "prettier --write src/**/*.{ts,tsx,js,jsx,css}",
-    "format:css": "stylelint \"src/**/*.css\" --fix"
+    "format:css": "stylelint \"src/**/*.css\" --fix",
+    "generate:popups": "tsx scripts/generate-popup-imports.ts"
   },
   "dependencies": {
     "@crowdin/ota-client": "^2.0.1",

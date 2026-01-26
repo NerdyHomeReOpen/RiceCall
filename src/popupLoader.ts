@@ -1,216 +1,225 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getSettings } from '../main.js';
-import * as DataService from './data.service.js';
+import type * as Types from './types/index.js';
 
-export async function applyFriend({ userId, targetId }: { userId: string; targetId: string }) {
-  const targetPromise = DataService.user({ userId: targetId });
-  const friendApplicationPromise = DataService.friendApplication({ senderId: userId, receiverId: targetId });
+/**
+ * Data fetcher interface - injected by the caller
+ */
+interface DataFetcher {
+  user(params: { userId: string }): Promise<Types.User | null>;
+  friend(params: { userId: string; targetId: string }): Promise<Types.Friend | null>;
+  friendGroup(params: { userId: string; friendGroupId: string }): Promise<Types.FriendGroup | null>;
+  friendApplication(params: { senderId: string; receiverId: string }): Promise<Types.FriendApplication | null>;
+  server(params: { userId: string; serverId: string }): Promise<Types.Server | null>;
+  servers(params: { userId: string }): Promise<Types.Server[]>;
+  channel(params: { userId: string; serverId: string; channelId: string }): Promise<Types.Channel | null>;
+  channels(params: { userId: string; serverId: string }): Promise<Types.Channel[]>;
+  member(params: { userId: string; serverId: string; channelId?: string }): Promise<Types.Member | null>;
+  serverMembers(params: { serverId: string }): Promise<Types.Member[]>;
+  channelMembers(params: { serverId: string; channelId: string }): Promise<Types.Member[]>;
+  memberApplication(params: { userId: string; serverId: string }): Promise<Types.MemberApplication | null>;
+  memberInvitation(params: { serverId: string; receiverId: string }): Promise<Types.MemberInvitation | null>;
+}
 
-  const [target, friendApplication] = await Promise.all([targetPromise, friendApplicationPromise]).catch((error) => {
-    throw error;
-  });
+/**
+ * Dependencies for popup loaders
+ */
+interface LoaderDeps {
+  data: DataFetcher;
+  getSystemSettings: () => Partial<Types.SystemSettings>;
+}
 
+let _deps: LoaderDeps | null = null;
+
+/**
+ * Initialize the popup loader with dependencies
+ * Must be called before using any loader
+ */
+export function initPopupLoader(deps: LoaderDeps): void {
+  _deps = deps;
+}
+
+function getDeps(): LoaderDeps {
+  if (!_deps) throw new Error('PopupLoader not initialized. Call initPopupLoader first.');
+  return _deps;
+}
+
+// ============ Popup Loader Functions ============
+
+async function applyFriend({ userId, targetId }: { userId: string; targetId: string }) {
+  const { data } = getDeps();
+  const [target, friendApplication] = await Promise.all([
+    data.user({ userId: targetId }),
+    data.friendApplication({ senderId: userId, receiverId: targetId }),
+  ]);
   return { userId, targetId, target, friendApplication };
 }
 
-export async function applyMember({ userId, serverId }: { userId: string; serverId: string }) {
-  const serverPromise = DataService.server({ userId, serverId });
-  const memberApplicationPromise = DataService.memberApplication({ userId, serverId });
-
-  const [server, memberApplication] = await Promise.all([serverPromise, memberApplicationPromise]).catch((error) => {
-    throw error;
-  });
-
+async function applyMember({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const [server, memberApplication] = await Promise.all([
+    data.server({ userId, serverId }),
+    data.memberApplication({ userId, serverId }),
+  ]);
   return { userId, serverId, server, memberApplication };
 }
 
-export async function blockMember({ userId, serverId }: { userId: string; serverId: string }) {
-  const memberPromise = DataService.member({ userId, serverId });
-
-  const [member] = await Promise.all([memberPromise]).catch((error) => {
-    throw error;
-  });
-
+async function blockMember({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const member = await data.member({ userId, serverId });
   return { userId, serverId, member };
 }
 
-export async function channelSetting({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
-  const serverPromise = DataService.server({ userId, serverId });
-  const channelPromise = DataService.channel({ userId, serverId, channelId });
-  const channelMembersPromise = DataService.channelMembers({ serverId, channelId });
-
-  const [server, channel, channelMembers] = await Promise.all([serverPromise, channelPromise, channelMembersPromise]).catch((error) => {
-    throw error;
-  });
-
+async function channelSetting({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
+  const { data } = getDeps();
+  const [server, channel, channelMembers] = await Promise.all([
+    data.server({ userId, serverId }),
+    data.channel({ userId, serverId, channelId }),
+    data.channelMembers({ serverId, channelId }),
+  ]);
   return { userId, serverId, channelId, server, channel, channelMembers };
 }
 
-export async function createChannel({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
+async function createChannel({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
   if (!channelId) return { userId, serverId };
-
-  const parentPromise = DataService.channel({ userId, serverId, channelId });
-
-  const [parent] = await Promise.all([parentPromise]).catch((error) => {
-    throw error;
-  });
-
+  const { data } = getDeps();
+  const parent = await data.channel({ userId, serverId, channelId });
   return { userId, serverId, channelId, parent };
 }
 
-export async function directMessage({ userId, targetId, event, message }: { userId: string; targetId: string; event: 'directMessage' | 'shakeWindow'; message: any }) {
-  const friendPromise = DataService.friend({ userId, targetId });
-  const targetPromise = DataService.user({ userId: targetId });
-
-  const [friend, target] = await Promise.all([friendPromise, targetPromise]).catch((error) => {
-    throw error;
-  });
-
+async function directMessage({ userId, targetId, event, message }: { userId: string; targetId: string; event: 'directMessage' | 'shakeWindow'; message: any }) {
+  const { data } = getDeps();
+  const [friend, target] = await Promise.all([
+    data.friend({ userId, targetId }),
+    data.user({ userId: targetId }),
+  ]);
   return { userId, targetId, friend, target, event, message };
 }
 
-export async function editChannelName({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
-  const channelPromise = DataService.channel({ userId, serverId, channelId });
-
-  const [channel] = await Promise.all([channelPromise]).catch((error) => {
-    throw error;
-  });
-
+async function editChannelName({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
+  const { data } = getDeps();
+  const channel = await data.channel({ userId, serverId, channelId });
   return { userId, serverId, channelId, channel };
 }
 
-export async function editChannelOrder({ userId, serverId }: { userId: string; serverId: string }) {
-  const channelsPromise = DataService.channels({ userId, serverId });
-
-  const [channels] = await Promise.all([channelsPromise]).catch((error) => {
-    throw error;
-  });
-
+async function editChannelOrder({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const channels = await data.channels({ userId, serverId });
   return { userId, serverId, channels };
 }
 
-export async function editFriendNote({ userId, targetId }: { userId: string; targetId: string }) {
-  const friendPromise = DataService.friend({ userId, targetId });
-
-  const [friend] = await Promise.all([friendPromise]).catch((error) => {
-    throw error;
-  });
-
+async function editFriendNote({ userId, targetId }: { userId: string; targetId: string }) {
+  const { data } = getDeps();
+  const friend = await data.friend({ userId, targetId });
   return { userId, targetId, friend };
 }
 
-export async function editFriendGroupName({ userId, friendGroupId }: { userId: string; friendGroupId: string }) {
-  const friendGroupPromise = DataService.friendGroup({ userId, friendGroupId });
-
-  const [friendGroup] = await Promise.all([friendGroupPromise]).catch((error) => {
-    throw error;
-  });
-
+async function editFriendGroupName({ userId, friendGroupId }: { userId: string; friendGroupId: string }) {
+  const { data } = getDeps();
+  const friendGroup = await data.friendGroup({ userId, friendGroupId });
   return { userId, friendGroupId, friendGroup };
 }
 
-export async function editNickname({ userId, serverId }: { userId: string; serverId: string }) {
-  const memberPromise = DataService.member({ userId, serverId });
-
-  const [member] = await Promise.all([memberPromise]).catch((error) => {
-    throw error;
-  });
-
+async function editNickname({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const member = await data.member({ userId, serverId });
   return { userId, serverId, member };
 }
 
-export async function inviteFriend({ userId, serverId }: { userId: string; serverId: string }) {
-  const serverPromise = DataService.server({ userId, serverId });
-
-  const [server] = await Promise.all([serverPromise]).catch((error) => {
-    throw error;
-  });
-
+async function inviteFriend({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const server = await data.server({ userId, serverId });
   return { userId, serverId, server };
 }
 
-export async function inviteMember({ userId, serverId }: { userId: string; serverId: string }) {
-  const targetPromise = DataService.member({ userId, serverId });
-  const memberInvitationPromise = DataService.memberInvitation({ serverId, receiverId: userId });
-
-  const [target, memberInvitation] = await Promise.all([targetPromise, memberInvitationPromise]).catch((error) => {
-    throw error;
-  });
-
+async function inviteMember({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const [target, memberInvitation] = await Promise.all([
+    data.member({ userId, serverId }),
+    data.memberInvitation({ serverId, receiverId: userId }),
+  ]);
   return { userId, serverId, target, memberInvitation };
 }
 
-export async function kickMemberFromChannel({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
-  const memberPromise = DataService.member({ userId, serverId, channelId });
-  const channelPromise = DataService.channel({ userId, serverId, channelId });
-
-  const [member, channel] = await Promise.all([memberPromise, channelPromise]).catch((error) => {
-    throw error;
-  });
-
+async function kickMemberFromChannel({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
+  const { data } = getDeps();
+  const [member, channel] = await Promise.all([
+    data.member({ userId, serverId, channelId }),
+    data.channel({ userId, serverId, channelId }),
+  ]);
   return { userId, serverId, channelId, channel, member };
 }
 
-export async function kickMemberFromServer({ userId, serverId }: { userId: string; serverId: string }) {
-  const memberPromise = DataService.member({ userId, serverId });
-
-  const [member] = await Promise.all([memberPromise]).catch((error) => {
-    throw error;
-  });
-
+async function kickMemberFromServer({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const member = await data.member({ userId, serverId });
   return { userId, serverId, member };
 }
 
-export async function memberApplicationSetting({ userId, serverId }: { userId: string; serverId: string }) {
-  const serverPromise = DataService.server({ userId, serverId });
-
-  const [server] = await Promise.all([serverPromise]).catch((error) => {
-    throw error;
-  });
-
+async function memberApplicationSetting({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const server = await data.server({ userId, serverId });
   return { userId, serverId, server };
 }
 
-export async function serverApplication({ userId, serverId }: { userId: string; serverId: string }) {
-  const serverPromise = DataService.server({ userId, serverId });
-
-  const [server] = await Promise.all([serverPromise]).catch((error) => {
-    throw error;
-  });
-
+async function serverApplication({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const server = await data.server({ userId, serverId });
   return { userId, serverId, server };
 }
 
-export async function serverSetting({ userId, serverId }: { userId: string; serverId: string }) {
-  const serverPromise = DataService.server({ userId, serverId });
-  const serverMembersPromise = DataService.serverMembers({ serverId });
-
-  const [server, serverMembers] = await Promise.all([serverPromise, serverMembersPromise]).catch((error) => {
-    throw error;
-  });
-
+async function serverSetting({ userId, serverId }: { userId: string; serverId: string }) {
+  const { data } = getDeps();
+  const [server, serverMembers] = await Promise.all([
+    data.server({ userId, serverId }),
+    data.serverMembers({ serverId }),
+  ]);
   return { userId, serverId, server, serverMembers };
 }
 
-export async function systemSetting({ userId }: { userId: string }) {
-  const userSettingsPromise = DataService.user({ userId });
-  const systemSettings = getSettings();
-
-  const [userSettings] = await Promise.all([userSettingsPromise]).catch((error) => {
-    throw error;
-  });
-
+async function systemSetting({ userId }: { userId: string }) {
+  const { data, getSystemSettings } = getDeps();
+  const userSettings = await data.user({ userId });
+  const systemSettings = getSystemSettings() ?? {};
   return { userId, userSettings, systemSettings };
 }
 
-export async function userInfo({ userId, targetId }: { userId: string; targetId: string }) {
-  const friendPromise = DataService.friend({ userId, targetId });
-  const targetPromise = DataService.user({ userId: targetId });
-  const targetServersPromise = DataService.servers({ userId: targetId });
-
-  const [friend, target, targetServers] = await Promise.all([friendPromise, targetPromise, targetServersPromise]).catch((error) => {
-    throw error;
-  });
-
+async function userInfo({ userId, targetId }: { userId: string; targetId: string }) {
+  const { data } = getDeps();
+  const [friend, target, targetServers] = await Promise.all([
+    data.friend({ userId, targetId }),
+    data.user({ userId: targetId }),
+    data.servers({ userId: targetId }),
+  ]);
   return { userId, targetId, friend, target, targetServers };
 }
+
+// ============ Export Loaders as Object ============
+
+/**
+ * All popup loaders as a record
+ * Used by main.ts: PopupLoader.loaders[type](initialData)
+ */
+export const loaders = {
+  applyFriend,
+  applyMember,
+  blockMember,
+  channelSetting,
+  createChannel,
+  directMessage,
+  editChannelName,
+  editChannelOrder,
+  editFriendNote,
+  editFriendGroupName,
+  editNickname,
+  inviteFriend,
+  inviteMember,
+  kickMemberFromChannel,
+  kickMemberFromServer,
+  memberApplicationSetting,
+  serverApplication,
+  serverSetting,
+  systemSetting,
+  userInfo,
+} as const;
+
+export type LoaderType = keyof typeof loaders;

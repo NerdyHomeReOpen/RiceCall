@@ -1,161 +1,167 @@
 import { t } from 'i18next';
 import ipc from '@/ipc';
+import { getPopupController } from '@/platform/popup';
 
 import * as Types from '@/types';
 
 export function openAlertDialog(message: string, callback: () => void) {
-  ipc.popup.open('dialogAlert', 'dialogAlert', { message });
-  ipc.popup.onSubmit('dialogAlert', callback);
+  const popup = getPopupController();
+  popup.open('dialogAlert', 'dialogAlert', { message });
+  popup.onSubmit('dialogAlert', callback);
 }
 
 export function openErrorDialog(message: string, callback: () => void) {
-  ipc.popup.open('dialogError', 'dialogError', { message, timestamp: Date.now() });
-  ipc.popup.onSubmit('dialogError', callback);
+  const popup = getPopupController();
+  popup.open('dialogError', 'dialogError', { message, timestamp: Date.now() });
+  popup.onSubmit('dialogError', callback);
 }
 
 export function openDirectMessage(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
+  getPopupController().open('directMessage', `directMessage-${targetId}`, { userId, targetId });
 }
 
 export function openChatHistory(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  ipc.popup.open('chatHistory', 'chatHistory', { userId, targetId });
+  getPopupController().open('chatHistory', 'chatHistory', { userId, targetId });
 }
 
 export function openUserInfo(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+  getPopupController().open('userInfo', `userInfo-${targetId}`, { userId, targetId });
 }
 
 export function openServerSetting(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
+  getPopupController().open('serverSetting', 'serverSetting', { userId, serverId });
 }
 
 export function openChannelEvent(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelEvents: Types.ChannelEvent[]) {
-  ipc.popup.open('channelEvent', 'channelEvent', { userId, serverId, channelEvents });
+  getPopupController().open('channelEvent', 'channelEvent', { userId, serverId, channelEvents });
 }
 
 export function openChannelSetting(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
-  ipc.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
+  getPopupController().open('channelSetting', 'channelSetting', { userId, serverId, channelId });
 }
 
 export function openCreateServer(userId: Types.User['userId']) {
-  ipc.popup.open('createServer', 'createServer', { userId });
+  getPopupController().open('createServer', 'createServer', { userId });
 }
 
 export function openCreateChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
-  ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
+  getPopupController().open('createChannel', 'createChannel', { userId, serverId, channelId });
 }
 
 export function openEditNickname(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
+  getPopupController().open('editNickname', 'editNickname', { serverId, userId });
 }
 
 export function openBlockMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
+  getPopupController().open('blockMember', `blockMember`, { userId, serverId });
 }
 
 export function openKickMemberFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('kickMemberFromServer', `kickMemberFromServer`, { userId, serverId });
+  getPopupController().open('kickMemberFromServer', `kickMemberFromServer`, { userId, serverId });
 }
 
 export function openKickMemberFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
-  ipc.popup.open('kickMemberFromChannel', `kickMemberFromChannel`, { userId, serverId, channelId });
+  getPopupController().open('kickMemberFromChannel', `kickMemberFromChannel`, { userId, serverId, channelId });
 }
 
 export function openInviteFriend(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('inviteFriend', `inviteFriend`, { userId, serverId });
+  getPopupController().open('inviteFriend', `inviteFriend`, { userId, serverId });
 }
 
 export function openInviteMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
+  getPopupController().open('inviteMember', `inviteMember`, { userId, serverId });
 }
 
 export function openMemberApplicationSetting(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('memberApplicationSetting', 'memberApplicationSetting', { userId, serverId });
+  getPopupController().open('memberApplicationSetting', 'memberApplicationSetting', { userId, serverId });
 }
 
 export function openEditChannelOrder(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
+  getPopupController().open('editChannelOrder', 'editChannelOrder', { serverId, userId });
 }
 
 export function openServerBroadcast(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
-  ipc.popup.open('serverBroadcast', 'serverBroadcast', { serverId, channelId });
+  getPopupController().open('serverBroadcast', 'serverBroadcast', { serverId, channelId });
 }
 
 export function openChannelPassword(onSubmit: (password: string) => void) {
-  ipc.popup.open('channelPassword', 'channelPassword', {});
-  ipc.popup.onSubmit('channelPassword', onSubmit);
+  const popup = getPopupController();
+  popup.open('channelPassword', 'channelPassword', {});
+  popup.onSubmit('channelPassword', onSubmit);
 }
 
 export function openEditChannelName(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], channelName: Types.Channel['name'] = '') {
-  ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName });
+  getPopupController().open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName });
 }
 
 export function openFriendVerification(userId: Types.User['userId']) {
-  ipc.popup.open('friendVerification', 'friendVerification', { userId });
+  getPopupController().open('friendVerification', 'friendVerification', { userId });
 }
 
 export function openMemberInvitation(userId: Types.User['userId']) {
-  ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
+  getPopupController().open('memberInvitation', 'memberInvitation', { userId });
 }
 
 export function openSearchUser() {
-  ipc.popup.open('searchUser', 'searchUser', {});
+  getPopupController().open('searchUser', 'searchUser', {});
 }
 
 export async function openApplyFriend(userId: Types.User['userId'], targetId: Types.User['userId']) {
   await ipc.data.friendApplication({ receiverId: userId, senderId: targetId }).then((receivedFriendApplication) => {
     if (receivedFriendApplication) {
-      ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
+      getPopupController().open('approveFriend', 'approveFriend', { userId, targetId });
     } else {
-      ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+      getPopupController().open('applyFriend', 'applyFriend', { userId, targetId });
     }
   });
 }
 
 export function openApproveFriend(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
+  getPopupController().open('approveFriend', 'approveFriend', { userId, targetId });
 }
 
 export function openCreateFriendGroup() {
-  ipc.popup.open('createFriendGroup', 'createFriendGroup', {});
+  getPopupController().open('createFriendGroup', 'createFriendGroup', {});
 }
 
 export function openEditFriendNote(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  ipc.popup.open('editFriendNote', 'editFriendNote', { userId, targetId });
+  getPopupController().open('editFriendNote', 'editFriendNote', { userId, targetId });
 }
 
 export function openEditFriendGroupName(userId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId']) {
-  ipc.popup.open('editFriendGroupName', 'editFriendGroupName', { userId, friendGroupId });
+  getPopupController().open('editFriendGroupName', 'editFriendGroupName', { userId, friendGroupId });
 }
 
 export function openSystemSetting(userId: Types.User['userId']) {
-  ipc.popup.open('systemSetting', 'systemSetting', { userId });
+  getPopupController().open('systemSetting', 'systemSetting', { userId });
 }
 
 export function openAboutUs() {
-  ipc.popup.open('aboutus', 'aboutUs', {});
+  getPopupController().open('aboutus', 'aboutUs', {});
 }
 
 export function openChangeTheme() {
-  ipc.popup.open('changeTheme', 'changeTheme', {});
+  getPopupController().open('changeTheme', 'changeTheme', {});
 }
 
 export function openApplyMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('applyMember', 'applyMember', { userId, serverId });
+  getPopupController().open('applyMember', 'applyMember', { userId, serverId });
 }
 
 export function openImageCropper(imageUnit8Array: Uint8Array, onSubmit: (imageUnit8Array: Uint8Array) => void) {
-  ipc.popup.open('imageCropper', 'imageCropper', { imageUnit8Array });
-  ipc.popup.onSubmit('imageCropper', onSubmit);
+  const popup = getPopupController();
+  popup.open('imageCropper', 'imageCropper', { imageUnit8Array });
+  popup.onSubmit('imageCropper', onSubmit);
 }
 
 export function openServerApplication(userId: Types.User['userId'], serverId: Types.Server['serverId'], onSubmit: (action: string) => void) {
-  ipc.popup.open('serverApplication', 'serverApplication', { userId, serverId });
-  ipc.popup.onSubmit('serverApplication', onSubmit);
+  const popup = getPopupController();
+  popup.open('serverApplication', 'serverApplication', { userId, serverId });
+  popup.onSubmit('serverApplication', onSubmit);
 }
 
 export function openServerAnnouncement(announcement: Types.Server['announcement']) {
-  ipc.popup.open('serverAnnouncement', 'serverAnnouncement', { announcement });
+  getPopupController().open('serverAnnouncement', 'serverAnnouncement', { announcement });
 }
 
 export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, isPasswordNeeded: boolean) {

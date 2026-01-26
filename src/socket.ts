@@ -4,6 +4,21 @@ import type * as Types from './types';
 import { env } from './env.js';
 import Logger from './logger.js';
 
+// Target window for sending events (set by main.ts)
+let targetWindow: BrowserWindow | null = null;
+
+export function setSocketTargetWindow(window: BrowserWindow | null) {
+  targetWindow = window;
+}
+
+/**
+ * Get windows that should receive socket events.
+ * Only sends to the main window, not to authWindow or popups.
+ */
+function getTargetWindows(): BrowserWindow[] {
+  return BrowserWindow.getAllWindows();
+}
+
 const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
 
 const ClientToServerEventNames = [
@@ -143,7 +158,7 @@ function sendHeartbeat() {
     } else {
       const latency = Date.now() - start;
       new Logger('Socket').info(`ACK for #${ack.seq} in ${latency} ms`);
-      BrowserWindow.getAllWindows().forEach((window) => {
+      getTargetWindows().forEach((window) => {
         window.webContents.send('heartbeat', { seq: ack.seq, latency });
       });
     }
@@ -204,7 +219,7 @@ export function connectSocket(token: string) {
     ServerToClientEventNames.forEach((event) => {
       socket?.on(event, async (...args) => {
         if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
-        BrowserWindow.getAllWindows().forEach((window) => {
+        getTargetWindows().forEach((window) => {
           window.webContents.send(event, ...args);
         });
       });
@@ -216,7 +231,7 @@ export function connectSocket(token: string) {
 
     new Logger('Socket').info(`Socket connected`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
+    getTargetWindows().forEach((window) => {
       window.webContents.send('connect', null);
     });
   });
@@ -239,7 +254,7 @@ export function connectSocket(token: string) {
 
     new Logger('Socket').info(`Socket disconnected, reason: ${reason}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
+    getTargetWindows().forEach((window) => {
       window.webContents.send('disconnect', reason);
     });
   });
@@ -247,7 +262,7 @@ export function connectSocket(token: string) {
   socket.on('connect_error', (error) => {
     new Logger('Socket').error(`Socket connect error: ${error}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
+    getTargetWindows().forEach((window) => {
       window.webContents.send('connect_error', error);
     });
   });
@@ -255,7 +270,7 @@ export function connectSocket(token: string) {
   socket.on('reconnect', (attemptNumber) => {
     new Logger('Socket').info(`Socket reconnected, attempt number: ${attemptNumber}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
+    getTargetWindows().forEach((window) => {
       window.webContents.send('reconnect', attemptNumber);
     });
   });
@@ -263,7 +278,7 @@ export function connectSocket(token: string) {
   socket.on('reconnect_error', (error) => {
     new Logger('Socket').error(`Socket reconnect error: ${error}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
+    getTargetWindows().forEach((window) => {
       window.webContents.send('reconnect_error', error);
     });
   });

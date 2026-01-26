@@ -19,6 +19,7 @@ import NotificationToaster from '@/components/NotificationToaster';
 import FriendPage from '@/pages/Friend';
 import HomePage from '@/pages/Home';
 import ServerPage from '@/pages/Server';
+// import LoginPage from '@/pages/Login';
 
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
@@ -76,10 +77,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Variables
-  const hasNotification = !!friendApplications.length || !!memberInvitations.length || !!systemNotifications.length;
-  const hasFriendApplication = !!friendApplications.length;
-  const hasMemberInvitation = !!memberInvitations.length;
-  const hasSystemNotification = !!systemNotifications.length;
+  // Guard here to avoid hard crashes like "Cannot read properties of undefined (reading 'length')".
+  const safeFriendApplications = friendApplications ?? [];
+  const safeMemberInvitations = memberInvitations ?? [];
+  const safeSystemNotifications = systemNotifications ?? [];
+  const hasNotification = !!safeFriendApplications.length || !!safeMemberInvitations.length || !!safeSystemNotifications.length;
+  const hasFriendApplication = !!safeFriendApplications.length;
+  const hasMemberInvitation = !!safeMemberInvitations.length;
+  const hasSystemNotification = !!safeSystemNotifications.length;
 
   const mainTabs: Tab[] = useMemo(
     () => [
@@ -93,8 +98,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   // Functions
   const logout = () => {
     ipc.auth.logout();
-    localStorage.removeItem('token');
-    localStorage.removeItem('userId');
   };
 
   const exit = () => {
@@ -142,7 +145,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       contentType: 'image',
       showContentLength: true,
       showContent: true,
-      contents: friendApplications.map((fa) => fa.avatarUrl),
+      contents: safeFriendApplications.map((fa) => fa.avatarUrl),
       onClick: () => Popup.openFriendVerification(user.userId),
     },
     {
@@ -153,7 +156,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       contentType: 'image',
       showContentLength: true,
       showContent: true,
-      contents: memberInvitations.map((mi) => mi.avatarUrl),
+      contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
       onClick: () => Popup.openMemberInvitation(user.userId),
     },
     {
@@ -163,7 +166,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       show: hasSystemNotification,
       showContentLength: true,
       showContent: false,
-      contents: memberInvitations.map((mi) => mi.avatarUrl),
+      contents: safeSystemNotifications.map((sn) => sn),
       onClick: () => {},
     },
   ];
@@ -334,6 +337,9 @@ const RootPageComponent: React.FC = React.memo(() => {
   const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   // Variables
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const isWebMode = typeof window !== 'undefined' && !(window as any).require;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const isSelectedHomePage = selectedTab === 'home';
   const isSelectedFriendsPage = selectedTab === 'friends';
   const isSelectedServerPage = selectedTab === 'server';
@@ -347,6 +353,16 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
+
+  // Web-mode: establish socket.io connection directly (Electron does this in main process).
+  useEffect(() => {
+    if (!isWebMode) return;
+    if (!token) return;
+    ipc.socketClient?.connect(token);
+    return () => {
+      ipc.socketClient?.disconnect();
+    };
+  }, [isWebMode, token]);
 
   useEffect(() => {
     if (user.userId) return;

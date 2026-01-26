@@ -26,13 +26,14 @@ import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, se
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
 import { initMainI18n, t } from './src/i18n.main.js';
-import { connectSocket, disconnectSocket } from './src/socket.js';
+import { connectSocket, disconnectSocket, setSocketTargetWindow } from './src/socket.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
 import * as AuthService from './src/auth.service.js';
 import * as DataService from './src/data.service.js';
 import * as PopupLoader from './src/popupLoader.js';
 import Logger from './src/logger.js';
 import { LANGUAGES } from './src/constant.js';
+import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -364,6 +365,9 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     return { action: 'deny' };
   });
 
+  // Set this window as the target for socket events
+  setSocketTargetWindow(mainWindow);
+
   return mainWindow;
 }
 
@@ -436,7 +440,8 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
 
 export async function createPopup(type: Types.PopupType, id: string, initialData: unknown, force = true, title?: string): Promise<BrowserWindow> {
   const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
-  const canResize = type === 'directMessage';
+  const behavior = POPUP_BEHAVIORS[type] ?? { resizable: false, maximizable: false, fullscreenable: false };
+  const size = POPUP_SIZES[type] ?? { width: 400, height: 300 };
 
   // If force is true, destroy the popup
   if (force) {
@@ -460,16 +465,16 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
 
   popups[id] = new BrowserWindow({
     title: fullTitle,
-    width: PopupSize[type].width,
-    height: PopupSize[type].height,
-    minWidth: PopupSize[type].width,
-    minHeight: PopupSize[type].height,
+    width: size.width,
+    height: size.height,
+    minWidth: size.width,
+    minHeight: size.height,
     thickFrame: true,
     titleBarStyle: 'hidden',
-    maximizable: canResize,
-    resizable: canResize,
+    maximizable: behavior.maximizable,
+    resizable: behavior.resizable,
     fullscreen: false,
-    fullscreenable: canResize,
+    fullscreenable: behavior.fullscreenable,
     hasShadow: true,
     icon: APP_ICON,
     show: false,
@@ -735,6 +740,12 @@ app.on('ready', async () => {
   // Initialize i18n
   initMainI18n(store.get('language'));
 
+  // Initialize popup loader with system settings getter
+  PopupLoader.initPopupLoader({
+    data: DataService,
+    getSystemSettings: getSettings,
+  });
+
   // Configure
   configureAutoUpdater();
   configureDiscordRPC();
@@ -770,14 +781,27 @@ app.on('ready', async () => {
   });
 
   ipcMain.handle('auth-logout', async () => {
+    new Logger('Auth').info('Logout: starting...');
     token = '';
     isLogin = false;
-    mainWindow?.reload();
-    mainWindow?.hide();
-    authWindow?.showInactive();
+    // Close popups and disconnect socket first
     closePopups();
     disconnectSocket();
+    // Hide main window
+    new Logger('Auth').info('Logout: hiding mainWindow...');
+    mainWindow?.hide();
+    new Logger('Auth').info(`Logout: mainWindow visible = ${mainWindow?.isVisible()}`);
+    // Load auth page explicitly (not reload, which might load wrong URL)
+    new Logger('Auth').info('Logout: loading auth page in authWindow...');
+    const authUrl = DEV ? `${BASE_URI}/auth` : `${BASE_URI}/auth.html`;
+    new Logger('Auth').info(`Logout: authUrl = ${authUrl}`);
+    authWindow?.loadURL(authUrl);
+    authWindow?.show();
+    new Logger('Auth').info(`Logout: authWindow visible = ${authWindow?.isVisible()}`);
+    // Note: We do NOT reload mainWindow here to avoid having two active windows
+    // The mainWindow will be reloaded when user logs in again via auth-login
     setTrayDetail();
+    new Logger('Auth').info('Logout: done');
   });
 
   ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string; locale: string }) => {
@@ -1051,7 +1075,7 @@ app.on('ready', async () => {
   ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
     new Logger('System').info(`Opening ${type} (${id})...`);
 
-    const loader = PopupLoader[type as keyof typeof PopupLoader];
+    const loader = PopupLoader.loaders[type as keyof typeof PopupLoader.loaders];
     if (loader)
       initialData = await loader(initialData).catch(() => {
         new Logger('System').error(`Cannot load ${type} data, aborting...`);
