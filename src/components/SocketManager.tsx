@@ -38,13 +38,6 @@ const SocketManager: React.FC = React.memo(() => {
   const { playSound } = useSoundPlayer();
   const dispatch = useAppDispatch();
 
-  // Debug ID
-  const instanceId = useRef(Math.random().toString(36).substring(7)).current;
-  useEffect(() => {
-    new Logger('SocketManager').info(`[${instanceId}] Mounted in ${window.location.href}`);
-    return () => new Logger('SocketManager').info(`[${instanceId}] Unmounted`);
-  }, []);
-
   // Refs
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
   const popupOffSubmitRef = useRef<() => void>(() => {});
@@ -456,9 +449,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('playSound', (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
-      // Don't play sound in popups
-      new Logger('SocketManager').info(`[${instanceId}] Received playSound event: ${JSON.stringify(args)} in ${window.location.href}`);
-      if (window.location.href.includes('popup')) return;
       args.forEach((s) => playSound(s));
     });
     return () => unsub();
