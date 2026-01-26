@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
-import packageJson from '../../package.json' with { type: 'json' };
+import packageJson from '../../package.json';
 const version = packageJson.version;
 import ipc from '@/ipc';
 

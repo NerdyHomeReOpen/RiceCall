@@ -81,64 +81,16 @@ function clamp(n: number, min: number, max: number) {
 }
 
 /**
- * Check if a popup has been hydrated (has all required data).
- * Returns true if popup can be rendered, false if still waiting for hydration.
+ * Render the popup component if data is ready.
  */
-function isPopupHydrated(type: Types.PopupType, data: any): boolean {
-  if (!data || typeof data !== 'object') return false;
-
-  // If there's a loader for this type, check if hydration is complete.
-  // A simple heuristic: if loader exists, check that we have more than just IDs.
-  const hasLoaderDefined = needsHydration(type);
-  if (!hasLoaderDefined) return true; // No loader = no hydration needed
-
-  // Type-specific checks for required fields
-  switch (type) {
-    case 'userInfo':
-    case 'userSetting':
-      return !!data.target && Array.isArray(data.targetServers);
-    case 'directMessage':
-    case 'chatHistory':
-      return !!data.user && !!data.target;
-    case 'systemSetting':
-      return !!data.userSettings && !!data.systemSettings;
-    case 'serverSetting':
-      return !!data.user && !!data.server && Array.isArray(data.serverMembers);
-    case 'channelSetting':
-      return !!data.user && !!data.server && !!data.channel;
-    case 'channelEvent':
-      return !!data.user && !!data.server && Array.isArray(data.channels);
-    case 'createServer':
-      return !!data.user && Array.isArray(data.servers);
-    case 'applyFriend':
-      return !!data.target && Array.isArray(data.friendGroups);
-    case 'editFriendNote':
-      return !!data.friend && Array.isArray(data.friendGroups);
-    case 'friendVerification':
-      return Array.isArray(data.friendApplications);
-    case 'memberInvitation':
-      return Array.isArray(data.memberInvitations);
-    case 'editChannelOrder':
-      return Array.isArray(data.channels);
-    case 'serverBroadcast':
-      return !!data.user && !!data.server;
-    default:
-      // For other types, assume hydrated if we have any data object
-      return true;
-  }
-}
-
-function renderPopupNode(p: InAppPopupInstance) {
-  const id = p.id;
-  const d: any = p.initialData;
-
-  // Wait for hydration if needed
-  if (!isPopupHydrated(p.type, d)) {
+function renderPopupNode(p: InAppPopupInstance, isReady: boolean) {
+  // If hydration is needed but not yet done, render nothing (or a spinner if desired)
+  if (!isReady) {
     return null;
   }
 
-  // Use the centralized popup renderer from popupComponents.generated.tsx
-  return renderPopup(p.type, id, d);
+  // Use the centralized popup renderer
+  return renderPopup(p.type, p.id, p.initialData);
 }
 
 export function InAppPopupHost() {
@@ -248,6 +200,12 @@ export function InAppPopupHost() {
           const effectiveData = hydratedData[p.id] ?? p.initialData;
           const popupTitle = getPopupTitle(p.type, effectiveData, t);
 
+          // Generic readiness check:
+          // 1. If it doesn't need hydration, it's always ready.
+          // 2. If it needs hydration, it's ready when we have data in hydratedData map.
+          const requiresHydration = needsHydration(p.type);
+          const isReady = !requiresHydration || hydratedData[p.id] !== undefined;
+
           return (
             <DraggableWindow
               key={key}
@@ -265,7 +223,7 @@ export function InAppPopupHost() {
               <PopupErrorBoundary popupId={p.id} onClose={() => closeInAppPopup(p.id)}>
                 {/* Allow popup components to call `ipc.window.close()` in web by providing a current-popup id hint. */}
                 <CurrentPopupIdScope popupId={p.id}>
-                {renderPopupNode({ ...p, initialData: effectiveData })}
+                {renderPopupNode({ ...p, initialData: effectiveData }, isReady)}
                 </CurrentPopupIdScope>
               </PopupErrorBoundary>
             </DraggableWindow>

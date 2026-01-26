@@ -24,6 +24,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as Popup from '@/utils/popup';
 import * as Default from '@/utils/default';
 import * as TagConverter from '@/utils/tagConverter';
+import { platformStorage } from '@/platform/storage';
 
 import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN } from '@/constant';
 
@@ -175,7 +176,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleServerSelect = (server: Types.Server) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
+    platformStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   const handleScroll = () => {

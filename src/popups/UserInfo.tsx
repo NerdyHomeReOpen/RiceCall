@@ -14,6 +14,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Popup from '@/utils/popup';
 import * as Permission from '@/utils/permission';
+import { platformStorage } from '@/platform/storage';
 import ObjDiff from '@/utils/objDiff';
 
 import { MAX_FILE_SIZE } from '@/constant';
@@ -106,7 +107,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
 
   // Handlers
   const handleServerSelect = (server: Types.Server) => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
+    platformStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   const handleAvatarClick = () => {

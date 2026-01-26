@@ -121,7 +121,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
           onAgreementClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
           onSpecificationClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
           onContactUsClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
-          onAboutUsClick: () => Popup.openAboutUs,
+          onAboutUsClick: Popup.openAboutUs,
         },
         () => {},
       )

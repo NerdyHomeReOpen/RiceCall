@@ -5,6 +5,7 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import * as Default from '@/utils/default';
+import { platformStorage } from '@/platform/storage';
 
 import styles from '@/styles/actionLink.module.css';
 
@@ -24,7 +25,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
 
   // Handlers
   const handleLinkClick = () => {
-    window.localStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() }));
+    platformStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() }));
   };
 
   // Effects
