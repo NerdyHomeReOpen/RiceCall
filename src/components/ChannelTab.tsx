@@ -78,7 +78,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
     [channelMembers, user.userId, permissionLevel],
   );
   const sortedChannelMembers = useMemo(() => {
-    const friendIds = new Set(friends.map((f) => f.targetId));
+    const friendIds = new Set(friends.filter((f) => f.relationStatus === 2).map((f) => f.targetId));
     return [...channelMembers].sort((a, b) => {
       if (!sortChannelMembersWithRules) return b.lastJoinChannelAt - a.lastJoinChannelAt;
 
