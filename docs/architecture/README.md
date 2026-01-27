@@ -11,7 +11,7 @@
 ## 目錄導覽
 
 ### 1. [核心概念 (01-concepts)](./01-concepts/README.md)
-了解支撐新架構的基礎設計模式與哲學。
+了解支撐新架構的基礎設計模式。
 - **[平台抽象層 (Platform Abstraction)](./01-concepts/platform-abstraction.md)**: 如何隔離 Web 與 Electron 的差異。
 - **[處理器模式 (Handler Pattern)](./01-concepts/handler-pattern.md)**: 業務邏輯如何與 IPC 解耦。
 
