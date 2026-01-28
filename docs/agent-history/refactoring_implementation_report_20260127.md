@@ -1,7 +1,7 @@
 # 架構重構實作報告：Electron/Web 雙平台支援
 
 **日期**: 2026-01-27
-**比較範圍**: Commit `f15853c` (基線) vs `HEAD` (目前版本)
+**比較範圍**: Commit [`f15853c`](https://github.com/NerdyHomeReOpen/RiceCall/commit/f15853c) (基線) vs `HEAD` (目前版本)
 
 ## 1. 總覽 (Overview)
 

@@ -6,7 +6,7 @@ When a user sends a direct message, the server correctly emits a `directMessage`
 ## Root Cause Analysis
 
 ### 1. Regression Introduced in Refactor
-The issue was traced back to **Commit `849793f`** ("feat: refactor and abstract electron related operations to support web"). During the architectural refactoring to support the Web platform, the socket event broadcasting logic in the Electron Main process was altered.
+The issue was traced back to **Commit [`849793f`](https://github.com/NerdyHomeReOpen/RiceCall/commit/849793f)** ("feat: refactor and abstract electron related operations to support web"). During the architectural refactoring to support the Web platform, the socket event broadcasting logic in the Electron Main process was altered.
 
 ### 2. Socket Event Broadcasting Logic
 *   **Previous Behavior (Working - e.g., tag 0.3.13):**

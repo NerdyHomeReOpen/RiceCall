@@ -1,7 +1,7 @@
 # RiceCall 架構重構詳細方塊圖 (Architecture Block Diagrams)
 
 **日期**: 2026-01-27
-**版本比較**: Commit `f15853c` (Legacy) vs `HEAD` (Refactored)
+**版本比較**: Commit [`f15853c`](https://github.com/NerdyHomeReOpen/RiceCall/commit/f15853c) (Legacy) vs `HEAD` (Refactored)
 
 這份文件透過詳細的文字方塊圖，描述系統重構前後的組件互動、依賴關係與資料流向。
 
