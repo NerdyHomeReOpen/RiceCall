@@ -125,6 +125,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
         },
         () => {},
       )
+      .addNetworkDiagnosisOption(() => Popup.openNetworkDiagnosis())
       .addLogoutOption(() => logout())
       .addExitOption(() => exit())
       .build();

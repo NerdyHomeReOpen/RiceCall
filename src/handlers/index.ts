@@ -11,6 +11,7 @@ import { createLanguageHandlers } from './language.handler';
 import { createThemesHandlers } from './themes.handler';
 import { createEnvHandlers } from './env.handler';
 import { createElectronOnlyHandlers } from './electron-only.handler';
+import { createNetworkHandlers } from './network.handler';
 
 /**
  * Merge multiple HandlerRegistration objects.
@@ -44,7 +45,8 @@ export function createAllHandlers(): HandlerRegistration {
     createLanguageHandlers(),
     createThemesHandlers(),
     createEnvHandlers(),
-    createElectronOnlyHandlers()
+    createElectronOnlyHandlers(),
+    createNetworkHandlers()
   );
 }
 
@@ -58,4 +60,5 @@ export {
   createThemesHandlers,
   createEnvHandlers,
   createElectronOnlyHandlers,
+  createNetworkHandlers,
 };

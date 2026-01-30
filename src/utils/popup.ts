@@ -413,3 +413,7 @@ export function leaveQueue(serverId: Types.Server['serverId'], channelId: Types.
 export function controlQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
   ipc.socket.send('controlQueue', { serverId, channelId });
 }
+
+export function openNetworkDiagnosis() {
+  getPopupController().open('networkDiagnosis', 'networkDiagnosis', {});
+}

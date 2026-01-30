@@ -771,6 +771,15 @@ export default class ContextMenuClass {
     return this;
   }
 
+  addNetworkDiagnosisOption(onClick: () => void): this {
+    this.options.push({
+      id: 'network-diagnosis',
+      label: 'network-diagnosis',
+      onClick: onClick,
+    });
+    return this;
+  }
+
   build(): Types.ContextMenuItem[] {
     return this.options;
   }

@@ -237,7 +237,8 @@ export type PopupType =
   | 'serverSetting'
   | 'systemSetting'
   | 'userInfo'
-  | 'userSetting';
+  | 'userSetting'
+  | 'networkDiagnosis';
 
 export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 

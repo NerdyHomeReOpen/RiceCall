@@ -5,6 +5,7 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
+import { useLoading } from '@/providers/Loading';
 
 import EncodeAudio from '@/utils/encodeAudio';
 import Logger from '@/utils/logger';
@@ -199,6 +200,7 @@ interface WebRTCProviderProps {
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Hooks
   const { playSound } = useSoundPlayer();
+  const { loadServer } = useLoading();
 
   // Refs
   const rafIdListRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
@@ -1112,6 +1114,107 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     });
     return () => unsub();
   }, [unconsumeOne]);
+
+  useEffect(() => {
+    const handleGetSfuDiagnosis = async (_: any, { senderId }: { senderId: number }) => {
+      let info = null;
+
+      const electron = (window as any).require ? (window as any).require('electron') : null;
+      if (!electron) return;
+
+      try {
+        // If not in a channel, try to join one automatically using standard logic
+        if (!recvTransportRef.current) {
+          new Logger('WebRTC').info('Not in a channel, attempting to join one for diagnosis using standard logic...');
+          
+          let targetServer = null;
+
+          // 1. Try to find server with displayId/serverId '10'
+          const searchResults = await ipc.data.searchServer({ query: '10' });
+          targetServer = searchResults.find(s => s.displayId === '10' || s.serverId === '10');
+          
+          if (!targetServer) {
+            // 2. Fallback to first joined server
+            const userId = window.localStorage.getItem('userId');
+            if (userId) {
+              const servers = await ipc.data.servers({ userId });
+              if (servers && servers.length > 0) {
+                targetServer = servers[0];
+              }
+            }
+          }
+
+          if (targetServer) {
+            new Logger('WebRTC').info(`Standard joining server: ${targetServer.name} (${targetServer.displayId})`);
+            
+            // Call standard logic directly
+            loadServer(targetServer.specialId || targetServer.displayId);
+            ipc.socket.send('connectServer', { serverId: targetServer.serverId });
+            
+            // Wait for SFUJoined event (max 10s)
+            await new Promise<void>((resolve, reject) => {
+              let unsub: () => void;
+              const timeout = setTimeout(() => {
+                if (unsub) unsub();
+                reject(new Error('Timeout waiting for SFUJoined after standard join'));
+              }, 10000);
+              unsub = ipc.socket.on('SFUJoined', () => {
+                clearTimeout(timeout);
+                if (unsub) unsub();
+                resolve();
+              });
+            }).catch((e) => new Logger('WebRTC').error(e.message));
+
+            // Wait for transport to be created
+            for (let i = 0; i < 5; i++) {
+              if (recvTransportRef.current) break;
+              await new Promise((r) => setTimeout(r, 1000));
+            }
+          }
+        } else {
+          new Logger('WebRTC').info('Already in an SFU session, reusing existing transport for diagnosis.');
+        }
+
+        if (recvTransportRef.current) {
+          // Retry gathering stats for up to 10 seconds to allow ICE connection to succeed
+          for (let retry = 0; retry < 10; retry++) {
+            const stats = await recvTransportRef.current.getStats();
+            stats.forEach((report) => {
+              if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+                info = {
+                  transportId: recvTransportRef.current?.id,
+                  ip: report.remoteCandidateId ? stats.get(report.remoteCandidateId)?.ip : 'unknown',
+                  port: report.remoteCandidateId ? stats.get(report.remoteCandidateId)?.port : 'unknown',
+                };
+                if (!info.ip || info.ip === 'unknown') {
+                  const remoteCandidate = stats.get(report.remoteCandidateId);
+                  if (remoteCandidate) {
+                    info.ip = remoteCandidate.ip || remoteCandidate.address;
+                    info.port = remoteCandidate.port;
+                  }
+                }
+              }
+            });
+            
+            if (info && info.ip && info.ip !== 'unknown') break;
+            await new Promise(r => setTimeout(r, 1000));
+          }
+        }
+      } catch (e) {
+        new Logger('WebRTC').error(`Error getting stats or joining channel: ${e}`);
+      }
+      
+      electron.ipcRenderer.send('sfu-diagnosis-response', { targetSenderId: senderId, info });
+    };
+
+    const electron = (window as any).require ? (window as any).require('electron') : null;
+    if (electron) {
+        electron.ipcRenderer.on('get-sfu-diagnosis', handleGetSfuDiagnosis);
+        return () => {
+            electron.ipcRenderer.removeListener('get-sfu-diagnosis', handleGetSfuDiagnosis);
+        }
+    }
+  }, []);
 
   const contextValue = useMemo(
     () => ({

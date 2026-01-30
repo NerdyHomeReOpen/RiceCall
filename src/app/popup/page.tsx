@@ -188,6 +188,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       systemSetting: t('system-setting'),
       userInfo: t('user-info'),
       userSetting: t('user-setting'),
+      networkDiagnosis: t('network-diagnosis'),
     }[type];
   }, [type, initialData, t]);
 

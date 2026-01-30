@@ -193,6 +193,10 @@ async function userInfo({ userId, targetId }: { userId: string; targetId: string
   return { userId, targetId, friend, target, targetServers };
 }
 
+async function networkDiagnosis(data: any) {
+  return data ?? {};
+}
+
 // ============ Export Loaders as Object ============
 
 /**
@@ -220,6 +224,7 @@ export const loaders = {
   serverSetting,
   systemSetting,
   userInfo,
+  networkDiagnosis,
 } as const;
 
 export type LoaderType = keyof typeof loaders;

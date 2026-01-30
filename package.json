@@ -65,6 +65,7 @@
     "i18next": "^25.2.1",
     "mediasoup-client": "^3.12.5",
     "net": "^1.0.2",
+    "networkdiagnosistool": "^1.0.4",
     "next": "^15.3.2",
     "npm": "^11.7.0",
     "path": "^0.12.7",

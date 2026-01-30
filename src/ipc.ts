@@ -413,7 +413,42 @@ const ipcFacade = {
       return getIpc().sendSync('get-env') ?? {};
     },
   },
+
+  // -------------------------------------------------------------------------
+  // Network Diagnosis
+  // -------------------------------------------------------------------------
+  network: {
+    runDiagnosis: async (params: { domains: string[]; duration?: number }): Promise<any> => {
+      return await getIpc().invoke('run-network-diagnosis', params);
+    },
+
+    cancelDiagnosis: () => {
+      getIpc().send('cancel-network-diagnosis');
+    },
+
+    onProgress: (callback: (progress: any) => void) => {
+      const listener = (_: any, progress: any) => callback(progress);
+      getIpc().on('network-diagnosis-progress', listener);
+      return () => getIpc().removeListener('network-diagnosis-progress', listener);
+    },
+  },
+
+  // -------------------------------------------------------------------------
+  // SFU Diagnosis
+  // -------------------------------------------------------------------------
+  sfuDiagnosis: {
+    request: () => {
+      getIpc().send('request-sfu-diagnosis');
+    },
+
+    onResponse: (callback: (data: any) => void) => {
+      const listener = (_: any, data: any) => callback(data);
+      getIpc().on('sfu-diagnosis-response', listener);
+      return () => getIpc().removeListener('sfu-diagnosis-response', listener);
+    },
+  },
 };
+
 
 // ============================================================================
 // System Settings Accessors (auto-generated pattern)

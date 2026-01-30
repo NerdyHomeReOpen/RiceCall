@@ -58,6 +58,7 @@ export const POPUP_SIZES: Record<Types.PopupType, PopupSizeConfig> = {
   systemSetting: { width: 600, height: 520 },
   userInfo: { width: 440, height: 630 },
   userSetting: { width: 500, height: 700 },
+  networkDiagnosis: { width: 400, height: 500 },
 };
 
 // ============================================================================
@@ -113,6 +114,7 @@ export const POPUP_HEADERS: Record<Types.PopupType, PopupHeaderConfig> = {
   systemSetting: { buttons: ['close'], hideHeader: false },
   userInfo: { buttons: ['close'], hideHeader: true },
   userSetting: { buttons: ['close'], hideHeader: false },
+  networkDiagnosis: { buttons: ['close'], hideHeader: false },
 };
 
 // ============================================================================
@@ -161,6 +163,7 @@ export const POPUP_TITLE_KEYS: Record<Types.PopupType, string> = {
   systemSetting: 'system-setting',
   userInfo: 'user-info',
   userSetting: 'user-setting',
+  networkDiagnosis: 'network-diagnosis',
 };
 
 // ============================================================================
@@ -218,6 +221,7 @@ export const POPUP_BEHAVIORS: Record<Types.PopupType, PopupBehaviorConfig> = {
   systemSetting: { resizable: false, maximizable: false, fullscreenable: false },
   userInfo: { resizable: false, maximizable: false, fullscreenable: false },
   userSetting: { resizable: false, maximizable: false, fullscreenable: false },
+  networkDiagnosis: { resizable: false, maximizable: false, fullscreenable: false },
 };
 
 // ============================================================================
@@ -270,6 +274,7 @@ export const POPUP_COMPONENTS: Record<Types.PopupType, string> = {
   systemSetting: 'SystemSetting',
   userInfo: 'UserInfo',
   userSetting: 'UserSetting',
+  networkDiagnosis: 'NetworkDiagnosis',
 };
 
 // ============================================================================

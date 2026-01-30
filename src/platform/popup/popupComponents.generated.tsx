@@ -50,6 +50,7 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import ServerSetting from '@/popups/ServerSetting';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
+import NetworkDiagnosis from '@/popups/NetworkDiagnosis';
 
 // ============================================================================
 // Component Registry by Name
@@ -78,6 +79,7 @@ export const POPUP_COMPONENTS: Record<string, React.ComponentType<any>> = {
   EditNickname,
   FriendVerification,
   ImageCropper,
+  InviteFriend,
   InviteMember,
   KickMemberFromChannel,
   KickMemberFromServer,
@@ -89,6 +91,7 @@ export const POPUP_COMPONENTS: Record<string, React.ComponentType<any>> = {
   ServerSetting,
   SystemSetting,
   UserInfo,
+  NetworkDiagnosis,
 };
 
 // ============================================================================
@@ -141,6 +144,7 @@ export const PopupComponentMap: Record<Types.PopupType, React.ComponentType<any>
   systemSetting: SystemSetting,
   userInfo: UserInfo,
   userSetting: UserInfo, // UserSetting uses UserInfo component
+  networkDiagnosis: NetworkDiagnosis,
 };
 
 /**

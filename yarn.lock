@@ -5694,6 +5694,11 @@ net@^1.0.2:
   resolved "https://registry.yarnpkg.com/net/-/net-1.0.2.tgz#d1757ec9a7fb2371d83cf4755ce3e27e10829388"
   integrity sha512-kbhcj2SVVR4caaVnGLJKmlk2+f+oLkjqdKeQlmUtz6nGzOpbcobwVIeSURNgraV/v3tlmGIX82OcPCl0K6RbHQ==
 
+networkdiagnosistool@^1.0.4:
+  version "1.0.4"
+  resolved "https://registry.yarnpkg.com/networkdiagnosistool/-/networkdiagnosistool-1.0.4.tgz#47d702718fcfe33786ec703e67d0d022030fc75a"
+  integrity sha512-zu8WoKB0JW5747DErLHpAL2UjFXj3GReD7q9YKXp0Tw6U+C8g/4F2gLAiFzNHkCXEX9+g8wpi191kMVGeB/F+A==
+
 next@^15.3.2:
   version "15.5.9"
   resolved "https://registry.yarnpkg.com/next/-/next-15.5.9.tgz#1b80d05865cc27e710fb4dcfc6fd9e726ed12ad4"

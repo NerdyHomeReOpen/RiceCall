@@ -22,7 +22,7 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session } from 'electron';
+import electron, { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session } from 'electron';
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
 import { initMainI18n, t } from './src/i18n.main.js';
@@ -30,6 +30,7 @@ import { connectSocket, disconnectSocket, setMainWindow } from './src/platform/s
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
 import * as AuthService from './src/auth.service.js';
 import * as DataService from './src/data.service.js';
+import { initNetworkService } from './src/network.service.js';
 import * as PopupLoader from './src/popupLoader.js';
 import Logger from './src/logger.js';
 import { LANGUAGES } from './src/constant.js';
@@ -286,6 +287,8 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     },
     trafficLightPosition: { x: -100, y: -100 },
   });
+
+  initNetworkService(mainWindow);
 
   if (app.isPackaged || !DEV) {
     appServe(mainWindow).then(() => {
@@ -1565,6 +1568,29 @@ app.on('ready', async () => {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('update-channel', channel);
     });
+  });
+
+  // Network Diagnosis Handlers
+  ipcMain.on('request-sfu-diagnosis', (event) => {
+    // Forward request to main window to get WebRTC info
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('get-sfu-diagnosis', { senderId: event.sender.id });
+    } else {
+      event.sender.send('sfu-diagnosis-response', null);
+    }
+  });
+
+  ipcMain.on('sfu-diagnosis-response', (_, data) => {
+    // Forward response to the popup (senderId is passed in data usually, or we broadcast/target)
+    // To simplify, we can target the sender from the request if we stored it, 
+    // or passing senderId back and forth.
+    // Let's expect the payload to contain targetSenderId
+    if (data && data.targetSenderId) {
+      const targetWebContents = electron.webContents.fromId(data.targetSenderId);
+      if (targetWebContents && !targetWebContents.isDestroyed()) {
+        targetWebContents.send('sfu-diagnosis-response', data.info);
+      }
+    }
   });
 
   // Disclaimer handlers
