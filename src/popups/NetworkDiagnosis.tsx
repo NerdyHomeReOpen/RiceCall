@@ -276,7 +276,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
     setActiveTab('logs');
     setStages(prev => prev.map(s => ({ ...s, status: 'pending' })));
 
-    addLog('Starting Network Diagnosis (v1.1.1)...');
+    addLog('Starting Network Diagnosis');
     updateStage('init', 'active');
 
     const env = ipc.env.get();
@@ -427,7 +427,6 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
          <div style={{ padding: '15px 20px', display: 'flex', flexDirection: 'column', height: '100%', gap: '5px', width: '100%', overflow: 'hidden' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2px' }}>
                 <h2 style={{ fontSize: '1.1rem' }}>{t('network-diagnosis')}</h2>
-                <div style={{ fontSize: '0.65rem', color: '#666' }}>v1.1.1</div>
             </div>
             
             {renderVisualProgress()}
