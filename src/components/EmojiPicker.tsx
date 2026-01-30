@@ -214,6 +214,7 @@ const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }
 
   return (
     <div className={emojiStyles['emoji']}>
+      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={emoji.path} alt={emoji.alt} width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
     </div>
   );

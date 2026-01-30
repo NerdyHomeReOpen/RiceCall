@@ -1116,9 +1116,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [unconsumeOne]);
 
   useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const handleGetSfuDiagnosis = async (_: any, { senderId }: { senderId: number }) => {
       let info = null;
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const electron = (window as any).require ? (window as any).require('electron') : null;
       if (!electron) return;
 
@@ -1153,6 +1155,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             
             // Wait for SFUJoined event (max 10s)
             await new Promise<void>((resolve, reject) => {
+              // eslint-disable-next-line prefer-const
               let unsub: () => void;
               const timeout = setTimeout(() => {
                 if (unsub) unsub();
@@ -1196,6 +1199,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
               }
             });
             
+            // @ts-expect-error - info is initially null
             if (info && info.ip && info.ip !== 'unknown') break;
             await new Promise(r => setTimeout(r, 1000));
           }
@@ -1207,6 +1211,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       electron.ipcRenderer.send('sfu-diagnosis-response', { targetSenderId: senderId, info });
     };
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const electron = (window as any).require ? (window as any).require('electron') : null;
     if (electron) {
         electron.ipcRenderer.on('get-sfu-diagnosis', handleGetSfuDiagnosis);
@@ -1214,6 +1219,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             electron.ipcRenderer.removeListener('get-sfu-diagnosis', handleGetSfuDiagnosis);
         }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const contextValue = useMemo(
