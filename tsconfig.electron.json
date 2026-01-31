@@ -10,8 +10,12 @@
     "sourceMap": true,
     "outDir": "build",
     "skipLibCheck": true,
+    "baseUrl": ".",
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@": ["./src"]
     }
   },
   "include": ["main.ts", "main/**/*"],
