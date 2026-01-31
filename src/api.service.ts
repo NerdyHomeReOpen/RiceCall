@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { token } from '../main.js';
-import { env } from './env.js';
-import Logger from './logger.js';
+import { getToken } from '@/auth.token';
+import { env } from '@/env';
+import Logger from '@/logger';
 
 // Node/Electron main shares the same HTTP core implementation as the web renderer.
 // This keeps request behavior (retries/envelope parsing/auth header) consistent across platforms.
@@ -22,7 +22,7 @@ function getClient(): ApiClient {
   if (!client) {
     client = createApiClient({
       baseUrl: env.API_URL,
-      tokenProvider: () => token,
+      tokenProvider: () => getToken(),
       maxRetry: 3,
       onLog: (level, message) => {
         if (level === 'error') new Logger('API').error(message);

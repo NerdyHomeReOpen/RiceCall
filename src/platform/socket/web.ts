@@ -1,7 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getIpcRenderer, isElectron } from '@/platform/ipc';
+import { getIpcRenderer } from '@/platform/ipc';
+import { isElectron } from '@/platform/isElectron';
+import Logger from '@/logger';
 import { SocketService, SocketPlatformBridge } from './SocketService';
 import { ClientToServerEventNames } from './constants';
+
+const logger = new Logger('Socket');
 
 // Bridge implementation for Web (Renderer Process)
 const webBridge: SocketPlatformBridge = {
@@ -11,21 +15,15 @@ const webBridge: SocketPlatformBridge = {
     ipc.__bridgeInitialized = true;
     
     ipc.onBroadcast((channel: string, event: any, ...args: any[]) => {
-      console.log(`[DEBUG.SocketBridge] Received broadcast: channel=${channel}, isRemote=${event?.isRemote}, _isSystemSending=${ipc._isSystemSending}`);
-      
       // event is { isRemote: boolean }
       // Filter out messages from other tabs or server-pushed events
       if (event?.isRemote || ipc._isSystemSending) {
-        console.log(`[DEBUG.SocketBridge] Skipping broadcast: reason=${event?.isRemote ? 'remote' : 'system'}`);
         return;
       }
       
       if (ClientToServerEventNames.includes(channel)) {
-        console.log(`[DEBUG.SocketBridge] Forwarding to Server: channel=${channel}`, args);
         callback(channel, ...args);
-      } else {
-        console.log(`[DEBUG.SocketBridge] Not a server event: channel=${channel}`);
-      }      
+      }   
     });
   },
 
@@ -59,7 +57,7 @@ const webBridge: SocketPlatformBridge = {
   },
 
   log(level, message) {
-    console[level](`[Socket.${level.toUpperCase()}] ${message}`);
+    logger[level as 'info' | 'warn' | 'error'](message);
   }
 };
 

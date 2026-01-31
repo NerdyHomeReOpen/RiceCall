@@ -2,7 +2,8 @@
  * Auth Platform Factory
  */
 
-import { isElectron, getIpcRenderer } from '@/platform/ipc';
+import { isElectron } from '@/platform/isElectron';
+import { getIpcRenderer } from '@/platform/ipc';
 import { createElectronAuthController } from './electron';
 import { createWebAuthController } from './web';
 import type { AuthController } from './types';

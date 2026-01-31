@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { FaCheckCircle, FaArrowRight, FaSpinner, FaNetworkWired, FaServer, FaCloud, FaWindowMaximize, FaTimes } from 'react-icons/fa';
 import ipc from '@/ipc';
-import { isElectron } from '@/platform/ipc';
+import { isElectron } from '@/platform/isElectron';
 
 import styles from '@/styles/popup.module.css';
 

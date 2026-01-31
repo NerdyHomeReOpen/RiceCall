@@ -122,7 +122,7 @@ export function createWebIpcRenderer(
  * Uses BroadcastChannel API for cross-tab communication.
  */
 export function createWebBroadcast(channelName: string = 'ricecall_ipc'): {
-  broadcast: (channel: string, ...args: any[]) => void;
+  broadcast: (channel: string, event: any, ...args: any[]) => void;
   onBroadcast: (callback: (channel: string, event: any, ...args: any[]) => void) => () => void;
 } {
   const bc = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(channelName) : null;
@@ -135,24 +135,34 @@ export function createWebBroadcast(channelName: string = 'ricecall_ipc'): {
   });
 
   return {
-    broadcast: (channel: string, ...args: any[]): void => {
-      
+    broadcast: (channel: string, event: any, ...args: any[]): void => {
       try {
         // Send to other tabs (may fail if args contains functions)
-        bc?.postMessage({ channel, args });
-      } catch {
-      }
-
-      localListeners.forEach((cb) => {
-        try {
-          if (typeof window !== 'undefined' && localStorage.getItem('ricecall:debug:ipc') === '1') {
-            console.log(`[WebIPC.Broadcast.Local] ${channel}`, args);
+        // Skip if event is marked as local-only
+        if (bc && !event?.localOnly) {
+          try {
+            bc.postMessage({ channel, event: { ...event, isRemote: true }, args });
+          } catch (e) {
+            // Ignore clone errors (e.g. functions in args)
+            console.warn('[WebIPC] Broadcast serialization failed:', e);
           }
-          cb(channel, { isRemote: false }, ...args);
-        } catch (e) {
-          console.error(`[WebIPC] Error in listener for ${channel}:`, e);
         }
-      });
+
+        localListeners.forEach((cb) => {
+          try {
+            if (typeof window !== 'undefined' && localStorage.getItem('ricecall:debug:ipc') === '1') {
+              console.log(`[WebIPC.Broadcast.Local] ${channel}`, args);
+            }
+            // Merge default event props with passed event props
+            const eventProps = { isRemote: false, ...event };
+            cb(channel, eventProps, ...args);
+          } catch (e) {
+            console.error(`[WebIPC] Error in listener for ${channel}:`, e);
+          }
+        });
+      } catch (e) {
+        console.error('[WebIPC] Broadcast failed:', e);
+      }
     },
     onBroadcast: (callback: (channel: string, event: any, ...args: any[]) => void): (() => void) => {
       localListeners.add(callback);

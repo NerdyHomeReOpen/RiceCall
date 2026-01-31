@@ -6,7 +6,8 @@
 
 export type { WindowController } from './types';
 import type { WindowController } from './types';
-import { isElectron, getIpcRenderer } from '@/platform/ipc';
+import { isElectron } from '@/platform/isElectron';
+import { getIpcRenderer } from '@/platform/ipc';
 import { createElectronWindowController } from './electron';
 import { createWebWindowController } from './web';
 

@@ -42,15 +42,12 @@ export interface DataService {
   searchUser(params: { query: string }): Promise<Types.User[]>;
 }
 
-function toQuery(params: Record<string, unknown>): string {
-  const filtered: Record<string, string> = {};
-  for (const [k, v] of Object.entries(params)) {
-    if (v !== undefined && v !== null) {
-      filtered[k] = String(v);
-    }
-  }
-  return new URLSearchParams(filtered).toString();
+// eslint-disable-next-line
+function toQuery(params: any): string {
+  return new URLSearchParams(params).toString();
 }
+
+
 
 /**
  * Create a DataService instance using the provided ApiClient.

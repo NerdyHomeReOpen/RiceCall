@@ -6,7 +6,8 @@
 
 export type { SocketClient } from './types';
 import type { SocketClient } from './types';
-import { isElectron, getIpcRenderer } from '@/platform/ipc';
+import { isElectron } from '@/platform/isElectron';
+import { getIpcRenderer } from '@/platform/ipc';
 import { createElectronSocketClient } from './electron';
 import { createWebSocketClient } from './web';
 

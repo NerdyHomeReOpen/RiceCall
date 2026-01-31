@@ -1,4 +1,14 @@
-import log from 'electron-log';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { isElectron } from '@/platform/isElectron';
+
+// Lazy-load electron-log to avoid bundling fs/path in web builds
+let electronLog: any = null;
+
+if (isElectron()) {
+  try {
+    electronLog = (window as any).require('electron-log');
+  } catch {}
+}
 
 /**
  * Logger class
@@ -11,12 +21,16 @@ export class Logger {
     this.origin = origin;
   }
 
+  private get log() {
+    return electronLog || console;
+  }
+
   /**
    * Log an info message
    * @param message - The message to log
    */
   info(message: string) {
-    log.info(`[${this.origin}] ${message}`);
+    this.log.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -24,7 +38,7 @@ export class Logger {
    * @param message - The message to log
    */
   command(message: string) {
-    log.info(`[${this.origin}] ${message}`);
+    this.log.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -32,7 +46,7 @@ export class Logger {
    * @param message - The message to log
    */
   success(message: string) {
-    log.info(`[${this.origin}] ${message}`);
+    this.log.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -40,7 +54,7 @@ export class Logger {
    * @param message - The message to log
    */
   warn(message: string) {
-    log.warn(`[${this.origin}] ${message}`);
+    this.log.warn(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -48,7 +62,7 @@ export class Logger {
    * @param message - The message to log
    */
   error(message: string) {
-    log.error(`[${this.origin}] ${message}`);
+    this.log.error(`[${this.origin}] ${message}`);
   }
 }
 

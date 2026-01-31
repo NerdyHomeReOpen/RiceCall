@@ -25,6 +25,7 @@ const { autoUpdater } = ElectronUpdater;
 import electron, { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session } from 'electron';
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
+import { getToken, setToken } from './src/auth.token.js';
 import { initMainI18n, t } from './src/i18n.main.js';
 import { connectSocket, disconnectSocket, setMainWindow } from './src/platform/socket/electron-main.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
@@ -140,7 +141,6 @@ export const APP_TRAY_ICON = {
 };
 
 // Variables
-export let token: string = '';
 export let isLogin: boolean = false;
 export let isUpdateNotified: boolean = false;
 export let checkForUpdatesInterval: NodeJS.Timeout | null = null;
@@ -647,7 +647,7 @@ export function setTrayDetail() {
       type: 'normal',
       enabled: isLogin,
       click: () => {
-        token = '';
+        setToken('');
         isLogin = false;
         mainWindow?.reload();
         mainWindow?.hide();
@@ -696,7 +696,7 @@ export function configureReactDevTools() {
 
 app.on('ready', async () => {
   // Load env
-  loadEnv(store.get('server', 'prod'));
+  await loadEnv(store.get('server', 'prod'));
 
   // Initialize i18n
   initMainI18n(store.get('language'));
@@ -726,11 +726,11 @@ app.on('ready', async () => {
     return await AuthService.login(formData)
       .then((res) => {
         if (res.success) {
-          token = res.token;
+          setToken(res.token);
           isLogin = true;
           mainWindow?.showInactive();
           authWindow?.hide();
-          connectSocket(token);
+          connectSocket(res.token);
           setTrayDetail();
         }
         return res;
@@ -743,7 +743,7 @@ app.on('ready', async () => {
 
   ipcMain.handle('auth-logout', async () => {
     new Logger('Auth').info('Logout: starting...');
-    token = '';
+    setToken('');
     isLogin = false;
     // Close popups and disconnect socket first
     closePopups();
@@ -776,11 +776,11 @@ app.on('ready', async () => {
     return await AuthService.autoLogin(t)
       .then((res) => {
         if (res.success) {
-          token = res.token;
+          setToken(res.token);
           isLogin = true;
           mainWindow?.showInactive();
           authWindow?.hide();
-          connectSocket(token);
+          connectSocket(res.token);
           setTrayDetail();
         }
         return res;
@@ -832,7 +832,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.handle('data-user-hot-reload', async (_, params: { userId: string }) => {
-    if (!token) return null;
+    if (!getToken()) return null;
     return await DataService.user(params);
   });
 

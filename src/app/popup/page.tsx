@@ -13,7 +13,7 @@ import { renderPopup } from '@/platform/popup/popupComponents.generated';
 import SocketManager from '@/components/SocketManager';
 
 import header from '@/styles/header.module.css';
-import { isElectron } from '@/platform/ipc';
+import { isElectron } from '@/platform/isElectron';
 
 async function hydrateUserInfoInitialData(initialData: any): Promise<any> {
   // UserInfo/UserSetting popups expect `target` and `targetServers`.
