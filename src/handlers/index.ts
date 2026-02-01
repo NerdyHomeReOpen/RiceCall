@@ -5,13 +5,36 @@
 import type { HandlerRegistration } from '@/platform/ipc/types';
 import { createDataHandlers } from './data.handler';
 import { createAuthHandlers } from './auth.handler';
-import { createSettingsHandlers } from './settings.handler';
 import { createAccountsHandlers } from './accounts.handler';
 import { createLanguageHandlers } from './language.handler';
 import { createThemesHandlers } from './themes.handler';
 import { createEnvHandlers } from './env.handler';
 import { createElectronOnlyHandlers } from './electron-only.handler';
 import { createNetworkHandlers } from './network.handler';
+
+import { WebIpcRouter } from '@/platform/ipc/router';
+import { registerSharedSettingsHandlers } from '@/platform/ipc/handlers/shared/settings';
+import { SETTINGS_DEFAULTS } from '@/platform/ipc/handlers/shared/defaults';
+
+/**
+ * Create settings handlers for Web using shared logic.
+ */
+function createWebSettingsHandlers(): HandlerRegistration {
+  const router = new WebIpcRouter();
+  return router.createWebHandlers((ipc, storage, broadcast) => {
+    const getSettings = () => {
+      // eslint-disable-next-line
+      const result : any = {};
+      for (const key of Object.keys(SETTINGS_DEFAULTS)) {
+        // eslint-disable-next-line
+        result[key] = storage.get(key) ?? (SETTINGS_DEFAULTS as any)[key];
+      }
+      return result;
+    };
+
+    registerSharedSettingsHandlers(ipc, storage, broadcast, getSettings);
+  });
+}
 
 /**
  * Merge multiple HandlerRegistration objects.
@@ -40,7 +63,7 @@ export function createAllHandlers(): HandlerRegistration {
   return mergeRegistrations(
     createDataHandlers(),
     createAuthHandlers(),
-    createSettingsHandlers(),
+    createWebSettingsHandlers(),
     createAccountsHandlers(),
     createLanguageHandlers(),
     createThemesHandlers(),
@@ -54,7 +77,7 @@ export function createAllHandlers(): HandlerRegistration {
 export {
   createDataHandlers,
   createAuthHandlers,
-  createSettingsHandlers,
+  createWebSettingsHandlers as createSettingsHandlers,
   createAccountsHandlers,
   createLanguageHandlers,
   createThemesHandlers,

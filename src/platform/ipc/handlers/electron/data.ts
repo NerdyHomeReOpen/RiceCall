@@ -1,6 +1,6 @@
 import { IpcMain } from 'electron';
-import * as DataService from './data.service';
-import { getToken } from './auth.token';
+import * as DataService from '@/data.service';
+import { getToken } from '@/auth.token';
 
 export function registerDataHandlers(ipcMain: IpcMain) {
   // Data handlers

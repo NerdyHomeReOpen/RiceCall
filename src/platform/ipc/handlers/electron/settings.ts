@@ -1,8 +1,8 @@
 import { app, BrowserWindow, IpcMain } from 'electron';
 import Store from 'electron-store';
 import fontList from 'font-list';
-import * as Types from './types';
-import { registerSharedSettingsHandlers } from './settings.shared.ipc';
+import * as Types from '@/types';
+import { registerSharedSettingsHandlers } from '../shared/settings';
 
 export interface SettingsDependencies {
   store: Store<Types.StoreType>;
@@ -16,8 +16,16 @@ export interface SettingsDependencies {
 export function registerSettingsHandlers(ipcMain: IpcMain, deps: SettingsDependencies) {
   const { store, setAutoLaunch, isAutoLaunchEnabled, startCheckForUpdates, stopCheckForUpdates, getSettings } = deps;
 
-  // 1. Register Shared Handlers (Pure Logic)
-  registerSharedSettingsHandlers(ipcMain, store, getSettings);
+  // Broadcast to all windows
+  // eslint-disable-next-line
+  const broadcast = (channel: string, value: any) => {
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(channel, value);
+    });
+  };
+
+  // 1. Register Shared Handlers
+  registerSharedSettingsHandlers(ipcMain, store, broadcast, getSettings);
 
   // 2. Register Electron-Only Handlers (Side Effects / Native APIs)
 
@@ -27,9 +35,7 @@ export function registerSettingsHandlers(ipcMain: IpcMain, deps: SettingsDepende
 
   ipcMain.on('set-auto-launch', (_, enable) => {
     setAutoLaunch(enable ?? false);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('auto-launch', enable);
-    });
+    broadcast('auto-launch', enable);
   });
 
   ipcMain.on('set-always-on-top', (_, enable) => {
@@ -45,23 +51,15 @@ export function registerSettingsHandlers(ipcMain: IpcMain, deps: SettingsDepende
     event.returnValue = fonts;
   });
 
-  ipcMain.on('get-record-save-path', (event) => {
-    event.returnValue = store.get('recordSavePath');
-  });
-
   ipcMain.on('set-record-save-path', (_, path) => {
     store.set('recordSavePath', path ?? app.getPath('documents'));
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('record-save-path', path);
-    });
+    broadcast('record-save-path', path);
   });
 
   ipcMain.on('set-auto-check-for-updates', (_, enable) => {
     store.set('autoCheckForUpdates', enable ?? false);
     if (enable) startCheckForUpdates();
     else stopCheckForUpdates();
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('auto-check-for-updates', enable);
-    });
+    broadcast('auto-check-for-updates', enable);
   });
 }
