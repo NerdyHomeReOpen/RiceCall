@@ -9,12 +9,16 @@ import { createWebIpcRenderer, createWebStorage, createWebBroadcast } from './we
 import { getApiClient } from '@/platform/api';
 import { createAllHandlers } from '@/handlers';
 import { isElectron } from '@/platform/isElectron';
+import { loadEnv } from '@/env';
 
 let ipcRendererInstance: IpcRenderer | null = null;
 let webContext: HandlerContext | null = null;
 let broadcastListeners: Map<string, Set<(...args: any[]) => void>> | null = null;
 
 function initWebIpc(): IpcRenderer {
+  // Fix: Ensure environment variables are loaded for Web
+  loadEnv();
+
   const storage = createWebStorage();
   const { broadcast, onBroadcast } = createWebBroadcast();
   const api = getApiClient();

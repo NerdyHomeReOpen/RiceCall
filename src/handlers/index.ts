@@ -3,8 +3,6 @@
  */
 
 import type { HandlerRegistration } from '@/platform/ipc/types';
-import { createDataHandlers } from './data.handler';
-import { createAuthHandlers } from './auth.handler';
 import { createAccountsHandlers } from './accounts.handler';
 import { createLanguageHandlers } from './language.handler';
 import { createThemesHandlers } from './themes.handler';
@@ -14,7 +12,31 @@ import { createNetworkHandlers } from './network.handler';
 
 import { WebIpcRouter } from '@/platform/ipc/router';
 import { registerSharedSettingsHandlers } from '@/platform/ipc/handlers/shared/settings';
+import { registerSharedDataHandlers } from '@/platform/ipc/handlers/shared/data';
+import { registerAuthIpcHandlers } from '@/platform/ipc/handlers/shared/auth';
+import { createWebAuthProvider } from '@/platform/ipc/handlers/web/auth';
 import { SETTINGS_DEFAULTS } from '@/platform/ipc/handlers/shared/defaults';
+
+/**
+ * Create auth handlers for Web using shared logic.
+ */
+function createWebAuthHandlers(): HandlerRegistration {
+  const router = new WebIpcRouter();
+  return router.createWebHandlers((ipc, storage) => {
+    const provider = createWebAuthProvider(storage);
+    registerAuthIpcHandlers(ipc, provider);
+  });
+}
+
+/**
+ * Create data handlers for Web using shared logic.
+ */
+function createWebDataHandlers(): HandlerRegistration {
+  const router = new WebIpcRouter();
+  return router.createWebHandlers((ipc) => {
+    registerSharedDataHandlers(ipc);
+  });
+}
 
 /**
  * Create settings handlers for Web using shared logic.
@@ -61,8 +83,8 @@ function mergeRegistrations(...registrations: HandlerRegistration[]): HandlerReg
  */
 export function createAllHandlers(): HandlerRegistration {
   return mergeRegistrations(
-    createDataHandlers(),
-    createAuthHandlers(),
+    createWebDataHandlers(),
+    createWebAuthHandlers(),
     createWebSettingsHandlers(),
     createAccountsHandlers(),
     createLanguageHandlers(),
@@ -75,8 +97,8 @@ export function createAllHandlers(): HandlerRegistration {
 
 // Re-export individual creators for Electron to override specific handlers
 export {
-  createDataHandlers,
-  createAuthHandlers,
+  createWebDataHandlers as createDataHandlers,
+  createWebAuthHandlers as createAuthHandlers,
   createWebSettingsHandlers as createSettingsHandlers,
   createAccountsHandlers,
   createLanguageHandlers,

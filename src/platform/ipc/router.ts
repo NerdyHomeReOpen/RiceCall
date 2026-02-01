@@ -4,7 +4,6 @@ import type { HandlerContext, HandlerRegistration } from './types';
 
 /**
  * Universal IPC Router interface mimicking Electron's ipcMain.
- * Allows writing shared IPC logic that works on both Web and Electron.
  */
 export interface IpcRouter {
   on(channel: string, listener: (event: any, ...args: any[]) => void): void;
@@ -40,32 +39,22 @@ export class WebIpcRouter implements IpcRouter {
 
   /**
    * Adapts a shared registration function to the Web IPC model.
-   * 
-   * This is the bridge that allows Electron-style code:
-   *   ipc.on('ch', (event, val) => { storage.set(key, val); broadcast('ch', val); })
-   * To work with Web-style handlers:
-   *   (ctx, val) => { ctx.storage.set(key, val); ctx.broadcast('ch', val); }
    */
   public createWebHandlers(
     registrar: (ipc: IpcRouter, storage: any, broadcast: any, getSettings: any) => void
   ): HandlerRegistration {
     
-    // We create a "Recording Router" that captures the calls to .on()
     const recordingRouter: IpcRouter = {
       on: (channel, listener) => {
-        // Create a Web Handler that adapts (ctx, ...args) to (event, ...args)
         const webHandler = (ctx: HandlerContext, ...args: any[]) => {
-          // Mock Electron Event
           const event = { returnValue: undefined };
+          // Note: We need to pass these to the listener if we want them available
+          // But our shared handlers use the ones from the registrar closure.
+          // So we must satisfy the registrar's arguments.
           
-          // Execute the listener, but we need to satisfy the 'storage' and 'broadcast'
-          // dependencies that were passed to the registrar.
-          // This is handled by the closure in registrar call below.
           listener(event, ...args);
-          
           return event.returnValue;
         };
-
         this.registration.sync![channel] = webHandler;
         this.registration.send![channel] = webHandler;
       },
@@ -76,49 +65,41 @@ export class WebIpcRouter implements IpcRouter {
       }
     };
 
-    // This is the magic part:
-    // We call the registrar, providing "Dynamic Adapters" for storage and broadcast.
-    // These adapters use a global pointer or a shared state to find the current 'ctx'.
+    // To make the registrar's closure-bound storage/broadcast work,
+    // we use a "Proxy" that always looks up the current context of the handler.
+    // However, since Web IPC handlers are executed one by one, we can use a simpler approach.
     
-    let currentCtx: HandlerContext | null = null;
+    let activeCtx: HandlerContext | null = null;
 
-    const dynamicStorage = {
-      get: (key: string) => currentCtx?.storage.get(key),
-      set: (key: string, val: any) => currentCtx?.storage.set(key, val),
+    const proxyStorage = {
+      get: (key: string) => activeCtx?.storage.get(key),
+      set: (key: string, val: any) => activeCtx?.storage.set(key, val),
+      delete: (key: string) => activeCtx?.storage.delete(key),
     };
 
-    const dynamicBroadcast = (channel: string, val: any) => currentCtx?.broadcast(channel, val);
+    const proxyBroadcast = (ch: string, val: any) => activeCtx?.broadcast(ch, val);
     
-    const dynamicGetSettings = () => {
-      // In Web mode, get-system-settings logic usually lives here
-      // Let's implement it by reading all keys from currentCtx
-      if (!currentCtx) return {};
-      // This part might need to be more specific depending on the needs
-      return (this.registration.sync as any)['get-system-settings']?.(currentCtx);
+    const proxyGetSettings = () => {
+      if (!activeCtx) return {};
+      return (this.registration.sync as any)['get-system-settings']?.(activeCtx);
     };
 
-    // Wrap the listeners to capture the context
-    const originalOn = recordingRouter.on;
-    recordingRouter.on = (channel, listener) => {
-      const wrappedListener = (event: any, ...args: any[]) => {
-        currentCtx = (recordingRouter as any)._lastCtx; // Set pointer
-        listener(event, ...args);
-        currentCtx = null; // Clear
-      };
-      originalOn(channel, wrappedListener);
-    };
+    // Register all channels
+    registrar(recordingRouter, proxyStorage, proxyBroadcast, proxyGetSettings);
 
-    // Execute the registrar once to record all handlers
-    registrar(recordingRouter, dynamicStorage, dynamicBroadcast, dynamicGetSettings);
-
-    // Now wrap the generated registration to inject the ctx
+    // Wrap all registered handlers to set the activeCtx
     const wrap = (handlers: any) => {
       if (!handlers) return;
       for (const ch of Object.keys(handlers)) {
         const original = handlers[ch];
         handlers[ch] = (ctx: HandlerContext, ...args: any[]) => {
-          (recordingRouter as any)._lastCtx = ctx;
-          return original(ctx, ...args);
+          activeCtx = ctx;
+          try {
+            return original(ctx, ...args);
+          } finally {
+            // We don't clear it immediately to avoid issues with sync return,
+            // but in Web, the next handler will overwrite it anyway.
+          }
         };
       }
     };
@@ -130,7 +111,6 @@ export class WebIpcRouter implements IpcRouter {
     return this.registration;
   }
 
-  // Not used directly in this new flow, but kept for interface completeness
   on() {}
   handle() {}
   getRegistration() { return this.registration; }

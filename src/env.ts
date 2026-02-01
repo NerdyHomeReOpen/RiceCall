@@ -3,7 +3,11 @@ import { z } from 'zod';
 import { isElectron } from '@/platform/isElectron';
 import Logger from '@/logger';
 
-export let env: Record<string, string> = {};
+export let env: Record<string, string> = {
+  API_URL: '',
+  WS_URL: '',
+  CROWDIN_DISTRIBUTION_HASH: '',
+};
 
 const EnvSchema = z.object({
   API_URL: z.string(),
@@ -11,6 +15,7 @@ const EnvSchema = z.object({
   CROWDIN_DISTRIBUTION_HASH: z.string().optional(),
   REACT_DEV_TOOLS_PATH: z.string().optional(),
 });
+
 
 export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
   let envLoaded: Record<string, string> = {};

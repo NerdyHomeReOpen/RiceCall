@@ -2,6 +2,7 @@ import { app, BrowserWindow, IpcMain } from 'electron';
 import Store from 'electron-store';
 import fontList from 'font-list';
 import * as Types from '@/types';
+import { ElectronIpcRouter } from '@/platform/ipc/router';
 import { registerSharedSettingsHandlers } from '../shared/settings';
 
 export interface SettingsDependencies {
@@ -16,6 +17,8 @@ export interface SettingsDependencies {
 export function registerSettingsHandlers(ipcMain: IpcMain, deps: SettingsDependencies) {
   const { store, setAutoLaunch, isAutoLaunchEnabled, startCheckForUpdates, stopCheckForUpdates, getSettings } = deps;
 
+  const router = new ElectronIpcRouter(ipcMain);
+
   // Broadcast to all windows
   // eslint-disable-next-line
   const broadcast = (channel: string, value: any) => {
@@ -25,7 +28,7 @@ export function registerSettingsHandlers(ipcMain: IpcMain, deps: SettingsDepende
   };
 
   // 1. Register Shared Handlers
-  registerSharedSettingsHandlers(ipcMain, store, broadcast, getSettings);
+  registerSharedSettingsHandlers(router, store, broadcast, getSettings);
 
   // 2. Register Electron-Only Handlers (Side Effects / Native APIs)
 

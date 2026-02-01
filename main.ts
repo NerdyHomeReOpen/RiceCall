@@ -29,12 +29,12 @@ import { getToken, setToken } from './src/auth.token.js';
 import { initMainI18n, t } from './src/i18n.main.js';
 import { connectSocket, disconnectSocket, setMainWindow } from './src/platform/socket/electron-main.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
-import * as AuthService from './src/auth.service.js';
 import * as DataService from './src/data.service.js';
 import { initNetworkService } from './src/network.service.js';
 import * as PopupLoader from './src/platform/popup/popupLoader.js';
 import { registerSettingsHandlers } from './src/platform/ipc/handlers/electron/settings.js';
 import { registerDataHandlers } from './src/platform/ipc/handlers/electron/data.js';
+import { registerAuthHandlers } from './src/platform/ipc/handlers/electron/auth.js';
 import Logger from './src/logger.js';
 import { LANGUAGES } from './src/constant.js';
 import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';
@@ -706,6 +706,21 @@ app.on('ready', async () => {
   // Register data handlers
   registerDataHandlers(ipcMain);
 
+  // Register auth handlers
+  registerAuthHandlers(ipcMain, {
+    store,
+    isLogin: (val) => (val !== undefined ? (isLogin = val) : isLogin),
+    connectSocket,
+    disconnectSocket,
+    setTrayDetail,
+    getMainWindow: () => mainWindow,
+    getAuthWindow: () => authWindow,
+    createPopup,
+    closePopups,
+    BASE_URI,
+    DEV,
+  });
+
   // Initialize popup loader with system settings getter
   PopupLoader.initPopupLoader({
     data: DataService,
@@ -734,76 +749,6 @@ app.on('ready', async () => {
 
   ipcMain.on('exit', () => {
     app.exit();
-  });
-
-  // Auth handlers
-  ipcMain.handle('auth-login', async (_, formData: { account: string; password: string }) => {
-    return await AuthService.login(formData)
-      .then((res) => {
-        if (res.success) {
-          setToken(res.token);
-          isLogin = true;
-          mainWindow?.showInactive();
-          authWindow?.hide();
-          connectSocket(res.token);
-          setTrayDetail();
-        }
-        return res;
-      })
-      .catch((error) => {
-        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
-        return { success: false };
-      });
-  });
-
-  ipcMain.handle('auth-logout', async () => {
-    new Logger('Auth').info('Logout: starting...');
-    setToken('');
-    isLogin = false;
-    // Close popups and disconnect socket first
-    closePopups();
-    disconnectSocket();
-    // Hide main window
-    new Logger('Auth').info('Logout: hiding mainWindow...');
-    mainWindow?.hide();
-    new Logger('Auth').info(`Logout: mainWindow visible = ${mainWindow?.isVisible()}`);
-    // Load auth page explicitly (not reload, which might load wrong URL)
-    new Logger('Auth').info('Logout: loading auth page in authWindow...');
-    const authUrl = DEV ? `${BASE_URI}/auth` : `${BASE_URI}/auth.html`;
-    new Logger('Auth').info(`Logout: authUrl = ${authUrl}`);
-    authWindow?.loadURL(authUrl);
-    authWindow?.show();
-    new Logger('Auth').info(`Logout: authWindow visible = ${authWindow?.isVisible()}`);
-    // Note: We do NOT reload mainWindow here to avoid having two active windows
-    // The mainWindow will be reloaded when user logs in again via auth-login
-    setTrayDetail();
-    new Logger('Auth').info('Logout: done');
-  });
-
-  ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string; locale: string }) => {
-    return await AuthService.register(formData).catch((error: any) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
-      return { success: false };
-    });
-  });
-
-  ipcMain.handle('auth-auto-login', async (_, t: string) => {
-    return await AuthService.autoLogin(t)
-      .then((res) => {
-        if (res.success) {
-          setToken(res.token);
-          isLogin = true;
-          mainWindow?.showInactive();
-          authWindow?.hide();
-          connectSocket(res.token);
-          setTrayDetail();
-        }
-        return res;
-      })
-      .catch((error) => {
-        createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
-        return { success: false };
-      });
   });
 
   ipcMain.on('save-record', (_, record: ArrayBuffer) => {
