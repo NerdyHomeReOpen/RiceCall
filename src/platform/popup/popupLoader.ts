@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type * as Types from './types/index.js';
+import type * as Types from '@/types/index';
 
 /**
  * Data fetcher interface - injected by the caller
