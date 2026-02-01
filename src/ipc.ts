@@ -20,7 +20,7 @@ import { getDataClient, type DataClient } from '@/platform/data';
 import { getPopupController } from '@/platform/popup';
 import { getSocketClient, type SocketClient } from '@/platform/socket';
 import { getWindowController, type WindowController } from '@/platform/window';
-import { getAuthController } from '@/platform/auth';
+import { AuthController, getAuthController } from '@/platform/auth';
 
 // Lazy-initialized singletons
 let ipc: IpcRenderer | null = null;
@@ -49,14 +49,10 @@ function getWindow(): WindowController {
   return windowController;
 }
 
-function getAuth(): any {
+function getAuth(): AuthController {
   if (!authController) authController = getAuthController();
   return authController;
 }
-
-// ============================================================================
-// IPC Facade Object
-// ============================================================================
 
 // ============================================================================
 // IPC Facade Object

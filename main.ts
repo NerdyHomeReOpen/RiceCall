@@ -32,7 +32,7 @@ import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from
 import * as AuthService from './src/auth.service.js';
 import * as DataService from './src/data.service.js';
 import { initNetworkService } from './src/network.service.js';
-import * as PopupLoader from './src/popupLoader.js';
+import * as PopupLoader from './src/platform/popup/popupLoader.js';
 import Logger from './src/logger.js';
 import { LANGUAGES } from './src/constant.js';
 import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';

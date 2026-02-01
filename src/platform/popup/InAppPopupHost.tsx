@@ -8,7 +8,6 @@ import type * as Types from '@/types';
 import { POPUP_SIZES, POPUP_HEADERS, POPUP_TITLE_KEYS } from '@/popup.config';
 
 import { closeInAppPopup, focusInAppPopup, minimizeInAppPopup, restoreInAppPopup, subscribeInAppPopups, type InAppPopupInstance } from './inAppPopupHost';
-import { hydratePopupData, needsHydration } from './webPopupLoader';
 import { renderPopup } from './popupComponents.generated';
 
 type Pos = { x: number; y: number };
@@ -81,12 +80,7 @@ function clamp(n: number, min: number, max: number) {
 /**
  * Render the popup component if data is ready.
  */
-function renderPopupNode(p: InAppPopupInstance, isReady: boolean) {
-  // If hydration is needed but not yet done, render nothing (or a spinner if desired)
-  if (!isReady) {
-    return null;
-  }
-
+function renderPopupNode(p: InAppPopupInstance) {
   // Use the centralized popup renderer
   return renderPopup(p.type, p.id, p.initialData);
 }
@@ -95,9 +89,6 @@ export function InAppPopupHost() {
   const { t } = useTranslation();
   const [popups, setPopups] = useState<InAppPopupInstance[]>([]);
   const [debugEnabled, setDebugEnabled] = useState(false);
-
-  // Hold hydrated data separately to avoid a setState loop (popups -> hydrate -> setPopups -> ...).
-  const [hydratedData, setHydratedData] = useState<Record<string, any>>({});
 
   // Stable per-popup positions
   const positionsRef = useRef<Record<string, Pos>>({});
@@ -112,45 +103,6 @@ export function InAppPopupHost() {
       setDebugEnabled(false);
     }
   }, []);
-
-  // Hydrate all popups that need data using the unified webPopupLoader
-  useEffect(() => {
-    let cancelled = false;
-
-    // Find popups that have a loader and haven't been hydrated yet
-    const popupsNeedingHydration = popups.filter((p) => {
-      const hasLoaderDefined = needsHydration(p.type);
-      const alreadyHydrated = hydratedData[p.id] !== undefined;
-      return hasLoaderDefined && !alreadyHydrated;
-    });
-
-    if (popupsNeedingHydration.length === 0) return;
-
-    const tasks = popupsNeedingHydration.map(async (p) => {
-      const hydrated = await hydratePopupData(p.type, p.initialData as Record<string, unknown>);
-      return { id: p.id, hydrated };
-    });
-
-    (async () => {
-      const results = await Promise.all(tasks);
-      if (cancelled) return;
-      setHydratedData((prev) => {
-        let changed = false;
-        const next = { ...prev };
-        for (const r of results) {
-          if (next[r.id] !== r.hydrated) {
-            next[r.id] = r.hydrated;
-            changed = true;
-          }
-        }
-        return changed ? next : prev;
-      });
-    })();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [popups, hydratedData]);
 
   const zOrder = useMemo(() => popups.map((p) => p.id), [popups]);
 
@@ -195,14 +147,8 @@ export function InAppPopupHost() {
           positionsRef.current[key] = pos;
 
           const z = zOrder.indexOf(p.id) + 1;
-          const effectiveData = hydratedData[p.id] ?? p.initialData;
+          const effectiveData = p.initialData;
           const popupTitle = getPopupTitle(p.type, effectiveData, t);
-
-          // Generic readiness check:
-          // 1. If it doesn't need hydration, it's always ready.
-          // 2. If it needs hydration, it's ready when we have data in hydratedData map.
-          const requiresHydration = needsHydration(p.type);
-          const isReady = !requiresHydration || hydratedData[p.id] !== undefined;
 
           return (
             <DraggableWindow
@@ -221,7 +167,7 @@ export function InAppPopupHost() {
               <PopupErrorBoundary popupId={p.id} onClose={() => closeInAppPopup(p.id)}>
                 {/* Allow popup components to call `ipc.window.close()` in web by providing a current-popup id hint. */}
                 <CurrentPopupIdScope popupId={p.id}>
-                {renderPopupNode({ ...p, initialData: effectiveData }, isReady)}
+                {renderPopupNode({ ...p, initialData: effectiveData })}
                 </CurrentPopupIdScope>
               </PopupErrorBoundary>
             </DraggableWindow>
@@ -242,7 +188,7 @@ export function InAppPopupHost() {
           }}
         >
           {minimized.map((p) => {
-            const effectiveData = hydratedData[p.id] ?? p.initialData;
+            const effectiveData = p.initialData;
             const title = getPopupTitle(p.type, effectiveData, t);
             return (
               <div
