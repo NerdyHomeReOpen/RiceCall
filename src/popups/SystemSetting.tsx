@@ -175,7 +175,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
   };
 
   const handleDisableAllSoundEffectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserSettings((prev) => ({ ...prev, disableAllSoundEffect: e.target.checked }));
+    setSystemSettings((prev) => ({ ...prev, disableAllSoundEffect: e.target.checked }));
   };
 
   const handleEnableEnterVoiceChannelSoundChange = () => {
