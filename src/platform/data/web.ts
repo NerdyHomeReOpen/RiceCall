@@ -20,6 +20,9 @@ function wrapWithErrorHandling(api: DataServiceApiClient): DataServiceApiClient 
   return {
     get: async <T>(endpoint: string): Promise<T | null> => {
       try {
+        if (endpoint.includes('memberInvitation')) {
+          console.log('[WebDataClient] GET memberInvitation:', endpoint);
+        }
         return await api.get<T>(endpoint);
       } catch (e) {
         logger.warn(`GET ${endpoint} failed: ${String(e)}`);

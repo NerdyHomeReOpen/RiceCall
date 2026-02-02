@@ -55,8 +55,18 @@ async function handleResponse<T>(response: Response, method: 'GET' | 'POST' | 'P
 
   // Most endpoints return envelope { data, message }.
   // Some may return a bare object; accept both.
-  const data = resultRecord?.data;
-  return ((data ?? result) as T) ?? (null as T);
+  if (resultRecord && 'data' in resultRecord) {
+    const data = resultRecord.data;
+    if (data && typeof data === 'object') {
+      try {
+        (data as Record<string, unknown>).message = message || '';
+      } catch {
+        // Ignore if non-extensible
+      }
+    }
+    return data as T;
+  }
+  return (result as T) ?? (null as T);
 }
 
 export function createApiClient(params: CreateApiClientParams): ApiClient {
