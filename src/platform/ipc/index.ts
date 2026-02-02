@@ -23,7 +23,9 @@ function initWebIpc(): IpcRenderer {
   const { broadcast, onBroadcast } = createWebBroadcast();
   const api = getApiClient();
 
-  webContext = { storage, api, broadcast };
+  // Wrap broadcast for the handler context to match the expected signature (without the event object)
+  const contextBroadcast = (channel: string, ...args: any[]) => broadcast(channel, {}, ...args);
+  webContext = { storage, api, broadcast: contextBroadcast };
 
   const registration = createAllHandlers();
   const ipcRenderer = createWebIpcRenderer(registration, webContext);
@@ -61,8 +63,10 @@ function initWebIpc(): IpcRenderer {
     // Loopback Prevention: Filter out local sends.
     // SocketBridge uses onBroadcast directly, so it won't be affected.
     // UI components use ipc.on, so they will be protected from receiving their own requests.
+    // EXCEPTION: popup-submit must loop back because the popup is in-app in Web mode.
     const wrappedListener = (event: any, ...args: any[]) => {
-      if (event?.isLocalSend && !event?.isRemote) return;
+      const isPopupSubmit = channel === 'popup-submit';
+      if (event?.isLocalSend && !event?.isRemote && !isPopupSubmit) return;
       listener(event, ...args);
     };
     // Store the original listener as a property of the wrapper for removal

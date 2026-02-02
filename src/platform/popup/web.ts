@@ -5,8 +5,13 @@ import { closeAllInAppPopups, closeInAppPopup, openInAppPopup } from './inAppPop
 import { loaders, initPopupLoader } from './popupLoader';
 
 export class WebPopupController implements PopupController {
+  private listenerCleanups: Map<PopupId, Set<() => void>> = new Map();
+
   async open(type: Types.PopupType, id: PopupId, initialData: unknown, options?: PopupOpenOptions): Promise<void> {
     console.log(`[WebPopup] Opening popup: ${type} (id: ${id})`, initialData);
+    
+    // Auto-cleanup any previous listeners for this ID if re-opening
+    this.cleanupListeners(id);
     
     // Simulate Electron's pre-fetching behavior:
     // Load data in the Controller (Main Process equivalent) BEFORE opening the window.
@@ -50,11 +55,15 @@ export class WebPopupController implements PopupController {
   close(id: PopupId): void {
     console.log(`[WebPopup] Closing popup: ${id}`);
     closeInAppPopup(id);
+    this.cleanupListeners(id);
   }
 
   closeAll(): void {
     console.log(`[WebPopup] Closing all popups`);
     closeAllInAppPopups();
+    for (const id of this.listenerCleanups.keys()) {
+      this.cleanupListeners(id);
+    }
   }
 
   submit(to: PopupId, data?: unknown): void {
@@ -74,9 +83,32 @@ export class WebPopupController implements PopupController {
     };
 
     getIpcRenderer().on('popup-submit', listener);
-    return () => {
+    
+    const cleanup = () => {
       console.log(`[WebPopup] Unregistering onSubmit listener for: ${host}`);
       getIpcRenderer().removeListener('popup-submit', listener);
+      
+      const cleanups = this.listenerCleanups.get(host);
+      if (cleanups) {
+        cleanups.delete(cleanup);
+        if (cleanups.size === 0) this.listenerCleanups.delete(host);
+      }
     };
+
+    if (!this.listenerCleanups.has(host)) {
+      this.listenerCleanups.set(host, new Set());
+    }
+    this.listenerCleanups.get(host)!.add(cleanup);
+
+    return cleanup;
+  }
+
+  private cleanupListeners(id: PopupId): void {
+    const cleanups = this.listenerCleanups.get(id);
+    if (cleanups) {
+      console.log(`[WebPopup] Auto-cleaning ${cleanups.size} listeners for: ${id}`);
+      cleanups.forEach(cleanup => cleanup());
+      this.listenerCleanups.delete(id);
+    }
   }
 }
