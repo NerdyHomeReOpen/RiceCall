@@ -31,7 +31,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.createChannel(serverId, { name: channelName, categoryId: parent?.categoryId || null });
+    Popup.createChannel(serverId, { name: channelName, categoryId: parent?.channelId || null });
     ipc.window.close();
   };
 
