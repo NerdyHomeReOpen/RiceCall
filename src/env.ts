@@ -35,7 +35,7 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
         dotenv = (window as any).require('dotenv');
         expand = (window as any).require('dotenv-expand').expand;
       } else {
-        const { createRequire } = await import('module');
+        const { createRequire } = await import(/* webpackIgnore: true */ 'module');
         const _require = createRequire(import.meta.url);
         
         electron = _require('electron');

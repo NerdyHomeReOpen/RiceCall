@@ -14,7 +14,7 @@ import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
 
-import { InAppPopupHost } from '@/platform/popup/InAppPopupHost';
+import { InAppPopupContainer } from '@/platform/popup/InAppPopupContainer';
 
 import Logger from '@/utils/logger';
 
@@ -78,7 +78,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
           <SoundPlayerProvider>
             <ImageViewerProvider>
               {children}
-              <InAppPopupHost />
+              <InAppPopupContainer />
             </ImageViewerProvider>
           </SoundPlayerProvider>
         </ContextMenuProvider>

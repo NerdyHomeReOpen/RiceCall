@@ -85,7 +85,7 @@ function renderPopupNode(p: InAppPopupInstance) {
   return renderPopup(p.type, p.id, p.initialData);
 }
 
-export function InAppPopupHost() {
+export function InAppPopupContainer() {
   const { t } = useTranslation();
   const [popups, setPopups] = useState<InAppPopupInstance[]>([]);
   const [debugEnabled, setDebugEnabled] = useState(false);
