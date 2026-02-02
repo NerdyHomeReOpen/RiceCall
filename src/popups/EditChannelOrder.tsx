@@ -66,6 +66,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const editedChannels = useMemo(() => {
     return channels
       .filter((c) => !c.categoryId)
+      .sort((a, b) => a.order - b.order)
       .reduce(
         (acc, c, index) => {
           if (c.order !== index || c.order !== orderMapRef.current[c.channelId]) {
@@ -73,6 +74,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           }
           channels
             .filter((sc) => sc.categoryId === c.channelId)
+            .sort((a, b) => a.order - b.order)
             .forEach((sc, sindex) => {
               if (sc.order !== sindex || sc.order !== orderMapRef.current[sc.channelId]) {
                 acc.push({ order: sindex, channelId: sc.channelId });
@@ -84,7 +86,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
       );
   }, [channels]);
   const filteredChannels = useMemo(() => {
-    return channels.filter((c) => c.categoryId === null).sort((a, b) => a.order - b.order);
+    return channels.filter((c) => c.categoryId === null && !c.isLobby).sort((a, b) => a.order - b.order);
   }, [channels]);
   const canSubmit = editedChannels.length > 0;
 
@@ -95,7 +97,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     if (targetIndex < 0 || targetIndex > categoryChildren.length - 1) return;
 
     const newChannels = [...channels];
-    const newCategoryChildren = [...categoryChildren];
+    const newCategoryChildren = categoryChildren.map(c => ({...c})); // Deep copy for local sort logic
 
     if (currentIndex < targetIndex) {
       for (let i = currentIndex; i < targetIndex; i++) {
@@ -114,7 +116,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     for (const child of newCategoryChildren) {
       const index = newChannels.findIndex((c) => c.channelId === child.channelId);
       if (index !== -1) {
-        newChannels[index].order = child.order;
+        newChannels[index] = { ...newChannels[index], order: child.order };
       }
     }
     dispatch(setChannels(newChannels.sort((a, b) => a.order - b.order)));
@@ -159,7 +161,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   const handleSelect = (channel: Types.Channel | Types.Category) => {
     setSelectedChannel(channel);
-    setCategoryChildren(channels.filter((c) => c.categoryId === channel.channelId));
+    setCategoryChildren(channels.filter((c) => c.categoryId === channel.categoryId && !c.isLobby).sort((a, b) => a.order - b.order));
   };
 
   const handleConfirmBtnClick = () => {
