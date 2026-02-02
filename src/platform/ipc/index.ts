@@ -7,7 +7,7 @@ import type { IpcRenderer, HandlerContext } from './types';
 import { getElectronIpcRenderer } from './electron';
 import { createWebIpcRenderer, createWebStorage, createWebBroadcast } from './web';
 import { getApiClient } from '@/platform/api';
-import { createAllHandlers } from '@/handlers';
+import { createAllHandlers } from './handlers/web';
 import { isElectron } from '@/platform/isElectron';
 import { loadEnv } from '@/env';
 

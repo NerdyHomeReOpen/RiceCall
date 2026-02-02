@@ -3,19 +3,19 @@
  */
 
 import type { HandlerRegistration } from '@/platform/ipc/types';
-import { createAccountsHandlers } from './accounts.handler';
-import { createLanguageHandlers } from './language.handler';
-import { createThemesHandlers } from './themes.handler';
-import { createEnvHandlers } from './env.handler';
-import { createElectronOnlyHandlers } from './electron-only.handler';
-import { createNetworkHandlers } from './network.handler';
+import { createAccountsHandlers } from '../shared/accounts';
+import { createLanguageHandlers } from '../shared/language';
+import { createThemesHandlers } from '../shared/themes';
+import { createEnvHandlers } from './env';
+import { createElectronOnlyHandlers } from './electron-only';
+import { createNetworkHandlers } from './network';
 
 import { WebIpcRouter } from '@/platform/ipc/router';
-import { registerSharedSettingsHandlers } from '@/platform/ipc/handlers/shared/settings';
-import { registerSharedDataHandlers } from '@/platform/ipc/handlers/shared/data';
-import { registerAuthIpcHandlers } from '@/platform/ipc/handlers/shared/auth';
-import { createWebAuthProvider } from '@/platform/ipc/handlers/web/auth';
-import { SETTINGS_DEFAULTS } from '@/platform/ipc/handlers/shared/defaults';
+import { registerSharedSettingsHandlers } from '../shared/settings';
+import { registerSharedDataHandlers } from '../shared/data';
+import { registerAuthIpcHandlers } from '../shared/auth';
+import { createWebAuthProvider } from './auth';
+import { SETTINGS_DEFAULTS } from '../shared/defaults';
 
 /**
  * Create auth handlers for Web using shared logic.
