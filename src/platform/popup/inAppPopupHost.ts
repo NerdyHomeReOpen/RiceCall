@@ -41,12 +41,18 @@ export function subscribeInAppPopups(listener: Listener): () => void {
 export function openInAppPopup(type: Types.PopupType, id: PopupId, initialData: unknown, options?: PopupOpenOptions) {
   // Replace existing same-id popup (same as Electron behavior where id is stable)
   const prev = instances.find((p) => p.id === id);
+
+  // If popup exists, keep its initialData unless forced.
+  // This matches Electron behavior (which doesn't reload the window/props)
+  // and prevents duplicate effects (e.g. processing 'message' prop twice in DirectMessagePopup).
+  const nextInitialData = prev && !options?.force ? prev.initialData : (initialData ?? null);
+
   instances = [
     ...instances.filter((p) => p.id !== id),
     {
       id,
       type,
-      initialData: initialData ?? null,
+      initialData: nextInitialData,
       options,
       title: options?.title ?? prev?.title,
       minimized: prev?.minimized ?? false,
