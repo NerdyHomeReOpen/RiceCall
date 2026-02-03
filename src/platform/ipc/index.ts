@@ -45,7 +45,9 @@ function initWebIpc(): IpcRenderer {
 
     const listeners = broadcastListeners?.get(channel);
     if (listeners) {
-      listeners.forEach((cb) => {
+      // Snapshot listeners to prevent "listeners added during emission" from being triggered immediately
+      const listenersSnapshot = new Set(listeners);
+      listenersSnapshot.forEach((cb) => {
         try {
           cb(event, ...args);
         } catch (e) {
