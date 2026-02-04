@@ -13,17 +13,17 @@ const webBridge: SocketPlatformBridge = {
     const ipc = getIpcRenderer() as any;
     if (ipc.__bridgeInitialized) return;
     ipc.__bridgeInitialized = true;
-    
+
     ipc.onBroadcast((channel: string, event: any, ...args: any[]) => {
       // event is { isRemote: boolean }
       // Filter out messages from other tabs or server-pushed events
       if (event?.isRemote || ipc._isSystemSending) {
         return;
       }
-      
+
       if (ClientToServerEventNames.includes(channel)) {
         callback(channel, ...args);
-      }   
+      }
     });
   },
 
@@ -34,10 +34,7 @@ const webBridge: SocketPlatformBridge = {
 
     const originalInvoke = ipc.invoke.bind(ipc);
     ipc.invoke = async (channel: string, ...args: any[]) => {
-      const isSocketEvent = [
-        'SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 
-        'SFUCreateConsumer', 'SFUJoin', 'SFULeave'
-      ].includes(channel);
+      const isSocketEvent = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'].includes(channel);
 
       if (isSocketEvent) {
         try {
@@ -58,7 +55,7 @@ const webBridge: SocketPlatformBridge = {
 
   log(level, message) {
     logger[level as 'info' | 'warn' | 'error'](message);
-  }
+  },
 };
 
 const service = isElectron() ? null : new SocketService(webBridge, () => process.env.NEXT_PUBLIC_WS_URL || process.env.NEXT_PUBLIC_API_BASE_URL || '');
@@ -81,13 +78,15 @@ export function createWebSocketClient() {
       return () => ipc.removeListener(event, listener);
     },
     emit(event: string, payload: any) {
-      return getIpcRenderer().invoke(event, payload).then((ack: any) => {
-        if (ack && typeof ack === 'object' && 'ok' in ack) {
-          if (ack.ok) return ack.data;
-          throw new Error(ack.error || 'unknown error');
-        }
-        return ack;
-      });
-    }
+      return getIpcRenderer()
+        .invoke(event, payload)
+        .then((ack: any) => {
+          if (ack && typeof ack === 'object' && 'ok' in ack) {
+            if (ack.ok) return ack.data;
+            throw new Error(ack.error || 'unknown error');
+          }
+          return ack;
+        });
+    },
   };
 }

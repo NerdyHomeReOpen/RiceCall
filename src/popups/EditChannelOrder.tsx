@@ -97,7 +97,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     if (targetIndex < 0 || targetIndex > categoryChildren.length - 1) return;
 
     const newChannels = [...channels];
-    const newCategoryChildren = categoryChildren.map(c => ({...c})); // Deep copy for local sort logic
+    const newCategoryChildren = categoryChildren.map((c) => ({ ...c })); // Deep copy for local sort logic
 
     if (currentIndex < targetIndex) {
       for (let i = currentIndex; i < targetIndex; i++) {

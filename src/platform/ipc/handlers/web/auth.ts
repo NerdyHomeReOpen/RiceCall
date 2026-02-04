@@ -13,13 +13,13 @@ export const createWebAuthProvider = (storage: any) => ({
       return { success: false };
     }
   },
-  
+
   logout: async () => {
     storage.delete('token');
     storage.delete('userId');
     storage.delete('login-account');
   },
-  
+
   register: async (formData: any) => {
     try {
       return await AuthService.register(formData);
@@ -28,7 +28,7 @@ export const createWebAuthProvider = (storage: any) => ({
       return { success: false };
     }
   },
-  
+
   autoLogin: async (token: string) => {
     try {
       return await AuthService.autoLogin(token);
@@ -36,5 +36,5 @@ export const createWebAuthProvider = (storage: any) => ({
       console.error('[WebAuth] AutoLogin failed:', e);
       return { success: false, message: e instanceof Error ? e.message : 'network-error' };
     }
-  }
+  },
 });

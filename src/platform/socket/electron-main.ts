@@ -52,7 +52,7 @@ const electronBridge: SocketPlatformBridge = {
 
   log(level, message) {
     logger[level](message);
-  }
+  },
 };
 
 const service = new SocketService(electronBridge, () => env.WS_URL);

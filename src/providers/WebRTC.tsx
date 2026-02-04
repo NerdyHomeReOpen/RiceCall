@@ -1003,7 +1003,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       document.removeEventListener('click', initAudioOnInteraction);
       document.removeEventListener('keydown', initAudioOnInteraction);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Effect for handling device/settings changes when mic is already taken
@@ -1128,13 +1128,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         // If not in a channel, try to join one automatically using standard logic
         if (!recvTransportRef.current) {
           new Logger('WebRTC').info('Not in a channel, attempting to join one for diagnosis using standard logic...');
-          
+
           let targetServer = null;
 
           // 1. Try to find server with displayId/serverId '10'
           const searchResults = await ipc.data.searchServer({ query: '10' });
-          targetServer = searchResults.find(s => s.displayId === '10' || s.serverId === '10');
-          
+          targetServer = searchResults.find((s) => s.displayId === '10' || s.serverId === '10');
+
           if (!targetServer) {
             // 2. Fallback to first joined server
             const userId = window.localStorage.getItem('userId');
@@ -1148,11 +1148,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
           if (targetServer) {
             new Logger('WebRTC').info(`Standard joining server: ${targetServer.name} (${targetServer.displayId})`);
-            
+
             // Call standard logic directly
             loadServer(targetServer.specialId || targetServer.displayId);
             ipc.socket.send('connectServer', { serverId: targetServer.serverId });
-            
+
             // Wait for SFUJoined event (max 10s)
             await new Promise<void>((resolve, reject) => {
               // eslint-disable-next-line prefer-const
@@ -1198,26 +1198,26 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
                 }
               }
             });
-            
+
             // @ts-expect-error - info is initially null
             if (info && info.ip && info.ip !== 'unknown') break;
-            await new Promise(r => setTimeout(r, 1000));
+            await new Promise((r) => setTimeout(r, 1000));
           }
         }
       } catch (e) {
         new Logger('WebRTC').error(`Error getting stats or joining channel: ${e}`);
       }
-      
+
       electron.ipcRenderer.send('sfu-diagnosis-response', { targetSenderId: senderId, info });
     };
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const electron = (window as any).require ? (window as any).require('electron') : null;
     if (electron) {
-        electron.ipcRenderer.on('get-sfu-diagnosis', handleGetSfuDiagnosis);
-        return () => {
-            electron.ipcRenderer.removeListener('get-sfu-diagnosis', handleGetSfuDiagnosis);
-        }
+      electron.ipcRenderer.on('get-sfu-diagnosis', handleGetSfuDiagnosis);
+      return () => {
+        electron.ipcRenderer.removeListener('get-sfu-diagnosis', handleGetSfuDiagnosis);
+      };
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

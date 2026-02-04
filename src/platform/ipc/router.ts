@@ -40,10 +40,7 @@ export class WebIpcRouter implements IpcRouter {
   /**
    * Adapts a shared registration function to the Web IPC model.
    */
-  public createWebHandlers(
-    registrar: (ipc: IpcRouter, storage: any, broadcast: any, getSettings: any) => void
-  ): HandlerRegistration {
-    
+  public createWebHandlers(registrar: (ipc: IpcRouter, storage: any, broadcast: any, getSettings: any) => void): HandlerRegistration {
     const recordingRouter: IpcRouter = {
       on: (channel, listener) => {
         const webHandler = (ctx: HandlerContext, ...args: any[]) => {
@@ -51,7 +48,7 @@ export class WebIpcRouter implements IpcRouter {
           // Note: We need to pass these to the listener if we want them available
           // But our shared handlers use the ones from the registrar closure.
           // So we must satisfy the registrar's arguments.
-          
+
           listener(event, ...args);
           return event.returnValue;
         };
@@ -62,13 +59,13 @@ export class WebIpcRouter implements IpcRouter {
         this.registration.async![channel] = async (ctx: HandlerContext, ...args: any[]) => {
           return await listener({}, ...args);
         };
-      }
+      },
     };
 
     // To make the registrar's closure-bound storage/broadcast work,
     // we use a "Proxy" that always looks up the current context of the handler.
     // However, since Web IPC handlers are executed one by one, we can use a simpler approach.
-    
+
     let activeCtx: HandlerContext | null = null;
 
     const proxyStorage = {
@@ -78,7 +75,7 @@ export class WebIpcRouter implements IpcRouter {
     };
 
     const proxyBroadcast = (ch: string, val: any) => activeCtx?.broadcast(ch, val);
-    
+
     const proxyGetSettings = () => {
       if (!activeCtx) return {};
       return (this.registration.sync as any)['get-system-settings']?.(activeCtx);
@@ -113,5 +110,7 @@ export class WebIpcRouter implements IpcRouter {
 
   on() {}
   handle() {}
-  getRegistration() { return this.registration; }
+  getRegistration() {
+    return this.registration;
+  }
 }

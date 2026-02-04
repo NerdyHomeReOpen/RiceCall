@@ -1,6 +1,6 @@
 /**
  * Electron Window Implementation
- * 
+ *
  * Uses IPC to communicate with main process for window control.
  */
 

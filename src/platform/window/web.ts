@@ -1,6 +1,6 @@
 /**
  * Web Window Implementation
- * 
+ *
  * Handles window control for in-app popups in Web mode.
  */
 

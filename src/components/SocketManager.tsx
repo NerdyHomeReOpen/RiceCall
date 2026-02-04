@@ -41,16 +41,7 @@ const SocketManager: React.FC = React.memo(() => {
   const [region, setRegion] = useState<Types.LanguageKey>('en-US');
 
   // Selectors
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      currentServerId: state.user.data.currentServerId,
-      currentChannelId: state.user.data.currentChannelId,
-      signature: state.user.data.signature,
-    }),
-    shallowEqual,
-  );
-
+  const user = useAppSelector((state) => state.user.data, shallowEqual);
   const currentFriends = useAppSelector((state) => state.friends.data, shallowEqual);
   const currentServer = useAppSelector((state) => state.currentServer.data, shallowEqual);
   const currentOnlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);

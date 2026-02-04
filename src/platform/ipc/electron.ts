@@ -10,11 +10,7 @@ import type { IpcRenderer, HandlerRegistration, IpcStorage, HandlerContext } fro
  * Register handlers with Electron's ipcMain.
  * Call this in main.ts with all your handlers.
  */
-export function registerHandlers(
-  ipcMain: any,
-  registration: HandlerRegistration,
-  context: HandlerContext
-): void {
+export function registerHandlers(ipcMain: any, registration: HandlerRegistration, context: HandlerContext): void {
   // Register sync handlers (ipcMain.on with event.returnValue)
   if (registration.sync) {
     for (const [channel, handler] of Object.entries(registration.sync)) {

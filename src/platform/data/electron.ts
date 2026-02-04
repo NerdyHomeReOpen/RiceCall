@@ -1,10 +1,10 @@
 /**
  * Electron DataClient implementation.
  * Uses ipcRenderer.invoke() to call the main process DataService.
- * 
+ *
  * Electron is the primary platform. Uses Proxy to auto-generate IPC calls
  * based on the standard channel naming convention: data-${methodName}
- * 
+ *
  * Adding a new method only requires updating dataService.ts - no changes here!
  */
 

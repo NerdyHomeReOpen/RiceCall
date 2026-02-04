@@ -10,7 +10,7 @@ export function createWebAuthController(getIpc: () => IpcRenderer): AuthControll
     async logout(): Promise<void> {
       // Invoke common logout handler to clear storage/data
       await getIpc().invoke('auth-logout');
-      
+
       // Explicitly redirect to auth page in web mode
       // Small delay to ensure storage writes are committed
       if (typeof window !== 'undefined') {

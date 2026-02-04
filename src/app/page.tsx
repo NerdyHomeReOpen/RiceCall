@@ -113,17 +113,17 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     new CtxMenuBuilder()
       .addSystemSettingOption(() => Popup.openSystemSetting(user.userId))
       .addChangeThemeOption(() => Popup.openChangeTheme())
-      .addFeedbackOption(() => window.open('https://forms.gle/AkBTqsZm9NGr5aH46', '_blank'))
+      .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
       .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
       .addHelpCenterOption(
         {
-          onFaqClick: () => window.open('https://ricecall.com.tw/#faq', '_blank'),
-          onAgreementClick: () => window.open('https://ricecall.com.tw/terms', '_blank'),
-          onSpecificationClick: () => window.open('https://ricecall.com.tw/specification', '_blank'),
-          onContactUsClick: () => window.open('https://ricecall.com.tw/contact', '_blank'),
+          onFaqClick: () => window.open('https://ricecall.com/#faq', '_blank'),
+          onAgreementClick: () => window.open('https://ricecall.com/terms', '_blank'),
+          onSpecificationClick: () => window.open('https://ricecall.com/specification', '_blank'),
+          onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
           onAboutUsClick: Popup.openAboutUs,
         },
-        () => {},
+        () => { },
       )
       .addNetworkDiagnosisOption(() => Popup.openNetworkDiagnosis())
       .addLogoutOption(() => logout())
@@ -168,7 +168,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: false,
       contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => {},
+      onClick: () => { },
     },
   ];
 

@@ -33,7 +33,7 @@ const AboutPopup: React.FC = React.memo(() => {
   };
 
   const handleOfficialWebsiteLinkClick = () => {
-    window.open('http://ricecall.com.tw', '_blank');
+    window.open('http://ricecall.com', '_blank');
   };
 
   const handleShowDisclaimerChange = (e: React.ChangeEvent<HTMLInputElement>) => {

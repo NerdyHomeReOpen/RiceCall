@@ -88,7 +88,7 @@ const ChannelList: React.FC = React.memo(() => {
       .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => Popup.openEditNickname(user.userId, currentServer.serverId))
       .addLocateMeOption(() => locateMe())
       .addSeparator()
-      .addReportOption(() => {})
+      .addReportOption(() => window.open('https://ricecall.com/report-server', '_blank'))
       .addFavoriteServerOption({ isFavorite: currentServer.favorite }, () => Popup.favoriteServer(currentServer.serverId))
       .build();
 

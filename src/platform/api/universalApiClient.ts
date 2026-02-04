@@ -84,12 +84,7 @@ export function createApiClient(params: CreateApiClientParams): ApiClient {
     });
   };
 
-  async function requestWithRetry<T>(
-    method: 'GET' | 'POST' | 'PATCH',
-    endpoint: string,
-    init: Omit<RequestInit, 'method'>,
-    retryCount = 0,
-  ): Promise<T> {
+  async function requestWithRetry<T>(method: 'GET' | 'POST' | 'PATCH', endpoint: string, init: Omit<RequestInit, 'method'>, retryCount = 0): Promise<T> {
     try {
       const response = await fetch(`${baseUrl}${endpoint}`, {
         ...init,

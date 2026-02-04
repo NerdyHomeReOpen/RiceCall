@@ -1,6 +1,6 @@
 /**
  * Platform Socket Factory
- * 
+ *
  * Returns the appropriate socket client based on the current platform.
  */
 

@@ -13,7 +13,7 @@ function isElectron(): boolean {
 export const platformStorage = {
   /**
    * Set a localStorage item and ensure 'storage' event fires.
-   * 
+   *
    * - In Electron: localStorage changes in one window automatically fire 'storage' in others.
    * - In Web (Single Page): localStorage changes DO NOT fire 'storage' in the same window.
    *   So we manually dispatch the event to simulate Electron-like behavior for in-app popups.
@@ -29,7 +29,7 @@ export const platformStorage = {
           newValue: value,
           storageArea: window.localStorage,
           url: window.location.href,
-        })
+        }),
       );
     }
   },
@@ -40,7 +40,7 @@ export const platformStorage = {
 
   removeItem: (key: string) => {
     window.localStorage.removeItem(key);
-    
+
     if (!isElectron()) {
       window.dispatchEvent(
         new StorageEvent('storage', {
@@ -48,8 +48,8 @@ export const platformStorage = {
           newValue: null,
           storageArea: window.localStorage,
           url: window.location.href,
-        })
+        }),
       );
     }
-  }
+  },
 };

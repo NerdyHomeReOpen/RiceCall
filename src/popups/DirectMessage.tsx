@@ -111,7 +111,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }
@@ -202,7 +202,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleReportBtnClick = () => {
-    // window.open('https://ricecall.com/report-user', '_blank');
+    window.open('https://ricecall.com/report-user', '_blank');
   };
 
   const handleTargetAvatarClick = () => {
@@ -356,7 +356,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
               <div className={`${styles['invite-temp-group']} disabled`} />
             </>
           )}
-          <div className={`${styles['report']} disabled`} onClick={handleReportBtnClick} />
+          <div className={styles['report']} onClick={handleReportBtnClick} />
         </div>
       </div>
       <div className={popupStyles['popup-body']}>

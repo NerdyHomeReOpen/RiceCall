@@ -1,6 +1,6 @@
 /**
  * Platform-agnostic DataService factory.
- * 
+ *
  * This creates a DataService that can work in both Electron main and Web browser
  * by accepting an ApiClient instance (which handles the actual HTTP calls).
  */
@@ -46,8 +46,6 @@ export interface DataService {
 function toQuery(params: any): string {
   return new URLSearchParams(params).toString();
 }
-
-
 
 /**
  * Create a DataService instance using the provided ApiClient.

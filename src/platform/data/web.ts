@@ -1,7 +1,7 @@
 /**
  * Web DataClient implementation.
  * Uses createDataService() with browser-safe ApiClient for direct HTTP calls.
- * 
+ *
  * Web is the secondary platform - it auto-adapts from the DataService interface.
  * When Electron adds new data methods, Web automatically inherits them via Proxy.
  */
@@ -41,13 +41,13 @@ function wrapWithErrorHandling(api: DataServiceApiClient): DataServiceApiClient 
  * Create a Web DataClient that uses HTTP API directly.
  * Uses Proxy to auto-forward any method calls to the underlying DataService,
  * so Web automatically adapts when new methods are added to Electron/DataService.
- * 
+ *
  * @param api - The ApiClient to use for HTTP requests (from getApiClient())
  */
 export function createWebDataClient(api: DataServiceApiClient): DataClient {
   const wrappedApi = wrapWithErrorHandling(api);
   const dataService = createDataService(wrappedApi);
-  
+
   // Special cases where Web behavior differs from Electron
   const webOverrides: Partial<DataClient> = {
     // In web mode, userHotReload is equivalent to regular user fetch

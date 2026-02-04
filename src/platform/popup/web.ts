@@ -9,10 +9,10 @@ export class WebPopupController implements PopupController {
 
   async open(type: Types.PopupType, id: PopupId, initialData: unknown, options?: PopupOpenOptions): Promise<void> {
     console.log(`[WebPopup] Opening popup: ${type} (id: ${id})`, initialData);
-    
+
     // Auto-cleanup any previous listeners for this ID if re-opening
     this.cleanupListeners(id);
-    
+
     // Simulate Electron's pre-fetching behavior:
     // Load data in the Controller (Main Process equivalent) BEFORE opening the window.
     try {
@@ -26,7 +26,7 @@ export class WebPopupController implements PopupController {
         data: ipc.data,
         getSystemSettings: () => ipc.systemSettings.get() || {},
       });
-      
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const loader = (loaders as any)[type];
       let fullData = initialData;
@@ -35,10 +35,10 @@ export class WebPopupController implements PopupController {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         fullData = await (loader as any)(initialData).catch((e: any) => {
           console.error(`[WebPopup] Loader error for ${type}:`, e);
-          return null; 
+          return null;
         });
       }
-      
+
       // If loader failed (returned null), do not open (matches Electron behavior)
       if (loader && !fullData) {
         console.error(`[WebPopup] Failed to load data for ${type}, aborting.`);
@@ -46,7 +46,6 @@ export class WebPopupController implements PopupController {
       }
 
       openInAppPopup(type, id, fullData, options);
-
     } catch (e) {
       console.error(`[WebPopup] Error during open for ${type}:`, e);
     }
@@ -74,7 +73,7 @@ export class WebPopupController implements PopupController {
 
   onSubmit<T>(host: PopupId, callback: (data: T) => void): () => void {
     console.log(`[WebPopup] Registering onSubmit listener for: ${host}`);
-    
+
     const listener = (_: unknown, to: string, data: T) => {
       if (to === host) {
         console.log(`[WebPopup] Received submit for: ${host}`, data);
@@ -83,11 +82,11 @@ export class WebPopupController implements PopupController {
     };
 
     getIpcRenderer().on('popup-submit', listener);
-    
+
     const cleanup = () => {
       console.log(`[WebPopup] Unregistering onSubmit listener for: ${host}`);
       getIpcRenderer().removeListener('popup-submit', listener);
-      
+
       const cleanups = this.listenerCleanups.get(host);
       if (cleanups) {
         cleanups.delete(cleanup);
@@ -107,7 +106,7 @@ export class WebPopupController implements PopupController {
     const cleanups = this.listenerCleanups.get(id);
     if (cleanups) {
       console.log(`[WebPopup] Auto-cleaning ${cleanups.size} listeners for: ${id}`);
-      cleanups.forEach(cleanup => cleanup());
+      cleanups.forEach((cleanup) => cleanup());
       this.listenerCleanups.delete(id);
     }
   }

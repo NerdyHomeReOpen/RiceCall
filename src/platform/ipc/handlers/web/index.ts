@@ -46,7 +46,7 @@ function createWebSettingsHandlers(): HandlerRegistration {
   return router.createWebHandlers((ipc, storage, broadcast) => {
     const getSettings = () => {
       // eslint-disable-next-line
-      const result : any = {};
+      const result: any = {};
       for (const key of Object.keys(SETTINGS_DEFAULTS)) {
         // eslint-disable-next-line
         result[key] = storage.get(key) ?? (SETTINGS_DEFAULTS as any)[key];
@@ -91,7 +91,7 @@ export function createAllHandlers(): HandlerRegistration {
     createThemesHandlers(),
     createEnvHandlers(),
     createElectronOnlyHandlers(),
-    createNetworkHandlers()
+    createNetworkHandlers(),
   );
 }
 
