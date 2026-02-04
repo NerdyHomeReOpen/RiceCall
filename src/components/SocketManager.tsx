@@ -41,16 +41,7 @@ const SocketManager: React.FC = React.memo(() => {
   const [region, setRegion] = useState<Types.LanguageKey>('en-US');
 
   // Selectors
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      currentServerId: state.user.data.currentServerId,
-      currentChannelId: state.user.data.currentChannelId,
-      signature: state.user.data.signature,
-    }),
-    shallowEqual,
-  );
-
+  const user = useAppSelector((state) => state.user.data, shallowEqual);
   const currentFriends = useAppSelector((state) => state.friends.data, shallowEqual);
   const currentServer = useAppSelector((state) => state.currentServer.data, shallowEqual);
   const currentOnlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
@@ -58,7 +49,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   // Refs
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const popupOffSubmitRef = useRef<() => void>(() => {});
+  const popupOffSubmitRef = useRef<() => void>(() => { });
   const userRef = useRef(user);
   const currentFriendsRef = useRef(currentFriends);
   const currentServerRef = useRef(currentServer);
@@ -497,7 +488,7 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error: Error) => {
       // General error handling only, logout is handled via openPopup
-      Popup.openErrorDialog(error.message, () => {});
+      Popup.openErrorDialog(error.message, () => { });
     });
     return () => unsub();
   }, []);
