@@ -93,14 +93,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
     () =>
       Permission.isChannelMod(permissionLevel)
         ? [
-            t('channel-info'),
-            t('channel-announcement'),
-            t('access-permission'),
-            t('speaking-permission'),
-            t('text-permission'),
-            `${t('channel-management')} (${totalModeratorsCount})`,
-            `${t('blacklist-management')} (${totalBlockMembersCount})`,
-          ]
+          t('channel-info'),
+          t('channel-announcement'),
+          t('access-permission'),
+          t('speaking-permission'),
+          t('text-permission'),
+          `${t('channel-management')} (${totalModeratorsCount})`,
+          `${t('blacklist-management')} (${totalBlockMembersCount})`,
+        ]
         : isReadOnly
           ? [t('channel-info'), t('channel-announcement')]
           : [t('channel-info')],
@@ -233,7 +233,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.editChannel(server.serverId, channel.channelId, ObjDiff(channel, channel));
+    Popup.editChannel(server.serverId, channel.channelId, ObjDiff(channel, channelData));
     ipc.window.close();
   };
 
@@ -367,19 +367,19 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
             </div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channel.visibility === 'public'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" value="public" checked={channel.visibility === 'public'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('anyone-can-access-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channel.visibility === 'member'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" value="member" checked={channel.visibility === 'member'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('forbid-guest-access-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channel.visibility === 'readonly'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" value="readonly" checked={channel.visibility === 'readonly'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('message-only-label')}</div>
               </div>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
-                <input type="radio" name="visibility" checked={channel.visibility === 'private'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
+                <input type="radio" name="visibility" value="private" checked={channel.visibility === 'private'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
                 <div className={popupStyles['label']}>{t('require-password-label')}</div>
               </div>
               {channel.visibility === 'private' && !isReadOnly && (
@@ -544,7 +544,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                         .addSeparator()
                         .addMemberManagementOption(
                           { permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId },
-                          () => {},
+                          () => { },
                           getMemberManagementSubmenuItems(),
                         )
                         .build();
