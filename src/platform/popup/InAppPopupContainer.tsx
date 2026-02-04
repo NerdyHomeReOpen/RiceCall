@@ -256,6 +256,8 @@ export function InAppPopupContainer() {
   );
 }
 
+export const PopupHydrationContext = React.createContext<boolean>(false);
+
 function CurrentPopupIdScope(props: { popupId: string; children: React.ReactNode }) {
   useEffect(() => {
     // Use a stack model to support nested popups (e.g., imageCropper opened from userInfo).
@@ -274,7 +276,7 @@ function CurrentPopupIdScope(props: { popupId: string; children: React.ReactNode
       }
     };
   }, [props.popupId]);
-  return <>{props.children}</>;
+  return <PopupHydrationContext.Provider value={true}>{props.children}</PopupHydrationContext.Provider>;
 }
 
 class PopupErrorBoundary extends React.Component<

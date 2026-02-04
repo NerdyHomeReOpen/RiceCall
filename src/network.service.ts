@@ -55,11 +55,10 @@ export function initNetworkService(mainWindow: BrowserWindow | null) {
       }
 
       if (activeTool) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         try {
           activeTool.cancel?.();
-        } catch (e) {
-          /* ignore */
+        } catch {
+          
         }
       }
 
@@ -71,19 +70,20 @@ export function initNetworkService(mainWindow: BrowserWindow | null) {
 
           activeTool = new Tool(uniqueDomains, duration);
 
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          
           activeTool
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .run((progress: any) => {
               if (!sender.isDestroyed()) {
                 sender.send('network-diagnosis-progress', progress);
               }
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .then((report: any) => {
               activeTool = null;
               resolve(report);
-              // eslint-disable-next-line @typescript-eslint/no-explicit-any
             })
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .catch((err: any) => {
               activeTool = null;
               // @ts-expect-error - Logger takes only 1 argument

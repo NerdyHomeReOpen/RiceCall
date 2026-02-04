@@ -1,4 +1,4 @@
-import { configureStore } from '@reduxjs/toolkit';
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 
 import actionMessagesReducer from './slices/actionMessagesSlice';
 import announcementsReducer from './slices/announcementsSlice';
@@ -23,31 +23,33 @@ import systemNotificationsReducer from './slices/systemNotificationsSlice';
 import uiReducer from './slices/uiSlice';
 import userReducer from './slices/userSlice';
 
+export const rootReducer = combineReducers({
+  actionMessages: actionMessagesReducer,
+  announcements: announcementsReducer,
+  channelEvents: channelEventsReducer,
+  channelMessages: channelMessagesReducer,
+  channels: channelsReducer,
+  currentChannel: currentChannelReducer,
+  currentServer: currentServerReducer,
+  friendActivities: friendActivitiesReducer,
+  friendApplications: friendApplicationsReducer,
+  friendGroups: friendGroupsReducer,
+  friends: friendsReducer,
+  memberApplications: memberApplicationsReducer,
+  memberInvitations: memberInvitationsReducer,
+  notifications: notificationsReducer,
+  onlineMembers: onlineMembersReducer,
+  queueUsers: queueUsersReducer,
+  recommendServers: recommendServersReducer,
+  servers: serversReducer,
+  socket: socketReducer,
+  systemNotifications: systemNotificationsReducer,
+  ui: uiReducer,
+  user: userReducer,
+});
+
 export const store = configureStore({
-  reducer: {
-    actionMessages: actionMessagesReducer,
-    announcements: announcementsReducer,
-    channelEvents: channelEventsReducer,
-    channelMessages: channelMessagesReducer,
-    channels: channelsReducer,
-    currentChannel: currentChannelReducer,
-    currentServer: currentServerReducer,
-    friendActivities: friendActivitiesReducer,
-    friendApplications: friendApplicationsReducer,
-    friendGroups: friendGroupsReducer,
-    friends: friendsReducer,
-    memberApplications: memberApplicationsReducer,
-    memberInvitations: memberInvitationsReducer,
-    notifications: notificationsReducer,
-    onlineMembers: onlineMembersReducer,
-    queueUsers: queueUsersReducer,
-    recommendServers: recommendServersReducer,
-    servers: serversReducer,
-    socket: socketReducer,
-    systemNotifications: systemNotificationsReducer,
-    ui: uiReducer,
-    user: userReducer,
-  },
+  reducer: rootReducer,
   // middleware 預設已包含 Thunk，這對處理 IPC/Socket 非同步非常有用
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

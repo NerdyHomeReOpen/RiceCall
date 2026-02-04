@@ -1,60 +1,43 @@
-import { useEffect, useState } from 'react';
-import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
-import type { RootState, AppDispatch } from './index';
+import { useEffect, useState, useContext } from 'react';
+import { TypedUseSelectorHook, useDispatch, useSelector as _useAppSelector } from 'react-redux';
+import { RootState, AppDispatch, rootReducer } from '@/store';
 import { isElectron } from '@/platform/isElectron';
+import { PopupHydrationContext } from '@/platform/popup/InAppPopupContainer';
 
 export const useAppDispatch = () => useDispatch<AppDispatch>();
 
-const _useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
-
 /**
- * Universal Mock: Simulates the Electron "State Hydration Lag".
- * ONLY active in Web mode to mimic Electron's multi-process behavior.
+ * 1:1 Simulation of Electron's "Multi-process Isolation" lag.
+ * 
+ * Logic:
+ * 1. Uses PopupHydrationContext to identify if a component is rendered within a Web Popup virtual layer.
+ * 2. Only components inside a popup experience the initial hydration lag (moving from InitialState to RealData).
+ * 3. Main interface components (like Friend.tsx) are outside the context and get data immediately to avoid crashes.
  */
 export const useAppSelector: TypedUseSelectorHook<RootState> = (selector, equalityFn) => {
   const isDesktop = isElectron();
-  const [isHydrated, setIsHydrated] = useState(isDesktop);
+  
+  // Check if we are within a popup's isolated hydration scope
+  const isInPopup = useContext(PopupHydrationContext);
+  
+  // If in Web Popup environment, start with unhydrated state to simulate fresh process startup
+  const [isLocalHydrated, setIsLocalHydrated] = useState(!isInPopup || isDesktop);
 
   useEffect(() => {
-    if (isDesktop) return;
-    // Simulates the time it takes for an Electron window to sync data from Main process
-    const timer = setTimeout(() => setIsHydrated(true), 500);
+    if (!isInPopup || isDesktop) return;
+    
+    // Simulate the async data synchronization lag (even with 0ms, it triggers the render cycle)
+    const timer = setTimeout(() => setIsLocalHydrated(true), 0);
     return () => clearTimeout(timer);
-  }, [isDesktop]);
+  }, [isInPopup, isDesktop]);
 
   const realData = _useAppSelector(selector, equalityFn);
-  
-  if (isHydrated) return realData;
 
-  // Universal Logic: Mask identifying fields while preserving structure
-  const maskIdentity = (val: any): any => {
-    if (val === null || val === undefined) return val;
-    
-    // Arrays usually start empty in a new window
-    if (Array.isArray(val)) return [];
+  // 1:1 Mirror of Electron startup flaw: return initialState for the first render cycle in popups
+  if (!isLocalHydrated) {
+    const initialState = rootReducer(undefined, { type: '@@INIT' });
+    return selector(initialState);
+  }
 
-    if (typeof val === 'object') {
-      const masked: any = {};
-      for (const key in val) {
-        const lowerKey = key.toLowerCase();
-        // If the key is an ID or Name related field
-        if (lowerKey.includes('id') || lowerKey === 'name' || lowerKey === 'displayid' || lowerKey === 'signature') {
-          masked[key] = typeof val[key] === 'number' ? 0 : "";
-        } else {
-          // Keep other fields (like badges, settings, etc.) to prevent crashes
-          masked[key] = val[key];
-        }
-      }
-      return masked;
-    }
-
-    // If the selector returned a single string that looks like a UUID
-    if (typeof val === 'string' && /^[0-9a-f-]{36}$/i.test(val)) {
-      return "";
-    }
-
-    return val;
-  };
-
-  return maskIdentity(realData);
+  return realData;
 };

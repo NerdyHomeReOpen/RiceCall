@@ -14,40 +14,41 @@ import SocketManager from '@/components/SocketManager';
 
 import header from '@/styles/header.module.css';
 import { isElectron } from '@/platform/isElectron';
+import * as PopupLoader from '@/platform/popup/popupLoader';
 
-async function hydrateUserInfoInitialData(initialData: any): Promise<any> {
-  // UserInfo/UserSetting popups expect `target` and `targetServers`.
-  // On Electron those are often passed eagerly; on web we may only have ids.
-  if (!initialData || typeof initialData !== 'object') return initialData;
+// async function hydrateUserInfoInitialData(initialData: any): Promise<any> {
+//   // UserInfo/UserSetting popups expect `target` and `targetServers`.
+//   // On Electron those are often passed eagerly; on web we may only have ids.
+//   if (!initialData || typeof initialData !== 'object') return initialData;
 
-  const userId = initialData.userId;
-  const targetId = initialData.targetId;
-  if (!userId || !targetId) return initialData;
+//   const userId = initialData.userId;
+//   const targetId = initialData.targetId;
+//   if (!userId || !targetId) return initialData;
 
-  const hasTarget = initialData.target && typeof initialData.target === 'object';
-  const hasTargetServers = Array.isArray(initialData.targetServers);
-  if (hasTarget && hasTargetServers) return initialData;
+//   const hasTarget = initialData.target && typeof initialData.target === 'object';
+//   const hasTargetServers = Array.isArray(initialData.targetServers);
+//   if (hasTarget && hasTargetServers) return initialData;
 
-  try {
-    const [target, targetServers] = await Promise.all([
-      hasTarget ? Promise.resolve(initialData.target) : ipc.data.user({ userId: targetId }),
-      hasTargetServers ? Promise.resolve(initialData.targetServers) : ipc.data.servers({ userId: targetId }),
-    ]);
+//   try {
+//     const [target, targetServers] = await Promise.all([
+//       hasTarget ? Promise.resolve(initialData.target) : ipc.data.user({ userId: targetId }),
+//       hasTargetServers ? Promise.resolve(initialData.targetServers) : ipc.data.servers({ userId: targetId }),
+//     ]);
 
-    // Don't replace existing values with null-ish results.
-    return {
-      ...initialData,
-      target: target ?? initialData.target ?? null,
-      targetServers: targetServers ?? initialData.targetServers ?? [],
-    };
-  } catch {
-    return {
-      ...initialData,
-      target: initialData.target ?? null,
-      targetServers: initialData.targetServers ?? [],
-    };
-  }
-}
+//     // Don't replace existing values with null-ish results.
+//     return {
+//       ...initialData,
+//       target: target ?? initialData.target ?? null,
+//       targetServers: targetServers ?? initialData.targetServers ?? [],
+//     };
+//   } catch {
+//     return {
+//       ...initialData,
+//       target: initialData.target ?? null,
+//       targetServers: initialData.targetServers ?? [],
+//     };
+//   }
+// }
 
 function getWebInitialData(id: string): any | null {
   try {
@@ -207,13 +208,22 @@ const PopupPageComponent: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    if (!id) return;
-    const isElectron = typeof (window as any).require === 'function';
-    const raw = isElectron ? ipc.initialData.get(id) : getWebInitialData(id);
-    // Some popups (notably userInfo/userSetting) need extra data beyond ids.
-    if ((type === 'userInfo' || type === 'userSetting') && !isElectron) {
-      hydrateUserInfoInitialData(raw).then((hydrated) => setInitialData(hydrated));
+    if (!id || !type) return;
+    const isDesktop = isElectron();
+    const raw = isDesktop ? ipc.initialData.get(id) : getWebInitialData(id);
+    
+    // Simulate Electron's Main-Process Loader:
+    // We run the loader on the initialData to "hydrate" it before rendering.
+    // This ensures props are full even if Redux is empty (simulating the lag).
+    const loader = (PopupLoader.loaders as any)[type];
+    if (loader && !isDesktop) {
+      loader(raw).then((hydrated: any) => {
+        // Replicate Electron behavior: Inject data into a global seed to simulate preloadedState
+        (window as any).__PRELOADED_STATE_SEED__ = hydrated;
+        setInitialData(hydrated);
+      });
     } else {
+      (window as any).__PRELOADED_STATE_SEED__ = raw;
       setInitialData(raw);
     }
   }, [id, type]);
