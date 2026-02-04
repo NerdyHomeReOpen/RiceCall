@@ -6,12 +6,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { io, Socket } from 'socket.io-client';
 import * as Types from '@/types';
-import { 
-  ClientToServerEventNames, 
-  ClientToServerEventWithAckNames, 
-  ServerToClientEventNames,
-  noLogEventSet
-} from './constants';
+import { ClientToServerEventNames, ClientToServerEventWithAckNames, ServerToClientEventNames, noLogEventSet } from './constants';
 
 export interface SocketPlatformBridge {
   onUIMessage(callback: (event: string, ...args: any[]) => void): void;
@@ -27,7 +22,7 @@ export class SocketService {
 
   constructor(
     private bridge: SocketPlatformBridge,
-    private getWsUrl: () => string
+    private getWsUrl: () => string,
   ) {
     this.setupUIBridge();
   }
@@ -51,13 +46,13 @@ export class SocketService {
     });
 
     this.setupSocketListeners();
-    
+
     this.socket.connect();
   }
 
   public disconnect() {
     if (!this.socket) return;
-    
+
     this.socket.emit('disconnectUser');
     this.socket.disconnect();
     this.socket = null;
@@ -66,7 +61,7 @@ export class SocketService {
       clearInterval(this.heartbeatInterval);
       this.heartbeatInterval = null;
     }
-    
+
     this.bridge.log('info', 'Socket disconnected manually');
   }
 
@@ -126,7 +121,7 @@ export class SocketService {
 
   private startHeartbeat() {
     if (this.heartbeatInterval) clearInterval(this.heartbeatInterval);
-    
+
     const sendHeartbeat = () => {
       const start = Date.now();
       this.socket?.timeout(5000).emit('heartbeat', { seq: ++this.seq }, (err: any, ack: any) => {
@@ -161,7 +156,7 @@ export class SocketService {
           this.bridge.log('error', `Failed to emit ${event} after ${retries} retries: ${err.message}`);
           throw err;
         }
-        this.bridge.log('warn', `Retrying (#${i+1}) ${event}...`);
+        this.bridge.log('warn', `Retrying (#${i + 1}) ${event}...`);
       }
     }
     throw new Error('Retry failed');

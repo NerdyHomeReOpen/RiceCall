@@ -2,14 +2,7 @@
  * Socket.io Event Definitions shared between platforms
  */
 
-export const ClientToServerEventWithAckNames = [
-  'SFUCreateTransport',
-  'SFUConnectTransport',
-  'SFUCreateProducer',
-  'SFUCreateConsumer',
-  'SFUJoin',
-  'SFULeave'
-];
+export const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
 
 export const ClientToServerEventNames = [
   'acceptMemberInvitation',

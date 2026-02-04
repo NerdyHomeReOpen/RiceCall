@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * IPC Facade - Unified interface for Renderer process
- * 
+ *
  * This module provides a clean API for the renderer (React components) to communicate
  * with the main process (Electron) or directly with handlers (Web).
- * 
+ *
  * Architecture:
  * - Uses platform abstractions which return appropriate implementations
  * - Electron: Real ipcRenderer, main process socket, native window controls
  * - Web: Fake ipcRenderer, direct socket.io, in-app popup controls
- * 
+ *
  * NO platform checks (isElectron) exist in this file!
  * All platform-specific logic is encapsulated in platform/* modules.
  */
@@ -70,20 +70,13 @@ const ipcFacade = {
   // Socket Communication (delegated to platform/socket)
   // -------------------------------------------------------------------------
   socket: {
-    send: <T extends keyof Types.ClientToServerEvents>(
-      event: T,
-      ...args: Parameters<Types.ClientToServerEvents[T]>
-    ) => getSocket().send(event, ...args),
+    send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => getSocket().send(event, ...args),
 
-    on: <T extends keyof Types.ServerToClientEvents>(
-      event: T,
-      callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>
-    ) => getSocket().on(event, callback),
+    on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) =>
+      getSocket().on(event, callback),
 
-    emit: <T extends keyof Types.ClientToServerEventsWithAck>(
-      event: T,
-      payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]
-    ): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => getSocket().emit(event, payload),
+    emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> =>
+      getSocket().emit(event, payload),
   },
 
   // Socket client management (delegated to platform/socket)
@@ -445,7 +438,6 @@ const ipcFacade = {
   },
 };
 
-
 // ============================================================================
 // System Settings Accessors (auto-generated pattern)
 // ============================================================================
@@ -479,7 +471,12 @@ function createSettingAccessors() {
     autoLaunch: createSettingAccessor({ getChannel: 'get-auto-launch', setChannel: 'set-auto-launch', updateChannel: 'auto-launch', defaultValue: false }),
     alwaysOnTop: createSettingAccessor({ getChannel: 'get-always-on-top', setChannel: 'set-always-on-top', updateChannel: 'always-on-top', defaultValue: false }),
     statusAutoIdle: createSettingAccessor({ getChannel: 'get-status-auto-idle', setChannel: 'set-status-auto-idle', updateChannel: 'status-auto-idle', defaultValue: false }),
-    statusAutoIdleMinutes: createSettingAccessor({ getChannel: 'get-status-auto-idle-minutes', setChannel: 'set-status-auto-idle-minutes', updateChannel: 'status-auto-idle-minutes', defaultValue: 0 }),
+    statusAutoIdleMinutes: createSettingAccessor({
+      getChannel: 'get-status-auto-idle-minutes',
+      setChannel: 'set-status-auto-idle-minutes',
+      updateChannel: 'status-auto-idle-minutes',
+      defaultValue: 0,
+    }),
     statusAutoDnd: createSettingAccessor({ getChannel: 'get-status-auto-dnd', setChannel: 'set-status-auto-dnd', updateChannel: 'status-auto-dnd', defaultValue: false }),
     channelUIMode: createSettingAccessor<Types.ChannelUIMode>({ getChannel: 'get-channel-ui-mode', setChannel: 'set-channel-ui-mode', updateChannel: 'channel-ui-mode', defaultValue: 'classic' }),
     closeToTray: createSettingAccessor({ getChannel: 'get-close-to-tray', setChannel: 'set-close-to-tray', updateChannel: 'close-to-tray', defaultValue: false }),
@@ -494,25 +491,70 @@ function createSettingAccessors() {
     autoMixSetting: createSettingAccessor({ getChannel: 'get-auto-mix-setting', setChannel: 'set-auto-mix-setting', updateChannel: 'auto-mix-setting', defaultValue: false }),
     echoCancellation: createSettingAccessor({ getChannel: 'get-echo-cancellation', setChannel: 'set-echo-cancellation', updateChannel: 'echo-cancellation', defaultValue: false }),
     noiseCancellation: createSettingAccessor({ getChannel: 'get-noise-cancellation', setChannel: 'set-noise-cancellation', updateChannel: 'noise-cancellation', defaultValue: false }),
-    microphoneAmplification: createSettingAccessor({ getChannel: 'get-microphone-amplification', setChannel: 'set-microphone-amplification', updateChannel: 'microphone-amplification', defaultValue: false }),
+    microphoneAmplification: createSettingAccessor({
+      getChannel: 'get-microphone-amplification',
+      setChannel: 'set-microphone-amplification',
+      updateChannel: 'microphone-amplification',
+      defaultValue: false,
+    }),
     manualMixMode: createSettingAccessor({ getChannel: 'get-manual-mix-mode', setChannel: 'set-manual-mix-mode', updateChannel: 'manual-mix-mode', defaultValue: false }),
     mixMode: createSettingAccessor<Types.MixMode>({ getChannel: 'get-mix-mode', setChannel: 'set-mix-mode', updateChannel: 'mix-mode', defaultValue: 'app' }),
     speakingMode: createSettingAccessor<Types.SpeakingMode>({ getChannel: 'get-speaking-mode', setChannel: 'set-speaking-mode', updateChannel: 'speaking-mode', defaultValue: 'auto' }),
     defaultSpeakingKey: createSettingAccessor({ getChannel: 'get-default-speaking-key', setChannel: 'set-default-speaking-key', updateChannel: 'default-speaking-key', defaultValue: '' }),
-    notSaveMessageHistory: createSettingAccessor({ getChannel: 'get-not-save-message-history', setChannel: 'set-not-save-message-history', updateChannel: 'not-save-message-history', defaultValue: false }),
-    hotKeyOpenMainWindow: createSettingAccessor({ getChannel: 'get-hot-key-open-main-window', setChannel: 'set-hot-key-open-main-window', updateChannel: 'hot-key-open-main-window', defaultValue: '' }),
+    notSaveMessageHistory: createSettingAccessor({
+      getChannel: 'get-not-save-message-history',
+      setChannel: 'set-not-save-message-history',
+      updateChannel: 'not-save-message-history',
+      defaultValue: false,
+    }),
+    hotKeyOpenMainWindow: createSettingAccessor({
+      getChannel: 'get-hot-key-open-main-window',
+      setChannel: 'set-hot-key-open-main-window',
+      updateChannel: 'hot-key-open-main-window',
+      defaultValue: '',
+    }),
     hotKeyIncreaseVolume: createSettingAccessor({ getChannel: 'get-hot-key-increase-volume', setChannel: 'set-hot-key-increase-volume', updateChannel: 'hot-key-increase-volume', defaultValue: '' }),
     hotKeyDecreaseVolume: createSettingAccessor({ getChannel: 'get-hot-key-decrease-volume', setChannel: 'set-hot-key-decrease-volume', updateChannel: 'hot-key-decrease-volume', defaultValue: '' }),
     hotKeyToggleSpeaker: createSettingAccessor({ getChannel: 'get-hot-key-toggle-speaker', setChannel: 'set-hot-key-toggle-speaker', updateChannel: 'hot-key-toggle-speaker', defaultValue: '' }),
-    hotKeyToggleMicrophone: createSettingAccessor({ getChannel: 'get-hot-key-toggle-microphone', setChannel: 'set-hot-key-toggle-microphone', updateChannel: 'hot-key-toggle-microphone', defaultValue: '' }),
+    hotKeyToggleMicrophone: createSettingAccessor({
+      getChannel: 'get-hot-key-toggle-microphone',
+      setChannel: 'set-hot-key-toggle-microphone',
+      updateChannel: 'hot-key-toggle-microphone',
+      defaultValue: '',
+    }),
     hotKeyScreenshot: createSettingAccessor({ getChannel: 'get-hot-key-screenshot', setChannel: 'set-hot-key-screenshot', updateChannel: 'hot-key-screenshot', defaultValue: '' }),
-    disableAllSoundEffect: createSettingAccessor({ getChannel: 'get-disable-all-sound-effect', setChannel: 'set-disable-all-sound-effect', updateChannel: 'disable-all-sound-effect', defaultValue: false }),
-    enterVoiceChannelSound: createSettingAccessor({ getChannel: 'get-enter-voice-channel-sound', setChannel: 'set-enter-voice-channel-sound', updateChannel: 'enter-voice-channel-sound', defaultValue: true }),
-    leaveVoiceChannelSound: createSettingAccessor({ getChannel: 'get-leave-voice-channel-sound', setChannel: 'set-leave-voice-channel-sound', updateChannel: 'leave-voice-channel-sound', defaultValue: true }),
+    disableAllSoundEffect: createSettingAccessor({
+      getChannel: 'get-disable-all-sound-effect',
+      setChannel: 'set-disable-all-sound-effect',
+      updateChannel: 'disable-all-sound-effect',
+      defaultValue: false,
+    }),
+    enterVoiceChannelSound: createSettingAccessor({
+      getChannel: 'get-enter-voice-channel-sound',
+      setChannel: 'set-enter-voice-channel-sound',
+      updateChannel: 'enter-voice-channel-sound',
+      defaultValue: true,
+    }),
+    leaveVoiceChannelSound: createSettingAccessor({
+      getChannel: 'get-leave-voice-channel-sound',
+      setChannel: 'set-leave-voice-channel-sound',
+      updateChannel: 'leave-voice-channel-sound',
+      defaultValue: true,
+    }),
     startSpeakingSound: createSettingAccessor({ getChannel: 'get-start-speaking-sound', setChannel: 'set-start-speaking-sound', updateChannel: 'start-speaking-sound', defaultValue: true }),
     stopSpeakingSound: createSettingAccessor({ getChannel: 'get-stop-speaking-sound', setChannel: 'set-stop-speaking-sound', updateChannel: 'stop-speaking-sound', defaultValue: true }),
-    receiveDirectMessageSound: createSettingAccessor({ getChannel: 'get-receive-direct-message-sound', setChannel: 'set-receive-direct-message-sound', updateChannel: 'receive-direct-message-sound', defaultValue: true }),
-    receiveChannelMessageSound: createSettingAccessor({ getChannel: 'get-receive-channel-message-sound', setChannel: 'set-receive-channel-message-sound', updateChannel: 'receive-channel-message-sound', defaultValue: true }),
+    receiveDirectMessageSound: createSettingAccessor({
+      getChannel: 'get-receive-direct-message-sound',
+      setChannel: 'set-receive-direct-message-sound',
+      updateChannel: 'receive-direct-message-sound',
+      defaultValue: true,
+    }),
+    receiveChannelMessageSound: createSettingAccessor({
+      getChannel: 'get-receive-channel-message-sound',
+      setChannel: 'set-receive-channel-message-sound',
+      updateChannel: 'receive-channel-message-sound',
+      defaultValue: true,
+    }),
     autoCheckForUpdates: createSettingAccessor({ getChannel: 'get-auto-check-for-updates', setChannel: 'set-auto-check-for-updates', updateChannel: 'auto-check-for-updates', defaultValue: false }),
     updateCheckInterval: createSettingAccessor({ getChannel: 'get-update-check-interval', setChannel: 'set-update-check-interval', updateChannel: 'update-check-interval', defaultValue: 0 }),
     updateChannel: createSettingAccessor({ getChannel: 'get-update-channel', setChannel: 'set-update-channel', updateChannel: 'update-channel', defaultValue: '' }),

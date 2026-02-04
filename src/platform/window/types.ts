@@ -1,6 +1,6 @@
 /**
  * Platform Window Types
- * 
+ *
  * Unified window control interface for both Electron and Web platforms.
  */
 

@@ -139,40 +139,38 @@ export function InAppPopupContainer() {
       {popups.length === 0
         ? null
         : popups.map((p, idx) => {
-          const key = p.id;
-          const pos = positionsRef.current[key] ?? {
-            x: 120 + idx * 24,
-            y: 80 + idx * 24,
-          };
-          positionsRef.current[key] = pos;
+            const key = p.id;
+            const pos = positionsRef.current[key] ?? {
+              x: 120 + idx * 24,
+              y: 80 + idx * 24,
+            };
+            positionsRef.current[key] = pos;
 
-          const z = zOrder.indexOf(p.id) + 1;
-          const effectiveData = p.initialData;
-          const popupTitle = getPopupTitle(p.type, effectiveData, t);
+            const z = zOrder.indexOf(p.id) + 1;
+            const effectiveData = p.initialData;
+            const popupTitle = getPopupTitle(p.type, effectiveData, t);
 
-          return (
-            <DraggableWindow
-              key={key}
-              id={p.id}
-              type={p.type}
-              title={popupTitle}
-              zIndex={z}
-              initialPos={pos}
-              onPosChange={(next) => {
-                positionsRef.current[key] = next;
-                setTick((x) => x + 1);
-              }}
-              hidden={!!p.minimized}
-            >
-              <PopupErrorBoundary popupId={p.id} onClose={() => closeInAppPopup(p.id)}>
-                {/* Allow popup components to call `ipc.window.close()` in web by providing a current-popup id hint. */}
-                <CurrentPopupIdScope popupId={p.id}>
-                {renderPopupNode({ ...p, initialData: effectiveData })}
-                </CurrentPopupIdScope>
-              </PopupErrorBoundary>
-            </DraggableWindow>
-          );
-        })}
+            return (
+              <DraggableWindow
+                key={key}
+                id={p.id}
+                type={p.type}
+                title={popupTitle}
+                zIndex={z}
+                initialPos={pos}
+                onPosChange={(next) => {
+                  positionsRef.current[key] = next;
+                  setTick((x) => x + 1);
+                }}
+                hidden={!!p.minimized}
+              >
+                <PopupErrorBoundary popupId={p.id} onClose={() => closeInAppPopup(p.id)}>
+                  {/* Allow popup components to call `ipc.window.close()` in web by providing a current-popup id hint. */}
+                  <CurrentPopupIdScope popupId={p.id}>{renderPopupNode({ ...p, initialData: effectiveData })}</CurrentPopupIdScope>
+                </PopupErrorBoundary>
+              </DraggableWindow>
+            );
+          })}
 
       {minimized.length === 0 ? null : (
         <div
@@ -256,7 +254,6 @@ export function InAppPopupContainer() {
       <span style={{ display: 'none' }}>{tick}</span>
     </div>
   );
-
 }
 
 function CurrentPopupIdScope(props: { popupId: string; children: React.ReactNode }) {
@@ -339,16 +336,7 @@ class PopupErrorBoundary extends React.Component<
   }
 }
 
-function DraggableWindow(props: {
-  id: string;
-  type: Types.PopupType;
-  title: string;
-  zIndex: number;
-  initialPos: Pos;
-  onPosChange: (p: Pos) => void;
-  hidden?: boolean;
-  children: React.ReactNode;
-}) {
+function DraggableWindow(props: { id: string; type: Types.PopupType; title: string; zIndex: number; initialPos: Pos; onPosChange: (p: Pos) => void; hidden?: boolean; children: React.ReactNode }) {
   const { zIndex, initialPos, onPosChange, children } = props;
   const headerConfig = POPUP_HEADERS[props.type] ?? { buttons: ['close'], hideHeader: false };
 
@@ -431,18 +419,20 @@ function DraggableWindow(props: {
       {/* Title bar (like Electron popup header) */}
       {!headerConfig.hideHeader && (
         <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            minHeight: 30,
-            padding: '0 8px',
-            background: 'var(--main-color, #1e90ff)',
-            color: 'var(--secondary-color, #fff)',
-            cursor: isDragging ? 'move' : 'default',
-            WebkitAppRegion: 'drag',
-            userSelect: 'none',
-          } as React.CSSProperties}
+          style={
+            {
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              minHeight: 30,
+              padding: '0 8px',
+              background: 'var(--main-color, #1e90ff)',
+              color: 'var(--secondary-color, #fff)',
+              cursor: isDragging ? 'move' : 'default',
+              WebkitAppRegion: 'drag',
+              userSelect: 'none',
+            } as React.CSSProperties
+          }
         >
           <span style={{ fontSize: 13, fontWeight: 500 }}>{props.title}</span>
           <div style={{ display: 'flex', gap: 4, WebkitAppRegion: 'no-drag' } as React.CSSProperties}>

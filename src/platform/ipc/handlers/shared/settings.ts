@@ -5,18 +5,13 @@ import type * as Types from '@/types';
 /**
  * Shared settings handlers logic.
  * Decoupled from Electron/Web specific APIs.
- * 
+ *
  * @param ipc - Object with .on(channel, listener) method
  * @param storage - Object with .get(key) and .set(key, val) methods
  * @param broadcast - Function to notify all windows/tabs about a change
  * @param getSettings - Function to get the full settings object
  */
-export function registerSharedSettingsHandlers(
-  ipc: any,
-  store: any,
-  broadcast: (channel: string, value: any) => void,
-  getSettings: () => any
-) {
+export function registerSharedSettingsHandlers(ipc: any, store: any, broadcast: (channel: string, value: any) => void, getSettings: () => any) {
   // --------------------------------------------------------------------------
   // Getters
   // --------------------------------------------------------------------------

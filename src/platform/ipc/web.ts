@@ -40,10 +40,7 @@ export function createWebStorage(prefix: string = ''): IpcStorage {
 /**
  * Create a Web IpcRenderer that directly calls handlers.
  */
-export function createWebIpcRenderer(
-  registration: HandlerRegistration,
-  context: HandlerContext
-): IpcRenderer {
+export function createWebIpcRenderer(registration: HandlerRegistration, context: HandlerContext): IpcRenderer {
   const listeners: Map<string, Set<(...args: any[]) => void>> = new Map();
 
   // Merge all handlers

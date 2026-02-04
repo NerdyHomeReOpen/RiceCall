@@ -23,7 +23,10 @@ function emit() {
   const snapshot = instances;
   try {
     if (typeof window !== 'undefined' && localStorage.getItem('ricecall:debug:popup') === '1') {
-      console.log('[InAppPopupHost.emit]', snapshot.map((p) => ({ id: p.id, type: p.type })));
+      console.log(
+        '[InAppPopupHost.emit]',
+        snapshot.map((p) => ({ id: p.id, type: p.type })),
+      );
     }
   } catch {
     // ignore

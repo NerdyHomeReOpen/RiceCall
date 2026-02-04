@@ -6,18 +6,15 @@
  */
 
 export function isElectron() {
-    
-    const isRenderer = typeof window !== 'undefined' && typeof window.process === 'object' && (window.process as any).type === 'renderer';
-    if (isRenderer) return true;
+  const isRenderer = typeof window !== 'undefined' && typeof window.process === 'object' && (window.process as any).type === 'renderer';
+  if (isRenderer) return true;
 
-    
-    const isMain = typeof process !== 'undefined' && !!(process.versions && process.versions.electron);
-    if (isMain) return true;
+  const isMain = typeof process !== 'undefined' && !!(process.versions && process.versions.electron);
+  if (isMain) return true;
 
-    
-    if (typeof navigator === 'object' && navigator.userAgent.includes('Electron')) {
-        return true;
-    }
+  if (typeof navigator === 'object' && navigator.userAgent.includes('Electron')) {
+    return true;
+  }
 
-    return false;
+  return false;
 }

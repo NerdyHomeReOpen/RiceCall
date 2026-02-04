@@ -49,7 +49,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   // Refs
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const popupOffSubmitRef = useRef<() => void>(() => { });
+  const popupOffSubmitRef = useRef<() => void>(() => {});
   const userRef = useRef(user);
   const currentFriendsRef = useRef(currentFriends);
   const currentServerRef = useRef(currentServer);
@@ -488,7 +488,7 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error: Error) => {
       // General error handling only, logout is handled via openPopup
-      Popup.openErrorDialog(error.message, () => { });
+      Popup.openErrorDialog(error.message, () => {});
     });
     return () => unsub();
   }, []);

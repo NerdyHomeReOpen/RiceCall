@@ -61,7 +61,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
   }, []);
 
   const updateStage = useCallback((id: string, status: StepStatus) => {
-    setStages(prev => prev.map(s => s.id === id ? { ...s, status } : s));
+    setStages((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
   }, []);
 
   useEffect(() => {
@@ -81,15 +81,14 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
         setProgress({
           current: percentage,
           cycle,
-          totalCycles
+          totalCycles,
         });
 
         // LIVE UPDATE: Update the report view while testing
         if (hops && domain) {
-          setReports(prev => {
-            const isSfu = prev.sfu?.some(r => r.domain === domain);
-            const updateTarget = (list?: DiagnosisResult[]) =>
-              list?.map(r => r.domain === domain ? { ...r, mtr: { ...r.mtr, executed: true, hops } } : r);
+          setReports((prev) => {
+            const isSfu = prev.sfu?.some((r) => r.domain === domain);
+            const updateTarget = (list?: DiagnosisResult[]) => list?.map((r) => (r.domain === domain ? { ...r, mtr: { ...r.mtr, executed: true, hops } } : r));
 
             if (isSfu) return { ...prev, sfu: updateTarget(prev.sfu) };
             return { ...prev, domain: updateTarget(prev.domain) };
@@ -101,58 +100,70 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
 
   const renderVisualProgress = () => {
     return (
-      <div style={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        background: 'rgba(255,255,255,0.05)',
-        padding: '12px 15px',
-        borderRadius: '10px',
-        marginBottom: '10px'
-      }}>
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          background: 'rgba(255,255,255,0.05)',
+          padding: '12px 15px',
+          borderRadius: '10px',
+          marginBottom: '10px',
+        }}
+      >
         {stages.map((stage, index) => (
           <React.Fragment key={stage.id}>
-            <div style={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              gap: '5px',
-              flex: 1,
-              position: 'relative',
-              opacity: stage.status === 'pending' ? 0.3 : 1
-            }}>
-              <div style={{
-                fontSize: '1.4rem',
-                color: stage.status === 'completed' ? '#4caf50' : stage.status === 'active' ? '#2196f3' : '#555',
+            <div
+              style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                justifyContent: 'center',
-                height: '30px'
-              }}>
+                gap: '5px',
+                flex: 1,
+                position: 'relative',
+                opacity: stage.status === 'pending' ? 0.3 : 1,
+              }}
+            >
+              <div
+                style={{
+                  fontSize: '1.4rem',
+                  color: stage.status === 'completed' ? '#4caf50' : stage.status === 'active' ? '#2196f3' : '#555',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  height: '30px',
+                }}
+              >
                 {stage.status === 'active' ? <FaSpinner style={{ animation: 'spin 2s linear infinite' }} /> : stage.icon}
               </div>
               <div style={{ fontSize: '0.65rem', fontWeight: 'bold', whiteSpace: 'nowrap', color: stage.status === 'pending' ? '#555' : 'inherit' }}>{stage.label}</div>
               {stage.status === 'active' && (stage.id === 'domain' || stage.id === 'sfu_test') && (
-                <div style={{
-                  width: '100%',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  marginTop: '3px'
-                }}>
-                  <div style={{
-                    width: '80%',
-                    height: '3px',
-                    background: 'rgba(255,255,255,0.1)',
-                    borderRadius: '2px',
-                    overflow: 'hidden'
-                  }}>
-                    <div style={{
-                      width: `${progress.current}%`,
-                      height: '100%',
-                      background: '#2196f3',
-                      transition: 'width 0.3s ease'
-                    }} />
+                <div
+                  style={{
+                    width: '100%',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
+                    marginTop: '3px',
+                  }}
+                >
+                  <div
+                    style={{
+                      width: '80%',
+                      height: '3px',
+                      background: 'rgba(255,255,255,0.1)',
+                      borderRadius: '2px',
+                      overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${progress.current}%`,
+                        height: '100%',
+                        background: '#2196f3',
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
                   </div>
                   <div style={{ fontSize: '0.6rem', color: '#2196f3', marginTop: '2px' }}>
                     Cycle {progress.cycle}/{progress.totalCycles}
@@ -161,16 +172,18 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
               )}
             </div>
             {index < stages.length - 1 && (
-              <div style={{
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                color: (stages[index].status === 'completed') ? '#4caf50' : 'rgba(255,255,255,0.2)',
-                fontSize: '1rem',
-                paddingBottom: (stages[index].status === 'active' || stages[index + 1].status === 'active') ? '25px' : '15px',
-                flex: 0.2,
-                transition: 'all 0.3s ease'
-              }}>
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: stages[index].status === 'completed' ? '#4caf50' : 'rgba(255,255,255,0.2)',
+                  fontSize: '1rem',
+                  paddingBottom: stages[index].status === 'active' || stages[index + 1].status === 'active' ? '25px' : '15px',
+                  flex: 0.2,
+                  transition: 'all 0.3s ease',
+                }}
+              >
                 <FaArrowRight />
               </div>
             )}
@@ -187,7 +200,9 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
     if (!results) return null;
     return results.map((res, idx) => (
       <div key={idx} style={{ marginBottom: '15px', background: 'rgba(255,255,255,0.05)', padding: '12px', borderRadius: '8px' }}>
-        <div style={{ fontWeight: 'bold', marginBottom: '8px', color: '#4da6ff', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '5px' }}>
+        <div
+          style={{ fontWeight: 'bold', marginBottom: '8px', color: '#4da6ff', display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.1)', paddingBottom: '5px' }}
+        >
           <span>Target: {res.domain}</span>
           {res.dns.resolved && <span style={{ fontSize: '0.75rem', color: '#888' }}>{res.dns.addresses[0]}</span>}
         </div>
@@ -225,21 +240,24 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
     ));
   };
 
-  const runDiagnosis = useCallback(async (domains: string[], duration: number = 3) => {
-    addLog(`Starting diagnosis for: ${domains.join(', ')}`);
-    setProgress({ current: 0, cycle: 0, totalCycles: duration });
-    try {
-      const report: FullReport = await ipc.network.runDiagnosis({ domains, duration });
-      if ((report as any).error) {
-        addLog(`Diagnosis error: ${(report as any).error}`);
+  const runDiagnosis = useCallback(
+    async (domains: string[], duration: number = 3) => {
+      addLog(`Starting diagnosis for: ${domains.join(', ')}`);
+      setProgress({ current: 0, cycle: 0, totalCycles: duration });
+      try {
+        const report: FullReport = await ipc.network.runDiagnosis({ domains, duration });
+        if ((report as any).error) {
+          addLog(`Diagnosis error: ${(report as any).error}`);
+          return null;
+        }
+        return report;
+      } catch (err: any) {
+        addLog(`IPC Error: ${err.message}`);
         return null;
       }
-      return report;
-    } catch (err: any) {
-      addLog(`IPC Error: ${err.message}`);
-      return null;
-    }
-  }, [addLog]);
+    },
+    [addLog],
+  );
 
   const startTest = useCallback(async () => {
     if (isTesting) return;
@@ -248,7 +266,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
     setReports({});
     setProgress({ current: 0, cycle: 0, totalCycles: 0 });
     setActiveTab('logs');
-    setStages(prev => prev.map(s => ({ ...s, status: 'pending' })));
+    setStages((prev) => prev.map((s) => ({ ...s, status: 'pending' })));
 
     addLog('Starting Network Diagnosis');
     updateStage('init', 'active');
@@ -272,18 +290,18 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
     const domains = Array.from(new Set([apiDomain, wsDomain])).filter(Boolean);
 
     // Pre-initialize reports so live updates have a target
-    setReports(prev => ({
+    setReports((prev) => ({
       ...prev,
-      domain: domains.map(d => ({
+      domain: domains.map((d) => ({
         domain: d,
         dns: { resolved: false, addresses: [], error: null },
-        mtr: { executed: false, hops: [], error: null }
-      }))
+        mtr: { executed: false, hops: [], error: null },
+      })),
     }));
 
     const report1 = await runDiagnosis(domains, 3);
     if (report1) {
-      setReports(prev => ({ ...prev, domain: report1.diagnosis }));
+      setReports((prev) => ({ ...prev, domain: report1.diagnosis }));
       addLog('--- Domain Diagnosis Completed ---');
       updateStage('domain', 'completed');
     } else {
@@ -307,18 +325,20 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
           // Step 2: Diagnose SFU direct connection
           addLog(`Starting diagnosis for SFU: ${data.ip}`);
 
-          setReports(prev => ({
+          setReports((prev) => ({
             ...prev,
-            sfu: [{
-              domain: data.ip,
-              dns: { resolved: true, addresses: [data.ip], error: null },
-              mtr: { executed: false, hops: [], error: null }
-            }]
+            sfu: [
+              {
+                domain: data.ip,
+                dns: { resolved: true, addresses: [data.ip], error: null },
+                mtr: { executed: false, hops: [], error: null },
+              },
+            ],
           }));
 
           const report2 = await runDiagnosis([data.ip], 5);
           if (report2) {
-            setReports(prev => ({ ...prev, sfu: report2.diagnosis }));
+            setReports((prev) => ({ ...prev, sfu: report2.diagnosis }));
             updateStage('sfu_test', 'completed');
             setActiveTab('reports'); // Auto switch to reports when done
           } else {
@@ -331,13 +351,11 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
         addLog(t('diagnosis-finished'));
         setIsTesting(false);
       });
-
     } catch (e: any) {
       addLog(`Error requesting SFU info: ${e.message}`);
       updateStage('sfu_info', 'failed');
       setIsTesting(false);
     }
-
   }, [isTesting, addLog, t, updateStage, runDiagnosis]);
 
   const exportReport = useCallback(() => {
@@ -354,7 +372,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
 
     if (reports.domain) {
       content += `--- API / WEBSOCKET SERVER REPORT ---\n`;
-      reports.domain.forEach(res => {
+      reports.domain.forEach((res) => {
         content += `Target: ${res.domain} (${res.dns.addresses.join(', ') || 'DNS Failed'})\n`;
         if (res.mtr.executed) {
           content += `Hop | Host                 | Loss% | Min   | Max   | Avg\n`;
@@ -370,7 +388,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
 
     if (reports.sfu) {
       content += `--- SFU (VOICE/VIDEO) SERVER REPORT ---\n`;
-      reports.sfu.forEach(res => {
+      reports.sfu.forEach((res) => {
         content += `Target: ${res.domain}\n`;
         if (res.mtr.executed) {
           content += `Hop | Host                 | Loss% | Min   | Max   | Avg\n`;
@@ -398,19 +416,24 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
   if (!isElectron()) {
     return (
       <div className={styles['popup-wrapper']}>
-        <div className={styles['popup-body']} style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          height: '100%',
-          gap: '20px'
-        }}>
-          <div style={{
-            fontSize: '1.2rem',
-            color: '#555',
-            fontWeight: 'bold'
-          }}>
+        <div
+          className={styles['popup-body']}
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            height: '100%',
+            gap: '20px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '1.2rem',
+              color: '#555',
+              fontWeight: 'bold',
+            }}
+          >
             {t('app-only-feature')}
           </div>
         </div>
@@ -444,7 +467,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
                 fontWeight: activeTab === 'logs' ? 'bold' : 'normal',
                 color: activeTab === 'logs' ? '#2196f3' : '#aaa',
                 borderBottom: activeTab === 'logs' ? '2px solid #2196f3' : '2px solid transparent',
-                transition: 'all 0.2s ease'
+                transition: 'all 0.2s ease',
               }}
             >
               {t('diagnosis-logs')}
@@ -461,7 +484,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
                 transition: 'all 0.2s ease',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '5px'
+                gap: '5px',
               }}
             >
               {t('diagnosis-reports')}
@@ -484,24 +507,32 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
                   fontSize: '0.8rem',
                   border: '1px solid rgba(255,255,255,0.1)',
                   userSelect: 'text',
-                  WebkitUserSelect: 'text'
+                  WebkitUserSelect: 'text',
                 }}
               >
-                {logs.length === 0 ? <div style={{ color: '#888' }}>Click &quot;Start Test&quot; to begin...</div> : logs.map((log, i) => (
-                  <div key={i} style={{ marginBottom: '3px', borderBottom: '1px solid rgba(255,255,255,0.03)', userSelect: 'text', WebkitUserSelect: 'text' }}>{log}</div>
-                ))}
+                {logs.length === 0 ? (
+                  <div style={{ color: '#888' }}>Click &quot;Start Test&quot; to begin...</div>
+                ) : (
+                  logs.map((log, i) => (
+                    <div key={i} style={{ marginBottom: '3px', borderBottom: '1px solid rgba(255,255,255,0.03)', userSelect: 'text', WebkitUserSelect: 'text' }}>
+                      {log}
+                    </div>
+                  ))
+                )}
               </div>
             ) : (
-              <div style={{
-                flex: 1,
-                background: 'rgba(0,0,0,0.35)',
-                padding: '15px',
-                borderRadius: '8px',
-                overflowY: 'auto',
-                border: '1px solid rgba(255,255,255,0.1)',
-                userSelect: 'text',
-                WebkitUserSelect: 'text'
-              }}>
+              <div
+                style={{
+                  flex: 1,
+                  background: 'rgba(0,0,0,0.35)',
+                  padding: '15px',
+                  borderRadius: '8px',
+                  overflowY: 'auto',
+                  border: '1px solid rgba(255,255,255,0.1)',
+                  userSelect: 'text',
+                  WebkitUserSelect: 'text',
+                }}
+              >
                 {!reports.domain && !reports.sfu && (
                   <div style={{ height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888', flexDirection: 'column', gap: '10px' }}>
                     <FaSpinner style={{ animation: 'spin 2s linear infinite', fontSize: '1.5rem' }} />
@@ -537,7 +568,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
           style={{
             opacity: logs.length === 0 || isTesting ? 0.5 : 1,
             pointerEvents: logs.length === 0 || isTesting ? 'none' : 'auto',
-            marginRight: 'auto'
+            marginRight: 'auto',
           }}
         >
           {t('export-report')}

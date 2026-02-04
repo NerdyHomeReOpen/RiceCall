@@ -47,19 +47,13 @@ function getDeps(): LoaderDeps {
 
 async function applyFriend({ userId, targetId }: { userId: string; targetId: string }) {
   const { data } = getDeps();
-  const [target, friendApplication] = await Promise.all([
-    data.user({ userId: targetId }),
-    data.friendApplication({ senderId: userId, receiverId: targetId }),
-  ]);
+  const [target, friendApplication] = await Promise.all([data.user({ userId: targetId }), data.friendApplication({ senderId: userId, receiverId: targetId })]);
   return { userId, targetId, target, friendApplication };
 }
 
 async function applyMember({ userId, serverId }: { userId: string; serverId: string }) {
   const { data } = getDeps();
-  const [server, memberApplication] = await Promise.all([
-    data.server({ userId, serverId }),
-    data.memberApplication({ userId, serverId }),
-  ]);
+  const [server, memberApplication] = await Promise.all([data.server({ userId, serverId }), data.memberApplication({ userId, serverId })]);
   return { userId, serverId, server, memberApplication };
 }
 
@@ -71,11 +65,7 @@ async function blockMember({ userId, serverId }: { userId: string; serverId: str
 
 async function channelSetting({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
   const { data } = getDeps();
-  const [server, channel, channelMembers] = await Promise.all([
-    data.server({ userId, serverId }),
-    data.channel({ userId, serverId, channelId }),
-    data.channelMembers({ serverId, channelId }),
-  ]);
+  const [server, channel, channelMembers] = await Promise.all([data.server({ userId, serverId }), data.channel({ userId, serverId, channelId }), data.channelMembers({ serverId, channelId })]);
   return { userId, serverId, channelId, server, channel, channelMembers };
 }
 
@@ -88,10 +78,7 @@ async function createChannel({ userId, serverId, channelId }: { userId: string; 
 
 async function directMessage({ userId, targetId, event, message }: { userId: string; targetId: string; event: 'directMessage' | 'shakeWindow'; message: any }) {
   const { data } = getDeps();
-  const [friend, target] = await Promise.all([
-    data.friend({ userId, targetId }),
-    data.user({ userId: targetId }),
-  ]);
+  const [friend, target] = await Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId })]);
   return { userId, targetId, friend, target, event, message };
 }
 
@@ -133,19 +120,13 @@ async function inviteFriend({ userId, serverId }: { userId: string; serverId: st
 
 async function inviteMember({ userId, serverId }: { userId: string; serverId: string }) {
   const { data } = getDeps();
-  const [target, memberInvitation] = await Promise.all([
-    data.member({ userId, serverId }),
-    data.memberInvitation({ serverId, receiverId: userId }),
-  ]);
+  const [target, memberInvitation] = await Promise.all([data.member({ userId, serverId }), data.memberInvitation({ serverId, receiverId: userId })]);
   return { userId, serverId, target, memberInvitation };
 }
 
 async function kickMemberFromChannel({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
   const { data } = getDeps();
-  const [member, channel] = await Promise.all([
-    data.member({ userId, serverId, channelId }),
-    data.channel({ userId, serverId, channelId }),
-  ]);
+  const [member, channel] = await Promise.all([data.member({ userId, serverId, channelId }), data.channel({ userId, serverId, channelId })]);
   return { userId, serverId, channelId, channel, member };
 }
 
@@ -169,10 +150,7 @@ async function serverApplication({ userId, serverId }: { userId: string; serverI
 
 async function serverSetting({ userId, serverId }: { userId: string; serverId: string }) {
   const { data } = getDeps();
-  const [server, serverMembers] = await Promise.all([
-    data.server({ userId, serverId }),
-    data.serverMembers({ serverId }),
-  ]);
+  const [server, serverMembers] = await Promise.all([data.server({ userId, serverId }), data.serverMembers({ serverId })]);
   return { userId, serverId, server, serverMembers };
 }
 
@@ -185,11 +163,7 @@ async function systemSetting({ userId }: { userId: string }) {
 
 async function userInfo({ userId, targetId }: { userId: string; targetId: string }) {
   const { data } = getDeps();
-  const [friend, target, targetServers] = await Promise.all([
-    data.friend({ userId, targetId }),
-    data.user({ userId: targetId }),
-    data.servers({ userId: targetId }),
-  ]);
+  const [friend, target, targetServers] = await Promise.all([data.friend({ userId, targetId }), data.user({ userId: targetId }), data.servers({ userId: targetId })]);
   return { userId, targetId, friend, target, targetServers };
 }
 

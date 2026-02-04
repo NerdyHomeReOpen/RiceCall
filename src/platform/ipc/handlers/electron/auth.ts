@@ -21,11 +21,7 @@ export interface AuthDependencies {
 }
 
 export function registerAuthHandlers(ipcMain: IpcMain, deps: AuthDependencies) {
-  const {
-    store, isLogin, connectSocket, disconnectSocket, setTrayDetail,
-    getMainWindow, getAuthWindow, createPopup, closePopups,
-    BASE_URI, DEV
-  } = deps;
+  const { store, isLogin, connectSocket, disconnectSocket, setTrayDetail, getMainWindow, getAuthWindow, createPopup, closePopups, BASE_URI, DEV } = deps;
 
   // Implement the AuthProvider interface for Electron
   const electronProvider: AuthProvider = {
@@ -51,30 +47,30 @@ export function registerAuthHandlers(ipcMain: IpcMain, deps: AuthDependencies) {
 
     logout: async () => {
       new Logger('Auth').info('Logout: starting...');
-      
+
       // 1. Clear Memory & Persistence
       setToken('');
       store.delete('token');
       store.delete('userId');
       store.delete('login-account');
-      
+
       // 2. Clear Session Data (localStorage, cookies, etc.) across all windows
       // This is the strongest way to prevent auto-login loops
       await session.defaultSession.clearStorageData({
-        storages: ['localstorage', 'cookies', 'indexdb']
+        storages: ['localstorage', 'cookies', 'indexdb'],
       });
 
       isLogin(false);
       closePopups();
       disconnectSocket();
-      
+
       const mainWindow = getMainWindow();
       mainWindow?.hide();
-      
+
       // 3. Load Auth Page with a small delay to ensure cleanup is committed
       const authWindow = getAuthWindow();
       const authUrl = DEV ? `${BASE_URI}/auth` : `${BASE_URI}/auth.html`;
-      
+
       new Logger('Auth').info(`Logout: loading auth page in authWindow...`);
       setTimeout(() => {
         authWindow?.loadURL(authUrl);
@@ -112,11 +108,11 @@ export function registerAuthHandlers(ipcMain: IpcMain, deps: AuthDependencies) {
           createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
           return { success: false };
         });
-    }
+    },
   };
 
   const router = new ElectronIpcRouter(ipcMain);
-  
+
   // Use the shared registrar to bind channels to our provider
   registerAuthIpcHandlers(router, electronProvider);
 }

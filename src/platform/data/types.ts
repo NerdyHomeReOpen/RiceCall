@@ -1,6 +1,6 @@
 /**
  * DataClient interface and type definitions.
- * 
+ *
  * This defines the contract for data operations that can be fulfilled
  * by either Electron (via IPC) or Web (via HTTP) implementations.
  */

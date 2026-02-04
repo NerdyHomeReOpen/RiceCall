@@ -16,7 +16,6 @@ const EnvSchema = z.object({
   REACT_DEV_TOOLS_PATH: z.string().optional(),
 });
 
-
 export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
   let envLoaded: Record<string, string> = {};
   const _isElectron = isElectron();
@@ -37,16 +36,16 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
       } else {
         const { createRequire } = await import(/* webpackIgnore: true */ 'module');
         const _require = createRequire(import.meta.url);
-        
+
         electron = _require('electron');
         path = _require('path');
         dotenv = _require('dotenv');
         expand = _require('dotenv-expand').expand;
       }
-      
+
       const app = electron.app || (electron.remote && electron.remote.app);
       envLoaded = { ...process.env } as any;
-      
+
       const envPaths: string[] = [];
       const root = !isRenderer ? process.cwd() : '/';
 
@@ -62,7 +61,6 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
       const cfg = dotenv.config({ path: envPaths, override: true });
       expand(cfg);
       envLoaded = { ...envLoaded, ...(cfg.parsed ?? {}) };
-      
     } catch (err) {
       console.error('Failed to load Electron env files:', err);
     }

@@ -1,6 +1,6 @@
 /**
  * Platform Window Factory
- * 
+ *
  * Returns the appropriate window controller based on the current platform.
  */
 

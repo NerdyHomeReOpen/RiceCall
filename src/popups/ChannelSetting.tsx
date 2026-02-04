@@ -93,14 +93,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
     () =>
       Permission.isChannelMod(permissionLevel)
         ? [
-          t('channel-info'),
-          t('channel-announcement'),
-          t('access-permission'),
-          t('speaking-permission'),
-          t('text-permission'),
-          `${t('channel-management')} (${totalModeratorsCount})`,
-          `${t('blacklist-management')} (${totalBlockMembersCount})`,
-        ]
+            t('channel-info'),
+            t('channel-announcement'),
+            t('access-permission'),
+            t('speaking-permission'),
+            t('text-permission'),
+            `${t('channel-management')} (${totalModeratorsCount})`,
+            `${t('blacklist-management')} (${totalBlockMembersCount})`,
+          ]
         : isReadOnly
           ? [t('channel-info'), t('channel-announcement')]
           : [t('channel-info')],
@@ -544,7 +544,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                         .addSeparator()
                         .addMemberManagementOption(
                           { permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId },
-                          () => { },
+                          () => {},
                           getMemberManagementSubmenuItems(),
                         )
                         .build();

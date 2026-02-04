@@ -1,6 +1,6 @@
 /**
  * Platform-agnostic System Settings
- * 
+ *
  * Abstracts the system settings storage:
  * - Electron: uses electron-store (in main process)
  * - Web: uses localStorage
@@ -27,11 +27,11 @@ export function getSystemSettings(): Partial<Types.SystemSettings> {
     // This is populated by the main process on window load
     const cached = (window as any).__SYSTEM_SETTINGS__;
     if (cached) return cached;
-    
+
     // Fallback to defaults
     return getDefaultSettings();
   }
-  
+
   // Web mode: read from localStorage
   if (isBrowser) {
     try {
@@ -43,7 +43,7 @@ export function getSystemSettings(): Partial<Types.SystemSettings> {
       console.warn('[SystemSettings] Failed to read from localStorage:', e);
     }
   }
-  
+
   return getDefaultSettings();
 }
 

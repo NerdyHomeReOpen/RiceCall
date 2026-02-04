@@ -1,6 +1,6 @@
 /**
  * Platform-agnostic DataClient factory.
- * 
+ *
  * This module provides getDataClient() which returns the appropriate
  * DataClient implementation based on the runtime environment.
  */
@@ -69,7 +69,7 @@ export function isElectron(): boolean {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function getIpcRenderer(): any {
   if (!isElectronRenderer()) return null;
-  
+
   if (!ipcRenderer) {
     try {
       const electron = (window as unknown as { require: NodeRequire }).require('electron');
@@ -78,6 +78,6 @@ export function getIpcRenderer(): any {
       return null;
     }
   }
-  
+
   return ipcRenderer;
 }

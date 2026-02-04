@@ -7,27 +7,27 @@ const require = createRequire(import.meta.url);
 let DiagnosisTool: any = null;
 
 async function loadTool() {
-    if (DiagnosisTool) return DiagnosisTool;
+  if (DiagnosisTool) return DiagnosisTool;
+  try {
+    // Try createRequire first for CJS module compatibility in ESM
+    DiagnosisTool = require('networkdiagnosistool');
+    if (DiagnosisTool.default) DiagnosisTool = DiagnosisTool.default;
+    return DiagnosisTool;
+  } catch (e1) {
+    // @ts-expect-error - Logger takes only 1 argument
+    new Logger('NetworkService').warn('createRequire failed, trying dynamic import:', e1);
     try {
-        // Try createRequire first for CJS module compatibility in ESM
-        DiagnosisTool = require('networkdiagnosistool');
-        if (DiagnosisTool.default) DiagnosisTool = DiagnosisTool.default;
-        return DiagnosisTool;
-    } catch (e1) {
-        // @ts-expect-error - Logger takes only 1 argument
-        new Logger('NetworkService').warn('createRequire failed, trying dynamic import:', e1);
-        try {
-            // @ts-expect-error - No types for networkdiagnosistool
-            const module = await import('networkdiagnosistool'); // eslint-disable-line @next/next/no-assign-module-variable
-            DiagnosisTool = module.default || module;
-            return DiagnosisTool;
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        } catch (e2: any) {
-            // @ts-expect-error - Logger takes only 1 argument
-            new Logger('NetworkService').error('Failed to load networkdiagnosistool via all methods:', e2);
-            throw new Error(`Tool loading failed: ${e2.message || String(e2)}`);
-        }
+      // @ts-expect-error - No types for networkdiagnosistool
+      const module = await import('networkdiagnosistool'); // eslint-disable-line @next/next/no-assign-module-variable
+      DiagnosisTool = module.default || module;
+      return DiagnosisTool;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (e2: any) {
+      // @ts-expect-error - Logger takes only 1 argument
+      new Logger('NetworkService').error('Failed to load networkdiagnosistool via all methods:', e2);
+      throw new Error(`Tool loading failed: ${e2.message || String(e2)}`);
     }
+  }
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,52 +48,59 @@ export function initNetworkService(mainWindow: BrowserWindow | null) {
     // @ts-expect-error - Logger takes only 1 argument
     new Logger('NetworkService').info('Received run-network-diagnosis request', params);
     try {
-        const Tool = await loadTool();
-        if (!Tool) {
-            new Logger('NetworkService').error('Tool could not be loaded');
-            return { error: 'Network diagnosis tool could not be loaded. Please check node_modules.' };
+      const Tool = await loadTool();
+      if (!Tool) {
+        new Logger('NetworkService').error('Tool could not be loaded');
+        return { error: 'Network diagnosis tool could not be loaded. Please check node_modules.' };
+      }
+
+      if (activeTool) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        try {
+          activeTool.cancel?.();
+        } catch (e) {
+          /* ignore */
         }
+      }
 
-        if (activeTool) {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            try { activeTool.cancel?.(); } catch (e) { /* ignore */ }
+      return new Promise((resolve) => {
+        try {
+          const { domains, duration = 3 } = params;
+          // Ensure domains are unique and filtered
+          const uniqueDomains = Array.from(new Set(domains)).filter(Boolean);
+
+          activeTool = new Tool(uniqueDomains, duration);
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          activeTool
+            .run((progress: any) => {
+              if (!sender.isDestroyed()) {
+                sender.send('network-diagnosis-progress', progress);
+              }
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            })
+            .then((report: any) => {
+              activeTool = null;
+              resolve(report);
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            })
+            .catch((err: any) => {
+              activeTool = null;
+              // @ts-expect-error - Logger takes only 1 argument
+              new Logger('NetworkService').error('Diagnosis execution error:', err);
+              resolve({ error: err.message || String(err) });
+            });
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (err: any) {
+          activeTool = null;
+          // @ts-expect-error - Logger takes only 1 argument
+          new Logger('NetworkService').error('Tool instantiation error:', err);
+          resolve({ error: err.message || String(err) });
         }
-
-        return new Promise((resolve) => {
-            try {
-                const { domains, duration = 3 } = params;
-                // Ensure domains are unique and filtered
-                const uniqueDomains = Array.from(new Set(domains)).filter(Boolean);
-                
-                activeTool = new Tool(uniqueDomains, duration);
-
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                activeTool.run((progress: any) => {
-                    if (!sender.isDestroyed()) {
-                        sender.send('network-diagnosis-progress', progress);
-                    }
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                }).then((report: any) => {
-                    activeTool = null;
-                    resolve(report);
-                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-                }).catch((err: any) => {
-                    activeTool = null;
-                    // @ts-expect-error - Logger takes only 1 argument
-                    new Logger('NetworkService').error('Diagnosis execution error:', err);
-                    resolve({ error: err.message || String(err) });
-                });
-                // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            } catch (err: any) {
-                activeTool = null;
-                // @ts-expect-error - Logger takes only 1 argument
-                new Logger('NetworkService').error('Tool instantiation error:', err);
-                resolve({ error: err.message || String(err) });
-            }
-        });
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-        return { error: err.message || 'Unknown error loading diagnosis tool.' };
+      return { error: err.message || 'Unknown error loading diagnosis tool.' };
     }
   });
 

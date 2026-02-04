@@ -127,8 +127,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
 Header.displayName = 'Header';
 
-
-
 const PopupPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
