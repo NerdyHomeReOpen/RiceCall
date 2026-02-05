@@ -9,6 +9,8 @@ import { POPUP_SIZES, POPUP_HEADERS, POPUP_TITLE_KEYS } from '@/popup.config';
 
 import { closeInAppPopup, focusInAppPopup, minimizeInAppPopup, restoreInAppPopup, subscribeInAppPopups, type InAppPopupInstance } from './inAppPopupHost';
 import { renderPopup } from './popupComponents.generated';
+import { PopupHeader } from '@/components/common/PopupHeader';
+import headerStyles from '@/styles/header.module.css';
 
 type Pos = { x: number; y: number };
 
@@ -420,54 +422,15 @@ function DraggableWindow(props: { id: string; type: Types.PopupType; title: stri
     >
       {/* Title bar (like Electron popup header) */}
       {!headerConfig.hideHeader && (
-        <div
-          style={
-            {
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              minHeight: 30,
-              padding: '0 8px',
-              background: 'var(--main-color, #1e90ff)',
-              color: 'var(--secondary-color, #fff)',
-              cursor: isDragging ? 'move' : 'default',
-              WebkitAppRegion: 'drag',
-              userSelect: 'none',
-            } as React.CSSProperties
-          }
-        >
-          <span style={{ fontSize: 13, fontWeight: 500 }}>{props.title}</span>
-          <div style={{ display: 'flex', gap: 4, WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-            {headerConfig.buttons.includes('minimize') && (
-              <button
-                onClick={handleMinimize}
-                style={{
-                  width: 20,
-                  height: 20,
-                  border: 'none',
-                  background: 'url(/Button_Minsize.webp) no-repeat 0 0',
-                  backgroundSize: 'cover',
-                  cursor: 'pointer',
-                }}
-                title="Minimize"
-              />
-            )}
-            {headerConfig.buttons.includes('close') && (
-              <button
-                onClick={handleClose}
-                style={{
-                  width: 20,
-                  height: 20,
-                  border: 'none',
-                  background: 'url(/Button_Close.webp) no-repeat 0 0',
-                  backgroundSize: 'cover',
-                  cursor: 'pointer',
-                }}
-                title="Close"
-              />
-            )}
-          </div>
-        </div>
+        <PopupHeader
+          title={props.title}
+          buttons={headerConfig.buttons}
+          titleBoxIcon={props.type === 'changeTheme' ? headerStyles['title-box-skin-icon'] : props.type === 'directMessage' ? headerStyles['title-box-direct-message-icon'] : undefined}
+          onMinimize={handleMinimize}
+          onClose={handleClose}
+          // Web popups currently don't implement full maximize logic, so we omit onMaximize/onRestore for now
+          // or we could implement a basic version if desired, but "minimize" and "close" are the main ones.
+        />
       )}
       {children}
     </div>

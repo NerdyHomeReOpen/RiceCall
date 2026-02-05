@@ -9,6 +9,7 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 import { POPUP_HEADERS } from '@/popup.config';
 import { renderPopup } from '@/platform/popup/popupComponents.generated';
+import { PopupHeader } from '@/components/common/PopupHeader';
 
 import SocketManager from '@/components/SocketManager';
 
@@ -74,60 +75,6 @@ function getWebInitialData(id: string): any | null {
   }
 }
 
-interface HeaderProps {
-  title: string;
-  buttons: ('minimize' | 'maxsize' | 'close')[];
-  titleBoxIcon?: string;
-}
-
-const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon }) => {
-  // States
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Handlers
-  const handleMaximizeBtnClick = () => {
-    if (isFullscreen) return;
-    ipc.window.maximize();
-  };
-
-  const handleUnmaximizeBtnClick = () => {
-    if (!isFullscreen) return;
-    ipc.window.unmaximize();
-  };
-
-  const handleMinimizeBtnClick = () => {
-    ipc.window.minimize();
-  };
-
-  const handleCloseBtnClick = () => {
-    ipc.window.close();
-  };
-
-  // Effects
-  useEffect(() => {
-    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, []);
-
-  return (
-    <header className={`${header['header']} ${header['popup']}`}>
-      <div className={header['title-wrapper']}>
-        <div className={`${header['title-box']} ${titleBoxIcon}`}>
-          <div className={header['title']}>{title}</div>
-        </div>
-        <div className={header['buttons']}>
-          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimizeBtnClick} />}
-          {buttons.includes('maxsize') &&
-            (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={header['maxsize']} onClick={handleMaximizeBtnClick} />)}
-          {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} />}
-        </div>
-      </div>
-    </header>
-  );
-});
-
-Header.displayName = 'Header';
-
 const PopupPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
@@ -136,6 +83,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
   const [id, setId] = useState<string | null>(null);
   const [type, setType] = useState<Types.PopupType | null>(null);
   const [initialData, setInitialData] = useState<any | null>(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Variables
   const { buttons, hideHeader } = useMemo(() => {
@@ -196,6 +144,25 @@ const PopupPageComponent: React.FC = React.memo(() => {
     return () => renderPopup(type, id!, initialData);
   }, [id, type, initialData]);
 
+  // Handlers
+  const handleMaximizeBtnClick = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximizeBtnClick = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
+  };
+
+  const handleMinimizeBtnClick = () => {
+    ipc.window.minimize();
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.window.close();
+  };
+
   // Effects
   useEffect(() => {
     if (window.location.search) {
@@ -228,6 +195,11 @@ const PopupPageComponent: React.FC = React.memo(() => {
     }
   }, [id, type]);
 
+  useEffect(() => {
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
+  }, []);
+
   const missingInitialData = useMemo(() => {
     // Most popups expect an object to spread as props; null/undefined will crash.
     // In web mode, opening in a new tab + refresh can make initialData unavailable.
@@ -242,10 +214,15 @@ const PopupPageComponent: React.FC = React.memo(() => {
       {isElectron() && <SocketManager />}
       {!isElectron() && typeof window !== 'undefined' && window.opener && <SocketManager />}
       {!hideHeader && (
-        <Header
+        <PopupHeader
           title={title}
           buttons={buttons}
           titleBoxIcon={type === 'changeTheme' ? header['title-box-skin-icon'] : type === 'directMessage' ? header['title-box-direct-message-icon'] : undefined}
+          isFullscreen={isFullscreen}
+          onMinimize={handleMinimizeBtnClick}
+          onMaximize={handleMaximizeBtnClick}
+          onRestore={handleUnmaximizeBtnClick}
+          onClose={handleCloseBtnClick}
         />
       )}
       {missingInitialData ? (
