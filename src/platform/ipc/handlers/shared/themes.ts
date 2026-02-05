@@ -3,51 +3,58 @@
  * Provides custom themes and current theme management.
  */
 
-import type { HandlerContext, HandlerRegistration } from '@/platform/ipc/types';
+import type { IpcRouter } from '../../router';
 import type * as Types from '@/types';
+import { FileStorage } from '@/platform/fileStorage';
 
 const CUSTOM_THEMES_KEY = 'customThemes';
 const CURRENT_THEME_KEY = 'currentTheme';
 const MAX_THEMES = 7;
 
 /**
- * Create themes handlers.
+ * Register shared themes handlers.
  */
-export function createThemesHandlers(): HandlerRegistration {
-  return {
-    sync: {
-      'get-custom-themes': (ctx: HandlerContext): Partial<Types.Theme>[] => {
-        const themes = ctx.storage.get<Types.Theme[]>(CUSTOM_THEMES_KEY, []);
-        // Always return array of 7 elements
-        return Array.from({ length: MAX_THEMES }, (_, i) => themes[i] ?? {});
-      },
+export function registerSharedThemesHandlers(ipc: IpcRouter, store: any, broadcast: (channel: string, value: any) => void) {
+  // --------------------------------------------------------------------------
+  // Getters
+  // --------------------------------------------------------------------------
 
-      'get-current-theme': (ctx: HandlerContext): Types.Theme | null => {
-        return ctx.storage.get<Types.Theme | null>(CURRENT_THEME_KEY, null);
-      },
-    },
+  ipc.on('get-custom-themes', (event: any) => {
+    const themes = store.get(CUSTOM_THEMES_KEY) ?? [];
+    // Always return array of 7 elements
+    event.returnValue = Array.from({ length: MAX_THEMES }, (_, i) => themes[i] ?? {});
+  });
 
-    send: {
-      'add-custom-theme': (ctx: HandlerContext, theme: Types.Theme) => {
-        const themes = ctx.storage.get<Types.Theme[]>(CUSTOM_THEMES_KEY, []);
-        themes.unshift(theme);
-        ctx.storage.set(CUSTOM_THEMES_KEY, themes);
-        const result = Array.from({ length: MAX_THEMES }, (_, i) => themes[i] ?? {});
-        ctx.broadcast('custom-themes', result);
-      },
+  ipc.on('get-current-theme', (event: any) => {
+    event.returnValue = store.get(CURRENT_THEME_KEY) ?? null;
+  });
 
-      'delete-custom-theme': (ctx: HandlerContext, index: number) => {
-        const themes = ctx.storage.get<Types.Theme[]>(CUSTOM_THEMES_KEY, []);
-        themes.splice(index, 1);
-        ctx.storage.set(CUSTOM_THEMES_KEY, themes);
-        const result = Array.from({ length: MAX_THEMES }, (_, i) => themes[i] ?? {});
-        ctx.broadcast('custom-themes', result);
-      },
+  // --------------------------------------------------------------------------
+  // Actions
+  // --------------------------------------------------------------------------
 
-      'set-current-theme': (ctx: HandlerContext, theme: Types.Theme | null) => {
-        ctx.storage.set(CURRENT_THEME_KEY, theme);
-        ctx.broadcast('current-theme', theme);
-      },
-    },
-  };
+  ipc.handle('save-theme-image', async (_event: any, buffer: ArrayBuffer): Promise<string | null> => {
+    return await FileStorage.store(buffer, 'custom_themes', 'theme', 'webp');
+  });
+
+  ipc.on('add-custom-theme', (_event: any, theme: Types.Theme) => {
+    const themes = store.get(CUSTOM_THEMES_KEY) ?? [];
+    themes.unshift(theme);
+    store.set(CUSTOM_THEMES_KEY, themes);
+    const result = Array.from({ length: MAX_THEMES }, (_, i) => themes[i] ?? {});
+    broadcast('custom-themes', result);
+  });
+
+  ipc.on('delete-custom-theme', (_event: any, index: number) => {
+    const themes = store.get(CUSTOM_THEMES_KEY) ?? [];
+    themes.splice(index, 1);
+    store.set(CUSTOM_THEMES_KEY, themes);
+    const result = Array.from({ length: MAX_THEMES }, (_, i) => themes[i] ?? {});
+    broadcast('custom-themes', result);
+  });
+
+  ipc.on('set-current-theme', (_event: any, theme: Types.Theme | null) => {
+    store.set(CURRENT_THEME_KEY, theme);
+    broadcast('current-theme', theme);
+  });
 }

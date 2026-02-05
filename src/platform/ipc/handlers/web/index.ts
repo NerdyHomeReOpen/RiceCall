@@ -5,7 +5,7 @@
 import type { HandlerRegistration } from '@/platform/ipc/types';
 import { createAccountsHandlers } from '../shared/accounts';
 import { createLanguageHandlers } from '../shared/language';
-import { createThemesHandlers } from '../shared/themes';
+import { registerSharedThemesHandlers } from '../shared/themes';
 import { createEnvHandlers } from './env';
 import { createElectronOnlyHandlers } from './electron-only';
 import { createNetworkHandlers } from './network';
@@ -59,6 +59,16 @@ function createWebSettingsHandlers(): HandlerRegistration {
 }
 
 /**
+ * Create themes handlers for Web using shared logic.
+ */
+function createWebThemesHandlers(): HandlerRegistration {
+  const router = new WebIpcRouter();
+  return router.createWebHandlers((ipc, storage, broadcast) => {
+    registerSharedThemesHandlers(ipc, storage, broadcast);
+  });
+}
+
+/**
  * Merge multiple HandlerRegistration objects.
  */
 function mergeRegistrations(...registrations: HandlerRegistration[]): HandlerRegistration {
@@ -88,7 +98,7 @@ export function createAllHandlers(): HandlerRegistration {
     createWebSettingsHandlers(),
     createAccountsHandlers(),
     createLanguageHandlers(),
-    createThemesHandlers(),
+    createWebThemesHandlers(),
     createEnvHandlers(),
     createElectronOnlyHandlers(),
     createNetworkHandlers(),
@@ -102,7 +112,7 @@ export {
   createWebSettingsHandlers as createSettingsHandlers,
   createAccountsHandlers,
   createLanguageHandlers,
-  createThemesHandlers,
+  createWebThemesHandlers as createThemesHandlers,
   createEnvHandlers,
   createElectronOnlyHandlers,
   createNetworkHandlers,

@@ -111,20 +111,23 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     if (!image) return;
     image.arrayBuffer().then((arrayBuffer) => {
       Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
-        const blob = new Blob([imageUnit8Array], { type: 'image/webp' });
-        const imageUrl = URL.createObjectURL(blob);
-        const dominantColor = await Color.getDominantColor(imageUrl);
-        const visibleColor = Color.getVisibleColor(dominantColor);
-        const contrastColor = Color.getContrastColor(dominantColor);
+        const buffer = imageUnit8Array.buffer;
+        const imageUrl = await ipc.customThemes.saveImage(buffer);
 
-        const newTheme: Types.Theme = {
-          headerImage: `url(${imageUrl})`,
-          mainColor: Color.toRGBString(visibleColor),
-          secondaryColor: Color.toRGBString(contrastColor),
-        };
+        if (imageUrl) {
+          const dominantColor = await Color.getDominantColor(imageUrl);
+          const visibleColor = Color.getVisibleColor(dominantColor);
+          const contrastColor = Color.getContrastColor(dominantColor);
 
-        ipc.customThemes.current.set(newTheme);
-        ipc.customThemes.add(newTheme);
+          const newTheme: Types.Theme = {
+            headerImage: `url(${imageUrl})`,
+            mainColor: Color.toRGBString(visibleColor),
+            secondaryColor: Color.toRGBString(contrastColor),
+          };
+
+          ipc.customThemes.current.set(newTheme);
+          ipc.customThemes.add(newTheme);
+        }
       });
     });
   };

@@ -35,6 +35,7 @@ import * as PopupLoader from './src/platform/popup/popupLoader.js';
 import { registerSettingsHandlers } from './src/platform/ipc/handlers/electron/settings.js';
 import { registerDataHandlers } from './src/platform/ipc/handlers/electron/data.js';
 import { registerAuthHandlers } from './src/platform/ipc/handlers/electron/auth.js';
+import { registerThemesHandlers } from './src/platform/ipc/handlers/electron/themes.js';
 import Logger from './src/logger.js';
 import { LANGUAGES } from './src/constant.js';
 import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';
@@ -706,6 +707,9 @@ app.on('ready', async () => {
   // Register data handlers
   registerDataHandlers(ipcMain);
 
+  // Register themes handlers
+  registerThemesHandlers(ipcMain, store);
+
   // Register auth handlers
   registerAuthHandlers(ipcMain, {
     store,
@@ -828,49 +832,6 @@ app.on('ready', async () => {
     setTrayDetail();
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
-    });
-  });
-
-  // Custom themes handlers
-  ipcMain.on('get-custom-themes', (event) => {
-    const customThemes = store.get('customThemes');
-    event.returnValue = Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
-  });
-
-  ipcMain.on('add-custom-theme', (_, theme) => {
-    const customThemes = store.get('customThemes');
-    // Keep total 7 themes
-    customThemes.unshift(theme);
-    store.set('customThemes', customThemes);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send(
-        'custom-themes',
-        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
-      );
-    });
-  });
-
-  ipcMain.on('delete-custom-theme', (_, index) => {
-    const customThemes = store.get('customThemes');
-    // Keep total 7 themes
-    customThemes.splice(index, 1);
-    store.set('customThemes', customThemes);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send(
-        'custom-themes',
-        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
-      );
-    });
-  });
-
-  ipcMain.on('get-current-theme', (event) => {
-    event.returnValue = store.get('currentTheme');
-  });
-
-  ipcMain.on('set-current-theme', (_, theme) => {
-    store.set('currentTheme', theme);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('current-theme', theme);
     });
   });
 

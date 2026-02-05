@@ -230,6 +230,10 @@ const ipcFacade = {
       return getIpc().sendSync('get-custom-themes') ?? [];
     },
 
+    saveImage: async (buffer: ArrayBuffer): Promise<string | null> => {
+      return await getIpc().invoke('save-theme-image', buffer);
+    },
+
     add: (theme: Types.Theme) => {
       getIpc().send('add-custom-theme', theme);
     },
