@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 export const FileStorage = {
   store: async (buffer: ArrayBuffer, _directory: string, _filenamePrefix: string, _extension: string): Promise<string | null> => {
     return new Promise((resolve) => {

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Themes handlers - shared between Electron and Web.
  * Provides custom themes and current theme management.

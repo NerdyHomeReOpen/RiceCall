@@ -19,8 +19,10 @@ export const FileStorage = {
       
       fs.writeFileSync(filePath, Buffer.from(buffer));
       
-      // Return file:// URL for local file access
-      return `file://${filePath.replace(/\\/g, '/')}`;
+      // Return local-resource:// URL
+      // We only need the relative path from userData, which is directory/fileName
+      return `local-resource://${directory}/${fileName}`;
+      // eslint-disable-next-line 
     } catch (error: any) {
       new Logger('FileStorage').error(`Electron Storage Error: ${error.message}`);
       return null;

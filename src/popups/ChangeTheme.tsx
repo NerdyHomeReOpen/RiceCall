@@ -112,6 +112,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     image.arrayBuffer().then((arrayBuffer) => {
       Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         const buffer = imageUnit8Array.buffer;
+        // @ts-expect-error - ArrayBufferLike and ArrayBuffer are interchangeable in this context
         const imageUrl = await ipc.customThemes.saveImage(buffer);
 
         if (imageUrl) {
