@@ -94,7 +94,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
       .addBroadcastOption({ permissionLevel }, () => Popup.openServerBroadcast(currentServer.serverId, category.channelId))
       .addSeparator()
       .addMoveAllUserToChannelOption({ isInChannel, currentPermissionLevel, permissionLevel, movableUserIds: movableCategoryUserIds }, () =>
-        Popup.moveAllUsersToChannel(movableCategoryUserIds, currentServer.serverId, category.channelId),
+        Popup.moveAllUsersToChannel(movableCategoryUserIds, currentServer.serverId, currentChannel.channelId),
       )
       .addEditChannelOrderOption({ permissionLevel }, () => Popup.openEditChannelOrder(user.userId, currentServer.serverId))
       .addSeparator()
