@@ -31,7 +31,7 @@ graph TD
 
     subgraph Logic
         MainProc[Electron Main Process]
-        Handlers[src/handlers/*]
+        Handlers[src/platform/ipc/handlers/*]
         
         Native -->|IPC Bridge| MainProc
         MainProc --> Handlers
