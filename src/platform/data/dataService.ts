@@ -44,7 +44,13 @@ export interface DataService {
 
 // eslint-disable-next-line
 function toQuery(params: any): string {
-  return new URLSearchParams(params).toString();
+  const filtered: Record<string, string> = {};
+  for (const [k, v] of Object.entries(params || {})) {
+    if (v !== undefined) {
+      filtered[k] = String(v);
+    }
+  }
+  return new URLSearchParams(filtered).toString();
 }
 
 /**

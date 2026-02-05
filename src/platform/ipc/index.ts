@@ -39,7 +39,7 @@ function initWebIpc(): IpcRenderer {
     if (args && args.length > 0) {
       try {
         // 1. Deep copy and remove undefined fields (mimic Structured Clone)
-        args = JSON.parse(JSON.stringify(args));
+        args = structuredClone(args);
       } catch {}
     }
 
