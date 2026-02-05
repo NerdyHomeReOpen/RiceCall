@@ -20,7 +20,7 @@
     "next:export": "next export",
     "next:lint": "next lint",
     "electron:prep": "tsc -p tsconfig.electron.json && resolve-tspaths -p tsconfig.electron.json --src . --out build && ts-add-js-extension --dir build",
-    "electron:dev": "electron -r tsx main.ts --dev",
+    "electron:dev": "electron -r tsx main.ts --dev --no-sandbox",
     "electron:start": "electron -r tsx main.ts",
     "electron:build": "npm run electron:prep && electron-builder",
     "electron:build:deb": "npm run electron:prep && electron-builder --linux deb",

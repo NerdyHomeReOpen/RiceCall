@@ -22,7 +22,7 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import electron, { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session } from 'electron';
+import electron, { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session, protocol } from 'electron';
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
 import { getToken, setToken } from './src/auth.token.js';
@@ -43,6 +43,11 @@ import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
 }
+
+// Register custom protocol privileges
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'local-resource', privileges: { secure: true, supportFetchAPI: true, standard: true, bypassCSP: true, corsEnabled: true } },
+]);
 
 export function getRegion(): Types.LanguageKey {
   const language = app.getLocale();
@@ -700,6 +705,13 @@ export function configureReactDevTools() {
 app.on('ready', async () => {
   // Load env
   await loadEnv(store.get('server', 'prod'));
+
+  // Register local-resource protocol
+  protocol.registerFileProtocol('local-resource', (request, callback) => {
+    const url = request.url.replace('local-resource://', '');
+    const filePath = path.join(app.getPath('userData'), decodeURIComponent(url));
+    callback({ path: filePath });
+  });
 
   // Initialize i18n
   initMainI18n(store.get('language'));
