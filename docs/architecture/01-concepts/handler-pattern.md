@@ -33,16 +33,20 @@ export interface HandlerContext {
 ```mermaid
 graph LR
     A[IPC Message] --> B[ipcMain]
-    B --> C["Handler (context: Node impl)"]
-    C --> D[Result]
+    B --> C["Handler (shared/data.ts)"]
+    C -->|Import| Service["DataService (Global)"]
+    C -.->|context.storage| Store[Electron Store]
+    Service --> D[Result]
 ```
 
 ### Web 環境
 ```mermaid
 graph LR
     A[Function Call] --> B[Fake IPC]
-    B --> C["Handler (context: Web impl)"]
-    C --> D[Result]
+    B --> C["Handler (shared/data.ts)"]
+    C -->|Import| Service["DataService (Global)"]
+    C -.->|context.storage| Store[LocalStorage]
+    Service --> D[Result]
 ```
 
 ## 4. 實作範例

@@ -26,16 +26,17 @@ graph TD
     ElectronCtrl -- "IPC: 'open-popup'" --> Main[Main Process]
     Main --> Window[new BrowserWindow]
     
-    WebCtrl -- "State: popups.push('user-info')<br/>Broadcast: 'open-popup'" --> Host["InAppPopupHost (React)"]
-    Host --> DOM["&lt;div className='overlay'&gt;<br/>&nbsp;&nbsp;&lt;UserInfoPopup /&gt;<br/>&lt;/div&gt;"]
+    WebCtrl -- "Direct Call: openInAppPopup()" --> HostState["inAppPopupHost.ts (State)"]
+    HostState -- "Observer Pattern (setState)" --> Container["InAppPopupContainer (React)"]
+    Container --> DOM["&lt;div className='overlay'&gt;<br/>&nbsp;&nbsp;&lt;UserInfoPopup /&gt;<br/>&lt;/div&gt;"]
 ```
 
-## 3. Web 實作細節：`InAppPopupHost`
+## 3. Web 實作細節：`InAppPopupContainer`
 
-在 Web 版中，我們在 `src/app/layout.tsx` 或根組件掛載了 `InAppPopupHost`。
+在 Web 版中，我們在 `src/app/provider.tsx` 掛載了 `InAppPopupContainer`。
 
 這是一個全域的監聽器：
-1.  它訂閱 `BroadcastChannel` 的 `'open-popup'` 事件。
+1.  它訂閱 `inAppPopupHost.ts` 的狀態變更。
 2.  當收到開啟請求時，它會動態載入對應的 React Component (透過 `popupComponents.generated.tsx`)。
 3.  它將元件渲染在畫面最上層 (Z-Index top)。
 
