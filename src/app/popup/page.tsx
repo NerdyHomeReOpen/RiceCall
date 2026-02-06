@@ -16,7 +16,8 @@ import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelEvent from '@/popups/ChannelEvent';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
-import ChatHistory from '@/popups/ChatHistory';
+import ChatHistory from '@/popups/chatHistory';
+import ConfirmWebRTC from '@/popups/ConfirmWebRTC';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
@@ -126,6 +127,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       channelPassword: () => <ChannelPassword id={id} {...initialData} />,
       channelSetting: () => <ChannelSetting id={id} {...initialData} />,
       chatHistory: () => <ChatHistory id={id} {...initialData} />,
+      confirmWebRTC: () => <ConfirmWebRTC id={id} {...initialData} />,
       createChannel: () => <CreateChannel id={id} {...initialData} />,
       createFriendGroup: () => <CreateFriendGroup id={id} {...initialData} />,
       createServer: () => <CreateServer id={id} {...initialData} />,

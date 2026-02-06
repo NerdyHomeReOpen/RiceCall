@@ -651,6 +651,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         .catch(eb);
     });
     sendTransportRef.current.on('connectionstatechange', (s) => {
+      if (s == "failed" || s == "disconnected") {
+        ipc.webrtc.confirmSignal({ signalState: s, userId: localStorage.getItem('userId') || '', channelId });
+      }
       new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
     });
 

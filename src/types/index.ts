@@ -217,6 +217,7 @@ export type PopupType =
   | 'channelPassword'
   | 'channelSetting'
   | 'chatHistory'
+  | 'confirmWebRTC'
   | 'createChannel'
   | 'createFriendGroup'
   | 'createServer'

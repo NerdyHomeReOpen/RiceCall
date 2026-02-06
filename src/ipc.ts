@@ -1017,6 +1017,13 @@ const ipc = {
       return modules.default.listen('sfu-diagnosis-response', callback);
     },
   },
+
+  webrtc: {
+    confirmSignal: async (data: { signalState: string; userId: string; channelId: string }) => {
+      if (!isElectron) return;
+      return await ipcRenderer.invoke('confirm-webrtc-signal', data);
+    },
+  },
 };
 
 export default ipc;
