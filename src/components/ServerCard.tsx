@@ -43,7 +43,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
       .addJoinServerOption(handleServerCardClick)
       .addViewServerInfoOption(() => Popup.openServerSetting(user.userId, server.serverId))
       .addFavoriteServerOption({ isFavorite: server.favorite }, () => Popup.favoriteServer(server.serverId))
-      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel }, () => Popup.terminateMember(user.userId, server.serverId, t('self')))
+      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isSelf: true }, () => Popup.terminateMember(user.userId, server.serverId, t('self')))
       .build();
 
   // Handles

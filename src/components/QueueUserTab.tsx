@@ -129,17 +129,17 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? unmuteUser(queueMember.userId) : muteUser(queueMember.userId)))
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(queueMember.userId, currentServer.serverId))
       .addSeparator()
-      .addForbidVoiceOption({ isSelf, isLowerLevel, isVoiceMuted: queueMember.isVoiceMuted }, () =>
+      .addForbidVoiceOption({ permissionLevel, isSelf, isLowerLevel, isVoiceMuted: queueMember.isVoiceMuted }, () =>
         Popup.forbidUserVoiceInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isVoiceMuted),
       )
-      .addForbidTextOption({ isSelf, isLowerLevel, isTextMuted: queueMember.isTextMuted }, () =>
+      .addForbidTextOption({ permissionLevel, isSelf, isLowerLevel, isTextMuted: queueMember.isTextMuted }, () =>
         Popup.forbidUserTextInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isTextMuted),
       )
       .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => Popup.openKickMemberFromChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId))
       .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openKickMemberFromServer(queueMember.userId, currentServer.serverId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(queueMember.userId, currentServer.serverId))
       .addSeparator()
-      .addTerminateSelfMembershipOption({ permissionLevel }, () => Popup.terminateMember(user.userId, currentServer.serverId, t('self')))
+      .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => Popup.terminateMember(user.userId, currentServer.serverId, t('self')))
       .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
         Popup.openInviteMember(queueMember.userId, currentServer.serverId),
       )
