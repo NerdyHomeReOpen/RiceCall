@@ -839,9 +839,9 @@ const ipc = {
     }
   },
 
-  sendSelectServer: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
+  sendServerSelect: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
     if (isWebsite()) {
-      webMain.webEventEmitter.emit('select-server', data);
+      webMain.webEventEmitter.emit('server-select', data);
     } else if (isRenderer()) {
       localStorage.setItem('server-select', JSON.stringify(data));
     } else {

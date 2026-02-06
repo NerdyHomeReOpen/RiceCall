@@ -175,7 +175,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleServerSelect = (server: Types.Server) => {
-    ipc.sendSelectServer({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
+    ipc.sendServerSelect({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   const handleScroll = () => {

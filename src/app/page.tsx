@@ -5,7 +5,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
-import { isElectron } from '@/platform/isElectron';
+import { isRenderer, isWebsite } from '@/platform/isElectron';
+import { webEventEmitter } from '@/web/event';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -17,7 +18,6 @@ import NotificationToaster from '@/components/NotificationToaster';
 import FriendPage from '@/pages/Friend';
 import HomePage from '@/pages/Home';
 import ServerPage from '@/pages/Server';
-// import LoginPage from '@/pages/Login';
 
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
@@ -121,7 +121,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
           onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
           onAboutUsClick: Popup.openAboutUs,
         },
-        () => {},
+        () => { },
       )
       .addNetworkDiagnosisOption(() => Popup.openNetworkDiagnosis())
       .addLogoutOption(() => logout())
@@ -166,7 +166,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: false,
       contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => {},
+      onClick: () => { },
     },
   ];
 
@@ -352,7 +352,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   // Web-mode: establish socket.io connection directly (Electron does this in main process).
   useEffect(() => {
     const token = localStorage.getItem('token') || '';
-    if (isElectron()) return;
+    if (isRenderer()) return;
     ipc.auth.autoLogin(token);
   }, []);
 
@@ -363,15 +363,26 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user.currentServerId, stopLoading]);
 
   useEffect(() => {
-    const onStorage = ({ key, newValue }: StorageEvent) => {
-      if (key !== 'server-select' || !newValue) return;
-      const { serverDisplayId, serverId } = JSON.parse(newValue);
-      if (getIsLoading() || user.currentServerId === serverId) return;
-      loadServer(serverDisplayId);
-      ipc.socket.send('connectServer', { serverId });
-    };
-    window.addEventListener('storage', onStorage);
-    return () => window.removeEventListener('storage', onStorage);
+    if (isRenderer()) {
+      const onServerSelect = ({ key, newValue }: StorageEvent) => {
+        if (key !== 'server-select' || !newValue) return;
+        const { serverDisplayId, serverId } = JSON.parse(newValue);
+        if (getIsLoading() || user.currentServerId === serverId) return;
+        loadServer(serverDisplayId);
+        ipc.socket.send('connectServer', { serverId });
+      };
+      window.addEventListener('storage', onServerSelect);
+      return () => window.removeEventListener('storage', onServerSelect);
+    } else if (isWebsite()) {
+      const onServerSelect = (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
+        const { serverDisplayId, serverId } = data;
+        if (getIsLoading() || user.currentServerId === serverId) return;
+        loadServer(serverDisplayId);
+        ipc.socket.send('connectServer', { serverId });
+      };
+      webEventEmitter.on('server-select', onServerSelect);
+      return () => webEventEmitter.removeListener('server-select', onServerSelect);
+    }
   }, [user.currentServerId, getIsLoading, loadServer]);
 
   useEffect(() => {

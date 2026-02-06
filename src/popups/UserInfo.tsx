@@ -107,7 +107,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 
   // Handlers
   const handleServerSelect = (server: Types.Server) => {
-    ipc.sendSelectServer({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
+    ipc.sendServerSelect({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   const handleAvatarClick = () => {

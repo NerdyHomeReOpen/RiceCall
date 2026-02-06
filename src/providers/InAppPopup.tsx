@@ -370,7 +370,6 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     popupsRef.current = popups;
   }, [popups]);
 
-
   return (
     <>
       {popups.map((popup) => (
