@@ -18,6 +18,6 @@
       "@": ["./src"]
     }
   },
-  "include": ["main.ts", "main/**/*"],
+  "include": ["src/electron/main.ts", "src/electron/main/**/*"],
   "exclude": ["node_modules"]
 }
