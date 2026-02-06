@@ -115,7 +115,7 @@
   transition: color 0.2s ease;
 }
 
-.step-completed+.step-connector {
+.step-completed + .step-connector {
   color: #0fb11f;
 }
 

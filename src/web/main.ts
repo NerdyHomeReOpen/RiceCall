@@ -164,8 +164,8 @@ export function getSettings(): Types.SystemSettings {
 }
 
 // Windows
-export function createPopup(type: Types.PopupType, id: string, initialData: unknown, force = true, title?: string) {
-  webEventEmitter.emit('open-popup', type, id, initialData, force, title);
+export function createPopup(type: Types.PopupType, id: string, initialData: unknown, force = true) {
+  webEventEmitter.emit('open-popup', type, id, initialData, force);
 }
 
 export function closePopups() {
@@ -656,6 +656,10 @@ export async function openPopup(type: Types.PopupType, id: string, initialData?:
 
 export function closePopup(id: string) {
   webEventEmitter.emit('close-popup', id);
+}
+
+export function windowMinimize(popupId: string) {
+  webEventEmitter.emit('minimize-popup', popupId);
 }
 
 export function closeAllPopups() {

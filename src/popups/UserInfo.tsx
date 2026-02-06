@@ -224,7 +224,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
   };
 
   const handleMinimizeBtnClick = () => {
-    ipc.window.minimize();
+    ipc.window.minimize(id);
   };
 
   const handleCloseBtnClick = () => {

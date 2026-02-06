@@ -406,19 +406,9 @@ const ipc = {
   },
 
   window: {
-    resize: (width: number, height: number) => {
+    minimize: (popupId?: string) => {
       if (isWebsite()) {
-        // ignore
-      } else if (isRenderer()) {
-        ipcRenderer.send('resize', width, height);
-      } else {
-        throw new Error('Unsupported platform');
-      }
-    },
-
-    minimize: () => {
-      if (isWebsite()) {
-        // ignore
+        if (popupId) webMain.windowMinimize(popupId);
       } else if (isRenderer()) {
         ipcRenderer.send('window-control-minimize');
       } else {

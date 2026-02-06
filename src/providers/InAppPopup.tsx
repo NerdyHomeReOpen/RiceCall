@@ -65,8 +65,12 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
   const { t } = useTranslation();
 
   // Handlers
-  const handleClose = () => {
+  const handleCloseBtnClick = () => {
     ipc.popup.close(id);
+  };
+
+  const handleMinimizeBtnClick = () => {
+    ipc.window.minimize(id);
   };
 
   return (
@@ -75,13 +79,47 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
         <div className={`${header['title-box']} ${titleBoxIcon}`}>
           <div className={header['title']}>{t(title)}</div>
         </div>
-        <div className={header['buttons']}>{buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}</div>
+        <div className={header['buttons']}>
+          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimizeBtnClick} title={t('minimize')} />}
+          {buttons.includes('maxsize') && <div className={header['maxsize']} title={t('maximize')} />}
+          {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} title={t('close')} />}
+        </div>
       </div>
     </header>
   );
 });
 
 Header.displayName = 'Header';
+
+interface MaximizedPopupProps {
+  id: string;
+  title: string;
+  buttons: ('minimize' | 'maxsize' | 'close')[];
+  onRestore: () => void;
+}
+
+const MaximizedPopup: React.FC<MaximizedPopupProps> = React.memo(({ title, buttons, id, onRestore }) => {
+  // Hooks
+  const { t } = useTranslation();
+
+  // Handlers
+  const handleRestoreBtnClick = () => {
+    onRestore();
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
+  };
+
+  return (
+    <button key={id} type="button" onClick={handleRestoreBtnClick} title={t(title)} className={header['maximized-popup-header']}>
+      <div className={header['title']}>{t(title)}</div>
+      {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} title={t('close')} />}
+    </button>
+  );
+});
+
+MaximizedPopup.displayName = 'MaximizedPopup';
 
 interface PopupProviderProps {
   children: ReactNode;
@@ -101,15 +139,15 @@ type Popup = {
 const PopupProvider = ({ children }: PopupProviderProps) => {
   // States
   const [popups, setPopups] = useState<Popup[]>([]);
+  const [minimizedIds, setMinimizedIds] = useState<Set<string>>(new Set());
 
   // Refs
   const holdingPopupIdRef = useRef<string | null>(null);
   const topZIndexRef = useRef(201);
   const popupsRef = useRef<Popup[]>([]);
 
-  const close = useCallback((id: string) => {
-    setPopups((prev) => prev.filter((p) => p.id !== id));
-  }, []);
+  // Variables
+  const minimizedPopups = popups.filter((p) => minimizedIds.has(p.id));
 
   const getPopup = useCallback((type: Types.PopupType, id: string, initialData?: any): Popup => {
     const node: Record<Types.PopupType, () => React.ReactNode> = {
@@ -157,13 +195,55 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
       userSetting: () => <UserInfo id={id} {...initialData} />,
     };
 
+    const config = getPopupConfig(type);
+
+    switch (type) {
+      case 'channelSetting':
+        config.title = initialData?.channel?.name ?? config.title;
+        break;
+      case 'directMessage':
+        config.title = initialData?.target?.name ?? config.title;
+        break;
+      case 'userInfo':
+        config.title = initialData?.target?.name ?? config.title;
+        break;
+      case 'serverSetting':
+        config.title = initialData?.server?.name ?? config.title;
+        break;
+    }
+
     return {
       id,
       type,
-      ...getPopupConfig(type),
+      ...config,
       node: node[type as keyof typeof node],
       position: { top: 0, left: 0 },
     };
+  }, []);
+
+  const close = useCallback((id: string) => {
+    setMinimizedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    setPopups((prev) => prev.filter((p) => p.id !== id));
+  }, []);
+
+  const minimize = useCallback((id: string) => {
+    setMinimizedIds((prev) => {
+      const next = new Set(prev);
+      next.add(id);
+      return next;
+    });
+  }, []);
+
+  const restore = useCallback((id: string) => {
+    setMinimizedIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
   }, []);
 
   const open = useCallback(
@@ -174,7 +254,17 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
       if (force) {
         close(id);
       } else {
-        if (popupsRef.current.findIndex((p) => p.id === id) !== -1) return;
+        if (popupsRef.current.findIndex((p) => p.id === id) !== -1) {
+          restore(id);
+
+          const popupEl = document.querySelector(`[data-popup-id="${id}"]`) as HTMLElement;
+          if (!popupEl) return;
+
+          topZIndexRef.current++;
+          popupEl.style.zIndex = `${topZIndexRef.current}`;
+
+          return;
+        }
       }
 
       const popup = getPopup(type, id, initialData);
@@ -189,7 +279,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
 
       setPopups((prev) => [...prev, { ...popup, position: { top: centerY, left: centerX } }]);
     },
-    [getPopup, close],
+    [getPopup, close, restore],
   );
 
   // Effects
@@ -206,6 +296,20 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
       webEventEmitter.off('close-popup', close);
     };
   }, [close]);
+
+  useEffect(() => {
+    webEventEmitter.on('minimize-popup', minimize);
+    return () => {
+      webEventEmitter.off('minimize-popup', minimize);
+    };
+  }, [minimize]);
+
+  useEffect(() => {
+    webEventEmitter.on('restore-popup', restore);
+    return () => {
+      webEventEmitter.off('restore-popup', restore);
+    };
+  }, [restore]);
 
   useEffect(() => {
     let startX = 0;
@@ -277,6 +381,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     popupsRef.current = popups;
   }, [popups]);
 
+
   return (
     <>
       {popups.map((popup) => (
@@ -284,7 +389,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
           key={popup.id}
           data-popup-id={popup.id}
           style={{
-            display: 'flex',
+            display: minimizedIds.has(popup.id) ? 'none' : 'flex',
             flexDirection: 'column',
             position: 'absolute',
             top: popup.position.top,
@@ -293,6 +398,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
             boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.5)',
             height: popup.size.height,
             width: popup.size.width,
+            overflow: 'hidden',
           }}
         >
           {!popup.hideHeader && (
@@ -306,6 +412,25 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
           {popup.node?.() ?? null}
         </div>
       ))}
+      {minimizedPopups.length > 0 && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: 12,
+            left: 12,
+            zIndex: 9999,
+            display: 'flex',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 6,
+            flexWrap: 'wrap',
+          }}
+        >
+          {minimizedPopups.map((popup) => (
+            <MaximizedPopup key={popup.id} id={popup.id} title={popup.title} buttons={popup.buttons} onRestore={() => restore(popup.id)} />
+          ))}
+        </div>
+      )}
       {children}
     </>
   );

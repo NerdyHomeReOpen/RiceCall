@@ -510,3 +510,18 @@
 .status-dropdown .option[datatype='gn']::before {
   background-position: -39px 0;
 }
+
+.maximized-popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  border-radius: 3px;
+  background: var(--main-color, #2f3136);
+  color: var(--secondary-color, #fff);
+  gap: 8px;
+}

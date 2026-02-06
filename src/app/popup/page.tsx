@@ -77,7 +77,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBox
   };
 
   const handleMinimizeBtnClick = () => {
-    ipc.window.minimize();
+    ipc.window.minimize(id);
   };
 
   const handleCloseBtnClick = () => {
