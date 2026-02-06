@@ -49,7 +49,7 @@ class Store {
   }
 
   public set(key: keyof Types.StoreType, value: Types.StoreType[keyof Types.StoreType]) {
-    localStorage.setItem(key, value?.toString() ?? this.defaults[key]?.toString() ?? 'null');
+    localStorage.setItem(key, JSON.stringify(value));
   }
 }
 
@@ -614,6 +614,27 @@ export function getCurrentTheme() {
 export function setCurrentTheme(theme: string) {
   store.set('currentTheme', theme);
   webEventEmitter.emit('current-theme', theme);
+}
+
+export async function saveImage(buffer: ArrayBuffer): Promise<string | null> {
+  return new Promise<string | null>((resolve) => {
+    try {
+      const blob = new Blob([buffer]);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        new Logger('System').info(`Save image success: ${reader.result as string}`);
+        resolve(reader.result as string);
+      };
+      reader.onerror = () => {
+        new Logger('System').error(`Save image error: unknown error`);
+        resolve(null);
+      };
+      reader.readAsDataURL(blob);
+    } catch (error: any) {
+      new Logger('System').error(`Save image error: ${error.message}`);
+      resolve(null);
+    }
+  });
 }
 
 // Popup handlers

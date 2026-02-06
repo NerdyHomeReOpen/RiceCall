@@ -1296,6 +1296,28 @@ app.on('ready', async () => {
     });
   });
 
+  ipcMain.handle('save-image', async (_, buffer: ArrayBuffer, directory: string, filenamePrefix: string, extension: string): Promise<string | null> => {
+    try {
+      const userDataPath = app.getPath('userData');
+      const dirPath = path.join(userDataPath, directory);
+
+      if (!fs.existsSync(dirPath)) {
+        fs.mkdirSync(dirPath, { recursive: true });
+      }
+
+      const timestamp = Date.now();
+      const fileName = `${filenamePrefix}-${timestamp}.${extension}`;
+      const filePath = path.join(dirPath, fileName);
+
+      fs.writeFileSync(filePath, Buffer.from(buffer));
+
+      return `local-resource://${directory}/${fileName}`;
+    } catch (error) {
+      new Logger('FileStorage').error(`Electron Storage Error: ${error.message}`);
+      return null;
+    }
+  });
+
   // Update check handlers
   ipcMain.on('check-for-updates', async () => {
     const result = await checkForUpdates(true);
@@ -1872,6 +1894,13 @@ app.on('open-url', (event, url) => {
 app.whenReady().then(() => {
   const protocolClient = process.execPath;
   const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
+
+  // Register local-resource protocol
+  protocol.registerFileProtocol('local-resource', (request, callback) => {
+    const url = request.url.replace('local-resource://', '');
+    const filePath = path.join(app.getPath('userData'), decodeURIComponent(url));
+    callback({ path: filePath });
+  });
 
   app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
 });

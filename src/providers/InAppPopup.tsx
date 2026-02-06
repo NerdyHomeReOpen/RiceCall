@@ -44,7 +44,6 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-import * as Loader from '@/loader';
 import { getPopupConfig } from '@/popup.config';
 
 import Logger from '@/utils/logger';
@@ -109,7 +108,6 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
   const popupsRef = useRef<Popup[]>([]);
 
   const close = useCallback((id: string) => {
-    console.log('close', id);
     setPopups((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
@@ -171,14 +169,6 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
   const open = useCallback(
     async (type: Types.PopupType, id: string, initialData: any = {}, force = true) => {
       new Logger('Popup').info(`Opening ${type} (${id})...`);
-
-      const loader = Loader[type as keyof typeof Loader];
-      if (loader)
-        initialData = await loader(initialData).catch(() => {
-          new Logger('Popup').error(`Cannot load ${type} data, aborting...`);
-          return null;
-        });
-      if (!initialData) return;
 
       // If force is true, destroy the popup
       if (force) {

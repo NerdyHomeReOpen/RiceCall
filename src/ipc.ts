@@ -394,7 +394,7 @@ const ipc = {
   deepLink: {
     onDeepLink: (callback: (serverId: string) => void) => {
       if (isWebsite()) {
-        return () => { };
+        return () => {};
       } else if (isRenderer()) {
         const listener = (_: any, serverId: string) => callback(serverId);
         ipcRenderer.on('deepLink', listener);
@@ -458,7 +458,7 @@ const ipc = {
 
     onMaximize: (callback: () => void) => {
       if (isWebsite()) {
-        return () => { };
+        return () => {};
       } else if (isRenderer()) {
         const listener = () => callback();
         ipcRenderer.on('maximize', listener);
@@ -470,7 +470,7 @@ const ipc = {
 
     onUnmaximize: (callback: () => void) => {
       if (isWebsite()) {
-        return () => { };
+        return () => {};
       } else if (isRenderer()) {
         const listener = () => callback();
         ipcRenderer.on('unmaximize', listener);
@@ -540,17 +540,15 @@ const ipc = {
           if (from === host) callback(data);
           webMain.webEventEmitter.removeAllListeners('popup-submit');
         };
-        return () => {
-          webMain.webEventEmitter.removeAllListeners('popup-submit');
-          webMain.webEventEmitter.on('popup-submit', listener);
-          return () => webMain.webEventEmitter.removeListener('popup-submit', listener);
-        };
+        webMain.webEventEmitter.removeListener('popup-submit', listener);
+        webMain.webEventEmitter.on('popup-submit', listener);
+        return () => webMain.webEventEmitter.removeListener('popup-submit', listener);
       } else if (isRenderer()) {
         const listener = (_: any, from: string, data: T) => {
           if (from === host) callback(data);
           ipcRenderer.removeAllListeners('popup-submit');
         };
-        ipcRenderer.removeAllListeners('popup-submit');
+        ipcRenderer.removeListener('popup-submit', listener);
         ipcRenderer.on('popup-submit', listener);
         return () => ipcRenderer.removeListener('popup-submit', listener);
       } else {
@@ -687,6 +685,16 @@ const ipc = {
         ipcRenderer.removeAllListeners('custom-themes');
         ipcRenderer.on('custom-themes', listener);
         return () => ipcRenderer.removeListener('custom-themes', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    saveImage: async (buffer: ArrayBuffer, directory: string, filenamePrefix: string, extension: string): Promise<string | null> => {
+      if (isWebsite()) {
+        return await webMain.saveImage(buffer);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('save-image', buffer, directory, filenamePrefix, extension);
       } else {
         throw new Error('Unsupported platform');
       }
