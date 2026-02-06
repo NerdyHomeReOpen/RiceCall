@@ -22,7 +22,7 @@ export function getRegion(): Types.LanguageKey {
 export const START_TIMESTAMP = Date.now();
 export const MAIN_TITLE = 'RiceCall';
 export const VERSION_TITLE = `RiceCall v${packageJson.version}`;
-export const DEV = process.argv.includes('--dev');
+export const DEV = typeof process !== 'undefined' && Array.isArray(process.argv) ? process.argv.includes('--dev') : false;
 export const PORT = 3000;
 export const BASE_URI = `http://localhost:${PORT}`;
 
@@ -271,19 +271,14 @@ export function connectSocket(token: string) {
     query: { token: token },
   });
 
-  socket.on('connect', () => {
-    for (const event of ServerToClientEventNames) {
-      socket?.removeAllListeners(event);
-    }
-
-    // Register event listeners
-    ServerToClientEventNames.forEach((event) => {
-      socket?.on(event, async (...args) => {
-        if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
-        webEventEmitter.emit(event, ...args);
-      });
+  ServerToClientEventNames.forEach((event) => {
+    socket?.on(event, async (...args) => {
+      if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
+      webEventEmitter.emit(event, ...args);
     });
+  });
 
+  socket.on('connect', () => {
     sendHeartbeat();
     if (interval) clearInterval(interval);
     interval = setInterval(sendHeartbeat, 30000);
