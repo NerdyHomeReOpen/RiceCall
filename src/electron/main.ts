@@ -15,7 +15,7 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session, protocol } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session, protocol, webContents } from 'electron';
 import { io, Socket } from 'socket.io-client';
 import * as Types from '../types';
 import { initMainI18n, t } from './i18n.js';
@@ -28,6 +28,7 @@ import * as Loader from '../loader.js';
 import Logger from '../logger.js';
 import { LANGUAGES } from '../constant.js';
 import { POPUP_SIZES, POPUP_BEHAVIORS } from '../popup.config.js';
+import { initNetworkDiagnosisTool } from './network-diagnosis-tool.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -1033,8 +1034,9 @@ app.on('ready', async () => {
   // Load env
   loadEnv(store.get('server', 'prod'));
 
-  // Initialize i18n
+  // Initialize
   initMainI18n(store.get('language'));
+  initNetworkDiagnosisTool();
 
   // Configure
   configureAutoUpdater();
@@ -1360,6 +1362,24 @@ app.on('ready', async () => {
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('popup-submit', to, data);
     });
+  });
+
+  // SFU Diagnosis
+  ipcMain.on('request-sfu-diagnosis', (event) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('get-sfu-diagnosis', { senderId: event.sender.id });
+    } else {
+      event.sender.send('sfu-diagnosis-response', null);
+    }
+  });
+
+  ipcMain.on('sfu-diagnosis-response', (_, data: { targetSenderId: number; info: unknown } | null) => {
+    if (data?.targetSenderId != null) {
+      const target = webContents.fromId(data.targetSenderId);
+      if (target && !target.isDestroyed()) {
+        target.send('sfu-diagnosis-response', data.info);
+      }
+    }
   });
 
   // Window control event handlers

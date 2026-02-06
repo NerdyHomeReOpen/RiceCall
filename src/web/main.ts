@@ -363,6 +363,18 @@ export function exit() {
   window.close();
 }
 
+export async function runNetworkDiagnosis(): Promise<{ error: string }> {
+  return { error: 'Network diagnosis is only available in the desktop version.' };
+}
+
+export function cancelNetworkDiagnosis() {
+  // No-op in Web
+}
+
+export function requestSfuDiagnosis() {
+  webEventEmitter.emit('sfu-diagnosis-response', null);
+}
+
 // Auth handlers
 export async function login(formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> {
   return await Auth.login(formData)

@@ -2479,6 +2479,68 @@ const ipc = {
       },
     },
   },
+
+  network: {
+    runDiagnosis: async (params: { domains: string[]; duration?: number }): Promise<any> => {
+      if (isWebsite()) {
+        return await webMain.runNetworkDiagnosis(params);
+      }
+      if (isRenderer()) {
+        return await ipcRenderer.invoke('run-network-diagnosis', params);
+      }
+      throw new Error('Unsupported platform');
+    },
+
+    cancelDiagnosis: () => {
+      if (isWebsite()) {
+        webMain.cancelNetworkDiagnosis();
+      } else if (isRenderer()) {
+        ipcRenderer.send('cancel-network-diagnosis');
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    onProgress: (callback: (progress: any) => void) => {
+      if (isWebsite()) {
+        const listener = (progress: any) => callback(progress);
+        webMain.webEventEmitter.on('network-diagnosis-progress', listener);
+        return () => webMain.webEventEmitter.removeListener('network-diagnosis-progress', listener);
+      }
+      if (isRenderer()) {
+        const listener = (_: any, progress: any) => callback(progress);
+        ipcRenderer.on('network-diagnosis-progress', listener);
+        return () => ipcRenderer.removeListener('network-diagnosis-progress', listener);
+      }
+      throw new Error('Unsupported platform');
+    },
+  },
+
+  sfuDiagnosis: {
+    request: () => {
+      if (isWebsite()) {
+        webMain.requestSfuDiagnosis();
+      } else if (isRenderer()) {
+        ipcRenderer.send('request-sfu-diagnosis');
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    onResponse: (callback: (data: any) => void) => {
+      if (isWebsite()) {
+        const listener = (data: any) => callback(data);
+        webMain.webEventEmitter.on('sfu-diagnosis-response', listener);
+        return () => webMain.webEventEmitter.removeListener('sfu-diagnosis-response', listener);
+      }
+      if (isRenderer()) {
+        const listener = (_: any, data: any) => callback(data);
+        ipcRenderer.on('sfu-diagnosis-response', listener);
+        return () => ipcRenderer.removeListener('sfu-diagnosis-response', listener);
+      }
+      throw new Error('Unsupported platform');
+    },
+  },
 };
 
 export default ipc;
