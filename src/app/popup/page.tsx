@@ -2,7 +2,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -45,7 +45,7 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-import { POPUP_HEADERS, POPUP_TITLE_KEYS } from '@/popup.config';
+import { getPopupConfig } from '@/popup.config';
 
 import SocketManager from '@/components/SocketManager';
 
@@ -111,23 +111,10 @@ Header.displayName = 'Header';
 
 const PopupPageComponent: React.FC = React.memo(() => {
   // States
-  const [id, setId] = useState<string>('');
-  const [type, setType] = useState<Types.PopupType | null>(null);
-  const [initialData, setInitialData] = useState<any | null>(null);
+  const [popup, setPopup] = useState<Types.Popup | null>(null);
 
-  // Variables
-  const { buttons, hideHeader } = useMemo(() => {
-    if (!type) return { buttons: [], hideHeader: true };
-    return POPUP_HEADERS[type] ?? { buttons: ['close'], hideHeader: false };
-  }, [type]);
-
-  const title = useMemo(() => {
-    if (!type) return '';
-    return POPUP_TITLE_KEYS[type];
-  }, [type]);
-
-  const node = useMemo<() => React.ReactNode | null>(() => {
-    if (!type || !initialData) return () => null;
+  // Functions
+  const getPopup = useCallback((type: Types.PopupType, id: string, initialData?: any): Types.Popup => {
     const node: Record<Types.PopupType, () => React.ReactNode> = {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,
@@ -172,8 +159,32 @@ const PopupPageComponent: React.FC = React.memo(() => {
       userInfo: () => <UserInfo id={id} {...initialData} />,
       userSetting: () => <UserInfo id={id} {...initialData} />,
     };
-    return node[type as keyof typeof node];
-  }, [id, type, initialData]);
+
+    const config = getPopupConfig(type);
+
+    switch (type) {
+      case 'channelSetting':
+        config.title = initialData?.channel?.name ?? config.title;
+        break;
+      case 'directMessage':
+        config.title = initialData?.target?.name ?? config.title;
+        break;
+      case 'userInfo':
+        config.title = initialData?.target?.name ?? config.title;
+        break;
+      case 'serverSetting':
+        config.title = initialData?.server?.name ?? config.title;
+        break;
+    }
+
+    return {
+      id,
+      type,
+      position: { top: 0, left: 0 },
+      ...config,
+      node: node[type as keyof typeof node],
+    };
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -181,28 +192,26 @@ const PopupPageComponent: React.FC = React.memo(() => {
       const params = new URLSearchParams(window.location.search);
       const type = params.get('type') as Types.PopupType;
       const id = params.get('id') as string;
-      setId(id);
-      setType(type);
-    }
-  }, []);
+      const initialData = ipc.initialData.get(id);
 
-  useEffect(() => {
-    if (!id || !type) return;
-    setInitialData(ipc.initialData.get(id));
-  }, [id, type]);
+      const popup = getPopup(type, id, initialData);
+
+      setPopup(popup);
+    }
+  }, [getPopup]);
 
   return (
     <>
       <SocketManager />
-      {!hideHeader && (
+      {popup && !popup.hideHeader && (
         <Header
-          id={id}
-          title={title}
-          buttons={buttons}
-          titleBoxIcon={type === 'changeTheme' ? headerStyle['title-box-skin-icon'] : type === 'directMessage' ? headerStyle['title-box-direct-message-icon'] : undefined}
+          id={popup.id}
+          title={popup.title}
+          buttons={popup.buttons}
+          titleBoxIcon={popup.type === 'changeTheme' ? headerStyle['title-box-skin-icon'] : popup.type === 'directMessage' ? headerStyle['title-box-direct-message-icon'] : undefined}
         />
       )}
-      {node && node()}
+      {popup && popup.node()}
     </>
   );
 });

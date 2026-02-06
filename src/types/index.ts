@@ -196,6 +196,17 @@ export type RecordFormat = 'wav' | 'mp3';
 
 export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
 
+export type Popup = {
+  id: string;
+  type: PopupType;
+  size: { height: number; width: number };
+  position: { top: number; left: number };
+  title: string;
+  hideHeader: boolean;
+  buttons: ('close' | 'minimize' | 'maxsize')[];
+  node: () => React.ReactNode | null;
+};
+
 export type PopupType =
   | 'aboutus'
   | 'applyFriend'

@@ -125,31 +125,20 @@ interface PopupProviderProps {
   children: ReactNode;
 }
 
-type Popup = {
-  id: string;
-  type: Types.PopupType;
-  title: string;
-  buttons: ('close' | 'minimize' | 'maxsize')[];
-  node: () => React.ReactNode | null;
-  hideHeader: boolean;
-  size: { height: number; width: number };
-  position: { top: number; left: number };
-};
-
 const PopupProvider = ({ children }: PopupProviderProps) => {
   // States
-  const [popups, setPopups] = useState<Popup[]>([]);
+  const [popups, setPopups] = useState<Types.Popup[]>([]);
   const [minimizedIds, setMinimizedIds] = useState<Set<string>>(new Set());
 
   // Refs
   const holdingPopupIdRef = useRef<string | null>(null);
   const topZIndexRef = useRef(201);
-  const popupsRef = useRef<Popup[]>([]);
+  const popupsRef = useRef<Types.Popup[]>([]);
 
   // Variables
   const minimizedPopups = popups.filter((p) => minimizedIds.has(p.id));
 
-  const getPopup = useCallback((type: Types.PopupType, id: string, initialData?: any): Popup => {
+  const getPopup = useCallback((type: Types.PopupType, id: string, initialData?: any): Types.Popup => {
     const node: Record<Types.PopupType, () => React.ReactNode> = {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,
@@ -215,9 +204,9 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     return {
       id,
       type,
+      position: { top: 0, left: 0 },
       ...config,
       node: node[type as keyof typeof node],
-      position: { top: 0, left: 0 },
     };
   }, []);
 
@@ -409,7 +398,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
               id={popup.id}
             />
           )}
-          {popup.node?.() ?? null}
+          {popup.node()}
         </div>
       ))}
       {minimizedPopups.length > 0 && (
