@@ -1,5 +1,4 @@
 import React, { useEffect } from 'react';
-import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
 import MarkdownContent from '@/components/MarkdownContent';
@@ -13,9 +12,10 @@ interface ConfirmWebRTCPopupProps {
   userId?: string;
 }
 
+// eslint-disable-next-line 
 const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, message, userId }) => {
   // Hooks
-  const { t } = useTranslation();
+  
 
   // Handlers
   const handleYes = () => {
