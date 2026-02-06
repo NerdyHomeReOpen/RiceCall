@@ -5,7 +5,6 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import * as Default from '@/utils/default';
-import { platformStorage } from '@/platform/storage';
 
 import styles from '@/styles/actionLink.module.css';
 
@@ -21,11 +20,11 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
   const [server, setServer] = useState<Types.Server>(Default.server());
 
   // Variables
-  const displayId = new URL(href).searchParams.get('sid');
+  const displayId = new URL(href).searchParams.get('sid') || '';
 
   // Handlers
   const handleLinkClick = () => {
-    platformStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() }));
+    ipc.sendSelectServer({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   // Effects

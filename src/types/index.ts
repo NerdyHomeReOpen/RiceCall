@@ -230,6 +230,7 @@ export type PopupType =
   | 'kickMemberFromServer'
   | 'memberApplicationSetting'
   | 'memberInvitation'
+  | 'networkDiagnosis'
   | 'searchUser'
   | 'serverAnnouncement'
   | 'serverApplication'
@@ -237,8 +238,7 @@ export type PopupType =
   | 'serverSetting'
   | 'systemSetting'
   | 'userInfo'
-  | 'userSetting'
-  | 'networkDiagnosis';
+  | 'userSetting';
 
 export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
 

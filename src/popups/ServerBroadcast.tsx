@@ -11,11 +11,12 @@ import { MAX_BROADCAST_LENGTH } from '@/constant';
 import popupStyles from '@/styles/popup.module.css';
 
 interface ServerBroadcastPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   channelId: Types.Channel['channelId'];
 }
 
-const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ serverId, channelId }) => {
+const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ id, serverId, channelId }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -52,11 +53,11 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
     if (!canSend) return;
     if (broadcastType === 'channel') Popup.broadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
     else Popup.broadcastServer(serverId, { type: 'alert', content: broadcastContent });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

@@ -22,20 +22,16 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import electron, { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session, protocol } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session } from 'electron';
+import { io, Socket } from 'socket.io-client';
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
-import { getToken, setToken } from './src/auth.token.js';
 import { initMainI18n, t } from './src/i18n.main.js';
-import { connectSocket, disconnectSocket, setMainWindow } from './src/platform/socket/electron-main.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
-import * as DataService from './src/data.service.js';
-import { initNetworkService } from './src/network.service.js';
-import * as PopupLoader from './src/platform/popup/popupLoader.js';
-import { registerSettingsHandlers } from './src/platform/ipc/handlers/electron/settings.js';
-import { registerDataHandlers } from './src/platform/ipc/handlers/electron/data.js';
-import { registerAuthHandlers } from './src/platform/ipc/handlers/electron/auth.js';
-import { registerThemesHandlers } from './src/platform/ipc/handlers/electron/themes.js';
+import { getToken, removeToken, setToken } from './src/auth.token.js';
+import * as Auth from './src/auth.service.js';
+import * as Data from './src/data.service.js';
+import * as Loader from './src/loader.js';
 import Logger from './src/logger.js';
 import { LANGUAGES } from './src/constant.js';
 import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';
@@ -51,8 +47,10 @@ protocol.registerSchemesAsPrivileged([
 
 export function getRegion(): Types.LanguageKey {
   const language = app.getLocale();
+
   const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
   if (!match) return 'en-US';
+
   return match.code;
 }
 
@@ -132,8 +130,6 @@ const store = new Store<Types.StoreType>({
     server: 'prod',
   },
 });
-
-
 
 // Constants
 export const START_TIMESTAMP = Date.now();
@@ -296,8 +292,6 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     trafficLightPosition: { x: -100, y: -100 },
   });
 
-  initNetworkService(mainWindow);
-
   if (app.isPackaged || !DEV) {
     appServe(mainWindow).then(() => {
       mainWindow?.loadURL(`${BASE_URI}`);
@@ -333,9 +327,6 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     shell.openExternal(url);
     return { action: 'deny' };
   });
-
-  // Set this window as the main window for socket events
-  setMainWindow(mainWindow);
 
   return mainWindow;
 }
@@ -654,15 +645,7 @@ export function setTrayDetail() {
       label: t('logout'),
       type: 'normal',
       enabled: isLogin,
-      click: () => {
-        setToken('');
-        isLogin = false;
-        mainWindow?.reload();
-        mainWindow?.hide();
-        authWindow?.showInactive();
-        closePopups();
-        disconnectSocket();
-      },
+      click: () => logout(),
     },
     {
       id: 'exit',
@@ -702,9 +685,351 @@ export function configureReactDevTools() {
   }
 }
 
+// Socket
+const ClientToServerEventWithAckNames = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
+
+const ClientToServerEventNames = [
+  'acceptMemberInvitation',
+  'actionMessage',
+  'addUserToQueue',
+  'approveFriendApplication',
+  'approveMemberApplication',
+  'blockUser',
+  'blockUserFromChannel',
+  'blockUserFromServer',
+  'channelMessage',
+  'clearQueue',
+  'connectChannel',
+  'connectServer',
+  'controlQueue',
+  'createChannel',
+  'createFriendGroup',
+  'createServer',
+  'deleteChannel',
+  'deleteFriend',
+  'deleteFriendApplication',
+  'deleteFriendGroup',
+  'deleteMemberApplication',
+  'deleteMemberInvitation',
+  'deleteServer',
+  'directMessage',
+  'disconnectChannel',
+  'disconnectServer',
+  'editChannel',
+  'editChannelPermission',
+  'editFriend',
+  'editFriendApplication',
+  'editFriendGroup',
+  'editMember',
+  'editMemberApplication',
+  'editMemberInvitation',
+  'editServer',
+  'editServerPermission',
+  'editUser',
+  'editUserSetting',
+  'favoriteServer',
+  'increaseUserQueueTime',
+  'joinQueue',
+  'leaveQueue',
+  'moveUserQueuePosition',
+  'moveUserToChannel',
+  'muteUserInChannel',
+  'rejectFriendApplication',
+  'rejectMemberApplication',
+  'rejectMemberInvitation',
+  'removeUserFromQueue',
+  'sendFriendApplication',
+  'sendMemberApplication',
+  'sendMemberInvitation',
+  'shakeWindow',
+  'stranger',
+  'terminateMember',
+  'unblockUser',
+  'unblockUserFromChannel',
+  'unblockUserFromServer',
+];
+
+const ServerToClientEventNames = [
+  'actionMessage',
+  'channelAdd',
+  'channelMemberUpdate',
+  'channelMessage',
+  'channelRemove',
+  'channelUpdate',
+  'directMessage',
+  'error',
+  'friendAdd',
+  'friendApplicationAdd',
+  'friendApplicationRemove',
+  'friendApplicationUpdate',
+  'friendGroupAdd',
+  'friendGroupRemove',
+  'friendGroupUpdate',
+  'friendRemove',
+  'friendUpdate',
+  'memberInvitationAdd',
+  'memberInvitationRemove',
+  'memberInvitationUpdate',
+  'notification', // not used yet
+  'openPopup',
+  'playSound',
+  'queueMembersSet',
+  'serverAdd',
+  'serverMemberAdd',
+  'serverMemberApplicationAdd',
+  'serverMemberApplicationRemove',
+  'serverMemberApplicationUpdate',
+  'serverMemberRemove',
+  'serverMemberUpdate',
+  'serverOnlineMemberAdd',
+  'serverOnlineMemberRemove',
+  'serverOnlineMemberUpdate',
+  'serverRemove',
+  'serverUpdate',
+  'SFUJoined',
+  'SFULeft',
+  'SFUNewProducer',
+  'SFUProducerClosed',
+  'shakeWindow',
+  'userUpdate',
+];
+
+const noLogEventSet = new Set<string>(['queueMembersSet', 'serverOnlineMemberUpdate']);
+
+export let socket: Socket | null = null;
+export let seq: number = 0;
+export let interval: NodeJS.Timeout | null = null;
+
+async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): Promise<Types.ACK<T>> {
+  for (let i = 0; i <= retries; i++) {
+    try {
+      return await new Promise<Types.ACK<T>>((resolve, reject) => {
+        socket?.timeout(5000).emit(event, payload, (err: unknown, ack: Types.ACK<T>) => {
+          if (err) reject(err);
+          else resolve(ack);
+        });
+      });
+    } catch (err) {
+      if (i === retries) throw err;
+      new Logger('Socket').warn(`Retrying(#${i}) socket.emit ${event}: ${JSON.stringify(payload)}`);
+    }
+  }
+  throw new Error('Failed to emit event with retry');
+}
+
+function sendHeartbeat() {
+  const start = Date.now();
+  socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
+    if (err) {
+      new Logger('Socket').warn(`Heartbeat ${seq} timeout`);
+    } else {
+      const latency = Date.now() - start;
+      new Logger('Socket').info(`ACK for #${ack.seq} in ${latency} ms`);
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('heartbeat', { seq: ack.seq, latency });
+      });
+    }
+  });
+}
+
+export function connectSocket(token: string) {
+  if (!token) return;
+
+  if (socket) disconnectSocket();
+
+  seq = 0;
+
+  socket = io(env.WS_URL, {
+    transports: ['websocket'],
+    reconnection: true,
+    reconnectionDelay: 1000,
+    reconnectionDelayMax: 20000,
+    timeout: 10000,
+    autoConnect: false,
+    query: { token: token },
+  });
+
+  socket.on('connect', () => {
+    for (const event of ClientToServerEventNames) {
+      ipcMain.removeAllListeners(event);
+    }
+
+    for (const event of ServerToClientEventNames) {
+      socket?.removeAllListeners(event);
+    }
+
+    // Register event listeners
+    ClientToServerEventWithAckNames.forEach((event) => {
+      ipcMain.handle(event, (_, payload) => {
+        new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(payload)}`);
+        return new Promise((resolve) => {
+          emitWithRetry(event, payload)
+            .then((ack) => {
+              new Logger('Socket').info(`socket.onAck ${event}: ${JSON.stringify(ack)}`);
+              resolve(ack);
+            })
+            .catch((err) => {
+              new Logger('Socket').error(`socket.emit ${event} error: ${err.message}`);
+              resolve({ ok: false, error: err.message });
+            });
+        });
+      });
+    });
+
+    ClientToServerEventNames.forEach((event) => {
+      ipcMain.on(event, (_, ...args) => {
+        new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(args)}`);
+        socket?.emit(event, ...args);
+      });
+    });
+
+    ServerToClientEventNames.forEach((event) => {
+      socket?.on(event, async (...args) => {
+        if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
+        BrowserWindow.getAllWindows().forEach((window) => {
+          window.webContents.send(event, ...args);
+        });
+      });
+    });
+
+    sendHeartbeat();
+    if (interval) clearInterval(interval);
+    interval = setInterval(sendHeartbeat, 30000);
+
+    new Logger('Socket').info(`Socket connected`);
+
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('connect', null);
+    });
+  });
+
+  socket.on('disconnect', (reason) => {
+    // Clean up event listeners
+    for (const event of ClientToServerEventWithAckNames) {
+      ipcMain.removeHandler(event);
+    }
+
+    for (const event of ClientToServerEventNames) {
+      ipcMain.removeAllListeners(event);
+    }
+
+    for (const event of ServerToClientEventNames) {
+      socket?.removeAllListeners(event);
+    }
+
+    if (interval) clearInterval(interval);
+
+    new Logger('Socket').info(`Socket disconnected, reason: ${reason}`);
+
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('disconnect', reason);
+    });
+  });
+
+  socket.on('connect_error', (error) => {
+    new Logger('Socket').error(`Socket connect error: ${error}`);
+
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('connect_error', error);
+    });
+  });
+
+  socket.on('reconnect', (attemptNumber) => {
+    new Logger('Socket').info(`Socket reconnected, attempt number: ${attemptNumber}`);
+
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('reconnect', attemptNumber);
+    });
+  });
+
+  socket.on('reconnect_error', (error) => {
+    new Logger('Socket').error(`Socket reconnect error: ${error}`);
+
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('reconnect_error', error);
+    });
+  });
+
+  socket.connect();
+}
+
+export function disconnectSocket() {
+  if (!socket) return;
+
+  socket.emit('disconnectUser');
+
+  for (const event of ClientToServerEventNames) {
+    ipcMain.removeAllListeners(event);
+  }
+
+  for (const event of ServerToClientEventNames) {
+    socket?.removeAllListeners(event);
+  }
+
+  socket.disconnect();
+  socket = null;
+}
+
+// Auth
+async function login(formData: { account: string; password: string }) {
+  return await Auth.login(formData)
+    .then((res) => {
+      if (res.success) {
+        setToken(res.token);
+        connectSocket(res.token);
+        isLogin = true;
+        mainWindow?.showInactive();
+        authWindow?.hide();
+        setTrayDetail();
+      }
+      return res;
+    })
+    .catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      return { success: false };
+    });
+}
+
+async function logout() {
+  removeToken();
+  disconnectSocket();
+  isLogin = false;
+  mainWindow?.reload();
+  mainWindow?.hide();
+  authWindow?.showInactive();
+  closePopups();
+  setTrayDetail();
+}
+
+async function register(formData: { account: string; password: string; email: string; username: string; locale: string }) {
+  return await Auth.register(formData).catch((error: any) => {
+    createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    return { success: false };
+  });
+}
+
+async function autoLogin(token: string) {
+  return await Auth.autoLogin(token)
+    .then((res) => {
+      if (res.success) {
+        setToken(res.token)
+        connectSocket(res.token);
+        isLogin = true;
+        mainWindow?.showInactive();
+        authWindow?.hide();
+        setTrayDetail();
+      }
+      return res;
+    })
+    .catch((error) => {
+      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      return { success: false };
+    });
+}
+
 app.on('ready', async () => {
   // Load env
-  await loadEnv(store.get('server', 'prod'));
+  loadEnv(store.get('server', 'prod'));
 
   // Register local-resource protocol
   protocol.registerFileProtocol('local-resource', (request, callback) => {
@@ -715,43 +1040,6 @@ app.on('ready', async () => {
 
   // Initialize i18n
   initMainI18n(store.get('language'));
-
-  // Register data handlers
-  registerDataHandlers(ipcMain);
-
-  // Register themes handlers
-  registerThemesHandlers(ipcMain, store);
-
-  // Register auth handlers
-  registerAuthHandlers(ipcMain, {
-    store,
-    isLogin: (val) => (val !== undefined ? (isLogin = val) : isLogin),
-    connectSocket,
-    disconnectSocket,
-    setTrayDetail,
-    getMainWindow: () => mainWindow,
-    getAuthWindow: () => authWindow,
-    createPopup,
-    closePopups,
-    BASE_URI,
-    DEV,
-  });
-
-  // Initialize popup loader with system settings getter
-  PopupLoader.initPopupLoader({
-    data: DataService,
-    getSystemSettings: getSettings,
-  });
-
-  // Register settings handlers
-  registerSettingsHandlers(ipcMain, {
-    store,
-    setAutoLaunch,
-    isAutoLaunchEnabled,
-    startCheckForUpdates,
-    stopCheckForUpdates,
-    getSettings,
-  });
 
   // Configure
   configureAutoUpdater();
@@ -765,6 +1053,23 @@ app.on('ready', async () => {
 
   ipcMain.on('exit', () => {
     app.exit();
+  });
+
+  // Auth handlers
+  ipcMain.handle('auth-login', async (_, formData: { account: string; password: string }) => {
+    return await login(formData);
+  });
+
+  ipcMain.handle('auth-logout', async () => {
+    return await logout();
+  });
+
+  ipcMain.handle('auth-register', async (_, formData: { account: string; password: string; email: string; username: string; locale: string }) => {
+    return await register(formData);
+  });
+
+  ipcMain.handle('auth-auto-login', async (_, token: string) => {
+    return await autoLogin(token);
   });
 
   ipcMain.on('save-record', (_, record: ArrayBuffer) => {
@@ -800,6 +1105,116 @@ app.on('ready', async () => {
     });
     if (canceled) return null;
     return filePaths[0];
+  });
+
+  // Data handlers
+  ipcMain.handle('data-user', async (_, params: { userId: string }) => {
+    return await Data.user(params);
+  });
+
+  ipcMain.handle('data-user-hot-reload', async (_, params: { userId: string }) => {
+    if (!getToken()) return null;
+    return await Data.user(params);
+  });
+
+  ipcMain.handle('data-friend', async (_, params: { userId: string; targetId: string }) => {
+    return await Data.friend(params);
+  });
+
+  ipcMain.handle('data-friends', async (_, params: { userId: string }) => {
+    return await Data.friends(params);
+  });
+
+  ipcMain.handle('data-friendActivities', async (_, params: { userId: string }) => {
+    return await Data.friendActivities(params);
+  });
+
+  ipcMain.handle('data-friendGroup', async (_, params: { userId: string; friendGroupId: string }) => {
+    return await Data.friendGroup(params);
+  });
+
+  ipcMain.handle('data-friendGroups', async (_, params: { userId: string }) => {
+    return await Data.friendGroups(params);
+  });
+
+  ipcMain.handle('data-friendApplication', async (_, params: { receiverId: string; senderId: string }) => {
+    return await Data.friendApplication(params);
+  });
+
+  ipcMain.handle('data-friendApplications', async (_, params: { receiverId: string }) => {
+    return await Data.friendApplications(params);
+  });
+
+  ipcMain.handle('data-server', async (_, params: { userId: string; serverId: string }) => {
+    return await Data.server(params);
+  });
+
+  ipcMain.handle('data-servers', async (_, params: { userId: string }) => {
+    return await Data.servers(params);
+  });
+
+  ipcMain.handle('data-serverMembers', async (_, params: { serverId: string }) => {
+    return await Data.serverMembers(params);
+  });
+
+  ipcMain.handle('data-serverOnlineMembers', async (_, params: { serverId: string }) => {
+    return await Data.serverOnlineMembers(params);
+  });
+
+  ipcMain.handle('data-channel', async (_, params: { userId: string; serverId: string; channelId: string }) => {
+    return await Data.channel(params);
+  });
+
+  ipcMain.handle('data-channels', async (_, params: { userId: string; serverId: string }) => {
+    return await Data.channels(params);
+  });
+
+  ipcMain.handle('data-channelMembers', async (_, params: { serverId: string; channelId: string }) => {
+    return await Data.channelMembers(params);
+  });
+
+  ipcMain.handle('data-member', async (_, params: { userId: string; serverId: string; channelId?: string }) => {
+    return await Data.member(params);
+  });
+
+  ipcMain.handle('data-memberApplication', async (_, params: { userId: string; serverId: string }) => {
+    return await Data.memberApplication(params);
+  });
+
+  ipcMain.handle('data-memberApplications', async (_, params: { serverId: string }) => {
+    return await Data.memberApplications(params);
+  });
+
+  ipcMain.handle('data-memberInvitation', async (_, params: { receiverId: string; serverId: string }) => {
+    return await Data.memberInvitation(params);
+  });
+
+  ipcMain.handle('data-memberInvitations', async (_, params: { receiverId: string }) => {
+    return await Data.memberInvitations(params);
+  });
+
+  ipcMain.handle('data-notifications', async (_, params: { region: string }) => {
+    return await Data.notifications(params);
+  });
+
+  ipcMain.handle('data-announcements', async (_, params: { region: string }) => {
+    return await Data.announcements(params);
+  });
+
+  ipcMain.handle('data-recommendServers', async (_, params: { region: string }) => {
+    return await Data.recommendServers(params);
+  });
+
+  ipcMain.handle('data-uploadImage', async (_, params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }) => {
+    return await Data.uploadImage(params);
+  });
+
+  ipcMain.handle('data-searchServer', async (_, params: { query: string }) => {
+    return await Data.searchServer(params);
+  });
+
+  ipcMain.handle('data-searchUser', async (_, params: { query: string }) => {
+    return await Data.searchUser(params);
   });
 
   // Accounts handlers
@@ -838,9 +1253,9 @@ app.on('ready', async () => {
     event.returnValue = store.get('language');
   });
 
-  ipcMain.on('set-language', (_, language) => {
-    store.set('language', language ?? getRegion());
-    initMainI18n(language ?? getRegion());
+  ipcMain.on('set-language', (_, language = getRegion()) => {
+    store.set('language', language);
+    initMainI18n(language);
     setTrayDetail();
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
@@ -859,9 +1274,9 @@ app.on('ready', async () => {
   ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
     new Logger('System').info(`Opening ${type} (${id})...`);
 
-    const loader = PopupLoader.loaders[type as keyof typeof PopupLoader.loaders];
+    const loader = Loader[type as keyof typeof Loader];
     if (loader)
-      initialData = await loader(initialData).catch(() => {
+      initialData = await loader({ ...initialData, systemSettings: getSettings() }).catch(() => {
         new Logger('System').error(`Cannot load ${type} data, aborting...`);
         return null;
       });
@@ -880,9 +1295,9 @@ app.on('ready', async () => {
     closePopups();
   });
 
-  ipcMain.on('popup-submit', (_, to, data?: unknown) => {
+  ipcMain.on('popup-submit', (_, to, data: unknown | null = null) => {
     BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('popup-submit', to, data ?? null);
+      window.webContents.send('popup-submit', to, data);
     });
   });
 
@@ -940,27 +1355,457 @@ app.on('ready', async () => {
     });
   });
 
-  // Network Diagnosis Handlers
-  ipcMain.on('request-sfu-diagnosis', (event) => {
-    // Forward request to main window to get WebRTC info
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('get-sfu-diagnosis', { senderId: event.sender.id });
-    } else {
-      event.sender.send('sfu-diagnosis-response', null);
-    }
+  // System settings handlers
+  ipcMain.on('get-system-settings', (event) => {
+    event.returnValue = getSettings();
   });
 
-  ipcMain.on('sfu-diagnosis-response', (_, data) => {
-    // Forward response to the popup (senderId is passed in data usually, or we broadcast/target)
-    // To simplify, we can target the sender from the request if we stored it, 
-    // or passing senderId back and forth.
-    // Let's expect the payload to contain targetSenderId
-    if (data && data.targetSenderId) {
-      const targetWebContents = electron.webContents.fromId(data.targetSenderId);
-      if (targetWebContents && !targetWebContents.isDestroyed()) {
-        targetWebContents.send('sfu-diagnosis-response', data.info);
-      }
-    }
+  ipcMain.on('get-auto-login', (event) => {
+    event.returnValue = store.get('autoLogin');
+  });
+
+  ipcMain.on('get-auto-launch', (event) => {
+    event.returnValue = isAutoLaunchEnabled();
+  });
+
+  ipcMain.on('get-always-on-top', (event) => {
+    event.returnValue = store.get('alwaysOnTop');
+  });
+
+  ipcMain.on('get-status-auto-idle', (event) => {
+    event.returnValue = store.get('statusAutoIdle');
+  });
+
+  ipcMain.on('get-status-auto-idle-minutes', (event) => {
+    event.returnValue = store.get('statusAutoIdleMinutes');
+  });
+
+  ipcMain.on('get-status-auto-dnd', (event) => {
+    event.returnValue = store.get('statusAutoDnd');
+  });
+
+  ipcMain.on('get-channel-ui-mode', (event) => {
+    event.returnValue = store.get('channelUIMode');
+  });
+
+  ipcMain.on('get-close-to-tray', (event) => {
+    event.returnValue = store.get('closeToTray');
+  });
+
+  ipcMain.on('get-font', (event) => {
+    event.returnValue = store.get('font');
+  });
+
+  ipcMain.on('get-font-size', (event) => {
+    event.returnValue = store.get('fontSize');
+  });
+
+  ipcMain.on('get-font-list', async (event) => {
+    const fonts = await fontList.getFonts();
+    event.returnValue = fonts;
+  });
+
+  ipcMain.on('get-input-audio-device', (event) => {
+    event.returnValue = store.get('inputAudioDevice');
+  });
+
+  ipcMain.on('get-output-audio-device', (event) => {
+    event.returnValue = store.get('outputAudioDevice');
+  });
+
+  ipcMain.on('get-record-format', (event) => {
+    event.returnValue = store.get('recordFormat');
+  });
+
+  ipcMain.on('get-record-save-path', (event) => {
+    event.returnValue = store.get('recordSavePath');
+  });
+
+  ipcMain.on('get-mix-effect', (event) => {
+    event.returnValue = store.get('mixEffect');
+  });
+
+  ipcMain.on('get-mix-effect-type', (event) => {
+    event.returnValue = store.get('mixEffectType');
+  });
+
+  ipcMain.on('get-auto-mix-setting', (event) => {
+    event.returnValue = store.get('autoMixSetting');
+  });
+
+  ipcMain.on('get-echo-cancellation', (event) => {
+    event.returnValue = store.get('echoCancellation');
+  });
+
+  ipcMain.on('get-noise-cancellation', (event) => {
+    event.returnValue = store.get('noiseCancellation');
+  });
+
+  ipcMain.on('get-microphone-amplification', (event) => {
+    event.returnValue = store.get('microphoneAmplification');
+  });
+
+  ipcMain.on('get-manual-mix-mode', (event) => {
+    event.returnValue = store.get('manualMixMode');
+  });
+
+  ipcMain.on('get-mix-mode', (event) => {
+    event.returnValue = store.get('mixMode');
+  });
+
+  ipcMain.on('get-speaking-mode', (event) => {
+    event.returnValue = store.get('speakingMode');
+  });
+
+  ipcMain.on('get-default-speaking-key', (event) => {
+    event.returnValue = store.get('defaultSpeakingKey');
+  });
+
+  ipcMain.on('get-not-save-message-history', (event) => {
+    event.returnValue = store.get('notSaveMessageHistory');
+  });
+
+  ipcMain.on('get-hot-key-open-main-window', (event) => {
+    event.returnValue = store.get('hotKeyOpenMainWindow');
+  });
+
+  ipcMain.on('get-hot-key-increase-volume', (event) => {
+    event.returnValue = store.get('hotKeyIncreaseVolume');
+  });
+
+  ipcMain.on('get-hot-key-decrease-volume', (event) => {
+    event.returnValue = store.get('hotKeyDecreaseVolume');
+  });
+
+  ipcMain.on('get-hot-key-toggle-speaker', (event) => {
+    event.returnValue = store.get('hotKeyToggleSpeaker');
+  });
+
+  ipcMain.on('get-hot-key-toggle-microphone', (event) => {
+    event.returnValue = store.get('hotKeyToggleMicrophone');
+  });
+
+  ipcMain.on('get-disable-all-sound-effect', (event) => {
+    event.returnValue = store.get('disableAllSoundEffect');
+  });
+
+  ipcMain.on('get-enter-voice-channel-sound', (event) => {
+    event.returnValue = store.get('enterVoiceChannelSound');
+  });
+
+  ipcMain.on('get-leave-voice-channel-sound', (event) => {
+    event.returnValue = store.get('leaveVoiceChannelSound');
+  });
+
+  ipcMain.on('get-start-speaking-sound', (event) => {
+    event.returnValue = store.get('startSpeakingSound');
+  });
+
+  ipcMain.on('get-stop-speaking-sound', (event) => {
+    event.returnValue = store.get('stopSpeakingSound');
+  });
+
+  ipcMain.on('get-receive-direct-message-sound', (event) => {
+    event.returnValue = store.get('receiveDirectMessageSound');
+  });
+
+  ipcMain.on('get-receive-channel-message-sound', (event) => {
+    event.returnValue = store.get('receiveChannelMessageSound');
+  });
+
+  ipcMain.on('get-auto-check-for-updates', (event) => {
+    event.returnValue = store.get('autoCheckForUpdates');
+  });
+
+  ipcMain.on('get-update-check-interval', (event) => {
+    event.returnValue = store.get('updateCheckInterval');
+  });
+
+  ipcMain.on('get-update-channel', (event) => {
+    event.returnValue = store.get('updateChannel');
+  });
+
+  ipcMain.on('set-auto-login', (_, enable = false) => {
+    store.set('autoLogin', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-login', enable);
+    });
+  });
+
+  ipcMain.on('set-auto-launch', (_, enable = false) => {
+    setAutoLaunch(enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-launch', enable);
+    });
+  });
+
+  ipcMain.on('set-always-on-top', (_, enable = false) => {
+    store.set('alwaysOnTop', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.setAlwaysOnTop(enable);
+      window.webContents.send('always-on-top', enable);
+    });
+  });
+
+  ipcMain.on('set-status-auto-idle', (_, enable = false) => {
+    store.set('statusAutoIdle', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('status-auto-idle', enable);
+    });
+  });
+
+  ipcMain.on('set-status-auto-idle-minutes', (_, value = 10) => {
+    store.set('statusAutoIdleMinutes', value);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('status-auto-idle-minutes', value);
+    });
+  });
+
+  ipcMain.on('set-status-auto-dnd', (_, enable = false) => {
+    store.set('statusAutoDnd', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('status-auto-dnd', enable);
+    });
+  });
+
+  ipcMain.on('set-channel-ui-mode', (_, mode = 'classic') => {
+    store.set('channelUIMode', mode);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('channel-ui-mode', mode);
+    });
+  });
+
+  ipcMain.on('set-close-to-tray', (_, enable = false) => {
+    store.set('closeToTray', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('close-to-tray', enable);
+    });
+  });
+
+  ipcMain.on('set-font', (_, font = '') => {
+    store.set('font', font);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('font', font);
+    });
+  });
+
+  ipcMain.on('set-font-size', (_, fontSize = 13) => {
+    store.set('fontSize', fontSize);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('font-size', fontSize);
+    });
+  });
+
+  ipcMain.on('set-input-audio-device', (_, deviceId = '') => {
+    store.set('inputAudioDevice', deviceId);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('input-audio-device', deviceId);
+    });
+  });
+
+  ipcMain.on('set-output-audio-device', (_, deviceId = '') => {
+    store.set('outputAudioDevice', deviceId);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('output-audio-device', deviceId);
+    });
+  });
+
+  ipcMain.on('set-record-format', (_, format = 'wav') => {
+    store.set('recordFormat', format);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('record-format', format);
+    });
+  });
+
+  ipcMain.on('set-record-save-path', (_, path = app.getPath('documents')) => {
+    store.set('recordSavePath', path);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('record-save-path', path);
+    });
+  });
+
+  ipcMain.on('set-mix-effect', (_, enable = false) => {
+    store.set('mixEffect', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('mix-effect', enable);
+    });
+  });
+
+  ipcMain.on('set-mix-effect-type', (_, type = '') => {
+    store.set('mixEffectType', type);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('mix-effect-type', type);
+    });
+  });
+
+  ipcMain.on('set-auto-mix-setting', (_, enable = false) => {
+    store.set('autoMixSetting', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-mix-setting', enable);
+    });
+  });
+
+  ipcMain.on('set-echo-cancellation', (_, enable = false) => {
+    store.set('echoCancellation', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('echo-cancellation', enable);
+    });
+  });
+
+  ipcMain.on('set-noise-cancellation', (_, enable = false) => {
+    store.set('noiseCancellation', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('noise-cancellation', enable);
+    });
+  });
+
+  ipcMain.on('set-microphone-amplification', (_, enable = false) => {
+    store.set('microphoneAmplification', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('microphone-amplification', enable);
+    });
+  });
+
+  ipcMain.on('set-manual-mix-mode', (_, enable = false) => {
+    store.set('manualMixMode', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('manual-mix-mode', enable);
+    });
+  });
+
+  ipcMain.on('set-mix-mode', (_, mode = 'all') => {
+    store.set('mixMode', mode);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('mix-mode', mode);
+    });
+  });
+
+  ipcMain.on('set-speaking-mode', (_, mode = 'key') => {
+    store.set('speakingMode', mode);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('speaking-mode', mode);
+    });
+  });
+
+  ipcMain.on('set-default-speaking-key', (_, key = '') => {
+    store.set('defaultSpeakingKey', key);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('default-speaking-key', key);
+    });
+  });
+
+  ipcMain.on('set-not-save-message-history', (_, enable = false) => {
+    store.set('notSaveMessageHistory', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('not-save-message-history', enable);
+    });
+  });
+
+  ipcMain.on('set-hot-key-open-main-window', (_, key = '') => {
+    store.set('hotKeyOpenMainWindow', key);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-open-main-window', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-increase-volume', (_, key = '') => {
+    store.set('hotKeyIncreaseVolume', key);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-increase-volume', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-decrease-volume', (_, key = '') => {
+    store.set('hotKeyDecreaseVolume', key);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-decrease-volume', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-toggle-speaker', (_, key = '') => {
+    store.set('hotKeyToggleSpeaker', key);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-toggle-speaker', key);
+    });
+  });
+
+  ipcMain.on('set-hot-key-toggle-microphone', (_, key = '') => {
+    store.set('hotKeyToggleMicrophone', key);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('hot-key-toggle-microphone', key);
+    });
+  });
+
+  ipcMain.on('set-disable-all-sound-effect', (_, enable = false) => {
+    store.set('disableAllSoundEffect', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('disable-all-sound-effect', enable);
+    });
+  });
+
+  ipcMain.on('set-enter-voice-channel-sound', (_, enable = false) => {
+    store.set('enterVoiceChannelSound', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('enter-voice-channel-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-leave-voice-channel-sound', (_, enable = false) => {
+    store.set('leaveVoiceChannelSound', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('leave-voice-channel-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-start-speaking-sound', (_, enable = false) => {
+    store.set('startSpeakingSound', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('start-speaking-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-stop-speaking-sound', (_, enable = false) => {
+    store.set('stopSpeakingSound', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('stop-speaking-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-receive-direct-message-sound', (_, enable = false) => {
+    store.set('receiveDirectMessageSound', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('receive-direct-message-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-receive-channel-message-sound', (_, enable = false) => {
+    store.set('receiveChannelMessageSound', enable);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('receive-channel-message-sound', enable);
+    });
+  });
+
+  ipcMain.on('set-auto-check-for-updates', (_, enable = false) => {
+    store.set('autoCheckForUpdates', enable);
+    if (enable) startCheckForUpdates();
+    else stopCheckForUpdates();
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('auto-check-for-updates', enable);
+    });
+  });
+
+  ipcMain.on('set-update-check-interval', (_, interval = 1 * 60 * 1000) => {
+    store.set('updateCheckInterval', interval);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('update-check-interval', interval);
+    });
+  });
+
+  ipcMain.on('set-update-channel', (_, channel = 'latest') => {
+    store.set('updateChannel', channel);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('update-channel', channel);
+    });
   });
 
   // Disclaimer handlers

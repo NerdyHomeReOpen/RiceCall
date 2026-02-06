@@ -26,11 +26,12 @@ import popupStyles from '@/styles/popup.module.css';
 import permissionStyles from '@/styles/permission.module.css';
 
 interface ServerSettingPopupProps {
+  id: string;
   server: Types.Server;
   serverMembers: Types.Member[];
 }
 
-const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ server: serverData, serverMembers: serverMembersData }) => {
+const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
@@ -102,13 +103,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
 
   const settingPages = Permission.isServerAdmin(permissionLevel)
     ? [
-        t('server-info'),
-        t('server-announcement'),
-        t('member-management'),
-        t('access-permission'),
-        `${t('member-application-management')} (${totalApplicationsCount})`,
-        `${t('blacklist-management')} (${totalBlockMembersCount})`,
-      ]
+      t('server-info'),
+      t('server-announcement'),
+      t('member-management'),
+      t('access-permission'),
+      `${t('member-application-management')} (${totalApplicationsCount})`,
+      `${t('blacklist-management')} (${totalBlockMembersCount})`,
+    ]
     : Permission.isMember(permissionLevel)
       ? [t('server-info'), t('server-announcement'), t('member-management')]
       : [t('server-info'), t('server-announcement')];
@@ -193,7 +194,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
       Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
           isUploadingRef.current = false;
           return;
         }
@@ -262,11 +263,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const handleSaveBtnClick = () => {
     if (!canSubmit) return;
     Popup.editServer(server.serverId, ObjDiff(server, serverData));
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects
@@ -449,7 +450,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
                         .addSeparator()
                         .addMemberManagementOption(
                           { permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: null },
-                          () => {},
+                          () => { },
                           getMemberManagementSubmenuItems(),
                         )
                         .build();

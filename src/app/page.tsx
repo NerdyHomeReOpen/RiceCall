@@ -4,13 +4,11 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useAppDispatch, useAppSelector } from '@/store/hook';
+import { useAppSelector } from '@/store/hook';
+import { isElectron } from '@/platform/isElectron';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
-
-import { setIsSocketConnected } from '@/store/slices/socketSlice';
-import { setUser } from '@/store/slices/userSlice';
 
 import SocketManager from '@/components/SocketManager';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -123,7 +121,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
           onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
           onAboutUsClick: Popup.openAboutUs,
         },
-        () => { },
+        () => {},
       )
       .addNetworkDiagnosisOption(() => Popup.openNetworkDiagnosis())
       .addLogoutOption(() => logout())
@@ -168,7 +166,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: false,
       contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => { },
+      onClick: () => {},
     },
   ];
 
@@ -312,7 +310,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
   const { getIsLoading, loadServer, stopLoading } = useLoading();
-  const dispatch = useAppDispatch();
 
   // States
   const [selectedTab, setSelectedTab] = useState<'home' | 'friends' | 'server'>('home');
@@ -338,9 +335,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   // Variables
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const isWebMode = typeof window !== 'undefined' && !(window as any).require;
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
   const isSelectedHomePage = selectedTab === 'home';
   const isSelectedFriendsPage = selectedTab === 'friends';
   const isSelectedServerPage = selectedTab === 'server';
@@ -357,27 +351,10 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   // Web-mode: establish socket.io connection directly (Electron does this in main process).
   useEffect(() => {
-    if (!isWebMode) return;
-    if (!token) return;
-    ipc.socketClient?.connect(token);
-    return () => {
-      ipc.socketClient?.disconnect();
-    };
-  }, [isWebMode, token]);
-
-  useEffect(() => {
-    if (user.userId) return;
-
-    const userId = localStorage.getItem('userId');
-    if (!userId) return;
-
-    ipc.data.userHotReload({ userId }).then((user) => {
-      if (user) {
-        dispatch(setUser(user));
-        dispatch(setIsSocketConnected(true));
-      }
-    });
-  }, [user, dispatch]);
+    const token = localStorage.getItem('token') || '';
+    if (isElectron()) return;
+    ipc.auth.autoLogin(token);
+  }, []);
 
   useEffect(() => {
     if (user.currentServerId) setSelectedTab('server');
@@ -386,15 +363,15 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user.currentServerId, stopLoading]);
 
   useEffect(() => {
-    const onTriggerHandleServerSelect = ({ key, newValue }: StorageEvent) => {
-      if (key !== 'trigger-handle-server-select' || !newValue) return;
+    const onStorage = ({ key, newValue }: StorageEvent) => {
+      if (key !== 'server-select' || !newValue) return;
       const { serverDisplayId, serverId } = JSON.parse(newValue);
       if (getIsLoading() || user.currentServerId === serverId) return;
       loadServer(serverDisplayId);
       ipc.socket.send('connectServer', { serverId });
     };
-    window.addEventListener('storage', onTriggerHandleServerSelect);
-    return () => window.removeEventListener('storage', onTriggerHandleServerSelect);
+    window.addEventListener('storage', onStorage);
+    return () => window.removeEventListener('storage', onStorage);
   }, [user.currentServerId, getIsLoading, loadServer]);
 
   useEffect(() => {
@@ -439,24 +416,27 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [selectedTab, user.name, currentServer.name, onlineMembersLength, t]);
 
   return (
-    <WebRTCProvider>
-      <ActionScannerProvider>
-        <ExpandedProvider>
-          <SocketManager />
-          <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
-          {!user.userId || !isSocketConnected ? (
-            <LoadingSpinner />
-          ) : (
-            <>
-              <HomePage display={isSelectedHomePage} />
-              <FriendPage display={isSelectedFriendsPage} />
-              <ServerPage display={isSelectedServerPage} />
-              <NotificationToaster />
-            </>
-          )}
-        </ExpandedProvider>
-      </ActionScannerProvider>
-    </WebRTCProvider>
+    <>
+      {/* {isWebMode && <WebSocketProvider />} */}
+      <WebRTCProvider>
+        <ActionScannerProvider>
+          <ExpandedProvider>
+            <SocketManager />
+            <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
+            {!user.userId || !isSocketConnected ? (
+              <LoadingSpinner />
+            ) : (
+              <>
+                <HomePage display={isSelectedHomePage} />
+                <FriendPage display={isSelectedFriendsPage} />
+                <ServerPage display={isSelectedServerPage} />
+                <NotificationToaster />
+              </>
+            )}
+          </ExpandedProvider>
+        </ActionScannerProvider>
+      </WebRTCProvider>
+    </>
   );
 });
 

@@ -9,11 +9,12 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface ApplyMemberPopupProps {
+  id: string;
   server: Types.Server;
   memberApplication: Types.MemberApplication | null;
 }
 
-const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, memberApplication }) => {
+const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, server, memberApplication }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -37,16 +38,16 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
 
   const handleSubmitBtnClick = () => {
     Popup.sendMemberApplication(server.serverId, { description: applicationDesc });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
     Popup.editMemberApplication(server.serverId, { description: applicationDesc });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

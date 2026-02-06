@@ -13,10 +13,9 @@ import ContextMenuProvider from '@/providers/ContextMenu';
 import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
+import InAppPopupProvider from '@/providers/InAppPopup';
 
-import { InAppPopupContainer } from '@/platform/popup/InAppPopupContainer';
-
-import Logger from '@/utils/logger';
+import Logger from '@/logger';
 
 interface ProvidersProps {
   children: React.ReactNode;
@@ -77,8 +76,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
         <ContextMenuProvider>
           <SoundPlayerProvider>
             <ImageViewerProvider>
-              {children}
-              <InAppPopupContainer />
+              <InAppPopupProvider>{children}</InAppPopupProvider>
             </ImageViewerProvider>
           </SoundPlayerProvider>
         </ContextMenuProvider>

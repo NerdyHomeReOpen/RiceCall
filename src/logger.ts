@@ -1,13 +1,19 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { isElectron } from '@/platform/isElectron';
+import { isMain, isRenderer } from '@/platform/isElectron';
 
-// Lazy-load electron-log to avoid bundling fs/path in web builds
-let electronLog: any = null;
+let logger: any = null;
 
-if (isElectron()) {
-  try {
-    electronLog = (window as any).require('electron-log');
-  } catch {}
+if (isMain()) {
+  import(/* webpackIgnore: true */ 'module')
+    .then((module) => module.createRequire)
+    .then((createRequire) => {
+      const require = createRequire(import.meta.url);
+      logger = require('electron-log').default;
+    });
+} else if (isRenderer()) {
+  logger = window.require('electron-log/renderer');
+} else {
+  logger = console;
 }
 
 /**
@@ -21,16 +27,12 @@ export class Logger {
     this.origin = origin;
   }
 
-  private get log() {
-    return electronLog || console;
-  }
-
   /**
    * Log an info message
    * @param message - The message to log
    */
   info(message: string) {
-    this.log.info(`[${this.origin}] ${message}`);
+    logger.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -38,7 +40,7 @@ export class Logger {
    * @param message - The message to log
    */
   command(message: string) {
-    this.log.info(`[${this.origin}] ${message}`);
+    logger.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -46,7 +48,7 @@ export class Logger {
    * @param message - The message to log
    */
   success(message: string) {
-    this.log.info(`[${this.origin}] ${message}`);
+    logger.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -54,7 +56,7 @@ export class Logger {
    * @param message - The message to log
    */
   warn(message: string) {
-    this.log.warn(`[${this.origin}] ${message}`);
+    logger.warn(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -62,7 +64,7 @@ export class Logger {
    * @param message - The message to log
    */
   error(message: string) {
-    this.log.error(`[${this.origin}] ${message}`);
+    logger.error(`[${this.origin}] ${message}`);
   }
 }
 

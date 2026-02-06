@@ -8,7 +8,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Color from '@/utils/color';
 import * as Popup from '@/utils/popup';
-import Logger from '@/utils/logger';
+import Logger from '@/logger';
 
 import styles from '@/styles/changeTheme.module.css';
 import popupStyles from '@/styles/popup.module.css';

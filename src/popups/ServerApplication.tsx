@@ -8,21 +8,22 @@ import styles from '@/styles/serverApplication.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
 interface ServerApplicationPopupProps {
+  id: string;
   server: Types.Server;
 }
 
-const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo(({ server }) => {
+const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo(({ id, server }) => {
   // Hooks
   const { t } = useTranslation();
 
   const handleShowFrameBtnClick = () => {
     ipc.popup.submit('serverApplication', 'openShowFrame');
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleChannelEventBtnClick = () => {
     ipc.popup.submit('serverApplication', 'openChannelEvent');
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

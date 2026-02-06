@@ -8,7 +8,11 @@ import * as Popup from '@/utils/popup';
 
 import popupStyles from '@/styles/popup.module.css';
 
-const SearchUserPopup: React.FC = React.memo(() => {
+interface SearchUserPopupProps {
+  id: string;
+}
+
+const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -42,7 +46,7 @@ const SearchUserPopup: React.FC = React.memo(() => {
         else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
         else {
           Popup.openApplyFriend(user.userId, target.userId);
-          ipc.window.close();
+          ipc.popup.close(id);
         }
       });
     });
@@ -59,7 +63,7 @@ const SearchUserPopup: React.FC = React.memo(() => {
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects

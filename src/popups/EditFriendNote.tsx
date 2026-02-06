@@ -9,10 +9,11 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditFriendNotePopupProps {
+  id: string;
   friend: Types.Friend;
 }
 
-const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ friend }) => {
+const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ id, friend }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -30,7 +31,7 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

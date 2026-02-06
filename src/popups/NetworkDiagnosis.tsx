@@ -2,6 +2,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaCheckCircle, FaArrowRight, FaSpinner, FaNetworkWired, FaServer, FaCloud } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
+import { getEnv } from '@/env';
 import ipc from '@/ipc';
 
 import { isElectron } from '@/platform/isElectron';
@@ -40,7 +41,11 @@ interface Stage {
   status: StepStatus;
 }
 
-const NetworkDiagnosis: React.FC = React.memo(() => {
+interface NetworkDiagnosisPopupProps {
+  id: string;
+}
+
+const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
 
   const [logs, setLogs] = useState<string[]>([]);
@@ -271,7 +276,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
     addLog('Starting Network Diagnosis');
     updateStage('init', 'active');
 
-    const env = ipc.env.get();
+    const env = getEnv();
     const getDomain = (url: string) => {
       try {
         return new URL(url).hostname;
@@ -413,6 +418,10 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
     URL.revokeObjectURL(url);
   }, [logs, reports]);
 
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
+  };
+
   if (!isElectron()) {
     return (
       <div className={styles['popup-wrapper']}>
@@ -438,7 +447,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
           </div>
         </div>
         <div className={styles['popup-footer']}>
-          <div className={styles['button']} onClick={() => ipc.window.close()}>
+          <div className={styles['button']} onClick={handleCloseBtnClick}>
             {t('close')}
           </div>
         </div>
@@ -576,7 +585,7 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
         <div className={styles['button']} onClick={startTest} style={{ opacity: isTesting ? 0.5 : 1, pointerEvents: isTesting ? 'none' : 'auto' }}>
           {isTesting ? t('testing') : t('start-test')}
         </div>
-        <div className={styles['button']} onClick={() => ipc.window.close()}>
+        <div className={styles['button']} onClick={handleCloseBtnClick}>
           {t('close')}
         </div>
       </div>
@@ -584,6 +593,6 @@ const NetworkDiagnosis: React.FC = React.memo(() => {
   );
 });
 
-NetworkDiagnosis.displayName = 'NetworkDiagnosis';
+NetworkDiagnosisPopup.displayName = 'NetworkDiagnosisPopup';
 
-export default NetworkDiagnosis;
+export default NetworkDiagnosisPopup;

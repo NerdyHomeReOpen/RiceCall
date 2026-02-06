@@ -24,7 +24,6 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as Popup from '@/utils/popup';
 import * as Default from '@/utils/default';
 import * as TagConverter from '@/utils/tagConverter';
-import { platformStorage } from '@/platform/storage';
 
 import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN } from '@/constant';
 
@@ -111,7 +110,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
@@ -176,7 +175,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleServerSelect = (server: Types.Server) => {
-    platformStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
+    ipc.sendSelectServer({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   const handleScroll = () => {

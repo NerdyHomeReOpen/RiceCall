@@ -26,12 +26,13 @@ import settingStyles from '@/styles/setting.module.css';
 import permissionStyles from '@/styles/permission.module.css';
 
 interface ChannelSettingPopupProps {
+  id: string;
   server: Types.Server;
   channel: Types.Channel;
   channelMembers: Types.Member[];
 }
 
-const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ server, channel: channelData, channelMembers: channelMembersData }) => {
+const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id, server, channel: channelData, channelMembers: channelMembersData }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
@@ -93,14 +94,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
     () =>
       Permission.isChannelMod(permissionLevel)
         ? [
-            t('channel-info'),
-            t('channel-announcement'),
-            t('access-permission'),
-            t('speaking-permission'),
-            t('text-permission'),
-            `${t('channel-management')} (${totalModeratorsCount})`,
-            `${t('blacklist-management')} (${totalBlockMembersCount})`,
-          ]
+          t('channel-info'),
+          t('channel-announcement'),
+          t('access-permission'),
+          t('speaking-permission'),
+          t('text-permission'),
+          `${t('channel-management')} (${totalModeratorsCount})`,
+          `${t('blacklist-management')} (${totalBlockMembersCount})`,
+        ]
         : isReadOnly
           ? [t('channel-info'), t('channel-announcement')]
           : [t('channel-info')],
@@ -234,11 +235,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
 
   const handleConfirmBtnClick = () => {
     Popup.editChannel(server.serverId, channel.channelId, ObjDiff(channel, channelData));
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects
@@ -544,7 +545,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
                         .addSeparator()
                         .addMemberManagementOption(
                           { permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId },
-                          () => {},
+                          () => { },
                           getMemberManagementSubmenuItems(),
                         )
                         .build();

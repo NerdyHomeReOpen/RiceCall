@@ -10,11 +10,12 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface CreateChannelPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   parent: Types.Channel | null;
 }
 
-const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serverId, parent }) => {
+const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, serverId, parent }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -32,11 +33,11 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
     Popup.createChannel(serverId, { name: channelName, categoryId: parent?.channelId || null });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

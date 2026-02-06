@@ -57,9 +57,7 @@ export function initNetworkService(mainWindow: BrowserWindow | null) {
       if (activeTool) {
         try {
           activeTool.cancel?.();
-        } catch {
-          
-        }
+        } catch {}
       }
 
       return new Promise((resolve) => {
@@ -70,9 +68,8 @@ export function initNetworkService(mainWindow: BrowserWindow | null) {
 
           activeTool = new Tool(uniqueDomains, duration);
 
-          
           activeTool
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             .run((progress: any) => {
               if (!sender.isDestroyed()) {
                 sender.send('network-diagnosis-progress', progress);

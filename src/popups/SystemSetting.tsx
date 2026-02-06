@@ -12,11 +12,12 @@ import settingStyles from '@/styles/setting.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
 interface SystemSettingPopupProps {
+  id: string;
   userSettings: Types.UserSetting;
   systemSettings: Types.SystemSettings;
 }
 
-const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ userSettings: userSettingsData, systemSettings: systemSettingsData }) => {
+const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, userSettings: userSettingsData, systemSettings: systemSettingsData }) => {
   // Hooks
   const { t } = useTranslation();
   const { playSound } = useSoundPlayer();
@@ -281,11 +282,11 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ user
   const handleConfirmBtnClick = () => {
     ipc.systemSettings.set(ObjDiff(systemSettings, systemSettingsData));
     ipc.socket.send('editUserSetting', { update: ObjDiff(userSettings, userSettingsData) });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects

@@ -1,233 +1,659 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-/**
- * IPC Facade - Unified interface for Renderer process
- *
- * This module provides a clean API for the renderer (React components) to communicate
- * with the main process (Electron) or directly with handlers (Web).
- *
- * Architecture:
- * - Uses platform abstractions which return appropriate implementations
- * - Electron: Real ipcRenderer, main process socket, native window controls
- * - Web: Fake ipcRenderer, direct socket.io, in-app popup controls
- *
- * NO platform checks (isElectron) exist in this file!
- * All platform-specific logic is encapsulated in platform/* modules.
- */
+/* eslint-disable @typescript-eslint/no-require-imports */
+import { isElectron, isRenderer, isWebsite } from '@/platform/isElectron';
 
 import * as Types from '@/types';
-import { getIpcRenderer, type IpcRenderer } from '@/platform/ipc';
-import { getDataClient, type DataClient } from '@/platform/data';
-import { getPopupController } from '@/platform/popup';
-import { getSocketClient, type SocketClient } from '@/platform/socket';
-import { getWindowController, type WindowController } from '@/platform/window';
-import { AuthController, getAuthController } from '@/platform/auth';
 
-// Lazy-initialized singletons
-let ipc: IpcRenderer | null = null;
-let dataClient: DataClient | null = null;
-let socketClient: SocketClient | null = null;
-let windowController: WindowController | null = null;
-let authController: any | null = null;
+import Logger from '@/logger';
 
-function getIpc(): IpcRenderer {
-  if (!ipc) ipc = getIpcRenderer();
-  return ipc;
+// Safe references initialized on first use
+let ipcRenderer: any = null;
+let webMain: any = null;
+
+if (isElectron()) {
+  // In Renderer environment, supplement ipcRenderer
+  if (!ipcRenderer && isRenderer()) {
+    try {
+      ipcRenderer = window.require('electron').ipcRenderer;
+    } catch (error) {
+      new Logger('IPC').error(`Failed to require electron: ${error}`);
+    }
+  }
+} else {
+  webMain = require('@/web/main');
 }
 
-function getDataClientSingleton(): DataClient {
-  if (!dataClient) dataClient = getDataClient();
-  return dataClient;
-}
-
-function getSocket(): SocketClient {
-  if (!socketClient) socketClient = getSocketClient();
-  return socketClient;
-}
-
-function getWindow(): WindowController {
-  if (!windowController) windowController = getWindowController();
-  return windowController;
-}
-
-function getAuth(): AuthController {
-  if (!authController) authController = getAuthController();
-  return authController;
-}
-
-// ============================================================================
-// IPC Facade Object
-// ============================================================================
-
-const ipcFacade = {
-  // -------------------------------------------------------------------------
-  // Application Control
-  // -------------------------------------------------------------------------
+const ipc = {
   exit: () => {
-    getIpc().send('exit');
+    if (isWebsite()) {
+      webMain.exit();
+    } else if (isRenderer()) {
+      ipcRenderer.send('exit');
+    } else {
+      throw new Error('Unsupported platform');
+    }
   },
 
-  // -------------------------------------------------------------------------
-  // Socket Communication (delegated to platform/socket)
-  // -------------------------------------------------------------------------
   socket: {
-    send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => getSocket().send(event, ...args),
+    send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => {
+      if (isWebsite()) {
+        return webMain.socketSend(event, ...args);
+      } else if (isRenderer()) {
+        ipcRenderer.send(event, ...args);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
 
-    on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) =>
-      getSocket().on(event, callback),
+    on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) => {
+      if (isWebsite()) {
+        const listener = (...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
+        return () => {
+          webMain.webEventEmitter.on(event, listener);
+          return () => webMain.webEventEmitter.removeListener(event, listener);
+        };
+      } else if (isRenderer()) {
+        const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
+        ipcRenderer.on(event, listener);
+        return () => ipcRenderer.removeListener(event, listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
 
-    emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> =>
-      getSocket().emit(event, payload),
+    emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => {
+      if (isWebsite()) {
+        return webMain.socketEmit(event, payload);
+      } else if (isRenderer()) {
+        return new Promise((resolve, reject) => {
+          ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
+            if (ack?.ok) resolve(ack.data);
+            else reject(new Error(ack?.error || 'unknown error'));
+          });
+        });
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
   },
 
-  // Socket client management (delegated to platform/socket)
-  socketClient: {
-    connect: (token: string) => getSocket().connect(token),
-    disconnect: () => getSocket().disconnect(),
-  },
-
-  // -------------------------------------------------------------------------
-  // Authentication
-  // -------------------------------------------------------------------------
   auth: {
     login: async (formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> => {
-      return await getIpc().invoke('auth-login', formData);
+      if (isWebsite()) {
+        return await webMain.login(formData);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('auth-login', formData);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     logout: async (): Promise<void> => {
-      await getAuth().logout();
-    },
-
-    loginSuccess: async (token: string): Promise<void> => {
-      await getAuth().loginSuccess(token);
+      if (isWebsite()) {
+        return await webMain.logout();
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('auth-logout');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     register: async (formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> => {
-      return await getIpc().invoke('auth-register', formData);
+      if (isWebsite()) {
+        return await webMain.register(formData);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('auth-register', formData);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
-    autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false; message?: string }> => {
-      return await getIpc().invoke('auth-auto-login', token);
+    autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
+      if (isWebsite()) {
+        return await webMain.autoLogin(token);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('auth-auto-login', token);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Data Operations (uses platform/data abstraction)
-  // -------------------------------------------------------------------------
-  data: new Proxy({} as DataClient, {
-    get(_target, prop: string) {
-      const client = getDataClientSingleton();
-      return (client as unknown as Record<string, unknown>)[prop];
+  data: {
+    user: async (params: { userId: string }): Promise<Types.User | null> => {
+      if (isWebsite()) {
+        return await webMain.dataUser(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-user', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
-  }),
 
-  // -------------------------------------------------------------------------
-  // Deep Link
-  // -------------------------------------------------------------------------
+    userHotReload: async (params: { userId: string }): Promise<Types.User | null> => {
+      if (isWebsite()) {
+        return await webMain.dataUserHotReload(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-user-hot-reload', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    friend: async (params: { userId: string; targetId: string }): Promise<Types.Friend | null> => {
+      if (isWebsite()) {
+        return await webMain.dataFriend(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-friend', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    friends: async (params: { userId: string }): Promise<Types.Friend[]> => {
+      if (isWebsite()) {
+        return await webMain.dataFriends(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-friends', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    friendActivities: async (params: { userId: string }): Promise<Types.FriendActivity[]> => {
+      if (isWebsite()) {
+        return await webMain.dataFriendActivities(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-friendActivities', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    friendGroup: async (params: { userId: string; friendGroupId: string }): Promise<Types.FriendGroup | null> => {
+      if (isWebsite()) {
+        return await webMain.dataFriendGroup(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-friendGroup', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    friendGroups: async (params: { userId: string }): Promise<Types.FriendGroup[]> => {
+      if (isWebsite()) {
+        return await webMain.dataFriendGroups(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-friendGroups', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    friendApplication: async (params: { receiverId: string; senderId: string }): Promise<Types.FriendApplication | null> => {
+      if (isWebsite()) {
+        return await webMain.dataFriendApplication(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-friendApplication', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    friendApplications: async (params: { receiverId: string }): Promise<Types.FriendApplication[]> => {
+      if (isWebsite()) {
+        return await webMain.dataFriendApplications(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-friendApplications', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    server: async (params: { userId: string; serverId: string }): Promise<Types.Server | null> => {
+      if (isWebsite()) {
+        return await webMain.dataServer(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-server', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    servers: async (params: { userId: string }): Promise<Types.Server[]> => {
+      if (isWebsite()) {
+        return await webMain.dataServers(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-servers', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    serverMembers: async (params: { serverId: string }): Promise<Types.Member[]> => {
+      if (isWebsite()) {
+        return await webMain.dataServerMembers(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-serverMembers', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    serverOnlineMembers: async (params: { serverId: string }): Promise<Types.OnlineMember[]> => {
+      if (isWebsite()) {
+        return await webMain.dataServerOnlineMembers(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-serverOnlineMembers', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    channel: async (params: { userId: string; serverId: string; channelId: string }): Promise<Types.Channel | null> => {
+      if (isWebsite()) {
+        return await webMain.dataChannel(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-channel', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    channels: async (params: { userId: string; serverId: string }): Promise<Types.Channel[]> => {
+      if (isWebsite()) {
+        return await webMain.dataChannels(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-channels', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    channelMembers: async (params: { serverId: string; channelId: string }): Promise<Types.Member[]> => {
+      if (isWebsite()) {
+        return await webMain.dataChannelMembers(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-channelMembers', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    member: async (params: { userId: string; serverId: string; channelId?: string }): Promise<Types.Member | null> => {
+      if (isWebsite()) {
+        return await webMain.dataMember(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-member', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    memberApplication: async (params: { userId: string; serverId: string }): Promise<Types.MemberApplication | null> => {
+      if (isWebsite()) {
+        return await webMain.dataMemberApplication(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-memberApplication', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    memberApplications: async (params: { serverId: string }): Promise<Types.MemberApplication[]> => {
+      if (isWebsite()) {
+        return await webMain.dataMemberApplications(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-memberApplications', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    memberInvitation: async (params: { receiverId: string; serverId: string }): Promise<Types.MemberInvitation | null> => {
+      if (isWebsite()) {
+        return await webMain.dataMemberInvitation(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-memberInvitation', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    memberInvitations: async (params: { receiverId: string }): Promise<Types.MemberInvitation[]> => {
+      if (isWebsite()) {
+        return await webMain.dataMemberInvitations(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-memberInvitations', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    notifications: async (params: { region: Types.LanguageKey }): Promise<Types.Notification[]> => {
+      if (isWebsite()) {
+        return await webMain.dataNotifications(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-notifications', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    announcements: async (params: { region: Types.LanguageKey }): Promise<Types.Announcement[]> => {
+      if (isWebsite()) {
+        return await webMain.dataAnnouncements(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-announcements', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    recommendServers: async (params: { region: Types.LanguageKey }): Promise<Types.RecommendServer[]> => {
+      if (isWebsite()) {
+        return await webMain.dataRecommendServers(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-recommendServers', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
+      if (isWebsite()) {
+        return await webMain.dataUploadImage(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-uploadImage', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    searchServer: async (params: { query: string }): Promise<Types.Server[]> => {
+      if (isWebsite()) {
+        return await webMain.dataSearchServer(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-searchServer', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    searchUser: async (params: { query: string }): Promise<Types.User[]> => {
+      if (isWebsite()) {
+        return await webMain.dataSearchUser(params);
+      } else if (isRenderer()) {
+        return await ipcRenderer.invoke('data-searchUser', params);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+  },
+
   deepLink: {
     onDeepLink: (callback: (serverId: string) => void) => {
-      const listener = (_: any, serverId: string) => callback(serverId);
-      getIpc().on('deepLink', listener);
-      return () => getIpc().removeListener('deepLink', listener);
+      if (isWebsite()) {
+        return () => { };
+      } else if (isRenderer()) {
+        const listener = (_: any, serverId: string) => callback(serverId);
+        ipcRenderer.on('deepLink', listener);
+        return () => ipcRenderer.removeListener('deepLink', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Window Control (delegated to platform/window)
-  // -------------------------------------------------------------------------
   window: {
-    resize: (width: number, height: number) => getWindow().resize(width, height),
-    minimize: () => getWindow().minimize(),
-    maximize: () => getWindow().maximize(),
-    unmaximize: () => getWindow().unmaximize(),
-    close: () => getWindow().close(),
-    onMaximize: (callback: () => void) => getWindow().onMaximize(callback),
-    onUnmaximize: (callback: () => void) => getWindow().onUnmaximize(callback),
+    resize: (width: number, height: number) => {
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.send('resize', width, height);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    minimize: () => {
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.send('window-control-minimize');
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    maximize: () => {
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.send('window-control-maximize');
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    unmaximize: () => {
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.send('window-control-unmaximize');
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    close: () => {
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.send('window-control-close');
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    onMaximize: (callback: () => void) => {
+      if (isWebsite()) {
+        return () => { };
+      } else if (isRenderer()) {
+        const listener = () => callback();
+        ipcRenderer.on('maximize', listener);
+        return () => ipcRenderer.removeListener('maximize', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    onUnmaximize: (callback: () => void) => {
+      if (isWebsite()) {
+        return () => { };
+      } else if (isRenderer()) {
+        const listener = () => callback();
+        ipcRenderer.on('unmaximize', listener);
+        return () => ipcRenderer.removeListener('unmaximize', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
   },
 
-  // -------------------------------------------------------------------------
-  // Initial Data (for popup windows)
-  // -------------------------------------------------------------------------
   initialData: {
     get: (id: string): Record<string, any> | null => {
-      return getIpc().sendSync(`get-initial-data?id=${id}`);
+      if (isWebsite()) {
+        return webMain.getInitialData(id);
+      } else if (isRenderer()) {
+        return ipcRenderer.sendSync(`get-initial-data?id=${id}`);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Popup Management (delegated to platform/popup)
-  // -------------------------------------------------------------------------
   popup: {
     open: (type: Types.PopupType, id: string, initialData: any, force?: boolean) => {
-      getPopupController().open(type, id, initialData, { force });
+      if (isWebsite()) {
+        return webMain.openPopup(type, id, initialData, force);
+      } else if (isRenderer()) {
+        ipcRenderer.send('open-popup', type, id, initialData, force);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     close: (id: string) => {
-      getPopupController().close(id);
+      if (isWebsite()) {
+        return webMain.closePopup(id);
+      } else if (isRenderer()) {
+        ipcRenderer.send('close-popup', id);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     closeAll: () => {
-      getPopupController().closeAll();
+      if (isWebsite()) {
+        return webMain.closeAllPopups();
+      } else if (isRenderer()) {
+        ipcRenderer.send('close-all-popups');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     submit: (to: string, data?: any) => {
-      getPopupController().submit(to, data);
+      if (isWebsite()) {
+        webMain.webEventEmitter.emit('popup-submit', to, data);
+      } else if (isRenderer()) {
+        ipcRenderer.send('popup-submit', to, data);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     onSubmit: <T>(host: string, callback: (data: T) => void) => {
-      return getPopupController().onSubmit(host, callback);
+      if (isWebsite()) {
+        const listener = (from: string, data: T) => {
+          if (from === host) callback(data);
+          webMain.webEventEmitter.removeAllListeners('popup-submit');
+        };
+        return () => {
+          webMain.webEventEmitter.removeAllListeners('popup-submit');
+          webMain.webEventEmitter.on('popup-submit', listener);
+          return () => webMain.webEventEmitter.removeListener('popup-submit', listener);
+        };
+      } else if (isRenderer()) {
+        const listener = (_: any, from: string, data: T) => {
+          if (from === host) callback(data);
+          ipcRenderer.removeAllListeners('popup-submit');
+        };
+        ipcRenderer.removeAllListeners('popup-submit');
+        ipcRenderer.on('popup-submit', listener);
+        return () => ipcRenderer.removeListener('popup-submit', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Account Storage
-  // -------------------------------------------------------------------------
   accounts: {
     get: (): Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }> => {
-      return getIpc().sendSync('get-accounts') ?? {};
+      if (isWebsite()) {
+        return webMain.getAccounts();
+      } else if (isRenderer()) {
+        return ipcRenderer.sendSync('get-accounts');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
-    add: (account: string, options: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
-      getIpc().send('add-account', account, options);
+    add: (account: string, { autoLogin, rememberAccount, password }: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
+      if (isWebsite()) {
+        return webMain.addAccount(account, { autoLogin, rememberAccount, password });
+      } else if (isRenderer()) {
+        ipcRenderer.send('add-account', account, { autoLogin, rememberAccount, password });
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     delete: (account: string) => {
-      getIpc().send('delete-account', account);
+      if (isWebsite()) {
+        return webMain.deleteAccount(account);
+      } else if (isRenderer()) {
+        ipcRenderer.send('delete-account', account);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     onUpdate: (callback: (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => void) => {
-      getIpc().removeAllListeners('accounts');
-      const listener = (_: any, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
-      getIpc().on('accounts', listener);
-      return () => getIpc().removeListener('accounts', listener);
+      if (isWebsite()) {
+        const listener = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
+        webMain.webEventEmitter.removeAllListeners('accounts');
+        webMain.webEventEmitter.on('accounts', listener);
+        return () => webMain.webEventEmitter.removeListener('accounts', listener);
+      } else if (isRenderer()) {
+        const listener = (_: any, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
+        ipcRenderer.removeAllListeners('accounts');
+        ipcRenderer.on('accounts', listener);
+        return () => ipcRenderer.removeListener('accounts', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Language
-  // -------------------------------------------------------------------------
   language: {
     get: (): Types.LanguageKey => {
-      return getIpc().sendSync('get-language') ?? 'zh-TW';
+      if (isWebsite()) {
+        return webMain.getLanguage();
+      } else if (isRenderer()) {
+        return ipcRenderer.sendSync('get-language');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     set: (language: Types.LanguageKey) => {
-      getIpc().send('set-language', language);
+      if (isWebsite()) {
+        webMain.setLanguage(language);
+      } else if (isRenderer()) {
+        ipcRenderer.send('set-language', language);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     onUpdate: (callback: (language: Types.LanguageKey) => void) => {
-      getIpc().removeAllListeners('language');
-      const listener = (_: any, language: Types.LanguageKey) => callback(language);
-      getIpc().on('language', listener);
-      return () => getIpc().removeListener('language', listener);
+      if (isWebsite()) {
+        const listener = (language: Types.LanguageKey) => callback(language);
+        webMain.webEventEmitter.removeAllListeners('language');
+        webMain.webEventEmitter.on('language', listener);
+        return () => webMain.webEventEmitter.removeListener('language', listener);
+      } else if (isRenderer()) {
+        const listener = (_: any, language: Types.LanguageKey) => callback(language);
+        ipcRenderer.removeAllListeners('language');
+        ipcRenderer.on('language', listener);
+        return () => ipcRenderer.removeListener('language', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Custom Themes
-  // -------------------------------------------------------------------------
   customThemes: {
     get: (): Types.Theme[] => {
-      return getIpc().sendSync('get-custom-themes') ?? [];
+      if (isWebsite()) {
+        return webMain.getCustomThemes();
+      } else if (isRenderer()) {
+        return ipcRenderer.sendSync('get-custom-themes');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     saveImage: async (buffer: ArrayBuffer): Promise<string | null> => {
@@ -235,334 +661,1822 @@ const ipcFacade = {
     },
 
     add: (theme: Types.Theme) => {
-      getIpc().send('add-custom-theme', theme);
+      if (isWebsite()) {
+        webMain.addCustomTheme(theme);
+      } else if (isRenderer()) {
+        ipcRenderer.send('add-custom-theme', theme);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     delete: (index: number) => {
-      getIpc().send('delete-custom-theme', index);
+      if (isWebsite()) {
+        webMain.deleteCustomTheme(index);
+      } else if (isRenderer()) {
+        ipcRenderer.send('delete-custom-theme', index);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     onUpdate: (callback: (themes: Types.Theme[]) => void) => {
-      getIpc().removeAllListeners('custom-themes');
-      const listener = (_: any, themes: Types.Theme[]) => callback(themes);
-      getIpc().on('custom-themes', listener);
-      return () => getIpc().removeListener('custom-themes', listener);
+      if (isWebsite()) {
+        const listener = (themes: Types.Theme[]) => callback(themes);
+        webMain.webEventEmitter.removeAllListeners('custom-themes');
+        webMain.webEventEmitter.on('custom-themes', listener);
+        return () => webMain.webEventEmitter.removeListener('custom-themes', listener);
+      } else if (isRenderer()) {
+        const listener = (_: any, themes: Types.Theme[]) => callback(themes);
+        ipcRenderer.removeAllListeners('custom-themes');
+        ipcRenderer.on('custom-themes', listener);
+        return () => ipcRenderer.removeListener('custom-themes', listener);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     current: {
       get: (): Types.Theme | null => {
-        return getIpc().sendSync('get-current-theme') ?? null;
+        if (isWebsite()) {
+          return webMain.getCurrentTheme();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-current-theme');
+        } else {
+          throw new Error('Unsupported platform');
+        }
       },
 
       set: (theme: Types.Theme | null) => {
-        getIpc().send('set-current-theme', theme);
+        if (isWebsite()) {
+          webMain.setCurrentTheme(theme);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-current-theme', theme);
+        } else {
+          throw new Error('Unsupported platform');
+        }
       },
 
       onUpdate: (callback: (theme: Types.Theme | null) => void) => {
-        getIpc().removeAllListeners('current-theme');
-        const listener = (_: any, theme: Types.Theme | null) => callback(theme);
-        getIpc().on('current-theme', listener);
-        return () => getIpc().removeListener('current-theme', listener);
+        if (isWebsite()) {
+          const listener = (theme: Types.Theme | null) => callback(theme);
+          webMain.webEventEmitter.removeAllListeners('current-theme');
+          webMain.webEventEmitter.on('current-theme', listener);
+          return () => webMain.webEventEmitter.removeListener('current-theme', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, theme: Types.Theme | null) => callback(theme);
+          ipcRenderer.removeAllListeners('current-theme');
+          ipcRenderer.on('current-theme', listener);
+          return () => ipcRenderer.removeListener('current-theme', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
       },
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Discord Presence
-  // -------------------------------------------------------------------------
   discord: {
     updatePresence: (presence: Types.DiscordPresence) => {
-      getIpc().send('update-discord-presence', presence);
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.send('update-discord-presence', presence);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Font List
-  // -------------------------------------------------------------------------
   fontList: {
     get: (): string[] => {
-      return getIpc().sendSync('get-font-list') ?? [];
+      if (isWebsite()) {
+        return webMain.getFontList();
+      } else if (isRenderer()) {
+        return ipcRenderer.sendSync('get-font-list');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
   },
 
-  // -------------------------------------------------------------------------
-  // Record
-  // -------------------------------------------------------------------------
   record: {
     save: (record: ArrayBuffer) => {
-      getIpc().send('save-record', record);
+      if (isWebsite()) {
+        return webMain.saveRecord(record);
+      } else if (isRenderer()) {
+        ipcRenderer.send('save-record', record);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
     savePath: {
       select: async (): Promise<string | null> => {
-        return await getIpc().invoke('select-record-save-path');
+        if (isWebsite()) {
+          return webMain.selectRecordSavePath();
+        } else if (isRenderer()) {
+          return await ipcRenderer.invoke('select-record-save-path');
+        } else {
+          throw new Error('Unsupported platform');
+        }
       },
     },
   },
 
-  // -------------------------------------------------------------------------
-  // System Settings
-  // -------------------------------------------------------------------------
-  systemSettings: {
-    set: (settings: Partial<Types.SystemSettings>) => {
-      // Send each setting individually
-      const settingMap: Record<keyof Types.SystemSettings, string> = {
-        autoLogin: 'set-auto-login',
-        autoLaunch: 'set-auto-launch',
-        alwaysOnTop: 'set-always-on-top',
-        statusAutoIdle: 'set-status-auto-idle',
-        statusAutoIdleMinutes: 'set-status-auto-idle-minutes',
-        statusAutoDnd: 'set-status-auto-dnd',
-        channelUIMode: 'set-channel-ui-mode',
-        closeToTray: 'set-close-to-tray',
-        font: 'set-font',
-        fontSize: 'set-font-size',
-        inputAudioDevice: 'set-input-audio-device',
-        outputAudioDevice: 'set-output-audio-device',
-        recordFormat: 'set-record-format',
-        recordSavePath: 'set-record-save-path',
-        mixEffect: 'set-mix-effect',
-        mixEffectType: 'set-mix-effect-type',
-        autoMixSetting: 'set-auto-mix-setting',
-        echoCancellation: 'set-echo-cancellation',
-        noiseCancellation: 'set-noise-cancellation',
-        microphoneAmplification: 'set-microphone-amplification',
-        manualMixMode: 'set-manual-mix-mode',
-        mixMode: 'set-mix-mode',
-        speakingMode: 'set-speaking-mode',
-        defaultSpeakingKey: 'set-default-speaking-key',
-        notSaveMessageHistory: 'set-not-save-message-history',
-        hotKeyOpenMainWindow: 'set-hot-key-open-main-window',
-        hotKeyIncreaseVolume: 'set-hot-key-increase-volume',
-        hotKeyDecreaseVolume: 'set-hot-key-decrease-volume',
-        hotKeyToggleSpeaker: 'set-hot-key-toggle-speaker',
-        hotKeyToggleMicrophone: 'set-hot-key-toggle-microphone',
-        hotKeyScreenshot: 'set-hot-key-screenshot',
-        disableAllSoundEffect: 'set-disable-all-sound-effect',
-        enterVoiceChannelSound: 'set-enter-voice-channel-sound',
-        leaveVoiceChannelSound: 'set-leave-voice-channel-sound',
-        startSpeakingSound: 'set-start-speaking-sound',
-        stopSpeakingSound: 'set-stop-speaking-sound',
-        receiveDirectMessageSound: 'set-receive-direct-message-sound',
-        receiveChannelMessageSound: 'set-receive-channel-message-sound',
-        autoCheckForUpdates: 'set-auto-check-for-updates',
-        updateCheckInterval: 'set-update-check-interval',
-        updateChannel: 'set-update-channel',
-      };
-
-      for (const [key, channel] of Object.entries(settingMap)) {
-        const value = settings[key as keyof Types.SystemSettings];
-        if (value !== undefined) {
-          getIpc().send(channel, value);
-        }
-      }
-    },
-
-    get: (): Types.SystemSettings | null => {
-      return getIpc().sendSync('get-system-settings');
-    },
-
-    // Helper function to create setting accessor
-    ...createSettingAccessors(),
-  },
-
-  // -------------------------------------------------------------------------
-  // Tray
-  // -------------------------------------------------------------------------
   tray: {
     title: {
       set: (title: string) => {
-        getIpc().send('set-tray-title', title);
+        if (isWebsite()) {
+          // ignore
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-tray-title', title);
+        } else {
+          throw new Error('Unsupported platform');
+        }
       },
     },
-  },
-
-  // -------------------------------------------------------------------------
-  // Misc
-  // -------------------------------------------------------------------------
-  dontShowDisclaimerNextTime: () => {
-    getIpc().send('dont-show-disclaimer-next-time');
   },
 
   loopbackAudio: {
     enable: () => {
-      getIpc().invoke('enable-loopback-audio');
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.invoke('enable-loopback-audio');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
+
     disable: () => {
-      getIpc().invoke('disable-loopback-audio');
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        ipcRenderer.invoke('disable-loopback-audio');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
+  },
+
+  dontShowDisclaimerNextTime: () => {
+    if (isWebsite()) {
+      webMain.dontShowDisclaimerNextTime();
+    } else if (isRenderer()) {
+      ipcRenderer.send('dont-show-disclaimer-next-time');
+    } else {
+      throw new Error('Unsupported platform');
+    }
   },
 
   checkForUpdates: () => {
-    getIpc().send('check-for-updates');
+    if (isWebsite()) {
+      // ignore
+    } else if (isRenderer()) {
+      ipcRenderer.send('check-for-updates');
+    } else {
+      throw new Error('Unsupported platform');
+    }
   },
 
   changeServer: (server: 'prod' | 'dev') => {
-    getIpc().send('change-server', server);
+    if (isWebsite()) {
+      webMain.changeServer(server);
+    } else if (isRenderer()) {
+      ipcRenderer.send('change-server', server);
+    } else {
+      throw new Error('Unsupported platform');
+    }
   },
 
-  env: {
-    get: (): Record<string, string> => {
-      return getIpc().sendSync('get-env') ?? {};
-    },
+  sendSelectServer: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
+    if (isWebsite()) {
+      webMain.webEventEmitter.emit('select-server', data);
+    } else if (isRenderer()) {
+      localStorage.setItem('server-select', JSON.stringify(data));
+    } else {
+      throw new Error('Unsupported platform');
+    }
   },
 
-  // -------------------------------------------------------------------------
-  // Network Diagnosis
-  // -------------------------------------------------------------------------
-  network: {
-    runDiagnosis: async (params: { domains: string[]; duration?: number }): Promise<any> => {
-      return await getIpc().invoke('run-network-diagnosis', params);
+  systemSettings: {
+    set: (settings: Partial<Types.SystemSettings>) => {
+      if (isWebsite()) {
+        webMain.setAutoLogin(settings.autoLogin);
+        webMain.setAutoLaunch(settings.autoLaunch);
+        webMain.setAlwaysOnTop(settings.alwaysOnTop);
+        webMain.setStatusAutoIdle(settings.statusAutoIdle);
+        webMain.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
+        webMain.setStatusAutoDnd(settings.statusAutoDnd);
+        webMain.setChannelUIMode(settings.channelUIMode);
+        webMain.setCloseToTray(settings.closeToTray);
+        webMain.setFontSize(settings.fontSize);
+        webMain.setInputAudioDevice(settings.inputAudioDevice);
+        webMain.setOutputAudioDevice(settings.outputAudioDevice);
+        webMain.setRecordFormat(settings.recordFormat);
+        webMain.setRecordSavePath(settings.recordSavePath);
+        webMain.setMixEffect(settings.mixEffect);
+        webMain.setMixEffectType(settings.mixEffectType);
+        webMain.setAutoMixSetting(settings.autoMixSetting);
+        webMain.setEchoCancellation(settings.echoCancellation);
+        webMain.setNoiseCancellation(settings.noiseCancellation);
+        webMain.setMicrophoneAmplification(settings.microphoneAmplification);
+        webMain.setManualMixMode(settings.manualMixMode);
+        webMain.setMixMode(settings.mixMode);
+        webMain.setSpeakingMode(settings.speakingMode);
+        webMain.setDefaultSpeakingKey(settings.defaultSpeakingKey);
+        webMain.setNotSaveMessageHistory(settings.notSaveMessageHistory);
+        webMain.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
+        webMain.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
+        webMain.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
+        webMain.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
+        webMain.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
+        webMain.setDisableAllSoundEffect(settings.disableAllSoundEffect);
+        webMain.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
+        webMain.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
+        webMain.setStartSpeakingSound(settings.startSpeakingSound);
+        webMain.setStopSpeakingSound(settings.stopSpeakingSound);
+        webMain.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
+        webMain.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
+        webMain.setAutoCheckForUpdates(settings.autoCheckForUpdates);
+        webMain.setUpdateCheckInterval(settings.updateCheckInterval);
+        webMain.setUpdateChannel(settings.updateChannel);
+      } else if (isRenderer()) {
+        if (settings.autoLogin !== undefined) ipcRenderer.send('set-auto-login', settings.autoLogin);
+        if (settings.autoLaunch !== undefined) ipcRenderer.send('set-auto-launch', settings.autoLaunch);
+        if (settings.alwaysOnTop !== undefined) ipcRenderer.send('set-always-on-top', settings.alwaysOnTop);
+        if (settings.statusAutoIdle !== undefined) ipcRenderer.send('set-status-auto-idle', settings.statusAutoIdle);
+        if (settings.statusAutoIdleMinutes !== undefined) ipcRenderer.send('set-status-auto-idle-minutes', settings.statusAutoIdleMinutes);
+        if (settings.statusAutoDnd !== undefined) ipcRenderer.send('set-status-auto-dnd', settings.statusAutoDnd);
+        if (settings.channelUIMode !== undefined) ipcRenderer.send('set-channel-ui-mode', settings.channelUIMode);
+        if (settings.closeToTray !== undefined) ipcRenderer.send('set-close-to-tray', settings.closeToTray);
+        if (settings.font !== undefined) ipcRenderer.send('set-font', settings.font);
+        if (settings.fontSize !== undefined) ipcRenderer.send('set-font-size', settings.fontSize);
+        if (settings.inputAudioDevice !== undefined) ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
+        if (settings.outputAudioDevice !== undefined) ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
+        if (settings.recordFormat !== undefined) ipcRenderer.send('set-record-format', settings.recordFormat);
+        if (settings.recordSavePath !== undefined) ipcRenderer.send('set-record-save-path', settings.recordSavePath);
+        if (settings.mixEffect !== undefined) ipcRenderer.send('set-mix-effect', settings.mixEffect);
+        if (settings.mixEffectType !== undefined) ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
+        if (settings.autoMixSetting !== undefined) ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
+        if (settings.echoCancellation !== undefined) ipcRenderer.send('set-echo-cancellation', settings.echoCancellation);
+        if (settings.noiseCancellation !== undefined) ipcRenderer.send('set-noise-cancellation', settings.noiseCancellation);
+        if (settings.microphoneAmplification !== undefined) ipcRenderer.send('set-microphone-amplification', settings.microphoneAmplification);
+        if (settings.manualMixMode !== undefined) ipcRenderer.send('set-manual-mix-mode', settings.manualMixMode);
+        if (settings.mixMode !== undefined) ipcRenderer.send('set-mix-mode', settings.mixMode);
+        if (settings.speakingMode !== undefined) ipcRenderer.send('set-speaking-mode', settings.speakingMode);
+        if (settings.defaultSpeakingKey !== undefined) ipcRenderer.send('set-default-speaking-key', settings.defaultSpeakingKey);
+        if (settings.notSaveMessageHistory !== undefined) ipcRenderer.send('set-not-save-message-history', settings.notSaveMessageHistory);
+        if (settings.hotKeyOpenMainWindow !== undefined) ipcRenderer.send('set-hot-key-open-main-window', settings.hotKeyOpenMainWindow);
+        if (settings.hotKeyIncreaseVolume !== undefined) ipcRenderer.send('set-hot-key-increase-volume', settings.hotKeyIncreaseVolume);
+        if (settings.hotKeyDecreaseVolume !== undefined) ipcRenderer.send('set-hot-key-decrease-volume', settings.hotKeyDecreaseVolume);
+        if (settings.hotKeyToggleSpeaker !== undefined) ipcRenderer.send('set-hot-key-toggle-speaker', settings.hotKeyToggleSpeaker);
+        if (settings.hotKeyToggleMicrophone !== undefined) ipcRenderer.send('set-hot-key-toggle-microphone', settings.hotKeyToggleMicrophone);
+        if (settings.disableAllSoundEffect !== undefined) ipcRenderer.send('set-disable-all-sound-effect', settings.disableAllSoundEffect);
+        if (settings.enterVoiceChannelSound !== undefined) ipcRenderer.send('set-enter-voice-channel-sound', settings.enterVoiceChannelSound);
+        if (settings.leaveVoiceChannelSound !== undefined) ipcRenderer.send('set-leave-voice-channel-sound', settings.leaveVoiceChannelSound);
+        if (settings.startSpeakingSound !== undefined) ipcRenderer.send('set-start-speaking-sound', settings.startSpeakingSound);
+        if (settings.stopSpeakingSound !== undefined) ipcRenderer.send('set-stop-speaking-sound', settings.stopSpeakingSound);
+        if (settings.receiveDirectMessageSound !== undefined) ipcRenderer.send('set-receive-direct-message-sound', settings.receiveDirectMessageSound);
+        if (settings.receiveChannelMessageSound !== undefined) ipcRenderer.send('set-receive-channel-message-sound', settings.receiveChannelMessageSound);
+        if (settings.autoCheckForUpdates !== undefined) ipcRenderer.send('set-auto-check-for-updates', settings.autoCheckForUpdates);
+        if (settings.updateCheckInterval !== undefined) ipcRenderer.send('set-update-check-interval', settings.updateCheckInterval);
+        if (settings.updateChannel !== undefined) ipcRenderer.send('set-update-channel', settings.updateChannel);
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
-    cancelDiagnosis: () => {
-      getIpc().send('cancel-network-diagnosis');
+    get: (): Types.SystemSettings | null => {
+      if (isWebsite()) {
+        return webMain.getSystemSettings();
+      } else if (isRenderer()) {
+        return ipcRenderer.sendSync('get-system-settings');
+      } else {
+        throw new Error('Unsupported platform');
+      }
     },
 
-    onProgress: (callback: (progress: any) => void) => {
-      const listener = (_: any, progress: any) => callback(progress);
-      getIpc().on('network-diagnosis-progress', listener);
-      return () => getIpc().removeListener('network-diagnosis-progress', listener);
-    },
-  },
+    autoLogin: {
+      set: (enable: boolean) => {
+        if (isWebsite()) {
+          webMain.setAutoLogin(enable);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-auto-login', enable);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
 
-  // -------------------------------------------------------------------------
-  // SFU Diagnosis
-  // -------------------------------------------------------------------------
-  sfuDiagnosis: {
-    request: () => {
-      getIpc().send('request-sfu-diagnosis');
+      get: (): boolean => {
+        if (isWebsite()) {
+          return false;
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-auto-login');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('auto-login');
+          webMain.webEventEmitter.on('auto-login', listener);
+          return () => webMain.webEventEmitter.removeListener('auto-login', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('auto-login');
+          ipcRenderer.on('auto-login', listener);
+          return () => ipcRenderer.removeListener('auto-login', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
     },
 
-    onResponse: (callback: (data: any) => void) => {
-      const listener = (_: any, data: any) => callback(data);
-      getIpc().on('sfu-diagnosis-response', listener);
-      return () => getIpc().removeListener('sfu-diagnosis-response', listener);
+    autoLaunch: {
+      set: (enable: boolean) => {
+        if (isWebsite()) {
+          // ignore
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-auto-launch', enable);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getAutoLaunch();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-auto-launch');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('auto-launch');
+          webMain.webEventEmitter.on('auto-launch', listener);
+          return () => webMain.webEventEmitter.removeListener('auto-launch', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('auto-launch');
+          ipcRenderer.on('auto-launch', listener);
+          return () => ipcRenderer.removeListener('auto-launch', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    alwaysOnTop: {
+      set: (enable: boolean) => {
+        if (isWebsite()) {
+          webMain.setAlwaysOnTop(enable);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-always-on-top', enable);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getAlwaysOnTop();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-always-on-top');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('always-on-top');
+          webMain.webEventEmitter.on('always-on-top', listener);
+          return () => webMain.webEventEmitter.removeListener('always-on-top', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('always-on-top');
+          ipcRenderer.on('always-on-top', listener);
+          return () => ipcRenderer.removeListener('always-on-top', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    statusAutoIdle: {
+      set: (enable: boolean) => {
+        if (isWebsite()) {
+          webMain.setStatusAutoIdle(enable);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-status-auto-idle', enable);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getStatusAutoIdle();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-status-auto-idle');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('status-auto-idle');
+          webMain.webEventEmitter.on('status-auto-idle', listener);
+          return () => webMain.webEventEmitter.removeListener('status-auto-idle', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('status-auto-idle');
+          ipcRenderer.on('status-auto-idle', listener);
+          return () => ipcRenderer.removeListener('status-auto-idle', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    statusAutoIdleMinutes: {
+      set: (fontSize: number) => {
+        if (isWebsite()) {
+          webMain.setStatusAutoIdleMinutes(fontSize);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-status-auto-idle-minutes', fontSize);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): number => {
+        if (isWebsite()) {
+          return webMain.getStatusAutoIdleMinutes();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-status-auto-idle-minutes');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (fontSize: number) => void) => {
+        if (isWebsite()) {
+          const listener = (fontSize: number) => callback(fontSize);
+          webMain.webEventEmitter.removeAllListeners('status-auto-idle-minutes');
+          webMain.webEventEmitter.on('status-auto-idle-minutes', listener);
+          return () => webMain.webEventEmitter.removeListener('status-auto-idle-minutes', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, fontSize: number) => callback(fontSize);
+          ipcRenderer.removeAllListeners('status-auto-idle-minutes');
+          ipcRenderer.on('status-auto-idle-minutes', listener);
+          return () => ipcRenderer.removeListener('status-auto-idle-minutes', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    statusAutoDnd: {
+      set: (enable: boolean) => {
+        if (isWebsite()) {
+          webMain.setStatusAutoDnd(enable);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-status-auto-dnd', enable);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getStatusAutoDnd();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-status-auto-dnd');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('status-auto-dnd');
+          webMain.webEventEmitter.on('status-auto-dnd', listener);
+          return () => webMain.webEventEmitter.removeListener('status-auto-dnd', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('status-auto-dnd');
+          ipcRenderer.on('status-auto-dnd', listener);
+          return () => ipcRenderer.removeListener('status-auto-dnd', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    channelUIMode: {
+      set: (key: Types.ChannelUIMode) => {
+        if (isWebsite()) {
+          webMain.setChannelUIMode(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-channel-ui-mode', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): Types.ChannelUIMode => {
+        if (isWebsite()) {
+          return webMain.getChannelUIMode();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-channel-ui-mode');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: Types.ChannelUIMode) => void) => {
+        if (isWebsite()) {
+          const listener = (channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
+          webMain.webEventEmitter.removeAllListeners('channel-ui-mode');
+          webMain.webEventEmitter.on('channel-ui-mode', listener);
+          return () => webMain.webEventEmitter.removeListener('channel-ui-mode', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
+          ipcRenderer.removeAllListeners('channel-ui-mode');
+          ipcRenderer.on('channel-ui-mode', listener);
+          return () => ipcRenderer.removeListener('channel-ui-mode', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    closeToTray: {
+      set: (enable: boolean) => {
+        if (isWebsite()) {
+          webMain.setCloseToTray(enable);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-close-to-tray', enable);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getCloseToTray();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-close-to-tray');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('close-to-tray');
+          webMain.webEventEmitter.on('close-to-tray', listener);
+          return () => webMain.webEventEmitter.removeListener('close-to-tray', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('close-to-tray');
+          ipcRenderer.on('close-to-tray', listener);
+          return () => ipcRenderer.removeListener('close-to-tray', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    font: {
+      set: (font: string) => {
+        if (isWebsite()) {
+          webMain.setFont(font);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-font', font);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getFont();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-font');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (font: string) => void) => {
+        if (isWebsite()) {
+          const listener = (font: string) => callback(font);
+          webMain.webEventEmitter.removeAllListeners('font');
+          webMain.webEventEmitter.on('font', listener);
+          return () => webMain.webEventEmitter.removeListener('font', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, font: string) => callback(font);
+          ipcRenderer.removeAllListeners('font');
+          ipcRenderer.on('font', listener);
+          return () => ipcRenderer.removeListener('font', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    fontSize: {
+      set: (fontSize: number) => {
+        if (isWebsite()) {
+          webMain.setFontSize(fontSize);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-font-size', fontSize);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): number => {
+        if (isWebsite()) {
+          return webMain.getFontSize();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-font-size');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (fontSize: number) => void) => {
+        if (isWebsite()) {
+          const listener = (fontSize: number) => callback(fontSize);
+          webMain.webEventEmitter.removeAllListeners('font-size');
+          webMain.webEventEmitter.on('font-size', listener);
+          return () => webMain.webEventEmitter.removeListener('font-size', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, fontSize: number) => callback(fontSize);
+          ipcRenderer.removeAllListeners('font-size');
+          ipcRenderer.on('font-size', listener);
+          return () => ipcRenderer.removeListener('font-size', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    inputAudioDevice: {
+      set: (deviceId: string) => {
+        if (isWebsite()) {
+          webMain.setInputAudioDevice(deviceId);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-input-audio-device', deviceId);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getInputAudioDevice();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-input-audio-device');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (deviceId: string) => void) => {
+        if (isWebsite()) {
+          const listener = (deviceId: string) => callback(deviceId);
+          webMain.webEventEmitter.removeAllListeners('input-audio-device');
+          webMain.webEventEmitter.on('input-audio-device', listener);
+          return () => webMain.webEventEmitter.removeListener('input-audio-device', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, deviceId: string) => callback(deviceId);
+          ipcRenderer.removeAllListeners('input-audio-device');
+          ipcRenderer.on('input-audio-device', listener);
+          return () => ipcRenderer.removeListener('input-audio-device', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    outputAudioDevice: {
+      set: (deviceId: string) => {
+        if (isWebsite()) {
+          webMain.setOutputAudioDevice(deviceId);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-output-audio-device', deviceId);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getOutputAudioDevice();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-output-audio-device');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (deviceId: string) => void) => {
+        if (isWebsite()) {
+          const listener = (deviceId: string) => callback(deviceId);
+          webMain.webEventEmitter.removeAllListeners('output-audio-device');
+          webMain.webEventEmitter.on('output-audio-device', listener);
+          return () => webMain.webEventEmitter.removeListener('output-audio-device', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, deviceId: string) => callback(deviceId);
+          ipcRenderer.removeAllListeners('output-audio-device');
+          ipcRenderer.on('output-audio-device', listener);
+          return () => ipcRenderer.removeListener('output-audio-device', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    recordFormat: {
+      set: (format: Types.RecordFormat) => {
+        if (isWebsite()) {
+          webMain.setRecordFormat(format);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-record-format', format);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): Types.RecordFormat => {
+        if (isWebsite()) {
+          return webMain.getRecordFormat();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-record-format');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (format: Types.RecordFormat) => void) => {
+        if (isWebsite()) {
+          const listener = (format: Types.RecordFormat) => callback(format);
+          webMain.webEventEmitter.removeAllListeners('record-format');
+          webMain.webEventEmitter.on('record-format', listener);
+          return () => webMain.webEventEmitter.removeListener('record-format', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, format: Types.RecordFormat) => callback(format);
+          ipcRenderer.removeAllListeners('record-format');
+          ipcRenderer.on('record-format', listener);
+          return () => ipcRenderer.removeListener('record-format', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    recordSavePath: {
+      set: (path: string) => {
+        if (isWebsite()) {
+          webMain.setRecordSavePath(path);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-record-save-path', path);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getRecordSavePath();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-record-save-path');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (path: string) => void) => {
+        if (isWebsite()) {
+          const listener = (path: string) => callback(path);
+          webMain.webEventEmitter.removeAllListeners('record-save-path');
+          webMain.webEventEmitter.on('record-save-path', listener);
+          return () => webMain.webEventEmitter.removeListener('record-save-path', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, path: string) => callback(path);
+          ipcRenderer.removeAllListeners('record-save-path');
+          ipcRenderer.on('record-save-path', listener);
+          return () => ipcRenderer.removeListener('record-save-path', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    mixEffect: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setMixEffect(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-mix-effect', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getMixEffect();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-mix-effect');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('mix-effect');
+          webMain.webEventEmitter.on('mix-effect', listener);
+          return () => webMain.webEventEmitter.removeListener('mix-effect', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('mix-effect');
+          ipcRenderer.on('mix-effect', listener);
+          return () => ipcRenderer.removeListener('mix-effect', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    mixEffectType: {
+      set: (key: string) => {
+        if (isWebsite()) {
+          webMain.setMixEffectType(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-mix-effect-type', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getMixEffectType();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-mix-effect-type');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (isWebsite()) {
+          const listener = (key: string) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('mix-effect-type');
+          webMain.webEventEmitter.on('mix-effect-type', listener);
+          return () => webMain.webEventEmitter.removeListener('mix-effect-type', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: string) => callback(key);
+          ipcRenderer.removeAllListeners('mix-effect-type');
+          ipcRenderer.on('mix-effect-type', listener);
+          return () => ipcRenderer.removeListener('mix-effect-type', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    autoMixSetting: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setAutoMixSetting(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-auto-mix-setting', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getAutoMixSetting();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-auto-mix-setting');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('auto-mix-setting');
+          webMain.webEventEmitter.on('auto-mix-setting', listener);
+          return () => webMain.webEventEmitter.removeListener('auto-mix-setting', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('auto-mix-setting');
+          ipcRenderer.on('auto-mix-setting', listener);
+          return () => ipcRenderer.removeListener('auto-mix-setting', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    echoCancellation: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setEchoCancellation(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-echo-cancellation', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getEchoCancellation();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-echo-cancellation');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('echo-cancellation');
+          webMain.webEventEmitter.on('echo-cancellation', listener);
+          return () => webMain.webEventEmitter.removeListener('echo-cancellation', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('echo-cancellation');
+          ipcRenderer.on('echo-cancellation', listener);
+          return () => ipcRenderer.removeListener('echo-cancellation', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    noiseCancellation: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setNoiseCancellation(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-noise-cancellation', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getNoiseCancellation();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-noise-cancellation');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('noise-cancellation');
+          webMain.webEventEmitter.on('noise-cancellation', listener);
+          return () => webMain.webEventEmitter.removeListener('noise-cancellation', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('noise-cancellation');
+          ipcRenderer.on('noise-cancellation', listener);
+          return () => ipcRenderer.removeListener('noise-cancellation', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    microphoneAmplification: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setMicrophoneAmplification(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-microphone-amplification', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getMicrophoneAmplification();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-microphone-amplification');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('microphone-amplification');
+          webMain.webEventEmitter.on('microphone-amplification', listener);
+          return () => webMain.webEventEmitter.removeListener('microphone-amplification', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('microphone-amplification');
+          ipcRenderer.on('microphone-amplification', listener);
+          return () => ipcRenderer.removeListener('microphone-amplification', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    manualMixMode: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setManualMixMode(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-manual-mix-mode', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getManualMixMode();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-manual-mix-mode');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('manual-mix-mode');
+          webMain.webEventEmitter.on('manual-mix-mode', listener);
+          return () => webMain.webEventEmitter.removeListener('manual-mix-mode', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('manual-mix-mode');
+          ipcRenderer.on('manual-mix-mode', listener);
+          return () => ipcRenderer.removeListener('manual-mix-mode', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    mixMode: {
+      set: (key: Types.MixMode) => {
+        if (isWebsite()) {
+          webMain.setMixMode(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-mix-mode', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): Types.MixMode => {
+        if (isWebsite()) {
+          return webMain.getMixMode();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-mix-mode');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: Types.MixMode) => void) => {
+        if (isWebsite()) {
+          const listener = (key: Types.MixMode) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('mix-mode');
+          webMain.webEventEmitter.on('mix-mode', listener);
+          return () => webMain.webEventEmitter.removeListener('mix-mode', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: Types.MixMode) => callback(key);
+          ipcRenderer.removeAllListeners('mix-mode');
+          ipcRenderer.on('mix-mode', listener);
+          return () => ipcRenderer.removeListener('mix-mode', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    speakingMode: {
+      set: (key: Types.SpeakingMode) => {
+        if (isWebsite()) {
+          webMain.setSpeakingMode(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-speaking-mode', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): Types.SpeakingMode => {
+        if (isWebsite()) {
+          return webMain.getSpeakingMode();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-speaking-mode');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: Types.SpeakingMode) => void) => {
+        if (isWebsite()) {
+          const listener = (key: Types.SpeakingMode) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('speaking-mode');
+          webMain.webEventEmitter.on('speaking-mode', listener);
+          return () => webMain.webEventEmitter.removeListener('speaking-mode', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: Types.SpeakingMode) => callback(key);
+          ipcRenderer.removeAllListeners('speaking-mode');
+          ipcRenderer.on('speaking-mode', listener);
+          return () => ipcRenderer.removeListener('speaking-mode', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    defaultSpeakingKey: {
+      set: (key: string) => {
+        if (isWebsite()) {
+          webMain.setDefaultSpeakingKey(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-default-speaking-key', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getDefaultSpeakingKey();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-default-speaking-key');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (isWebsite()) {
+          const listener = (key: string) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('default-speaking-key');
+          webMain.webEventEmitter.on('default-speaking-key', listener);
+          return () => webMain.webEventEmitter.removeListener('default-speaking-key', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: string) => callback(key);
+          ipcRenderer.removeAllListeners('default-speaking-key');
+          ipcRenderer.on('default-speaking-key', listener);
+          return () => ipcRenderer.removeListener('default-speaking-key', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    notSaveMessageHistory: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setNotSaveMessageHistory(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-not-save-message-history', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getNotSaveMessageHistory();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-not-save-message-history');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('not-save-message-history');
+          webMain.webEventEmitter.on('not-save-message-history', listener);
+          return () => webMain.webEventEmitter.removeListener('not-save-message-history', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('not-save-message-history');
+          ipcRenderer.on('not-save-message-history', listener);
+          return () => ipcRenderer.removeListener('not-save-message-history', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    hotKeyOpenMainWindow: {
+      set: (key: string) => {
+        if (isWebsite()) {
+          webMain.setHotKeyOpenMainWindow(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-hot-key-open-main-window', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getHotKeyOpenMainWindow();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-hot-key-open-main-window');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (isWebsite()) {
+          const listener = (key: string) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('hot-key-open-main-window');
+          webMain.webEventEmitter.on('hot-key-open-main-window', listener);
+          return () => webMain.webEventEmitter.removeListener('hot-key-open-main-window', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: string) => callback(key);
+          ipcRenderer.removeAllListeners('hot-key-open-main-window');
+          ipcRenderer.on('hot-key-open-main-window', listener);
+          return () => ipcRenderer.removeListener('hot-key-open-main-window', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    hotKeyIncreaseVolume: {
+      set: (key: string) => {
+        if (isWebsite()) {
+          webMain.setHotKeyIncreaseVolume(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-hot-key-increase-volume', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getHotKeyIncreaseVolume();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-hot-key-increase-volume');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (isWebsite()) {
+          const listener = (key: string) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('hot-key-increase-volume');
+          webMain.webEventEmitter.on('hot-key-increase-volume', listener);
+          return () => webMain.webEventEmitter.removeListener('hot-key-increase-volume', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: string) => callback(key);
+          ipcRenderer.removeAllListeners('hot-key-increase-volume');
+          ipcRenderer.on('hot-key-increase-volume', listener);
+          return () => ipcRenderer.removeListener('hot-key-increase-volume', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    hotKeyDecreaseVolume: {
+      set: (key: string) => {
+        if (isWebsite()) {
+          webMain.setHotKeyDecreaseVolume(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-hot-key-decrease-volume', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getHotKeyDecreaseVolume();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-hot-key-decrease-volume');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (isWebsite()) {
+          const listener = (key: string) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('hot-key-decrease-volume');
+          webMain.webEventEmitter.on('hot-key-decrease-volume', listener);
+          return () => webMain.webEventEmitter.removeListener('hot-key-decrease-volume', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: string) => callback(key);
+          ipcRenderer.removeAllListeners('hot-key-decrease-volume');
+          ipcRenderer.on('hot-key-decrease-volume', listener);
+          return () => ipcRenderer.removeListener('hot-key-decrease-volume', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    hotKeyToggleSpeaker: {
+      set: (key: string) => {
+        if (isWebsite()) {
+          webMain.setHotKeyToggleSpeaker(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-hot-key-toggle-speaker', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getHotKeyToggleSpeaker();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-hot-key-toggle-speaker');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (isWebsite()) {
+          const listener = (key: string) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('hot-key-toggle-speaker');
+          webMain.webEventEmitter.on('hot-key-toggle-speaker', listener);
+          return () => webMain.webEventEmitter.removeListener('hot-key-toggle-speaker', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: string) => callback(key);
+          ipcRenderer.removeAllListeners('hot-key-toggle-speaker');
+          ipcRenderer.on('hot-key-toggle-speaker', listener);
+          return () => ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    hotKeyToggleMicrophone: {
+      set: (key: string) => {
+        if (isWebsite()) {
+          webMain.setHotKeyToggleMicrophone(key);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-hot-key-toggle-microphone', key);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getHotKeyToggleMicrophone();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-hot-key-toggle-microphone');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (key: string) => void) => {
+        if (isWebsite()) {
+          const listener = (key: string) => callback(key);
+          webMain.webEventEmitter.removeAllListeners('hot-key-toggle-microphone');
+          webMain.webEventEmitter.on('hot-key-toggle-microphone', listener);
+          return () => webMain.webEventEmitter.removeListener('hot-key-toggle-microphone', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, key: string) => callback(key);
+          ipcRenderer.removeAllListeners('hot-key-toggle-microphone');
+          ipcRenderer.on('hot-key-toggle-microphone', listener);
+          return () => ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    disableAllSoundEffect: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setDisableAllSoundEffect(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-disable-all-sound-effect', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getDisableAllSoundEffect();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-disable-all-sound-effect');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('disable-all-sound-effect');
+          webMain.webEventEmitter.on('disable-all-sound-effect', listener);
+          return () => webMain.webEventEmitter.removeListener('disable-all-sound-effect', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('disable-all-sound-effect');
+          ipcRenderer.on('disable-all-sound-effect', listener);
+          return () => ipcRenderer.removeListener('disable-all-sound-effect', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    enterVoiceChannelSound: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setEnterVoiceChannelSound(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-enter-voice-channel-sound', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getEnterVoiceChannelSound();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-enter-voice-channel-sound');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('enter-voice-channel-effect');
+          webMain.webEventEmitter.on('enter-voice-channel-sound', listener);
+          return () => webMain.webEventEmitter.removeListener('enter-voice-channel-sound', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('enter-voice-channel-sound');
+          ipcRenderer.on('enter-voice-channel-sound', listener);
+          return () => ipcRenderer.removeListener('enter-voice-channel-sound', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    leaveVoiceChannelSound: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setLeaveVoiceChannelSound(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-leave-voice-channel-sound', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getLeaveVoiceChannelSound();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-leave-voice-channel-sound');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('leave-voice-channel-sound');
+          webMain.webEventEmitter.on('leave-voice-channel-sound', listener);
+          return () => webMain.webEventEmitter.removeListener('leave-voice-channel-sound', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('leave-voice-channel-sound');
+          ipcRenderer.on('leave-voice-channel-sound', listener);
+          return () => ipcRenderer.removeListener('leave-voice-channel-sound', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    startSpeakingSound: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setStartSpeakingSound(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-start-speaking-sound', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getStartSpeakingSound();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-start-speaking-sound');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('start-speaking-sound');
+          webMain.webEventEmitter.on('start-speaking-sound', listener);
+          return () => webMain.webEventEmitter.removeListener('start-speaking-sound', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('start-speaking-sound');
+          ipcRenderer.on('start-speaking-sound', listener);
+          return () => ipcRenderer.removeListener('start-speaking-sound', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    stopSpeakingSound: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setStopSpeakingSound(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-stop-speaking-sound', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getStopSpeakingSound();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-stop-speaking-sound');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('stop-speaking-sound');
+          webMain.webEventEmitter.on('stop-speaking-sound', listener);
+          return () => webMain.webEventEmitter.removeListener('stop-speaking-sound', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('stop-speaking-sound');
+          ipcRenderer.on('stop-speaking-sound', listener);
+          return () => ipcRenderer.removeListener('stop-speaking-sound', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    receiveDirectMessageSound: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setReceiveDirectMessageSound(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-receive-direct-message-sound', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getReceiveDirectMessageSound();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-receive-direct-message-sound');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('receive-direct-message-sound');
+          webMain.webEventEmitter.on('receive-direct-message-sound', listener);
+          return () => webMain.webEventEmitter.removeListener('receive-direct-message-sound', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('receive-direct-message-sound');
+          ipcRenderer.on('receive-direct-message-sound', listener);
+          return () => ipcRenderer.removeListener('receive-direct-message-sound', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    receiveChannelMessageSound: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setReceiveChannelMessageSound(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-receive-channel-message-sound', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getReceiveChannelMessageSound();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-receive-channel-message-sound');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('receive-channel-message-sound');
+          webMain.webEventEmitter.on('receive-channel-message-sound', listener);
+          return () => webMain.webEventEmitter.removeListener('receive-channel-message-sound', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('receive-channel-message-sound');
+          ipcRenderer.on('receive-channel-message-sound', listener);
+          return () => ipcRenderer.removeListener('receive-channel-message-sound', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    autoCheckForUpdates: {
+      set: (enabled: boolean) => {
+        if (isWebsite()) {
+          webMain.setAutoCheckForUpdates(enabled);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-auto-check-for-updates', enabled);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): boolean => {
+        if (isWebsite()) {
+          return webMain.getAutoCheckForUpdates();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-auto-check-for-updates');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void) => {
+        if (isWebsite()) {
+          const listener = (enabled: boolean) => callback(enabled);
+          webMain.webEventEmitter.removeAllListeners('auto-check-for-updates');
+          webMain.webEventEmitter.on('auto-check-for-updates', listener);
+          return () => webMain.webEventEmitter.removeListener('auto-check-for-updates', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, enabled: boolean) => callback(enabled);
+          ipcRenderer.removeAllListeners('auto-check-for-updates');
+          ipcRenderer.on('auto-check-for-updates', listener);
+          return () => ipcRenderer.removeListener('auto-check-for-updates', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    updateCheckInterval: {
+      set: (interval: number) => {
+        if (isWebsite()) {
+          webMain.setUpdateCheckInterval(interval);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-update-check-interval', interval);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): number => {
+        if (isWebsite()) {
+          return webMain.getUpdateCheckInterval();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-update-check-interval');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (interval: number) => void) => {
+        if (isWebsite()) {
+          const listener = (interval: number) => callback(interval);
+          webMain.webEventEmitter.removeAllListeners('update-check-interval');
+          webMain.webEventEmitter.on('update-check-interval', listener);
+          return () => webMain.webEventEmitter.removeListener('update-check-interval', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, interval: number) => callback(interval);
+          ipcRenderer.removeAllListeners('update-check-interval');
+          ipcRenderer.on('update-check-interval', listener);
+          return () => ipcRenderer.removeListener('update-check-interval', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+    },
+
+    updateChannel: {
+      set: (channel: string) => {
+        if (isWebsite()) {
+          webMain.setUpdateChannel(channel);
+        } else if (isRenderer()) {
+          ipcRenderer.send('set-update-channel', channel);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      get: (): string => {
+        if (isWebsite()) {
+          return webMain.getUpdateChannel();
+        } else if (isRenderer()) {
+          return ipcRenderer.sendSync('get-update-channel');
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
+
+      onUpdate: (callback: (channel: string) => void) => {
+        if (isWebsite()) {
+          const listener = (channel: string) => callback(channel);
+          webMain.webEventEmitter.removeAllListeners('update-channel');
+          webMain.webEventEmitter.on('update-channel', listener);
+          return () => webMain.webEventEmitter.removeListener('update-channel', listener);
+        } else if (isRenderer()) {
+          const listener = (_: any, channel: string) => callback(channel);
+          ipcRenderer.removeAllListeners('update-channel');
+          ipcRenderer.on('update-channel', listener);
+          return () => ipcRenderer.removeListener('update-channel', listener);
+        } else {
+          throw new Error('Unsupported platform');
+        }
+      },
     },
   },
 };
 
-// ============================================================================
-// System Settings Accessors (auto-generated pattern)
-// ============================================================================
-
-type SettingConfig<T> = {
-  getChannel: string;
-  setChannel: string;
-  updateChannel: string;
-  defaultValue: T;
-};
-
-function createSettingAccessor<T>(config: SettingConfig<T>) {
-  return {
-    get: (): T => {
-      return getIpc().sendSync(config.getChannel) ?? config.defaultValue;
-    },
-    set: (value: T) => {
-      getIpc().send(config.setChannel, value);
-    },
-    onUpdate: (callback: (value: T) => void) => {
-      const listener = (_: any, value: T) => callback(value);
-      getIpc().on(config.updateChannel, listener);
-      return () => getIpc().removeListener(config.updateChannel, listener);
-    },
-  };
-}
-
-function createSettingAccessors() {
-  return {
-    autoLogin: createSettingAccessor({ getChannel: 'get-auto-login', setChannel: 'set-auto-login', updateChannel: 'auto-login', defaultValue: false }),
-    autoLaunch: createSettingAccessor({ getChannel: 'get-auto-launch', setChannel: 'set-auto-launch', updateChannel: 'auto-launch', defaultValue: false }),
-    alwaysOnTop: createSettingAccessor({ getChannel: 'get-always-on-top', setChannel: 'set-always-on-top', updateChannel: 'always-on-top', defaultValue: false }),
-    statusAutoIdle: createSettingAccessor({ getChannel: 'get-status-auto-idle', setChannel: 'set-status-auto-idle', updateChannel: 'status-auto-idle', defaultValue: false }),
-    statusAutoIdleMinutes: createSettingAccessor({
-      getChannel: 'get-status-auto-idle-minutes',
-      setChannel: 'set-status-auto-idle-minutes',
-      updateChannel: 'status-auto-idle-minutes',
-      defaultValue: 0,
-    }),
-    statusAutoDnd: createSettingAccessor({ getChannel: 'get-status-auto-dnd', setChannel: 'set-status-auto-dnd', updateChannel: 'status-auto-dnd', defaultValue: false }),
-    channelUIMode: createSettingAccessor<Types.ChannelUIMode>({ getChannel: 'get-channel-ui-mode', setChannel: 'set-channel-ui-mode', updateChannel: 'channel-ui-mode', defaultValue: 'classic' }),
-    closeToTray: createSettingAccessor({ getChannel: 'get-close-to-tray', setChannel: 'set-close-to-tray', updateChannel: 'close-to-tray', defaultValue: false }),
-    font: createSettingAccessor({ getChannel: 'get-font', setChannel: 'set-font', updateChannel: 'font', defaultValue: '' }),
-    fontSize: createSettingAccessor({ getChannel: 'get-font-size', setChannel: 'set-font-size', updateChannel: 'font-size', defaultValue: 0 }),
-    inputAudioDevice: createSettingAccessor({ getChannel: 'get-input-audio-device', setChannel: 'set-input-audio-device', updateChannel: 'input-audio-device', defaultValue: '' }),
-    outputAudioDevice: createSettingAccessor({ getChannel: 'get-output-audio-device', setChannel: 'set-output-audio-device', updateChannel: 'output-audio-device', defaultValue: '' }),
-    recordFormat: createSettingAccessor<Types.RecordFormat>({ getChannel: 'get-record-format', setChannel: 'set-record-format', updateChannel: 'record-format', defaultValue: 'wav' }),
-    recordSavePath: createSettingAccessor({ getChannel: 'get-record-save-path', setChannel: 'set-record-save-path', updateChannel: 'record-save-path', defaultValue: '' }),
-    mixEffect: createSettingAccessor({ getChannel: 'get-mix-effect', setChannel: 'set-mix-effect', updateChannel: 'mix-effect', defaultValue: false }),
-    mixEffectType: createSettingAccessor({ getChannel: 'get-mix-effect-type', setChannel: 'set-mix-effect-type', updateChannel: 'mix-effect-type', defaultValue: '' }),
-    autoMixSetting: createSettingAccessor({ getChannel: 'get-auto-mix-setting', setChannel: 'set-auto-mix-setting', updateChannel: 'auto-mix-setting', defaultValue: false }),
-    echoCancellation: createSettingAccessor({ getChannel: 'get-echo-cancellation', setChannel: 'set-echo-cancellation', updateChannel: 'echo-cancellation', defaultValue: false }),
-    noiseCancellation: createSettingAccessor({ getChannel: 'get-noise-cancellation', setChannel: 'set-noise-cancellation', updateChannel: 'noise-cancellation', defaultValue: false }),
-    microphoneAmplification: createSettingAccessor({
-      getChannel: 'get-microphone-amplification',
-      setChannel: 'set-microphone-amplification',
-      updateChannel: 'microphone-amplification',
-      defaultValue: false,
-    }),
-    manualMixMode: createSettingAccessor({ getChannel: 'get-manual-mix-mode', setChannel: 'set-manual-mix-mode', updateChannel: 'manual-mix-mode', defaultValue: false }),
-    mixMode: createSettingAccessor<Types.MixMode>({ getChannel: 'get-mix-mode', setChannel: 'set-mix-mode', updateChannel: 'mix-mode', defaultValue: 'app' }),
-    speakingMode: createSettingAccessor<Types.SpeakingMode>({ getChannel: 'get-speaking-mode', setChannel: 'set-speaking-mode', updateChannel: 'speaking-mode', defaultValue: 'auto' }),
-    defaultSpeakingKey: createSettingAccessor({ getChannel: 'get-default-speaking-key', setChannel: 'set-default-speaking-key', updateChannel: 'default-speaking-key', defaultValue: '' }),
-    notSaveMessageHistory: createSettingAccessor({
-      getChannel: 'get-not-save-message-history',
-      setChannel: 'set-not-save-message-history',
-      updateChannel: 'not-save-message-history',
-      defaultValue: false,
-    }),
-    hotKeyOpenMainWindow: createSettingAccessor({
-      getChannel: 'get-hot-key-open-main-window',
-      setChannel: 'set-hot-key-open-main-window',
-      updateChannel: 'hot-key-open-main-window',
-      defaultValue: '',
-    }),
-    hotKeyIncreaseVolume: createSettingAccessor({ getChannel: 'get-hot-key-increase-volume', setChannel: 'set-hot-key-increase-volume', updateChannel: 'hot-key-increase-volume', defaultValue: '' }),
-    hotKeyDecreaseVolume: createSettingAccessor({ getChannel: 'get-hot-key-decrease-volume', setChannel: 'set-hot-key-decrease-volume', updateChannel: 'hot-key-decrease-volume', defaultValue: '' }),
-    hotKeyToggleSpeaker: createSettingAccessor({ getChannel: 'get-hot-key-toggle-speaker', setChannel: 'set-hot-key-toggle-speaker', updateChannel: 'hot-key-toggle-speaker', defaultValue: '' }),
-    hotKeyToggleMicrophone: createSettingAccessor({
-      getChannel: 'get-hot-key-toggle-microphone',
-      setChannel: 'set-hot-key-toggle-microphone',
-      updateChannel: 'hot-key-toggle-microphone',
-      defaultValue: '',
-    }),
-    hotKeyScreenshot: createSettingAccessor({ getChannel: 'get-hot-key-screenshot', setChannel: 'set-hot-key-screenshot', updateChannel: 'hot-key-screenshot', defaultValue: '' }),
-    disableAllSoundEffect: createSettingAccessor({
-      getChannel: 'get-disable-all-sound-effect',
-      setChannel: 'set-disable-all-sound-effect',
-      updateChannel: 'disable-all-sound-effect',
-      defaultValue: false,
-    }),
-    enterVoiceChannelSound: createSettingAccessor({
-      getChannel: 'get-enter-voice-channel-sound',
-      setChannel: 'set-enter-voice-channel-sound',
-      updateChannel: 'enter-voice-channel-sound',
-      defaultValue: true,
-    }),
-    leaveVoiceChannelSound: createSettingAccessor({
-      getChannel: 'get-leave-voice-channel-sound',
-      setChannel: 'set-leave-voice-channel-sound',
-      updateChannel: 'leave-voice-channel-sound',
-      defaultValue: true,
-    }),
-    startSpeakingSound: createSettingAccessor({ getChannel: 'get-start-speaking-sound', setChannel: 'set-start-speaking-sound', updateChannel: 'start-speaking-sound', defaultValue: true }),
-    stopSpeakingSound: createSettingAccessor({ getChannel: 'get-stop-speaking-sound', setChannel: 'set-stop-speaking-sound', updateChannel: 'stop-speaking-sound', defaultValue: true }),
-    receiveDirectMessageSound: createSettingAccessor({
-      getChannel: 'get-receive-direct-message-sound',
-      setChannel: 'set-receive-direct-message-sound',
-      updateChannel: 'receive-direct-message-sound',
-      defaultValue: true,
-    }),
-    receiveChannelMessageSound: createSettingAccessor({
-      getChannel: 'get-receive-channel-message-sound',
-      setChannel: 'set-receive-channel-message-sound',
-      updateChannel: 'receive-channel-message-sound',
-      defaultValue: true,
-    }),
-    autoCheckForUpdates: createSettingAccessor({ getChannel: 'get-auto-check-for-updates', setChannel: 'set-auto-check-for-updates', updateChannel: 'auto-check-for-updates', defaultValue: false }),
-    updateCheckInterval: createSettingAccessor({ getChannel: 'get-update-check-interval', setChannel: 'set-update-check-interval', updateChannel: 'update-check-interval', defaultValue: 0 }),
-    updateChannel: createSettingAccessor({ getChannel: 'get-update-channel', setChannel: 'set-update-channel', updateChannel: 'update-channel', defaultValue: '' }),
-  };
-}
-
-export default ipcFacade;
+export default ipc;

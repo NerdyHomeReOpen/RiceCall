@@ -16,10 +16,11 @@ import vipStyles from '@/styles/vip.module.css';
 import { INVITATION_BASE_URL } from '@/constant';
 
 interface InviteFriendPopupProps {
+  id: string;
   server: Types.Server;
 }
 
-const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ server }) => {
+const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, server }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -68,7 +69,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ server
       for (const userId of selectedUserIds) {
         ipc.socket.send('directMessage', { targetId: userId, preset: { type: 'dm', content: formatedMessage } });
       }
-      ipc.window.close();
+      ipc.popup.close(id);
     });
   };
 

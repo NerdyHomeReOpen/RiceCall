@@ -8,7 +8,7 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 import { useLoading } from '@/providers/Loading';
 
 import EncodeAudio from '@/utils/encodeAudio';
-import Logger from '@/utils/logger';
+import Logger from '@/logger';
 
 const BASE_VOLUME = 4;
 

@@ -16,11 +16,12 @@ import serverPage from '@/styles/server.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditChannelOrderPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   channels: Types.Channel[];
 }
 
-const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ serverId, channels: channelsData }) => {
+const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId, channels: channelsData }) => {
   // Hooks
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
@@ -167,11 +168,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
     Popup.editChannels(serverId, editedChannels);
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects

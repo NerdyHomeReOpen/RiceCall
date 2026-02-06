@@ -9,11 +9,12 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditChannelNamePopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   channel: Types.Channel;
 }
 
-const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ serverId, channel }) => {
+const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ id, serverId, channel }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -35,7 +36,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

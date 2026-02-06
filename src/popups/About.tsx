@@ -12,7 +12,11 @@ import MarkdownContent from '@/components/MarkdownContent';
 import styles from '@/styles/about.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
-const AboutPopup: React.FC = React.memo(() => {
+interface AboutPopupProps {
+  id: string;
+}
+
+const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -42,7 +46,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
   const handleCloseBtnClick = () => {
     if (dontShowNextTime) ipc.dontShowDisclaimerNextTime();
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects
