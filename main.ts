@@ -22,7 +22,7 @@ import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
-import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session } from 'electron';
+import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session, protocol } from 'electron';
 import { io, Socket } from 'socket.io-client';
 import * as Types from './src/types';
 import { env, loadEnv } from './src/env.js';
@@ -41,9 +41,7 @@ if (process.platform === 'linux') {
 }
 
 // Register custom protocol privileges
-protocol.registerSchemesAsPrivileged([
-  { scheme: 'local-resource', privileges: { secure: true, supportFetchAPI: true, standard: true, bypassCSP: true, corsEnabled: true } },
-]);
+protocol.registerSchemesAsPrivileged([{ scheme: 'local-resource', privileges: { secure: true, supportFetchAPI: true, standard: true, bypassCSP: true, corsEnabled: true } }]);
 
 export function getRegion(): Types.LanguageKey {
   const language = app.getLocale();
@@ -1012,7 +1010,7 @@ async function autoLogin(token: string) {
   return await Auth.autoLogin(token)
     .then((res) => {
       if (res.success) {
-        setToken(res.token)
+        setToken(res.token);
         connectSocket(res.token);
         isLogin = true;
         mainWindow?.showInactive();
@@ -1252,6 +1250,49 @@ app.on('ready', async () => {
     setTrayDetail();
     BrowserWindow.getAllWindows().forEach((window) => {
       window.webContents.send('language', language);
+    });
+  });
+
+  // Custom themes handlers
+  ipcMain.on('get-custom-themes', (event) => {
+    const customThemes = store.get('customThemes');
+    event.returnValue = Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
+  });
+
+  ipcMain.on('add-custom-theme', (_, theme: Types.Theme) => {
+    const customThemes = store.get('customThemes');
+    // Keep total 7 themes
+    customThemes.unshift(theme);
+    store.set('customThemes', customThemes);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(
+        'custom-themes',
+        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+      );
+    });
+  });
+
+  ipcMain.on('delete-custom-theme', (_, index: number) => {
+    const customThemes = store.get('customThemes');
+    // Keep total 7 themes
+    customThemes.splice(index, 1);
+    store.set('customThemes', customThemes);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send(
+        'custom-themes',
+        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+      );
+    });
+  });
+
+  ipcMain.on('get-current-theme', (event) => {
+    event.returnValue = store.get('currentTheme');
+  });
+
+  ipcMain.on('set-current-theme', (_, theme: string) => {
+    store.set('currentTheme', theme);
+    BrowserWindow.getAllWindows().forEach((window) => {
+      window.webContents.send('current-theme', theme);
     });
   });
 

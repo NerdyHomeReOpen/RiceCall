@@ -103,13 +103,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
 
   const settingPages = Permission.isServerAdmin(permissionLevel)
     ? [
-      t('server-info'),
-      t('server-announcement'),
-      t('member-management'),
-      t('access-permission'),
-      `${t('member-application-management')} (${totalApplicationsCount})`,
-      `${t('blacklist-management')} (${totalBlockMembersCount})`,
-    ]
+        t('server-info'),
+        t('server-announcement'),
+        t('member-management'),
+        t('access-permission'),
+        `${t('member-application-management')} (${totalApplicationsCount})`,
+        `${t('blacklist-management')} (${totalBlockMembersCount})`,
+      ]
     : Permission.isMember(permissionLevel)
       ? [t('server-info'), t('server-announcement'), t('member-management')]
       : [t('server-info'), t('server-announcement')];
@@ -194,7 +194,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+          Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }
@@ -450,7 +450,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         .addSeparator()
                         .addMemberManagementOption(
                           { permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: null },
-                          () => { },
+                          () => {},
                           getMemberManagementSubmenuItems(),
                         )
                         .build();

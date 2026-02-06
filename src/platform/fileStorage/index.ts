@@ -17,5 +17,5 @@ export const FileStorage = {
       const { FileStorage: WebStorage } = await import('./web');
       return WebStorage.store(buffer, directory, filenamePrefix, extension);
     }
-  }
+  },
 };

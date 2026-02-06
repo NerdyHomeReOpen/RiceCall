@@ -121,13 +121,13 @@ export async function directMessage({ userId, targetId, event, message }: { user
 }
 
 export async function editChannelOrder({ userId, serverId }: { userId: string; serverId: string }) {
-  const serverChannelsPromise = Data.channels({ userId, serverId });
+  const channelsPromise = Data.channels({ userId, serverId });
 
-  const [serverChannels] = await Promise.all([serverChannelsPromise]).catch((error) => {
+  const [channels] = await Promise.all([channelsPromise]).catch((error) => {
     throw error;
   });
 
-  return { userId, serverId, serverChannels };
+  return { userId, serverId, channels };
 }
 
 export async function editChannelName({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {

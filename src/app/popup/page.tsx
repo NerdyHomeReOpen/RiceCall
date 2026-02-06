@@ -8,7 +8,6 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
 import ApproveFriend from '@/popups/ApproveFriend';
@@ -111,7 +110,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBox
 Header.displayName = 'Header';
 
 const PopupPageComponent: React.FC = React.memo(() => {
-
   // States
   const [id, setId] = useState<string>('');
   const [type, setType] = useState<Types.PopupType | null>(null);

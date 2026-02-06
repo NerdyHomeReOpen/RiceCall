@@ -554,7 +554,7 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addTerminateSelfMembershipOption(params: { permissionLevel: Types.Permission, isSelf: boolean }, onClick: () => void): this {
+  addTerminateSelfMembershipOption(params: { permissionLevel: Types.Permission; isSelf: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'terminate-self-membership',
       label: 'terminate-self-membership',
@@ -608,7 +608,7 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addForbidVoiceOption(params: { permissionLevel: Types.Permission, isSelf: boolean; isLowerLevel: boolean; isVoiceMuted: boolean }, onClick: () => void): this {
+  addForbidVoiceOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; isVoiceMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-voice',
       label: params.isVoiceMuted ? 'unforbid-voice' : 'forbid-voice',
@@ -618,7 +618,7 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addForbidTextOption(params: { permissionLevel: Types.Permission, isSelf: boolean; isLowerLevel: boolean; isTextMuted: boolean }, onClick: () => void): this {
+  addForbidTextOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; isTextMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-text',
       label: params.isTextMuted ? 'unforbid-text' : 'forbid-text',
