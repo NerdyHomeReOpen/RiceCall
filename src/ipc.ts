@@ -48,10 +48,8 @@ const ipc = {
     on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) => {
       if (isWebsite()) {
         const listener = (...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
-        return () => {
-          webMain.webEventEmitter.on(event, listener);
-          return () => webMain.webEventEmitter.removeListener(event, listener);
-        };
+        webMain.webEventEmitter.on(event, listener);
+        return () => webMain.webEventEmitter.removeListener(event, listener);
       } else if (isRenderer()) {
         const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
         ipcRenderer.on(event, listener);
