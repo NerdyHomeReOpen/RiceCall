@@ -24,17 +24,17 @@ import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session, protocol } from 'electron';
 import { io, Socket } from 'socket.io-client';
-import * as Types from './src/types';
-import { env, loadEnv } from './src/env.js';
-import { initMainI18n, t } from './src/i18n.main.js';
-import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './src/discord.js';
-import { getToken, removeToken, setToken } from './src/auth.token.js';
-import * as Auth from './src/auth.service.js';
-import * as Data from './src/data.service.js';
-import * as Loader from './src/loader.js';
-import Logger from './src/logger.js';
-import { LANGUAGES } from './src/constant.js';
-import { POPUP_SIZES, POPUP_BEHAVIORS } from './src/popup.config.js';
+import * as Types from '../types';
+import { initMainI18n, t } from './i18n.js';
+import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
+import { env, loadEnv } from '../env.js';
+import { getToken, removeToken, setToken } from '../auth.token.js';
+import * as Auth from '../auth.service.js';
+import * as Data from '../data.service.js';
+import * as Loader from '../loader.js';
+import Logger from '../logger.js';
+import { LANGUAGES } from '../constant.js';
+import { POPUP_SIZES, POPUP_BEHAVIORS } from '../popup.config.js';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -1312,7 +1312,7 @@ app.on('ready', async () => {
       fs.writeFileSync(filePath, Buffer.from(buffer));
 
       return `local-resource://${directory}/${fileName}`;
-    } catch (error) {
+    } catch (error: any) {
       new Logger('FileStorage').error(`Electron Storage Error: ${error.message}`);
       return null;
     }

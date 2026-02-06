@@ -538,7 +538,6 @@ const ipc = {
       if (isWebsite()) {
         const listener = (from: string, data: T) => {
           if (from === host) callback(data);
-          webMain.webEventEmitter.removeAllListeners('popup-submit');
         };
         webMain.webEventEmitter.removeListener('popup-submit', listener);
         webMain.webEventEmitter.on('popup-submit', listener);
@@ -546,7 +545,6 @@ const ipc = {
       } else if (isRenderer()) {
         const listener = (_: any, from: string, data: T) => {
           if (from === host) callback(data);
-          ipcRenderer.removeAllListeners('popup-submit');
         };
         ipcRenderer.removeListener('popup-submit', listener);
         ipcRenderer.on('popup-submit', listener);
@@ -777,7 +775,7 @@ const ipc = {
     savePath: {
       select: async (): Promise<string | null> => {
         if (isWebsite()) {
-          return webMain.selectRecordSavePath();
+          return null;
         } else if (isRenderer()) {
           return await ipcRenderer.invoke('select-record-save-path');
         } else {

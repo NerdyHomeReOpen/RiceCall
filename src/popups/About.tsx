@@ -60,7 +60,7 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   }, []);
 
   return (
-    <div className={`${popupStyles['popup-wrapper']}`}>
+    <div className={popupStyles['popup-wrapper']}>
       <div className={popupStyles['popup-body']}>
         <div className={popupStyles['content']} style={{ justifyContent: 'flex-start' }}>
           <div className={styles['app-logo']} />

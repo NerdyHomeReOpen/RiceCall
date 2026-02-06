@@ -1,5 +1,5 @@
 import DiscordRPC from 'discord-rpc';
-import Logger from './logger.js';
+import Logger from '../logger.js';
 
 export const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
 

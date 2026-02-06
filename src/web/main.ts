@@ -430,16 +430,6 @@ export function saveRecord(record: ArrayBuffer) {
   }
 }
 
-export function selectRecordSavePath() {
-  //   const { canceled, filePaths } = await dialog.showOpenDialog({
-  //     title: t('select-record-save-path'),
-  //     defaultPath: store.get('recordSavePath'),
-  //     properties: ['openDirectory'],
-  //   });
-  //   if (canceled) return null;
-  //   return filePaths[0];
-}
-
 // Data handlers
 export async function dataUser(params: { userId: string }) {
   return await Data.user(params);
