@@ -608,21 +608,21 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addForbidVoiceOption(params: { isSelf: boolean; isLowerLevel: boolean; isVoiceMuted: boolean }, onClick: () => void): this {
+  addForbidVoiceOption(params: { permissionLevel: Types.Permission, isSelf: boolean; isLowerLevel: boolean; isVoiceMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-voice',
       label: params.isVoiceMuted ? 'unforbid-voice' : 'forbid-voice',
-      show: !params.isSelf && params.isLowerLevel,
+      show: !params.isSelf && params.isLowerLevel && Permission.isChannelMod(params.permissionLevel),
       onClick: onClick,
     });
     return this;
   }
 
-  addForbidTextOption(params: { isSelf: boolean; isLowerLevel: boolean; isTextMuted: boolean }, onClick: () => void): this {
+  addForbidTextOption(params: { permissionLevel: Types.Permission, isSelf: boolean; isLowerLevel: boolean; isTextMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-text',
       label: params.isTextMuted ? 'unforbid-text' : 'forbid-text',
-      show: !params.isSelf && params.isLowerLevel,
+      show: !params.isSelf && params.isLowerLevel && Permission.isChannelMod(params.permissionLevel),
       onClick: onClick,
     });
     return this;

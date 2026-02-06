@@ -129,10 +129,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
         Popup.moveUserToChannel(member.userId, currentServer.serverId, currentChannel.channelId),
       )
       .addSeparator()
-      .addForbidVoiceOption({ isSelf, isLowerLevel, isVoiceMuted: member.isVoiceMuted }, () =>
+      .addForbidVoiceOption({ permissionLevel, isSelf, isLowerLevel, isVoiceMuted: member.isVoiceMuted }, () =>
         Popup.forbidUserVoiceInChannel(member.userId, currentServer.serverId, channel.channelId, !member.isVoiceMuted),
       )
-      .addForbidTextOption({ isSelf, isLowerLevel, isTextMuted: member.isTextMuted }, () =>
+      .addForbidTextOption({ permissionLevel, isSelf, isLowerLevel, isTextMuted: member.isTextMuted }, () =>
         Popup.forbidUserTextInChannel(member.userId, currentServer.serverId, channel.channelId, !member.isTextMuted),
       )
       .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => Popup.openKickMemberFromChannel(member.userId, currentServer.serverId, channel.channelId))
