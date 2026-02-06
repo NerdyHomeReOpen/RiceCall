@@ -554,11 +554,11 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addTerminateSelfMembershipOption(params: { permissionLevel: Types.Permission }, onClick: () => void): this {
+  addTerminateSelfMembershipOption(params: { permissionLevel: Types.Permission, isSelf: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'terminate-self-membership',
       label: 'terminate-self-membership',
-      show: Permission.isMember(params.permissionLevel) && !Permission.isServerOwner(params.permissionLevel),
+      show: params.isSelf && Permission.isMember(params.permissionLevel) && !Permission.isServerOwner(params.permissionLevel),
       onClick: onClick,
     });
     return this;
