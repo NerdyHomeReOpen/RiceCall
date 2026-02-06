@@ -20,19 +20,6 @@
   box-shadow: 0 0 5px 1px rgb(0 0 0 / 10%);
 }
 
-.invitation-container::before {
-  position: absolute;
-  top: 50%;
-  left: -2px;
-  width: 5px;
-  height: 10px;
-  content: '';
-  background: #fff;
-  border: solid 1px #ccc;
-  border-radius: 50% 0 0 50%;
-  transform: translateX(-50%);
-}
-
 .invitation-headers {
   display: flex;
   flex-direction: row;
