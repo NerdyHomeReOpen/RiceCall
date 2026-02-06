@@ -136,7 +136,8 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   const handleDeleteChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Popup.deleteChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
+    if (!selectedChannel) return;
+    Popup.deleteChannel(serverId, selectedChannel.channelId, selectedChannel.name);
   };
 
   const handleMoveUpBtnClick = (e: React.MouseEvent) => {
