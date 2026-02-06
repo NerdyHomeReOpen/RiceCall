@@ -1031,13 +1031,6 @@ app.on('ready', async () => {
   // Load env
   loadEnv(store.get('server', 'prod'));
 
-  // Register local-resource protocol
-  protocol.registerFileProtocol('local-resource', (request, callback) => {
-    const url = request.url.replace('local-resource://', '');
-    const filePath = path.join(app.getPath('userData'), decodeURIComponent(url));
-    callback({ path: filePath });
-  });
-
   // Initialize i18n
   initMainI18n(store.get('language'));
 

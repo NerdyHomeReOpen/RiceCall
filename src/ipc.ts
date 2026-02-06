@@ -656,10 +656,6 @@ const ipc = {
       }
     },
 
-    saveImage: async (buffer: ArrayBuffer): Promise<string | null> => {
-      return await getIpc().invoke('save-theme-image', buffer);
-    },
-
     add: (theme: Types.Theme) => {
       if (isWebsite()) {
         webMain.addCustomTheme(theme);
