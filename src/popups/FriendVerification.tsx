@@ -75,7 +75,7 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
   };
 
   const handleRejectBtnClick = () => {
-    Popup.rejectFriendApplication(user.userId, application.name);
+    Popup.rejectFriendApplication(application.senderId, application.name);
   };
 
   const handleDirectMessageBtnClick = () => {
