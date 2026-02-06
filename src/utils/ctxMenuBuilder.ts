@@ -366,7 +366,7 @@ export default class ContextMenuClass {
         !params.isSelf &&
         params.isLowerLevel &&
         Permission.isMember(params.targetPermissionLevel) &&
-        (!!params.channelCategoryId ? Permission.isServerAdmin(params.permissionLevel) : Permission.isChannelAdmin(params.permissionLevel)),
+        (!!params.channelCategoryId ? Permission.isChannelAdmin(params.permissionLevel) : Permission.isServerAdmin(params.permissionLevel)),
       hasSubmenu: submenuItems.length > 0,
       submenuItems: submenuItems,
       onClick: onClick,
