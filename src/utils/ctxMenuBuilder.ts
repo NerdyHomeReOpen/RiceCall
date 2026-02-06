@@ -247,7 +247,7 @@ export default class ContextMenuClass {
         { id: 'agreement', label: 'agreement', onClick: params.onAgreementClick },
         { id: 'specification', label: 'specification', onClick: params.onSpecificationClick },
         { id: 'contact-us', label: 'contact-us', onClick: params.onContactUsClick },
-        { id: 'about-us', label: 'about-us', onClick: params.onAboutUsClick },
+        { id: 'about-us', label: 'about-ricecall', onClick: params.onAboutUsClick },
       ],
       onClick: onClick,
     });

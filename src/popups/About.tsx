@@ -61,11 +61,11 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   return (
     <div className={popupStyles['popup-wrapper']}>
       <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['content']} style={{ justifyContent: 'flex-start' }}>
+        <div className={popupStyles['content']} style={{ justifyContent: 'flex-start', gap: '10px' }}>
           <div className={styles['app-logo']} />
           <div className={styles['app-info']}>
             <div className={styles['app-version-text']}>{`RiceCall v${packageJson.version}`}</div>
-            <div className={styles['copyright-text']}>{`COPYRIGHT @ ${currentYear} RiceCall.com ,ALL RIGHTS RESERVED.`}</div>
+            <div className={styles['copyright-text']}>{`COPYRIGHT @ ${currentYear} ricecall.com ,ALL RIGHTS RESERVED.`}</div>
             <div className={popupStyles['row']} style={{ alignSelf: 'center' }}>
               <div className={popupStyles['link-text']} onClick={handleGetHelpLinkClick}>
                 {t('get-help')}

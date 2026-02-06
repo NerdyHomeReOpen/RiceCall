@@ -1058,7 +1058,7 @@ export function setUpdateChannel(channel: string = 'latest') {
 }
 
 // Disclaimer handlers
-export function setDontShowDisclaimerNextTime(enable: boolean = false) {
+export function dontShowDisclaimerNextTime(enable: boolean = false) {
   store.set('dontShowDisclaimer', enable);
   webEventEmitter.emit('dont-show-disclaimer-next-time', enable);
 }
