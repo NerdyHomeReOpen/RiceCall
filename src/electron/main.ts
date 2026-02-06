@@ -11,13 +11,6 @@ ffmpeg.setFfmpegPath(binaryPath);
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import log from 'electron-log';
-log.initialize();
-log.transports.file.level = 'info';
-log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
-log.transports.file.maxSize = 5 * 1024 * 1024;
-log.transports.remote.url = `${env.API_URL}/logs`;
-Object.assign(console, log.functions);
-log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
@@ -27,7 +20,7 @@ import { io, Socket } from 'socket.io-client';
 import * as Types from '../types';
 import { initMainI18n, t } from './i18n.js';
 import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
-import { env, loadEnv } from '../env.js';
+import { getEnv as env, loadEnv } from '../env.js';
 import { getToken, removeToken, setToken } from '../auth.token.js';
 import * as Auth from '../auth.service.js';
 import * as Data from '../data.service.js';
@@ -668,10 +661,21 @@ export function configureTray() {
   setTrayDetail();
 }
 
+// Logger
+const configureLogger = () => {
+  log.initialize();
+  log.transports.file.level = 'info';
+  log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
+  log.transports.file.maxSize = 5 * 1024 * 1024;
+  log.transports.remote.url = `${env().API_URL}/logs`;
+  Object.assign(console, log.functions);
+  log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
+};
+
 // React DevTools
 export function configureReactDevTools() {
   if (DEV) {
-    const reactDevToolsPath = env.REACT_DEV_TOOLS_PATH || '';
+    const reactDevToolsPath = env().REACT_DEV_TOOLS_PATH || '';
     try {
       session.defaultSession.extensions.loadExtension(reactDevToolsPath, {
         allowFileAccess: true,
@@ -837,7 +841,7 @@ export function connectSocket(token: string) {
 
   seq = 0;
 
-  socket = io(env.WS_URL, {
+  socket = io(env().WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,
@@ -1037,6 +1041,7 @@ app.on('ready', async () => {
   configureDiscordRPC();
   configureTray();
   configureReactDevTools();
+  configureLogger();
 
   if (!store.get('dontShowDisclaimer')) createPopup('aboutus', 'aboutUs', {});
   createAuthWindow().then((authWindow) => authWindow.showInactive());

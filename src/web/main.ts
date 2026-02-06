@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { io, Socket } from 'socket.io-client';
 import * as Types from '@/types';
-import { env, loadEnv } from '@/env';
 import * as Auth from '@/auth.service';
 import * as Data from '@/data.service';
+import { getEnv as env, loadEnv } from '@/env';
 import { getToken, removeToken, setToken } from '@/auth.token';
 import * as Loader from '@/loader';
 import Logger from '@/logger';
@@ -261,7 +261,7 @@ export function connectSocket(token: string) {
 
   seq = 0;
 
-  socket = io(env.WS_URL, {
+  socket = io(env().WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,
@@ -662,7 +662,7 @@ export function updateDiscordPresence(updatePresence: any) {
 
 // Env handlers
 export function getEnv() {
-  return env;
+  return env();
 }
 
 export function changeServer(server: 'prod' | 'dev') {

@@ -3,11 +3,7 @@ import { z } from 'zod';
 import { isElectron, isRenderer } from '@/platform/isElectron';
 import Logger from '@/logger';
 
-export let env: Record<string, string> = {
-  API_URL: '',
-  WS_URL: '',
-  CROWDIN_DISTRIBUTION_HASH: '',
-};
+let env: Record<string, string> | null = null;
 
 const EnvSchema = z.object({
   API_URL: z.string(),
@@ -84,6 +80,10 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
 }
 
 export function getEnv() {
+  if (!env) {
+    new Logger('Env').error('Env is not loaded');
+    return {};
+  }
   return env;
 }
 

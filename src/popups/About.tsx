@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 import packageJson from '../../package.json';
-const version = packageJson.version;
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -65,7 +64,7 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
         <div className={popupStyles['content']} style={{ justifyContent: 'flex-start' }}>
           <div className={styles['app-logo']} />
           <div className={styles['app-info']}>
-            <div className={styles['app-version-text']}>{`RiceCall v${version}`}</div>
+            <div className={styles['app-version-text']}>{`RiceCall v${packageJson.version}`}</div>
             <div className={styles['copyright-text']}>{`COPYRIGHT @ ${currentYear} RiceCall.com ,ALL RIGHTS RESERVED.`}</div>
             <div className={popupStyles['row']} style={{ alignSelf: 'center' }}>
               <div className={popupStyles['link-text']} onClick={handleGetHelpLinkClick}>
