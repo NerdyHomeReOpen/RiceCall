@@ -354,7 +354,7 @@ export default class ContextMenuClass {
   }
 
   addMemberManagementOption(
-    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; channelCategoryId: string | null },
+    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean },
     onClick: () => void,
     submenuItems: Types.ContextMenuItem[] = [],
   ): this {
@@ -366,8 +366,9 @@ export default class ContextMenuClass {
         !params.isSelf &&
         params.isLowerLevel &&
         Permission.isMember(params.targetPermissionLevel) &&
-        (!!params.channelCategoryId ? Permission.isChannelAdmin(params.permissionLevel) : Permission.isServerAdmin(params.permissionLevel)),
-      hasSubmenu: submenuItems.length > 0,
+        Permission.isChannelMod(params.permissionLevel) &&
+        submenuItems.filter((item) => item.show).length > 0,
+      hasSubmenu: true,
       submenuItems: submenuItems,
       onClick: onClick,
     });
@@ -486,8 +487,8 @@ export default class ContextMenuClass {
       id: 'edit-friend-friend-group',
       label: 'edit-friend-friend-group',
       icon: 'submenu',
-      show: !params.isSelf && !params.isStranger && !params.isBlocked,
-      hasSubmenu: submenuItems.length > 0,
+      show: !params.isSelf && !params.isStranger && !params.isBlocked && submenuItems.filter((item) => item.show).length > 0,
+      hasSubmenu: true,
       submenuItems: submenuItems,
       onClick: onClick,
     });
