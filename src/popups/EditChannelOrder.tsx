@@ -7,7 +7,6 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import { setSelectedItemId } from '@/store/slices/uiSlice';
-import { setChannels } from '@/store/slices/channelsSlice';
 
 import * as Popup from '@/utils/popup';
 
@@ -18,13 +17,12 @@ import popupStyles from '@/styles/popup.module.css';
 interface EditChannelOrderPopupProps {
   id: string;
   serverId: Types.Server['serverId'];
-  channels: Types.Channel[];
+  channels: (Types.Channel | Types.Category)[];
 }
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId, channels: channelsData }) => {
   // Hooks
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
 
   // Refs
   const orderMapRef = useRef<Record<string, number>>(
@@ -44,9 +42,9 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     }),
     shallowEqual,
   );
-  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
 
   // States
+  const [channels, setChannels] = useState<(Types.Channel | Types.Category)[]>(channelsData);
   const [selectedChannel, setSelectedChannel] = useState<Types.Channel | Types.Category | null>(null);
   const [categoryChildren, setCategoryChildren] = useState<(Types.Channel | Types.Category)[]>([]);
 
@@ -120,7 +118,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         newChannels[index] = { ...newChannels[index], order: child.order };
       }
     }
-    dispatch(setChannels(newChannels.sort((a, b) => a.order - b.order)));
+    setChannels(newChannels.sort((a, b) => a.order - b.order));
     setCategoryChildren(newCategoryChildren.sort((a, b) => a.order - b.order));
   };
 
@@ -186,6 +184,30 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     return () => window.removeEventListener('click', onClick);
   }, []);
 
+  useEffect(() => {
+    const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
+      const add = new Set(args.map((i) => `${i.data.channelId}`));
+      setChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
+      const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
+      setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('channelRemove', (...args: { channelId: string }[]) => {
+      const remove = new Set(args.map((i) => `${i.channelId}`));
+      setChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
+    });
+    return () => unsub();
+  }, []);
+
   return (
     <div className={popupStyles['popup-wrapper']}>
       <div className={styles['header']}>
@@ -215,7 +237,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         <div className={styles['body']}>
           <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
             {filteredChannels.map((c) =>
-              c.type === 'category' ? <CategoryTab key={c.channelId} category={c} onSelect={handleSelect} /> : <ChannelTab key={c.channelId} channel={c} onSelect={handleSelect} />,
+              c.type === 'category' ? <CategoryTab key={c.channelId} channels={channels} category={c} onSelect={handleSelect} /> : <ChannelTab key={c.channelId} channel={c} onSelect={handleSelect} />,
             )}
           </div>
         </div>
@@ -237,16 +259,16 @@ EditChannelOrderPopup.displayName = 'EditChannelOrderPopup';
 export default EditChannelOrderPopup;
 
 interface CategoryTabProps {
+  channels: (Types.Channel | Types.Category)[];
   category: Types.Category;
   onSelect: (channel: Types.Channel | Types.Category) => void;
 }
 
-const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category, onSelect }) => {
+const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category, onSelect }) => {
   // Hooks
   const dispatch = useAppDispatch();
 
   // Selectors
-  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
 
   // States
