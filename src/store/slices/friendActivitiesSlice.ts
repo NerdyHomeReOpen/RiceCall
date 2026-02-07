@@ -18,7 +18,7 @@ export const friendActivitiesSlice = createSlice({
       state.data = action.payload;
     },
     addFriendActivities: (state, action: PayloadAction<Types.FriendActivity[]>) => {
-      state.data = state.data.concat(action.payload);
+      state.data = action.payload.concat(state.data);
     },
     clearFriendActivities: (state) => {
       state.data = [];
