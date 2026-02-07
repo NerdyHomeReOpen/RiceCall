@@ -526,6 +526,7 @@ const ipc = {
       if (isWebsite()) {
         const listener = (from: string, data: T) => {
           if (from === host) callback(data);
+          webMain.webEventEmitter.removeListener('popup-submit', listener);
         };
         webMain.webEventEmitter.removeListener('popup-submit', listener);
         webMain.webEventEmitter.on('popup-submit', listener);
@@ -533,6 +534,7 @@ const ipc = {
       } else if (isRenderer()) {
         const listener = (_: any, from: string, data: T) => {
           if (from === host) callback(data);
+          ipcRenderer.removeListener('popup-submit', listener);
         };
         ipcRenderer.removeListener('popup-submit', listener);
         ipcRenderer.on('popup-submit', listener);
@@ -577,12 +579,10 @@ const ipc = {
     onUpdate: (callback: (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => void) => {
       if (isWebsite()) {
         const listener = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
-        webMain.webEventEmitter.removeAllListeners('accounts');
         webMain.webEventEmitter.on('accounts', listener);
         return () => webMain.webEventEmitter.removeListener('accounts', listener);
       } else if (isRenderer()) {
         const listener = (_: any, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
-        ipcRenderer.removeAllListeners('accounts');
         ipcRenderer.on('accounts', listener);
         return () => ipcRenderer.removeListener('accounts', listener);
       } else {
@@ -615,12 +615,10 @@ const ipc = {
     onUpdate: (callback: (language: Types.LanguageKey) => void) => {
       if (isWebsite()) {
         const listener = (language: Types.LanguageKey) => callback(language);
-        webMain.webEventEmitter.removeAllListeners('language');
         webMain.webEventEmitter.on('language', listener);
         return () => webMain.webEventEmitter.removeListener('language', listener);
       } else if (isRenderer()) {
         const listener = (_: any, language: Types.LanguageKey) => callback(language);
-        ipcRenderer.removeAllListeners('language');
         ipcRenderer.on('language', listener);
         return () => ipcRenderer.removeListener('language', listener);
       } else {
@@ -663,12 +661,10 @@ const ipc = {
     onUpdate: (callback: (themes: Types.Theme[]) => void) => {
       if (isWebsite()) {
         const listener = (themes: Types.Theme[]) => callback(themes);
-        webMain.webEventEmitter.removeAllListeners('custom-themes');
         webMain.webEventEmitter.on('custom-themes', listener);
         return () => webMain.webEventEmitter.removeListener('custom-themes', listener);
       } else if (isRenderer()) {
         const listener = (_: any, themes: Types.Theme[]) => callback(themes);
-        ipcRenderer.removeAllListeners('custom-themes');
         ipcRenderer.on('custom-themes', listener);
         return () => ipcRenderer.removeListener('custom-themes', listener);
       } else {
@@ -710,12 +706,10 @@ const ipc = {
       onUpdate: (callback: (theme: Types.Theme | null) => void) => {
         if (isWebsite()) {
           const listener = (theme: Types.Theme | null) => callback(theme);
-          webMain.webEventEmitter.removeAllListeners('current-theme');
           webMain.webEventEmitter.on('current-theme', listener);
           return () => webMain.webEventEmitter.removeListener('current-theme', listener);
         } else if (isRenderer()) {
           const listener = (_: any, theme: Types.Theme | null) => callback(theme);
-          ipcRenderer.removeAllListeners('current-theme');
           ipcRenderer.on('current-theme', listener);
           return () => ipcRenderer.removeListener('current-theme', listener);
         } else {
@@ -852,45 +846,45 @@ const ipc = {
   systemSettings: {
     set: (settings: Partial<Types.SystemSettings>) => {
       if (isWebsite()) {
-        webMain.setAutoLogin(settings.autoLogin);
-        webMain.setAutoLaunch(settings.autoLaunch);
-        webMain.setAlwaysOnTop(settings.alwaysOnTop);
-        webMain.setStatusAutoIdle(settings.statusAutoIdle);
-        webMain.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
-        webMain.setStatusAutoDnd(settings.statusAutoDnd);
-        webMain.setChannelUIMode(settings.channelUIMode);
-        webMain.setCloseToTray(settings.closeToTray);
-        webMain.setFontSize(settings.fontSize);
-        webMain.setInputAudioDevice(settings.inputAudioDevice);
-        webMain.setOutputAudioDevice(settings.outputAudioDevice);
-        webMain.setRecordFormat(settings.recordFormat);
-        webMain.setRecordSavePath(settings.recordSavePath);
-        webMain.setMixEffect(settings.mixEffect);
-        webMain.setMixEffectType(settings.mixEffectType);
-        webMain.setAutoMixSetting(settings.autoMixSetting);
-        webMain.setEchoCancellation(settings.echoCancellation);
-        webMain.setNoiseCancellation(settings.noiseCancellation);
-        webMain.setMicrophoneAmplification(settings.microphoneAmplification);
-        webMain.setManualMixMode(settings.manualMixMode);
-        webMain.setMixMode(settings.mixMode);
-        webMain.setSpeakingMode(settings.speakingMode);
-        webMain.setDefaultSpeakingKey(settings.defaultSpeakingKey);
-        webMain.setNotSaveMessageHistory(settings.notSaveMessageHistory);
-        webMain.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
-        webMain.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
-        webMain.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
-        webMain.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
-        webMain.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
-        webMain.setDisableAllSoundEffect(settings.disableAllSoundEffect);
-        webMain.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
-        webMain.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
-        webMain.setStartSpeakingSound(settings.startSpeakingSound);
-        webMain.setStopSpeakingSound(settings.stopSpeakingSound);
-        webMain.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
-        webMain.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
-        webMain.setAutoCheckForUpdates(settings.autoCheckForUpdates);
-        webMain.setUpdateCheckInterval(settings.updateCheckInterval);
-        webMain.setUpdateChannel(settings.updateChannel);
+        if (settings.autoLogin !== undefined) webMain.setAutoLogin(settings.autoLogin);
+        if (settings.autoLaunch !== undefined) webMain.setAutoLaunch(settings.autoLaunch);
+        if (settings.alwaysOnTop !== undefined) webMain.setAlwaysOnTop(settings.alwaysOnTop);
+        if (settings.statusAutoIdle !== undefined) webMain.setStatusAutoIdle(settings.statusAutoIdle);
+        if (settings.statusAutoIdleMinutes !== undefined) webMain.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
+        if (settings.channelUIMode !== undefined) webMain.setChannelUIMode(settings.channelUIMode);
+        if (settings.closeToTray !== undefined) webMain.setCloseToTray(settings.closeToTray);
+        if (settings.font !== undefined) webMain.setFont(settings.font);
+        if (settings.fontSize !== undefined) webMain.setFontSize(settings.fontSize);
+        if (settings.inputAudioDevice !== undefined) webMain.setInputAudioDevice(settings.inputAudioDevice);
+        if (settings.outputAudioDevice !== undefined) webMain.setOutputAudioDevice(settings.outputAudioDevice);
+        if (settings.recordFormat !== undefined) webMain.setRecordFormat(settings.recordFormat);
+        if (settings.recordSavePath !== undefined) webMain.setRecordSavePath(settings.recordSavePath);
+        if (settings.mixEffect !== undefined) webMain.setMixEffect(settings.mixEffect);
+        if (settings.mixEffectType !== undefined) webMain.setMixEffectType(settings.mixEffectType);
+        if (settings.autoMixSetting !== undefined) webMain.setAutoMixSetting(settings.autoMixSetting);
+        if (settings.echoCancellation !== undefined) webMain.setEchoCancellation(settings.echoCancellation);
+        if (settings.noiseCancellation !== undefined) webMain.setNoiseCancellation(settings.noiseCancellation);
+        if (settings.microphoneAmplification !== undefined) webMain.setMicrophoneAmplification(settings.microphoneAmplification);
+        if (settings.manualMixMode !== undefined) webMain.setManualMixMode(settings.manualMixMode);
+        if (settings.mixMode !== undefined) webMain.setMixMode(settings.mixMode);
+        if (settings.speakingMode !== undefined) webMain.setSpeakingMode(settings.speakingMode);
+        if (settings.defaultSpeakingKey !== undefined) webMain.setDefaultSpeakingKey(settings.defaultSpeakingKey);
+        if (settings.notSaveMessageHistory !== undefined) webMain.setNotSaveMessageHistory(settings.notSaveMessageHistory);
+        if (settings.hotKeyOpenMainWindow !== undefined) webMain.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
+        if (settings.hotKeyIncreaseVolume !== undefined) webMain.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
+        if (settings.hotKeyDecreaseVolume !== undefined) webMain.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
+        if (settings.hotKeyToggleSpeaker !== undefined) webMain.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
+        if (settings.hotKeyToggleMicrophone !== undefined) webMain.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
+        if (settings.disableAllSoundEffect !== undefined) webMain.setDisableAllSoundEffect(settings.disableAllSoundEffect);
+        if (settings.enterVoiceChannelSound !== undefined) webMain.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
+        if (settings.leaveVoiceChannelSound !== undefined) webMain.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
+        if (settings.startSpeakingSound !== undefined) webMain.setStartSpeakingSound(settings.startSpeakingSound);
+        if (settings.stopSpeakingSound !== undefined) webMain.setStopSpeakingSound(settings.stopSpeakingSound);
+        if (settings.receiveDirectMessageSound !== undefined) webMain.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
+        if (settings.receiveChannelMessageSound !== undefined) webMain.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
+        if (settings.autoCheckForUpdates !== undefined) webMain.setAutoCheckForUpdates(settings.autoCheckForUpdates);
+        if (settings.updateCheckInterval !== undefined) webMain.setUpdateCheckInterval(settings.updateCheckInterval);
+        if (settings.updateChannel !== undefined) webMain.setUpdateChannel(settings.updateChannel);
       } else if (isRenderer()) {
         if (settings.autoLogin !== undefined) ipcRenderer.send('set-auto-login', settings.autoLogin);
         if (settings.autoLaunch !== undefined) ipcRenderer.send('set-auto-launch', settings.autoLaunch);
@@ -971,12 +965,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('auto-login');
           webMain.webEventEmitter.on('auto-login', listener);
           return () => webMain.webEventEmitter.removeListener('auto-login', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('auto-login');
           ipcRenderer.on('auto-login', listener);
           return () => ipcRenderer.removeListener('auto-login', listener);
         } else {
@@ -1009,12 +1001,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('auto-launch');
           webMain.webEventEmitter.on('auto-launch', listener);
           return () => webMain.webEventEmitter.removeListener('auto-launch', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('auto-launch');
           ipcRenderer.on('auto-launch', listener);
           return () => ipcRenderer.removeListener('auto-launch', listener);
         } else {
@@ -1047,12 +1037,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('always-on-top');
           webMain.webEventEmitter.on('always-on-top', listener);
           return () => webMain.webEventEmitter.removeListener('always-on-top', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('always-on-top');
           ipcRenderer.on('always-on-top', listener);
           return () => ipcRenderer.removeListener('always-on-top', listener);
         } else {
@@ -1085,12 +1073,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('status-auto-idle');
           webMain.webEventEmitter.on('status-auto-idle', listener);
           return () => webMain.webEventEmitter.removeListener('status-auto-idle', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('status-auto-idle');
           ipcRenderer.on('status-auto-idle', listener);
           return () => ipcRenderer.removeListener('status-auto-idle', listener);
         } else {
@@ -1123,12 +1109,10 @@ const ipc = {
       onUpdate: (callback: (fontSize: number) => void) => {
         if (isWebsite()) {
           const listener = (fontSize: number) => callback(fontSize);
-          webMain.webEventEmitter.removeAllListeners('status-auto-idle-minutes');
           webMain.webEventEmitter.on('status-auto-idle-minutes', listener);
           return () => webMain.webEventEmitter.removeListener('status-auto-idle-minutes', listener);
         } else if (isRenderer()) {
           const listener = (_: any, fontSize: number) => callback(fontSize);
-          ipcRenderer.removeAllListeners('status-auto-idle-minutes');
           ipcRenderer.on('status-auto-idle-minutes', listener);
           return () => ipcRenderer.removeListener('status-auto-idle-minutes', listener);
         } else {
@@ -1161,12 +1145,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('status-auto-dnd');
           webMain.webEventEmitter.on('status-auto-dnd', listener);
           return () => webMain.webEventEmitter.removeListener('status-auto-dnd', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('status-auto-dnd');
           ipcRenderer.on('status-auto-dnd', listener);
           return () => ipcRenderer.removeListener('status-auto-dnd', listener);
         } else {
@@ -1199,12 +1181,10 @@ const ipc = {
       onUpdate: (callback: (key: Types.ChannelUIMode) => void) => {
         if (isWebsite()) {
           const listener = (channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
-          webMain.webEventEmitter.removeAllListeners('channel-ui-mode');
           webMain.webEventEmitter.on('channel-ui-mode', listener);
           return () => webMain.webEventEmitter.removeListener('channel-ui-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
-          ipcRenderer.removeAllListeners('channel-ui-mode');
           ipcRenderer.on('channel-ui-mode', listener);
           return () => ipcRenderer.removeListener('channel-ui-mode', listener);
         } else {
@@ -1237,12 +1217,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('close-to-tray');
           webMain.webEventEmitter.on('close-to-tray', listener);
           return () => webMain.webEventEmitter.removeListener('close-to-tray', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('close-to-tray');
           ipcRenderer.on('close-to-tray', listener);
           return () => ipcRenderer.removeListener('close-to-tray', listener);
         } else {
@@ -1275,12 +1253,10 @@ const ipc = {
       onUpdate: (callback: (font: string) => void) => {
         if (isWebsite()) {
           const listener = (font: string) => callback(font);
-          webMain.webEventEmitter.removeAllListeners('font');
           webMain.webEventEmitter.on('font', listener);
           return () => webMain.webEventEmitter.removeListener('font', listener);
         } else if (isRenderer()) {
           const listener = (_: any, font: string) => callback(font);
-          ipcRenderer.removeAllListeners('font');
           ipcRenderer.on('font', listener);
           return () => ipcRenderer.removeListener('font', listener);
         } else {
@@ -1313,12 +1289,10 @@ const ipc = {
       onUpdate: (callback: (fontSize: number) => void) => {
         if (isWebsite()) {
           const listener = (fontSize: number) => callback(fontSize);
-          webMain.webEventEmitter.removeAllListeners('font-size');
           webMain.webEventEmitter.on('font-size', listener);
           return () => webMain.webEventEmitter.removeListener('font-size', listener);
         } else if (isRenderer()) {
           const listener = (_: any, fontSize: number) => callback(fontSize);
-          ipcRenderer.removeAllListeners('font-size');
           ipcRenderer.on('font-size', listener);
           return () => ipcRenderer.removeListener('font-size', listener);
         } else {
@@ -1351,12 +1325,10 @@ const ipc = {
       onUpdate: (callback: (deviceId: string) => void) => {
         if (isWebsite()) {
           const listener = (deviceId: string) => callback(deviceId);
-          webMain.webEventEmitter.removeAllListeners('input-audio-device');
           webMain.webEventEmitter.on('input-audio-device', listener);
           return () => webMain.webEventEmitter.removeListener('input-audio-device', listener);
         } else if (isRenderer()) {
           const listener = (_: any, deviceId: string) => callback(deviceId);
-          ipcRenderer.removeAllListeners('input-audio-device');
           ipcRenderer.on('input-audio-device', listener);
           return () => ipcRenderer.removeListener('input-audio-device', listener);
         } else {
@@ -1389,12 +1361,10 @@ const ipc = {
       onUpdate: (callback: (deviceId: string) => void) => {
         if (isWebsite()) {
           const listener = (deviceId: string) => callback(deviceId);
-          webMain.webEventEmitter.removeAllListeners('output-audio-device');
           webMain.webEventEmitter.on('output-audio-device', listener);
           return () => webMain.webEventEmitter.removeListener('output-audio-device', listener);
         } else if (isRenderer()) {
           const listener = (_: any, deviceId: string) => callback(deviceId);
-          ipcRenderer.removeAllListeners('output-audio-device');
           ipcRenderer.on('output-audio-device', listener);
           return () => ipcRenderer.removeListener('output-audio-device', listener);
         } else {
@@ -1427,12 +1397,10 @@ const ipc = {
       onUpdate: (callback: (format: Types.RecordFormat) => void) => {
         if (isWebsite()) {
           const listener = (format: Types.RecordFormat) => callback(format);
-          webMain.webEventEmitter.removeAllListeners('record-format');
           webMain.webEventEmitter.on('record-format', listener);
           return () => webMain.webEventEmitter.removeListener('record-format', listener);
         } else if (isRenderer()) {
           const listener = (_: any, format: Types.RecordFormat) => callback(format);
-          ipcRenderer.removeAllListeners('record-format');
           ipcRenderer.on('record-format', listener);
           return () => ipcRenderer.removeListener('record-format', listener);
         } else {
@@ -1465,12 +1433,10 @@ const ipc = {
       onUpdate: (callback: (path: string) => void) => {
         if (isWebsite()) {
           const listener = (path: string) => callback(path);
-          webMain.webEventEmitter.removeAllListeners('record-save-path');
           webMain.webEventEmitter.on('record-save-path', listener);
           return () => webMain.webEventEmitter.removeListener('record-save-path', listener);
         } else if (isRenderer()) {
           const listener = (_: any, path: string) => callback(path);
-          ipcRenderer.removeAllListeners('record-save-path');
           ipcRenderer.on('record-save-path', listener);
           return () => ipcRenderer.removeListener('record-save-path', listener);
         } else {
@@ -1503,12 +1469,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('mix-effect');
           webMain.webEventEmitter.on('mix-effect', listener);
           return () => webMain.webEventEmitter.removeListener('mix-effect', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('mix-effect');
           ipcRenderer.on('mix-effect', listener);
           return () => ipcRenderer.removeListener('mix-effect', listener);
         } else {
@@ -1541,12 +1505,10 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('mix-effect-type');
           webMain.webEventEmitter.on('mix-effect-type', listener);
           return () => webMain.webEventEmitter.removeListener('mix-effect-type', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.removeAllListeners('mix-effect-type');
           ipcRenderer.on('mix-effect-type', listener);
           return () => ipcRenderer.removeListener('mix-effect-type', listener);
         } else {
@@ -1579,12 +1541,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('auto-mix-setting');
           webMain.webEventEmitter.on('auto-mix-setting', listener);
           return () => webMain.webEventEmitter.removeListener('auto-mix-setting', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('auto-mix-setting');
           ipcRenderer.on('auto-mix-setting', listener);
           return () => ipcRenderer.removeListener('auto-mix-setting', listener);
         } else {
@@ -1617,12 +1577,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('echo-cancellation');
           webMain.webEventEmitter.on('echo-cancellation', listener);
           return () => webMain.webEventEmitter.removeListener('echo-cancellation', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('echo-cancellation');
           ipcRenderer.on('echo-cancellation', listener);
           return () => ipcRenderer.removeListener('echo-cancellation', listener);
         } else {
@@ -1655,12 +1613,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('noise-cancellation');
           webMain.webEventEmitter.on('noise-cancellation', listener);
           return () => webMain.webEventEmitter.removeListener('noise-cancellation', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('noise-cancellation');
           ipcRenderer.on('noise-cancellation', listener);
           return () => ipcRenderer.removeListener('noise-cancellation', listener);
         } else {
@@ -1693,12 +1649,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('microphone-amplification');
           webMain.webEventEmitter.on('microphone-amplification', listener);
           return () => webMain.webEventEmitter.removeListener('microphone-amplification', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('microphone-amplification');
           ipcRenderer.on('microphone-amplification', listener);
           return () => ipcRenderer.removeListener('microphone-amplification', listener);
         } else {
@@ -1731,12 +1685,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('manual-mix-mode');
           webMain.webEventEmitter.on('manual-mix-mode', listener);
           return () => webMain.webEventEmitter.removeListener('manual-mix-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('manual-mix-mode');
           ipcRenderer.on('manual-mix-mode', listener);
           return () => ipcRenderer.removeListener('manual-mix-mode', listener);
         } else {
@@ -1769,12 +1721,10 @@ const ipc = {
       onUpdate: (callback: (key: Types.MixMode) => void) => {
         if (isWebsite()) {
           const listener = (key: Types.MixMode) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('mix-mode');
           webMain.webEventEmitter.on('mix-mode', listener);
           return () => webMain.webEventEmitter.removeListener('mix-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: Types.MixMode) => callback(key);
-          ipcRenderer.removeAllListeners('mix-mode');
           ipcRenderer.on('mix-mode', listener);
           return () => ipcRenderer.removeListener('mix-mode', listener);
         } else {
@@ -1807,12 +1757,10 @@ const ipc = {
       onUpdate: (callback: (key: Types.SpeakingMode) => void) => {
         if (isWebsite()) {
           const listener = (key: Types.SpeakingMode) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('speaking-mode');
           webMain.webEventEmitter.on('speaking-mode', listener);
           return () => webMain.webEventEmitter.removeListener('speaking-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: Types.SpeakingMode) => callback(key);
-          ipcRenderer.removeAllListeners('speaking-mode');
           ipcRenderer.on('speaking-mode', listener);
           return () => ipcRenderer.removeListener('speaking-mode', listener);
         } else {
@@ -1845,12 +1793,10 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('default-speaking-key');
           webMain.webEventEmitter.on('default-speaking-key', listener);
           return () => webMain.webEventEmitter.removeListener('default-speaking-key', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.removeAllListeners('default-speaking-key');
           ipcRenderer.on('default-speaking-key', listener);
           return () => ipcRenderer.removeListener('default-speaking-key', listener);
         } else {
@@ -1883,12 +1829,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('not-save-message-history');
           webMain.webEventEmitter.on('not-save-message-history', listener);
           return () => webMain.webEventEmitter.removeListener('not-save-message-history', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('not-save-message-history');
           ipcRenderer.on('not-save-message-history', listener);
           return () => ipcRenderer.removeListener('not-save-message-history', listener);
         } else {
@@ -1921,12 +1865,10 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('hot-key-open-main-window');
           webMain.webEventEmitter.on('hot-key-open-main-window', listener);
           return () => webMain.webEventEmitter.removeListener('hot-key-open-main-window', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.removeAllListeners('hot-key-open-main-window');
           ipcRenderer.on('hot-key-open-main-window', listener);
           return () => ipcRenderer.removeListener('hot-key-open-main-window', listener);
         } else {
@@ -1959,12 +1901,10 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('hot-key-increase-volume');
           webMain.webEventEmitter.on('hot-key-increase-volume', listener);
           return () => webMain.webEventEmitter.removeListener('hot-key-increase-volume', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.removeAllListeners('hot-key-increase-volume');
           ipcRenderer.on('hot-key-increase-volume', listener);
           return () => ipcRenderer.removeListener('hot-key-increase-volume', listener);
         } else {
@@ -1997,12 +1937,10 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('hot-key-decrease-volume');
           webMain.webEventEmitter.on('hot-key-decrease-volume', listener);
           return () => webMain.webEventEmitter.removeListener('hot-key-decrease-volume', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.removeAllListeners('hot-key-decrease-volume');
           ipcRenderer.on('hot-key-decrease-volume', listener);
           return () => ipcRenderer.removeListener('hot-key-decrease-volume', listener);
         } else {
@@ -2035,12 +1973,10 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('hot-key-toggle-speaker');
           webMain.webEventEmitter.on('hot-key-toggle-speaker', listener);
           return () => webMain.webEventEmitter.removeListener('hot-key-toggle-speaker', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.removeAllListeners('hot-key-toggle-speaker');
           ipcRenderer.on('hot-key-toggle-speaker', listener);
           return () => ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
         } else {
@@ -2073,12 +2009,10 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.removeAllListeners('hot-key-toggle-microphone');
           webMain.webEventEmitter.on('hot-key-toggle-microphone', listener);
           return () => webMain.webEventEmitter.removeListener('hot-key-toggle-microphone', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.removeAllListeners('hot-key-toggle-microphone');
           ipcRenderer.on('hot-key-toggle-microphone', listener);
           return () => ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
         } else {
@@ -2111,12 +2045,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('disable-all-sound-effect');
           webMain.webEventEmitter.on('disable-all-sound-effect', listener);
           return () => webMain.webEventEmitter.removeListener('disable-all-sound-effect', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('disable-all-sound-effect');
           ipcRenderer.on('disable-all-sound-effect', listener);
           return () => ipcRenderer.removeListener('disable-all-sound-effect', listener);
         } else {
@@ -2149,12 +2081,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('enter-voice-channel-effect');
           webMain.webEventEmitter.on('enter-voice-channel-sound', listener);
           return () => webMain.webEventEmitter.removeListener('enter-voice-channel-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('enter-voice-channel-sound');
           ipcRenderer.on('enter-voice-channel-sound', listener);
           return () => ipcRenderer.removeListener('enter-voice-channel-sound', listener);
         } else {
@@ -2187,12 +2117,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('leave-voice-channel-sound');
           webMain.webEventEmitter.on('leave-voice-channel-sound', listener);
           return () => webMain.webEventEmitter.removeListener('leave-voice-channel-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('leave-voice-channel-sound');
           ipcRenderer.on('leave-voice-channel-sound', listener);
           return () => ipcRenderer.removeListener('leave-voice-channel-sound', listener);
         } else {
@@ -2225,12 +2153,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('start-speaking-sound');
           webMain.webEventEmitter.on('start-speaking-sound', listener);
           return () => webMain.webEventEmitter.removeListener('start-speaking-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('start-speaking-sound');
           ipcRenderer.on('start-speaking-sound', listener);
           return () => ipcRenderer.removeListener('start-speaking-sound', listener);
         } else {
@@ -2263,12 +2189,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('stop-speaking-sound');
           webMain.webEventEmitter.on('stop-speaking-sound', listener);
           return () => webMain.webEventEmitter.removeListener('stop-speaking-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('stop-speaking-sound');
           ipcRenderer.on('stop-speaking-sound', listener);
           return () => ipcRenderer.removeListener('stop-speaking-sound', listener);
         } else {
@@ -2301,12 +2225,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('receive-direct-message-sound');
           webMain.webEventEmitter.on('receive-direct-message-sound', listener);
           return () => webMain.webEventEmitter.removeListener('receive-direct-message-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('receive-direct-message-sound');
           ipcRenderer.on('receive-direct-message-sound', listener);
           return () => ipcRenderer.removeListener('receive-direct-message-sound', listener);
         } else {
@@ -2339,12 +2261,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('receive-channel-message-sound');
           webMain.webEventEmitter.on('receive-channel-message-sound', listener);
           return () => webMain.webEventEmitter.removeListener('receive-channel-message-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('receive-channel-message-sound');
           ipcRenderer.on('receive-channel-message-sound', listener);
           return () => ipcRenderer.removeListener('receive-channel-message-sound', listener);
         } else {
@@ -2377,12 +2297,10 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.removeAllListeners('auto-check-for-updates');
           webMain.webEventEmitter.on('auto-check-for-updates', listener);
           return () => webMain.webEventEmitter.removeListener('auto-check-for-updates', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.removeAllListeners('auto-check-for-updates');
           ipcRenderer.on('auto-check-for-updates', listener);
           return () => ipcRenderer.removeListener('auto-check-for-updates', listener);
         } else {
@@ -2415,12 +2333,10 @@ const ipc = {
       onUpdate: (callback: (interval: number) => void) => {
         if (isWebsite()) {
           const listener = (interval: number) => callback(interval);
-          webMain.webEventEmitter.removeAllListeners('update-check-interval');
           webMain.webEventEmitter.on('update-check-interval', listener);
           return () => webMain.webEventEmitter.removeListener('update-check-interval', listener);
         } else if (isRenderer()) {
           const listener = (_: any, interval: number) => callback(interval);
-          ipcRenderer.removeAllListeners('update-check-interval');
           ipcRenderer.on('update-check-interval', listener);
           return () => ipcRenderer.removeListener('update-check-interval', listener);
         } else {
@@ -2453,12 +2369,10 @@ const ipc = {
       onUpdate: (callback: (channel: string) => void) => {
         if (isWebsite()) {
           const listener = (channel: string) => callback(channel);
-          webMain.webEventEmitter.removeAllListeners('update-channel');
           webMain.webEventEmitter.on('update-channel', listener);
           return () => webMain.webEventEmitter.removeListener('update-channel', listener);
         } else if (isRenderer()) {
           const listener = (_: any, channel: string) => callback(channel);
-          ipcRenderer.removeAllListeners('update-channel');
           ipcRenderer.on('update-channel', listener);
           return () => ipcRenderer.removeListener('update-channel', listener);
         } else {

@@ -116,6 +116,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
 
   const handleTabDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
+    e.dataTransfer.clearData();
     e.dataTransfer.setData('moveUserEvent/userIds', JSON.stringify(movableCategoryUserIds));
     e.dataTransfer.setData('moveUserEvent/currentChannelId', category.channelId);
   };
@@ -127,13 +128,13 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
 
   const handleTabDrop = (e: React.DragEvent) => {
     if (isReadonlyChannel) return;
-    e.preventDefault();
+    e.stopPropagation();
     const userIds = JSON.parse(e.dataTransfer.getData('moveUserEvent/userIds')) as string[];
     const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
     if (!currentChannelId || !userIds || userIds.length === 0) return;
     if (currentChannelId === category.channelId || isReadonlyChannel) return;
-    if (userIds.length === 1) Popup.moveUserToChannel(userIds[0], currentServer.serverId, category.channelId);
-    else Popup.moveAllUsersToChannel(userIds, currentServer.serverId, category.channelId);
+    Popup.moveAllUsersToChannel(userIds, currentServer.serverId, category.channelId);
+    e.dataTransfer.clearData();
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

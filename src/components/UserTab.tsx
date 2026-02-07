@@ -143,7 +143,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
       .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => Popup.openInviteMember(member.userId, currentServer.serverId))
       .addMemberManagementOption(
         { permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId },
-        () => {},
+        () => { },
         getMemberManagementSubmenuItems(),
       )
       .build();
@@ -161,6 +161,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
 
   const handleTabDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
+    e.dataTransfer.clearData();
     e.dataTransfer.setData('moveUserEvent/userIds', JSON.stringify([member.userId]));
     e.dataTransfer.setData('moveUserEvent/currentChannelId', member.currentChannelId || '');
   };

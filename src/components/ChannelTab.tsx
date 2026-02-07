@@ -142,6 +142,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
 
   const handleTabDragStart = (e: React.DragEvent) => {
     if (!isDraggable) return;
+    e.dataTransfer.clearData();
     e.dataTransfer.setData('moveUserEvent/userIds', JSON.stringify(movableChannelUserIds));
     e.dataTransfer.setData('moveUserEvent/currentChannelId', channel.channelId);
   };
@@ -153,13 +154,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
 
   const handleTabDrop = (e: React.DragEvent) => {
     if (isReadonlyChannel) return;
-    e.preventDefault();
+    e.stopPropagation();
     const userIds = JSON.parse(e.dataTransfer.getData('moveUserEvent/userIds')) as string[];
     const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
     if (!currentChannelId || !userIds || userIds.length === 0) return;
     if (currentChannelId === channel.channelId || isReadonlyChannel) return;
-    if (userIds.length === 1) Popup.moveUserToChannel(userIds[0], currentServer.serverId, channel.channelId);
-    else Popup.moveAllUsersToChannel(userIds, currentServer.serverId, channel.channelId);
+    Popup.moveAllUsersToChannel(userIds, currentServer.serverId, channel.channelId);
+    e.dataTransfer.clearData();
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
