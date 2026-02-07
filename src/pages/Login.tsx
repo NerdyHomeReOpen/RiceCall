@@ -72,17 +72,6 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     await ipc.auth.login({ account, password }).then((res) => {
       if (res.success) {
         if (rememberAccount) ipc.accounts.add(account, { autoLogin, rememberAccount, password });
-        // Persist userId for app bootstrapping. In web mode we don't have Electron main to set it.
-        try {
-          const payload = res.token.split('.')[1];
-          if (payload) {
-            const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/')));
-            const userId = json?.userId || json?.uid || json?.id;
-            if (userId) localStorage.setItem('userId', String(userId));
-          }
-        } catch {
-          // Ignore if token isn't a JWT
-        }
         localStorage.setItem('login-account', account);
       }
     });
