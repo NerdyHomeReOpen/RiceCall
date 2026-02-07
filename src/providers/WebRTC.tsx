@@ -604,6 +604,28 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     [removeSpeakerAudio],
   );
 
+  const logTransportStats = useCallback(async (transport: mediasoupClient.types.Transport, direction: string, channelId: string) => {
+    try {
+      const stats = await transport.getStats();
+      stats.forEach((report) => {
+        if (report.type === 'candidate-pair' && report.selected) {
+          const info = {
+            state: report.state,
+            currentRoundTripTime: report.currentRoundTripTime,
+            requestsSent: report.requestsSent,
+            responsesReceived: report.responsesReceived,
+            localCandidateId: report.localCandidateId,
+            remoteCandidateId: report.remoteCandidateId,
+          };
+          new Logger('WebRTC').error(`🚨 [${direction}斷線診斷] ICE Pair 詳細數據: ${JSON.stringify(info)}`);
+          ipc.webrtc.confirmSignal({ signalState: 'disconnected', userId: localStorage.getItem('userId') || '', channelId, stats: info });
+        }
+      });
+    } catch (err) {
+      new Logger('WebRTC').error(`無法取得 ${direction} Stats: ${err}`);
+    }
+  }, []);
+
   const setupSend = useCallback(async (channelId: string) => {
     if (sendTransportRef.current) {
       sendTransportRef.current.close();
@@ -652,7 +674,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     });
     sendTransportRef.current.on('connectionstatechange', (s) => {
       if (s == "failed" || s == "disconnected") {
-        ipc.webrtc.confirmSignal({ signalState: s, userId: localStorage.getItem('userId') || '', channelId });
+        if (s === 'disconnected' && sendTransportRef.current) {
+          logTransportStats(sendTransportRef.current, 'send', channelId);
+        } else {
+           ipc.webrtc.confirmSignal({ signalState: s, userId: localStorage.getItem('userId') || '', channelId });
+        }
       }
       new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
     });
@@ -678,7 +704,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       new Logger('WebRTC').info('Producer track ended');
       audioProducerRef.current?.close();
     });
-  }, []);
+  }, [logTransportStats]);
 
   const setupRecv = useCallback(
     async (channelId: string) => {
