@@ -107,11 +107,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel }, () =>
         Popup.openInviteMember(messageGroup.userId, currentServer.serverId),
       )
-      .addMemberManagementOption(
-        { permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId },
-        () => {},
-        getMemberManagementSubmenuItems(),
-      )
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: messageGroup.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
   // Handlers

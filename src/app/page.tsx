@@ -121,7 +121,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
           onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
           onAboutUsClick: Popup.openAboutUs,
         },
-        () => { },
+        () => {},
       )
       .addNetworkDiagnosisOption(() => Popup.openNetworkDiagnosis())
       .addLogoutOption(() => logout())
@@ -166,7 +166,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: false,
       contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => { },
+      onClick: () => {},
     },
   ];
 

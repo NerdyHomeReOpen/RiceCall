@@ -448,11 +448,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(member.userId, server.serverId))
                         .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(member.userId, server.serverId))
                         .addSeparator()
-                        .addMemberManagementOption(
-                          { permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: null },
-                          () => {},
-                          getMemberManagementSubmenuItems(),
-                        )
+                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
                         .build();
 
                     // Handlers

@@ -543,11 +543,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                         .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(moderator.userId, server.serverId))
                         .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(moderator.userId, server.serverId))
                         .addSeparator()
-                        .addMemberManagementOption(
-                          { permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId },
-                          () => {},
-                          getMemberManagementSubmenuItems(),
-                        )
+                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
                         .build();
 
                     // Handlers

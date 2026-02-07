@@ -141,11 +141,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
       .addSeparator()
       .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => Popup.terminateMember(user.userId, currentServer.serverId, t('self')))
       .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => Popup.openInviteMember(member.userId, currentServer.serverId))
-      .addMemberManagementOption(
-        { permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId },
-        () => { },
-        getMemberManagementSubmenuItems(),
-      )
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
   // Handlers

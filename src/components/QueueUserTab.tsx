@@ -143,11 +143,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
         Popup.openInviteMember(queueMember.userId, currentServer.serverId),
       )
-      .addMemberManagementOption(
-        { permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannel.categoryId },
-        () => {},
-        getMemberManagementSubmenuItems(),
-      )
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
       .build();
 
   // Handlers
