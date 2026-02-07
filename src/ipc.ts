@@ -5,30 +5,35 @@ import { isElectron, isRenderer, isWebsite } from '@/platform/isElectron';
 import * as Types from '@/types';
 
 import Logger from '@/logger';
+import { IpcRenderer } from 'electron';
 
-// Safe references initialized on first use
-let ipcRenderer: any = null;
-let webMain: any = null;
 
-if (isElectron()) {
-  // In Renderer environment, supplement ipcRenderer
-  if (!ipcRenderer && isRenderer()) {
-    try {
-      ipcRenderer = window.require('electron').ipcRenderer;
-    } catch (error) {
-      new Logger('IPC').error(`Failed to require electron: ${error}`);
+let _ipcRenderer: IpcRenderer | null = null;
+let _webMain: typeof import('@/web/main') | null = null;
+
+const modules = {
+  get ipcRenderer() : IpcRenderer {
+    if (!_ipcRenderer && isRenderer()) {
+      _ipcRenderer = window.require('electron').ipcRenderer;
     }
+    return _ipcRenderer!;
+  },
+  get webMain() : typeof import('@/web/main') {
+    if (!_webMain && isWebsite()) {
+      _webMain = require('@/web/main');
+    }
+    return _webMain!;
   }
-} else {
-  webMain = require('@/web/main');
-}
+};
+
+
 
 const ipc = {
   exit: () => {
     if (isWebsite()) {
-      webMain.exit();
+      modules.webMain.exit();
     } else if (isRenderer()) {
-      ipcRenderer.send('exit');
+      modules.ipcRenderer.send('exit');
     } else {
       throw new Error('Unsupported platform');
     }
@@ -37,9 +42,9 @@ const ipc = {
   socket: {
     send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => {
       if (isWebsite()) {
-        return webMain.socketSend(event, ...args);
+        return modules.webMain.socketSend(event, ...args);
       } else if (isRenderer()) {
-        ipcRenderer.send(event, ...args);
+        modules.ipcRenderer.send(event, ...args);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -48,12 +53,12 @@ const ipc = {
     on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) => {
       if (isWebsite()) {
         const listener = (...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
-        webMain.webEventEmitter.on(event, listener);
-        return () => webMain.webEventEmitter.removeListener(event, listener);
+        modules.webMain.webEventEmitter.on(event, listener);
+        return () => modules.webMain.webEventEmitter.removeListener(event, listener);
       } else if (isRenderer()) {
         const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
-        ipcRenderer.on(event, listener);
-        return () => ipcRenderer.removeListener(event, listener);
+        modules.ipcRenderer.on(event, listener);
+        return () => modules.ipcRenderer.removeListener(event, listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -61,10 +66,10 @@ const ipc = {
 
     emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => {
       if (isWebsite()) {
-        return webMain.socketEmit(event, payload);
+        return modules.webMain.socketEmit(event, payload);
       } else if (isRenderer()) {
         return new Promise((resolve, reject) => {
-          ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
+          modules.ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
             if (ack?.ok) resolve(ack.data);
             else reject(new Error(ack?.error || 'unknown error'));
           });
@@ -78,9 +83,9 @@ const ipc = {
   auth: {
     login: async (formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> => {
       if (isWebsite()) {
-        return await webMain.login(formData);
+        return await modules.webMain.login(formData);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('auth-login', formData);
+        return await modules.ipcRenderer.invoke('auth-login', formData);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -88,9 +93,9 @@ const ipc = {
 
     logout: async (): Promise<void> => {
       if (isWebsite()) {
-        return await webMain.logout();
+        return await modules.webMain.logout();
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('auth-logout');
+        return await modules.ipcRenderer.invoke('auth-logout');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -98,9 +103,9 @@ const ipc = {
 
     register: async (formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> => {
       if (isWebsite()) {
-        return await webMain.register(formData);
+        return await modules.webMain.register(formData);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('auth-register', formData);
+        return await modules.ipcRenderer.invoke('auth-register', formData);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -108,9 +113,9 @@ const ipc = {
 
     autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
       if (isWebsite()) {
-        return await webMain.autoLogin(token);
+        return await modules.webMain.autoLogin(token);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('auth-auto-login', token);
+        return await modules.ipcRenderer.invoke('auth-auto-login', token);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -120,9 +125,9 @@ const ipc = {
   data: {
     user: async (params: { userId: string }): Promise<Types.User | null> => {
       if (isWebsite()) {
-        return await webMain.dataUser(params);
+        return await modules.webMain.dataUser(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-user', params);
+        return await modules.ipcRenderer.invoke('data-user', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -130,9 +135,9 @@ const ipc = {
 
     userHotReload: async (params: { userId: string }): Promise<Types.User | null> => {
       if (isWebsite()) {
-        return await webMain.dataUserHotReload(params);
+        return await modules.webMain.dataUserHotReload(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-user-hot-reload', params);
+        return await modules.ipcRenderer.invoke('data-user-hot-reload', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -140,9 +145,9 @@ const ipc = {
 
     friend: async (params: { userId: string; targetId: string }): Promise<Types.Friend | null> => {
       if (isWebsite()) {
-        return await webMain.dataFriend(params);
+        return await modules.webMain.dataFriend(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-friend', params);
+        return await modules.ipcRenderer.invoke('data-friend', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -150,9 +155,9 @@ const ipc = {
 
     friends: async (params: { userId: string }): Promise<Types.Friend[]> => {
       if (isWebsite()) {
-        return await webMain.dataFriends(params);
+        return await modules.webMain.dataFriends(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-friends', params);
+        return await modules.ipcRenderer.invoke('data-friends', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -160,9 +165,9 @@ const ipc = {
 
     friendActivities: async (params: { userId: string }): Promise<Types.FriendActivity[]> => {
       if (isWebsite()) {
-        return await webMain.dataFriendActivities(params);
+        return await modules.webMain.dataFriendActivities(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-friendActivities', params);
+        return await modules.ipcRenderer.invoke('data-friendActivities', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -170,9 +175,9 @@ const ipc = {
 
     friendGroup: async (params: { userId: string; friendGroupId: string }): Promise<Types.FriendGroup | null> => {
       if (isWebsite()) {
-        return await webMain.dataFriendGroup(params);
+        return await modules.webMain.dataFriendGroup(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-friendGroup', params);
+        return await modules.ipcRenderer.invoke('data-friendGroup', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -180,9 +185,9 @@ const ipc = {
 
     friendGroups: async (params: { userId: string }): Promise<Types.FriendGroup[]> => {
       if (isWebsite()) {
-        return await webMain.dataFriendGroups(params);
+        return await modules.webMain.dataFriendGroups(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-friendGroups', params);
+        return await modules.ipcRenderer.invoke('data-friendGroups', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -190,9 +195,9 @@ const ipc = {
 
     friendApplication: async (params: { receiverId: string; senderId: string }): Promise<Types.FriendApplication | null> => {
       if (isWebsite()) {
-        return await webMain.dataFriendApplication(params);
+        return await modules.webMain.dataFriendApplication(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-friendApplication', params);
+        return await modules.ipcRenderer.invoke('data-friendApplication', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -200,9 +205,9 @@ const ipc = {
 
     friendApplications: async (params: { receiverId: string }): Promise<Types.FriendApplication[]> => {
       if (isWebsite()) {
-        return await webMain.dataFriendApplications(params);
+        return await modules.webMain.dataFriendApplications(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-friendApplications', params);
+        return await modules.ipcRenderer.invoke('data-friendApplications', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -210,9 +215,9 @@ const ipc = {
 
     server: async (params: { userId: string; serverId: string }): Promise<Types.Server | null> => {
       if (isWebsite()) {
-        return await webMain.dataServer(params);
+        return await modules.webMain.dataServer(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-server', params);
+        return await modules.ipcRenderer.invoke('data-server', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -220,9 +225,9 @@ const ipc = {
 
     servers: async (params: { userId: string }): Promise<Types.Server[]> => {
       if (isWebsite()) {
-        return await webMain.dataServers(params);
+        return await modules.webMain.dataServers(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-servers', params);
+        return await modules.ipcRenderer.invoke('data-servers', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -230,9 +235,9 @@ const ipc = {
 
     serverMembers: async (params: { serverId: string }): Promise<Types.Member[]> => {
       if (isWebsite()) {
-        return await webMain.dataServerMembers(params);
+        return await modules.webMain.dataServerMembers(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-serverMembers', params);
+        return await modules.ipcRenderer.invoke('data-serverMembers', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -240,9 +245,9 @@ const ipc = {
 
     serverOnlineMembers: async (params: { serverId: string }): Promise<Types.OnlineMember[]> => {
       if (isWebsite()) {
-        return await webMain.dataServerOnlineMembers(params);
+        return await modules.webMain.dataServerOnlineMembers(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-serverOnlineMembers', params);
+        return await modules.ipcRenderer.invoke('data-serverOnlineMembers', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -250,9 +255,9 @@ const ipc = {
 
     channel: async (params: { userId: string; serverId: string; channelId: string }): Promise<Types.Channel | null> => {
       if (isWebsite()) {
-        return await webMain.dataChannel(params);
+        return await modules.webMain.dataChannel(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-channel', params);
+        return await modules.ipcRenderer.invoke('data-channel', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -260,9 +265,9 @@ const ipc = {
 
     channels: async (params: { userId: string; serverId: string }): Promise<Types.Channel[]> => {
       if (isWebsite()) {
-        return await webMain.dataChannels(params);
+        return await modules.webMain.dataChannels(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-channels', params);
+        return await modules.ipcRenderer.invoke('data-channels', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -270,9 +275,9 @@ const ipc = {
 
     channelMembers: async (params: { serverId: string; channelId: string }): Promise<Types.Member[]> => {
       if (isWebsite()) {
-        return await webMain.dataChannelMembers(params);
+        return await modules.webMain.dataChannelMembers(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-channelMembers', params);
+        return await modules.ipcRenderer.invoke('data-channelMembers', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -280,9 +285,9 @@ const ipc = {
 
     member: async (params: { userId: string; serverId: string; channelId?: string }): Promise<Types.Member | null> => {
       if (isWebsite()) {
-        return await webMain.dataMember(params);
+        return await modules.webMain.dataMember(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-member', params);
+        return await modules.ipcRenderer.invoke('data-member', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -290,9 +295,9 @@ const ipc = {
 
     memberApplication: async (params: { userId: string; serverId: string }): Promise<Types.MemberApplication | null> => {
       if (isWebsite()) {
-        return await webMain.dataMemberApplication(params);
+        return await modules.webMain.dataMemberApplication(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-memberApplication', params);
+        return await modules.ipcRenderer.invoke('data-memberApplication', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -300,9 +305,9 @@ const ipc = {
 
     memberApplications: async (params: { serverId: string }): Promise<Types.MemberApplication[]> => {
       if (isWebsite()) {
-        return await webMain.dataMemberApplications(params);
+        return await modules.webMain.dataMemberApplications(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-memberApplications', params);
+        return await modules.ipcRenderer.invoke('data-memberApplications', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -310,9 +315,9 @@ const ipc = {
 
     memberInvitation: async (params: { receiverId: string; serverId: string }): Promise<Types.MemberInvitation | null> => {
       if (isWebsite()) {
-        return await webMain.dataMemberInvitation(params);
+        return await modules.webMain.dataMemberInvitation(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-memberInvitation', params);
+        return await modules.ipcRenderer.invoke('data-memberInvitation', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -320,9 +325,9 @@ const ipc = {
 
     memberInvitations: async (params: { receiverId: string }): Promise<Types.MemberInvitation[]> => {
       if (isWebsite()) {
-        return await webMain.dataMemberInvitations(params);
+        return await modules.webMain.dataMemberInvitations(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-memberInvitations', params);
+        return await modules.ipcRenderer.invoke('data-memberInvitations', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -330,9 +335,9 @@ const ipc = {
 
     notifications: async (params: { region: Types.LanguageKey }): Promise<Types.Notification[]> => {
       if (isWebsite()) {
-        return await webMain.dataNotifications(params);
+        return await modules.webMain.dataNotifications(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-notifications', params);
+        return await modules.ipcRenderer.invoke('data-notifications', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -340,9 +345,9 @@ const ipc = {
 
     announcements: async (params: { region: Types.LanguageKey }): Promise<Types.Announcement[]> => {
       if (isWebsite()) {
-        return await webMain.dataAnnouncements(params);
+        return await modules.webMain.dataAnnouncements(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-announcements', params);
+        return await modules.ipcRenderer.invoke('data-announcements', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -350,9 +355,9 @@ const ipc = {
 
     recommendServers: async (params: { region: Types.LanguageKey }): Promise<Types.RecommendServer[]> => {
       if (isWebsite()) {
-        return await webMain.dataRecommendServers(params);
+        return await modules.webMain.dataRecommendServers(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-recommendServers', params);
+        return await modules.ipcRenderer.invoke('data-recommendServers', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -360,9 +365,9 @@ const ipc = {
 
     uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
       if (isWebsite()) {
-        return await webMain.dataUploadImage(params);
+        return await modules.webMain.dataUploadImage(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-uploadImage', params);
+        return await modules.ipcRenderer.invoke('data-uploadImage', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -370,9 +375,9 @@ const ipc = {
 
     searchServer: async (params: { query: string }): Promise<Types.Server[]> => {
       if (isWebsite()) {
-        return await webMain.dataSearchServer(params);
+        return await modules.webMain.dataSearchServer(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-searchServer', params);
+        return await modules.ipcRenderer.invoke('data-searchServer', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -380,9 +385,9 @@ const ipc = {
 
     searchUser: async (params: { query: string }): Promise<Types.User[]> => {
       if (isWebsite()) {
-        return await webMain.dataSearchUser(params);
+        return await modules.webMain.dataSearchUser(params);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('data-searchUser', params);
+        return await modules.ipcRenderer.invoke('data-searchUser', params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -395,8 +400,8 @@ const ipc = {
         return () => {};
       } else if (isRenderer()) {
         const listener = (_: any, serverId: string) => callback(serverId);
-        ipcRenderer.on('deepLink', listener);
-        return () => ipcRenderer.removeListener('deepLink', listener);
+        modules.ipcRenderer.on('deepLink', listener);
+        return () => modules.ipcRenderer.removeListener('deepLink', listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -406,9 +411,9 @@ const ipc = {
   window: {
     minimize: (popupId?: string) => {
       if (isWebsite()) {
-        if (popupId) webMain.windowMinimize(popupId);
+        if (popupId) modules.webMain.windowMinimize(popupId);
       } else if (isRenderer()) {
-        ipcRenderer.send('window-control-minimize');
+        modules.ipcRenderer.send('window-control-minimize');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -418,7 +423,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        ipcRenderer.send('window-control-maximize');
+        modules.ipcRenderer.send('window-control-maximize');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -428,7 +433,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        ipcRenderer.send('window-control-unmaximize');
+        modules.ipcRenderer.send('window-control-unmaximize');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -438,7 +443,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        ipcRenderer.send('window-control-close');
+        modules.ipcRenderer.send('window-control-close');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -449,8 +454,8 @@ const ipc = {
         return () => {};
       } else if (isRenderer()) {
         const listener = () => callback();
-        ipcRenderer.on('maximize', listener);
-        return () => ipcRenderer.removeListener('maximize', listener);
+        modules.ipcRenderer.on('maximize', listener);
+        return () => modules.ipcRenderer.removeListener('maximize', listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -461,8 +466,8 @@ const ipc = {
         return () => {};
       } else if (isRenderer()) {
         const listener = () => callback();
-        ipcRenderer.on('unmaximize', listener);
-        return () => ipcRenderer.removeListener('unmaximize', listener);
+        modules.ipcRenderer.on('unmaximize', listener);
+        return () => modules.ipcRenderer.removeListener('unmaximize', listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -472,9 +477,9 @@ const ipc = {
   initialData: {
     get: (id: string): Record<string, any> | null => {
       if (isWebsite()) {
-        return webMain.getInitialData(id);
+        return modules.webMain.getInitialData(id);
       } else if (isRenderer()) {
-        return ipcRenderer.sendSync(`get-initial-data?id=${id}`);
+        return modules.ipcRenderer.sendSync(`get-initial-data?id=${id}`);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -484,9 +489,9 @@ const ipc = {
   popup: {
     open: (type: Types.PopupType, id: string, initialData: any, force?: boolean) => {
       if (isWebsite()) {
-        return webMain.openPopup(type, id, initialData, force);
+        return modules.webMain.openPopup(type, id, initialData, force);
       } else if (isRenderer()) {
-        ipcRenderer.send('open-popup', type, id, initialData, force);
+        modules.ipcRenderer.send('open-popup', type, id, initialData, force);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -494,9 +499,9 @@ const ipc = {
 
     close: (id: string) => {
       if (isWebsite()) {
-        return webMain.closePopup(id);
+        return modules.webMain.closePopup(id);
       } else if (isRenderer()) {
-        ipcRenderer.send('close-popup', id);
+        modules.ipcRenderer.send('close-popup', id);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -504,9 +509,9 @@ const ipc = {
 
     closeAll: () => {
       if (isWebsite()) {
-        return webMain.closeAllPopups();
+        return modules.webMain.closeAllPopups();
       } else if (isRenderer()) {
-        ipcRenderer.send('close-all-popups');
+        modules.ipcRenderer.send('close-all-popups');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -514,9 +519,9 @@ const ipc = {
 
     submit: (to: string, data?: any) => {
       if (isWebsite()) {
-        webMain.webEventEmitter.emit('popup-submit', to, data);
+        modules.webMain.webEventEmitter.emit('popup-submit', to, data);
       } else if (isRenderer()) {
-        ipcRenderer.send('popup-submit', to, data);
+        modules.ipcRenderer.send('popup-submit', to, data);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -526,19 +531,19 @@ const ipc = {
       if (isWebsite()) {
         const listener = (from: string, data: T) => {
           if (from === host) callback(data);
-          webMain.webEventEmitter.removeListener('popup-submit', listener);
+          modules.webMain.webEventEmitter.removeListener('popup-submit', listener);
         };
-        webMain.webEventEmitter.removeListener('popup-submit', listener);
-        webMain.webEventEmitter.on('popup-submit', listener);
-        return () => webMain.webEventEmitter.removeListener('popup-submit', listener);
+        modules.webMain.webEventEmitter.removeListener('popup-submit', listener);
+        modules.webMain.webEventEmitter.on('popup-submit', listener);
+        return () => modules.webMain.webEventEmitter.removeListener('popup-submit', listener);
       } else if (isRenderer()) {
         const listener = (_: any, from: string, data: T) => {
           if (from === host) callback(data);
-          ipcRenderer.removeListener('popup-submit', listener);
+          modules.ipcRenderer.removeListener('popup-submit', listener);
         };
-        ipcRenderer.removeListener('popup-submit', listener);
-        ipcRenderer.on('popup-submit', listener);
-        return () => ipcRenderer.removeListener('popup-submit', listener);
+        modules.ipcRenderer.removeListener('popup-submit', listener);
+        modules.ipcRenderer.on('popup-submit', listener);
+        return () => modules.ipcRenderer.removeListener('popup-submit', listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -548,9 +553,9 @@ const ipc = {
   accounts: {
     get: (): Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }> => {
       if (isWebsite()) {
-        return webMain.getAccounts();
+        return modules.webMain.getAccounts();
       } else if (isRenderer()) {
-        return ipcRenderer.sendSync('get-accounts');
+        return modules.ipcRenderer.sendSync('get-accounts');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -558,9 +563,9 @@ const ipc = {
 
     add: (account: string, { autoLogin, rememberAccount, password }: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
       if (isWebsite()) {
-        return webMain.addAccount(account, { autoLogin, rememberAccount, password });
+        return modules.webMain.addAccount(account, { autoLogin, rememberAccount, password });
       } else if (isRenderer()) {
-        ipcRenderer.send('add-account', account, { autoLogin, rememberAccount, password });
+        modules.ipcRenderer.send('add-account', account, { autoLogin, rememberAccount, password });
       } else {
         throw new Error('Unsupported platform');
       }
@@ -568,9 +573,9 @@ const ipc = {
 
     delete: (account: string) => {
       if (isWebsite()) {
-        return webMain.deleteAccount(account);
+        return modules.webMain.deleteAccount(account);
       } else if (isRenderer()) {
-        ipcRenderer.send('delete-account', account);
+        modules.ipcRenderer.send('delete-account', account);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -579,12 +584,12 @@ const ipc = {
     onUpdate: (callback: (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => void) => {
       if (isWebsite()) {
         const listener = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
-        webMain.webEventEmitter.on('accounts', listener);
-        return () => webMain.webEventEmitter.removeListener('accounts', listener);
+        modules.webMain.webEventEmitter.on('accounts', listener);
+        return () => modules.webMain.webEventEmitter.removeListener('accounts', listener);
       } else if (isRenderer()) {
         const listener = (_: any, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
-        ipcRenderer.on('accounts', listener);
-        return () => ipcRenderer.removeListener('accounts', listener);
+        modules.ipcRenderer.on('accounts', listener);
+        return () => modules.ipcRenderer.removeListener('accounts', listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -594,9 +599,9 @@ const ipc = {
   language: {
     get: (): Types.LanguageKey => {
       if (isWebsite()) {
-        return webMain.getLanguage();
+        return modules.webMain.getLanguage();
       } else if (isRenderer()) {
-        return ipcRenderer.sendSync('get-language');
+        return modules.ipcRenderer.sendSync('get-language');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -604,9 +609,9 @@ const ipc = {
 
     set: (language: Types.LanguageKey) => {
       if (isWebsite()) {
-        webMain.setLanguage(language);
+        modules.webMain.setLanguage(language);
       } else if (isRenderer()) {
-        ipcRenderer.send('set-language', language);
+        modules.ipcRenderer.send('set-language', language);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -615,12 +620,12 @@ const ipc = {
     onUpdate: (callback: (language: Types.LanguageKey) => void) => {
       if (isWebsite()) {
         const listener = (language: Types.LanguageKey) => callback(language);
-        webMain.webEventEmitter.on('language', listener);
-        return () => webMain.webEventEmitter.removeListener('language', listener);
+        modules.webMain.webEventEmitter.on('language', listener);
+        return () => modules.webMain.webEventEmitter.removeListener('language', listener);
       } else if (isRenderer()) {
         const listener = (_: any, language: Types.LanguageKey) => callback(language);
-        ipcRenderer.on('language', listener);
-        return () => ipcRenderer.removeListener('language', listener);
+        modules.ipcRenderer.on('language', listener);
+        return () => modules.ipcRenderer.removeListener('language', listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -630,9 +635,9 @@ const ipc = {
   customThemes: {
     get: (): Types.Theme[] => {
       if (isWebsite()) {
-        return webMain.getCustomThemes();
+        return modules.webMain.getCustomThemes();
       } else if (isRenderer()) {
-        return ipcRenderer.sendSync('get-custom-themes');
+        return modules.ipcRenderer.sendSync('get-custom-themes');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -640,9 +645,9 @@ const ipc = {
 
     add: (theme: Types.Theme) => {
       if (isWebsite()) {
-        webMain.addCustomTheme(theme);
+        modules.webMain.addCustomTheme(theme);
       } else if (isRenderer()) {
-        ipcRenderer.send('add-custom-theme', theme);
+        modules.ipcRenderer.send('add-custom-theme', theme);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -650,9 +655,9 @@ const ipc = {
 
     delete: (index: number) => {
       if (isWebsite()) {
-        webMain.deleteCustomTheme(index);
+        modules.webMain.deleteCustomTheme(index);
       } else if (isRenderer()) {
-        ipcRenderer.send('delete-custom-theme', index);
+        modules.ipcRenderer.send('delete-custom-theme', index);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -661,12 +666,12 @@ const ipc = {
     onUpdate: (callback: (themes: Types.Theme[]) => void) => {
       if (isWebsite()) {
         const listener = (themes: Types.Theme[]) => callback(themes);
-        webMain.webEventEmitter.on('custom-themes', listener);
-        return () => webMain.webEventEmitter.removeListener('custom-themes', listener);
+        modules.webMain.webEventEmitter.on('custom-themes', listener);
+        return () => modules.webMain.webEventEmitter.removeListener('custom-themes', listener);
       } else if (isRenderer()) {
         const listener = (_: any, themes: Types.Theme[]) => callback(themes);
-        ipcRenderer.on('custom-themes', listener);
-        return () => ipcRenderer.removeListener('custom-themes', listener);
+        modules.ipcRenderer.on('custom-themes', listener);
+        return () => modules.ipcRenderer.removeListener('custom-themes', listener);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -674,9 +679,9 @@ const ipc = {
 
     saveImage: async (buffer: ArrayBuffer, directory: string, filenamePrefix: string, extension: string): Promise<string | null> => {
       if (isWebsite()) {
-        return await webMain.saveImage(buffer);
+        return await modules.webMain.saveImage(buffer);
       } else if (isRenderer()) {
-        return await ipcRenderer.invoke('save-image', buffer, directory, filenamePrefix, extension);
+        return await modules.ipcRenderer.invoke('save-image', buffer, directory, filenamePrefix, extension);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -685,9 +690,9 @@ const ipc = {
     current: {
       get: (): Types.Theme | null => {
         if (isWebsite()) {
-          return webMain.getCurrentTheme();
+          return modules.webMain.getCurrentTheme();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-current-theme');
+          return modules.ipcRenderer.sendSync('get-current-theme');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -695,9 +700,9 @@ const ipc = {
 
       set: (theme: Types.Theme | null) => {
         if (isWebsite()) {
-          webMain.setCurrentTheme(theme);
+          modules.webMain.setCurrentTheme(theme);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-current-theme', theme);
+          modules.ipcRenderer.send('set-current-theme', theme);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -706,12 +711,12 @@ const ipc = {
       onUpdate: (callback: (theme: Types.Theme | null) => void) => {
         if (isWebsite()) {
           const listener = (theme: Types.Theme | null) => callback(theme);
-          webMain.webEventEmitter.on('current-theme', listener);
-          return () => webMain.webEventEmitter.removeListener('current-theme', listener);
+          modules.webMain.webEventEmitter.on('current-theme', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('current-theme', listener);
         } else if (isRenderer()) {
           const listener = (_: any, theme: Types.Theme | null) => callback(theme);
-          ipcRenderer.on('current-theme', listener);
-          return () => ipcRenderer.removeListener('current-theme', listener);
+          modules.ipcRenderer.on('current-theme', listener);
+          return () => modules.ipcRenderer.removeListener('current-theme', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -724,7 +729,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        ipcRenderer.send('update-discord-presence', presence);
+        modules.ipcRenderer.send('update-discord-presence', presence);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -734,9 +739,9 @@ const ipc = {
   fontList: {
     get: (): string[] => {
       if (isWebsite()) {
-        return webMain.getFontList();
+        return modules.webMain.getFontList();
       } else if (isRenderer()) {
-        return ipcRenderer.sendSync('get-font-list');
+        return modules.ipcRenderer.sendSync('get-font-list');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -746,9 +751,9 @@ const ipc = {
   record: {
     save: (record: ArrayBuffer) => {
       if (isWebsite()) {
-        return webMain.saveRecord(record);
+        return modules.webMain.saveRecord(record);
       } else if (isRenderer()) {
-        ipcRenderer.send('save-record', record);
+        modules.ipcRenderer.send('save-record', record);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -759,7 +764,7 @@ const ipc = {
         if (isWebsite()) {
           return null;
         } else if (isRenderer()) {
-          return await ipcRenderer.invoke('select-record-save-path');
+          return await modules.ipcRenderer.invoke('select-record-save-path');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -773,7 +778,7 @@ const ipc = {
         if (isWebsite()) {
           // ignore
         } else if (isRenderer()) {
-          ipcRenderer.send('set-tray-title', title);
+          modules.ipcRenderer.send('set-tray-title', title);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -786,7 +791,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        ipcRenderer.invoke('enable-loopback-audio');
+        modules.ipcRenderer.invoke('enable-loopback-audio');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -796,7 +801,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        ipcRenderer.invoke('disable-loopback-audio');
+        modules.ipcRenderer.invoke('disable-loopback-audio');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -805,9 +810,9 @@ const ipc = {
 
   dontShowDisclaimerNextTime: () => {
     if (isWebsite()) {
-      webMain.dontShowDisclaimerNextTime();
+      modules.webMain.dontShowDisclaimerNextTime();
     } else if (isRenderer()) {
-      ipcRenderer.send('dont-show-disclaimer-next-time');
+      modules.ipcRenderer.send('dont-show-disclaimer-next-time');
     } else {
       throw new Error('Unsupported platform');
     }
@@ -817,7 +822,7 @@ const ipc = {
     if (isWebsite()) {
       // ignore
     } else if (isRenderer()) {
-      ipcRenderer.send('check-for-updates');
+      modules.ipcRenderer.send('check-for-updates');
     } else {
       throw new Error('Unsupported platform');
     }
@@ -825,9 +830,9 @@ const ipc = {
 
   changeServer: (server: 'prod' | 'dev') => {
     if (isWebsite()) {
-      webMain.changeServer(server);
+      modules.webMain.changeServer(server);
     } else if (isRenderer()) {
-      ipcRenderer.send('change-server', server);
+      modules.ipcRenderer.send('change-server', server);
     } else {
       throw new Error('Unsupported platform');
     }
@@ -835,7 +840,7 @@ const ipc = {
 
   sendServerSelect: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
     if (isWebsite()) {
-      webMain.webEventEmitter.emit('server-select', data);
+      modules.webMain.webEventEmitter.emit('server-select', data);
     } else if (isRenderer()) {
       localStorage.setItem('server-select', JSON.stringify(data));
     } else {
@@ -846,86 +851,86 @@ const ipc = {
   systemSettings: {
     set: (settings: Partial<Types.SystemSettings>) => {
       if (isWebsite()) {
-        if (settings.autoLogin !== undefined) webMain.setAutoLogin(settings.autoLogin);
-        if (settings.autoLaunch !== undefined) webMain.setAutoLaunch(settings.autoLaunch);
-        if (settings.alwaysOnTop !== undefined) webMain.setAlwaysOnTop(settings.alwaysOnTop);
-        if (settings.statusAutoIdle !== undefined) webMain.setStatusAutoIdle(settings.statusAutoIdle);
-        if (settings.statusAutoIdleMinutes !== undefined) webMain.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
-        if (settings.channelUIMode !== undefined) webMain.setChannelUIMode(settings.channelUIMode);
-        if (settings.closeToTray !== undefined) webMain.setCloseToTray(settings.closeToTray);
-        if (settings.font !== undefined) webMain.setFont(settings.font);
-        if (settings.fontSize !== undefined) webMain.setFontSize(settings.fontSize);
-        if (settings.inputAudioDevice !== undefined) webMain.setInputAudioDevice(settings.inputAudioDevice);
-        if (settings.outputAudioDevice !== undefined) webMain.setOutputAudioDevice(settings.outputAudioDevice);
-        if (settings.recordFormat !== undefined) webMain.setRecordFormat(settings.recordFormat);
-        if (settings.recordSavePath !== undefined) webMain.setRecordSavePath(settings.recordSavePath);
-        if (settings.mixEffect !== undefined) webMain.setMixEffect(settings.mixEffect);
-        if (settings.mixEffectType !== undefined) webMain.setMixEffectType(settings.mixEffectType);
-        if (settings.autoMixSetting !== undefined) webMain.setAutoMixSetting(settings.autoMixSetting);
-        if (settings.echoCancellation !== undefined) webMain.setEchoCancellation(settings.echoCancellation);
-        if (settings.noiseCancellation !== undefined) webMain.setNoiseCancellation(settings.noiseCancellation);
-        if (settings.microphoneAmplification !== undefined) webMain.setMicrophoneAmplification(settings.microphoneAmplification);
-        if (settings.manualMixMode !== undefined) webMain.setManualMixMode(settings.manualMixMode);
-        if (settings.mixMode !== undefined) webMain.setMixMode(settings.mixMode);
-        if (settings.speakingMode !== undefined) webMain.setSpeakingMode(settings.speakingMode);
-        if (settings.defaultSpeakingKey !== undefined) webMain.setDefaultSpeakingKey(settings.defaultSpeakingKey);
-        if (settings.notSaveMessageHistory !== undefined) webMain.setNotSaveMessageHistory(settings.notSaveMessageHistory);
-        if (settings.hotKeyOpenMainWindow !== undefined) webMain.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
-        if (settings.hotKeyIncreaseVolume !== undefined) webMain.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
-        if (settings.hotKeyDecreaseVolume !== undefined) webMain.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
-        if (settings.hotKeyToggleSpeaker !== undefined) webMain.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
-        if (settings.hotKeyToggleMicrophone !== undefined) webMain.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
-        if (settings.disableAllSoundEffect !== undefined) webMain.setDisableAllSoundEffect(settings.disableAllSoundEffect);
-        if (settings.enterVoiceChannelSound !== undefined) webMain.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
-        if (settings.leaveVoiceChannelSound !== undefined) webMain.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
-        if (settings.startSpeakingSound !== undefined) webMain.setStartSpeakingSound(settings.startSpeakingSound);
-        if (settings.stopSpeakingSound !== undefined) webMain.setStopSpeakingSound(settings.stopSpeakingSound);
-        if (settings.receiveDirectMessageSound !== undefined) webMain.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
-        if (settings.receiveChannelMessageSound !== undefined) webMain.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
-        if (settings.autoCheckForUpdates !== undefined) webMain.setAutoCheckForUpdates(settings.autoCheckForUpdates);
-        if (settings.updateCheckInterval !== undefined) webMain.setUpdateCheckInterval(settings.updateCheckInterval);
-        if (settings.updateChannel !== undefined) webMain.setUpdateChannel(settings.updateChannel);
+        if (settings.autoLogin !== undefined) modules.webMain.setAutoLogin(settings.autoLogin);
+        if (settings.autoLaunch !== undefined) modules.webMain.setAutoLaunch(settings.autoLaunch);
+        if (settings.alwaysOnTop !== undefined) modules.webMain.setAlwaysOnTop(settings.alwaysOnTop);
+        if (settings.statusAutoIdle !== undefined) modules.webMain.setStatusAutoIdle(settings.statusAutoIdle);
+        if (settings.statusAutoIdleMinutes !== undefined) modules.webMain.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
+        if (settings.channelUIMode !== undefined) modules.webMain.setChannelUIMode(settings.channelUIMode);
+        if (settings.closeToTray !== undefined) modules.webMain.setCloseToTray(settings.closeToTray);
+        if (settings.font !== undefined) modules.webMain.setFont(settings.font);
+        if (settings.fontSize !== undefined) modules.webMain.setFontSize(settings.fontSize);
+        if (settings.inputAudioDevice !== undefined) modules.webMain.setInputAudioDevice(settings.inputAudioDevice);
+        if (settings.outputAudioDevice !== undefined) modules.webMain.setOutputAudioDevice(settings.outputAudioDevice);
+        if (settings.recordFormat !== undefined) modules.webMain.setRecordFormat(settings.recordFormat);
+        if (settings.recordSavePath !== undefined) modules.webMain.setRecordSavePath(settings.recordSavePath);
+        if (settings.mixEffect !== undefined) modules.webMain.setMixEffect(settings.mixEffect);
+        if (settings.mixEffectType !== undefined) modules.webMain.setMixEffectType(settings.mixEffectType);
+        if (settings.autoMixSetting !== undefined) modules.webMain.setAutoMixSetting(settings.autoMixSetting);
+        if (settings.echoCancellation !== undefined) modules.webMain.setEchoCancellation(settings.echoCancellation);
+        if (settings.noiseCancellation !== undefined) modules.webMain.setNoiseCancellation(settings.noiseCancellation);
+        if (settings.microphoneAmplification !== undefined) modules.webMain.setMicrophoneAmplification(settings.microphoneAmplification);
+        if (settings.manualMixMode !== undefined) modules.webMain.setManualMixMode(settings.manualMixMode);
+        if (settings.mixMode !== undefined) modules.webMain.setMixMode(settings.mixMode);
+        if (settings.speakingMode !== undefined) modules.webMain.setSpeakingMode(settings.speakingMode);
+        if (settings.defaultSpeakingKey !== undefined) modules.webMain.setDefaultSpeakingKey(settings.defaultSpeakingKey);
+        if (settings.notSaveMessageHistory !== undefined) modules.webMain.setNotSaveMessageHistory(settings.notSaveMessageHistory);
+        if (settings.hotKeyOpenMainWindow !== undefined) modules.webMain.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
+        if (settings.hotKeyIncreaseVolume !== undefined) modules.webMain.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
+        if (settings.hotKeyDecreaseVolume !== undefined) modules.webMain.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
+        if (settings.hotKeyToggleSpeaker !== undefined) modules.webMain.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
+        if (settings.hotKeyToggleMicrophone !== undefined) modules.webMain.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
+        if (settings.disableAllSoundEffect !== undefined) modules.webMain.setDisableAllSoundEffect(settings.disableAllSoundEffect);
+        if (settings.enterVoiceChannelSound !== undefined) modules.webMain.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
+        if (settings.leaveVoiceChannelSound !== undefined) modules.webMain.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
+        if (settings.startSpeakingSound !== undefined) modules.webMain.setStartSpeakingSound(settings.startSpeakingSound);
+        if (settings.stopSpeakingSound !== undefined) modules.webMain.setStopSpeakingSound(settings.stopSpeakingSound);
+        if (settings.receiveDirectMessageSound !== undefined) modules.webMain.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
+        if (settings.receiveChannelMessageSound !== undefined) modules.webMain.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
+        if (settings.autoCheckForUpdates !== undefined) modules.webMain.setAutoCheckForUpdates(settings.autoCheckForUpdates);
+        if (settings.updateCheckInterval !== undefined) modules.webMain.setUpdateCheckInterval(settings.updateCheckInterval);
+        if (settings.updateChannel !== undefined) modules.webMain.setUpdateChannel(settings.updateChannel);
       } else if (isRenderer()) {
-        if (settings.autoLogin !== undefined) ipcRenderer.send('set-auto-login', settings.autoLogin);
-        if (settings.autoLaunch !== undefined) ipcRenderer.send('set-auto-launch', settings.autoLaunch);
-        if (settings.alwaysOnTop !== undefined) ipcRenderer.send('set-always-on-top', settings.alwaysOnTop);
-        if (settings.statusAutoIdle !== undefined) ipcRenderer.send('set-status-auto-idle', settings.statusAutoIdle);
-        if (settings.statusAutoIdleMinutes !== undefined) ipcRenderer.send('set-status-auto-idle-minutes', settings.statusAutoIdleMinutes);
-        if (settings.statusAutoDnd !== undefined) ipcRenderer.send('set-status-auto-dnd', settings.statusAutoDnd);
-        if (settings.channelUIMode !== undefined) ipcRenderer.send('set-channel-ui-mode', settings.channelUIMode);
-        if (settings.closeToTray !== undefined) ipcRenderer.send('set-close-to-tray', settings.closeToTray);
-        if (settings.font !== undefined) ipcRenderer.send('set-font', settings.font);
-        if (settings.fontSize !== undefined) ipcRenderer.send('set-font-size', settings.fontSize);
-        if (settings.inputAudioDevice !== undefined) ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
-        if (settings.outputAudioDevice !== undefined) ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
-        if (settings.recordFormat !== undefined) ipcRenderer.send('set-record-format', settings.recordFormat);
-        if (settings.recordSavePath !== undefined) ipcRenderer.send('set-record-save-path', settings.recordSavePath);
-        if (settings.mixEffect !== undefined) ipcRenderer.send('set-mix-effect', settings.mixEffect);
-        if (settings.mixEffectType !== undefined) ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
-        if (settings.autoMixSetting !== undefined) ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
-        if (settings.echoCancellation !== undefined) ipcRenderer.send('set-echo-cancellation', settings.echoCancellation);
-        if (settings.noiseCancellation !== undefined) ipcRenderer.send('set-noise-cancellation', settings.noiseCancellation);
-        if (settings.microphoneAmplification !== undefined) ipcRenderer.send('set-microphone-amplification', settings.microphoneAmplification);
-        if (settings.manualMixMode !== undefined) ipcRenderer.send('set-manual-mix-mode', settings.manualMixMode);
-        if (settings.mixMode !== undefined) ipcRenderer.send('set-mix-mode', settings.mixMode);
-        if (settings.speakingMode !== undefined) ipcRenderer.send('set-speaking-mode', settings.speakingMode);
-        if (settings.defaultSpeakingKey !== undefined) ipcRenderer.send('set-default-speaking-key', settings.defaultSpeakingKey);
-        if (settings.notSaveMessageHistory !== undefined) ipcRenderer.send('set-not-save-message-history', settings.notSaveMessageHistory);
-        if (settings.hotKeyOpenMainWindow !== undefined) ipcRenderer.send('set-hot-key-open-main-window', settings.hotKeyOpenMainWindow);
-        if (settings.hotKeyIncreaseVolume !== undefined) ipcRenderer.send('set-hot-key-increase-volume', settings.hotKeyIncreaseVolume);
-        if (settings.hotKeyDecreaseVolume !== undefined) ipcRenderer.send('set-hot-key-decrease-volume', settings.hotKeyDecreaseVolume);
-        if (settings.hotKeyToggleSpeaker !== undefined) ipcRenderer.send('set-hot-key-toggle-speaker', settings.hotKeyToggleSpeaker);
-        if (settings.hotKeyToggleMicrophone !== undefined) ipcRenderer.send('set-hot-key-toggle-microphone', settings.hotKeyToggleMicrophone);
-        if (settings.disableAllSoundEffect !== undefined) ipcRenderer.send('set-disable-all-sound-effect', settings.disableAllSoundEffect);
-        if (settings.enterVoiceChannelSound !== undefined) ipcRenderer.send('set-enter-voice-channel-sound', settings.enterVoiceChannelSound);
-        if (settings.leaveVoiceChannelSound !== undefined) ipcRenderer.send('set-leave-voice-channel-sound', settings.leaveVoiceChannelSound);
-        if (settings.startSpeakingSound !== undefined) ipcRenderer.send('set-start-speaking-sound', settings.startSpeakingSound);
-        if (settings.stopSpeakingSound !== undefined) ipcRenderer.send('set-stop-speaking-sound', settings.stopSpeakingSound);
-        if (settings.receiveDirectMessageSound !== undefined) ipcRenderer.send('set-receive-direct-message-sound', settings.receiveDirectMessageSound);
-        if (settings.receiveChannelMessageSound !== undefined) ipcRenderer.send('set-receive-channel-message-sound', settings.receiveChannelMessageSound);
-        if (settings.autoCheckForUpdates !== undefined) ipcRenderer.send('set-auto-check-for-updates', settings.autoCheckForUpdates);
-        if (settings.updateCheckInterval !== undefined) ipcRenderer.send('set-update-check-interval', settings.updateCheckInterval);
-        if (settings.updateChannel !== undefined) ipcRenderer.send('set-update-channel', settings.updateChannel);
+        if (settings.autoLogin !== undefined) modules.ipcRenderer.send('set-auto-login', settings.autoLogin);
+        if (settings.autoLaunch !== undefined) modules.ipcRenderer.send('set-auto-launch', settings.autoLaunch);
+        if (settings.alwaysOnTop !== undefined) modules.ipcRenderer.send('set-always-on-top', settings.alwaysOnTop);
+        if (settings.statusAutoIdle !== undefined) modules.ipcRenderer.send('set-status-auto-idle', settings.statusAutoIdle);
+        if (settings.statusAutoIdleMinutes !== undefined) modules.ipcRenderer.send('set-status-auto-idle-minutes', settings.statusAutoIdleMinutes);
+        if (settings.statusAutoDnd !== undefined) modules.ipcRenderer.send('set-status-auto-dnd', settings.statusAutoDnd);
+        if (settings.channelUIMode !== undefined) modules.ipcRenderer.send('set-channel-ui-mode', settings.channelUIMode);
+        if (settings.closeToTray !== undefined) modules.ipcRenderer.send('set-close-to-tray', settings.closeToTray);
+        if (settings.font !== undefined) modules.ipcRenderer.send('set-font', settings.font);
+        if (settings.fontSize !== undefined) modules.ipcRenderer.send('set-font-size', settings.fontSize);
+        if (settings.inputAudioDevice !== undefined) modules.ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
+        if (settings.outputAudioDevice !== undefined) modules.ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
+        if (settings.recordFormat !== undefined) modules.ipcRenderer.send('set-record-format', settings.recordFormat);
+        if (settings.recordSavePath !== undefined) modules.ipcRenderer.send('set-record-save-path', settings.recordSavePath);
+        if (settings.mixEffect !== undefined) modules.ipcRenderer.send('set-mix-effect', settings.mixEffect);
+        if (settings.mixEffectType !== undefined) modules.ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
+        if (settings.autoMixSetting !== undefined) modules.ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
+        if (settings.echoCancellation !== undefined) modules.ipcRenderer.send('set-echo-cancellation', settings.echoCancellation);
+        if (settings.noiseCancellation !== undefined) modules.ipcRenderer.send('set-noise-cancellation', settings.noiseCancellation);
+        if (settings.microphoneAmplification !== undefined) modules.ipcRenderer.send('set-microphone-amplification', settings.microphoneAmplification);
+        if (settings.manualMixMode !== undefined) modules.ipcRenderer.send('set-manual-mix-mode', settings.manualMixMode);
+        if (settings.mixMode !== undefined) modules.ipcRenderer.send('set-mix-mode', settings.mixMode);
+        if (settings.speakingMode !== undefined) modules.ipcRenderer.send('set-speaking-mode', settings.speakingMode);
+        if (settings.defaultSpeakingKey !== undefined) modules.ipcRenderer.send('set-default-speaking-key', settings.defaultSpeakingKey);
+        if (settings.notSaveMessageHistory !== undefined) modules.ipcRenderer.send('set-not-save-message-history', settings.notSaveMessageHistory);
+        if (settings.hotKeyOpenMainWindow !== undefined) modules.ipcRenderer.send('set-hot-key-open-main-window', settings.hotKeyOpenMainWindow);
+        if (settings.hotKeyIncreaseVolume !== undefined) modules.ipcRenderer.send('set-hot-key-increase-volume', settings.hotKeyIncreaseVolume);
+        if (settings.hotKeyDecreaseVolume !== undefined) modules.ipcRenderer.send('set-hot-key-decrease-volume', settings.hotKeyDecreaseVolume);
+        if (settings.hotKeyToggleSpeaker !== undefined) modules.ipcRenderer.send('set-hot-key-toggle-speaker', settings.hotKeyToggleSpeaker);
+        if (settings.hotKeyToggleMicrophone !== undefined) modules.ipcRenderer.send('set-hot-key-toggle-microphone', settings.hotKeyToggleMicrophone);
+        if (settings.disableAllSoundEffect !== undefined) modules.ipcRenderer.send('set-disable-all-sound-effect', settings.disableAllSoundEffect);
+        if (settings.enterVoiceChannelSound !== undefined) modules.ipcRenderer.send('set-enter-voice-channel-sound', settings.enterVoiceChannelSound);
+        if (settings.leaveVoiceChannelSound !== undefined) modules.ipcRenderer.send('set-leave-voice-channel-sound', settings.leaveVoiceChannelSound);
+        if (settings.startSpeakingSound !== undefined) modules.ipcRenderer.send('set-start-speaking-sound', settings.startSpeakingSound);
+        if (settings.stopSpeakingSound !== undefined) modules.ipcRenderer.send('set-stop-speaking-sound', settings.stopSpeakingSound);
+        if (settings.receiveDirectMessageSound !== undefined) modules.ipcRenderer.send('set-receive-direct-message-sound', settings.receiveDirectMessageSound);
+        if (settings.receiveChannelMessageSound !== undefined) modules.ipcRenderer.send('set-receive-channel-message-sound', settings.receiveChannelMessageSound);
+        if (settings.autoCheckForUpdates !== undefined) modules.ipcRenderer.send('set-auto-check-for-updates', settings.autoCheckForUpdates);
+        if (settings.updateCheckInterval !== undefined) modules.ipcRenderer.send('set-update-check-interval', settings.updateCheckInterval);
+        if (settings.updateChannel !== undefined) modules.ipcRenderer.send('set-update-channel', settings.updateChannel);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -933,9 +938,9 @@ const ipc = {
 
     get: (): Types.SystemSettings | null => {
       if (isWebsite()) {
-        return webMain.getSystemSettings();
+        return modules.webMain.getSystemSettings();
       } else if (isRenderer()) {
-        return ipcRenderer.sendSync('get-system-settings');
+        return modules.ipcRenderer.sendSync('get-system-settings');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -944,9 +949,9 @@ const ipc = {
     autoLogin: {
       set: (enable: boolean) => {
         if (isWebsite()) {
-          webMain.setAutoLogin(enable);
+          modules.webMain.setAutoLogin(enable);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-auto-login', enable);
+          modules.ipcRenderer.send('set-auto-login', enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -956,7 +961,7 @@ const ipc = {
         if (isWebsite()) {
           return false;
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-auto-login');
+          return modules.ipcRenderer.sendSync('get-auto-login');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -965,12 +970,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('auto-login', listener);
-          return () => webMain.webEventEmitter.removeListener('auto-login', listener);
+          modules.webMain.webEventEmitter.on('auto-login', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('auto-login', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('auto-login', listener);
-          return () => ipcRenderer.removeListener('auto-login', listener);
+          modules.ipcRenderer.on('auto-login', listener);
+          return () => modules.ipcRenderer.removeListener('auto-login', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -982,7 +987,7 @@ const ipc = {
         if (isWebsite()) {
           // ignore
         } else if (isRenderer()) {
-          ipcRenderer.send('set-auto-launch', enable);
+          modules.ipcRenderer.send('set-auto-launch', enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -990,9 +995,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getAutoLaunch();
+          return modules.webMain.getAutoLaunch();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-auto-launch');
+          return modules.ipcRenderer.sendSync('get-auto-launch');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1001,12 +1006,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('auto-launch', listener);
-          return () => webMain.webEventEmitter.removeListener('auto-launch', listener);
+          modules.webMain.webEventEmitter.on('auto-launch', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('auto-launch', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('auto-launch', listener);
-          return () => ipcRenderer.removeListener('auto-launch', listener);
+          modules.ipcRenderer.on('auto-launch', listener);
+          return () => modules.ipcRenderer.removeListener('auto-launch', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1016,9 +1021,9 @@ const ipc = {
     alwaysOnTop: {
       set: (enable: boolean) => {
         if (isWebsite()) {
-          webMain.setAlwaysOnTop(enable);
+          modules.webMain.setAlwaysOnTop(enable);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-always-on-top', enable);
+          modules.ipcRenderer.send('set-always-on-top', enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1026,9 +1031,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getAlwaysOnTop();
+          return modules.webMain.getAlwaysOnTop();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-always-on-top');
+          return modules.ipcRenderer.sendSync('get-always-on-top');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1037,12 +1042,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('always-on-top', listener);
-          return () => webMain.webEventEmitter.removeListener('always-on-top', listener);
+          modules.webMain.webEventEmitter.on('always-on-top', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('always-on-top', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('always-on-top', listener);
-          return () => ipcRenderer.removeListener('always-on-top', listener);
+          modules.ipcRenderer.on('always-on-top', listener);
+          return () => modules.ipcRenderer.removeListener('always-on-top', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1052,9 +1057,9 @@ const ipc = {
     statusAutoIdle: {
       set: (enable: boolean) => {
         if (isWebsite()) {
-          webMain.setStatusAutoIdle(enable);
+          modules.webMain.setStatusAutoIdle(enable);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-status-auto-idle', enable);
+          modules.ipcRenderer.send('set-status-auto-idle', enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1062,9 +1067,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getStatusAutoIdle();
+          return modules.webMain.getStatusAutoIdle();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-status-auto-idle');
+          return modules.ipcRenderer.sendSync('get-status-auto-idle');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1073,12 +1078,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('status-auto-idle', listener);
-          return () => webMain.webEventEmitter.removeListener('status-auto-idle', listener);
+          modules.webMain.webEventEmitter.on('status-auto-idle', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('status-auto-idle', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('status-auto-idle', listener);
-          return () => ipcRenderer.removeListener('status-auto-idle', listener);
+          modules.ipcRenderer.on('status-auto-idle', listener);
+          return () => modules.ipcRenderer.removeListener('status-auto-idle', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1088,9 +1093,9 @@ const ipc = {
     statusAutoIdleMinutes: {
       set: (fontSize: number) => {
         if (isWebsite()) {
-          webMain.setStatusAutoIdleMinutes(fontSize);
+          modules.webMain.setStatusAutoIdleMinutes(fontSize);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-status-auto-idle-minutes', fontSize);
+          modules.ipcRenderer.send('set-status-auto-idle-minutes', fontSize);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1098,9 +1103,9 @@ const ipc = {
 
       get: (): number => {
         if (isWebsite()) {
-          return webMain.getStatusAutoIdleMinutes();
+          return modules.webMain.getStatusAutoIdleMinutes();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-status-auto-idle-minutes');
+          return modules.ipcRenderer.sendSync('get-status-auto-idle-minutes');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1109,12 +1114,12 @@ const ipc = {
       onUpdate: (callback: (fontSize: number) => void) => {
         if (isWebsite()) {
           const listener = (fontSize: number) => callback(fontSize);
-          webMain.webEventEmitter.on('status-auto-idle-minutes', listener);
-          return () => webMain.webEventEmitter.removeListener('status-auto-idle-minutes', listener);
+          modules.webMain.webEventEmitter.on('status-auto-idle-minutes', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('status-auto-idle-minutes', listener);
         } else if (isRenderer()) {
           const listener = (_: any, fontSize: number) => callback(fontSize);
-          ipcRenderer.on('status-auto-idle-minutes', listener);
-          return () => ipcRenderer.removeListener('status-auto-idle-minutes', listener);
+          modules.ipcRenderer.on('status-auto-idle-minutes', listener);
+          return () => modules.ipcRenderer.removeListener('status-auto-idle-minutes', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1124,9 +1129,9 @@ const ipc = {
     statusAutoDnd: {
       set: (enable: boolean) => {
         if (isWebsite()) {
-          webMain.setStatusAutoDnd(enable);
+          modules.webMain.setStatusAutoDnd(enable);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-status-auto-dnd', enable);
+          modules.ipcRenderer.send('set-status-auto-dnd', enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1134,9 +1139,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getStatusAutoDnd();
+          return modules.webMain.getStatusAutoDnd();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-status-auto-dnd');
+          return modules.ipcRenderer.sendSync('get-status-auto-dnd');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1145,12 +1150,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('status-auto-dnd', listener);
-          return () => webMain.webEventEmitter.removeListener('status-auto-dnd', listener);
+          modules.webMain.webEventEmitter.on('status-auto-dnd', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('status-auto-dnd', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('status-auto-dnd', listener);
-          return () => ipcRenderer.removeListener('status-auto-dnd', listener);
+          modules.ipcRenderer.on('status-auto-dnd', listener);
+          return () => modules.ipcRenderer.removeListener('status-auto-dnd', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1160,9 +1165,9 @@ const ipc = {
     channelUIMode: {
       set: (key: Types.ChannelUIMode) => {
         if (isWebsite()) {
-          webMain.setChannelUIMode(key);
+          modules.webMain.setChannelUIMode(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-channel-ui-mode', key);
+          modules.ipcRenderer.send('set-channel-ui-mode', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1170,9 +1175,9 @@ const ipc = {
 
       get: (): Types.ChannelUIMode => {
         if (isWebsite()) {
-          return webMain.getChannelUIMode();
+          return modules.webMain.getChannelUIMode();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-channel-ui-mode');
+          return modules.ipcRenderer.sendSync('get-channel-ui-mode');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1181,12 +1186,12 @@ const ipc = {
       onUpdate: (callback: (key: Types.ChannelUIMode) => void) => {
         if (isWebsite()) {
           const listener = (channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
-          webMain.webEventEmitter.on('channel-ui-mode', listener);
-          return () => webMain.webEventEmitter.removeListener('channel-ui-mode', listener);
+          modules.webMain.webEventEmitter.on('channel-ui-mode', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('channel-ui-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
-          ipcRenderer.on('channel-ui-mode', listener);
-          return () => ipcRenderer.removeListener('channel-ui-mode', listener);
+          modules.ipcRenderer.on('channel-ui-mode', listener);
+          return () => modules.ipcRenderer.removeListener('channel-ui-mode', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1196,9 +1201,9 @@ const ipc = {
     closeToTray: {
       set: (enable: boolean) => {
         if (isWebsite()) {
-          webMain.setCloseToTray(enable);
+          modules.webMain.setCloseToTray(enable);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-close-to-tray', enable);
+          modules.ipcRenderer.send('set-close-to-tray', enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1206,9 +1211,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getCloseToTray();
+          return modules.webMain.getCloseToTray();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-close-to-tray');
+          return modules.ipcRenderer.sendSync('get-close-to-tray');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1217,12 +1222,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('close-to-tray', listener);
-          return () => webMain.webEventEmitter.removeListener('close-to-tray', listener);
+          modules.webMain.webEventEmitter.on('close-to-tray', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('close-to-tray', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('close-to-tray', listener);
-          return () => ipcRenderer.removeListener('close-to-tray', listener);
+          modules.ipcRenderer.on('close-to-tray', listener);
+          return () => modules.ipcRenderer.removeListener('close-to-tray', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1232,9 +1237,9 @@ const ipc = {
     font: {
       set: (font: string) => {
         if (isWebsite()) {
-          webMain.setFont(font);
+          modules.webMain.setFont(font);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-font', font);
+          modules.ipcRenderer.send('set-font', font);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1242,9 +1247,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getFont();
+          return modules.webMain.getFont();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-font');
+          return modules.ipcRenderer.sendSync('get-font');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1253,12 +1258,12 @@ const ipc = {
       onUpdate: (callback: (font: string) => void) => {
         if (isWebsite()) {
           const listener = (font: string) => callback(font);
-          webMain.webEventEmitter.on('font', listener);
-          return () => webMain.webEventEmitter.removeListener('font', listener);
+          modules.webMain.webEventEmitter.on('font', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('font', listener);
         } else if (isRenderer()) {
           const listener = (_: any, font: string) => callback(font);
-          ipcRenderer.on('font', listener);
-          return () => ipcRenderer.removeListener('font', listener);
+          modules.ipcRenderer.on('font', listener);
+          return () => modules.ipcRenderer.removeListener('font', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1268,9 +1273,9 @@ const ipc = {
     fontSize: {
       set: (fontSize: number) => {
         if (isWebsite()) {
-          webMain.setFontSize(fontSize);
+          modules.webMain.setFontSize(fontSize);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-font-size', fontSize);
+          modules.ipcRenderer.send('set-font-size', fontSize);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1278,9 +1283,9 @@ const ipc = {
 
       get: (): number => {
         if (isWebsite()) {
-          return webMain.getFontSize();
+          return modules.webMain.getFontSize();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-font-size');
+          return modules.ipcRenderer.sendSync('get-font-size');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1289,12 +1294,12 @@ const ipc = {
       onUpdate: (callback: (fontSize: number) => void) => {
         if (isWebsite()) {
           const listener = (fontSize: number) => callback(fontSize);
-          webMain.webEventEmitter.on('font-size', listener);
-          return () => webMain.webEventEmitter.removeListener('font-size', listener);
+          modules.webMain.webEventEmitter.on('font-size', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('font-size', listener);
         } else if (isRenderer()) {
           const listener = (_: any, fontSize: number) => callback(fontSize);
-          ipcRenderer.on('font-size', listener);
-          return () => ipcRenderer.removeListener('font-size', listener);
+          modules.ipcRenderer.on('font-size', listener);
+          return () => modules.ipcRenderer.removeListener('font-size', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1304,9 +1309,9 @@ const ipc = {
     inputAudioDevice: {
       set: (deviceId: string) => {
         if (isWebsite()) {
-          webMain.setInputAudioDevice(deviceId);
+          modules.webMain.setInputAudioDevice(deviceId);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-input-audio-device', deviceId);
+          modules.ipcRenderer.send('set-input-audio-device', deviceId);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1314,9 +1319,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getInputAudioDevice();
+          return modules.webMain.getInputAudioDevice();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-input-audio-device');
+          return modules.ipcRenderer.sendSync('get-input-audio-device');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1325,12 +1330,12 @@ const ipc = {
       onUpdate: (callback: (deviceId: string) => void) => {
         if (isWebsite()) {
           const listener = (deviceId: string) => callback(deviceId);
-          webMain.webEventEmitter.on('input-audio-device', listener);
-          return () => webMain.webEventEmitter.removeListener('input-audio-device', listener);
+          modules.webMain.webEventEmitter.on('input-audio-device', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('input-audio-device', listener);
         } else if (isRenderer()) {
           const listener = (_: any, deviceId: string) => callback(deviceId);
-          ipcRenderer.on('input-audio-device', listener);
-          return () => ipcRenderer.removeListener('input-audio-device', listener);
+          modules.ipcRenderer.on('input-audio-device', listener);
+          return () => modules.ipcRenderer.removeListener('input-audio-device', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1340,9 +1345,9 @@ const ipc = {
     outputAudioDevice: {
       set: (deviceId: string) => {
         if (isWebsite()) {
-          webMain.setOutputAudioDevice(deviceId);
+          modules.webMain.setOutputAudioDevice(deviceId);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-output-audio-device', deviceId);
+          modules.ipcRenderer.send('set-output-audio-device', deviceId);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1350,9 +1355,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getOutputAudioDevice();
+          return modules.webMain.getOutputAudioDevice();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-output-audio-device');
+          return modules.ipcRenderer.sendSync('get-output-audio-device');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1361,12 +1366,12 @@ const ipc = {
       onUpdate: (callback: (deviceId: string) => void) => {
         if (isWebsite()) {
           const listener = (deviceId: string) => callback(deviceId);
-          webMain.webEventEmitter.on('output-audio-device', listener);
-          return () => webMain.webEventEmitter.removeListener('output-audio-device', listener);
+          modules.webMain.webEventEmitter.on('output-audio-device', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('output-audio-device', listener);
         } else if (isRenderer()) {
           const listener = (_: any, deviceId: string) => callback(deviceId);
-          ipcRenderer.on('output-audio-device', listener);
-          return () => ipcRenderer.removeListener('output-audio-device', listener);
+          modules.ipcRenderer.on('output-audio-device', listener);
+          return () => modules.ipcRenderer.removeListener('output-audio-device', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1376,9 +1381,9 @@ const ipc = {
     recordFormat: {
       set: (format: Types.RecordFormat) => {
         if (isWebsite()) {
-          webMain.setRecordFormat(format);
+          modules.webMain.setRecordFormat(format);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-record-format', format);
+          modules.ipcRenderer.send('set-record-format', format);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1386,9 +1391,9 @@ const ipc = {
 
       get: (): Types.RecordFormat => {
         if (isWebsite()) {
-          return webMain.getRecordFormat();
+          return modules.webMain.getRecordFormat();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-record-format');
+          return modules.ipcRenderer.sendSync('get-record-format');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1397,12 +1402,12 @@ const ipc = {
       onUpdate: (callback: (format: Types.RecordFormat) => void) => {
         if (isWebsite()) {
           const listener = (format: Types.RecordFormat) => callback(format);
-          webMain.webEventEmitter.on('record-format', listener);
-          return () => webMain.webEventEmitter.removeListener('record-format', listener);
+          modules.webMain.webEventEmitter.on('record-format', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('record-format', listener);
         } else if (isRenderer()) {
           const listener = (_: any, format: Types.RecordFormat) => callback(format);
-          ipcRenderer.on('record-format', listener);
-          return () => ipcRenderer.removeListener('record-format', listener);
+          modules.ipcRenderer.on('record-format', listener);
+          return () => modules.ipcRenderer.removeListener('record-format', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1412,9 +1417,9 @@ const ipc = {
     recordSavePath: {
       set: (path: string) => {
         if (isWebsite()) {
-          webMain.setRecordSavePath(path);
+          modules.webMain.setRecordSavePath(path);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-record-save-path', path);
+          modules.ipcRenderer.send('set-record-save-path', path);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1422,9 +1427,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getRecordSavePath();
+          return modules.webMain.getRecordSavePath();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-record-save-path');
+          return modules.ipcRenderer.sendSync('get-record-save-path');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1433,12 +1438,12 @@ const ipc = {
       onUpdate: (callback: (path: string) => void) => {
         if (isWebsite()) {
           const listener = (path: string) => callback(path);
-          webMain.webEventEmitter.on('record-save-path', listener);
-          return () => webMain.webEventEmitter.removeListener('record-save-path', listener);
+          modules.webMain.webEventEmitter.on('record-save-path', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('record-save-path', listener);
         } else if (isRenderer()) {
           const listener = (_: any, path: string) => callback(path);
-          ipcRenderer.on('record-save-path', listener);
-          return () => ipcRenderer.removeListener('record-save-path', listener);
+          modules.ipcRenderer.on('record-save-path', listener);
+          return () => modules.ipcRenderer.removeListener('record-save-path', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1448,9 +1453,9 @@ const ipc = {
     mixEffect: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setMixEffect(enabled);
+          modules.webMain.setMixEffect(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-mix-effect', enabled);
+          modules.ipcRenderer.send('set-mix-effect', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1458,9 +1463,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getMixEffect();
+          return modules.webMain.getMixEffect();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-mix-effect');
+          return modules.ipcRenderer.sendSync('get-mix-effect');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1469,12 +1474,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('mix-effect', listener);
-          return () => webMain.webEventEmitter.removeListener('mix-effect', listener);
+          modules.webMain.webEventEmitter.on('mix-effect', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('mix-effect', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('mix-effect', listener);
-          return () => ipcRenderer.removeListener('mix-effect', listener);
+          modules.ipcRenderer.on('mix-effect', listener);
+          return () => modules.ipcRenderer.removeListener('mix-effect', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1484,9 +1489,9 @@ const ipc = {
     mixEffectType: {
       set: (key: string) => {
         if (isWebsite()) {
-          webMain.setMixEffectType(key);
+          modules.webMain.setMixEffectType(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-mix-effect-type', key);
+          modules.ipcRenderer.send('set-mix-effect-type', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1494,9 +1499,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getMixEffectType();
+          return modules.webMain.getMixEffectType();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-mix-effect-type');
+          return modules.ipcRenderer.sendSync('get-mix-effect-type');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1505,12 +1510,12 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.on('mix-effect-type', listener);
-          return () => webMain.webEventEmitter.removeListener('mix-effect-type', listener);
+          modules.webMain.webEventEmitter.on('mix-effect-type', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('mix-effect-type', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.on('mix-effect-type', listener);
-          return () => ipcRenderer.removeListener('mix-effect-type', listener);
+          modules.ipcRenderer.on('mix-effect-type', listener);
+          return () => modules.ipcRenderer.removeListener('mix-effect-type', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1520,9 +1525,9 @@ const ipc = {
     autoMixSetting: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setAutoMixSetting(enabled);
+          modules.webMain.setAutoMixSetting(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-auto-mix-setting', enabled);
+          modules.ipcRenderer.send('set-auto-mix-setting', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1530,9 +1535,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getAutoMixSetting();
+          return modules.webMain.getAutoMixSetting();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-auto-mix-setting');
+          return modules.ipcRenderer.sendSync('get-auto-mix-setting');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1541,12 +1546,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('auto-mix-setting', listener);
-          return () => webMain.webEventEmitter.removeListener('auto-mix-setting', listener);
+          modules.webMain.webEventEmitter.on('auto-mix-setting', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('auto-mix-setting', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('auto-mix-setting', listener);
-          return () => ipcRenderer.removeListener('auto-mix-setting', listener);
+          modules.ipcRenderer.on('auto-mix-setting', listener);
+          return () => modules.ipcRenderer.removeListener('auto-mix-setting', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1556,9 +1561,9 @@ const ipc = {
     echoCancellation: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setEchoCancellation(enabled);
+          modules.webMain.setEchoCancellation(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-echo-cancellation', enabled);
+          modules.ipcRenderer.send('set-echo-cancellation', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1566,9 +1571,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getEchoCancellation();
+          return modules.webMain.getEchoCancellation();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-echo-cancellation');
+          return modules.ipcRenderer.sendSync('get-echo-cancellation');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1577,12 +1582,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('echo-cancellation', listener);
-          return () => webMain.webEventEmitter.removeListener('echo-cancellation', listener);
+          modules.webMain.webEventEmitter.on('echo-cancellation', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('echo-cancellation', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('echo-cancellation', listener);
-          return () => ipcRenderer.removeListener('echo-cancellation', listener);
+          modules.ipcRenderer.on('echo-cancellation', listener);
+          return () => modules.ipcRenderer.removeListener('echo-cancellation', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1592,9 +1597,9 @@ const ipc = {
     noiseCancellation: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setNoiseCancellation(enabled);
+          modules.webMain.setNoiseCancellation(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-noise-cancellation', enabled);
+          modules.ipcRenderer.send('set-noise-cancellation', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1602,9 +1607,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getNoiseCancellation();
+          return modules.webMain.getNoiseCancellation();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-noise-cancellation');
+          return modules.ipcRenderer.sendSync('get-noise-cancellation');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1613,12 +1618,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('noise-cancellation', listener);
-          return () => webMain.webEventEmitter.removeListener('noise-cancellation', listener);
+          modules.webMain.webEventEmitter.on('noise-cancellation', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('noise-cancellation', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('noise-cancellation', listener);
-          return () => ipcRenderer.removeListener('noise-cancellation', listener);
+          modules.ipcRenderer.on('noise-cancellation', listener);
+          return () => modules.ipcRenderer.removeListener('noise-cancellation', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1628,9 +1633,9 @@ const ipc = {
     microphoneAmplification: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setMicrophoneAmplification(enabled);
+          modules.webMain.setMicrophoneAmplification(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-microphone-amplification', enabled);
+          modules.ipcRenderer.send('set-microphone-amplification', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1638,9 +1643,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getMicrophoneAmplification();
+          return modules.webMain.getMicrophoneAmplification();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-microphone-amplification');
+          return modules.ipcRenderer.sendSync('get-microphone-amplification');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1649,12 +1654,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('microphone-amplification', listener);
-          return () => webMain.webEventEmitter.removeListener('microphone-amplification', listener);
+          modules.webMain.webEventEmitter.on('microphone-amplification', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('microphone-amplification', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('microphone-amplification', listener);
-          return () => ipcRenderer.removeListener('microphone-amplification', listener);
+          modules.ipcRenderer.on('microphone-amplification', listener);
+          return () => modules.ipcRenderer.removeListener('microphone-amplification', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1664,9 +1669,9 @@ const ipc = {
     manualMixMode: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setManualMixMode(enabled);
+          modules.webMain.setManualMixMode(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-manual-mix-mode', enabled);
+          modules.ipcRenderer.send('set-manual-mix-mode', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1674,9 +1679,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getManualMixMode();
+          return modules.webMain.getManualMixMode();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-manual-mix-mode');
+          return modules.ipcRenderer.sendSync('get-manual-mix-mode');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1685,12 +1690,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('manual-mix-mode', listener);
-          return () => webMain.webEventEmitter.removeListener('manual-mix-mode', listener);
+          modules.webMain.webEventEmitter.on('manual-mix-mode', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('manual-mix-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('manual-mix-mode', listener);
-          return () => ipcRenderer.removeListener('manual-mix-mode', listener);
+          modules.ipcRenderer.on('manual-mix-mode', listener);
+          return () => modules.ipcRenderer.removeListener('manual-mix-mode', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1700,9 +1705,9 @@ const ipc = {
     mixMode: {
       set: (key: Types.MixMode) => {
         if (isWebsite()) {
-          webMain.setMixMode(key);
+          modules.webMain.setMixMode(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-mix-mode', key);
+          modules.ipcRenderer.send('set-mix-mode', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1710,9 +1715,9 @@ const ipc = {
 
       get: (): Types.MixMode => {
         if (isWebsite()) {
-          return webMain.getMixMode();
+          return modules.webMain.getMixMode();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-mix-mode');
+          return modules.ipcRenderer.sendSync('get-mix-mode');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1721,12 +1726,12 @@ const ipc = {
       onUpdate: (callback: (key: Types.MixMode) => void) => {
         if (isWebsite()) {
           const listener = (key: Types.MixMode) => callback(key);
-          webMain.webEventEmitter.on('mix-mode', listener);
-          return () => webMain.webEventEmitter.removeListener('mix-mode', listener);
+          modules.webMain.webEventEmitter.on('mix-mode', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('mix-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: Types.MixMode) => callback(key);
-          ipcRenderer.on('mix-mode', listener);
-          return () => ipcRenderer.removeListener('mix-mode', listener);
+          modules.ipcRenderer.on('mix-mode', listener);
+          return () => modules.ipcRenderer.removeListener('mix-mode', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1736,9 +1741,9 @@ const ipc = {
     speakingMode: {
       set: (key: Types.SpeakingMode) => {
         if (isWebsite()) {
-          webMain.setSpeakingMode(key);
+          modules.webMain.setSpeakingMode(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-speaking-mode', key);
+          modules.ipcRenderer.send('set-speaking-mode', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1746,9 +1751,9 @@ const ipc = {
 
       get: (): Types.SpeakingMode => {
         if (isWebsite()) {
-          return webMain.getSpeakingMode();
+          return modules.webMain.getSpeakingMode();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-speaking-mode');
+          return modules.ipcRenderer.sendSync('get-speaking-mode');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1757,12 +1762,12 @@ const ipc = {
       onUpdate: (callback: (key: Types.SpeakingMode) => void) => {
         if (isWebsite()) {
           const listener = (key: Types.SpeakingMode) => callback(key);
-          webMain.webEventEmitter.on('speaking-mode', listener);
-          return () => webMain.webEventEmitter.removeListener('speaking-mode', listener);
+          modules.webMain.webEventEmitter.on('speaking-mode', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('speaking-mode', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: Types.SpeakingMode) => callback(key);
-          ipcRenderer.on('speaking-mode', listener);
-          return () => ipcRenderer.removeListener('speaking-mode', listener);
+          modules.ipcRenderer.on('speaking-mode', listener);
+          return () => modules.ipcRenderer.removeListener('speaking-mode', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1772,9 +1777,9 @@ const ipc = {
     defaultSpeakingKey: {
       set: (key: string) => {
         if (isWebsite()) {
-          webMain.setDefaultSpeakingKey(key);
+          modules.webMain.setDefaultSpeakingKey(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-default-speaking-key', key);
+          modules.ipcRenderer.send('set-default-speaking-key', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1782,9 +1787,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getDefaultSpeakingKey();
+          return modules.webMain.getDefaultSpeakingKey();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-default-speaking-key');
+          return modules.ipcRenderer.sendSync('get-default-speaking-key');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1793,12 +1798,12 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.on('default-speaking-key', listener);
-          return () => webMain.webEventEmitter.removeListener('default-speaking-key', listener);
+          modules.webMain.webEventEmitter.on('default-speaking-key', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('default-speaking-key', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.on('default-speaking-key', listener);
-          return () => ipcRenderer.removeListener('default-speaking-key', listener);
+          modules.ipcRenderer.on('default-speaking-key', listener);
+          return () => modules.ipcRenderer.removeListener('default-speaking-key', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1808,9 +1813,9 @@ const ipc = {
     notSaveMessageHistory: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setNotSaveMessageHistory(enabled);
+          modules.webMain.setNotSaveMessageHistory(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-not-save-message-history', enabled);
+          modules.ipcRenderer.send('set-not-save-message-history', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1818,9 +1823,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getNotSaveMessageHistory();
+          return modules.webMain.getNotSaveMessageHistory();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-not-save-message-history');
+          return modules.ipcRenderer.sendSync('get-not-save-message-history');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1829,12 +1834,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('not-save-message-history', listener);
-          return () => webMain.webEventEmitter.removeListener('not-save-message-history', listener);
+          modules.webMain.webEventEmitter.on('not-save-message-history', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('not-save-message-history', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('not-save-message-history', listener);
-          return () => ipcRenderer.removeListener('not-save-message-history', listener);
+          modules.ipcRenderer.on('not-save-message-history', listener);
+          return () => modules.ipcRenderer.removeListener('not-save-message-history', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1844,9 +1849,9 @@ const ipc = {
     hotKeyOpenMainWindow: {
       set: (key: string) => {
         if (isWebsite()) {
-          webMain.setHotKeyOpenMainWindow(key);
+          modules.webMain.setHotKeyOpenMainWindow(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-hot-key-open-main-window', key);
+          modules.ipcRenderer.send('set-hot-key-open-main-window', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1854,9 +1859,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getHotKeyOpenMainWindow();
+          return modules.webMain.getHotKeyOpenMainWindow();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-hot-key-open-main-window');
+          return modules.ipcRenderer.sendSync('get-hot-key-open-main-window');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1865,12 +1870,12 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.on('hot-key-open-main-window', listener);
-          return () => webMain.webEventEmitter.removeListener('hot-key-open-main-window', listener);
+          modules.webMain.webEventEmitter.on('hot-key-open-main-window', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('hot-key-open-main-window', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.on('hot-key-open-main-window', listener);
-          return () => ipcRenderer.removeListener('hot-key-open-main-window', listener);
+          modules.ipcRenderer.on('hot-key-open-main-window', listener);
+          return () => modules.ipcRenderer.removeListener('hot-key-open-main-window', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1880,9 +1885,9 @@ const ipc = {
     hotKeyIncreaseVolume: {
       set: (key: string) => {
         if (isWebsite()) {
-          webMain.setHotKeyIncreaseVolume(key);
+          modules.webMain.setHotKeyIncreaseVolume(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-hot-key-increase-volume', key);
+          modules.ipcRenderer.send('set-hot-key-increase-volume', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1890,9 +1895,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getHotKeyIncreaseVolume();
+          return modules.webMain.getHotKeyIncreaseVolume();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-hot-key-increase-volume');
+          return modules.ipcRenderer.sendSync('get-hot-key-increase-volume');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1901,12 +1906,12 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.on('hot-key-increase-volume', listener);
-          return () => webMain.webEventEmitter.removeListener('hot-key-increase-volume', listener);
+          modules.webMain.webEventEmitter.on('hot-key-increase-volume', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('hot-key-increase-volume', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.on('hot-key-increase-volume', listener);
-          return () => ipcRenderer.removeListener('hot-key-increase-volume', listener);
+          modules.ipcRenderer.on('hot-key-increase-volume', listener);
+          return () => modules.ipcRenderer.removeListener('hot-key-increase-volume', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1916,9 +1921,9 @@ const ipc = {
     hotKeyDecreaseVolume: {
       set: (key: string) => {
         if (isWebsite()) {
-          webMain.setHotKeyDecreaseVolume(key);
+          modules.webMain.setHotKeyDecreaseVolume(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-hot-key-decrease-volume', key);
+          modules.ipcRenderer.send('set-hot-key-decrease-volume', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1926,9 +1931,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getHotKeyDecreaseVolume();
+          return modules.webMain.getHotKeyDecreaseVolume();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-hot-key-decrease-volume');
+          return modules.ipcRenderer.sendSync('get-hot-key-decrease-volume');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1937,12 +1942,12 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.on('hot-key-decrease-volume', listener);
-          return () => webMain.webEventEmitter.removeListener('hot-key-decrease-volume', listener);
+          modules.webMain.webEventEmitter.on('hot-key-decrease-volume', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('hot-key-decrease-volume', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.on('hot-key-decrease-volume', listener);
-          return () => ipcRenderer.removeListener('hot-key-decrease-volume', listener);
+          modules.ipcRenderer.on('hot-key-decrease-volume', listener);
+          return () => modules.ipcRenderer.removeListener('hot-key-decrease-volume', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1952,9 +1957,9 @@ const ipc = {
     hotKeyToggleSpeaker: {
       set: (key: string) => {
         if (isWebsite()) {
-          webMain.setHotKeyToggleSpeaker(key);
+          modules.webMain.setHotKeyToggleSpeaker(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-hot-key-toggle-speaker', key);
+          modules.ipcRenderer.send('set-hot-key-toggle-speaker', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1962,9 +1967,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getHotKeyToggleSpeaker();
+          return modules.webMain.getHotKeyToggleSpeaker();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-hot-key-toggle-speaker');
+          return modules.ipcRenderer.sendSync('get-hot-key-toggle-speaker');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1973,12 +1978,12 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.on('hot-key-toggle-speaker', listener);
-          return () => webMain.webEventEmitter.removeListener('hot-key-toggle-speaker', listener);
+          modules.webMain.webEventEmitter.on('hot-key-toggle-speaker', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('hot-key-toggle-speaker', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.on('hot-key-toggle-speaker', listener);
-          return () => ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
+          modules.ipcRenderer.on('hot-key-toggle-speaker', listener);
+          return () => modules.ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1988,9 +1993,9 @@ const ipc = {
     hotKeyToggleMicrophone: {
       set: (key: string) => {
         if (isWebsite()) {
-          webMain.setHotKeyToggleMicrophone(key);
+          modules.webMain.setHotKeyToggleMicrophone(key);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-hot-key-toggle-microphone', key);
+          modules.ipcRenderer.send('set-hot-key-toggle-microphone', key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1998,9 +2003,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getHotKeyToggleMicrophone();
+          return modules.webMain.getHotKeyToggleMicrophone();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-hot-key-toggle-microphone');
+          return modules.ipcRenderer.sendSync('get-hot-key-toggle-microphone');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2009,12 +2014,12 @@ const ipc = {
       onUpdate: (callback: (key: string) => void) => {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
-          webMain.webEventEmitter.on('hot-key-toggle-microphone', listener);
-          return () => webMain.webEventEmitter.removeListener('hot-key-toggle-microphone', listener);
+          modules.webMain.webEventEmitter.on('hot-key-toggle-microphone', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('hot-key-toggle-microphone', listener);
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
-          ipcRenderer.on('hot-key-toggle-microphone', listener);
-          return () => ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
+          modules.ipcRenderer.on('hot-key-toggle-microphone', listener);
+          return () => modules.ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2024,9 +2029,9 @@ const ipc = {
     disableAllSoundEffect: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setDisableAllSoundEffect(enabled);
+          modules.webMain.setDisableAllSoundEffect(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-disable-all-sound-effect', enabled);
+          modules.ipcRenderer.send('set-disable-all-sound-effect', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2034,9 +2039,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getDisableAllSoundEffect();
+          return modules.webMain.getDisableAllSoundEffect();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-disable-all-sound-effect');
+          return modules.ipcRenderer.sendSync('get-disable-all-sound-effect');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2045,12 +2050,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('disable-all-sound-effect', listener);
-          return () => webMain.webEventEmitter.removeListener('disable-all-sound-effect', listener);
+          modules.webMain.webEventEmitter.on('disable-all-sound-effect', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('disable-all-sound-effect', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('disable-all-sound-effect', listener);
-          return () => ipcRenderer.removeListener('disable-all-sound-effect', listener);
+          modules.ipcRenderer.on('disable-all-sound-effect', listener);
+          return () => modules.ipcRenderer.removeListener('disable-all-sound-effect', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2060,9 +2065,9 @@ const ipc = {
     enterVoiceChannelSound: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setEnterVoiceChannelSound(enabled);
+          modules.webMain.setEnterVoiceChannelSound(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-enter-voice-channel-sound', enabled);
+          modules.ipcRenderer.send('set-enter-voice-channel-sound', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2070,9 +2075,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getEnterVoiceChannelSound();
+          return modules.webMain.getEnterVoiceChannelSound();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-enter-voice-channel-sound');
+          return modules.ipcRenderer.sendSync('get-enter-voice-channel-sound');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2081,12 +2086,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('enter-voice-channel-sound', listener);
-          return () => webMain.webEventEmitter.removeListener('enter-voice-channel-sound', listener);
+          modules.webMain.webEventEmitter.on('enter-voice-channel-sound', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('enter-voice-channel-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('enter-voice-channel-sound', listener);
-          return () => ipcRenderer.removeListener('enter-voice-channel-sound', listener);
+          modules.ipcRenderer.on('enter-voice-channel-sound', listener);
+          return () => modules.ipcRenderer.removeListener('enter-voice-channel-sound', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2096,9 +2101,9 @@ const ipc = {
     leaveVoiceChannelSound: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setLeaveVoiceChannelSound(enabled);
+          modules.webMain.setLeaveVoiceChannelSound(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-leave-voice-channel-sound', enabled);
+          modules.ipcRenderer.send('set-leave-voice-channel-sound', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2106,9 +2111,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getLeaveVoiceChannelSound();
+          return modules.webMain.getLeaveVoiceChannelSound();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-leave-voice-channel-sound');
+          return modules.ipcRenderer.sendSync('get-leave-voice-channel-sound');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2117,12 +2122,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('leave-voice-channel-sound', listener);
-          return () => webMain.webEventEmitter.removeListener('leave-voice-channel-sound', listener);
+          modules.webMain.webEventEmitter.on('leave-voice-channel-sound', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('leave-voice-channel-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('leave-voice-channel-sound', listener);
-          return () => ipcRenderer.removeListener('leave-voice-channel-sound', listener);
+          modules.ipcRenderer.on('leave-voice-channel-sound', listener);
+          return () => modules.ipcRenderer.removeListener('leave-voice-channel-sound', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2132,9 +2137,9 @@ const ipc = {
     startSpeakingSound: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setStartSpeakingSound(enabled);
+          modules.webMain.setStartSpeakingSound(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-start-speaking-sound', enabled);
+          modules.ipcRenderer.send('set-start-speaking-sound', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2142,9 +2147,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getStartSpeakingSound();
+          return modules.webMain.getStartSpeakingSound();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-start-speaking-sound');
+          return modules.ipcRenderer.sendSync('get-start-speaking-sound');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2153,12 +2158,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('start-speaking-sound', listener);
-          return () => webMain.webEventEmitter.removeListener('start-speaking-sound', listener);
+          modules.webMain.webEventEmitter.on('start-speaking-sound', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('start-speaking-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('start-speaking-sound', listener);
-          return () => ipcRenderer.removeListener('start-speaking-sound', listener);
+          modules.ipcRenderer.on('start-speaking-sound', listener);
+          return () => modules.ipcRenderer.removeListener('start-speaking-sound', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2168,9 +2173,9 @@ const ipc = {
     stopSpeakingSound: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setStopSpeakingSound(enabled);
+          modules.webMain.setStopSpeakingSound(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-stop-speaking-sound', enabled);
+          modules.ipcRenderer.send('set-stop-speaking-sound', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2178,9 +2183,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getStopSpeakingSound();
+          return modules.webMain.getStopSpeakingSound();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-stop-speaking-sound');
+          return modules.ipcRenderer.sendSync('get-stop-speaking-sound');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2189,12 +2194,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('stop-speaking-sound', listener);
-          return () => webMain.webEventEmitter.removeListener('stop-speaking-sound', listener);
+          modules.webMain.webEventEmitter.on('stop-speaking-sound', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('stop-speaking-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('stop-speaking-sound', listener);
-          return () => ipcRenderer.removeListener('stop-speaking-sound', listener);
+          modules.ipcRenderer.on('stop-speaking-sound', listener);
+          return () => modules.ipcRenderer.removeListener('stop-speaking-sound', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2204,9 +2209,9 @@ const ipc = {
     receiveDirectMessageSound: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setReceiveDirectMessageSound(enabled);
+          modules.webMain.setReceiveDirectMessageSound(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-receive-direct-message-sound', enabled);
+          modules.ipcRenderer.send('set-receive-direct-message-sound', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2214,9 +2219,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getReceiveDirectMessageSound();
+          return modules.webMain.getReceiveDirectMessageSound();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-receive-direct-message-sound');
+          return modules.ipcRenderer.sendSync('get-receive-direct-message-sound');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2225,12 +2230,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('receive-direct-message-sound', listener);
-          return () => webMain.webEventEmitter.removeListener('receive-direct-message-sound', listener);
+          modules.webMain.webEventEmitter.on('receive-direct-message-sound', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('receive-direct-message-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('receive-direct-message-sound', listener);
-          return () => ipcRenderer.removeListener('receive-direct-message-sound', listener);
+          modules.ipcRenderer.on('receive-direct-message-sound', listener);
+          return () => modules.ipcRenderer.removeListener('receive-direct-message-sound', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2240,9 +2245,9 @@ const ipc = {
     receiveChannelMessageSound: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setReceiveChannelMessageSound(enabled);
+          modules.webMain.setReceiveChannelMessageSound(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-receive-channel-message-sound', enabled);
+          modules.ipcRenderer.send('set-receive-channel-message-sound', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2250,9 +2255,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getReceiveChannelMessageSound();
+          return modules.webMain.getReceiveChannelMessageSound();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-receive-channel-message-sound');
+          return modules.ipcRenderer.sendSync('get-receive-channel-message-sound');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2261,12 +2266,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('receive-channel-message-sound', listener);
-          return () => webMain.webEventEmitter.removeListener('receive-channel-message-sound', listener);
+          modules.webMain.webEventEmitter.on('receive-channel-message-sound', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('receive-channel-message-sound', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('receive-channel-message-sound', listener);
-          return () => ipcRenderer.removeListener('receive-channel-message-sound', listener);
+          modules.ipcRenderer.on('receive-channel-message-sound', listener);
+          return () => modules.ipcRenderer.removeListener('receive-channel-message-sound', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2276,9 +2281,9 @@ const ipc = {
     autoCheckForUpdates: {
       set: (enabled: boolean) => {
         if (isWebsite()) {
-          webMain.setAutoCheckForUpdates(enabled);
+          modules.webMain.setAutoCheckForUpdates(enabled);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-auto-check-for-updates', enabled);
+          modules.ipcRenderer.send('set-auto-check-for-updates', enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2286,9 +2291,9 @@ const ipc = {
 
       get: (): boolean => {
         if (isWebsite()) {
-          return webMain.getAutoCheckForUpdates();
+          return modules.webMain.getAutoCheckForUpdates();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-auto-check-for-updates');
+          return modules.ipcRenderer.sendSync('get-auto-check-for-updates');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2297,12 +2302,12 @@ const ipc = {
       onUpdate: (callback: (enabled: boolean) => void) => {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
-          webMain.webEventEmitter.on('auto-check-for-updates', listener);
-          return () => webMain.webEventEmitter.removeListener('auto-check-for-updates', listener);
+          modules.webMain.webEventEmitter.on('auto-check-for-updates', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('auto-check-for-updates', listener);
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
-          ipcRenderer.on('auto-check-for-updates', listener);
-          return () => ipcRenderer.removeListener('auto-check-for-updates', listener);
+          modules.ipcRenderer.on('auto-check-for-updates', listener);
+          return () => modules.ipcRenderer.removeListener('auto-check-for-updates', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2312,9 +2317,9 @@ const ipc = {
     updateCheckInterval: {
       set: (interval: number) => {
         if (isWebsite()) {
-          webMain.setUpdateCheckInterval(interval);
+          modules.webMain.setUpdateCheckInterval(interval);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-update-check-interval', interval);
+          modules.ipcRenderer.send('set-update-check-interval', interval);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2322,9 +2327,9 @@ const ipc = {
 
       get: (): number => {
         if (isWebsite()) {
-          return webMain.getUpdateCheckInterval();
+          return modules.webMain.getUpdateCheckInterval();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-update-check-interval');
+          return modules.ipcRenderer.sendSync('get-update-check-interval');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2333,12 +2338,12 @@ const ipc = {
       onUpdate: (callback: (interval: number) => void) => {
         if (isWebsite()) {
           const listener = (interval: number) => callback(interval);
-          webMain.webEventEmitter.on('update-check-interval', listener);
-          return () => webMain.webEventEmitter.removeListener('update-check-interval', listener);
+          modules.webMain.webEventEmitter.on('update-check-interval', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('update-check-interval', listener);
         } else if (isRenderer()) {
           const listener = (_: any, interval: number) => callback(interval);
-          ipcRenderer.on('update-check-interval', listener);
-          return () => ipcRenderer.removeListener('update-check-interval', listener);
+          modules.ipcRenderer.on('update-check-interval', listener);
+          return () => modules.ipcRenderer.removeListener('update-check-interval', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2348,9 +2353,9 @@ const ipc = {
     updateChannel: {
       set: (channel: string) => {
         if (isWebsite()) {
-          webMain.setUpdateChannel(channel);
+          modules.webMain.setUpdateChannel(channel);
         } else if (isRenderer()) {
-          ipcRenderer.send('set-update-channel', channel);
+          modules.ipcRenderer.send('set-update-channel', channel);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2358,9 +2363,9 @@ const ipc = {
 
       get: (): string => {
         if (isWebsite()) {
-          return webMain.getUpdateChannel();
+          return modules.webMain.getUpdateChannel();
         } else if (isRenderer()) {
-          return ipcRenderer.sendSync('get-update-channel');
+          return modules.ipcRenderer.sendSync('get-update-channel');
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2369,12 +2374,12 @@ const ipc = {
       onUpdate: (callback: (channel: string) => void) => {
         if (isWebsite()) {
           const listener = (channel: string) => callback(channel);
-          webMain.webEventEmitter.on('update-channel', listener);
-          return () => webMain.webEventEmitter.removeListener('update-channel', listener);
+          modules.webMain.webEventEmitter.on('update-channel', listener);
+          return () => modules.webMain.webEventEmitter.removeListener('update-channel', listener);
         } else if (isRenderer()) {
           const listener = (_: any, channel: string) => callback(channel);
-          ipcRenderer.on('update-channel', listener);
-          return () => ipcRenderer.removeListener('update-channel', listener);
+          modules.ipcRenderer.on('update-channel', listener);
+          return () => modules.ipcRenderer.removeListener('update-channel', listener);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2385,19 +2390,19 @@ const ipc = {
   network: {
     runDiagnosis: async (params: { domains: string[]; duration?: number }): Promise<any> => {
       if (isWebsite()) {
-        return await webMain.runNetworkDiagnosis(params);
+        return await modules.webMain.runNetworkDiagnosis(params);
       }
       if (isRenderer()) {
-        return await ipcRenderer.invoke('run-network-diagnosis', params);
+        return await modules.ipcRenderer.invoke('run-network-diagnosis', params);
       }
       throw new Error('Unsupported platform');
     },
 
     cancelDiagnosis: () => {
       if (isWebsite()) {
-        webMain.cancelNetworkDiagnosis();
+        modules.webMain.cancelNetworkDiagnosis();
       } else if (isRenderer()) {
-        ipcRenderer.send('cancel-network-diagnosis');
+        modules.ipcRenderer.send('cancel-network-diagnosis');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -2406,13 +2411,13 @@ const ipc = {
     onProgress: (callback: (progress: any) => void) => {
       if (isWebsite()) {
         const listener = (progress: any) => callback(progress);
-        webMain.webEventEmitter.on('network-diagnosis-progress', listener);
-        return () => webMain.webEventEmitter.removeListener('network-diagnosis-progress', listener);
+        modules.webMain.webEventEmitter.on('network-diagnosis-progress', listener);
+        return () => modules.webMain.webEventEmitter.removeListener('network-diagnosis-progress', listener);
       }
       if (isRenderer()) {
         const listener = (_: any, progress: any) => callback(progress);
-        ipcRenderer.on('network-diagnosis-progress', listener);
-        return () => ipcRenderer.removeListener('network-diagnosis-progress', listener);
+        modules.ipcRenderer.on('network-diagnosis-progress', listener);
+        return () => modules.ipcRenderer.removeListener('network-diagnosis-progress', listener);
       }
       throw new Error('Unsupported platform');
     },
@@ -2421,9 +2426,9 @@ const ipc = {
   sfuDiagnosis: {
     request: () => {
       if (isWebsite()) {
-        webMain.requestSfuDiagnosis();
+        modules.webMain.requestSfuDiagnosis();
       } else if (isRenderer()) {
-        ipcRenderer.send('request-sfu-diagnosis');
+        modules.ipcRenderer.send('request-sfu-diagnosis');
       } else {
         throw new Error('Unsupported platform');
       }
@@ -2432,13 +2437,13 @@ const ipc = {
     onResponse: (callback: (data: any) => void) => {
       if (isWebsite()) {
         const listener = (data: any) => callback(data);
-        webMain.webEventEmitter.on('sfu-diagnosis-response', listener);
-        return () => webMain.webEventEmitter.removeListener('sfu-diagnosis-response', listener);
+        modules.webMain.webEventEmitter.on('sfu-diagnosis-response', listener);
+        return () => modules.webMain.webEventEmitter.removeListener('sfu-diagnosis-response', listener);
       }
       if (isRenderer()) {
         const listener = (_: any, data: any) => callback(data);
-        ipcRenderer.on('sfu-diagnosis-response', listener);
-        return () => ipcRenderer.removeListener('sfu-diagnosis-response', listener);
+        modules.ipcRenderer.on('sfu-diagnosis-response', listener);
+        return () => modules.ipcRenderer.removeListener('sfu-diagnosis-response', listener);
       }
       throw new Error('Unsupported platform');
     },
