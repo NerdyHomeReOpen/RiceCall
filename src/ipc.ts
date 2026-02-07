@@ -1019,7 +1019,7 @@ const ipc = {
   },
 
   webrtc: {
-    confirmSignal: async (data: { signalState: string; userId: string; channelId: string; stats?: any }) => {
+    confirmSignal: async (data: { signalState: string; userId: string; channelId: string; info?: any }) => {
       if (!isElectron) return;
       return await ipcRenderer.invoke('confirm-webrtc-signal', data);
     },

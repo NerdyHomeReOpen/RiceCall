@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import ipc from '@/ipc';
 
 import MarkdownContent from '@/components/MarkdownContent';
@@ -7,33 +7,26 @@ import popupStyles from '@/styles/popup.module.css';
 
 interface ConfirmWebRTCPopupProps {
   id: string;
-  message?: string;
-  channelId?: string;
-  userId?: string;
+  count?: number;
 }
 
 // eslint-disable-next-line 
-const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, message, userId }) => {
-  // Hooks
-  
+const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, count }) => {
+  const [currentCount, setCurrentCount] = useState(count || 1);
 
   // Handlers
-  const handleYes = () => {
-    ipc.popup.submit(id, true);
+  const handleClose = () => {
     ipc.window.close();
   };
 
-  const handleNo = () => {
-    ipc.popup.submit(id, false);
-    ipc.window.close(); 
-  };
-
   useEffect(() => {
-    const timer = setTimeout(() => {
-      ipc.window.close();
-    }, 60000);
+    const removeListener = ipc.socket.on('webrtcDisconnectCountUpdate', (newCount) => {
+      setCurrentCount(newCount);
+    });
 
-    return () => clearTimeout(timer);
+    return () => {
+      removeListener();
+    };
   }, []);
 
   return (
@@ -42,16 +35,13 @@ const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, 
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['info']}`} />
           <div className={popupStyles['dialog-message']}>
-            <MarkdownContent markdownText="偵測到斷線事件，請問您是否為上麥者然後別人現在突然聽不到你的聲音了，但你還在伺服器內開麥講話？ " />
+            <MarkdownContent markdownText={`我們偵測到 ${currentCount} 次斷線，我們已經蒐集了連線資訊，正在盡力分析 請耐心等待我們修復`} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleYes}>
-          {"是"}
-        </div>
-        <div className={popupStyles['button']} onClick={handleNo}>
-          {"否"}
+        <div className={popupStyles['button']} onClick={handleClose}>
+          {"確定"}
         </div>
       </div>
     </div>

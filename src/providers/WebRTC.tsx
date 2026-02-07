@@ -604,28 +604,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     [removeSpeakerAudio],
   );
 
-  const logTransportStats = useCallback(async (transport: mediasoupClient.types.Transport, direction: string, channelId: string) => {
-    try {
-      const stats = await transport.getStats();
-      stats.forEach((report) => {
-        if (report.type === 'candidate-pair' && report.selected) {
-          const info = {
-            state: report.state,
-            currentRoundTripTime: report.currentRoundTripTime,
-            requestsSent: report.requestsSent,
-            responsesReceived: report.responsesReceived,
-            localCandidateId: report.localCandidateId,
-            remoteCandidateId: report.remoteCandidateId,
-          };
-          new Logger('WebRTC').error(`🚨 [${direction}斷線診斷] ICE Pair 詳細數據: ${JSON.stringify(info)}`);
-          ipc.webrtc.confirmSignal({ signalState: 'disconnected', userId: localStorage.getItem('userId') || '', channelId, stats: info });
-        }
-      });
-    } catch (err) {
-      new Logger('WebRTC').error(`無法取得 ${direction} Stats: ${err}`);
-    }
-  }, []);
-
   const setupSend = useCallback(async (channelId: string) => {
     if (sendTransportRef.current) {
       sendTransportRef.current.close();
@@ -672,15 +650,31 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         })
         .catch(eb);
     });
-    sendTransportRef.current.on('connectionstatechange', (s) => {
-      if (s == "failed" || s == "disconnected") {
-        if (s === 'disconnected' && sendTransportRef.current) {
-          logTransportStats(sendTransportRef.current, 'send', channelId);
-        } else {
-           ipc.webrtc.confirmSignal({ signalState: s, userId: localStorage.getItem('userId') || '', channelId });
-        }
-      }
+    sendTransportRef.current.on('connectionstatechange', async (s) => {
+      // @ts-expect-error for debugging
+      window["testSFU"] = sendTransportRef.current;
       new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
+      if (s != "failed" && s != "disconnected") return;
+
+      let info;
+      if (s != "failed") {
+        const stats = await sendTransportRef.current?.getStats();
+        stats?.forEach((report) => {
+          if (report.type === 'candidate-pair' && report.nominated) {
+            info = {
+              state: report.state, // 通常會變成 'disconnected' 或 'frozen'
+              currentRoundTripTime: report.currentRoundTripTime, // 如果是 undefined 或 0，代表不通了
+              requestsSent: report.requestsSent, // 我送了多少 STUN 請求
+              responsesReceived: report.responsesReceived, // 我收到了多少 STUN 回應
+              localCandidateId: report.localCandidateId,
+              remoteCandidateId: report.remoteCandidateId
+            }
+          }
+        });
+        new Logger("WebRTC").error(`SendTransport connection ${s}, stats: ${JSON.stringify(info)}`);
+      }
+
+      ipc.webrtc.confirmSignal({ signalState: s, userId: localStorage.getItem('userId') || '', channelId, info });
     });
 
     const track = inputDesRef.current?.stream.getAudioTracks()[0];
@@ -704,7 +698,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       new Logger('WebRTC').info('Producer track ended');
       audioProducerRef.current?.close();
     });
-  }, [logTransportStats]);
+  }, []);
 
   const setupRecv = useCallback(
     async (channelId: string) => {

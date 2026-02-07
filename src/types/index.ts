@@ -393,6 +393,7 @@ export type ServerToClientEvents = {
   SFULeft: () => void;
   SFUNewProducer: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
   SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
+  webrtcDisconnectCountUpdate: (count: number) => void;
   // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Popup
