@@ -9,11 +9,12 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface BlockMemberPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   member: Types.Member;
 }
 
-const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId, member }) => {
+const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -33,11 +34,11 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
 
   const handleConfirmBtnClick = () => {
     Popup.blockUserFromServer(member.userId, serverId, -1);
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

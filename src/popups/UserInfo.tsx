@@ -14,7 +14,6 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Popup from '@/utils/popup';
 import * as Permission from '@/utils/permission';
-import { platformStorage } from '@/platform/storage';
 import ObjDiff from '@/utils/objDiff';
 
 import { MAX_FILE_SIZE } from '@/constant';
@@ -26,12 +25,13 @@ import permissionStyles from '@/styles/permission.module.css';
 import emojiStyles from '@/styles/emoji.module.css';
 
 interface UserInfoPopupProps {
+  id: string;
   friend: Types.Friend | null;
   target: Types.User;
   targetServers: Types.Server[];
 }
 
-const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target: targetData, targetServers }) => {
+const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, target: targetData, targetServers }) => {
   // Hooks
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
@@ -107,7 +107,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
 
   // Handlers
   const handleServerSelect = (server: Types.Server) => {
-    platformStorage.setItem('trigger-handle-server-select', JSON.stringify({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() }));
+    ipc.sendServerSelect({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   const handleAvatarClick = () => {
@@ -224,11 +224,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   };
 
   const handleMinimizeBtnClick = () => {
-    ipc.window.minimize();
+    ipc.window.minimize(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects
@@ -254,7 +254,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ friend, target
   return (
     <div className={`${popupStyles['popup-wrapper']} ${styles['user-profile']}`}>
       <div className={styles['profile-box']}>
-        <div className={styles['header']}>
+        <div data-draggable className={styles['header']}>
           <div className={styles['window-action-buttons']}>
             <div className={styles['minimize-btn']} onClick={handleMinimizeBtnClick} />
             <div className={styles['close-btn']} onClick={handleCloseBtnClick} />

@@ -26,12 +26,13 @@ import settingStyles from '@/styles/setting.module.css';
 import permissionStyles from '@/styles/permission.module.css';
 
 interface ChannelSettingPopupProps {
+  id: string;
   server: Types.Server;
   channel: Types.Channel;
   channelMembers: Types.Member[];
 }
 
-const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ server, channel: channelData, channelMembers: channelMembersData }) => {
+const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id, server, channel: channelData, channelMembers: channelMembersData }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
@@ -234,11 +235,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ se
 
   const handleConfirmBtnClick = () => {
     Popup.editChannel(server.serverId, channel.channelId, ObjDiff(channel, channelData));
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects

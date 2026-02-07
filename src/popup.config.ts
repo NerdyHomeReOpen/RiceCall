@@ -1,15 +1,4 @@
-/**
- * Unified Popup Configuration
- *
- * This file defines all popup settings used by both Electron (main.ts) and Web (InAppPopupHost.tsx).
- * Changes here will automatically apply to both platforms.
- */
-
 import type * as Types from '@/types';
-
-// ============================================================================
-// Popup Size Configuration
-// ============================================================================
 
 export interface PopupSizeConfig {
   width: number;
@@ -61,14 +50,8 @@ export const POPUP_SIZES: Record<Types.PopupType, PopupSizeConfig> = {
   networkDiagnosis: { width: 400, height: 500 },
 };
 
-// ============================================================================
-// Popup Header Configuration
-// ============================================================================
-
-export type PopupHeaderButton = 'minimize' | 'maxsize' | 'close';
-
 export interface PopupHeaderConfig {
-  buttons: PopupHeaderButton[];
+  buttons: ('minimize' | 'maxsize' | 'close')[];
   hideHeader: boolean;
 }
 
@@ -117,10 +100,6 @@ export const POPUP_HEADERS: Record<Types.PopupType, PopupHeaderConfig> = {
   networkDiagnosis: { buttons: ['close'], hideHeader: false },
 };
 
-// ============================================================================
-// Popup Title Keys (i18n)
-// ============================================================================
-
 export const POPUP_TITLE_KEYS: Record<Types.PopupType, string> = {
   aboutus: 'about-ricecall',
   applyFriend: 'apply-friend',
@@ -166,16 +145,9 @@ export const POPUP_TITLE_KEYS: Record<Types.PopupType, string> = {
   networkDiagnosis: 'network-diagnosis',
 };
 
-// ============================================================================
-// Popup Behavior Configuration
-// ============================================================================
-
 export interface PopupBehaviorConfig {
-  /** Whether the popup can be resized */
   resizable: boolean;
-  /** Whether the popup can be maximized */
   maximizable: boolean;
-  /** Whether the popup can go fullscreen */
   fullscreenable: boolean;
 }
 
@@ -224,73 +196,15 @@ export const POPUP_BEHAVIORS: Record<Types.PopupType, PopupBehaviorConfig> = {
   networkDiagnosis: { resizable: false, maximizable: false, fullscreenable: false },
 };
 
-// ============================================================================
-// Popup Component Mapping
-// ============================================================================
-
-/**
- * Map popup types to their component file names (without extension).
- * This is used by the code generator to create imports.
- */
-export const POPUP_COMPONENTS: Record<Types.PopupType, string> = {
-  aboutus: 'About',
-  applyFriend: 'ApplyFriend',
-  approveFriend: 'ApproveFriend',
-  applyMember: 'ApplyMember',
-  blockMember: 'BlockMember',
-  channelEvent: 'ChannelEvent',
-  changeTheme: 'ChangeTheme',
-  channelPassword: 'ChannelPassword',
-  channelSetting: 'ChannelSetting',
-  chatHistory: 'chatHistory',
-  createServer: 'CreateServer',
-  createChannel: 'CreateChannel',
-  createFriendGroup: 'CreateFriendGroup',
-  directMessage: 'DirectMessage',
-  dialogAlert: 'Dialog',
-  dialogAlert2: 'Dialog',
-  dialogSuccess: 'Dialog',
-  dialogWarning: 'Dialog',
-  dialogError: 'Dialog',
-  dialogInfo: 'Dialog',
-  editChannelOrder: 'EditChannelOrder',
-  editChannelName: 'EditChannelName',
-  editNickname: 'EditNickname',
-  editFriendNote: 'EditFriendNote',
-  editFriendGroupName: 'EditFriendGroupName',
-  friendVerification: 'FriendVerification',
-  imageCropper: 'ImageCropper',
-  inviteFriend: 'InviteFriend',
-  inviteMember: 'InviteMember',
-  kickMemberFromChannel: 'KickMemberFromChannel',
-  kickMemberFromServer: 'KickMemberFromServer',
-  memberApplicationSetting: 'MemberApplicationSetting',
-  memberInvitation: 'MemberInvitation',
-  searchUser: 'SearchUser',
-  serverAnnouncement: 'ServerAnnouncement',
-  serverApplication: 'ServerApplication',
-  serverSetting: 'ServerSetting',
-  serverBroadcast: 'ServerBroadcast',
-  systemSetting: 'SystemSetting',
-  userInfo: 'UserInfo',
-  userSetting: 'UserSetting',
-  networkDiagnosis: 'NetworkDiagnosis',
-};
-
-// ============================================================================
-// Helper Functions
-// ============================================================================
-
 /**
  * Get the full popup configuration for a given type.
  */
 export function getPopupConfig(type: Types.PopupType) {
   return {
     size: POPUP_SIZES[type],
-    header: POPUP_HEADERS[type],
-    titleKey: POPUP_TITLE_KEYS[type],
-    behavior: POPUP_BEHAVIORS[type],
-    component: POPUP_COMPONENTS[type],
+    title: POPUP_TITLE_KEYS[type],
+    ...POPUP_HEADERS[type],
+    ...POPUP_BEHAVIORS[type],
   };
 }
 

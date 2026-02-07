@@ -11,11 +11,12 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface ApplyFriendPopupProps {
+  id: string;
   target: Types.User;
   friendApplication: Types.FriendApplication | null;
 }
 
-const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ target, friendApplication }) => {
+const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, target, friendApplication }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -62,16 +63,16 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ target, 
 
   const handleSubmitBtnClick = () => {
     Popup.sendFriendApplication(target.userId, { description: applicationDesc }, friendGroupId || null);
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
     Popup.editFriendApplication(target.userId, { description: applicationDesc });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

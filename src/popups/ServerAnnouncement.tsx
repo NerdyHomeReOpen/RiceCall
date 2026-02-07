@@ -10,18 +10,19 @@ import popupStyles from '@/styles/popup.module.css';
 import styles from '@/styles/serverAnnouncement.module.css';
 
 interface ServerAnnouncementPopupProps {
+  id: string;
   announcement: Types.Server['announcement'];
 }
 
-const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.memo(({ announcement }) => {
+const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.memo(({ id, announcement }) => {
   const { t } = useTranslation();
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (
-    <div className={`${popupStyles['popup-wrapper']}`}>
+    <div data-draggable className={`${popupStyles['popup-wrapper']}`}>
       <div className={styles['headers']}>
         <div className={styles['tabs']}>
           <span>{t('announcement')}</span>

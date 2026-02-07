@@ -9,11 +9,12 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditNicknamePopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   member: Types.Member;
 }
 
-const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ serverId, member }) => {
+const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -23,7 +24,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ server
   // Handlers
   const handleConfirmBtnClick = () => {
     Popup.editMember(member.userId, serverId, { nickname: memberNickname || null });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleApplyBtnClick = () => {
@@ -31,7 +32,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ server
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

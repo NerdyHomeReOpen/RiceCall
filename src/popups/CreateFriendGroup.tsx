@@ -8,7 +8,11 @@ import * as Default from '@/utils/default';
 
 import popupStyles from '@/styles/popup.module.css';
 
-const CreateFriendGroupPopup: React.FC = React.memo(() => {
+interface CreateFriendGroupPopupProps {
+  id: string;
+}
+
+const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo(({ id }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -26,11 +30,11 @@ const CreateFriendGroupPopup: React.FC = React.memo(() => {
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
     ipc.socket.send('createFriendGroup', { preset: { name: friendGroupName } });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

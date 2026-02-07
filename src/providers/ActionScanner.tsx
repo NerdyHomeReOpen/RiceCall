@@ -3,7 +3,7 @@ import ipc from '@/ipc';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
-import Logger from '@/utils/logger';
+import Logger from '@/logger';
 
 type ActionScannerContextType = {
   isIdling: boolean;

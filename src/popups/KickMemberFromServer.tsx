@@ -11,11 +11,12 @@ import popupStyles from '@/styles/popup.module.css';
 import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constant';
 
 interface KickMemberFromServerPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   member: Types.Member;
 }
 
-const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = React.memo(({ serverId, member }) => {
+const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = React.memo(({ id, serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -82,11 +83,11 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
 
   const handleConfirmBtnClick = () => {
     Popup.blockUserFromServer(member.userId, serverId, Date.now() + getBlockTime());
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

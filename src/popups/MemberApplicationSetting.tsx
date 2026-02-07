@@ -9,10 +9,11 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface MemberApplicationSettingPopupProps {
+  id: string;
   server: Types.Server;
 }
 
-const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ server }) => {
+const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ id, server }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -31,11 +32,11 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
 
   const handleConfirmBtnClick = () => {
     Popup.editServer(server.serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

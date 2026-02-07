@@ -12,3 +12,7 @@ export function getToken(): string {
 export function setToken(token: string): void {
   _token = token;
 }
+
+export function removeToken(): void {
+  _token = '';
+}

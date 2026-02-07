@@ -15,7 +15,11 @@ import styles from '@/styles/createServer.module.css';
 import popupStyles from '@/styles/popup.module.css';
 import settingStyles from '@/styles/setting.module.css';
 
-const CreateServerPopup: React.FC = React.memo(() => {
+interface CreateServerPopupProps {
+  id: string;
+}
+
+const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -85,11 +89,11 @@ const CreateServerPopup: React.FC = React.memo(() => {
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
     Popup.createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

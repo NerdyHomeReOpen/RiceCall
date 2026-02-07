@@ -132,12 +132,12 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
       const arrayBuffer = await blob.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
       ipc.popup.submit(id, uint8Array);
-      ipc.window.close();
+      ipc.popup.close(id);
     }, 'image/webp');
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects

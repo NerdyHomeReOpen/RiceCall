@@ -1,13 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { z } from 'zod';
-import { isElectron } from '@/platform/isElectron';
+import { isElectron, isRenderer } from '@/platform/isElectron';
 import Logger from '@/logger';
 
-export let env: Record<string, string> = {
-  API_URL: '',
-  WS_URL: '',
-  CROWDIN_DISTRIBUTION_HASH: '',
-};
+let env: Record<string, string> | null = null;
 
 const EnvSchema = z.object({
   API_URL: z.string(),
@@ -18,36 +14,36 @@ const EnvSchema = z.object({
 
 export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
   let envLoaded: Record<string, string> = {};
-  const _isElectron = isElectron();
-  const isRenderer = typeof window !== 'undefined';
 
-  if (_isElectron) {
+  if (isElectron()) {
     try {
       let electron: any;
       let path: any;
       let dotenv: any;
       let expand: any;
 
-      if (isRenderer) {
-        electron = (window as any).require('electron');
-        path = (window as any).require('path');
-        dotenv = (window as any).require('dotenv');
-        expand = (window as any).require('dotenv-expand').expand;
+      if (isRenderer()) {
+        electron = window.require('electron');
+        path = window.require('path');
+        dotenv = window.require('dotenv');
+        expand = window.require('dotenv-expand').expand;
       } else {
-        const { createRequire } = await import(/* webpackIgnore: true */ 'module');
-        const _require = createRequire(import.meta.url);
-
-        electron = _require('electron');
-        path = _require('path');
-        dotenv = _require('dotenv');
-        expand = _require('dotenv-expand').expand;
+        await import(/* webpackIgnore: true */ 'module')
+          .then((module) => module.createRequire)
+          .then((createRequire) => {
+            const require = createRequire(import.meta.url);
+            electron = require('electron');
+            path = require('path');
+            dotenv = require('dotenv');
+            expand = require('dotenv-expand').expand;
+          });
       }
 
       const app = electron.app || (electron.remote && electron.remote.app);
       envLoaded = { ...process.env } as any;
 
       const envPaths: string[] = [];
-      const root = !isRenderer ? process.cwd() : '/';
+      const root = !isRenderer() ? process.cwd() : '/';
 
       if (app && app.isPackaged) {
         const resourcesPath = process.resourcesPath;
@@ -66,9 +62,9 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
     }
   } else {
     envLoaded = {
-      API_URL: process.env.NEXT_PUBLIC_API_BASE_URL || '',
-      WS_URL: process.env.NEXT_PUBLIC_WS_URL || '',
-      CROWDIN_DISTRIBUTION_HASH: process.env.NEXT_PUBLIC_CROWDIN_DISTRIBUTION_HASH || '',
+      API_URL: process.env.API_URL || '',
+      WS_URL: process.env.WS_URL || '',
+      CROWDIN_DISTRIBUTION_HASH: process.env.CROWDIN_DISTRIBUTION_HASH || '',
     };
   }
 
@@ -82,3 +78,13 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
   env = envLoaded;
   return { env };
 }
+
+export function getEnv() {
+  if (!env) {
+    new Logger('Env').error('Env is not loaded');
+    return {};
+  }
+  return env;
+}
+
+loadEnv();

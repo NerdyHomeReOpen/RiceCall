@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 import packageJson from '../../package.json';
-const version = packageJson.version;
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -12,7 +11,11 @@ import MarkdownContent from '@/components/MarkdownContent';
 import styles from '@/styles/about.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
-const AboutPopup: React.FC = React.memo(() => {
+interface AboutPopupProps {
+  id: string;
+}
+
+const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -42,7 +45,7 @@ const AboutPopup: React.FC = React.memo(() => {
 
   const handleCloseBtnClick = () => {
     if (dontShowNextTime) ipc.dontShowDisclaimerNextTime();
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects
@@ -56,13 +59,13 @@ const AboutPopup: React.FC = React.memo(() => {
   }, []);
 
   return (
-    <div className={`${popupStyles['popup-wrapper']}`}>
+    <div className={popupStyles['popup-wrapper']}>
       <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['content']} style={{ justifyContent: 'flex-start' }}>
+        <div className={popupStyles['content']} style={{ justifyContent: 'flex-start', gap: '10px' }}>
           <div className={styles['app-logo']} />
           <div className={styles['app-info']}>
-            <div className={styles['app-version-text']}>{`RiceCall v${version}`}</div>
-            <div className={styles['copyright-text']}>{`COPYRIGHT @ ${currentYear} RiceCall.com ,ALL RIGHTS RESERVED.`}</div>
+            <div className={styles['app-version-text']}>{`RiceCall v${packageJson.version}`}</div>
+            <div className={styles['copyright-text']}>{`COPYRIGHT @ ${currentYear} ricecall.com ,ALL RIGHTS RESERVED.`}</div>
             <div className={popupStyles['row']} style={{ alignSelf: 'center' }}>
               <div className={popupStyles['link-text']} onClick={handleGetHelpLinkClick}>
                 {t('get-help')}

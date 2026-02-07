@@ -2,147 +2,68 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
-import { POPUP_HEADERS } from '@/popup.config';
-import { renderPopup } from '@/platform/popup/popupComponents.generated';
-import { PopupHeader } from '@/components/common/PopupHeader';
+
+import About from '@/popups/About';
+import ApplyFriend from '@/popups/ApplyFriend';
+import ApproveFriend from '@/popups/ApproveFriend';
+import ApplyMember from '@/popups/ApplyMember';
+import BlockMember from '@/popups/BlockMember';
+import ChangeTheme from '@/popups/ChangeTheme';
+import ChannelEvent from '@/popups/ChannelEvent';
+import ChannelPassword from '@/popups/ChannelPassword';
+import ChannelSetting from '@/popups/ChannelSetting';
+import ChatHistory from '@/popups/ChatHistory';
+import CreateChannel from '@/popups/CreateChannel';
+import CreateFriendGroup from '@/popups/CreateFriendGroup';
+import CreateServer from '@/popups/CreateServer';
+import Dialog from '@/popups/Dialog';
+import DirectMessage from '@/popups/DirectMessage';
+import EditChannelName from '@/popups/EditChannelName';
+import EditChannelOrder from '@/popups/EditChannelOrder';
+import EditNickname from '@/popups/EditNickname';
+import EditFriendNote from '@/popups/EditFriendNote';
+import EditFriendGroupName from '@/popups/EditFriendGroupName';
+import FriendVerification from '@/popups/FriendVerification';
+import KickMemberFromChannel from '@/popups/KickMemberFromChannel';
+import KickMemberFromServer from '@/popups/KickMemberFromServer';
+import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
+import MemberInvitation from '@/popups/MemberInvitation';
+import NetworkDiagnosis from '@/popups/NetworkDiagnosis';
+import ImageCropper from '@/popups/ImageCropper';
+import InviteFriend from '@/popups/InviteFriend';
+import InviteMember from '@/popups/InviteMember';
+import SearchUser from '@/popups/SearchUser';
+import ServerAnnouncement from '@/popups/ServerAnnouncement';
+import ServerApplication from '@/popups/ServerApplication';
+import ServerSetting from '@/popups/ServerSetting';
+import ServerBroadcast from '@/popups/ServerBroadcast';
+import SystemSetting from '@/popups/SystemSetting';
+import UserInfo from '@/popups/UserInfo';
+
+import { getPopupConfig } from '@/popup.config';
 
 import SocketManager from '@/components/SocketManager';
 
-import header from '@/styles/header.module.css';
-import { isElectron } from '@/platform/isElectron';
-import * as PopupLoader from '@/platform/popup/popupLoader';
+import headerStyle from '@/styles/header.module.css';
 
-// async function hydrateUserInfoInitialData(initialData: any): Promise<any> {
-//   // UserInfo/UserSetting popups expect `target` and `targetServers`.
-//   // On Electron those are often passed eagerly; on web we may only have ids.
-//   if (!initialData || typeof initialData !== 'object') return initialData;
-
-//   const userId = initialData.userId;
-//   const targetId = initialData.targetId;
-//   if (!userId || !targetId) return initialData;
-
-//   const hasTarget = initialData.target && typeof initialData.target === 'object';
-//   const hasTargetServers = Array.isArray(initialData.targetServers);
-//   if (hasTarget && hasTargetServers) return initialData;
-
-//   try {
-//     const [target, targetServers] = await Promise.all([
-//       hasTarget ? Promise.resolve(initialData.target) : ipc.data.user({ userId: targetId }),
-//       hasTargetServers ? Promise.resolve(initialData.targetServers) : ipc.data.servers({ userId: targetId }),
-//     ]);
-
-//     // Don't replace existing values with null-ish results.
-//     return {
-//       ...initialData,
-//       target: target ?? initialData.target ?? null,
-//       targetServers: targetServers ?? initialData.targetServers ?? [],
-//     };
-//   } catch {
-//     return {
-//       ...initialData,
-//       target: initialData.target ?? null,
-//       targetServers: initialData.targetServers ?? [],
-//     };
-//   }
-// }
-
-function getWebInitialData(id: string): any | null {
-  try {
-    const key = `ricecall:popup:initialData:${id}`;
-    // New tab/window does not share sessionStorage with the opener.
-    const raw = sessionStorage.getItem(key) ?? localStorage.getItem(key);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    // Best-effort cleanup to avoid stale data reuse.
-    try {
-      sessionStorage.removeItem(key);
-    } catch {
-      // ignore
-    }
-    try {
-      localStorage.removeItem(key);
-    } catch {
-      // ignore
-    }
-    return parsed;
-  } catch {
-    return null;
-  }
+interface HeaderProps {
+  id: string;
+  title: string;
+  buttons: ('minimize' | 'maxsize' | 'close')[];
+  titleBoxIcon?: string;
 }
 
-const PopupPageComponent: React.FC = React.memo(() => {
+const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBoxIcon }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [id, setId] = useState<string | null>(null);
-  const [type, setType] = useState<Types.PopupType | null>(null);
-  const [initialData, setInitialData] = useState<any | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  // Variables
-  const { buttons, hideHeader } = useMemo(() => {
-    if (!type) return { buttons: [], hideHeader: true };
-    return POPUP_HEADERS[type] ?? { buttons: ['close'], hideHeader: false };
-  }, [type]);
-
-  const title = useMemo(() => {
-    if (!type) return '';
-    return {
-      aboutus: t('about-ricecall'),
-      applyFriend: t('apply-friend'),
-      applyMember: t('apply-member'),
-      approveFriend: t('approve-friend'),
-      blockMember: t('block'),
-      channelEvent: t('channel-event'),
-      changeTheme: t('change-theme'),
-      channelPassword: t('please-enter-the-channel-password'),
-      channelSetting: initialData?.channel?.name || t('edit-channel'),
-      chatHistory: t('chat-history'),
-      createServer: t('create-server'),
-      createChannel: t('create-channel'),
-      createFriendGroup: t('create-friend-group'),
-      dialogAlert: t('alert'),
-      dialogAlert2: t('alert'),
-      dialogError: t('error'),
-      dialogInfo: t('info'),
-      dialogSuccess: t('success'),
-      dialogWarning: t('warning'),
-      directMessage: initialData?.target?.name || t('direct-message'),
-      editChannelOrder: t('edit-channel-order'),
-      editChannelName: t('edit-channel-name'),
-      editFriendNote: t('edit-friend-note'),
-      editFriendGroupName: t('edit-friend-group-name'),
-      editNickname: t('edit-nickname'),
-      friendVerification: t('friend-verification'),
-      imageCropper: t('image-cropper'),
-      inviteFriend: t('invite-friend-to-server'),
-      inviteMember: t('invite-member'),
-      kickMemberFromChannel: t('kick-channel'),
-      kickMemberFromServer: t('kick-server'),
-      memberApplicationSetting: t('member-application-setting'),
-      memberInvitation: t('member-invitation'),
-      searchUser: t('search-user'),
-      serverAnnouncement: t('announcement'),
-      serverApplication: t('server-application'),
-      serverBroadcast: t('server-broadcast'),
-      serverSetting: initialData?.server?.name || t('server-setting'),
-      systemSetting: t('system-setting'),
-      userInfo: t('user-info'),
-      userSetting: t('user-setting'),
-      networkDiagnosis: t('network-diagnosis'),
-    }[type];
-  }, [type, initialData, t]);
-
-  const node = useMemo<() => React.ReactNode | null>(() => {
-    if (!type || !initialData) return () => null;
-    return () => renderPopup(type, id!, initialData);
-  }, [id, type, initialData]);
 
   // Handlers
   const handleMaximizeBtnClick = () => {
@@ -156,12 +77,114 @@ const PopupPageComponent: React.FC = React.memo(() => {
   };
 
   const handleMinimizeBtnClick = () => {
-    ipc.window.minimize();
+    ipc.window.minimize(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
+
+  // Effects
+  useEffect(() => {
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
+  }, []);
+
+  return (
+    <header className={`${headerStyle['header']} ${headerStyle['popup']}`}>
+      <div className={headerStyle['title-wrapper']}>
+        <div className={`${headerStyle['title-box']} ${titleBoxIcon}`}>
+          <div className={headerStyle['title']}>{t(title)}</div>
+        </div>
+        <div className={headerStyle['buttons']}>
+          {buttons.includes('minimize') && <div className={headerStyle['minimize']} onClick={handleMinimizeBtnClick} />}
+          {buttons.includes('maxsize') &&
+            (isFullscreen ? <div className={headerStyle['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyle['maxsize']} onClick={handleMaximizeBtnClick} />)}
+          {buttons.includes('close') && <div className={headerStyle['close']} onClick={handleCloseBtnClick} />}
+        </div>
+      </div>
+    </header>
+  );
+});
+
+Header.displayName = 'Header';
+
+const PopupPageComponent: React.FC = React.memo(() => {
+  // States
+  const [popup, setPopup] = useState<Types.Popup | null>(null);
+
+  // Functions
+  const getPopup = useCallback((type: Types.PopupType, id: string, initialData?: any): Types.Popup => {
+    const node: Record<Types.PopupType, () => React.ReactNode> = {
+      aboutus: () => <About id={id} {...initialData} />,
+      applyFriend: () => <ApplyFriend id={id} {...initialData} />,
+      applyMember: () => <ApplyMember id={id} {...initialData} />,
+      approveFriend: () => <ApproveFriend id={id} {...initialData} />,
+      blockMember: () => <BlockMember id={id} {...initialData} />,
+      changeTheme: () => <ChangeTheme id={id} {...initialData} />,
+      channelEvent: () => <ChannelEvent id={id} {...initialData} />,
+      channelPassword: () => <ChannelPassword id={id} {...initialData} />,
+      channelSetting: () => <ChannelSetting id={id} {...initialData} />,
+      chatHistory: () => <ChatHistory id={id} {...initialData} />,
+      createChannel: () => <CreateChannel id={id} {...initialData} />,
+      createFriendGroup: () => <CreateFriendGroup id={id} {...initialData} />,
+      createServer: () => <CreateServer id={id} {...initialData} />,
+      dialogAlert: () => <Dialog id={id} iconType="ALERT" {...initialData} />,
+      dialogAlert2: () => <Dialog id={id} iconType="ALERT" {...initialData} />,
+      dialogError: () => <Dialog id={id} iconType="ERROR" {...initialData} />,
+      dialogInfo: () => <Dialog id={id} iconType="INFO" {...initialData} />,
+      dialogSuccess: () => <Dialog id={id} iconType="SUCCESS" {...initialData} />,
+      dialogWarning: () => <Dialog id={id} iconType="WARNING" {...initialData} />,
+      directMessage: () => <DirectMessage id={id} {...initialData} />,
+      editChannelOrder: () => <EditChannelOrder id={id} {...initialData} />,
+      editChannelName: () => <EditChannelName id={id} {...initialData} />,
+      editFriendNote: () => <EditFriendNote id={id} {...initialData} />,
+      editFriendGroupName: () => <EditFriendGroupName id={id} {...initialData} />,
+      editNickname: () => <EditNickname id={id} {...initialData} />,
+      friendVerification: () => <FriendVerification id={id} {...initialData} />,
+      imageCropper: () => <ImageCropper id={id} {...initialData} />,
+      inviteFriend: () => <InviteFriend id={id} {...initialData} />,
+      inviteMember: () => <InviteMember id={id} {...initialData} />,
+      kickMemberFromChannel: () => <KickMemberFromChannel id={id} {...initialData} />,
+      kickMemberFromServer: () => <KickMemberFromServer id={id} {...initialData} />,
+      memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
+      memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
+      networkDiagnosis: () => <NetworkDiagnosis id={id} {...initialData} />,
+      searchUser: () => <SearchUser id={id} {...initialData} />,
+      serverAnnouncement: () => <ServerAnnouncement id={id} {...initialData} />,
+      serverApplication: () => <ServerApplication id={id} {...initialData} />,
+      serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
+      serverSetting: () => <ServerSetting id={id} {...initialData} />,
+      systemSetting: () => <SystemSetting id={id} {...initialData} />,
+      userInfo: () => <UserInfo id={id} {...initialData} />,
+      userSetting: () => <UserInfo id={id} {...initialData} />,
+    };
+
+    const config = getPopupConfig(type);
+
+    switch (type) {
+      case 'channelSetting':
+        config.title = initialData?.channel?.name ?? config.title;
+        break;
+      case 'directMessage':
+        config.title = initialData?.target?.name ?? config.title;
+        break;
+      case 'userInfo':
+        config.title = initialData?.target?.name ?? config.title;
+        break;
+      case 'serverSetting':
+        config.title = initialData?.server?.name ?? config.title;
+        break;
+    }
+
+    return {
+      id,
+      type,
+      position: { top: 0, left: 0 },
+      ...config,
+      node: node[type as keyof typeof node],
+    };
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -169,74 +192,26 @@ const PopupPageComponent: React.FC = React.memo(() => {
       const params = new URLSearchParams(window.location.search);
       const type = params.get('type') as Types.PopupType;
       const id = params.get('id') as string;
-      setId(id || null);
-      setType(type || null);
+      const initialData = ipc.initialData.get(id);
+
+      const popup = getPopup(type, id, initialData);
+
+      setPopup(popup);
     }
-  }, []);
-
-  useEffect(() => {
-    if (!id || !type) return;
-    const isDesktop = isElectron();
-    const raw = isDesktop ? ipc.initialData.get(id) : getWebInitialData(id);
-    
-    // Simulate Electron's Main-Process Loader:
-    // We run the loader on the initialData to "hydrate" it before rendering.
-    // This ensures props are full even if Redux is empty (simulating the lag).
-    const loader = (PopupLoader.loaders as any)[type];
-    if (loader && !isDesktop) {
-      loader(raw).then((hydrated: any) => {
-        // Replicate Electron behavior: Inject data into a global seed to simulate preloadedState
-        (window as any).__PRELOADED_STATE_SEED__ = hydrated;
-        setInitialData(hydrated);
-      });
-    } else {
-      (window as any).__PRELOADED_STATE_SEED__ = raw;
-      setInitialData(raw);
-    }
-  }, [id, type]);
-
-  useEffect(() => {
-    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, []);
-
-  const missingInitialData = useMemo(() => {
-    // Most popups expect an object to spread as props; null/undefined will crash.
-    // In web mode, opening in a new tab + refresh can make initialData unavailable.
-    if (!type || !id) return false;
-    return initialData == null || typeof initialData !== 'object';
-  }, [type, id, initialData]);
+  }, [getPopup]);
 
   return (
     <>
-      {/* SocketManager is provided by the RootPage in web in-app mode. 
-          Only include it if we might be in a standalone popup window. */}
-      {isElectron() && <SocketManager />}
-      {!isElectron() && typeof window !== 'undefined' && window.opener && <SocketManager />}
-      {!hideHeader && (
-        <PopupHeader
-          title={title}
-          buttons={buttons}
-          titleBoxIcon={type === 'changeTheme' ? header['title-box-skin-icon'] : type === 'directMessage' ? header['title-box-direct-message-icon'] : undefined}
-          isFullscreen={isFullscreen}
-          onMinimize={handleMinimizeBtnClick}
-          onMaximize={handleMaximizeBtnClick}
-          onRestore={handleUnmaximizeBtnClick}
-          onClose={handleCloseBtnClick}
+      <SocketManager />
+      {popup && !popup.hideHeader && (
+        <Header
+          id={popup.id}
+          title={popup.title}
+          buttons={popup.buttons}
+          titleBoxIcon={popup.type === 'changeTheme' ? headerStyle['title-box-skin-icon'] : popup.type === 'directMessage' ? headerStyle['title-box-direct-message-icon'] : undefined}
         />
       )}
-      {missingInitialData ? (
-        <div style={{ padding: 16, fontFamily: 'system-ui, sans-serif' }}>
-          <h3 style={{ margin: '0 0 8px 0' }}>Popup data missing</h3>
-          <div style={{ opacity: 0.85, lineHeight: 1.4 }}>
-            This popup was opened in a new tab/window, but its initial data wasn’t available.
-            <br />
-            Please close this tab and try opening the popup again.
-          </div>
-        </div>
-      ) : (
-        node && node()
-      )}
+      {popup && popup.node()}
     </>
   );
 });

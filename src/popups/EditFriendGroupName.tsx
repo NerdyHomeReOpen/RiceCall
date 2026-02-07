@@ -9,10 +9,11 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditFriendGroupNamePopupProps {
+  id: string;
   friendGroup: Types.FriendGroup;
 }
 
-const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ friendGroup }) => {
+const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ id, friendGroup }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -34,7 +35,7 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

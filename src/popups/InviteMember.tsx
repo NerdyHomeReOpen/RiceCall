@@ -9,12 +9,13 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface InviteMemberPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   target: Types.Member;
   memberInvitation: Types.MemberInvitation | null;
 }
 
-const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ serverId, target, memberInvitation }) => {
+const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, serverId, target, memberInvitation }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -42,7 +43,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ server
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

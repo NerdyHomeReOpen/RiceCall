@@ -2,7 +2,7 @@
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import ipc from '@/ipc';
+import { getEnv } from '@/env';
 
 import type * as Types from '@/types';
 
@@ -80,7 +80,7 @@ const APP_TO_CROWDIN: Record<Types.LanguageKey, string> = {
   'tr-TR': 'tr',
 };
 
-const getHash = () => ipc.env.get()?.CROWDIN_DISTRIBUTION_HASH || '';
+const getHash = () => getEnv().CROWDIN_DISTRIBUTION_HASH || '';
 
 /** OTA backend */
 class CrowdinBackend {

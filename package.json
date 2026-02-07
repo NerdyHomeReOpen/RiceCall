@@ -8,7 +8,7 @@
     "email": "support@ricecall.com",
     "url": "https://ricecall.com"
   },
-  "main": "./build/main.js",
+  "main": "./build/src/electron/main.js",
   "engines": {
     "node": ">=20"
   },
@@ -20,8 +20,8 @@
     "next:export": "next export",
     "next:lint": "next lint",
     "electron:prep": "tsc -p tsconfig.electron.json && resolve-tspaths -p tsconfig.electron.json --src . --out build && ts-add-js-extension --dir build",
-    "electron:dev": "electron -r tsx main.ts --dev --no-sandbox",
-    "electron:start": "electron -r tsx main.ts",
+    "electron:dev": "electron -r tsx src/electron/main.ts --dev --no-sandbox",
+    "electron:start": "electron -r tsx src/electron/main.ts",
     "electron:build": "npm run electron:prep && electron-builder",
     "electron:build:deb": "npm run electron:prep && electron-builder --linux deb",
     "electron:build:dmg": "npm run electron:prep && electron-builder --mac dmg",
@@ -32,8 +32,7 @@
     "build:dmg": "npm run next:build && npm run electron:build:dmg",
     "build:action": "npm run next:build && npm run electron:prep",
     "format": "prettier --write src/**/*.{ts,tsx,js,jsx,css}",
-    "format:css": "stylelint \"src/**/*.css\" --fix",
-    "generate:popups": "tsx scripts/generate-popup-imports.ts"
+    "format:css": "stylelint --fix \"src/**/*.css\""
   },
   "dependencies": {
     "@crowdin/ota-client": "^2.0.1",

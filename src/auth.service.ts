@@ -1,6 +1,5 @@
-import packageJson from '../package.json' with { type: 'json' };
-const version = packageJson.version;
 import * as APIService from '@/api.service';
+import packageJson from '../package.json' with { type: 'json' };
 
 interface RegisterFormData {
   account: string;
@@ -23,14 +22,14 @@ export async function register(formData: RegisterFormData): Promise<{ success: t
 }
 
 export async function login(formData: LoginFormData): Promise<{ success: true; token: string } | { success: false }> {
-  const res = await APIService.post('/account/login', { ...formData, version });
+  const res = await APIService.post('/account/login', { ...formData, version: packageJson.version });
   if (!res?.token) return { success: false };
 
   return { success: true, token: res.token };
 }
 
 export async function autoLogin(token: string): Promise<{ success: true; token: string } | { success: false }> {
-  const res = await APIService.post('/token/verify', { token, version });
+  const res = await APIService.post('/token/verify', { token, version: packageJson.version });
   if (!res?.token) return { success: false };
 
   return { success: true, token: res.token };

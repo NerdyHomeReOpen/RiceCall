@@ -26,11 +26,12 @@ import popupStyles from '@/styles/popup.module.css';
 import permissionStyles from '@/styles/permission.module.css';
 
 interface ServerSettingPopupProps {
+  id: string;
   server: Types.Server;
   serverMembers: Types.Member[];
 }
 
-const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ server: serverData, serverMembers: serverMembersData }) => {
+const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData }) => {
   // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
@@ -262,11 +263,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ serv
   const handleSaveBtnClick = () => {
     if (!canSubmit) return;
     Popup.editServer(server.serverId, ObjDiff(server, serverData));
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   // Effects

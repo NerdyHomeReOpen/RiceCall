@@ -35,11 +35,11 @@ const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, mess
   // Handlers
   const handleSubmitBtnClick = () => {
     ipc.popup.submit(id);
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

@@ -11,10 +11,11 @@ import * as Popup from '@/utils/popup';
 import popupStyles from '@/styles/popup.module.css';
 
 interface ApproveFriendPopupProps {
+  id: string;
   targetId: Types.User['userId'];
 }
 
-const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targetId }) => {
+const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, targetId }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -40,11 +41,11 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ targ
 
   const handleAddBtnClick = () => {
     Popup.approveFriendApplication(targetId, friendGroupId || null, friendNotes);
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (

@@ -11,12 +11,13 @@ import popupStyles from '@/styles/popup.module.css';
 import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constant';
 
 interface KickMemberFromChannelPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   channel: Types.Channel;
   member: Types.Member;
 }
 
-const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = React.memo(({ serverId, channel, member }) => {
+const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = React.memo(({ id, serverId, channel, member }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -84,11 +85,11 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
 
   const handleConfirmBtnClick = () => {
     Popup.blockUserFromChannel(member.userId, serverId, channel.channelId, Date.now() + getBlockTime());
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   const handleCloseBtnClick = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   return (
