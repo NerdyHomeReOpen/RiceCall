@@ -515,12 +515,19 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 8px;
+  padding: 8px 10px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  border-radius: 3px;
+  height: 40px;
+  border-radius: 20px;
   background: var(--main-color, #2f3136);
+  opacity: 0.5;
   color: var(--secondary-color, #fff);
   gap: 8px;
+  transition: opacity 0.1s ease-in-out;
+
+  &:hover {
+    opacity: 1;
+  }
 }
