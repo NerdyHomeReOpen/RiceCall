@@ -192,6 +192,14 @@ function isAutoLaunchEnabled(): boolean {
   }
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function broadcast(channel: string, ...args: any[]) {
+  BrowserWindow.getAllWindows().forEach((window) => {
+    window.webContents.send(channel, ...args);
+  });
+
+}
+
 export function getSettings(): Types.SystemSettings {
   return {
     autoLogin: store.get('autoLogin'),
@@ -828,9 +836,7 @@ function sendHeartbeat() {
     } else {
       const latency = Date.now() - start;
       new Logger('Socket').info(`ACK for #${ack.seq} in ${latency} ms`);
-      BrowserWindow.getAllWindows().forEach((window) => {
-        window.webContents.send('heartbeat', { seq: ack.seq, latency });
-      });
+      broadcast('heartbeat', { seq: ack.seq, latency });
     }
   });
 }
@@ -889,9 +895,7 @@ export function connectSocket(token: string) {
     ServerToClientEventNames.forEach((event) => {
       socket?.on(event, async (...args) => {
         if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send(event, ...args);
-        });
+        broadcast(event, ...args);
       });
     });
 
@@ -901,9 +905,7 @@ export function connectSocket(token: string) {
 
     new Logger('Socket').info(`Socket connected`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('connect', null);
-    });
+    broadcast('connect', null);
   });
 
   socket.on('disconnect', (reason) => {
@@ -924,33 +926,25 @@ export function connectSocket(token: string) {
 
     new Logger('Socket').info(`Socket disconnected, reason: ${reason}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('disconnect', reason);
-    });
+    broadcast('disconnect', reason);
   });
 
   socket.on('connect_error', (error) => {
     new Logger('Socket').error(`Socket connect error: ${error}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('connect_error', error);
-    });
+    broadcast('connect_error', error);
   });
 
   socket.on('reconnect', (attemptNumber) => {
     new Logger('Socket').info(`Socket reconnected, attempt number: ${attemptNumber}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('reconnect', attemptNumber);
-    });
+    broadcast('reconnect', attemptNumber);
   });
 
   socket.on('reconnect_error', (error) => {
     new Logger('Socket').error(`Socket reconnect error: ${error}`);
 
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('reconnect_error', error);
-    });
+    broadcast('reconnect_error', error);
   });
 
   socket.connect();
@@ -1224,18 +1218,14 @@ app.on('ready', async () => {
     const accounts = store.get('accounts');
     accounts[account] = data;
     store.set('accounts', accounts);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('accounts', accounts);
-    });
+    broadcast('accounts', accounts);
   });
 
   ipcMain.on('delete-account', (_, account: string) => {
     const accounts = store.get('accounts');
     delete accounts[account];
     store.set('accounts', accounts);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('accounts', accounts);
-    });
+    broadcast('accounts', accounts);
   });
 
   // Toolbar handlers
@@ -1255,9 +1245,7 @@ app.on('ready', async () => {
     store.set('language', language);
     initMainI18n(language);
     setTrayDetail();
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('language', language);
-    });
+    broadcast('language', language);
   });
 
   // Custom themes handlers
@@ -1271,12 +1259,7 @@ app.on('ready', async () => {
     // Keep total 7 themes
     customThemes.unshift(theme);
     store.set('customThemes', customThemes);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send(
-        'custom-themes',
-        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
-      );
-    });
+    broadcast('custom-themes', Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),);
   });
 
   ipcMain.on('delete-custom-theme', (_, index: number) => {
@@ -1284,12 +1267,7 @@ app.on('ready', async () => {
     // Keep total 7 themes
     customThemes.splice(index, 1);
     store.set('customThemes', customThemes);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send(
-        'custom-themes',
-        Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
-      );
-    });
+    broadcast('custom-themes', Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),);
   });
 
   ipcMain.on('get-current-theme', (event) => {
@@ -1298,9 +1276,7 @@ app.on('ready', async () => {
 
   ipcMain.on('set-current-theme', (_, theme: string) => {
     store.set('currentTheme', theme);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('current-theme', theme);
-    });
+    broadcast('current-theme', theme);
   });
 
   ipcMain.handle('save-image', async (_, buffer: ArrayBuffer, directory: string, filenamePrefix: string, extension: string): Promise<string | null> => {
@@ -1359,9 +1335,7 @@ app.on('ready', async () => {
   });
 
   ipcMain.on('popup-submit', (_, to, data: unknown | null = null) => {
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('popup-submit', to, data);
-    });
+    broadcast('popup-submit', to, data);
   });
 
   // SFU Diagnosis
@@ -1431,9 +1405,7 @@ app.on('ready', async () => {
   ipcMain.on('change-server', (_, server: 'prod' | 'dev') => {
     store.set('server', server);
     loadEnv(server);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('server', server);
-    });
+    broadcast('server', server);
   });
 
   // System settings handlers
@@ -1608,16 +1580,12 @@ app.on('ready', async () => {
 
   ipcMain.on('set-auto-login', (_, enable = false) => {
     store.set('autoLogin', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('auto-login', enable);
-    });
+    broadcast('auto-login', enable);
   });
 
   ipcMain.on('set-auto-launch', (_, enable = false) => {
     setAutoLaunch(enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('auto-launch', enable);
-    });
+    broadcast('auto-launch', enable);
   });
 
   ipcMain.on('set-always-on-top', (_, enable = false) => {
@@ -1630,263 +1598,189 @@ app.on('ready', async () => {
 
   ipcMain.on('set-status-auto-idle', (_, enable = false) => {
     store.set('statusAutoIdle', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('status-auto-idle', enable);
-    });
+    broadcast('status-auto-idle', enable);
   });
 
   ipcMain.on('set-status-auto-idle-minutes', (_, value = 10) => {
     store.set('statusAutoIdleMinutes', value);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('status-auto-idle-minutes', value);
-    });
+    broadcast('status-auto-idle-minutes', value);
   });
 
   ipcMain.on('set-status-auto-dnd', (_, enable = false) => {
     store.set('statusAutoDnd', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('status-auto-dnd', enable);
-    });
+    broadcast('status-auto-dnd', enable);
   });
 
   ipcMain.on('set-channel-ui-mode', (_, mode = 'classic') => {
     store.set('channelUIMode', mode);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('channel-ui-mode', mode);
-    });
+    broadcast('channel-ui-mode', mode);
   });
 
   ipcMain.on('set-close-to-tray', (_, enable = false) => {
     store.set('closeToTray', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('close-to-tray', enable);
-    });
+    broadcast('close-to-tray', enable);
   });
 
   ipcMain.on('set-font', (_, font = '') => {
     store.set('font', font);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('font', font);
-    });
+    broadcast('font', font);
   });
 
   ipcMain.on('set-font-size', (_, fontSize = 13) => {
     store.set('fontSize', fontSize);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('font-size', fontSize);
-    });
+    broadcast('font-size', fontSize);
   });
 
   ipcMain.on('set-input-audio-device', (_, deviceId = '') => {
     store.set('inputAudioDevice', deviceId);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('input-audio-device', deviceId);
-    });
+    broadcast('input-audio-device', deviceId);
   });
 
   ipcMain.on('set-output-audio-device', (_, deviceId = '') => {
     store.set('outputAudioDevice', deviceId);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('output-audio-device', deviceId);
-    });
+    broadcast('output-audio-device', deviceId);
   });
 
   ipcMain.on('set-record-format', (_, format = 'wav') => {
     store.set('recordFormat', format);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('record-format', format);
-    });
+    broadcast('record-format', format);
   });
 
   ipcMain.on('set-record-save-path', (_, path = app.getPath('documents')) => {
     store.set('recordSavePath', path);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('record-save-path', path);
-    });
+    broadcast('record-save-path', path);
   });
 
   ipcMain.on('set-mix-effect', (_, enable = false) => {
     store.set('mixEffect', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('mix-effect', enable);
-    });
+    broadcast('mix-effect', enable);
   });
 
   ipcMain.on('set-mix-effect-type', (_, type = '') => {
     store.set('mixEffectType', type);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('mix-effect-type', type);
-    });
+    broadcast('mix-effect-type', type);
   });
 
   ipcMain.on('set-auto-mix-setting', (_, enable = false) => {
     store.set('autoMixSetting', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('auto-mix-setting', enable);
-    });
+    broadcast('auto-mix-setting', enable);
   });
 
   ipcMain.on('set-echo-cancellation', (_, enable = false) => {
     store.set('echoCancellation', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('echo-cancellation', enable);
-    });
+    broadcast('echo-cancellation', enable);
   });
 
   ipcMain.on('set-noise-cancellation', (_, enable = false) => {
     store.set('noiseCancellation', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('noise-cancellation', enable);
-    });
+    broadcast('noise-cancellation', enable);
   });
 
   ipcMain.on('set-microphone-amplification', (_, enable = false) => {
     store.set('microphoneAmplification', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('microphone-amplification', enable);
-    });
+    broadcast('microphone-amplification', enable);
   });
 
   ipcMain.on('set-manual-mix-mode', (_, enable = false) => {
     store.set('manualMixMode', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('manual-mix-mode', enable);
-    });
+    broadcast('manual-mix-mode', enable);
   });
 
   ipcMain.on('set-mix-mode', (_, mode = 'all') => {
     store.set('mixMode', mode);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('mix-mode', mode);
-    });
+    broadcast('mix-mode', mode);
   });
 
   ipcMain.on('set-speaking-mode', (_, mode = 'key') => {
     store.set('speakingMode', mode);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('speaking-mode', mode);
-    });
+    broadcast('speaking-mode', mode);
   });
 
   ipcMain.on('set-default-speaking-key', (_, key = '') => {
     store.set('defaultSpeakingKey', key);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('default-speaking-key', key);
-    });
+    broadcast('default-speaking-key', key);
   });
 
   ipcMain.on('set-not-save-message-history', (_, enable = false) => {
     store.set('notSaveMessageHistory', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('not-save-message-history', enable);
-    });
+    broadcast('not-save-message-history', enable);
   });
 
   ipcMain.on('set-hot-key-open-main-window', (_, key = '') => {
     store.set('hotKeyOpenMainWindow', key);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('hot-key-open-main-window', key);
-    });
+    broadcast('hot-key-open-main-window', key);
   });
 
   ipcMain.on('set-hot-key-increase-volume', (_, key = '') => {
     store.set('hotKeyIncreaseVolume', key);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('hot-key-increase-volume', key);
-    });
+    broadcast('hot-key-increase-volume', key);
   });
 
   ipcMain.on('set-hot-key-decrease-volume', (_, key = '') => {
     store.set('hotKeyDecreaseVolume', key);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('hot-key-decrease-volume', key);
-    });
+    broadcast('hot-key-decrease-volume', key);
   });
 
   ipcMain.on('set-hot-key-toggle-speaker', (_, key = '') => {
     store.set('hotKeyToggleSpeaker', key);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('hot-key-toggle-speaker', key);
-    });
+    broadcast('hot-key-toggle-speaker', key);
   });
 
   ipcMain.on('set-hot-key-toggle-microphone', (_, key = '') => {
     store.set('hotKeyToggleMicrophone', key);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('hot-key-toggle-microphone', key);
-    });
+    broadcast('hot-key-toggle-microphone', key);
   });
 
   ipcMain.on('set-disable-all-sound-effect', (_, enable = false) => {
     store.set('disableAllSoundEffect', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('disable-all-sound-effect', enable);
-    });
+    broadcast('disable-all-sound-effect', enable);
   });
 
   ipcMain.on('set-enter-voice-channel-sound', (_, enable = false) => {
     store.set('enterVoiceChannelSound', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('enter-voice-channel-sound', enable);
-    });
+    broadcast('enter-voice-channel-sound', enable);
   });
 
   ipcMain.on('set-leave-voice-channel-sound', (_, enable = false) => {
     store.set('leaveVoiceChannelSound', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('leave-voice-channel-sound', enable);
-    });
+    broadcast('leave-voice-channel-sound', enable);
   });
 
   ipcMain.on('set-start-speaking-sound', (_, enable = false) => {
     store.set('startSpeakingSound', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('start-speaking-sound', enable);
-    });
+    broadcast('start-speaking-sound', enable);
   });
 
   ipcMain.on('set-stop-speaking-sound', (_, enable = false) => {
     store.set('stopSpeakingSound', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('stop-speaking-sound', enable);
-    });
+    broadcast('stop-speaking-sound', enable);
   });
 
   ipcMain.on('set-receive-direct-message-sound', (_, enable = false) => {
     store.set('receiveDirectMessageSound', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('receive-direct-message-sound', enable);
-    });
+    broadcast('receive-direct-message-sound', enable);
   });
 
   ipcMain.on('set-receive-channel-message-sound', (_, enable = false) => {
     store.set('receiveChannelMessageSound', enable);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('receive-channel-message-sound', enable);
-    });
+    broadcast('receive-channel-message-sound', enable);
   });
 
   ipcMain.on('set-auto-check-for-updates', (_, enable = false) => {
     store.set('autoCheckForUpdates', enable);
     if (enable) startCheckForUpdates();
     else stopCheckForUpdates();
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('auto-check-for-updates', enable);
-    });
+    broadcast('auto-check-for-updates', enable);
   });
 
   ipcMain.on('set-update-check-interval', (_, interval = 1 * 60 * 1000) => {
     store.set('updateCheckInterval', interval);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('update-check-interval', interval);
-    });
+    broadcast('update-check-interval', interval);
   });
 
   ipcMain.on('set-update-channel', (_, channel = 'latest') => {
     store.set('updateChannel', channel);
-    BrowserWindow.getAllWindows().forEach((window) => {
-      window.webContents.send('update-channel', channel);
-    });
+    broadcast('update-channel', channel);
   });
 
   // Disclaimer handlers
@@ -1994,9 +1888,7 @@ async function handleDeepLink(url: string) {
     switch (hostname) {
       case 'join':
         const serverId = new URL(url).searchParams.get('sid');
-        BrowserWindow.getAllWindows().forEach((window) => {
-          window.webContents.send('deepLink', serverId);
-        });
+        broadcast('deepLink', serverId);
         break;
     }
   } catch (error) {
