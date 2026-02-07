@@ -89,7 +89,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
       .addSeparator()
       .addCreateChannelOption({ permissionLevel }, () => Popup.openCreateChannel(user.userId, currentServer.serverId, ''))
       .addCreateSubChannelOption({ permissionLevel }, () => Popup.openCreateChannel(user.userId, currentServer.serverId, category.channelId))
-      .addDeleteChannelOption({ permissionLevel }, () => Popup.deleteChannel(currentServer.serverId, category.channelId, category.name))
+      .addDeleteChannelOption({ permissionLevel, isSubChannel: false }, () => Popup.deleteChannel(currentServer.serverId, category.channelId, category.name))
       .addSeparator()
       .addBroadcastOption({ permissionLevel }, () => Popup.openServerBroadcast(currentServer.serverId, category.channelId))
       .addSeparator()

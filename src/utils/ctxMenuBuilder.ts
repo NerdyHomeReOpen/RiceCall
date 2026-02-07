@@ -54,11 +54,11 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addDeleteChannelOption(params: { permissionLevel: Types.Permission }, onClick: () => void): this {
+  addDeleteChannelOption(params: { permissionLevel: Types.Permission, isSubChannel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'delete-channel',
       label: 'delete-channel',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: params.isSubChannel ? Permission.isChannelAdmin(params.permissionLevel) : Permission.isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
     return this;
