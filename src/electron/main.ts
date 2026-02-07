@@ -55,7 +55,7 @@ function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
     .audioBitrate('320k')
     .save(outputMp3)
     .on('error', () => {
-      createPopup('dialogError', 'dialogError', { message: t('convert-wav-to-mp3-failed'), timestamp: Date.now() }, true);
+      createPopup('dialogError', 'dialogError', { error: new Error('convert-wav-to-mp3-failed') }, true);
     });
 }
 
@@ -988,7 +988,7 @@ async function login(formData: { account: string; password: string }) {
       return res;
     })
     .catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
 }
@@ -1006,7 +1006,7 @@ async function logout() {
 
 async function register(formData: { account: string; password: string; email: string; username: string; locale: string }) {
   return await Auth.register(formData).catch((error: any) => {
-    createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    createPopup('dialogError', 'dialogError', { error }, true);
     return { success: false };
   });
 }
@@ -1025,7 +1025,7 @@ async function autoLogin(token: string) {
       return res;
     })
     .catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
 }
@@ -1892,6 +1892,45 @@ app.on('ready', async () => {
   // Disclaimer handlers
   ipcMain.on('dont-show-disclaimer-next-time', () => {
     store.set('dontShowDisclaimer', true);
+  });
+
+  // Error submission handler
+  ipcMain.on('error-submit', (_, errorId: string, error: Error) => {
+    fetch(env().ERROR_SUBMISSION_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        content: null,
+        embeds: [
+          {
+            title: 'Error Submission',
+            color: 14286900,
+            fields: [
+              { name: 'Error Message', value: JSON.stringify(error.message) || 'Unknown', inline: true },
+              { name: 'Error Cause', value: JSON.stringify(error.cause) || 'Unknown', inline: true },
+              { name: 'Error Detail', value: JSON.stringify(error.stack) || 'Unknown' },
+            ],
+            footer: {
+              text: `Error ID: ${errorId}`,
+            },
+            timestamp: new Date().toISOString(),
+          },
+        ],
+        attachments: [],
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          new Logger('Error').error(`(${errorId}), Error submitted: ${error.message}`);
+        } else {
+          new Logger('Error').error(`(${errorId}), Failed to submit error: ${response.statusText}`);
+        }
+      })
+      .catch((error2) => {
+        new Logger('Error').error(`(${errorId}), Failed to submit error: ${error2.message}`);
+      });
   });
 });
 

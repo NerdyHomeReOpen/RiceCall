@@ -24,6 +24,18 @@ if (isElectron()) {
 }
 
 const ipc = {
+  error: {
+    submit: (errorId: string, error: Error) => {
+      if (isWebsite()) {
+        webMain.errorSubmit(errorId, error);
+      } else if (isRenderer()) {
+        ipcRenderer.send('error-submit', errorId, error);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+  },
+
   exit: () => {
     if (isWebsite()) {
       webMain.exit();

@@ -382,7 +382,7 @@ export async function login(formData: { account: string; password: string }): Pr
       return res as { success: true; token: string };
     })
     .catch((error) => {
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
 }
@@ -396,7 +396,7 @@ export function logout() {
 
 export async function register(formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> {
   return await Auth.register(formData).catch((error: any) => {
-    createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+    createPopup('dialogError', 'dialogError', { error }, true);
     return { success: false };
   });
 }
@@ -419,7 +419,7 @@ export async function autoLogin(token: string): Promise<{ success: true; token: 
       localStorage.removeItem('token');
       removeToken();
       window.location.href = '/auth';
-      createPopup('dialogError', 'dialogError', { message: error.message, timestamp: Date.now() }, true);
+      createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
 }
@@ -1056,6 +1056,45 @@ export function setUpdateChannel(channel: string = 'latest') {
 export function dontShowDisclaimerNextTime(enable: boolean = false) {
   store.set('dontShowDisclaimer', enable);
   webEventEmitter.emit('dont-show-disclaimer-next-time', enable);
+}
+
+// Error submission handler
+export function errorSubmit(errorId: string, error: Error) {
+  fetch(env().ERROR_SUBMISSION_URL, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      content: null,
+      embeds: [
+        {
+          title: 'Error Submission',
+          color: 14286900,
+          fields: [
+            { name: 'Error Message', value: JSON.stringify(error.message) || 'Unknown', inline: true },
+            { name: 'Error Cause', value: JSON.stringify(error.cause) || 'Unknown', inline: true },
+            { name: 'Error Detail', value: JSON.stringify(error.stack) || 'Unknown' },
+          ],
+          footer: {
+            text: `Error ID: ${errorId}`,
+          },
+          timestamp: new Date().toISOString(),
+        },
+      ],
+      attachments: [],
+    }),
+  })
+    .then((response) => {
+      if (response.ok) {
+        new Logger('Error').error(`(${errorId}), Error submitted: ${error.message}`);
+      } else {
+        new Logger('Error').error(`(${errorId}), Failed to submit error: ${response.statusText}`);
+      }
+    })
+    .catch((error2) => {
+      new Logger('Error').error(`(${errorId}), Failed to submit error: ${error2.message}`);
+    });
 }
 
 export { webEventEmitter };

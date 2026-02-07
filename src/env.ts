@@ -10,6 +10,7 @@ const EnvSchema = z.object({
   WS_URL: z.string(),
   CROWDIN_DISTRIBUTION_HASH: z.string().optional(),
   REACT_DEV_TOOLS_PATH: z.string().optional(),
+  ERROR_SUBMISSION_URL: z.string().optional(),
 });
 
 export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
@@ -65,6 +66,7 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
       API_URL: process.env.API_URL || '',
       WS_URL: process.env.WS_URL || '',
       CROWDIN_DISTRIBUTION_HASH: process.env.CROWDIN_DISTRIBUTION_HASH || '',
+      ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
     };
   }
 

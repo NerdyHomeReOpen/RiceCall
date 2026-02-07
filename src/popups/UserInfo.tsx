@@ -162,7 +162,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 
   const handleConfirmBtnClick = () => {
     if (!countries.includes(target.country)) {
-      Popup.openErrorDialog(t('invalid-country'), () => {});
+      Popup.openErrorDialog(new Error('invalid-country'), () => {});
       return;
     }
     Popup.editUser(ObjDiff(target, targetData));

@@ -8,8 +8,8 @@ export function openAlertDialog(message: string, callback: () => void) {
   ipc.popup.onSubmit('dialogAlert', callback);
 }
 
-export function openErrorDialog(message: string, callback: () => void) {
-  ipc.popup.open('dialogError', 'dialogError', { message, timestamp: Date.now() });
+export function openErrorDialog(error: Error, callback: () => void) {
+  ipc.popup.open('dialogError', 'dialogError', { error });
   ipc.popup.onSubmit('dialogError', callback);
 }
 
