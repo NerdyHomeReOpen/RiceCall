@@ -984,18 +984,13 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Effects
   useEffect(() => {
     initLocalStorage();
-    // Note: initAudioContext is called on first user interaction, not on mount
-    // This is required by browser autoplay policy
-  }, [initLocalStorage]);
+    initAudioContext();
+  }, [initLocalStorage, initAudioContext]);
 
-  // Initialize AudioContext on user interaction (required for browsers)
   useEffect(() => {
     const initAudioOnInteraction = async () => {
-      if (!audioContextRef.current) {
-        await initAudioContext();
-      } else if (audioContextRef.current.state === 'suspended') {
-        await audioContextRef.current.resume();
-      }
+      if (!audioContextRef.current) await initAudioContext();
+      else if (audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
     };
     document.addEventListener('click', initAudioOnInteraction, { once: true });
     document.addEventListener('keydown', initAudioOnInteraction, { once: true });
@@ -1003,12 +998,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       document.removeEventListener('click', initAudioOnInteraction);
       document.removeEventListener('keydown', initAudioOnInteraction);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [initAudioContext]);
 
-  // Effect for handling device/settings changes when mic is already taken
-  // Note: Initial mic setup is handled by takeMic()
-  // const prevMicSettingsRef = useRef<{ inputAudioDevice: string | null; echoCancellation: boolean; noiseCancellation: boolean } | null>(null);
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
       new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);
@@ -1116,27 +1107,19 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [unconsumeOne]);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const handleGetSfuDiagnosis = async (_: any, { senderId }: { senderId: number }) => {
-      let info = null;
-
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const electron = (window as any).require ? (window as any).require('electron') : null;
-      if (!electron) return;
+    const handleGetSfuDiagnosis = async ({ senderId }: { senderId: number }) => {
+      let info: { transportId?: string; ip?: string; port?: string } | null = null;
 
       try {
-        // If not in a channel, try to join one automatically using standard logic
         if (!recvTransportRef.current) {
           new Logger('WebRTC').info('Not in a channel, attempting to join one for diagnosis using standard logic...');
 
           let targetServer = null;
 
-          // 1. Try to find server with displayId/serverId '10'
           const searchResults = await ipc.data.searchServer({ query: '10' });
           targetServer = searchResults.find((s) => s.displayId === '10' || s.serverId === '10');
 
           if (!targetServer) {
-            // 2. Fallback to first joined server
             const userId = window.localStorage.getItem('userId');
             if (userId) {
               const servers = await ipc.data.servers({ userId });
@@ -1149,14 +1132,11 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           if (targetServer) {
             new Logger('WebRTC').info(`Standard joining server: ${targetServer.name} (${targetServer.displayId})`);
 
-            // Call standard logic directly
             loadServer(targetServer.specialId || targetServer.displayId);
             ipc.socket.send('connectServer', { serverId: targetServer.serverId });
 
-            // Wait for SFUJoined event (max 10s)
             await new Promise<void>((resolve, reject) => {
-              // eslint-disable-next-line prefer-const
-              let unsub: () => void;
+              let unsub: () => void = () => {};
               const timeout = setTimeout(() => {
                 if (unsub) unsub();
                 reject(new Error('Timeout waiting for SFUJoined after standard join'));
@@ -1168,7 +1148,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
               });
             }).catch((e) => new Logger('WebRTC').error(e.message));
 
-            // Wait for transport to be created
             for (let i = 0; i < 5; i++) {
               if (recvTransportRef.current) break;
               await new Promise((r) => setTimeout(r, 1000));
@@ -1179,7 +1158,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         }
 
         if (recvTransportRef.current) {
-          // Retry gathering stats for up to 10 seconds to allow ICE connection to succeed
           for (let retry = 0; retry < 10; retry++) {
             const stats = await recvTransportRef.current.getStats();
             stats.forEach((report) => {
@@ -1199,8 +1177,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
               }
             });
 
-            // @ts-expect-error - info is initially null
-            if (info && info.ip && info.ip !== 'unknown') break;
+            // if (info && info.ip && info.ip !== 'unknown') break;
             await new Promise((r) => setTimeout(r, 1000));
           }
         }
@@ -1208,19 +1185,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         new Logger('WebRTC').error(`Error getting stats or joining channel: ${e}`);
       }
 
-      electron.ipcRenderer.send('sfu-diagnosis-response', { targetSenderId: senderId, info });
+      ipc.sfuDiagnosis.response({ targetSenderId: senderId, info });
     };
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const electron = (window as any).require ? (window as any).require('electron') : null;
-    if (electron) {
-      electron.ipcRenderer.on('get-sfu-diagnosis', handleGetSfuDiagnosis);
-      return () => {
-        electron.ipcRenderer.removeListener('get-sfu-diagnosis', handleGetSfuDiagnosis);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    const unsub = ipc.sfuDiagnosis.onRequest(handleGetSfuDiagnosis);
+    return () => unsub();
+  }, [loadServer]);
 
   const contextValue = useMemo(
     () => ({

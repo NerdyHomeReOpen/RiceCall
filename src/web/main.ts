@@ -358,18 +358,6 @@ export function exit() {
   window.close();
 }
 
-export async function runNetworkDiagnosis(): Promise<{ error: string }> {
-  return { error: 'Network diagnosis is only available in the desktop version.' };
-}
-
-export function cancelNetworkDiagnosis() {
-  // No-op in Web
-}
-
-export function requestSfuDiagnosis() {
-  webEventEmitter.emit('sfu-diagnosis-response', null);
-}
-
 // Auth handlers
 export async function login(formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> {
   return await Auth.login(formData)
@@ -608,7 +596,7 @@ export function getCurrentTheme() {
   return store.get('currentTheme');
 }
 
-export function setCurrentTheme(theme: string) {
+export function setCurrentTheme(theme: Types.Theme | null) {
   store.set('currentTheme', theme);
   webEventEmitter.emit('current-theme', theme);
 }
@@ -882,7 +870,7 @@ export function setStatusAutoDnd(enable: boolean = false) {
   webEventEmitter.emit('status-auto-dnd', enable);
 }
 
-export function setChannelUIMode(mode: 'classic' | 'modern' = 'classic') {
+export function setChannelUIMode(mode: Types.ChannelUIMode = 'classic') {
   store.set('channelUIMode', mode);
   webEventEmitter.emit('channel-ui-mode', mode);
 }
@@ -957,7 +945,7 @@ export function setManualMixMode(enable: boolean = false) {
   webEventEmitter.emit('manual-mix-mode', enable);
 }
 
-export function setMixMode(mode: 'all' | 'selected' = 'all') {
+export function setMixMode(mode: Types.MixMode = 'all') {
   store.set('mixMode', mode);
   webEventEmitter.emit('mix-mode', mode);
 }

@@ -1,40 +1,36 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-require-imports */
-import { isElectron, isRenderer, isWebsite } from '@/platform/isElectron';
+import { isRenderer, isWebsite } from '@/platform/isElectron';
 
 import * as Types from '@/types';
 
-import Logger from '@/logger';
 import { IpcRenderer } from 'electron';
-
 
 let _ipcRenderer: IpcRenderer | null = null;
 let _webMain: typeof import('@/web/main') | null = null;
 
 const modules = {
-  get ipcRenderer() : IpcRenderer {
+  get ipcRenderer(): IpcRenderer {
     if (!_ipcRenderer && isRenderer()) {
       _ipcRenderer = window.require('electron').ipcRenderer;
     }
     return _ipcRenderer!;
   },
-  get webMain() : typeof import('@/web/main') {
+  get webMain(): typeof import('@/web/main') {
     if (!_webMain && isWebsite()) {
       _webMain = require('@/web/main');
     }
     return _webMain!;
-  }
+  },
 };
-
-
 
 const ipc = {
   error: {
     submit: (errorId: string, error: Error) => {
       if (isWebsite()) {
-        webMain.errorSubmit(errorId, error);
+        modules.webMain.errorSubmit(errorId, error);
       } else if (isRenderer()) {
-        ipcRenderer.send('error-submit', errorId, error);
+        modules.ipcRenderer.send('error-submit', errorId, error);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -66,11 +62,15 @@ const ipc = {
       if (isWebsite()) {
         const listener = (...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
         modules.webMain.webEventEmitter.on(event, listener);
-        return () => modules.webMain.webEventEmitter.removeListener(event, listener);
+        return () => {
+          modules.webMain.webEventEmitter.removeListener(event, listener);
+        };
       } else if (isRenderer()) {
         const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
         modules.ipcRenderer.on(event, listener);
-        return () => modules.ipcRenderer.removeListener(event, listener);
+        return () => {
+          modules.ipcRenderer.removeListener(event, listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -78,7 +78,10 @@ const ipc = {
 
     emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => {
       if (isWebsite()) {
-        return modules.webMain.socketEmit(event, payload);
+        return modules.webMain.socketEmit(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
+          if (ack?.ok) return ack.data;
+          throw new Error(ack?.error || 'unknown error');
+        });
       } else if (isRenderer()) {
         return new Promise((resolve, reject) => {
           modules.ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
@@ -413,7 +416,9 @@ const ipc = {
       } else if (isRenderer()) {
         const listener = (_: any, serverId: string) => callback(serverId);
         modules.ipcRenderer.on('deepLink', listener);
-        return () => modules.ipcRenderer.removeListener('deepLink', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('deepLink', listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -467,7 +472,9 @@ const ipc = {
       } else if (isRenderer()) {
         const listener = () => callback();
         modules.ipcRenderer.on('maximize', listener);
-        return () => modules.ipcRenderer.removeListener('maximize', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('maximize', listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -479,7 +486,9 @@ const ipc = {
       } else if (isRenderer()) {
         const listener = () => callback();
         modules.ipcRenderer.on('unmaximize', listener);
-        return () => modules.ipcRenderer.removeListener('unmaximize', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('unmaximize', listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -489,7 +498,7 @@ const ipc = {
   initialData: {
     get: (id: string): Record<string, any> | null => {
       if (isWebsite()) {
-        return modules.webMain.getInitialData(id);
+        return null;
       } else if (isRenderer()) {
         return modules.ipcRenderer.sendSync(`get-initial-data?id=${id}`);
       } else {
@@ -547,7 +556,9 @@ const ipc = {
         };
         modules.webMain.webEventEmitter.removeListener('popup-submit', listener);
         modules.webMain.webEventEmitter.on('popup-submit', listener);
-        return () => modules.webMain.webEventEmitter.removeListener('popup-submit', listener);
+        return () => {
+          modules.webMain.webEventEmitter.removeListener('popup-submit', listener);
+        };
       } else if (isRenderer()) {
         const listener = (_: any, from: string, data: T) => {
           if (from === host) callback(data);
@@ -555,7 +566,9 @@ const ipc = {
         };
         modules.ipcRenderer.removeListener('popup-submit', listener);
         modules.ipcRenderer.on('popup-submit', listener);
-        return () => modules.ipcRenderer.removeListener('popup-submit', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('popup-submit', listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -597,11 +610,15 @@ const ipc = {
       if (isWebsite()) {
         const listener = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
         modules.webMain.webEventEmitter.on('accounts', listener);
-        return () => modules.webMain.webEventEmitter.removeListener('accounts', listener);
+        return () => {
+          modules.webMain.webEventEmitter.removeListener('accounts', listener);
+        };
       } else if (isRenderer()) {
         const listener = (_: any, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
         modules.ipcRenderer.on('accounts', listener);
-        return () => modules.ipcRenderer.removeListener('accounts', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('accounts', listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -633,11 +650,15 @@ const ipc = {
       if (isWebsite()) {
         const listener = (language: Types.LanguageKey) => callback(language);
         modules.webMain.webEventEmitter.on('language', listener);
-        return () => modules.webMain.webEventEmitter.removeListener('language', listener);
+        return () => {
+          modules.webMain.webEventEmitter.removeListener('language', listener);
+        };
       } else if (isRenderer()) {
         const listener = (_: any, language: Types.LanguageKey) => callback(language);
         modules.ipcRenderer.on('language', listener);
-        return () => modules.ipcRenderer.removeListener('language', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('language', listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -679,11 +700,15 @@ const ipc = {
       if (isWebsite()) {
         const listener = (themes: Types.Theme[]) => callback(themes);
         modules.webMain.webEventEmitter.on('custom-themes', listener);
-        return () => modules.webMain.webEventEmitter.removeListener('custom-themes', listener);
+        return () => {
+          modules.webMain.webEventEmitter.removeListener('custom-themes', listener);
+        };
       } else if (isRenderer()) {
         const listener = (_: any, themes: Types.Theme[]) => callback(themes);
         modules.ipcRenderer.on('custom-themes', listener);
-        return () => modules.ipcRenderer.removeListener('custom-themes', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('custom-themes', listener);
+        };
       } else {
         throw new Error('Unsupported platform');
       }
@@ -724,11 +749,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (theme: Types.Theme | null) => callback(theme);
           modules.webMain.webEventEmitter.on('current-theme', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('current-theme', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('current-theme', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, theme: Types.Theme | null) => callback(theme);
           modules.ipcRenderer.on('current-theme', listener);
-          return () => modules.ipcRenderer.removeListener('current-theme', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('current-theme', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -983,11 +1012,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('auto-login', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('auto-login', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('auto-login', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('auto-login', listener);
-          return () => modules.ipcRenderer.removeListener('auto-login', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('auto-login', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1019,11 +1052,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('auto-launch', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('auto-launch', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('auto-launch', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('auto-launch', listener);
-          return () => modules.ipcRenderer.removeListener('auto-launch', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('auto-launch', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1055,11 +1092,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('always-on-top', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('always-on-top', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('always-on-top', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('always-on-top', listener);
-          return () => modules.ipcRenderer.removeListener('always-on-top', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('always-on-top', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1091,11 +1132,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('status-auto-idle', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('status-auto-idle', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('status-auto-idle', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('status-auto-idle', listener);
-          return () => modules.ipcRenderer.removeListener('status-auto-idle', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('status-auto-idle', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1127,11 +1172,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (fontSize: number) => callback(fontSize);
           modules.webMain.webEventEmitter.on('status-auto-idle-minutes', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('status-auto-idle-minutes', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('status-auto-idle-minutes', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, fontSize: number) => callback(fontSize);
           modules.ipcRenderer.on('status-auto-idle-minutes', listener);
-          return () => modules.ipcRenderer.removeListener('status-auto-idle-minutes', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('status-auto-idle-minutes', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1163,11 +1212,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('status-auto-dnd', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('status-auto-dnd', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('status-auto-dnd', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('status-auto-dnd', listener);
-          return () => modules.ipcRenderer.removeListener('status-auto-dnd', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('status-auto-dnd', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1199,11 +1252,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
           modules.webMain.webEventEmitter.on('channel-ui-mode', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('channel-ui-mode', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('channel-ui-mode', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
           modules.ipcRenderer.on('channel-ui-mode', listener);
-          return () => modules.ipcRenderer.removeListener('channel-ui-mode', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('channel-ui-mode', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1235,11 +1292,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('close-to-tray', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('close-to-tray', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('close-to-tray', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('close-to-tray', listener);
-          return () => modules.ipcRenderer.removeListener('close-to-tray', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('close-to-tray', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1271,11 +1332,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (font: string) => callback(font);
           modules.webMain.webEventEmitter.on('font', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('font', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('font', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, font: string) => callback(font);
           modules.ipcRenderer.on('font', listener);
-          return () => modules.ipcRenderer.removeListener('font', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('font', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1307,11 +1372,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (fontSize: number) => callback(fontSize);
           modules.webMain.webEventEmitter.on('font-size', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('font-size', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('font-size', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, fontSize: number) => callback(fontSize);
           modules.ipcRenderer.on('font-size', listener);
-          return () => modules.ipcRenderer.removeListener('font-size', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('font-size', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1343,11 +1412,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (deviceId: string) => callback(deviceId);
           modules.webMain.webEventEmitter.on('input-audio-device', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('input-audio-device', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('input-audio-device', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, deviceId: string) => callback(deviceId);
           modules.ipcRenderer.on('input-audio-device', listener);
-          return () => modules.ipcRenderer.removeListener('input-audio-device', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('input-audio-device', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1379,11 +1452,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (deviceId: string) => callback(deviceId);
           modules.webMain.webEventEmitter.on('output-audio-device', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('output-audio-device', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('output-audio-device', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, deviceId: string) => callback(deviceId);
           modules.ipcRenderer.on('output-audio-device', listener);
-          return () => modules.ipcRenderer.removeListener('output-audio-device', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('output-audio-device', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1415,11 +1492,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (format: Types.RecordFormat) => callback(format);
           modules.webMain.webEventEmitter.on('record-format', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('record-format', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('record-format', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, format: Types.RecordFormat) => callback(format);
           modules.ipcRenderer.on('record-format', listener);
-          return () => modules.ipcRenderer.removeListener('record-format', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('record-format', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1451,11 +1532,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (path: string) => callback(path);
           modules.webMain.webEventEmitter.on('record-save-path', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('record-save-path', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('record-save-path', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, path: string) => callback(path);
           modules.ipcRenderer.on('record-save-path', listener);
-          return () => modules.ipcRenderer.removeListener('record-save-path', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('record-save-path', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1487,11 +1572,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('mix-effect', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('mix-effect', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('mix-effect', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('mix-effect', listener);
-          return () => modules.ipcRenderer.removeListener('mix-effect', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('mix-effect', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1523,11 +1612,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
           modules.webMain.webEventEmitter.on('mix-effect-type', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('mix-effect-type', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('mix-effect-type', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
           modules.ipcRenderer.on('mix-effect-type', listener);
-          return () => modules.ipcRenderer.removeListener('mix-effect-type', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('mix-effect-type', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1559,11 +1652,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('auto-mix-setting', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('auto-mix-setting', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('auto-mix-setting', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('auto-mix-setting', listener);
-          return () => modules.ipcRenderer.removeListener('auto-mix-setting', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('auto-mix-setting', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1595,11 +1692,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('echo-cancellation', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('echo-cancellation', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('echo-cancellation', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('echo-cancellation', listener);
-          return () => modules.ipcRenderer.removeListener('echo-cancellation', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('echo-cancellation', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1631,11 +1732,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('noise-cancellation', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('noise-cancellation', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('noise-cancellation', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('noise-cancellation', listener);
-          return () => modules.ipcRenderer.removeListener('noise-cancellation', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('noise-cancellation', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1667,11 +1772,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('microphone-amplification', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('microphone-amplification', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('microphone-amplification', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('microphone-amplification', listener);
-          return () => modules.ipcRenderer.removeListener('microphone-amplification', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('microphone-amplification', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1703,11 +1812,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('manual-mix-mode', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('manual-mix-mode', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('manual-mix-mode', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('manual-mix-mode', listener);
-          return () => modules.ipcRenderer.removeListener('manual-mix-mode', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('manual-mix-mode', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1739,11 +1852,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: Types.MixMode) => callback(key);
           modules.webMain.webEventEmitter.on('mix-mode', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('mix-mode', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('mix-mode', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: Types.MixMode) => callback(key);
           modules.ipcRenderer.on('mix-mode', listener);
-          return () => modules.ipcRenderer.removeListener('mix-mode', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('mix-mode', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1775,11 +1892,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: Types.SpeakingMode) => callback(key);
           modules.webMain.webEventEmitter.on('speaking-mode', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('speaking-mode', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('speaking-mode', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: Types.SpeakingMode) => callback(key);
           modules.ipcRenderer.on('speaking-mode', listener);
-          return () => modules.ipcRenderer.removeListener('speaking-mode', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('speaking-mode', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1811,11 +1932,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
           modules.webMain.webEventEmitter.on('default-speaking-key', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('default-speaking-key', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('default-speaking-key', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
           modules.ipcRenderer.on('default-speaking-key', listener);
-          return () => modules.ipcRenderer.removeListener('default-speaking-key', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('default-speaking-key', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1847,11 +1972,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('not-save-message-history', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('not-save-message-history', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('not-save-message-history', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('not-save-message-history', listener);
-          return () => modules.ipcRenderer.removeListener('not-save-message-history', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('not-save-message-history', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1883,11 +2012,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
           modules.webMain.webEventEmitter.on('hot-key-open-main-window', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('hot-key-open-main-window', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('hot-key-open-main-window', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
           modules.ipcRenderer.on('hot-key-open-main-window', listener);
-          return () => modules.ipcRenderer.removeListener('hot-key-open-main-window', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('hot-key-open-main-window', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1919,11 +2052,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
           modules.webMain.webEventEmitter.on('hot-key-increase-volume', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('hot-key-increase-volume', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('hot-key-increase-volume', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
           modules.ipcRenderer.on('hot-key-increase-volume', listener);
-          return () => modules.ipcRenderer.removeListener('hot-key-increase-volume', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('hot-key-increase-volume', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1955,11 +2092,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
           modules.webMain.webEventEmitter.on('hot-key-decrease-volume', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('hot-key-decrease-volume', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('hot-key-decrease-volume', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
           modules.ipcRenderer.on('hot-key-decrease-volume', listener);
-          return () => modules.ipcRenderer.removeListener('hot-key-decrease-volume', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('hot-key-decrease-volume', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1991,11 +2132,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
           modules.webMain.webEventEmitter.on('hot-key-toggle-speaker', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('hot-key-toggle-speaker', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('hot-key-toggle-speaker', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
           modules.ipcRenderer.on('hot-key-toggle-speaker', listener);
-          return () => modules.ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2027,11 +2172,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (key: string) => callback(key);
           modules.webMain.webEventEmitter.on('hot-key-toggle-microphone', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('hot-key-toggle-microphone', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('hot-key-toggle-microphone', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, key: string) => callback(key);
           modules.ipcRenderer.on('hot-key-toggle-microphone', listener);
-          return () => modules.ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2063,11 +2212,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('disable-all-sound-effect', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('disable-all-sound-effect', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('disable-all-sound-effect', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('disable-all-sound-effect', listener);
-          return () => modules.ipcRenderer.removeListener('disable-all-sound-effect', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('disable-all-sound-effect', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2099,11 +2252,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('enter-voice-channel-sound', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('enter-voice-channel-sound', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('enter-voice-channel-sound', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('enter-voice-channel-sound', listener);
-          return () => modules.ipcRenderer.removeListener('enter-voice-channel-sound', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('enter-voice-channel-sound', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2135,11 +2292,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('leave-voice-channel-sound', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('leave-voice-channel-sound', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('leave-voice-channel-sound', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('leave-voice-channel-sound', listener);
-          return () => modules.ipcRenderer.removeListener('leave-voice-channel-sound', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('leave-voice-channel-sound', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2171,11 +2332,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('start-speaking-sound', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('start-speaking-sound', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('start-speaking-sound', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('start-speaking-sound', listener);
-          return () => modules.ipcRenderer.removeListener('start-speaking-sound', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('start-speaking-sound', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2207,11 +2372,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('stop-speaking-sound', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('stop-speaking-sound', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('stop-speaking-sound', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('stop-speaking-sound', listener);
-          return () => modules.ipcRenderer.removeListener('stop-speaking-sound', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('stop-speaking-sound', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2243,11 +2412,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('receive-direct-message-sound', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('receive-direct-message-sound', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('receive-direct-message-sound', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('receive-direct-message-sound', listener);
-          return () => modules.ipcRenderer.removeListener('receive-direct-message-sound', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('receive-direct-message-sound', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2279,11 +2452,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('receive-channel-message-sound', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('receive-channel-message-sound', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('receive-channel-message-sound', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('receive-channel-message-sound', listener);
-          return () => modules.ipcRenderer.removeListener('receive-channel-message-sound', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('receive-channel-message-sound', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2315,11 +2492,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (enabled: boolean) => callback(enabled);
           modules.webMain.webEventEmitter.on('auto-check-for-updates', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('auto-check-for-updates', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('auto-check-for-updates', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, enabled: boolean) => callback(enabled);
           modules.ipcRenderer.on('auto-check-for-updates', listener);
-          return () => modules.ipcRenderer.removeListener('auto-check-for-updates', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('auto-check-for-updates', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2351,11 +2532,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (interval: number) => callback(interval);
           modules.webMain.webEventEmitter.on('update-check-interval', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('update-check-interval', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('update-check-interval', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, interval: number) => callback(interval);
           modules.ipcRenderer.on('update-check-interval', listener);
-          return () => modules.ipcRenderer.removeListener('update-check-interval', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('update-check-interval', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2387,11 +2572,15 @@ const ipc = {
         if (isWebsite()) {
           const listener = (channel: string) => callback(channel);
           modules.webMain.webEventEmitter.on('update-channel', listener);
-          return () => modules.webMain.webEventEmitter.removeListener('update-channel', listener);
+          return () => {
+            modules.webMain.webEventEmitter.removeListener('update-channel', listener);
+          };
         } else if (isRenderer()) {
           const listener = (_: any, channel: string) => callback(channel);
           modules.ipcRenderer.on('update-channel', listener);
-          return () => modules.ipcRenderer.removeListener('update-channel', listener);
+          return () => {
+            modules.ipcRenderer.removeListener('update-channel', listener);
+          };
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2402,7 +2591,7 @@ const ipc = {
   network: {
     runDiagnosis: async (params: { domains: string[]; duration?: number }): Promise<any> => {
       if (isWebsite()) {
-        return await modules.webMain.runNetworkDiagnosis(params);
+        return { error: 'Network diagnosis is only available in the desktop version.' };
       }
       if (isRenderer()) {
         return await modules.ipcRenderer.invoke('run-network-diagnosis', params);
@@ -2412,7 +2601,7 @@ const ipc = {
 
     cancelDiagnosis: () => {
       if (isWebsite()) {
-        modules.webMain.cancelNetworkDiagnosis();
+        // ignore
       } else if (isRenderer()) {
         modules.ipcRenderer.send('cancel-network-diagnosis');
       } else {
@@ -2422,14 +2611,14 @@ const ipc = {
 
     onProgress: (callback: (progress: any) => void) => {
       if (isWebsite()) {
-        const listener = (progress: any) => callback(progress);
-        modules.webMain.webEventEmitter.on('network-diagnosis-progress', listener);
-        return () => modules.webMain.webEventEmitter.removeListener('network-diagnosis-progress', listener);
+        return () => {};
       }
       if (isRenderer()) {
         const listener = (_: any, progress: any) => callback(progress);
         modules.ipcRenderer.on('network-diagnosis-progress', listener);
-        return () => modules.ipcRenderer.removeListener('network-diagnosis-progress', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('network-diagnosis-progress', listener);
+        };
       }
       throw new Error('Unsupported platform');
     },
@@ -2438,7 +2627,7 @@ const ipc = {
   sfuDiagnosis: {
     request: () => {
       if (isWebsite()) {
-        modules.webMain.requestSfuDiagnosis();
+        return;
       } else if (isRenderer()) {
         modules.ipcRenderer.send('request-sfu-diagnosis');
       } else {
@@ -2446,16 +2635,39 @@ const ipc = {
       }
     },
 
-    onResponse: (callback: (data: any) => void) => {
+    onRequest: (callback: ({ senderId }: { senderId: number }) => void) => {
       if (isWebsite()) {
-        const listener = (data: any) => callback(data);
-        modules.webMain.webEventEmitter.on('sfu-diagnosis-response', listener);
-        return () => modules.webMain.webEventEmitter.removeListener('sfu-diagnosis-response', listener);
+        return () => {};
+      } else if (isRenderer()) {
+        const listener = (_: any, { senderId }: { senderId: number }) => callback({ senderId });
+        modules.ipcRenderer.on('get-sfu-diagnosis', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('get-sfu-diagnosis', listener);
+        };
+      }
+      throw new Error('Unsupported platform');
+    },
+
+    response: (data: { targetSenderId: number; info: unknown }) => {
+      if (isWebsite()) {
+        // ignore
+      } else if (isRenderer()) {
+        modules.ipcRenderer.send('sfu-diagnosis-response', data);
+      } else {
+        throw new Error('Unsupported platform');
+      }
+    },
+
+    onResponse: (callback: (data: { targetSenderId: number; info: unknown }) => void) => {
+      if (isWebsite()) {
+        return () => {};
       }
       if (isRenderer()) {
-        const listener = (_: any, data: any) => callback(data);
+        const listener = (_: any, data: { targetSenderId: number; info: unknown }) => callback(data);
         modules.ipcRenderer.on('sfu-diagnosis-response', listener);
-        return () => modules.ipcRenderer.removeListener('sfu-diagnosis-response', listener);
+        return () => {
+          modules.ipcRenderer.removeListener('sfu-diagnosis-response', listener);
+        };
       }
       throw new Error('Unsupported platform');
     },
