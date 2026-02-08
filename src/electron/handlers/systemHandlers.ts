@@ -5,13 +5,16 @@ export default function registerSystemHandlers(
     ipcMain: Electron.IpcMain, 
     store: Store<Types.StoreType>, 
     saveRecordDefaultPath: string,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     broadcast: (channel: string, data: any) => void, 
     batchWindowsOperation: (operation: (win: Electron.BrowserWindow) => void) => void,
     getSettings: () => Types.SystemSettings, 
     setAutoLaunch: (enable: boolean) => void, 
     isAutoLaunchEnabled: () => boolean, 
     startCheckForUpdates: () => void, 
-    stopCheckForUpdates: () => void, fontList: any
+    stopCheckForUpdates: () => void, 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    fontList: any
 ) {
   ipcMain.on('get-system-settings', (event) => {
     event.returnValue = getSettings();

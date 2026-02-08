@@ -151,8 +151,10 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     try {
       ipc.sfuDiagnosis.request();
 
-      const unsubscribe = ipc.sfuDiagnosis.onResponse((data: { ip?: string; port?: number } | null) => {
+      const unsubscribe = ipc.sfuDiagnosis.onResponse((response: { targetSenderId: number; info: unknown }) => {
         unsubscribe();
+
+        const data = response.info as { ip?: string; port?: number } | null;
 
         if (data?.ip) {
           const sfuIp = data.ip;
