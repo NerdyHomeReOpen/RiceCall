@@ -29,6 +29,7 @@ import { LANGUAGES } from '../constant.js';
 import { POPUP_SIZES, POPUP_BEHAVIORS } from '../popup.config.js';
 import { initNetworkDiagnosisTool } from './network-diagnosis-tool.js';
 import registerDataHandlers from './handlers/dataHandlers';
+import registerAccountHandlers from './handlers/accountHandlers';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -1103,23 +1104,7 @@ app.on('ready', async () => {
   registerDataHandlers(ipcMain, getToken);
 
   // Accounts handlers
-  ipcMain.on('get-accounts', (event) => {
-    event.returnValue = store.get('accounts');
-  });
-
-  ipcMain.on('add-account', (_, account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
-    const accounts = store.get('accounts');
-    accounts[account] = data;
-    store.set('accounts', accounts);
-    broadcast('accounts', accounts);
-  });
-
-  ipcMain.on('delete-account', (_, account: string) => {
-    const accounts = store.get('accounts');
-    delete accounts[account];
-    store.set('accounts', accounts);
-    broadcast('accounts', accounts);
-  });
+  registerAccountHandlers(ipcMain, store, broadcast);
 
   // Toolbar handlers
   ipcMain.on('set-tray-title', (_, title: string) => {
