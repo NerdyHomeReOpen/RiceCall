@@ -12,6 +12,7 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
+import { useWebRTC } from '@/providers/WebRTC';
 
 import * as Popup from '@/action';
 import * as Permission from '@/utils/permission';
@@ -26,6 +27,7 @@ const ChannelList: React.FC = React.memo(() => {
   const { showContextMenu } = useContextMenu();
   const { findMe } = useFindMeContext();
   const dispatch = useAppDispatch();
+  const { rtcLatency, rtcStatus } = useWebRTC();
 
   // Selectors
   const user = useAppSelector(
@@ -188,8 +190,19 @@ const ChannelList: React.FC = React.memo(() => {
       </div>
       <div className={styles['current-channel-box']}>
         <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
-          <div className={'hover-text'}>{`${latency}ms`}</div>
+          <div className={'hover-text'}>{`文字: ${latency}ms`}</div>
         </div>
+        {rtcStatus !== 'disconnected' && (
+          <div
+            className={`${styles['rtc-latency-icon']} ${rtcStatus === 'connected' ? styles[`status${4 - Math.floor(rtcLatency / 50)}`] : ''} has-hover-text`}
+            style={{
+              backgroundImage: rtcStatus === 'failed' ? "url('/pic_error.webp')" : rtcStatus === 'connecting' ? "url('/icon_loading.gif')" : undefined,
+              backgroundSize: rtcStatus === 'connected' ? undefined : 'contain',
+            }}
+          >
+            <div className={'hover-text'}>{`音訊: ${rtcStatus === 'connected' ? `${rtcLatency}ms` : rtcStatus}`}</div>
+          </div>
+        )}
         <div className={styles['current-channel-text']}>{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
       </div>
       {isCurrentChannelQueueMode && (

@@ -189,6 +189,8 @@ export type SpeakingMode = 'key' | 'auto';
 
 export type MixMode = 'all' | 'app';
 
+export type RTCStatus = 'disconnected' | 'connecting' | 'connected' | 'failed';
+
 export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
 
 export type RecordFormat = 'wav' | 'mp3';
