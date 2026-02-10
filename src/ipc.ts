@@ -3,15 +3,14 @@ import * as WebMain from '@/web/main';
 
 import * as Types from '@/types';
 
-import { IpcRenderer } from 'electron';
-
-let _ipcRenderer: IpcRenderer | null = null;
-let _webMain: typeof import('@/web/main') | null = null;
+let _ipcRenderer: typeof window.ipcRenderer | null = null;
+let _webMain: typeof WebMain | null = null;
 
 const modules = {
-  get ipcRenderer(): IpcRenderer {
+  get ipcRenderer(): NonNullable<typeof window.ipcRenderer> {
     if (!_ipcRenderer && isRenderer()) {
-      _ipcRenderer = window.require('electron').ipcRenderer;
+      console.log('window.ipcRenderer', window.ipcRenderer);
+      _ipcRenderer = window.ipcRenderer;
     }
     return _ipcRenderer!;
   },
@@ -29,7 +28,7 @@ const ipc = {
       if (isWebsite()) {
         modules.webMain.errorSubmit(errorId, error);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('error-submit', errorId, error);
+        modules.ipcRenderer.errorSubmit(errorId, error);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -40,7 +39,7 @@ const ipc = {
     if (isWebsite()) {
       modules.webMain.exit();
     } else if (isRenderer()) {
-      modules.ipcRenderer.send('exit');
+      modules.ipcRenderer.exit();
     } else {
       throw new Error('Unsupported platform');
     }
@@ -51,7 +50,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.socketSend(event, ...args);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send(event, ...args);
+        modules.ipcRenderer.socketSend(event, ...args);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -66,9 +65,9 @@ const ipc = {
         };
       } else if (isRenderer()) {
         const listener = (_: unknown, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
-        modules.ipcRenderer.on(event, listener);
+        modules.ipcRenderer.ipcEventEmitter.on(event, listener);
         return () => {
-          modules.ipcRenderer.removeListener(event, listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener(event, listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -84,7 +83,7 @@ const ipc = {
         if (ack?.ok) return ack.data;
         throw new Error(ack?.error || 'Unknown error');
       } else if (isRenderer()) {
-        const ack = await modules.ipcRenderer.invoke(event, payload);
+        const ack = await modules.ipcRenderer.socketEmit(event, payload);
         if (ack?.ok) return ack.data;
         throw new Error(ack?.error || 'Unknown error');
       } else {
@@ -98,7 +97,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.login(formData);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('auth-login', formData);
+        return await modules.ipcRenderer.authLogin(formData);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -108,7 +107,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.logout();
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('auth-logout');
+        return await modules.ipcRenderer.authLogout();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -118,7 +117,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.register(formData);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('auth-register', formData);
+        return await modules.ipcRenderer.authRegister(formData);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -128,7 +127,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.autoLogin(token);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('auth-auto-login', token);
+        return await modules.ipcRenderer.authAutoLogin(token);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -140,7 +139,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataUser(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-user', params);
+        return await modules.ipcRenderer.dataUser(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -150,7 +149,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataUserHotReload(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-user-hot-reload', params);
+        return await modules.ipcRenderer.dataUserHotReload(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -160,7 +159,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataFriend(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-friend', params);
+        return await modules.ipcRenderer.dataFriend(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -170,7 +169,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataFriends(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-friends', params);
+        return await modules.ipcRenderer.dataFriends(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -180,7 +179,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataFriendActivities(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-friendActivities', params);
+        return await modules.ipcRenderer.dataFriendActivities(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -190,7 +189,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataFriendGroup(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-friendGroup', params);
+        return await modules.ipcRenderer.dataFriendGroup(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -200,7 +199,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataFriendGroups(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-friendGroups', params);
+        return await modules.ipcRenderer.dataFriendGroups(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -210,7 +209,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataFriendApplication(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-friendApplication', params);
+        return await modules.ipcRenderer.dataFriendApplication(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -220,7 +219,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataFriendApplications(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-friendApplications', params);
+        return await modules.ipcRenderer.dataFriendApplications(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -230,7 +229,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataServer(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-server', params);
+        return await modules.ipcRenderer.dataServer(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -240,7 +239,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataServers(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-servers', params);
+        return await modules.ipcRenderer.dataServers(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -250,7 +249,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataServerMembers(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-serverMembers', params);
+        return await modules.ipcRenderer.dataServerMembers(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -260,7 +259,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataServerOnlineMembers(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-serverOnlineMembers', params);
+        return await modules.ipcRenderer.dataServerOnlineMembers(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -270,7 +269,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataChannel(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-channel', params);
+        return await modules.ipcRenderer.dataChannel(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -280,7 +279,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataChannels(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-channels', params);
+        return await modules.ipcRenderer.dataChannels(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -290,7 +289,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataChannelMembers(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-channelMembers', params);
+        return await modules.ipcRenderer.dataChannelMembers(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -300,7 +299,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataMember(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-member', params);
+        return await modules.ipcRenderer.dataMember(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -310,7 +309,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataMemberApplication(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-memberApplication', params);
+        return await modules.ipcRenderer.dataMemberApplication(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -320,7 +319,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataMemberApplications(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-memberApplications', params);
+        return await modules.ipcRenderer.dataMemberApplications(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -330,7 +329,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataMemberInvitation(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-memberInvitation', params);
+        return await modules.ipcRenderer.dataMemberInvitation(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -340,7 +339,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataMemberInvitations(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-memberInvitations', params);
+        return await modules.ipcRenderer.dataMemberInvitations(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -350,7 +349,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataNotifications(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-notifications', params);
+        return await modules.ipcRenderer.dataNotifications(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -360,7 +359,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataAnnouncements(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-announcements', params);
+        return await modules.ipcRenderer.dataAnnouncements(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -370,7 +369,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataRecommendServers(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-recommendServers', params);
+        return await modules.ipcRenderer.dataRecommendServers(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -380,7 +379,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataUploadImage(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-uploadImage', params);
+        return await modules.ipcRenderer.dataUploadImage(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -390,7 +389,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataSearchServer(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-searchServer', params);
+        return await modules.ipcRenderer.dataSearchServer(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -400,7 +399,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.dataSearchUser(params);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('data-searchUser', params);
+        return await modules.ipcRenderer.dataSearchUser(params);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -410,12 +409,12 @@ const ipc = {
   deepLink: {
     onDeepLink: (callback: (serverId: string) => void): (() => void) => {
       if (isWebsite()) {
-        return () => {};
+        return () => { };
       } else if (isRenderer()) {
         const listener = (_: unknown, serverId: string) => callback(serverId);
-        modules.ipcRenderer.on('deepLink', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('deepLink', listener);
         return () => {
-          modules.ipcRenderer.removeListener('deepLink', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('deepLink', listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -428,7 +427,7 @@ const ipc = {
       if (isWebsite()) {
         if (popupId) modules.webMain.windowMinimize(popupId);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('window-control-minimize');
+        modules.ipcRenderer.windowControlMinimize();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -438,7 +437,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('window-control-maximize');
+        modules.ipcRenderer.windowControlMaximize();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -448,7 +447,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('window-control-unmaximize');
+        modules.ipcRenderer.windowControlUnmaximize();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -458,7 +457,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('window-control-close');
+        modules.ipcRenderer.windowControlClose();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -466,12 +465,12 @@ const ipc = {
 
     onMaximize: (callback: () => void): (() => void) => {
       if (isWebsite()) {
-        return () => {};
+        return () => { };
       } else if (isRenderer()) {
         const listener = () => callback();
-        modules.ipcRenderer.on('maximize', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('maximize', listener);
         return () => {
-          modules.ipcRenderer.removeListener('maximize', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('maximize', listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -480,12 +479,12 @@ const ipc = {
 
     onUnmaximize: (callback: () => void): (() => void) => {
       if (isWebsite()) {
-        return () => {};
+        return () => { };
       } else if (isRenderer()) {
         const listener = () => callback();
-        modules.ipcRenderer.on('unmaximize', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('unmaximize', listener);
         return () => {
-          modules.ipcRenderer.removeListener('unmaximize', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('unmaximize', listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -498,7 +497,7 @@ const ipc = {
       if (isWebsite()) {
         return null;
       } else if (isRenderer()) {
-        return modules.ipcRenderer.sendSync(`get-initial-data?id=${id}`);
+        return modules.ipcRenderer.getInitialData(id);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -510,7 +509,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.openPopup(type, id, initialData, force);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('open-popup', type, id, initialData, force);
+        modules.ipcRenderer.openPopup(type, id, initialData, force);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -520,7 +519,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.closePopup(id);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('close-popup', id);
+        modules.ipcRenderer.closePopup(id);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -530,7 +529,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.closeAllPopups();
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('close-all-popups');
+        modules.ipcRenderer.closeAllPopups();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -540,7 +539,7 @@ const ipc = {
       if (isWebsite()) {
         modules.webMain.webEventEmitter.emit('popup-submit', to, data);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('popup-submit', to, data);
+        modules.ipcRenderer.popupSubmit(to, data);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -560,12 +559,12 @@ const ipc = {
       } else if (isRenderer()) {
         const listener = (_: unknown, from: string, data: T) => {
           if (from === host) callback(data);
-          modules.ipcRenderer.removeListener('popup-submit', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('popup-submit', listener);
         };
-        modules.ipcRenderer.removeListener('popup-submit', listener);
-        modules.ipcRenderer.on('popup-submit', listener);
+        modules.ipcRenderer.ipcEventEmitter.removeListener('popup-submit', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('popup-submit', listener);
         return () => {
-          modules.ipcRenderer.removeListener('popup-submit', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('popup-submit', listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -578,7 +577,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.getAccounts();
       } else if (isRenderer()) {
-        return modules.ipcRenderer.sendSync('get-accounts');
+        return modules.ipcRenderer.getAccounts();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -588,7 +587,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.addAccount(account, data);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('add-account', account, data);
+        modules.ipcRenderer.addAccount(account, data);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -598,7 +597,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.deleteAccount(account);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('delete-account', account);
+        modules.ipcRenderer.deleteAccount(account);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -613,9 +612,9 @@ const ipc = {
         };
       } else if (isRenderer()) {
         const listener = (_: unknown, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
-        modules.ipcRenderer.on('accounts', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('accounts', listener);
         return () => {
-          modules.ipcRenderer.removeListener('accounts', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('accounts', listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -628,7 +627,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.getLanguage();
       } else if (isRenderer()) {
-        return modules.ipcRenderer.sendSync('get-language');
+        return modules.ipcRenderer.getLanguage();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -638,7 +637,7 @@ const ipc = {
       if (isWebsite()) {
         modules.webMain.setLanguage(language);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('set-language', language);
+        modules.ipcRenderer.setLanguage(language);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -653,9 +652,9 @@ const ipc = {
         };
       } else if (isRenderer()) {
         const listener = (_: unknown, language: Types.LanguageKey) => callback(language);
-        modules.ipcRenderer.on('language', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('language', listener);
         return () => {
-          modules.ipcRenderer.removeListener('language', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('language', listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -668,7 +667,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.getCustomThemes();
       } else if (isRenderer()) {
-        return modules.ipcRenderer.sendSync('get-custom-themes');
+        return modules.ipcRenderer.getCustomThemes();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -678,7 +677,7 @@ const ipc = {
       if (isWebsite()) {
         modules.webMain.addCustomTheme(theme);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('add-custom-theme', theme);
+        modules.ipcRenderer.addCustomTheme(theme);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -688,7 +687,7 @@ const ipc = {
       if (isWebsite()) {
         modules.webMain.deleteCustomTheme(index);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('delete-custom-theme', index);
+        modules.ipcRenderer.deleteCustomTheme(index);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -703,9 +702,9 @@ const ipc = {
         };
       } else if (isRenderer()) {
         const listener = (_: unknown, themes: Types.Theme[]) => callback(themes);
-        modules.ipcRenderer.on('custom-themes', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('custom-themes', listener);
         return () => {
-          modules.ipcRenderer.removeListener('custom-themes', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('custom-themes', listener);
         };
       } else {
         throw new Error('Unsupported platform');
@@ -716,7 +715,7 @@ const ipc = {
       if (isWebsite()) {
         return await modules.webMain.saveImage(buffer);
       } else if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('save-image', buffer, directory, filenamePrefix, extension);
+        return await modules.ipcRenderer.saveImage(buffer, directory, filenamePrefix, extension);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -727,7 +726,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getCurrentTheme();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-current-theme');
+          return modules.ipcRenderer.getCurrentTheme();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -737,7 +736,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setCurrentTheme(theme);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-current-theme', theme);
+          modules.ipcRenderer.setCurrentTheme(theme);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -752,9 +751,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, theme: Types.Theme | null) => callback(theme);
-          modules.ipcRenderer.on('current-theme', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('current-theme', listener);
           return () => {
-            modules.ipcRenderer.removeListener('current-theme', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('current-theme', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -768,7 +767,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('update-discord-presence', presence);
+        modules.ipcRenderer.updateDiscordPresence(presence);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -780,7 +779,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.getFontList();
       } else if (isRenderer()) {
-        return modules.ipcRenderer.sendSync('get-font-list');
+        return modules.ipcRenderer.getFontList();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -792,7 +791,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.saveRecord(record);
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('save-record', record);
+        modules.ipcRenderer.saveRecord(record);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -803,7 +802,7 @@ const ipc = {
         if (isWebsite()) {
           return null;
         } else if (isRenderer()) {
-          return await modules.ipcRenderer.invoke('select-record-save-path');
+          return await modules.ipcRenderer.selectRecordSavePath();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -817,7 +816,7 @@ const ipc = {
         if (isWebsite()) {
           // ignore
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-tray-title', title);
+          modules.ipcRenderer.setTrayTitle(title);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -830,7 +829,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.invoke('enable-loopback-audio');
+        modules.ipcRenderer.enableLoopbackAudio();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -840,7 +839,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.invoke('disable-loopback-audio');
+        modules.ipcRenderer.disableLoopbackAudio();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -851,7 +850,7 @@ const ipc = {
     if (isWebsite()) {
       modules.webMain.dontShowDisclaimerNextTime();
     } else if (isRenderer()) {
-      modules.ipcRenderer.send('dont-show-disclaimer-next-time');
+      modules.ipcRenderer.dontShowDisclaimerNextTime();
     } else {
       throw new Error('Unsupported platform');
     }
@@ -861,7 +860,7 @@ const ipc = {
     if (isWebsite()) {
       // ignore
     } else if (isRenderer()) {
-      modules.ipcRenderer.send('check-for-updates');
+      modules.ipcRenderer.checkForUpdates();
     } else {
       throw new Error('Unsupported platform');
     }
@@ -871,7 +870,7 @@ const ipc = {
     if (isWebsite()) {
       modules.webMain.changeServer(server);
     } else if (isRenderer()) {
-      modules.ipcRenderer.send('change-server', server);
+      modules.ipcRenderer.changeServer(server);
     } else {
       throw new Error('Unsupported platform');
     }
@@ -930,46 +929,46 @@ const ipc = {
         if (settings.updateCheckInterval !== undefined) modules.webMain.setUpdateCheckInterval(settings.updateCheckInterval);
         if (settings.updateChannel !== undefined) modules.webMain.setUpdateChannel(settings.updateChannel);
       } else if (isRenderer()) {
-        if (settings.autoLogin !== undefined) modules.ipcRenderer.send('set-auto-login', settings.autoLogin);
-        if (settings.autoLaunch !== undefined) modules.ipcRenderer.send('set-auto-launch', settings.autoLaunch);
-        if (settings.alwaysOnTop !== undefined) modules.ipcRenderer.send('set-always-on-top', settings.alwaysOnTop);
-        if (settings.statusAutoIdle !== undefined) modules.ipcRenderer.send('set-status-auto-idle', settings.statusAutoIdle);
-        if (settings.statusAutoIdleMinutes !== undefined) modules.ipcRenderer.send('set-status-auto-idle-minutes', settings.statusAutoIdleMinutes);
-        if (settings.statusAutoDnd !== undefined) modules.ipcRenderer.send('set-status-auto-dnd', settings.statusAutoDnd);
-        if (settings.channelUIMode !== undefined) modules.ipcRenderer.send('set-channel-ui-mode', settings.channelUIMode);
-        if (settings.closeToTray !== undefined) modules.ipcRenderer.send('set-close-to-tray', settings.closeToTray);
-        if (settings.font !== undefined) modules.ipcRenderer.send('set-font', settings.font);
-        if (settings.fontSize !== undefined) modules.ipcRenderer.send('set-font-size', settings.fontSize);
-        if (settings.inputAudioDevice !== undefined) modules.ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
-        if (settings.outputAudioDevice !== undefined) modules.ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
-        if (settings.recordFormat !== undefined) modules.ipcRenderer.send('set-record-format', settings.recordFormat);
-        if (settings.recordSavePath !== undefined) modules.ipcRenderer.send('set-record-save-path', settings.recordSavePath);
-        if (settings.mixEffect !== undefined) modules.ipcRenderer.send('set-mix-effect', settings.mixEffect);
-        if (settings.mixEffectType !== undefined) modules.ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
-        if (settings.autoMixSetting !== undefined) modules.ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
-        if (settings.echoCancellation !== undefined) modules.ipcRenderer.send('set-echo-cancellation', settings.echoCancellation);
-        if (settings.noiseCancellation !== undefined) modules.ipcRenderer.send('set-noise-cancellation', settings.noiseCancellation);
-        if (settings.microphoneAmplification !== undefined) modules.ipcRenderer.send('set-microphone-amplification', settings.microphoneAmplification);
-        if (settings.manualMixMode !== undefined) modules.ipcRenderer.send('set-manual-mix-mode', settings.manualMixMode);
-        if (settings.mixMode !== undefined) modules.ipcRenderer.send('set-mix-mode', settings.mixMode);
-        if (settings.speakingMode !== undefined) modules.ipcRenderer.send('set-speaking-mode', settings.speakingMode);
-        if (settings.defaultSpeakingKey !== undefined) modules.ipcRenderer.send('set-default-speaking-key', settings.defaultSpeakingKey);
-        if (settings.notSaveMessageHistory !== undefined) modules.ipcRenderer.send('set-not-save-message-history', settings.notSaveMessageHistory);
-        if (settings.hotKeyOpenMainWindow !== undefined) modules.ipcRenderer.send('set-hot-key-open-main-window', settings.hotKeyOpenMainWindow);
-        if (settings.hotKeyIncreaseVolume !== undefined) modules.ipcRenderer.send('set-hot-key-increase-volume', settings.hotKeyIncreaseVolume);
-        if (settings.hotKeyDecreaseVolume !== undefined) modules.ipcRenderer.send('set-hot-key-decrease-volume', settings.hotKeyDecreaseVolume);
-        if (settings.hotKeyToggleSpeaker !== undefined) modules.ipcRenderer.send('set-hot-key-toggle-speaker', settings.hotKeyToggleSpeaker);
-        if (settings.hotKeyToggleMicrophone !== undefined) modules.ipcRenderer.send('set-hot-key-toggle-microphone', settings.hotKeyToggleMicrophone);
-        if (settings.disableAllSoundEffect !== undefined) modules.ipcRenderer.send('set-disable-all-sound-effect', settings.disableAllSoundEffect);
-        if (settings.enterVoiceChannelSound !== undefined) modules.ipcRenderer.send('set-enter-voice-channel-sound', settings.enterVoiceChannelSound);
-        if (settings.leaveVoiceChannelSound !== undefined) modules.ipcRenderer.send('set-leave-voice-channel-sound', settings.leaveVoiceChannelSound);
-        if (settings.startSpeakingSound !== undefined) modules.ipcRenderer.send('set-start-speaking-sound', settings.startSpeakingSound);
-        if (settings.stopSpeakingSound !== undefined) modules.ipcRenderer.send('set-stop-speaking-sound', settings.stopSpeakingSound);
-        if (settings.receiveDirectMessageSound !== undefined) modules.ipcRenderer.send('set-receive-direct-message-sound', settings.receiveDirectMessageSound);
-        if (settings.receiveChannelMessageSound !== undefined) modules.ipcRenderer.send('set-receive-channel-message-sound', settings.receiveChannelMessageSound);
-        if (settings.autoCheckForUpdates !== undefined) modules.ipcRenderer.send('set-auto-check-for-updates', settings.autoCheckForUpdates);
-        if (settings.updateCheckInterval !== undefined) modules.ipcRenderer.send('set-update-check-interval', settings.updateCheckInterval);
-        if (settings.updateChannel !== undefined) modules.ipcRenderer.send('set-update-channel', settings.updateChannel);
+        if (settings.autoLogin !== undefined) modules.ipcRenderer.setAutoLogin(settings.autoLogin);
+        if (settings.autoLaunch !== undefined) modules.ipcRenderer.setAutoLaunch(settings.autoLaunch);
+        if (settings.alwaysOnTop !== undefined) modules.ipcRenderer.setAlwaysOnTop(settings.alwaysOnTop);
+        if (settings.statusAutoIdle !== undefined) modules.ipcRenderer.setStatusAutoIdle(settings.statusAutoIdle);
+        if (settings.statusAutoIdleMinutes !== undefined) modules.ipcRenderer.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
+        if (settings.statusAutoDnd !== undefined) modules.ipcRenderer.setStatusAutoDnd(settings.statusAutoDnd);
+        if (settings.channelUIMode !== undefined) modules.ipcRenderer.setChannelUIMode(settings.channelUIMode);
+        if (settings.closeToTray !== undefined) modules.ipcRenderer.setCloseToTray(settings.closeToTray);
+        if (settings.font !== undefined) modules.ipcRenderer.setFont(settings.font);
+        if (settings.fontSize !== undefined) modules.ipcRenderer.setFontSize(settings.fontSize);
+        if (settings.inputAudioDevice !== undefined) modules.ipcRenderer.setInputAudioDevice(settings.inputAudioDevice);
+        if (settings.outputAudioDevice !== undefined) modules.ipcRenderer.setOutputAudioDevice(settings.outputAudioDevice);
+        if (settings.recordFormat !== undefined) modules.ipcRenderer.setRecordFormat(settings.recordFormat);
+        if (settings.recordSavePath !== undefined) modules.ipcRenderer.setRecordSavePath(settings.recordSavePath);
+        if (settings.mixEffect !== undefined) modules.ipcRenderer.setMixEffect(settings.mixEffect);
+        if (settings.mixEffectType !== undefined) modules.ipcRenderer.setMixEffectType(settings.mixEffectType);
+        if (settings.autoMixSetting !== undefined) modules.ipcRenderer.setAutoMixSetting(settings.autoMixSetting);
+        if (settings.echoCancellation !== undefined) modules.ipcRenderer.setEchoCancellation(settings.echoCancellation);
+        if (settings.noiseCancellation !== undefined) modules.ipcRenderer.setNoiseCancellation(settings.noiseCancellation);
+        if (settings.microphoneAmplification !== undefined) modules.ipcRenderer.setMicrophoneAmplification(settings.microphoneAmplification);
+        if (settings.manualMixMode !== undefined) modules.ipcRenderer.setManualMixMode(settings.manualMixMode);
+        if (settings.mixMode !== undefined) modules.ipcRenderer.setMixMode(settings.mixMode);
+        if (settings.speakingMode !== undefined) modules.ipcRenderer.setSpeakingMode(settings.speakingMode);
+        if (settings.defaultSpeakingKey !== undefined) modules.ipcRenderer.setDefaultSpeakingKey(settings.defaultSpeakingKey);
+        if (settings.notSaveMessageHistory !== undefined) modules.ipcRenderer.setNotSaveMessageHistory(settings.notSaveMessageHistory);
+        if (settings.hotKeyOpenMainWindow !== undefined) modules.ipcRenderer.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
+        if (settings.hotKeyIncreaseVolume !== undefined) modules.ipcRenderer.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
+        if (settings.hotKeyDecreaseVolume !== undefined) modules.ipcRenderer.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
+        if (settings.hotKeyToggleSpeaker !== undefined) modules.ipcRenderer.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
+        if (settings.hotKeyToggleMicrophone !== undefined) modules.ipcRenderer.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
+        if (settings.disableAllSoundEffect !== undefined) modules.ipcRenderer.setDisableAllSoundEffect(settings.disableAllSoundEffect);
+        if (settings.enterVoiceChannelSound !== undefined) modules.ipcRenderer.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
+        if (settings.leaveVoiceChannelSound !== undefined) modules.ipcRenderer.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
+        if (settings.startSpeakingSound !== undefined) modules.ipcRenderer.setStartSpeakingSound(settings.startSpeakingSound);
+        if (settings.stopSpeakingSound !== undefined) modules.ipcRenderer.setStopSpeakingSound(settings.stopSpeakingSound);
+        if (settings.receiveDirectMessageSound !== undefined) modules.ipcRenderer.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
+        if (settings.receiveChannelMessageSound !== undefined) modules.ipcRenderer.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
+        if (settings.autoCheckForUpdates !== undefined) modules.ipcRenderer.setAutoCheckForUpdates(settings.autoCheckForUpdates);
+        if (settings.updateCheckInterval !== undefined) modules.ipcRenderer.setUpdateCheckInterval(settings.updateCheckInterval);
+        if (settings.updateChannel !== undefined) modules.ipcRenderer.setUpdateChannel(settings.updateChannel);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -979,7 +978,7 @@ const ipc = {
       if (isWebsite()) {
         return modules.webMain.getSystemSettings();
       } else if (isRenderer()) {
-        return modules.ipcRenderer.sendSync('get-system-settings');
+        return modules.ipcRenderer.getSystemSettings();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -990,7 +989,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setAutoLogin(enable);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-auto-login', enable);
+          modules.ipcRenderer.setAutoLogin(enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1000,7 +999,7 @@ const ipc = {
         if (isWebsite()) {
           return false;
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-auto-login');
+          return modules.ipcRenderer.getAutoLogin();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1015,9 +1014,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('auto-login', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('auto-login', listener);
           return () => {
-            modules.ipcRenderer.removeListener('auto-login', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('auto-login', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1030,7 +1029,7 @@ const ipc = {
         if (isWebsite()) {
           // ignore
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-auto-launch', enable);
+          modules.ipcRenderer.setAutoLaunch(enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1040,7 +1039,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getAutoLaunch();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-auto-launch');
+          return modules.ipcRenderer.getAutoLaunch();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1055,9 +1054,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('auto-launch', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('auto-launch', listener);
           return () => {
-            modules.ipcRenderer.removeListener('auto-launch', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('auto-launch', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1070,7 +1069,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setAlwaysOnTop(enable);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-always-on-top', enable);
+          modules.ipcRenderer.setAlwaysOnTop(enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1080,7 +1079,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getAlwaysOnTop();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-always-on-top');
+          return modules.ipcRenderer.getAlwaysOnTop();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1095,9 +1094,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('always-on-top', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('always-on-top', listener);
           return () => {
-            modules.ipcRenderer.removeListener('always-on-top', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('always-on-top', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1110,7 +1109,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setStatusAutoIdle(enable);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-status-auto-idle', enable);
+          modules.ipcRenderer.setStatusAutoIdle(enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1120,7 +1119,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getStatusAutoIdle();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-status-auto-idle');
+          return modules.ipcRenderer.getStatusAutoIdle();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1135,9 +1134,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('status-auto-idle', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('status-auto-idle', listener);
           return () => {
-            modules.ipcRenderer.removeListener('status-auto-idle', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('status-auto-idle', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1150,7 +1149,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setStatusAutoIdleMinutes(fontSize);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-status-auto-idle-minutes', fontSize);
+          modules.ipcRenderer.setStatusAutoIdleMinutes(fontSize);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1160,7 +1159,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getStatusAutoIdleMinutes();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-status-auto-idle-minutes');
+          return modules.ipcRenderer.getStatusAutoIdleMinutes();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1175,9 +1174,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, fontSize: number) => callback(fontSize);
-          modules.ipcRenderer.on('status-auto-idle-minutes', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('status-auto-idle-minutes', listener);
           return () => {
-            modules.ipcRenderer.removeListener('status-auto-idle-minutes', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('status-auto-idle-minutes', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1190,7 +1189,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setStatusAutoDnd(enable);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-status-auto-dnd', enable);
+          modules.ipcRenderer.setStatusAutoDnd(enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1200,7 +1199,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getStatusAutoDnd();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-status-auto-dnd');
+          return modules.ipcRenderer.getStatusAutoDnd();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1215,9 +1214,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('status-auto-dnd', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('status-auto-dnd', listener);
           return () => {
-            modules.ipcRenderer.removeListener('status-auto-dnd', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('status-auto-dnd', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1230,7 +1229,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setChannelUIMode(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-channel-ui-mode', key);
+          modules.ipcRenderer.setChannelUIMode(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1240,7 +1239,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getChannelUIMode();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-channel-ui-mode');
+          return modules.ipcRenderer.getChannelUIMode();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1255,9 +1254,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
-          modules.ipcRenderer.on('channel-ui-mode', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('channel-ui-mode', listener);
           return () => {
-            modules.ipcRenderer.removeListener('channel-ui-mode', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('channel-ui-mode', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1270,7 +1269,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setCloseToTray(enable);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-close-to-tray', enable);
+          modules.ipcRenderer.setCloseToTray(enable);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1280,7 +1279,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getCloseToTray();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-close-to-tray');
+          return modules.ipcRenderer.getCloseToTray();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1295,9 +1294,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('close-to-tray', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('close-to-tray', listener);
           return () => {
-            modules.ipcRenderer.removeListener('close-to-tray', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('close-to-tray', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1310,7 +1309,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setFont(font);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-font', font);
+          modules.ipcRenderer.setFont(font);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1320,7 +1319,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getFont();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-font');
+          return modules.ipcRenderer.getFont();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1335,9 +1334,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, font: string) => callback(font);
-          modules.ipcRenderer.on('font', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('font', listener);
           return () => {
-            modules.ipcRenderer.removeListener('font', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('font', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1350,7 +1349,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setFontSize(fontSize);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-font-size', fontSize);
+          modules.ipcRenderer.setFontSize(fontSize);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1360,7 +1359,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getFontSize();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-font-size');
+          return modules.ipcRenderer.getFontSize();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1375,9 +1374,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, fontSize: number) => callback(fontSize);
-          modules.ipcRenderer.on('font-size', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('font-size', listener);
           return () => {
-            modules.ipcRenderer.removeListener('font-size', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('font-size', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1390,7 +1389,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setInputAudioDevice(deviceId);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-input-audio-device', deviceId);
+          modules.ipcRenderer.setInputAudioDevice(deviceId);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1400,7 +1399,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getInputAudioDevice();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-input-audio-device');
+          return modules.ipcRenderer.getInputAudioDevice();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1415,9 +1414,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, deviceId: string) => callback(deviceId);
-          modules.ipcRenderer.on('input-audio-device', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('input-audio-device', listener);
           return () => {
-            modules.ipcRenderer.removeListener('input-audio-device', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('input-audio-device', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1430,7 +1429,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setOutputAudioDevice(deviceId);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-output-audio-device', deviceId);
+          modules.ipcRenderer.setOutputAudioDevice(deviceId);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1440,7 +1439,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getOutputAudioDevice();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-output-audio-device');
+          return modules.ipcRenderer.getOutputAudioDevice();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1455,9 +1454,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, deviceId: string) => callback(deviceId);
-          modules.ipcRenderer.on('output-audio-device', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('output-audio-device', listener);
           return () => {
-            modules.ipcRenderer.removeListener('output-audio-device', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('output-audio-device', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1470,7 +1469,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setRecordFormat(format);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-record-format', format);
+          modules.ipcRenderer.setRecordFormat(format);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1480,7 +1479,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getRecordFormat();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-record-format');
+          return modules.ipcRenderer.getRecordFormat();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1495,9 +1494,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, format: Types.RecordFormat) => callback(format);
-          modules.ipcRenderer.on('record-format', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('record-format', listener);
           return () => {
-            modules.ipcRenderer.removeListener('record-format', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('record-format', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1510,7 +1509,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setRecordSavePath(path);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-record-save-path', path);
+          modules.ipcRenderer.setRecordSavePath(path);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1520,7 +1519,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getRecordSavePath();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-record-save-path');
+          return modules.ipcRenderer.getRecordSavePath();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1535,9 +1534,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, path: string) => callback(path);
-          modules.ipcRenderer.on('record-save-path', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('record-save-path', listener);
           return () => {
-            modules.ipcRenderer.removeListener('record-save-path', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('record-save-path', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1550,7 +1549,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setMixEffect(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-mix-effect', enabled);
+          modules.ipcRenderer.setMixEffect(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1560,7 +1559,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getMixEffect();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-mix-effect');
+          return modules.ipcRenderer.getMixEffect();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1575,9 +1574,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('mix-effect', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('mix-effect', listener);
           return () => {
-            modules.ipcRenderer.removeListener('mix-effect', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('mix-effect', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1590,7 +1589,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setMixEffectType(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-mix-effect-type', key);
+          modules.ipcRenderer.setMixEffectType(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1600,7 +1599,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getMixEffectType();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-mix-effect-type');
+          return modules.ipcRenderer.getMixEffectType();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1615,9 +1614,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: string) => callback(key);
-          modules.ipcRenderer.on('mix-effect-type', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('mix-effect-type', listener);
           return () => {
-            modules.ipcRenderer.removeListener('mix-effect-type', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('mix-effect-type', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1630,7 +1629,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setAutoMixSetting(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-auto-mix-setting', enabled);
+          modules.ipcRenderer.setAutoMixSetting(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1640,7 +1639,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getAutoMixSetting();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-auto-mix-setting');
+          return modules.ipcRenderer.getAutoMixSetting();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1655,9 +1654,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('auto-mix-setting', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('auto-mix-setting', listener);
           return () => {
-            modules.ipcRenderer.removeListener('auto-mix-setting', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('auto-mix-setting', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1670,7 +1669,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setEchoCancellation(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-echo-cancellation', enabled);
+          modules.ipcRenderer.setEchoCancellation(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1680,7 +1679,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getEchoCancellation();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-echo-cancellation');
+          return modules.ipcRenderer.getEchoCancellation();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1695,9 +1694,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('echo-cancellation', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('echo-cancellation', listener);
           return () => {
-            modules.ipcRenderer.removeListener('echo-cancellation', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('echo-cancellation', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1710,7 +1709,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setNoiseCancellation(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-noise-cancellation', enabled);
+          modules.ipcRenderer.setNoiseCancellation(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1720,7 +1719,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getNoiseCancellation();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-noise-cancellation');
+          return modules.ipcRenderer.getNoiseCancellation();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1735,9 +1734,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('noise-cancellation', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('noise-cancellation', listener);
           return () => {
-            modules.ipcRenderer.removeListener('noise-cancellation', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('noise-cancellation', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1750,7 +1749,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setMicrophoneAmplification(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-microphone-amplification', enabled);
+          modules.ipcRenderer.setMicrophoneAmplification(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1760,7 +1759,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getMicrophoneAmplification();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-microphone-amplification');
+          return modules.ipcRenderer.getMicrophoneAmplification();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1775,9 +1774,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('microphone-amplification', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('microphone-amplification', listener);
           return () => {
-            modules.ipcRenderer.removeListener('microphone-amplification', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('microphone-amplification', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1790,7 +1789,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setManualMixMode(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-manual-mix-mode', enabled);
+          modules.ipcRenderer.setManualMixMode(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1800,7 +1799,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getManualMixMode();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-manual-mix-mode');
+          return modules.ipcRenderer.getManualMixMode();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1815,9 +1814,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('manual-mix-mode', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('manual-mix-mode', listener);
           return () => {
-            modules.ipcRenderer.removeListener('manual-mix-mode', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('manual-mix-mode', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1830,7 +1829,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setMixMode(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-mix-mode', key);
+          modules.ipcRenderer.setMixMode(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1840,7 +1839,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getMixMode();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-mix-mode');
+          return modules.ipcRenderer.getMixMode();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1855,9 +1854,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: Types.MixMode) => callback(key);
-          modules.ipcRenderer.on('mix-mode', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('mix-mode', listener);
           return () => {
-            modules.ipcRenderer.removeListener('mix-mode', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('mix-mode', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1870,7 +1869,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setSpeakingMode(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-speaking-mode', key);
+          modules.ipcRenderer.setSpeakingMode(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1880,7 +1879,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getSpeakingMode();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-speaking-mode');
+          return modules.ipcRenderer.getSpeakingMode();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1895,9 +1894,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: Types.SpeakingMode) => callback(key);
-          modules.ipcRenderer.on('speaking-mode', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('speaking-mode', listener);
           return () => {
-            modules.ipcRenderer.removeListener('speaking-mode', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('speaking-mode', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1910,7 +1909,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setDefaultSpeakingKey(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-default-speaking-key', key);
+          modules.ipcRenderer.setDefaultSpeakingKey(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1920,7 +1919,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getDefaultSpeakingKey();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-default-speaking-key');
+          return modules.ipcRenderer.getDefaultSpeakingKey();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1935,9 +1934,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: string) => callback(key);
-          modules.ipcRenderer.on('default-speaking-key', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('default-speaking-key', listener);
           return () => {
-            modules.ipcRenderer.removeListener('default-speaking-key', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('default-speaking-key', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1950,7 +1949,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setNotSaveMessageHistory(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-not-save-message-history', enabled);
+          modules.ipcRenderer.setNotSaveMessageHistory(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1960,7 +1959,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getNotSaveMessageHistory();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-not-save-message-history');
+          return modules.ipcRenderer.getNotSaveMessageHistory();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -1975,9 +1974,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('not-save-message-history', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('not-save-message-history', listener);
           return () => {
-            modules.ipcRenderer.removeListener('not-save-message-history', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('not-save-message-history', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -1990,7 +1989,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setHotKeyOpenMainWindow(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-hot-key-open-main-window', key);
+          modules.ipcRenderer.setHotKeyOpenMainWindow(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2000,7 +1999,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getHotKeyOpenMainWindow();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-hot-key-open-main-window');
+          return modules.ipcRenderer.getHotKeyOpenMainWindow();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2015,9 +2014,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: string) => callback(key);
-          modules.ipcRenderer.on('hot-key-open-main-window', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('hot-key-open-main-window', listener);
           return () => {
-            modules.ipcRenderer.removeListener('hot-key-open-main-window', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('hot-key-open-main-window', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2030,7 +2029,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setHotKeyIncreaseVolume(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-hot-key-increase-volume', key);
+          modules.ipcRenderer.setHotKeyIncreaseVolume(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2040,7 +2039,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getHotKeyIncreaseVolume();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-hot-key-increase-volume');
+          return modules.ipcRenderer.getHotKeyIncreaseVolume();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2055,9 +2054,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: string) => callback(key);
-          modules.ipcRenderer.on('hot-key-increase-volume', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('hot-key-increase-volume', listener);
           return () => {
-            modules.ipcRenderer.removeListener('hot-key-increase-volume', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('hot-key-increase-volume', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2070,7 +2069,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setHotKeyDecreaseVolume(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-hot-key-decrease-volume', key);
+          modules.ipcRenderer.setHotKeyDecreaseVolume(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2080,7 +2079,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getHotKeyDecreaseVolume();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-hot-key-decrease-volume');
+          return modules.ipcRenderer.getHotKeyDecreaseVolume();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2095,9 +2094,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: string) => callback(key);
-          modules.ipcRenderer.on('hot-key-decrease-volume', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('hot-key-decrease-volume', listener);
           return () => {
-            modules.ipcRenderer.removeListener('hot-key-decrease-volume', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('hot-key-decrease-volume', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2110,7 +2109,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setHotKeyToggleSpeaker(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-hot-key-toggle-speaker', key);
+          modules.ipcRenderer.setHotKeyToggleSpeaker(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2120,7 +2119,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getHotKeyToggleSpeaker();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-hot-key-toggle-speaker');
+          return modules.ipcRenderer.getHotKeyToggleSpeaker();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2135,9 +2134,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: string) => callback(key);
-          modules.ipcRenderer.on('hot-key-toggle-speaker', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('hot-key-toggle-speaker', listener);
           return () => {
-            modules.ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('hot-key-toggle-speaker', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2150,7 +2149,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setHotKeyToggleMicrophone(key);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-hot-key-toggle-microphone', key);
+          modules.ipcRenderer.setHotKeyToggleMicrophone(key);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2160,7 +2159,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getHotKeyToggleMicrophone();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-hot-key-toggle-microphone');
+          return modules.ipcRenderer.getHotKeyToggleMicrophone();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2175,9 +2174,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, key: string) => callback(key);
-          modules.ipcRenderer.on('hot-key-toggle-microphone', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('hot-key-toggle-microphone', listener);
           return () => {
-            modules.ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('hot-key-toggle-microphone', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2190,7 +2189,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setDisableAllSoundEffect(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-disable-all-sound-effect', enabled);
+          modules.ipcRenderer.setDisableAllSoundEffect(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2200,7 +2199,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getDisableAllSoundEffect();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-disable-all-sound-effect');
+          return modules.ipcRenderer.getDisableAllSoundEffect();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2215,9 +2214,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('disable-all-sound-effect', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('disable-all-sound-effect', listener);
           return () => {
-            modules.ipcRenderer.removeListener('disable-all-sound-effect', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('disable-all-sound-effect', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2230,7 +2229,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setEnterVoiceChannelSound(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-enter-voice-channel-sound', enabled);
+          modules.ipcRenderer.setEnterVoiceChannelSound(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2240,7 +2239,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getEnterVoiceChannelSound();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-enter-voice-channel-sound');
+          return modules.ipcRenderer.getEnterVoiceChannelSound();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2255,9 +2254,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('enter-voice-channel-sound', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('enter-voice-channel-sound', listener);
           return () => {
-            modules.ipcRenderer.removeListener('enter-voice-channel-sound', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('enter-voice-channel-sound', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2270,7 +2269,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setLeaveVoiceChannelSound(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-leave-voice-channel-sound', enabled);
+          modules.ipcRenderer.setLeaveVoiceChannelSound(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2280,7 +2279,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getLeaveVoiceChannelSound();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-leave-voice-channel-sound');
+          return modules.ipcRenderer.getLeaveVoiceChannelSound();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2295,9 +2294,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('leave-voice-channel-sound', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('leave-voice-channel-sound', listener);
           return () => {
-            modules.ipcRenderer.removeListener('leave-voice-channel-sound', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('leave-voice-channel-sound', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2310,7 +2309,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setStartSpeakingSound(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-start-speaking-sound', enabled);
+          modules.ipcRenderer.setStartSpeakingSound(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2320,7 +2319,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getStartSpeakingSound();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-start-speaking-sound');
+          return modules.ipcRenderer.getStartSpeakingSound();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2335,9 +2334,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('start-speaking-sound', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('start-speaking-sound', listener);
           return () => {
-            modules.ipcRenderer.removeListener('start-speaking-sound', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('start-speaking-sound', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2350,7 +2349,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setStopSpeakingSound(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-stop-speaking-sound', enabled);
+          modules.ipcRenderer.setStopSpeakingSound(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2360,7 +2359,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getStopSpeakingSound();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-stop-speaking-sound');
+          return modules.ipcRenderer.getStopSpeakingSound();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2375,9 +2374,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('stop-speaking-sound', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('stop-speaking-sound', listener);
           return () => {
-            modules.ipcRenderer.removeListener('stop-speaking-sound', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('stop-speaking-sound', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2390,7 +2389,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setReceiveDirectMessageSound(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-receive-direct-message-sound', enabled);
+          modules.ipcRenderer.setReceiveDirectMessageSound(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2400,7 +2399,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getReceiveDirectMessageSound();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-receive-direct-message-sound');
+          return modules.ipcRenderer.getReceiveDirectMessageSound();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2415,9 +2414,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('receive-direct-message-sound', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('receive-direct-message-sound', listener);
           return () => {
-            modules.ipcRenderer.removeListener('receive-direct-message-sound', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('receive-direct-message-sound', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2430,7 +2429,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setReceiveChannelMessageSound(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-receive-channel-message-sound', enabled);
+          modules.ipcRenderer.setReceiveChannelMessageSound(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2440,7 +2439,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getReceiveChannelMessageSound();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-receive-channel-message-sound');
+          return modules.ipcRenderer.getReceiveChannelMessageSound();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2455,9 +2454,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('receive-channel-message-sound', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('receive-channel-message-sound', listener);
           return () => {
-            modules.ipcRenderer.removeListener('receive-channel-message-sound', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('receive-channel-message-sound', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2470,7 +2469,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setAutoCheckForUpdates(enabled);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-auto-check-for-updates', enabled);
+          modules.ipcRenderer.setAutoCheckForUpdates(enabled);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2480,7 +2479,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getAutoCheckForUpdates();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-auto-check-for-updates');
+          return modules.ipcRenderer.getAutoCheckForUpdates();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2495,9 +2494,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, enabled: boolean) => callback(enabled);
-          modules.ipcRenderer.on('auto-check-for-updates', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('auto-check-for-updates', listener);
           return () => {
-            modules.ipcRenderer.removeListener('auto-check-for-updates', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('auto-check-for-updates', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2510,7 +2509,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setUpdateCheckInterval(interval);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-update-check-interval', interval);
+          modules.ipcRenderer.setUpdateCheckInterval(interval);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2520,7 +2519,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getUpdateCheckInterval();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-update-check-interval');
+          return modules.ipcRenderer.getUpdateCheckInterval();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2535,9 +2534,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, interval: number) => callback(interval);
-          modules.ipcRenderer.on('update-check-interval', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('update-check-interval', listener);
           return () => {
-            modules.ipcRenderer.removeListener('update-check-interval', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('update-check-interval', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2550,7 +2549,7 @@ const ipc = {
         if (isWebsite()) {
           modules.webMain.setUpdateChannel(channel);
         } else if (isRenderer()) {
-          modules.ipcRenderer.send('set-update-channel', channel);
+          modules.ipcRenderer.setUpdateChannel(channel);
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2560,7 +2559,7 @@ const ipc = {
         if (isWebsite()) {
           return modules.webMain.getUpdateChannel();
         } else if (isRenderer()) {
-          return modules.ipcRenderer.sendSync('get-update-channel');
+          return modules.ipcRenderer.getUpdateChannel();
         } else {
           throw new Error('Unsupported platform');
         }
@@ -2575,9 +2574,9 @@ const ipc = {
           };
         } else if (isRenderer()) {
           const listener = (_: unknown, channel: string) => callback(channel);
-          modules.ipcRenderer.on('update-channel', listener);
+          modules.ipcRenderer.ipcEventEmitter.on('update-channel', listener);
           return () => {
-            modules.ipcRenderer.removeListener('update-channel', listener);
+            modules.ipcRenderer.ipcEventEmitter.removeListener('update-channel', listener);
           };
         } else {
           throw new Error('Unsupported platform');
@@ -2592,7 +2591,7 @@ const ipc = {
         return { error: 'Network diagnosis is only available in the desktop version.' };
       }
       if (isRenderer()) {
-        return await modules.ipcRenderer.invoke('run-network-diagnosis', params);
+        return await modules.ipcRenderer.runNetworkDiagnosis(params);
       }
       throw new Error('Unsupported platform');
     },
@@ -2601,7 +2600,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('cancel-network-diagnosis');
+        modules.ipcRenderer.cancelNetworkDiagnosis();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -2609,13 +2608,13 @@ const ipc = {
 
     onProgress: (callback: (progress: Types.ProgressData) => void): (() => void) => {
       if (isWebsite()) {
-        return () => {};
+        return () => { };
       }
       if (isRenderer()) {
         const listener = (_: unknown, progress: Types.ProgressData) => callback(progress);
-        modules.ipcRenderer.on('network-diagnosis-progress', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('network-diagnosis-progress', listener);
         return () => {
-          modules.ipcRenderer.removeListener('network-diagnosis-progress', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('network-diagnosis-progress', listener);
         };
       }
       throw new Error('Unsupported platform');
@@ -2627,7 +2626,7 @@ const ipc = {
       if (isWebsite()) {
         return;
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('request-sfu-diagnosis');
+        modules.ipcRenderer.requestSfuDiagnosis();
       } else {
         throw new Error('Unsupported platform');
       }
@@ -2635,12 +2634,12 @@ const ipc = {
 
     onRequest: (callback: ({ senderId }: { senderId: number }) => void): (() => void) => {
       if (isWebsite()) {
-        return () => {};
+        return () => { };
       } else if (isRenderer()) {
         const listener = (_: unknown, { senderId }: { senderId: number }) => callback({ senderId });
-        modules.ipcRenderer.on('get-sfu-diagnosis', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('get-sfu-diagnosis', listener);
         return () => {
-          modules.ipcRenderer.removeListener('get-sfu-diagnosis', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('get-sfu-diagnosis', listener);
         };
       }
       throw new Error('Unsupported platform');
@@ -2650,7 +2649,7 @@ const ipc = {
       if (isWebsite()) {
         // ignore
       } else if (isRenderer()) {
-        modules.ipcRenderer.send('sfu-diagnosis-response', data);
+        modules.ipcRenderer.sfuDiagnosisResponse(data);
       } else {
         throw new Error('Unsupported platform');
       }
@@ -2658,13 +2657,13 @@ const ipc = {
 
     onResponse: (callback: (data: { targetSenderId: number; info: unknown }) => void): (() => void) => {
       if (isWebsite()) {
-        return () => {};
+        return () => { };
       }
       if (isRenderer()) {
         const listener = (_: unknown, data: { targetSenderId: number; info: unknown }) => callback(data);
-        modules.ipcRenderer.on('sfu-diagnosis-response', listener);
+        modules.ipcRenderer.ipcEventEmitter.on('sfu-diagnosis-response', listener);
         return () => {
-          modules.ipcRenderer.removeListener('sfu-diagnosis-response', listener);
+          modules.ipcRenderer.ipcEventEmitter.removeListener('sfu-diagnosis-response', listener);
         };
       }
       throw new Error('Unsupported platform');
