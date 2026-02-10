@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { EventEmitter } from 'events';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -138,7 +137,8 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
   // Variables
   const minimizedPopups = popups.filter((p) => minimizedIds.has(p.id));
 
-  const getPopup = useCallback((type: Types.PopupType, id: string, initialData?: any): Types.Popup => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
     const node: Record<Types.PopupType, () => React.ReactNode> = {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,
@@ -236,7 +236,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
   }, []);
 
   const open = useCallback(
-    async (type: Types.PopupType, id: string, initialData: any = {}, force = true) => {
+    async (type: Types.PopupType, id: string, initialData: unknown = {}, force = true) => {
       new Logger('Popup').info(`Opening ${type} (${id})...`);
 
       // If force is true, destroy the popup

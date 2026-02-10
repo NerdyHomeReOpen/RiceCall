@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import dynamic from 'next/dynamic';
@@ -114,7 +113,8 @@ const PopupPageComponent: React.FC = React.memo(() => {
   const [popup, setPopup] = useState<Types.Popup | null>(null);
 
   // Functions
-  const getPopup = useCallback((type: Types.PopupType, id: string, initialData?: any): Types.Popup => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
     const node: Record<Types.PopupType, () => React.ReactNode> = {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,

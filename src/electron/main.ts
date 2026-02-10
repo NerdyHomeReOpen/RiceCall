@@ -1,9 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import fs from 'fs';
 import net from 'net';
 import path from 'path';
 import { Readable } from 'stream';
-import fontList from 'font-list';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
 const binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath) : '';
@@ -17,21 +15,22 @@ import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, BrowserWindow, ipcMain, dialog, shell, Tray, Menu, nativeImage, session, protocol, webContents } from 'electron';
 import { io, Socket } from 'socket.io-client';
-import * as Types from '../types';
-import { initMainI18n, t } from './i18n.js';
-import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from './discord.js';
-import { getEnv as env, loadEnv } from '../env.js';
-import { getToken, removeToken, setToken } from '../auth.token.js';
-import * as Auth from '../auth.service.js';
-import * as Loader from '../loader.js';
-import Logger from '../logger.js';
-import { LANGUAGES } from '../constant.js';
-import { POPUP_SIZES, POPUP_BEHAVIORS } from '../popup.config.js';
-import { initNetworkDiagnosisTool } from './network-diagnosis-tool.js';
-import registerDataHandlers from './handlers/dataHandlers';
-import registerAccountHandlers from './handlers/accountHandlers';
-import registerToolbarHandlers from './handlers/toolbarHandlers';
-import registerSystemHandlers from './handlers/systemHandlers';
+import { Presence } from 'discord-rpc';
+import * as Types from '@/types';
+import { initMainI18n, t } from '@/electron/i18n';
+import { clearDiscordPresence, configureDiscordRPC, updateDiscordPresence } from '@/electron/discord';
+import { getEnv as env, loadEnv } from '@/env';
+import { removeToken, setToken } from '@/auth.token';
+import * as Auth from '@/auth.service';
+import * as Loader from '@/loader';
+import Logger from '@/logger';
+import { LANGUAGES } from '@/constant';
+import { POPUP_SIZES, POPUP_BEHAVIORS } from '@/popup.config';
+import { initNetworkDiagnosisTool } from '@/electron/network-diagnosis-tool';
+import registerDataHandlers from '@/electron/handlers/dataHandlers';
+import registerAccountHandlers from '@/electron/handlers/accountHandlers';
+import registerToolbarHandlers from '@/electron/handlers/toolbarHandlers';
+import registerSystemHandlers from '@/electron/handlers/systemHandlers';
 
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
@@ -62,7 +61,7 @@ function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
     });
 }
 
-const store = new Store<Types.StoreType>({
+export const store = new Store<Types.StoreType>({
   defaults: {
     // Accounts
     accounts: {},
@@ -174,36 +173,27 @@ function waitForPort(port: number) {
 }
 
 // Store Functions
-function setAutoLaunch(enable: boolean) {
+export function setAutoLaunch(enable: boolean) {
   try {
     app.setLoginItemSettings({
       openAtLogin: enable,
       openAsHidden: false,
     });
-  } catch (error) {
-    new Logger('System').error(`Set auto launch error: ${error}`);
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('System').error(`Set auto launch error: ${error.message}`);
   }
 }
 
-function isAutoLaunchEnabled(): boolean {
+export function isAutoLaunchEnabled(): boolean {
   try {
     const settings = app.getLoginItemSettings();
     return settings.openAtLogin;
-  } catch (error) {
-    new Logger('System').error(`Get auto launch error: ${error}`);
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('System').error(`Get auto launch error: ${error.message}`);
     return false;
   }
-}
-
-function batchWindowsOperation(operation: (win: BrowserWindow) => void) {
-  BrowserWindow.getAllWindows().forEach(operation);
-}
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function broadcast(channel: string, ...args: any[]) {
-  batchWindowsOperation((window) => {
-    window.webContents.send(channel, ...args);
-  });
 }
 
 export function getSettings(): Types.SystemSettings {
@@ -253,9 +243,9 @@ export function getSettings(): Types.SystemSettings {
 }
 
 // Windows
-let mainWindow: BrowserWindow | null = null;
-let authWindow: BrowserWindow | null = null;
-let popups: Record<string, BrowserWindow> = {};
+export let mainWindow: BrowserWindow | null = null;
+export let authWindow: BrowserWindow | null = null;
+export let popups: Record<string, BrowserWindow> = {};
 
 export async function createMainWindow(title?: string): Promise<BrowserWindow> {
   if (mainWindow && !mainWindow.isDestroyed()) {
@@ -266,8 +256,9 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
   }
 
   if (DEV) {
-    waitForPort(PORT).catch((err) => {
-      new Logger('System').error(`Cannot connect to Next.js server: ${err}`);
+    waitForPort(PORT).catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      new Logger('System').error(`Cannot connect to Next server: ${error.message}`);
       app.exit();
     });
   }
@@ -345,8 +336,9 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   }
 
   if (DEV) {
-    waitForPort(PORT).catch((err) => {
-      new Logger('System').error(`Cannot connect to Next.js server: ${err}`);
+    waitForPort(PORT).catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      new Logger('System').error(`Cannot connect to Next server: ${error.message}`);
       app.quit();
     });
   }
@@ -404,7 +396,8 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   return authWindow;
 }
 
-export async function createPopup(type: Types.PopupType, id: string, initialData: unknown, force = true, title?: string): Promise<BrowserWindow> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function createPopup(type: Types.PopupType, id: string, initialData: any = {}, force = true, title?: string): Promise<BrowserWindow> {
   const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
   const behavior = POPUP_BEHAVIORS[type] ?? { resizable: false, maximizable: false, fullscreenable: false };
   const size = POPUP_SIZES[type] ?? { width: 400, height: 300 };
@@ -423,8 +416,9 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
   }
 
   if (DEV) {
-    waitForPort(PORT).catch((err) => {
-      new Logger('System').error(`Cannot connect to Next.js server: ${err}`);
+    waitForPort(PORT).catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      new Logger('System').error(`Cannot connect to Next server: ${error.message}`);
       app.exit();
     });
   }
@@ -512,8 +506,19 @@ export function closePopups() {
   popups = {};
 }
 
+// Windows Operation
+export function batchWindowsOperation(operation: (win: BrowserWindow) => void) {
+  BrowserWindow.getAllWindows().forEach(operation);
+}
+
+export function broadcast(channel: string, ...args: unknown[]) {
+  batchWindowsOperation((window) => {
+    window.webContents.send(channel, ...args);
+  });
+}
+
 // Auto Updater
-async function checkForUpdates(force = false) {
+export async function checkForUpdates(force = false) {
   if (isUpdateNotified && !force) return;
 
   if (DEV) {
@@ -535,7 +540,8 @@ async function checkForUpdates(force = false) {
     autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = false;
     autoUpdater.allowDowngrade = true;
-    const result = await autoUpdater.checkForUpdates().catch((error) => {
+    const result = await autoUpdater.checkForUpdates().catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       new Logger('System').error(`Cannot check for updates in dev channel: ${error.message}`);
     });
     if (result?.isUpdateAvailable) return result;
@@ -551,7 +557,8 @@ async function checkForUpdates(force = false) {
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.allowDowngrade = false;
-  const result = await autoUpdater.checkForUpdates().catch((error) => {
+  const result = await autoUpdater.checkForUpdates().catch((e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('System').error(`Cannot check for updates in latest channel: ${error.message}`);
   });
   if (result?.isUpdateAvailable) return result;
@@ -574,7 +581,8 @@ async function configureAutoUpdater() {
           autoUpdater.downloadUpdate();
         }
       })
-      .catch((error) => {
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
         new Logger('System').error(`Cannot show update dialog: ${error.message}`);
       });
     isUpdateNotified = true;
@@ -609,7 +617,8 @@ async function configureAutoUpdater() {
           autoUpdater.autoInstallOnAppQuit = true;
         }
       })
-      .catch((error) => {
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
         new Logger('System').error(`Cannot show update dialog: ${error.message}`);
       });
     isUpdateNotified = false;
@@ -630,7 +639,7 @@ export function stopCheckForUpdates() {
 }
 
 // Tray Icon
-let tray: Tray | null = null;
+export let tray: Tray | null = null;
 
 export function setTrayDetail() {
   if (!tray) return;
@@ -696,8 +705,9 @@ export function configureReactDevTools() {
         allowFileAccess: true,
       });
       new Logger('System').info('React DevTools loaded successfully');
-    } catch (err) {
-      new Logger('System').error(`Cannot load React DevTools: ${err}`);
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      new Logger('System').error(`Cannot load React DevTools: ${error.message}`);
     }
   }
 }
@@ -821,13 +831,13 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
   for (let i = 0; i <= retries; i++) {
     try {
       return await new Promise<Types.ACK<T>>((resolve, reject) => {
-        socket?.timeout(5000).emit(event, payload, (err: unknown, ack: Types.ACK<T>) => {
-          if (err) reject(err);
+        socket?.timeout(5000).emit(event, payload, (e: unknown, ack: Types.ACK<T>) => {
+          if (e) reject(e);
           else resolve(ack);
         });
       });
-    } catch (err) {
-      if (i === retries) throw err;
+    } catch (e) {
+      if (i === retries) throw e;
       new Logger('Socket').warn(`Retrying(#${i}) socket.emit ${event}: ${JSON.stringify(payload)}`);
     }
   }
@@ -836,8 +846,8 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
 
 function sendHeartbeat() {
   const start = Date.now();
-  socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
-    if (err) {
+  socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (e: unknown, ack: { seq: number; t: number }) => {
+    if (e) {
       new Logger('Socket').warn(`Heartbeat ${seq} timeout`);
     } else {
       const latency = Date.now() - start;
@@ -883,9 +893,10 @@ export function connectSocket(token: string) {
               new Logger('Socket').info(`socket.onAck ${event}: ${JSON.stringify(ack)}`);
               resolve(ack);
             })
-            .catch((err) => {
-              new Logger('Socket').error(`socket.emit ${event} error: ${err.message}`);
-              resolve({ ok: false, error: err.message });
+            .catch((e) => {
+              const error = e instanceof Error ? e : new Error('Unknown error');
+              new Logger('Socket').error(`socket.emit ${event} error: ${error.message}`);
+              resolve({ ok: false, error: error.message });
             });
         });
       });
@@ -935,10 +946,11 @@ export function connectSocket(token: string) {
     broadcast('disconnect', reason);
   });
 
-  socket.on('connect_error', (error) => {
-    new Logger('Socket').error(`Socket connect error: ${error}`);
+  socket.on('connect_error', (e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('Socket').error(`Socket connect error: ${error.message}`);
 
-    broadcast('connect_error', error);
+    broadcast('connect_error', e);
   });
 
   socket.on('reconnect', (attemptNumber) => {
@@ -947,10 +959,11 @@ export function connectSocket(token: string) {
     broadcast('reconnect', attemptNumber);
   });
 
-  socket.on('reconnect_error', (error) => {
-    new Logger('Socket').error(`Socket reconnect error: ${error}`);
+  socket.on('reconnect_error', (e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('Socket').error(`Socket reconnect error: ${error.message}`);
 
-    broadcast('reconnect_error', error);
+    broadcast('reconnect_error', e);
   });
 
   socket.connect();
@@ -987,7 +1000,8 @@ async function login(formData: { account: string; password: string }) {
       }
       return res;
     })
-    .catch((error) => {
+    .catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
@@ -1005,7 +1019,8 @@ async function logout() {
 }
 
 async function register(formData: { account: string; password: string; email: string; username: string; locale: string }) {
-  return await Auth.register(formData).catch((error: any) => {
+  return await Auth.register(formData).catch((e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
     createPopup('dialogError', 'dialogError', { error }, true);
     return { success: false };
   });
@@ -1024,7 +1039,8 @@ async function autoLogin(token: string) {
       }
       return res;
     })
-    .catch((error) => {
+    .catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
@@ -1045,7 +1061,7 @@ app.on('ready', async () => {
   configureReactDevTools();
   configureLogger();
 
-  if (!store.get('dontShowDisclaimer')) createPopup('aboutus', 'aboutUs', {});
+  if (!store.get('dontShowDisclaimer')) createPopup('aboutus', 'aboutUs');
   createAuthWindow().then((authWindow) => authWindow.showInactive());
   createMainWindow().then((mainWindow) => mainWindow.hide());
 
@@ -1090,7 +1106,8 @@ app.on('ready', async () => {
         const buffer = Buffer.from(record);
         fs.writeFileSync(outputPath, buffer);
       }
-    } catch (error: any) {
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       new Logger('System').error(`Save audio error: ${error.message}`);
     }
   });
@@ -1106,20 +1123,20 @@ app.on('ready', async () => {
   });
 
   // Data handlers
-  registerDataHandlers(ipcMain, getToken);
+  registerDataHandlers();
 
   // Accounts handlers
-  registerAccountHandlers(ipcMain, store, broadcast);
+  registerAccountHandlers();
 
   // Toolbar handlers
-  registerToolbarHandlers(ipcMain, mainWindow, tray, MAIN_TITLE, VERSION_TITLE);
+  registerToolbarHandlers();
 
   // Language handlers
   ipcMain.on('get-language', (event) => {
     event.returnValue = store.get('language');
   });
 
-  ipcMain.on('set-language', (_, language = getRegion()) => {
+  ipcMain.on('set-language', (_, language: Types.LanguageKey = getRegion()) => {
     store.set('language', language);
     initMainI18n(language);
     setTrayDetail();
@@ -1137,7 +1154,10 @@ app.on('ready', async () => {
     // Keep total 7 themes
     customThemes.unshift(theme);
     store.set('customThemes', customThemes);
-    broadcast('custom-themes', Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),);
+    broadcast(
+      'custom-themes',
+      Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+    );
   });
 
   ipcMain.on('delete-custom-theme', (_, index: number) => {
@@ -1145,14 +1165,17 @@ app.on('ready', async () => {
     // Keep total 7 themes
     customThemes.splice(index, 1);
     store.set('customThemes', customThemes);
-    broadcast('custom-themes', Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),);
+    broadcast(
+      'custom-themes',
+      Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
+    );
   });
 
   ipcMain.on('get-current-theme', (event) => {
     event.returnValue = store.get('currentTheme');
   });
 
-  ipcMain.on('set-current-theme', (_, theme: string) => {
+  ipcMain.on('set-current-theme', (_, theme: Types.Theme) => {
     store.set('currentTheme', theme);
     broadcast('current-theme', theme);
   });
@@ -1173,7 +1196,8 @@ app.on('ready', async () => {
       fs.writeFileSync(filePath, Buffer.from(buffer));
 
       return `local-resource://${directory}/${fileName}`;
-    } catch (error: any) {
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       new Logger('FileStorage').error(`Electron Storage Error: ${error.message}`);
       return null;
     }
@@ -1188,8 +1212,13 @@ app.on('ready', async () => {
   });
 
   // Popup handlers
-  ipcMain.on('open-popup', async (_, type, id, initialData?, force = true) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ipcMain.on('open-popup', async (_, type: Types.PopupType, id: string, initialData: any, force = true) => {
     new Logger('System').info(`Opening ${type} (${id})...`);
+
+    if (typeof initialData !== 'object' || initialData === null) {
+      initialData = {};
+    }
 
     const loader = Loader[type as keyof typeof Loader];
     if (loader)
@@ -1202,7 +1231,7 @@ app.on('ready', async () => {
     createPopup(type, id, initialData, force);
   });
 
-  ipcMain.on('close-popup', (_, id) => {
+  ipcMain.on('close-popup', (_, id: string) => {
     if (popups[id] && !popups[id].isDestroyed()) {
       popups[id].close();
     }
@@ -1212,7 +1241,7 @@ app.on('ready', async () => {
     closePopups();
   });
 
-  ipcMain.on('popup-submit', (_, to, data: unknown | null = null) => {
+  ipcMain.on('popup-submit', (_, to: string, data: unknown | null = null) => {
     broadcast('popup-submit', to, data);
   });
 
@@ -1270,7 +1299,7 @@ app.on('ready', async () => {
   });
 
   // Discord RPC handlers
-  ipcMain.on('update-discord-presence', (_, updatePresence) => {
+  ipcMain.on('update-discord-presence', (_, updatePresence: Presence) => {
     updatePresence.startTimestamp = START_TIMESTAMP;
     updateDiscordPresence(updatePresence);
   });
@@ -1287,20 +1316,7 @@ app.on('ready', async () => {
   });
 
   // System settings handlers
-  registerSystemHandlers(
-    ipcMain, 
-    store, 
-    app.getPath('documents'), 
-    broadcast, 
-    batchWindowsOperation, 
-    getSettings, 
-    setAutoLaunch, 
-    isAutoLaunchEnabled, 
-    startCheckForUpdates, 
-    stopCheckForUpdates, 
-    fontList
-  );
-  
+  registerSystemHandlers();
 
   // Disclaimer handlers
   ipcMain.on('dont-show-disclaimer-next-time', () => {
@@ -1341,8 +1357,9 @@ app.on('ready', async () => {
           new Logger('Error').error(`(${errorId}), Failed to submit error: ${response.statusText}`);
         }
       })
-      .catch((error2) => {
-        new Logger('Error').error(`(${errorId}), Failed to submit error: ${error2.message}`);
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('Error').error(`(${errorId}), Failed to submit error: ${error.message}`);
       });
   });
 });
@@ -1410,15 +1427,18 @@ async function handleDeepLink(url: string) {
         broadcast('deepLink', serverId);
         break;
     }
-  } catch (error) {
-    new Logger('System').error(`Error parsing deep link: ${error}`);
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('System').error(`Error parsing deep link: ${error.message}`);
   }
 }
 
-process.on('uncaughtException', (error) => {
-  new Logger('System').error(`Uncaught exception: ${error}`);
+process.on('uncaughtException', (e) => {
+  const error = e instanceof Error ? e : new Error('Unknown error');
+  new Logger('System').error(`Uncaught exception: ${error.message}`);
 });
 
-process.on('unhandledRejection', (error) => {
-  new Logger('System').error(`Unhandled rejection: ${error}`);
+process.on('unhandledRejection', (e) => {
+  const error = e instanceof Error ? e : new Error('Unknown error');
+  new Logger('System').error(`Unhandled rejection: ${error.message}`);
 });

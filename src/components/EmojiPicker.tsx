@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import type * as Types from '@/types';
@@ -184,7 +185,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
             </div>
           </div>
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'vip' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
-            <div className={emojiStyles['emoji-vip-placeholder']}>即將推出...</div>
+            <div className={emojiStyles['emoji-vip-placeholder']}>{/* TODO: i18n */}即將推出...</div>
           </div>
         </div>
         <div className={emojiStyles['emoji-tabs']} role="tablist">
@@ -214,7 +215,6 @@ const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }
 
   return (
     <div className={emojiStyles['emoji']}>
-      {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={emoji.path} alt={emoji.alt} width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
     </div>
   );

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
@@ -86,12 +85,12 @@ const getHash = () => getEnv().CROWDIN_DISTRIBUTION_HASH || '';
 class CrowdinBackend {
   type = 'backend' as const;
   client = new otaClient(getHash());
-  read(lng: string, _ns: string, cb: any) {
+  read(lng: string, _ns: string, cb: (error: Error | null, data: Record<string, unknown> | null) => void) {
     const crowdinLng = APP_TO_CROWDIN[lng.replace('_', '-') as Types.LanguageKey] ?? lng;
     this.client
       .getStringsByLocale(crowdinLng)
-      .then((data: any) => cb(null, data))
-      .catch((err: any) => cb(err, null));
+      .then((data: Record<string, unknown>) => cb(null, data))
+      .catch((error: Error) => cb(error, null));
   }
 }
 

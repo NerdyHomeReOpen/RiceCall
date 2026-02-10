@@ -82,7 +82,7 @@ export function openServerBroadcast(serverId: Types.Server['serverId'], channelI
 }
 
 export function openChannelPassword(onSubmit: (password: string) => void) {
-  ipc.popup.open('channelPassword', 'channelPassword', {});
+  ipc.popup.open('channelPassword', 'channelPassword');
   ipc.popup.onSubmit('channelPassword', onSubmit);
 }
 
@@ -99,7 +99,7 @@ export function openMemberInvitation(userId: Types.User['userId']) {
 }
 
 export function openSearchUser() {
-  ipc.popup.open('searchUser', 'searchUser', {});
+  ipc.popup.open('searchUser', 'searchUser');
 }
 
 export async function openApplyFriend(userId: Types.User['userId'], targetId: Types.User['userId']) {
@@ -117,7 +117,7 @@ export function openApproveFriend(userId: Types.User['userId'], targetId: Types.
 }
 
 export function openCreateFriendGroup() {
-  ipc.popup.open('createFriendGroup', 'createFriendGroup', {});
+  ipc.popup.open('createFriendGroup', 'createFriendGroup');
 }
 
 export function openEditFriendNote(userId: Types.User['userId'], targetId: Types.User['userId']) {
@@ -133,11 +133,11 @@ export function openSystemSetting(userId: Types.User['userId']) {
 }
 
 export function openAboutUs() {
-  ipc.popup.open('aboutus', 'aboutUs', {});
+  ipc.popup.open('aboutus', 'aboutUs');
 }
 
 export function openChangeTheme() {
-  ipc.popup.open('changeTheme', 'changeTheme', {});
+  ipc.popup.open('changeTheme', 'changeTheme');
 }
 
 export function openApplyMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
@@ -409,5 +409,5 @@ export function controlQueue(serverId: Types.Server['serverId'], channelId: Type
 }
 
 export function openNetworkDiagnosis() {
-  ipc.popup.open('networkDiagnosis', 'networkDiagnosis', {});
+  ipc.popup.open('networkDiagnosis', 'networkDiagnosis');
 }

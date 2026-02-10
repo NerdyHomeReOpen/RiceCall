@@ -3,47 +3,12 @@ import { FaCheckCircle, FaArrowRight, FaSpinner, FaNetworkWired, FaServer, FaClo
 import { useTranslation } from 'react-i18next';
 import { getEnv } from '@/env';
 import ipc from '@/ipc';
-
 import { isElectron } from '@/platform/isElectron';
+
+import type * as Types from '@/types';
 
 import popupStyles from '@/styles/popup.module.css';
 import ndStyles from '@/styles/networkDiagnosis.module.css';
-
-interface MtrHop {
-  hop: number;
-  host: string;
-  ip: string;
-  loss: number;
-  avg: number;
-  best: number;
-  worst: number;
-  stdev: number;
-}
-
-interface DiagnosisResult {
-  domain: string;
-  dns: { resolved: boolean; addresses: string[]; error: string | null };
-  mtr: { executed: boolean; hops: MtrHop[]; error: string | null };
-}
-
-interface FullReport {
-  timestamp: string;
-  localNetwork: unknown;
-  diagnosis: DiagnosisResult[];
-}
-
-interface ReportError {
-  error: string;
-}
-
-type StepStatus = 'pending' | 'active' | 'completed' | 'failed';
-
-interface Stage {
-  id: string;
-  label: string;
-  icon: React.ReactNode;
-  status: StepStatus;
-}
 
 interface NetworkDiagnosisPopupProps {
   id: string;
@@ -61,8 +26,8 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   const [isTesting, setIsTesting] = useState(false);
   const [progress, setProgress] = useState({ current: 0, cycle: 0, totalCycles: 0 });
   const [activeTab, setActiveTab] = useState<'logs' | 'reports'>('logs');
-  const [reports, setReports] = useState<{ domain?: DiagnosisResult[]; sfu?: DiagnosisResult[] }>({});
-  const [stages, setStages] = useState<Stage[]>([
+  const [reports, setReports] = useState<{ domain?: Types.DiagnosisResult[]; sfu?: Types.DiagnosisResult[] }>({});
+  const [stages, setStages] = useState<Types.Stage[]>([
     { id: 'init', label: t('diagnosis-initialize'), icon: <FaNetworkWired />, status: 'pending' },
     { id: 'domain', label: t('diagnosis-api-ws-test'), icon: <FaCloud />, status: 'pending' },
     { id: 'sfu_info', label: t('diagnosis-sfu-check'), icon: <FaServer />, status: 'pending' },
@@ -74,24 +39,24 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
   }, []);
 
-  const updateStage = useCallback((id: string, status: StepStatus) => {
+  const updateStage = useCallback((id: string, status: Types.StepStatus) => {
     setStages((prev) => prev.map((s) => (s.id === id ? { ...s, status } : s)));
   }, []);
 
   const runDiagnosis = useCallback(
-    async (domains: string[], duration: number = 3): Promise<FullReport | null> => {
+    async (domains: string[], duration: number = 3): Promise<Types.FullReport | null> => {
       addLog(`Starting diagnosis for: ${domains.join(', ')}`);
       setProgress({ current: 0, cycle: 0, totalCycles: duration });
       try {
         const report = await ipc.network.runDiagnosis({ domains, duration });
-        if (report && 'error' in report && (report as ReportError).error) {
-          addLog(`Diagnosis error: ${(report as ReportError).error}`);
+        if (report && 'error' in report && (report as Types.ReportError).error) {
+          addLog(`Diagnosis error: ${(report as Types.ReportError).error}`);
           return null;
         }
-        return report as FullReport;
-      } catch (err: unknown) {
-        const message = err instanceof Error ? err.message : String(err);
-        addLog(`IPC Error: ${message}`);
+        return report as Types.FullReport;
+      } catch (e) {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        addLog(`IPC Error: ${error.message}`);
         return null;
       }
     },
@@ -193,9 +158,9 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
           setIsTesting(false);
         }
       });
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : String(err);
-      addLog(`Error requesting SFU info: ${message}`);
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      addLog(`Error requesting SFU info: ${error.message}`);
       updateStage('sfu_info', 'failed');
       setIsTesting(false);
     }
@@ -271,8 +236,8 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   }, [logs, activeTab]);
 
   useEffect(() => {
-    return ipc.network.onProgress((progressData: { step?: string; cycle?: number; totalCycles?: number; hops?: MtrHop[]; domain?: string }) => {
-      const { step, cycle, totalCycles, hops, domain } = progressData;
+    return ipc.network.onProgress((progress: Types.ProgressData) => {
+      const { step, cycle, totalCycles, hops, domain } = progress;
 
       if (step === 'mtr_ping_progress' && cycle !== undefined && totalCycles !== undefined) {
         const percentage = Math.round((cycle / totalCycles) * 100);
@@ -281,7 +246,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
         if (hops && domain) {
           setReports((prev) => {
             const isSfu = prev.sfu?.some((r) => r.domain === domain);
-            const updateTarget = (list?: DiagnosisResult[]) => list?.map((r) => (r.domain === domain ? { ...r, mtr: { ...r.mtr, executed: true, hops } } : r));
+            const updateTarget = (list?: Types.DiagnosisResult[]) => list?.map((r) => (r.domain === domain ? { ...r, mtr: { ...r.mtr, executed: true, hops } } : r));
 
             if (isSfu) return { ...prev, sfu: updateTarget(prev.sfu) };
             return { ...prev, domain: updateTarget(prev.domain) };
@@ -316,7 +281,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     </div>
   );
 
-  const renderDiagnosisResult = (results?: DiagnosisResult[]) => {
+  const renderDiagnosisResult = (results?: Types.DiagnosisResult[]) => {
     if (!results) return null;
     return results.map((res, idx) => (
       <div key={idx} className={ndStyles['result-card']}>

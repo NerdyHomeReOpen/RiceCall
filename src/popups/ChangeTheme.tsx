@@ -112,7 +112,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     image.arrayBuffer().then((arrayBuffer) => {
       Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         const buffer = imageUnit8Array.buffer;
-        const imageUrl = await ipc.customThemes.saveImage(buffer as ArrayBuffer, 'custom_themes', 'theme', 'webp').catch((error) => {
+        const imageUrl = await ipc.customThemes.saveImage(buffer as ArrayBuffer, 'custom_themes', 'theme', 'webp').catch((e) => {
+          const error = e instanceof Error ? e : new Error('Unknown error');
           new Logger('ChangeTheme').error(`Error saving image: ${error.message}`);
           return null;
         });

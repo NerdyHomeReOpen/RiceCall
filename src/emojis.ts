@@ -67,7 +67,7 @@ export const defEmojis: Types.Emoji[] = [
 ];
 
 export const otherEmojis: Types.Emoji[] = emojiData
-  .filter((e) => e.codes.length <= 5)
+  .filter((emoji) => emoji.codes.length <= 5)
   .map((emoji) => {
     const code = twemoji.convert.toCodePoint(emoji.char);
     return {

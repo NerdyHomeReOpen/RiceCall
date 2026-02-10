@@ -1,21 +1,8 @@
-import * as Types from "@/types";
-import Store from 'electron-store';
+import { app, ipcMain } from 'electron';
+import { store, getSettings, batchWindowsOperation, broadcast, isAutoLaunchEnabled, setAutoLaunch, startCheckForUpdates, stopCheckForUpdates } from '@/electron/main';
+import fontList from 'font-list';
 
-export default function registerSystemHandlers(
-    ipcMain: Electron.IpcMain, 
-    store: Store<Types.StoreType>, 
-    saveRecordDefaultPath: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    broadcast: (channel: string, data: any) => void, 
-    batchWindowsOperation: (operation: (win: Electron.BrowserWindow) => void) => void,
-    getSettings: () => Types.SystemSettings, 
-    setAutoLaunch: (enable: boolean) => void, 
-    isAutoLaunchEnabled: () => boolean, 
-    startCheckForUpdates: () => void, 
-    stopCheckForUpdates: () => void, 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    fontList: any
-) {
+export default function registerSystemHandlers() {
   ipcMain.on('get-system-settings', (event) => {
     event.returnValue = getSettings();
   });
@@ -251,7 +238,7 @@ export default function registerSystemHandlers(
     broadcast('record-format', format);
   });
 
-  ipcMain.on('set-record-save-path', (_, path = saveRecordDefaultPath) => {
+  ipcMain.on('set-record-save-path', (_, path = app.getPath('documents')) => {
     store.set('recordSavePath', path);
     broadcast('record-save-path', path);
   });

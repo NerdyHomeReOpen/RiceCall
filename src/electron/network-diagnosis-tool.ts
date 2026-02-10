@@ -1,31 +1,31 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import { ipcMain } from 'electron';
-import { createRequire } from 'module';
-import Logger from '../logger.js';
+import Logger from '@/logger';
+import * as Types from '@/types';
 
-const require = createRequire(import.meta.url);
-
-let DiagnosisTool: any = null;
-let activeTool: any = null;
+let DiagnosisTool: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
+let activeTool: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 let isInitialized = false;
 
 async function loadTool() {
   if (DiagnosisTool) return DiagnosisTool;
   try {
-    DiagnosisTool = require('networkdiagnosistool');
+    const createdRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
+    DiagnosisTool = createdRequire('networkdiagnosistool');
     if (DiagnosisTool.default) DiagnosisTool = DiagnosisTool.default;
     return DiagnosisTool;
-  } catch (error1: any) {
-    new Logger('NetworkDiagnosisTool').warn(`createRequire failed, trying dynamic import: ${error1.message}`);
+  } catch (e1) {
+    const error = e1 instanceof Error ? e1 : new Error('Unknown error');
+    new Logger('NetworkDiagnosisTool').warn(`createRequire failed, trying dynamic import: ${error.message}`);
+
     try {
       // @ts-expect-error - No types for networkdiagnosistool
       const { default: module } = await import('networkdiagnosistool');
       DiagnosisTool = module.default || module;
       return DiagnosisTool;
-    } catch (error2: any) {
-      new Logger('NetworkDiagnosisTool').error(`Failed to load networkdiagnosistool via all methods: ${error2.message}`);
-      throw new Error(`Tool loading failed: ${error2.message}`);
+    } catch (e2) {
+      const error = e2 instanceof Error ? e2 : new Error('Unknown error');
+      new Logger('NetworkDiagnosisTool').error(`Failed to load networkdiagnosistool via all methods: ${error.message}`);
+      throw new Error(`Tool loading failed: ${error.message}`);
     }
   }
 }
@@ -38,7 +38,7 @@ export function initNetworkDiagnosisTool() {
 
   new Logger('NetworkDiagnosisTool').info('Initializing NetworkDiagnosisTool IPC handlers...');
 
-  ipcMain.handle('run-network-diagnosis', async (event, params: { domains: string[]; duration?: number }) => {
+  ipcMain.handle('run-network-diagnosis', async (event, params: { domains: string[]; duration?: number }): Promise<Types.FullReport | { error: string }> => {
     const sender = event.sender;
     new Logger('NetworkDiagnosisTool').info(`Received run-network-diagnosis request: ${JSON.stringify(params)}`);
     try {
@@ -56,7 +56,7 @@ export function initNetworkDiagnosisTool() {
         }
       }
 
-      return new Promise((resolve) => {
+      return new Promise<Types.FullReport | { error: string }>((resolve) => {
         try {
           const { domains, duration = 3 } = params;
           const uniqueDomains = Array.from(new Set(domains)).filter(Boolean);
@@ -64,28 +64,31 @@ export function initNetworkDiagnosisTool() {
           activeTool = new Tool(uniqueDomains, duration);
 
           activeTool
-            .run((progress: any) => {
+            .run((progress: Types.ProgressData) => {
               if (!sender.isDestroyed()) {
                 sender.send('network-diagnosis-progress', progress);
               }
             })
-            .then((report: any) => {
+            .then((report: Types.FullReport) => {
               activeTool = null;
               resolve(report);
             })
-            .catch((err: any) => {
+            .catch((e: unknown) => {
               activeTool = null;
-              new Logger('NetworkDiagnosisTool').error(`Diagnosis execution error: ${err.message}`);
-              resolve({ error: err.message || String(err) });
+              const error = e instanceof Error ? e : new Error('Unknown error');
+              new Logger('NetworkDiagnosisTool').error(`Diagnosis execution error: ${error.message}`);
+              resolve({ error: error.message });
             });
-        } catch (err: any) {
+        } catch (e) {
           activeTool = null;
-          new Logger('NetworkDiagnosisTool').error(`Tool instantiation error: ${err.message}`);
-          resolve({ error: err.message || String(err) });
+          const error = e instanceof Error ? e : new Error('Unknown error');
+          new Logger('NetworkDiagnosisTool').error(`Tool instantiation error: ${error.message}`);
+          resolve({ error: error.message });
         }
       });
-    } catch (err: any) {
-      return { error: err.message || 'Unknown error loading diagnosis tool.' };
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      return { error: error.message };
     }
   });
 

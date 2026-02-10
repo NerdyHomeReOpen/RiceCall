@@ -1,8 +1,7 @@
-import Store from 'electron-store';
-import * as Types from "@/types";
-  
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export default function registerAccountHandlers(ipcMain: Electron.IpcMain, store: Store<Types.StoreType>, broadcast: (channel: string, data: any) => void) {
+import { ipcMain } from 'electron';
+import { store, broadcast } from '@/electron/main';
+
+export default function registerAccountHandlers() {
   ipcMain.on('get-accounts', (event) => {
     event.returnValue = store.get('accounts');
   });

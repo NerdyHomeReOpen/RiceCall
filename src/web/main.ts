@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { io, Socket } from 'socket.io-client';
 import * as Types from '@/types';
 import * as Auth from '@/auth.service';
@@ -228,13 +227,13 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
   for (let i = 0; i <= retries; i++) {
     try {
       return await new Promise<Types.ACK<T>>((resolve, reject) => {
-        socket?.timeout(5000).emit(event, payload, (err: unknown, ack: Types.ACK<T>) => {
-          if (err) reject(err);
+        socket?.timeout(5000).emit(event, payload, (e: unknown, ack: Types.ACK<T>) => {
+          if (e) reject(e);
           else resolve(ack);
         });
       });
-    } catch (err) {
-      if (i === retries) throw err;
+    } catch (e) {
+      if (i === retries) throw e;
       new Logger('Socket').warn(`Retrying(#${i}) socket.emit ${event}: ${JSON.stringify(payload)}`);
     }
   }
@@ -243,8 +242,8 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
 
 function sendHeartbeat() {
   const start = Date.now();
-  socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (err: unknown, ack: { seq: number; t: number }) => {
-    if (err) {
+  socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (e: unknown, ack: { seq: number; t: number }) => {
+    if (e) {
       new Logger('Socket').warn(`Heartbeat ${seq} timeout`);
     } else {
       const latency = Date.now() - start;
@@ -271,14 +270,18 @@ export function connectSocket(token: string) {
     query: { token: token },
   });
 
-  ServerToClientEventNames.forEach((event) => {
-    socket?.on(event, async (...args) => {
-      if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
-      webEventEmitter.emit(event, ...args);
-    });
-  });
-
   socket.on('connect', () => {
+    for (const event of ServerToClientEventNames) {
+      socket?.removeAllListeners(event);
+    }
+
+    ServerToClientEventNames.forEach((event) => {
+      socket?.on(event, async (...args) => {
+        if (!noLogEventSet.has(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
+        webEventEmitter.emit(event, ...args);
+      });
+    });
+
     sendHeartbeat();
     if (interval) clearInterval(interval);
     interval = setInterval(sendHeartbeat, 30000);
@@ -300,10 +303,11 @@ export function connectSocket(token: string) {
     webEventEmitter.emit('disconnect', reason);
   });
 
-  socket.on('connect_error', (error) => {
-    new Logger('Socket').error(`Socket connect error: ${error}`);
+  socket.on('connect_error', (e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('Socket').error(`Socket connect error: ${error.message}`);
 
-    webEventEmitter.emit('connect_error', error);
+    webEventEmitter.emit('connect_error', e);
   });
 
   socket.on('reconnect', (attemptNumber) => {
@@ -312,10 +316,11 @@ export function connectSocket(token: string) {
     webEventEmitter.emit('reconnect', attemptNumber);
   });
 
-  socket.on('reconnect_error', (error) => {
-    new Logger('Socket').error(`Socket reconnect error: ${error}`);
+  socket.on('reconnect_error', (e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('Socket').error(`Socket reconnect error: ${error.message}`);
 
-    webEventEmitter.emit('reconnect_error', error);
+    webEventEmitter.emit('reconnect_error', e);
   });
 
   socket.connect();
@@ -334,17 +339,21 @@ export function disconnectSocket() {
   socket = null;
 }
 
-export function socketEmit<T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): any {
+export async function socketEmit<T extends keyof Types.ClientToServerEventsWithAck>(
+  event: T,
+  payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0],
+): Promise<Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>> {
   new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(payload)}`);
-  return new Promise((resolve) => {
-    emitWithRetry(event, payload)
+  return new Promise<Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>>((resolve) => {
+    emitWithRetry<ReturnType<Types.ClientToServerEventsWithAck[T]>>(event, payload)
       .then((ack) => {
         new Logger('Socket').info(`socket.onAck ${event}: ${JSON.stringify(ack)}`);
         resolve(ack);
       })
-      .catch((err) => {
-        new Logger('Socket').error(`socket.emit ${event} error: ${err.message}`);
-        resolve({ ok: false, error: err.message });
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('Socket').error(`socket.emit ${event} error: ${error.message}`);
+        resolve({ ok: false, error: error.message });
       });
   });
 }
@@ -369,13 +378,14 @@ export async function login(formData: { account: string; password: string }): Pr
       }
       return res as { success: true; token: string };
     })
-    .catch((error) => {
+    .catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
 }
 
-export function logout() {
+export async function logout() {
   localStorage.removeItem('token');
   removeToken();
   window.location.href = '/auth';
@@ -383,7 +393,8 @@ export function logout() {
 }
 
 export async function register(formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> {
-  return await Auth.register(formData).catch((error: any) => {
+  return await Auth.register(formData).catch((e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
     createPopup('dialogError', 'dialogError', { error }, true);
     return { success: false };
   });
@@ -403,10 +414,11 @@ export async function autoLogin(token: string): Promise<{ success: true; token: 
       }
       return res;
     })
-    .catch((error) => {
+    .catch((e) => {
       localStorage.removeItem('token');
       removeToken();
       window.location.href = '/auth';
+      const error = e instanceof Error ? e : new Error('Unknown error');
       createPopup('dialogError', 'dialogError', { error }, true);
       return { success: false };
     });
@@ -420,7 +432,8 @@ export function saveRecord(record: ArrayBuffer) {
     a.href = URL.createObjectURL(new Blob([record]));
     a.download = `recording-${timestamp}.wav`;
     a.click();
-  } catch (error: any) {
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('System').error(`Save audio error: ${error.message}`);
   }
 }
@@ -615,7 +628,8 @@ export async function saveImage(buffer: ArrayBuffer): Promise<string | null> {
         resolve(null);
       };
       reader.readAsDataURL(blob);
-    } catch (error: any) {
+    } catch (e) {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       new Logger('System').error(`Save image error: ${error.message}`);
       resolve(null);
     }
@@ -623,8 +637,13 @@ export async function saveImage(buffer: ArrayBuffer): Promise<string | null> {
 }
 
 // Popup handlers
-export async function openPopup(type: Types.PopupType, id: string, initialData?: any, force = true) {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export async function openPopup(type: Types.PopupType, id: string, initialData: any, force: boolean = true) {
   new Logger('System').info(`Opening ${type} (${id})...`);
+
+  if (typeof initialData !== 'object' || initialData === null) {
+    initialData = {};
+  }
 
   const loader = Loader[type as keyof typeof Loader];
   if (loader)
@@ -651,12 +670,6 @@ export function closeAllPopups() {
 
 export function popupSubmit(to: string, data: unknown | null = null) {
   webEventEmitter.emit('popup-submit', to, data);
-}
-
-// Discord RPC handlers
-export function updateDiscordPresence(updatePresence: any) {
-  updatePresence.startTimestamp = START_TIMESTAMP;
-  updateDiscordPresence(updatePresence);
 }
 
 // Env handlers
@@ -1080,8 +1093,9 @@ export function errorSubmit(errorId: string, error: Error) {
         new Logger('Error').error(`(${errorId}), Failed to submit error: ${response.statusText}`);
       }
     })
-    .catch((error2) => {
-      new Logger('Error').error(`(${errorId}), Failed to submit error: ${error2.message}`);
+    .catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      new Logger('Error').error(`(${errorId}), Failed to submit error: ${error.message}`);
     });
 }
 

@@ -205,14 +205,14 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('heartbeat', (...args: { seq: number; latency: number }[]) => {
+    const unsub = ipc.socket.on('heartbeat', (...args) => {
       dispatch(setLatency(args[0].latency));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('userUpdate', (...args: { update: Partial<Types.User> }[]) => {
+    const unsub = ipc.socket.on('userUpdate', (...args) => {
       // Add activity when signature is updated
       const newActives = args.reduce<Types.FriendActivity[]>((acc, curr) => {
         if (curr.update.signature && userRef.current.signature !== curr.update.signature) {
@@ -239,14 +239,14 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendAdd', (...args: { data: Types.Friend }[]) => {
+    const unsub = ipc.socket.on('friendAdd', (...args) => {
       dispatch(addFriends(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: string; update: Partial<Types.Friend> }[]) => {
+    const unsub = ipc.socket.on('friendUpdate', (...args) => {
       // Add activity when signature is updated
       const newActivities = args.reduce<Types.FriendActivity[]>((acc, curr) => {
         const targetFriend = currentFriendsRef.current.find((f) => f.targetId === curr.targetId && f.relationStatus === 2);
@@ -262,63 +262,63 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendRemove', (...args: { targetId: string }[]) => {
+    const unsub = ipc.socket.on('friendRemove', (...args) => {
       dispatch(removeFriends(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupAdd', (...args: { data: Types.FriendGroup }[]) => {
+    const unsub = ipc.socket.on('friendGroupAdd', (...args) => {
       dispatch(addFriendGroups(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupUpdate', (...args: { friendGroupId: string; update: Partial<Types.FriendGroup> }[]) => {
+    const unsub = ipc.socket.on('friendGroupUpdate', (...args) => {
       dispatch(updateFriendGroups(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendGroupRemove', (...args: { friendGroupId: string }[]) => {
+    const unsub = ipc.socket.on('friendGroupRemove', (...args) => {
       dispatch(removeFriendGroups(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationAdd', (...args: { data: Types.FriendApplication }[]) => {
+    const unsub = ipc.socket.on('friendApplicationAdd', (...args) => {
       dispatch(addFriendApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationUpdate', (...args: { senderId: string; update: Partial<Types.FriendApplication> }[]) => {
+    const unsub = ipc.socket.on('friendApplicationUpdate', (...args) => {
       dispatch(updateFriendApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('friendApplicationRemove', (...args: { senderId: string }[]) => {
+    const unsub = ipc.socket.on('friendApplicationRemove', (...args) => {
       dispatch(removeFriendApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverAdd', (...args: { data: Types.Server }[]) => {
+    const unsub = ipc.socket.on('serverAdd', (...args) => {
       dispatch(addServers(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverUpdate', (...args: { serverId: string; update: Partial<Types.Server> }[]) => {
+    const unsub = ipc.socket.on('serverUpdate', (...args) => {
       // Update current server
       const currentServerUpdate = args.filter((i) => i.serverId === currentServerRef.current.serverId).reduce<Partial<Types.Server>>((acc, curr) => ({ ...acc, ...curr.update }), {});
       dispatch(updateCurrentServer(currentServerUpdate));
@@ -328,14 +328,14 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverRemove', (...args: { serverId: string }[]) => {
+    const unsub = ipc.socket.on('serverRemove', (...args) => {
       dispatch(removeServers(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args: { data: Types.OnlineMember }[]) => {
+    const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args) => {
       // Add channel events
       const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
         const originMember = currentOnlineMembersRef.current.find((om) => om.userId === curr.data.userId && om.serverId === curr.data.serverId);
@@ -351,7 +351,7 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.OnlineMember> }[]) => {
+    const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args) => {
       // Add channel events
       const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
         const originMember = currentOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
@@ -367,7 +367,7 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args: { userId: string; serverId: string }[]) => {
+    const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args) => {
       // Add channel events
       const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
         const originMember = currentOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
@@ -383,28 +383,28 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args: { data: Types.MemberApplication }[]) => {
+    const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args) => {
       dispatch(addMemberApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberApplicationRemove', (...args: { userId: string; serverId: string }[]) => {
+    const unsub = ipc.socket.on('serverMemberApplicationRemove', (...args) => {
       dispatch(removeMemberApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
+    const unsub = ipc.socket.on('channelAdd', (...args) => {
       dispatch(addChannels(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
+    const unsub = ipc.socket.on('channelUpdate', (...args) => {
       // Update current channel
       const currentChannelUpdate = args.filter((i) => i.channelId === currentChannelRef.current.channelId).reduce<Partial<Types.Channel>>((acc, curr) => ({ ...acc, ...curr.update }), {});
       dispatch(updateCurrentChannel(currentChannelUpdate));
@@ -414,64 +414,63 @@ const SocketManager: React.FC = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelRemove', (...args: { channelId: string }[]) => {
+    const unsub = ipc.socket.on('channelRemove', (...args) => {
       dispatch(removeChannels(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationAdd', (...args: { data: Types.MemberInvitation }[]) => {
+    const unsub = ipc.socket.on('memberInvitationAdd', (...args) => {
       dispatch(addMemberInvitations(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationUpdate', (...args: { serverId: string; update: Partial<Types.MemberInvitation> }[]) => {
+    const unsub = ipc.socket.on('memberInvitationUpdate', (...args) => {
       dispatch(updateMemberInvitations(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('memberInvitationRemove', (...args: { serverId: string }[]) => {
+    const unsub = ipc.socket.on('memberInvitationRemove', (...args) => {
       dispatch(removeMemberInvitations(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('channelMessage', (...args: Types.ChannelMessage[]) => {
+    const unsub = ipc.socket.on('channelMessage', (...args) => {
       dispatch(addChannelMessages(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('actionMessage', (...args: Types.PromptMessage[]) => {
+    const unsub = ipc.socket.on('actionMessage', (...args) => {
       dispatch(addActionMessages(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('queueMembersSet', (...args: Types.QueueUser[]) => {
+    const unsub = ipc.socket.on('queueMembersSet', (...args) => {
       dispatch(setQueueUsers(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('playSound', (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => {
+    const unsub = ipc.socket.on('playSound', (...args) => {
       args.forEach((s) => playSound(s));
     });
     return () => unsub();
   }, [playSound]);
 
   useEffect(() => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const unsub = ipc.socket.on('openPopup', (...args: { type: Types.PopupType; id: string; initialData?: any; force?: boolean }[]) => {
+    const unsub = ipc.socket.on('openPopup', (...args) => {
       args.forEach((p) => {
         ipc.popup.open(p.type, p.id, p.initialData, p.force);
         popupOffSubmitRef.current?.();
@@ -486,19 +485,19 @@ const SocketManager: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('error', (error: Error) => {
-      // General error handling only, logout is handled via openPopup
+    const unsub = ipc.socket.on('error', (e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
       Popup.openErrorDialog(error, () => {});
     });
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('shakeWindow', (...args: (Types.DirectMessage & { initialData?: Record<string, unknown> })[]) => {
+    const unsub = ipc.socket.on('shakeWindow', (...args) => {
       args.forEach((item) => {
         if (!item) return;
-        const initialData: Record<string, unknown> | undefined = item.initialData;
-        if (!initialData) return;
+        const initialData: unknown | undefined = item.initialData;
+        if (!initialData || typeof initialData !== 'object' || !('targetId' in initialData)) return;
         ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'shakeWindow', message: item }, false);
       });
     });
@@ -506,9 +505,9 @@ const SocketManager: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('directMessage', (...args: (Types.DirectMessage & { initialData?: Record<string, unknown> })[]) => {
-      const initialData: Record<string, unknown> | undefined = args[0].initialData;
-      if (!initialData) return;
+    const unsub = ipc.socket.on('directMessage', (...args) => {
+      const initialData: unknown | undefined = args[0].initialData;
+      if (!initialData || typeof initialData !== 'object' || !('targetId' in initialData)) return;
       ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'directMessage', message: args[0] }, false);
     });
     return () => unsub();

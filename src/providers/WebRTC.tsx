@@ -803,8 +803,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       .then((stream) => {
         initMicAudio(stream);
       })
-      .catch((err) => {
-        new Logger('WebRTC').error(`Access input device failed: ${err}`);
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('WebRTC').error(`Access input device failed: ${error.message}`);
       });
 
     storeRef.current.set({ isMicTaken: true });
@@ -837,8 +838,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         }
         initMixAudio(stream);
       })
-      .catch((err) => {
-        new Logger('WebRTC').error(`Error capturing audio from system: ${err}`);
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('WebRTC').error(`Error capturing audio from system: ${error.message}`);
       });
 
     storeRef.current.set({ isMixModeActive: true });
@@ -1016,8 +1018,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       new Logger('WebRTC').info(`Output audio device updated: ${outputAudioDevice}`);
       const el = speakerRef.current;
       if (el && typeof el.setSinkId === 'function') {
-        el.setSinkId(outputAudioDevice).catch((err) => {
-          new Logger('WebRTC').warn(`Set output device failed: ${err}`);
+        el.setSinkId(outputAudioDevice).catch((e) => {
+          const error = e instanceof Error ? e : new Error('Unknown error');
+          new Logger('WebRTC').warn(`Set output device failed: ${error.message}`);
         });
       }
     };

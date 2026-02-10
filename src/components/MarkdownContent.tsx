@@ -1,5 +1,4 @@
 /* eslint-disable @next/next/no-img-element */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import React, { useMemo } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Components } from 'react-markdown';
@@ -80,28 +79,40 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   const { selectImage } = useImageViewer();
 
   const components: Components = {
-    div: ({ ...props }: any) => <div {...props} />,
-    span: ({ ...props }: any) => <span {...props} />,
-    h1: ({ ...props }: any) => <h1 {...props} />,
-    h2: ({ ...props }: any) => <h2 {...props} />,
-    h3: ({ ...props }: any) => <h3 {...props} />,
-    p: ({ ...props }: any) => <p {...props} />,
-    ul: ({ ...props }: any) => <ul {...props} />,
-    ol: ({ ...props }: any) => <ol {...props} />,
-    li: ({ ...props }: any) => <li {...props} />,
-    blockquote: ({ ...props }: any) => <blockquote {...props} />,
-    a: ({ ...props }: any) => {
+    div: ({ ...props }: React.HTMLAttributes<HTMLDivElement>) => <div {...props} />,
+    span: ({ ...props }: React.HTMLAttributes<HTMLSpanElement>) => <span {...props} />,
+    h1: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => <h1 {...props} />,
+    h2: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => <h2 {...props} />,
+    h3: ({ ...props }: React.HTMLAttributes<HTMLHeadingElement>) => <h3 {...props} />,
+    p: ({ ...props }: React.HTMLAttributes<HTMLParagraphElement>) => <p {...props} />,
+    ul: ({ ...props }: React.HTMLAttributes<HTMLUListElement>) => <ul {...props} />,
+    ol: ({ ...props }: React.HTMLAttributes<HTMLOListElement>) => <ol {...props} />,
+    li: ({ ...props }: React.HTMLAttributes<HTMLLIElement>) => <li {...props} />,
+    blockquote: ({ ...props }: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) => <blockquote {...props} />,
+    a: ({ ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
+      if (!props.href) return <a {...props} target="_blank" rel="noreferrer" />;
       const isInvitelink = /^https?:\/\/ricecall(\.com|\.com\.tw)\/join(?:\?|$)/.test(props.href);
-      if (isInvitelink) return <ActionLink href={props.href} />;
-      return <a {...props} target="_blank" rel="noreferrer" />;
+      if (!isInvitelink) return <a {...props} target="_blank" rel="noreferrer" />;
+      return <ActionLink href={props.href} />;
     },
-    table: ({ ...props }: any) => <table className={markdown['table-wrapper']} {...props} />,
-    th: ({ ...props }: any) => <th {...props} />,
-    td: ({ ...props }: any) => <td {...props} />,
-    hr: ({ ...props }: any) => <hr {...props} />,
-    img: ({ alt, src, ...props }: any) => <img loading="lazy" alt={alt} src={src} {...props} onClick={() => selectImage(src)} />,
-    code: ({ children, ...props }: any) => <code {...props}>{children}</code>,
-    pre: ({ ...props }: any) => <pre {...props} />,
+    table: ({ ...props }: React.TableHTMLAttributes<HTMLTableElement>) => <table className={markdown['table-wrapper']} {...props} />,
+    th: ({ ...props }: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => <th {...props} />,
+    td: ({ ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => <td {...props} />,
+    hr: ({ ...props }: React.HTMLAttributes<HTMLHRElement>) => <hr {...props} />,
+    img: ({ alt, src, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
+      <img
+        loading="lazy"
+        alt={alt}
+        src={src}
+        {...props}
+        onClick={() => {
+          if (typeof src !== 'string') return;
+          selectImage(src);
+        }}
+      />
+    ),
+    code: ({ children, ...props }: React.HTMLAttributes<HTMLElement>) => <code {...props}>{children}</code>,
+    pre: ({ ...props }: React.HTMLAttributes<HTMLPreElement>) => <pre {...props} />,
   };
 
   // Variables

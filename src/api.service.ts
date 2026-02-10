@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { getEnv } from '@/env';
 import { getToken } from '@/auth.token';
 import Logger from '@/logger';
@@ -8,11 +7,9 @@ type RequestOptions = {
   credentials?: RequestCredentials;
 };
 
-type ApiRequestData = {
-  [key: string]: any;
-};
+type ApiRequestData = Record<string, unknown>;
 
-export async function handleResponse(response: Response, method: 'GET' | 'POST' | 'PATCH'): Promise<any> {
+export async function handleResponse<T>(response: Response, method: 'GET' | 'POST' | 'PATCH'): Promise<T> {
   const result = await response.json();
   if (!response.ok) {
     new Logger('API').error(`HTTP ${method} ${response.url} [${response.status}]: ${result.message}`);
@@ -24,7 +21,7 @@ export async function handleResponse(response: Response, method: 'GET' | 'POST' 
   }
 }
 
-export async function get(endpoint: string, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<any | null> {
+export async function get<T>(endpoint: string, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<T | null> {
   try {
     const response = await fetch(`${getEnv().API_URL}${endpoint}`, {
       headers: {
@@ -33,16 +30,16 @@ export async function get(endpoint: string, options?: RequestOptions, maxRetry =
       },
     });
 
-    return await handleResponse(response, 'GET');
-  } catch (error: any) {
+    return await handleResponse<T>(response, 'GET');
+  } catch (e) {
     if (retryCount < maxRetry) {
       return await get(endpoint, options, maxRetry, retryCount + 1);
     }
-    throw error;
+    throw e;
   }
 }
 
-export async function post(endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<any | null> {
+export async function post<T>(endpoint: string, data: ApiRequestData | FormData, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<T | null> {
   try {
     const isFormData = data instanceof FormData;
 
@@ -59,16 +56,16 @@ export async function post(endpoint: string, data: ApiRequestData | FormData, op
       body: isFormData ? data : JSON.stringify(data),
     });
 
-    return await handleResponse(response, 'POST');
-  } catch (error: any) {
+    return await handleResponse<T>(response, 'POST');
+  } catch (e) {
     if (retryCount < maxRetry) {
       return await post(endpoint, data, options, maxRetry, retryCount + 1);
     }
-    throw error;
+    throw e;
   }
 }
 
-export async function patch(endpoint: string, data: Record<string, any>, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<any | null> {
+export async function patch<T>(endpoint: string, data: Record<string, unknown>, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<T | null> {
   try {
     const headers = new Headers({
       ...(options?.headers || {}),
@@ -82,11 +79,11 @@ export async function patch(endpoint: string, data: Record<string, any>, options
       body: JSON.stringify(data),
     });
 
-    return await handleResponse(response, 'PATCH');
-  } catch (error: any) {
+    return await handleResponse<T>(response, 'PATCH');
+  } catch (e) {
     if (retryCount < maxRetry) {
       return await patch(endpoint, data, options, maxRetry, retryCount + 1);
     }
-    throw error;
+    throw e;
   }
 }

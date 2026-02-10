@@ -1,15 +1,16 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { isMain, isRenderer } from '@/platform/isElectron';
 
-let logger: any = null;
+type LoggerType = {
+  info: (...args: unknown[]) => void;
+  warn: (...args: unknown[]) => void;
+  error: (...args: unknown[]) => void;
+};
+
+let logger: LoggerType | null = null;
 
 if (isMain()) {
-  import(/* webpackIgnore: true */ 'module')
-    .then((module) => module.createRequire)
-    .then((createRequire) => {
-      const require = createRequire(import.meta.url);
-      logger = require('electron-log').default;
-    });
+  const createdRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
+  logger = createdRequire('electron-log').default;
 } else if (isRenderer()) {
   logger = window.require('electron-log/renderer');
 } else {
@@ -32,7 +33,7 @@ export class Logger {
    * @param message - The message to log
    */
   info(message: string) {
-    logger.info(`[${this.origin}] ${message}`);
+    logger?.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -40,7 +41,7 @@ export class Logger {
    * @param message - The message to log
    */
   command(message: string) {
-    logger.info(`[${this.origin}] ${message}`);
+    logger?.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -48,7 +49,7 @@ export class Logger {
    * @param message - The message to log
    */
   success(message: string) {
-    logger.info(`[${this.origin}] ${message}`);
+    logger?.info(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -56,7 +57,7 @@ export class Logger {
    * @param message - The message to log
    */
   warn(message: string) {
-    logger.warn(`[${this.origin}] ${message}`);
+    logger?.warn(`[${this.origin}] ${message}`);
   }
 
   /**
@@ -64,7 +65,7 @@ export class Logger {
    * @param message - The message to log
    */
   error(message: string) {
-    logger.error(`[${this.origin}] ${message}`);
+    logger?.error(`[${this.origin}] ${message}`);
   }
 }
 
