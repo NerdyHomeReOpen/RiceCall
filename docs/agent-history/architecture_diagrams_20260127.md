@@ -15,12 +15,12 @@
 graph TD
     subgraph Renderer_Process [Renderer Process (React)]
         UI[UI Components]
-        
+
         subgraph Legacy_IPC_Facade [src/ipc.ts]
             IPC_Funcs[Functions: login, minimize, openPopup]
             IPC_Direct[Direct calls to window.require('electron')]
         end
-        
+
         Socket_Legacy[src/socket.ts (Global Socket Instance)]
     end
 
@@ -31,7 +31,7 @@ graph TD
 
     subgraph Main_Process [Main Process (Node.js)]
         Main_Entry[main.ts (God Object)]
-        
+
         subgraph Main_Logic [Coupled Logic inside main.ts]
             Win_Mgmt[Window Management]
             Auth_Logic[Auth Logic]
@@ -39,7 +39,7 @@ graph TD
             App_Lifecycle[App Lifecycle]
             Tray_Logic[Tray & Menus]
         end
-        
+
         Native_Wins[BrowserWindows (Main & Popups)]
     end
 
@@ -47,11 +47,11 @@ graph TD
     UI --> IPC_Funcs
     IPC_Funcs -->|ipcRenderer.send| IPC_Channel
     Socket_Legacy -->|Direct Connection| UI
-    
+
     IPC_Channel -->|ipcMain.on| Main_Entry
     Main_Entry --> Main_Logic
     Main_Logic --> Native_Wins
-    
+
     %% Critical Coupling
     IPC_Direct -.->|Hard Dependency| IPC_Channel
 ```
@@ -232,6 +232,7 @@ graph TD
 以下列出關鍵的介面定義，這定義了重構後的「契約」。
 
 ### 3.1 `IpcRenderer` Contract
+
 ```typescript
 // src/platform/ipc/types.ts
 interface IpcRenderer {
@@ -243,6 +244,7 @@ interface IpcRenderer {
 ```
 
 ### 3.2 `PopupController` Contract
+
 ```typescript
 // src/platform/popup/types.ts
 interface PopupController {
@@ -254,12 +256,13 @@ interface PopupController {
 ```
 
 ### 3.3 `HandlerContext` (The "Dependency Injection")
+
 ```typescript
 // src/platform/ipc/types.ts
 // 這個 Context 傳入 Handler，讓 Handler 不需要知道自己在 Electron 還是 Web
 interface HandlerContext {
-  storage: IpcStorage;      // Electron-store vs LocalStorage
-  api: ApiClient;           // Axios/Net vs Fetch
-  broadcast: Broadcaster;   // BrowserWindow.send vs BroadcastChannel
+  storage: IpcStorage; // Electron-store vs LocalStorage
+  api: ApiClient; // Axios/Net vs Fetch
+  broadcast: Broadcaster; // BrowserWindow.send vs BroadcastChannel
 }
 ```

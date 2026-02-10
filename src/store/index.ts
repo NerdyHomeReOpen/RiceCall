@@ -50,10 +50,9 @@ export const rootReducer = combineReducers({
 
 export const store = configureStore({
   reducer: rootReducer,
-  // middleware 預設已包含 Thunk，這對處理 IPC/Socket 非同步非常有用
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // 關閉序列化檢查，方便在 Action 裡傳遞一些特殊物件（如果需要）
+      serializableCheck: false,
     }),
 });
 

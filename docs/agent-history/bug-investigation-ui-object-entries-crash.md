@@ -4,6 +4,7 @@
 **Subject:** Investigation of `TypeError` in `PromptMessage.tsx` during UI rendering.
 
 ## 1. Problem Description
+
 After fixing the data layer (toQuery), a similar crash occurred in `src/components/PromptMessage.tsx`. This happens when the application tries to render a "System Message" (Prompt) that does not contain any dynamic parameters.
 
 ## 2. Root Cause Analysis
@@ -26,7 +27,7 @@ graph TD
     subgraph "UI Layer (React)"
         Store --> ChannelMessage["ChannelMessageContent.tsx"]
         ChannelMessage --> PromptMessage["PromptMessage.tsx"]
-        
+
         subgraph "PromptMessage Component"
             Logic["Object.entries(messageGroup.parameter)"]
             Logic -- "If parameter is undefined" --> Crash["CRASH: TypeError"]
@@ -35,6 +36,7 @@ graph TD
 ```
 
 ### Technical Detail:
+
 - **Location:** `src/components/PromptMessage.tsx` line 23.
 - **Cause:** Some system messages are static (e.g., a simple "Connection Lost" notification) and do not include a `parameter` field.
 - **JavaScript Behavior:** `Object.entries(undefined)` throws a fatal error, unmounting the entire message list component.
@@ -53,7 +55,7 @@ graph TD
 
     Data -- "Socket.io" --> WebReact["Web React<br/>parameter is undefined"]
     Data -- "IPC Bridge" --> MainProcess["Electron Main"]
-    
+
     MainProcess -- "Optional normalization" --> ElectronReact["Electron Renderer<br/>parameter might be null or {}"]
 
     WebReact --> UI_Crash["Object.entries(undefined)<br/>CRASH"]
@@ -61,6 +63,7 @@ graph TD
 ```
 
 ### Why Electron might avoid the crash:
+
 1.  **IPC Serialization:** When data passes through Electron's `ipcMain` to `ipcRenderer`, it undergoes JSON-like serialization. Some versions of Electron or custom IPC wrappers might normalize `undefined` to `null` or omit the key entirely, but the main reason is often that the **Main Process** (written in Node.js) acts as a data-cleaning layer.
 2.  **Environment Strictness:** Standard browsers (Chrome/Firefox) are often stricter with `Uncaught TypeError` in the UI thread compared to the Electron renderer's environment during certain development modes.
 
@@ -74,20 +77,21 @@ Instead of adding guards in every React component, we can mimic Electron's Main 
 graph TD
     subgraph "Web Environment"
         Socket["Socket / API Handlers"] -- "Raw JSON" --> WebIPC["Web IPC Abstraction<br/>(src/platform/ipc/index.ts)"]
-        
+
         subgraph "Middleware Layer"
             WebIPC --> Interceptor["Data Normalizer<br/>(Ensures parameter = {})"]
         end
-        
+
         Interceptor -- "Normalized Object" --> React["React Components<br/>(PromptMessage.tsx)"]
     end
-    
+
     subgraph "Result"
         React -- "Reliable Data" --> Success["Object.entries() works!"]
     end
 ```
 
 ### Why this is better:
+
 - **Contract Fulfillment:** The TypeScript type says `parameter` is required. The middleware ensures this contract is fulfilled at runtime, mirroring how Electron's Main process typically prepares data.
 - **Global Fix:** This fixes the crash for ALL components receiving these messages, not just one.
 - **Maintainability:** UI components stay clean and focused on rendering, not data sanitization.
@@ -97,11 +101,13 @@ graph TD
 A secondary crash was identified at `content.split(' ')`. This occurs when the `content` field is missing from the message object.
 
 ### Updated Implementation Plan
-1.  **Modify `src/platform/ipc/index.ts`**: 
+
+1.  **Modify `src/platform/ipc/index.ts`**:
     - Ensure `parameter = {}`
     - Ensure `contentMetadata = {}`
     - **Ensure `content = ""`** (New)
 2.  **UI Component updates**: Add defensive checks during rendering.
 
 ## 6. Implementation Strategy
+
 ... (rest of the report)

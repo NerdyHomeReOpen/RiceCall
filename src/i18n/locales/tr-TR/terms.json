@@ -3,24 +3,15 @@
   "sections": [
     {
       "title": "1. Kabul ve değişiklikler",
-      "items": [
-        "Hizmeti yüklemek, giriş yapmak veya kullanmak bu Şartları kabul ettiğiniz anlamına gelir",
-        "Bu Şartları güncelleyebiliriz; önemli değişiklikler bildirilecektir"
-      ]
+      "items": ["Hizmeti yüklemek, giriş yapmak veya kullanmak bu Şartları kabul ettiğiniz anlamına gelir", "Bu Şartları güncelleyebiliriz; önemli değişiklikler bildirilecektir"]
     },
     {
       "title": "2. Hizmet",
-      "items": [
-        "Gerçek zamanlı ses, sesli mesajlar, topluluklar ve ilgili özellikler",
-        "Özellikler operasyonel veya güvenlik ihtiyaçları için eklenebilir/değiştirilebilir/askıya alınabilir"
-      ]
+      "items": ["Gerçek zamanlı ses, sesli mesajlar, topluluklar ve ilgili özellikler", "Özellikler operasyonel veya güvenlik ihtiyaçları için eklenebilir/değiştirilebilir/askıya alınabilir"]
     },
     {
       "title": "3. Hesap ve güvenlik",
-      "items": [
-        "Doğru bilgi sağlayın ve kimlik bilgilerinizi gizli tutun",
-        "İzinsiz kullanımı bize bildirin; yetersiz yönetimden siz sorumlusunuz"
-      ]
+      "items": ["Doğru bilgi sağlayın ve kimlik bilgilerinizi gizli tutun", "İzinsiz kullanımı bize bildirin; yetersiz yönetimden siz sorumlusunuz"]
     },
     {
       "title": "4. Kabul edilebilir kullanım",
@@ -42,17 +33,11 @@
     },
     {
       "title": "6. Ödemeler ve abonelikler (varsa)",
-      "items": [
-        "Plan ücretleri ve yenileme kuralları satın alma sırasında gösterilir",
-        "Ücretler, yasa gerektirmedikçe iade edilmez"
-      ]
+      "items": ["Plan ücretleri ve yenileme kuralları satın alma sırasında gösterilir", "Ücretler, yasa gerektirmedikçe iade edilmez"]
     },
     {
       "title": "7. Kullanıcı içeriği ve lisans",
-      "items": [
-        "İçeriğinizden siz sorumlusunuz",
-        "Hizmeti işletmek için bize münhasır olmayan, dünya çapında ve feshedilebilir bir lisans verirsiniz (yedekleme, iletim, gösterim)"
-      ]
+      "items": ["İçeriğinizden siz sorumlusunuz", "Hizmeti işletmek için bize münhasır olmayan, dünya çapında ve feshedilebilir bir lisans verirsiniz (yedekleme, iletim, gösterim)"]
     },
     {
       "title": "8. Fikri mülkiyet hakları",

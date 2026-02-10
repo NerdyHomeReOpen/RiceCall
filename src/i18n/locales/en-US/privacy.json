@@ -27,12 +27,7 @@
     },
     {
       "title": "4. Sharing",
-      "items": [
-        "Vendors/Processors (cloud, CDN, RTC, analytics, monitoring) under contracts",
-        "Legal requests",
-        "Business transactions",
-        "We do not sell personal data"
-      ]
+      "items": ["Vendors/Processors (cloud, CDN, RTC, analytics, monitoring) under contracts", "Legal requests", "Business transactions", "We do not sell personal data"]
     },
     {
       "title": "5. Voice Data",
@@ -45,10 +40,7 @@
     },
     {
       "title": "6. Storage & Retention",
-      "items": [
-        "Data centers in various countries/regions",
-        "Retention based on necessity and legal obligations"
-      ]
+      "items": ["Data centers in various countries/regions", "Retention based on necessity and legal obligations"]
     },
     {
       "title": "7. Your Rights",

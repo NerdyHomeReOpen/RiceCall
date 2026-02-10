@@ -3,24 +3,15 @@
   "sections": [
     {
       "title": "1. Aceitação e alterações",
-      "items": [
-        "Instalar, entrar ou usar o serviço significa que você aceita estes Termos",
-        "Podemos atualizar estes Termos; alterações materiais serão notificadas"
-      ]
+      "items": ["Instalar, entrar ou usar o serviço significa que você aceita estes Termos", "Podemos atualizar estes Termos; alterações materiais serão notificadas"]
     },
     {
       "title": "2. Serviço",
-      "items": [
-        "Voz em tempo real, mensagens de voz, comunidades e recursos relacionados",
-        "Recursos podem ser adicionados/alterados/suspensos por necessidades operacionais ou de segurança"
-      ]
+      "items": ["Voz em tempo real, mensagens de voz, comunidades e recursos relacionados", "Recursos podem ser adicionados/alterados/suspensos por necessidades operacionais ou de segurança"]
     },
     {
       "title": "3. Conta e segurança",
-      "items": [
-        "Forneça informações precisas e mantenha suas credenciais confidenciais",
-        "Avise-nos sobre uso não autorizado; você é responsável por má gestão"
-      ]
+      "items": ["Forneça informações precisas e mantenha suas credenciais confidenciais", "Avise-nos sobre uso não autorizado; você é responsável por má gestão"]
     },
     {
       "title": "4. Uso aceitável",
@@ -42,17 +33,11 @@
     },
     {
       "title": "6. Pagamentos e assinaturas (se houver)",
-      "items": [
-        "Taxas do plano e regras de renovação são exibidas na compra",
-        "As taxas não são reembolsáveis, salvo exigência legal"
-      ]
+      "items": ["Taxas do plano e regras de renovação são exibidas na compra", "As taxas não são reembolsáveis, salvo exigência legal"]
     },
     {
       "title": "7. Conteúdo do usuário e licença",
-      "items": [
-        "Você é responsável pelo seu conteúdo",
-        "Você nos concede uma licença não exclusiva, mundial e revogável para operar o serviço (backup, transmissão, exibição)"
-      ]
+      "items": ["Você é responsável pelo seu conteúdo", "Você nos concede uma licença não exclusiva, mundial e revogável para operar o serviço (backup, transmissão, exibição)"]
     },
     {
       "title": "8. Direitos de PI",

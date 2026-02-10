@@ -57,7 +57,7 @@
 
 ### 1) 「並不能 100% 替換」
 
-這句話若指「等價替換能力」：*成立*。
+這句話若指「等價替換能力」：_成立_。
 
 原因：`main.ts` 集中大量只存在於 Electron/Node/OS 的能力，例如：
 
@@ -71,7 +71,7 @@
 
 Web 端無法完全等價。
 
-但若指「抽象成 interface」：*不成立*（抽象是可行的）。
+但若指「抽象成 interface」：_不成立_（抽象是可行的）。
 
 你們已經用 `src/ipc.ts` 做了第一層抽象；接下來的工作是補齊 WebAdapter 的行為契約，而不是停止抽象。
 
@@ -120,7 +120,7 @@ Web 的合理替代：
 
 ### 3) 「popup 的呼叫跟實現完全不一樣，從邏輯層次上就長得不一樣」
 
-這句話就「實作形態」而言：*成立*。
+這句話就「實作形態」而言：_成立_。
 
 #### Electron popup：本質是第二個 `BrowserWindow`
 
@@ -172,33 +172,33 @@ Web 端通常是：
 
 以下列的是「Web 無法 1:1 等價」的能力；但多數仍可做替代/降級。
 
-1) **OS 全域快捷鍵 / global hotkey**
+1. **OS 全域快捷鍵 / global hotkey**
    - e.g. `hotKeyOpenMainWindow`、`hotKeyIncreaseVolume` 等
    - Web 無 OS-global hotkey；只能在頁面 focus 時攔截。
 
-2) **開機自啟（autoLaunch/login item）**
+2. **開機自啟（autoLaunch/login item）**
    - Electron 可 `app.setLoginItemSettings()`
    - Web 不可。
 
-3) **Tray / close-to-tray / flashFrame / alwaysOnTop**
+3. **Tray / close-to-tray / flashFrame / alwaysOnTop**
    - Tray 與視窗管理屬 OS 權限。
    - Web 不可等價。
 
-4) **桌面 auto updater（`electron-updater`）**
+4. **桌面 auto updater（`electron-updater`）**
    - Web 更新語意是部署即更新 / PWA service worker update。
    - 不等價但可替代。
 
-5) **列舉系統字體 `font-list`**
+5. **列舉系統字體 `font-list`**
    - Web 不能完整列舉系統字體清單。
 
-6) **任意路徑寫檔 / 靜默存檔**
+6. **任意路徑寫檔 / 靜默存檔**
    - Web 的檔案系統權限受限制。
 
-7) **loopback audio（抓系統輸出聲音）**
+7. **loopback audio（抓系統輸出聲音）**
    - Electron 可使用 native 能力
    - Web 非常受限（可能要走螢幕分享 system audio、權限與 UX 不同）。
 
-8) **Discord RPC（桌面 presence）**
+8. **Discord RPC（桌面 presence）**
    - Web 通常做不到同等整合（可改後端或其他 integration）。
 
 ---
@@ -257,8 +257,8 @@ Web 端通常是：
 
 - `open()`：把 `initialData` 寫入 `sessionStorage`（key: `ricecall:popup:initialData:<id>`），然後開啟 `/popup?type=...&id=...`。
 - `/popup` 頁面（`src/app/popup/page.tsx`）已支援：
-   - Electron：沿用 `ipc.initialData.get(id)`
-   - Web：改從 `sessionStorage` 讀取 initialData
+  - Electron：沿用 `ipc.initialData.get(id)`
+  - Web：改從 `sessionStorage` 讀取 initialData
 - `submit/onSubmit`：使用 `BroadcastChannel('ricecall-popup-submit')` 做同源通訊
 
 > 這個 PoC 只用來證明「可以用同一套契約描述 popup 行為」；後續若要改成 DOM modal，只需要替換 Web adapter 的 `open/close/submit` 實作，不必改動呼叫端。
