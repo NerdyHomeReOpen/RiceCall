@@ -64,6 +64,8 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
   return { env };
 }
 
+loadEnv();
+
 export function getEnv() {
   if (!env) {
     new Logger('Env').error('Env is not loaded');
@@ -71,5 +73,3 @@ export function getEnv() {
   }
   return env;
 }
-
-loadEnv();

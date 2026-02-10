@@ -8,14 +8,18 @@ type LoggerType = {
 
 let logger: LoggerType | null = null;
 
-if (isMain()) {
-  const createdRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
-  logger = createdRequire('electron-log').default;
-} else if (isRenderer()) {
-  logger = window.electronLog ?? console;
-} else {
-  logger = console;
+async function loadLogger() {
+  if (isMain()) {
+    const createdRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
+    logger = createdRequire('electron-log').default;
+  } else if (isRenderer()) {
+    logger = window.electronLog ?? console;
+  } else {
+    logger = console;
+  }
 }
+
+loadLogger();
 
 /**
  * Logger class

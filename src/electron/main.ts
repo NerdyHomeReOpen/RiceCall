@@ -131,7 +131,7 @@ export const MAIN_TITLE = 'RiceCall';
 export const VERSION_TITLE = `RiceCall v${app.getVersion()}`;
 export const DEV = process.argv.includes('--dev');
 export const PORT = 3000;
-export const PRELOAD_PATH = path.join(app.getAppPath(), 'preload.js');
+export const PRELOAD_PATH = DEV ? path.join(app.getAppPath(), 'preload.ts') : path.join(app.getAppPath(), 'build', 'src', 'electron', 'preload.js');
 export const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 export const APP_ICON = process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'icon.ico') : path.join(app.getAppPath(), 'resources', 'icon.png');
 export const APP_TRAY_ICON = {
