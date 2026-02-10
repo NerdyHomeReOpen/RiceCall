@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isElectron, isRenderer } from '@/platform/isElectron';
+import { isElectron, isMain } from '@/platform/isElectron';
 import Logger from '@/logger';
 
 let env: Record<string, string> | null = null;
@@ -23,40 +23,30 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
 
   if (isElectron()) {
     try {
-      let electron: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-      let path: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-      let dotenv: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-      let expand: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-
-      if (isRenderer()) {
-        electron = window.require('electron');
-        path = window.require('path');
-        dotenv = window.require('dotenv');
-        expand = window.require('dotenv-expand').expand;
-      } else {
+      if (isMain()) {
         const createRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
-        electron = createRequire('electron');
-        path = createRequire('path');
-        dotenv = createRequire('dotenv');
-        expand = createRequire('dotenv-expand').expand;
+        const electron = createRequire('electron');
+        const path = createRequire('path');
+        const dotenv = createRequire('dotenv');
+        const expand = createRequire('dotenv-expand').expand;
+
+        const app = electron.app || (electron.remote && electron.remote.app);
+        const envPaths: string[] = [];
+        const root = process.cwd();
+
+        if (app && app.isPackaged) {
+          const resourcesPath = process.resourcesPath;
+          envPaths.push(path.join(resourcesPath, 'app.env'));
+          if (server === 'dev') envPaths.push(path.join(resourcesPath, 'app.env.dev'));
+        } else {
+          envPaths.push(path.join(root, '.env'));
+          if (server === 'dev') envPaths.push(path.join(root, '.env.dev'));
+        }
+
+        const cfg = dotenv.config({ path: envPaths, override: true });
+        expand(cfg);
+        envLoaded = { ...envLoaded, ...(cfg.parsed ?? {}) };
       }
-
-      const app = electron.app || (electron.remote && electron.remote.app);
-      const envPaths: string[] = [];
-      const root = !isRenderer() ? process.cwd() : '/';
-
-      if (app && app.isPackaged) {
-        const resourcesPath = process.resourcesPath;
-        envPaths.push(path.join(resourcesPath, 'app.env'));
-        if (server === 'dev') envPaths.push(path.join(resourcesPath, 'app.env.dev'));
-      } else {
-        envPaths.push(path.join(root, '.env'));
-        if (server === 'dev') envPaths.push(path.join(root, '.env.dev'));
-      }
-
-      const cfg = dotenv.config({ path: envPaths, override: true });
-      expand(cfg);
-      envLoaded = { ...envLoaded, ...(cfg.parsed ?? {}) };
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');
       console.error('Failed to load Electron env files:', error.message);
@@ -74,6 +64,8 @@ export async function loadEnv(server: 'dev' | 'prod' = 'prod') {
   return { env };
 }
 
+loadEnv();
+
 export function getEnv() {
   if (!env) {
     new Logger('Env').error('Env is not loaded');
@@ -81,5 +73,3 @@ export function getEnv() {
   }
   return env;
 }
-
-loadEnv();

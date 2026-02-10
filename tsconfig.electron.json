@@ -18,6 +18,6 @@
       "@": ["./src"]
     }
   },
-  "include": ["src/electron/main.ts", "src/electron/main/**/*"],
+  "include": ["src/electron/**/*", "src/types/preload.d.ts"],
   "exclude": ["node_modules"]
 }

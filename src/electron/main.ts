@@ -131,6 +131,7 @@ export const MAIN_TITLE = 'RiceCall';
 export const VERSION_TITLE = `RiceCall v${app.getVersion()}`;
 export const DEV = process.argv.includes('--dev');
 export const PORT = 3000;
+export const PRELOAD_PATH = DEV ? path.join(app.getAppPath(), 'preload.ts') : path.join(app.getAppPath(), 'build', 'src', 'electron', 'preload.js');
 export const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
 export const APP_ICON = process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'icon.ico') : path.join(app.getAppPath(), 'resources', 'icon.png');
 export const APP_TRAY_ICON = {
@@ -282,8 +283,9 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
       devTools: DEV,
       webviewTag: true,
       webSecurity: true,
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: PRELOAD_PATH,
       backgroundThrottling: false,
     },
     trafficLightPosition: { x: -100, y: -100 },
@@ -359,8 +361,9 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
     webPreferences: {
       devTools: DEV,
       webviewTag: true,
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: PRELOAD_PATH,
       backgroundThrottling: false,
     },
     trafficLightPosition: { x: -100, y: -100 },
@@ -441,8 +444,9 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
     webPreferences: {
       devTools: DEV,
       webviewTag: true,
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
+      preload: PRELOAD_PATH,
       backgroundThrottling: false,
     },
     trafficLightPosition: { x: -100, y: -100 },
@@ -1306,7 +1310,7 @@ app.on('ready', async () => {
 
   // Env handlers
   ipcMain.on('get-env', (event) => {
-    event.returnValue = env;
+    event.returnValue = env();
   });
 
   ipcMain.on('change-server', (_, server: 'prod' | 'dev') => {
@@ -1361,6 +1365,19 @@ app.on('ready', async () => {
         const error = e instanceof Error ? e : new Error('Unknown error');
         new Logger('Error').error(`(${errorId}), Failed to submit error: ${error.message}`);
       });
+  });
+
+  // Electron log handlers
+  ipcMain.on('electron-log-info', (_, ...args) => {
+    new Logger('System').info(args.join(' '));
+  });
+
+  ipcMain.on('electron-log-warn', (_, ...args) => {
+    new Logger('System').warn(args.join(' '));
+  });
+
+  ipcMain.on('electron-log-error', (_, ...args) => {
+    new Logger('System').error(args.join(' '));
   });
 });
 
