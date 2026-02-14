@@ -10,7 +10,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Permission from '@/utils/permission';
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Language from '@/utils/language';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 

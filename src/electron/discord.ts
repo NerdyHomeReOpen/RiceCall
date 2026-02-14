@@ -1,7 +1,9 @@
+import { ipcMain } from 'electron';
 import DiscordRPC, { Presence } from 'discord-rpc';
 import Logger from '@/logger';
 
-export const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
+const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
+const START_TIMESTAMP = Date.now();
 
 let rpc: DiscordRPC.Client | null = null;
 
@@ -12,6 +14,11 @@ export async function configureDiscordRPC() {
     const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('DiscordRPC').error(`Cannot login to discord rpc: ${error.message}`);
     return null;
+  });
+
+  ipcMain.on('update-discord-presence', (_, presence: Presence) => {
+    presence.startTimestamp = START_TIMESTAMP;
+    updateDiscordPresence(presence);
   });
 }
 

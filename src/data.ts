@@ -1,6 +1,6 @@
 import type * as Types from '@/types';
 
-import * as APIService from '@/api.service';
+import * as APIService from '@/api';
 
 export async function user(params: { userId: string }): Promise<Types.User | null> {
   return await APIService.get(`/user?${new URLSearchParams(params).toString()}`);

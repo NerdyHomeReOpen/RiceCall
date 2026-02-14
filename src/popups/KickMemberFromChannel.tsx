@@ -4,7 +4,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 

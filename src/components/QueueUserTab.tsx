@@ -10,7 +10,7 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useWebRTC, useWebRTCIsMuted, useWebRTCIsSpeaking } from '@/providers/WebRTC';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Default from '@/utils/default';
 import * as Permission from '@/utils/permission';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';

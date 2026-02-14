@@ -1,8 +1,9 @@
 import { EventEmitter } from 'events';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { webEventEmitter } from '@/web/event';
+import { eventEmitter } from '@/web/event';
 import ipc from '@/ipc';
+import Logger from '@/logger';
 
 import * as Types from '@/types';
 
@@ -44,8 +45,6 @@ import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
 import { getPopupConfig } from '@/popup.config';
-
-import Logger from '@/utils/logger';
 
 import header from '@/styles/header.module.css';
 
@@ -273,30 +272,30 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
 
   // Effects
   useEffect(() => {
-    webEventEmitter.on('open-popup', open);
+    eventEmitter.on('open-popup', open);
     return () => {
-      webEventEmitter.off('open-popup', open);
+      eventEmitter.off('open-popup', open);
     };
   }, [open]);
 
   useEffect(() => {
-    webEventEmitter.on('close-popup', close);
+    eventEmitter.on('close-popup', close);
     return () => {
-      webEventEmitter.off('close-popup', close);
+      eventEmitter.off('close-popup', close);
     };
   }, [close]);
 
   useEffect(() => {
-    webEventEmitter.on('minimize-popup', minimize);
+    eventEmitter.on('minimize-popup', minimize);
     return () => {
-      webEventEmitter.off('minimize-popup', minimize);
+      eventEmitter.off('minimize-popup', minimize);
     };
   }, [minimize]);
 
   useEffect(() => {
-    webEventEmitter.on('restore-popup', restore);
+    eventEmitter.on('restore-popup', restore);
     return () => {
-      webEventEmitter.off('restore-popup', restore);
+      eventEmitter.off('restore-popup', restore);
     };
   }, [restore]);
 

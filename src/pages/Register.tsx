@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 import i18n from '@/i18n';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 
 import styles from '@/styles/register.module.css';
 

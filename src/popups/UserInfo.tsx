@@ -12,7 +12,7 @@ import BadgeItem from '@/components/BadgeItem';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Permission from '@/utils/permission';
 import ObjDiff from '@/utils/objDiff';
 
@@ -107,7 +107,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 
   // Handlers
   const handleServerSelect = (server: Types.Server) => {
-    ipc.sendServerSelect({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
+    ipc.server.select({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   const handleAvatarClick = () => {

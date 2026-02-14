@@ -8,7 +8,7 @@ import type * as Types from '@/types';
 import MarkdownContent from '@/components/MarkdownContent';
 
 import * as Language from '@/utils/language';
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 
 import { ALLOWED_MESSAGE_KEYS } from '@/constant';
 

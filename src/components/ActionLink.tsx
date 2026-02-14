@@ -24,7 +24,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
 
   // Handlers
   const handleLinkClick = () => {
-    ipc.sendServerSelect({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() });
+    ipc.server.select({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   // Effects

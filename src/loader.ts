@@ -1,6 +1,6 @@
 import type * as Types from '@/types';
 
-import * as Data from '@/data.service';
+import * as Data from '@/data';
 
 export async function applyMember({ userId, serverId }: { userId: string; serverId: string }) {
   const serverPromise = Data.server({ userId, serverId });

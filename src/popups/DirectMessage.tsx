@@ -21,7 +21,7 @@ import LevelIcon from '@/components/LevelIcon';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Default from '@/utils/default';
 import * as TagConverter from '@/utils/tagConverter';
 
@@ -175,7 +175,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleServerSelect = (server: Types.Server) => {
-    ipc.sendServerSelect({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
+    ipc.server.select({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   const handleScroll = () => {

@@ -1,8 +1,9 @@
 import { ipcMain } from 'electron';
-import * as Data from '@/data.service.js';
-import { getToken } from '@/auth.token.js';
 
-export default function registerDataHandlers() {
+import * as Data from '@/data';
+import { getToken } from '@/token';
+
+export function registerDataHandlers() {
   ipcMain.handle('data-user', async (_, params: { userId: string }) => {
     return await Data.user(params);
   });

@@ -5,7 +5,7 @@ import { useAppSelector } from '@/store/hook';
 
 import FriendGroupTab from '@/components/FriendGroupTab';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Default from '@/utils/default';
 
 import styles from '@/styles/friend.module.css';

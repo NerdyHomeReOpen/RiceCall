@@ -11,7 +11,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as TagConverter from '@/utils/tagConverter';
 import * as Language from '@/utils/language';
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/message.module.css';

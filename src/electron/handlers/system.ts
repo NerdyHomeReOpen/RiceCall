@@ -1,8 +1,15 @@
 import { app, ipcMain } from 'electron';
-import { store, getSettings, batchWindowsOperation, broadcast, isAutoLaunchEnabled, setAutoLaunch, startCheckForUpdates, stopCheckForUpdates } from '@/electron/main';
 import fontList from 'font-list';
 
-export default function registerSystemHandlers() {
+import * as Types from '@/types';
+
+import { store, getSettings, broadcast, isAutoLaunchEnabled, setAutoLaunch, mainWindow, getRegion } from '@/electron/main';
+import { startCheckForUpdates, stopCheckForUpdates } from '@/electron/auto-updater';
+import { setTrayDetail } from '@/electron/tray';
+
+import { changeLanguage } from '@/i18n';
+
+export function registerSystemHandlers() {
   ipcMain.on('get-system-settings', (event) => {
     event.returnValue = getSettings();
   });
@@ -172,6 +179,10 @@ export default function registerSystemHandlers() {
     event.returnValue = store.get('updateChannel');
   });
 
+  ipcMain.on('get-language', (event) => {
+    event.returnValue = store.get('language');
+  });
+
   ipcMain.on('set-auto-login', (_, enable = false) => {
     store.set('autoLogin', enable);
     broadcast('auto-login', enable);
@@ -185,7 +196,7 @@ export default function registerSystemHandlers() {
   ipcMain.on('set-always-on-top', (_, enable = false) => {
     store.set('alwaysOnTop', enable);
     broadcast('always-on-top', enable);
-    batchWindowsOperation((window) => window.setAlwaysOnTop(enable));
+    mainWindow?.setAlwaysOnTop(enable);
   });
 
   ipcMain.on('set-status-auto-idle', (_, enable = false) => {
@@ -373,5 +384,12 @@ export default function registerSystemHandlers() {
   ipcMain.on('set-update-channel', (_, channel = 'latest') => {
     store.set('updateChannel', channel);
     broadcast('update-channel', channel);
+  });
+
+  ipcMain.on('set-language', (_, language: Types.LanguageKey = getRegion()) => {
+    store.set('language', language);
+    changeLanguage(language);
+    setTrayDetail();
+    broadcast('language', language);
   });
 }

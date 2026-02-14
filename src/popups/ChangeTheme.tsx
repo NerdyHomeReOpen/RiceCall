@@ -7,7 +7,7 @@ import type * as Types from '@/types';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Color from '@/utils/color';
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import Logger from '@/logger';
 
 import styles from '@/styles/changeTheme.module.css';

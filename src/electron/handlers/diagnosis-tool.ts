@@ -1,10 +1,13 @@
-import { ipcMain } from 'electron';
-import Logger from '@/logger';
+import { ipcMain, webContents } from 'electron';
+
 import * as Types from '@/types';
+
+import { mainWindow } from '@/electron/main';
+
+import Logger from '@/logger';
 
 let DiagnosisTool: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
 let activeTool: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
-let isInitialized = false;
 
 async function loadTool() {
   if (DiagnosisTool) return DiagnosisTool;
@@ -30,14 +33,7 @@ async function loadTool() {
   }
 }
 
-export function initNetworkDiagnosisTool() {
-  if (isInitialized) {
-    new Logger('NetworkDiagnosisTool').info('NetworkDiagnosisTool already initialized, skipping handler registration.');
-    return;
-  }
-
-  new Logger('NetworkDiagnosisTool').info('Initializing NetworkDiagnosisTool IPC handlers...');
-
+export function registerDiagnosisToolHandlers() {
   ipcMain.handle('run-network-diagnosis', async (event, params: { domains: string[]; duration?: number }): Promise<Types.FullReport | { error: string }> => {
     const sender = event.sender;
     new Logger('NetworkDiagnosisTool').info(`Received run-network-diagnosis request: ${JSON.stringify(params)}`);
@@ -99,6 +95,20 @@ export function initNetworkDiagnosisTool() {
     }
   });
 
-  isInitialized = true;
-  new Logger('NetworkDiagnosisTool').info('NetworkDiagnosisTool IPC handlers registered successfully.');
+  ipcMain.on('request-sfu-diagnosis', (event) => {
+    if (mainWindow && !mainWindow.isDestroyed()) {
+      mainWindow.webContents.send('get-sfu-diagnosis', { senderId: event.sender.id });
+    } else {
+      event.sender.send('sfu-diagnosis-response', null);
+    }
+  });
+
+  ipcMain.on('sfu-diagnosis-response', (_, data: { targetSenderId: number; info: unknown } | null) => {
+    if (data?.targetSenderId != null) {
+      const target = webContents.fromId(data.targetSenderId);
+      if (target && !target.isDestroyed()) {
+        target.send('sfu-diagnosis-response', data.info);
+      }
+    }
+  });
 }

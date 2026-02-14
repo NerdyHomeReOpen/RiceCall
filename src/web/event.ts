@@ -1,4 +1,4 @@
 import { EventEmitter } from 'events';
 
-export const webEventEmitter = new EventEmitter();
-webEventEmitter.setMaxListeners(9999);
+export const eventEmitter = new EventEmitter();
+eventEmitter.setMaxListeners(9999);

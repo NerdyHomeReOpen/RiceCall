@@ -14,7 +14,7 @@ import RecommendServerCard from '@/components/RecommendServerCard';
 
 import { useLoading } from '@/providers/Loading';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Language from '@/utils/language';
 
 import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constant';

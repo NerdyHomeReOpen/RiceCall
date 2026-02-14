@@ -8,7 +8,7 @@ import type * as Types from '@/types';
 
 import { setSelectedItemId } from '@/store/slices/uiSlice';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 
 import styles from '@/styles/editChannelOrder.module.css';
 import serverPage from '@/styles/server.module.css';

@@ -21,7 +21,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Permission from '@/utils/permission';
 import * as Language from '@/utils/language';
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import { SHOW_FRAME_ORIGIN, MESSAGE_VIERER_DEVIATION } from '@/constant';

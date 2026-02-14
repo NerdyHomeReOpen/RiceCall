@@ -3,7 +3,7 @@ import { FaCheckCircle, FaArrowRight, FaSpinner, FaNetworkWired, FaServer, FaClo
 import { useTranslation } from 'react-i18next';
 import { getEnv } from '@/env';
 import ipc from '@/ipc';
-import { isElectron } from '@/platform/isElectron';
+import { isElectron } from '@/utils/platform';
 
 import type * as Types from '@/types';
 

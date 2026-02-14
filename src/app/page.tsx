@@ -5,9 +5,8 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
-import { isRenderer, isWebsite } from '@/platform/isElectron';
-import { webEventEmitter } from '@/web/event';
 import ipc from '@/ipc';
+import * as Action from '@/action';
 
 import type * as Types from '@/types';
 
@@ -26,8 +25,8 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 import { useActionScanner } from '@/providers/ActionScanner';
 
-import * as Popup from '@/utils/popup';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import { isRenderer } from '@/utils/platform';
 
 import { LANGUAGES } from '@/constant';
 
@@ -109,8 +108,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
 
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addSystemSettingOption(() => Popup.openSystemSetting(user.userId))
-      .addChangeThemeOption(() => Popup.openChangeTheme())
+      .addSystemSettingOption(() => Action.openSystemSetting(user.userId))
+      .addChangeThemeOption(() => Action.openChangeTheme())
       .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
       .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
       .addHelpCenterOption(
@@ -119,11 +118,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
           onAgreementClick: () => window.open('https://ricecall.com/terms', '_blank'),
           onSpecificationClick: () => window.open('https://ricecall.com/specification', '_blank'),
           onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
-          onAboutUsClick: Popup.openAboutUs,
+          onAboutUsClick: Action.openAboutUs,
         },
         () => {},
       )
-      .addNetworkDiagnosisOption(() => Popup.openNetworkDiagnosis())
+      .addNetworkDiagnosisOption(() => Action.openNetworkDiagnosis())
       .addLogoutOption(() => logout())
       .addExitOption(() => exit())
       .build();
@@ -145,7 +144,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: true,
       contents: safeFriendApplications.map((fa) => fa.avatarUrl),
-      onClick: () => Popup.openFriendVerification(user.userId),
+      onClick: () => Action.openFriendVerification(user.userId),
     },
     {
       id: 'member-invitation',
@@ -156,7 +155,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: true,
       contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
-      onClick: () => Popup.openMemberInvitation(user.userId),
+      onClick: () => Action.openMemberInvitation(user.userId),
     },
     {
       id: 'system-notify',
@@ -197,7 +196,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
     showStatusDropdown(x, y, 'right-bottom', (status) => {
       setIsManualIdling(status !== 'online');
-      Popup.editUserStatus(status);
+      Action.editUserStatus(status);
     });
   };
 
@@ -216,7 +215,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   };
 
   const handleNameClick = () => {
-    Popup.openUserInfo(user.userId, user.userId);
+    Action.openUserInfo(user.userId, user.userId);
   };
 
   const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
@@ -227,7 +226,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   useEffect(() => {
     const next = isIdling ? 'idle' : 'online';
     if (user.status !== next && !isManualIdling) {
-      Popup.editUserStatus(next);
+      Action.editUserStatus(next);
     }
   }, [isIdling, isManualIdling, user.status]);
 
@@ -286,7 +285,7 @@ const TabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: T
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
     if (!currentServerId) return;
-    Popup.leaveServer(currentServerId);
+    Action.leaveServer(currentServerId);
   };
 
   if (tab.id === 'server' && !currentServerId) return null;
@@ -363,26 +362,13 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [user.currentServerId, stopLoading]);
 
   useEffect(() => {
-    if (isRenderer()) {
-      const onServerSelect = ({ key, newValue }: StorageEvent) => {
-        if (key !== 'server-select' || !newValue) return;
-        const { serverDisplayId, serverId } = JSON.parse(newValue);
-        if (getIsLoading() || user.currentServerId === serverId) return;
-        loadServer(serverDisplayId);
-        ipc.socket.send('connectServer', { serverId });
-      };
-      window.addEventListener('storage', onServerSelect);
-      return () => window.removeEventListener('storage', onServerSelect);
-    } else if (isWebsite()) {
-      const onServerSelect = (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
-        const { serverDisplayId, serverId } = data;
-        if (getIsLoading() || user.currentServerId === serverId) return;
-        loadServer(serverDisplayId);
-        ipc.socket.send('connectServer', { serverId });
-      };
-      webEventEmitter.on('server-select', onServerSelect);
-      return () => webEventEmitter.removeListener('server-select', onServerSelect);
-    }
+    const onServerSelect = (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
+      if (getIsLoading() || user.currentServerId === data.serverId) return;
+      loadServer(data.serverDisplayId);
+      ipc.socket.send('connectServer', { serverId: data.serverId });
+    };
+    const unsub = ipc.server.onSelect(onServerSelect);
+    return () => unsub();
   }, [user.currentServerId, getIsLoading, loadServer]);
 
   useEffect(() => {

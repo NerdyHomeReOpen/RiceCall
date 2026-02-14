@@ -6,7 +6,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Default from '@/utils/default';
 
 import styles from '@/styles/inviteFriend.module.css';

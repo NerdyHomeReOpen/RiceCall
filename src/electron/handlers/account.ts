@@ -1,7 +1,8 @@
 import { ipcMain } from 'electron';
+
 import { store, broadcast } from '@/electron/main';
 
-export default function registerAccountHandlers() {
+export function registerAccountHandlers() {
   ipcMain.on('get-accounts', (event) => {
     event.returnValue = store.get('accounts');
   });

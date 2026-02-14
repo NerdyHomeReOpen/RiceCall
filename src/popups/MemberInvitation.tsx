@@ -5,7 +5,7 @@ import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Language from '@/utils/language';
 
 import styles from '@/styles/verification.module.css';

@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 

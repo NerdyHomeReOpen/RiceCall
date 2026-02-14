@@ -14,7 +14,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import { fromTags, toTags } from '@/utils/tagConverter';
 
 import { FONT_LIST, MAX_FILE_SIZE } from '@/constant';

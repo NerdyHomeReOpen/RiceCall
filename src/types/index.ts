@@ -397,7 +397,7 @@ export type ServerToClientEvents = {
   // Popup
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
   // Error
-  error: (e: unknown) => void;
+  error: (error: { code: number; message: string }) => void;
 };
 
 export type ClientToServerEventsWithAck = {
@@ -456,7 +456,7 @@ export type StoreType = {
   autoCheckForUpdates: boolean;
   updateCheckInterval: number;
   updateChannel: string;
-  server: 'prod' | 'dev';
+  env: 'prod' | 'dev';
 };
 
 export type SFUCreateTransportParams = {

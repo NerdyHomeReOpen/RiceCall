@@ -12,7 +12,7 @@ import { useFindMeContext } from '@/providers/FindMe';
 
 import UserTab from '@/components/UserTab';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Permission from '@/utils/permission';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 

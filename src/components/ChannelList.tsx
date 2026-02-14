@@ -13,7 +13,7 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Permission from '@/utils/permission';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 

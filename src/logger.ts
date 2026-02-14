@@ -1,4 +1,4 @@
-import { isMain, isRenderer } from '@/platform/isElectron';
+import { isMain, isRenderer } from '@/utils/platform';
 
 type LoggerType = {
   info: (...messages: string[]) => void;

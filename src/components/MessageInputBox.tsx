@@ -16,7 +16,7 @@ import ipc from '@/ipc';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Permission from '@/utils/permission';
 import * as TagConverter from '@/utils/tagConverter';
 

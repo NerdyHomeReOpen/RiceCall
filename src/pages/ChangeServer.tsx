@@ -3,7 +3,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 
 import { SERVER_OPTIONS } from '@/constant';
 
@@ -22,11 +22,11 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
   const handleServerSelect = (value: 'prod' | 'dev') => {
     if (value === 'dev') {
       Popup.openAlertDialog(t('confirm-change-server-to-dev'), () => {
-        ipc.changeServer(value);
+        ipc.env.change(value);
         onBackToLoginBtnClick();
       });
     } else {
-      ipc.changeServer(value);
+      ipc.env.change(value);
       onBackToLoginBtnClick();
     }
   };

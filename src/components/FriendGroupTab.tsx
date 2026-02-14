@@ -10,7 +10,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import FriendTab from '@/components/FriendTab';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 
 import styles from '@/styles/friend.module.css';

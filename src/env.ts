@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { isElectron, isMain } from '@/platform/isElectron';
+import { isElectron, isMain } from '@/utils/platform';
 import Logger from '@/logger';
 
 let env: Record<string, string> | null = null;

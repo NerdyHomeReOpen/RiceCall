@@ -29,7 +29,7 @@ import { setUser, updateUser } from '@/store/slices/userSlice';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 import * as Default from '@/utils/default';
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 
 import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
@@ -485,9 +485,8 @@ const SocketManager: React.FC = React.memo(() => {
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('error', (e) => {
-      const error = e instanceof Error ? e : new Error('Unknown error');
-      Popup.openErrorDialog(error, () => {});
+    const unsub = ipc.socket.on('error', (error) => {
+      Popup.openErrorDialog(new Error(error.message), () => {});
     });
     return () => unsub();
   }, []);

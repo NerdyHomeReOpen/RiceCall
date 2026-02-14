@@ -14,7 +14,7 @@ import { useWebRTC, useWebRTCIsMuted, useWebRTCIsSpeaking } from '@/providers/We
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
-import * as Popup from '@/utils/popup';
+import * as Popup from '@/action';
 import * as Permission from '@/utils/permission';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
 

@@ -1,5 +1,5 @@
 import { getEnv } from '@/env';
-import { getToken } from '@/auth.token';
+import { getToken } from '@/token';
 import Logger from '@/logger';
 
 type RequestOptions = {

@@ -1,4 +1,4 @@
-import * as APIService from '@/api.service';
+import * as APIService from '@/api';
 import packageJson from '../package.json' with { type: 'json' };
 
 type RegisterFormData = {
