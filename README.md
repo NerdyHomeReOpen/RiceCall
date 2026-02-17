@@ -60,30 +60,39 @@ RiceCall
 ├── build/                    # Electron build artifacts (local)
 ├── build_deb/                # Linux post-install scripts
 ├── public/                   # Static assets (images, icons, fonts, etc.)
-├── resources/                # Electron packaging resources
-├── scripts/                  # Development and maintenance scripts
+├── resources/                # Electron packaging resources (icons, tray)
 ├── src/
 │   ├── app/                  # Next.js App Router entry pages/layout
 │   ├── components/           # Reusable UI components
+│   ├── configs/              # Popup and socket configuration
+│   ├── electron/             # Electron main-process (main, preload, handlers)
 │   ├── extensions/           # TipTap editor extensions
 │   ├── i18n/                 # Client i18n setup and translations
-│   ├── main/                 # Electron main-process helpers/services
-│   ├── pages/                # Legacy renderer pages integrated with Electron
+│   ├── pages/                # Renderer pages integrated with Electron
 │   ├── popups/               # Popup view components
 │   ├── providers/            # React context providers
-│   ├── services/             # IPC bridge for renderer
+│   ├── store/                # Redux store and slices
 │   ├── styles/               # Global styles and CSS modules
 │   ├── types/                # Shared TypeScript types
 │   ├── utils/                # Utility functions
+│   ├── web/                  # Web platform handlers (non-Electron fallback)
+│   ├── action.ts             # Action definitions
+│   ├── api.ts                # API client
+│   ├── auth.ts               # Authentication helpers
 │   ├── constant.ts           # Shared constants
+│   ├── data.ts               # Data fetch helpers
 │   ├── emojis.ts             # Emoji definitions
-│   └── next-env.d.ts         # Next.js environment type declarations
+│   ├── env.ts                # Environment variable helpers
+│   ├── ipc.ts                # IPC bridge for renderer
+│   ├── loader.ts             # Loader utilities
+│   ├── logger.ts             # Logger utilities
+│   └── token.ts              # Token management
 ├── dev-app-update.yml        # Electron auto-update configuration
 ├── electron-builder.json     # Electron packaging configuration
 ├── electron-builder-dev.json # Electron packaging configuration for dev builds
 ├── eslint.config.mjs         # ESLint configuration
 ├── LICENSE                   # Project license
-├── main.ts                   # Electron main-process entry point
+├── next-env.d.ts             # Next.js environment type declarations
 ├── next.config.ts            # Next.js configuration
 ├── package.json              # Dependencies and npm/yarn scripts
 ├── tsconfig.electron.json    # TypeScript config for the Electron main process
@@ -103,8 +112,8 @@ WS_URL=http://localhost:4500 # Use the same URL if your server runs locally
 # Crowdin Settings (Optional)
 CROWDIN_DISTRIBUTION_HASH= # If not provided, will use local files (./src/i18n/locales/[lang]/[ns]) instead
 
-# Update Settings (Optional)
-UPDATE_CHANNEL=latest # The channel to update the app (latest, dev)
+# Error Submission URL (Optional)
+ERROR_SUBMISSION_URL=https://error-submission.example.com # If not provided, errors will not be submitted
 ```
 
 ### 2. Install dependencies
