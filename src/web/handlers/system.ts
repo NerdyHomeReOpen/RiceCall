@@ -2,7 +2,7 @@ import * as Types from '@/types';
 
 import { store, eventEmitter, getSettings, getRegion } from '@/web/main';
 
-import { FONT_LIST } from '@/constant';
+import { SYSTEM_FONT_LIST } from '@/constant';
 
 export function getSystemSettings() {
   return getSettings();
@@ -49,7 +49,7 @@ export function getFontSize() {
 }
 
 export function getFontList() {
-  const fonts = FONT_LIST.map((font) => font.value);
+  const fonts = SYSTEM_FONT_LIST
   return fonts;
 }
 

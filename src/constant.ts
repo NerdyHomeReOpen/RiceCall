@@ -8,6 +8,20 @@ export type RecommendServerCategory = {
   subCategories?: RecommendServerCategory[];
 };
 
+export const SYSTEM_FONT_LIST = [
+  '-apple-system',
+  'BlinkMacSystemFont',
+  'Segoe UI',
+  'Roboto',
+  'Helvetica Neue',
+  'Arial',
+  'Noto Sans TC',
+  'Microsoft JhengHei',
+  'Heiti TC',
+  'LiHei Pro',
+  'sans-serif',
+];
+
 export const FONT_LIST = [
   // Recommended Fonts
   {
