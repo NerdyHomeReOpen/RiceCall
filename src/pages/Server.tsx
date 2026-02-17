@@ -111,8 +111,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const isCentralAreaNoneMode = centralAreaMode === 'none';
   const isCentralAreaAnnouncementMode = centralAreaMode === 'announcement';
   const isCentralAreaShowMode = centralAreaMode === 'show';
-  const isChannelUIClassicMode = channelUIMode === 'classic';
-  const isChannelUIThreeLineMode = channelUIMode === 'three-line';
+  const isChannelUIClassicMode = channelUIMode === 'classic' || (channelUIMode === 'auto' && isCentralAreaAnnouncementMode);
+  const isChannelUIThreeLineMode = channelUIMode === 'three-line' || (channelUIMode === 'auto' && isCentralAreaShowMode);
   const isControlled = !Permission.isChannelMod(permissionLevel) && isQueueControlled;
   const isQueuing = queuePosition !== undefined && queuePosition > 0;
   const isMicTaken = queuePosition !== undefined && queuePosition <= 0;
@@ -435,7 +435,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
         <main className={styles['content']}>
-          <div className={`${styles['content-layout']} ${styles[channelUIMode]}`}>
+          <div className={`${styles['content-layout']} ${isChannelUIClassicMode ? styles['classic'] : ''} ${isChannelUIThreeLineMode ? styles['three-line'] : ''}`}>
             {!isCentralAreaNoneMode &&
               (isCentralAreaAnnouncementMode ? (
                 <div

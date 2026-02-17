@@ -449,7 +449,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
               <input name="channel-three-line-mode" type="radio" checked={systemSettings.channelUIMode === 'three-line'} onChange={handleChannelUIModeThreeLineSelect} />
               <div className={popupStyles['label']}>{t('channel-ui-mode-three-line-label')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`}>
+            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
               <input name="channel-auto-mode" type="radio" checked={systemSettings.channelUIMode === 'auto'} onChange={handleChannelUIModeAutoSelect} />
               <div className={popupStyles['label']}>{t('channel-ui-mode-auto-label')}</div>
             </div>
