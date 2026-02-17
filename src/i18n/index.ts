@@ -6,76 +6,76 @@ import { getEnv } from '@/env';
 
 import type * as Types from '@/types';
 
-import enUS_app from './locales/en-US/app.json';
-import enUS_message from './locales/en-US/message.json';
-import enUS_rpc from './locales/en-US/rpc.json';
-import enUS_country from './locales/en-US/country.json';
-import enUS_badge from './locales/en-US/badge.json';
-import enUS_position from './locales/en-US/position.json';
-import enUS_system from './locales/en-US/system.json';
+import enUS_app from './locales/en-US/app.json' with { type: 'json' };
+import enUS_message from './locales/en-US/message.json' with { type: 'json' };
+import enUS_rpc from './locales/en-US/rpc.json' with { type: 'json' };
+import enUS_country from './locales/en-US/country.json' with { type: 'json' };
+import enUS_badge from './locales/en-US/badge.json' with { type: 'json' };
+import enUS_position from './locales/en-US/position.json' with { type: 'json' };
+import enUS_system from './locales/en-US/system.json' with { type: 'json' };
 
 // es-ES
-import esES_app from './locales/es-ES/app.json';
-import esES_message from './locales/es-ES/message.json';
-import esES_rpc from './locales/es-ES/rpc.json';
-import esES_country from './locales/es-ES/country.json';
-import esES_badge from './locales/es-ES/badge.json';
-import esES_position from './locales/es-ES/position.json';
-import esES_system from './locales/es-ES/system.json';
+import esES_app from './locales/es-ES/app.json' with { type: 'json' };
+import esES_message from './locales/es-ES/message.json' with { type: 'json' };
+import esES_rpc from './locales/es-ES/rpc.json' with { type: 'json' };
+import esES_country from './locales/es-ES/country.json' with { type: 'json' };
+import esES_badge from './locales/es-ES/badge.json' with { type: 'json' };
+import esES_position from './locales/es-ES/position.json' with { type: 'json' };
+import esES_system from './locales/es-ES/system.json' with { type: 'json' };
 
 // fa-IR
-import faIR_app from './locales/fa-IR/app.json';
-import faIR_message from './locales/fa-IR/message.json';
-import faIR_rpc from './locales/fa-IR/rpc.json';
-import faIR_country from './locales/fa-IR/country.json';
-import faIR_badge from './locales/fa-IR/badge.json';
-import faIR_position from './locales/fa-IR/position.json';
-import faIR_system from './locales/fa-IR/system.json';
+import faIR_app from './locales/fa-IR/app.json' with { type: 'json' };
+import faIR_message from './locales/fa-IR/message.json' with { type: 'json' };
+import faIR_rpc from './locales/fa-IR/rpc.json' with { type: 'json' };
+import faIR_country from './locales/fa-IR/country.json' with { type: 'json' };
+import faIR_badge from './locales/fa-IR/badge.json' with { type: 'json' };
+import faIR_position from './locales/fa-IR/position.json' with { type: 'json' };
+import faIR_system from './locales/fa-IR/system.json' with { type: 'json' };
 
 // pt-BR
-import ptBR_app from './locales/pt-BR/app.json';
-import ptBR_message from './locales/pt-BR/message.json';
-import ptBR_rpc from './locales/pt-BR/rpc.json';
-import ptBR_country from './locales/pt-BR/country.json';
-import ptBR_badge from './locales/pt-BR/badge.json';
-import ptBR_position from './locales/pt-BR/position.json';
-import ptBR_system from './locales/pt-BR/system.json';
+import ptBR_app from './locales/pt-BR/app.json' with { type: 'json' };
+import ptBR_message from './locales/pt-BR/message.json' with { type: 'json' };
+import ptBR_rpc from './locales/pt-BR/rpc.json' with { type: 'json' };
+import ptBR_country from './locales/pt-BR/country.json' with { type: 'json' };
+import ptBR_badge from './locales/pt-BR/badge.json' with { type: 'json' };
+import ptBR_position from './locales/pt-BR/position.json' with { type: 'json' };
+import ptBR_system from './locales/pt-BR/system.json' with { type: 'json' };
 
 // ru-RU
-import ruRU_app from './locales/ru-RU/app.json';
-import ruRU_message from './locales/ru-RU/message.json';
-import ruRU_rpc from './locales/ru-RU/rpc.json';
-import ruRU_country from './locales/ru-RU/country.json';
-import ruRU_badge from './locales/ru-RU/badge.json';
-import ruRU_position from './locales/ru-RU/position.json';
-import ruRU_system from './locales/ru-RU/system.json';
+import ruRU_app from './locales/ru-RU/app.json' with { type: 'json' };
+import ruRU_message from './locales/ru-RU/message.json' with { type: 'json' };
+import ruRU_rpc from './locales/ru-RU/rpc.json' with { type: 'json' };
+import ruRU_country from './locales/ru-RU/country.json' with { type: 'json' };
+import ruRU_badge from './locales/ru-RU/badge.json' with { type: 'json' };
+import ruRU_position from './locales/ru-RU/position.json' with { type: 'json' };
+import ruRU_system from './locales/ru-RU/system.json' with { type: 'json' };
 
 // tr-TR
-import trTR_app from './locales/tr-TR/app.json';
-import trTR_message from './locales/tr-TR/message.json';
-import trTR_rpc from './locales/tr-TR/rpc.json';
-import trTR_country from './locales/tr-TR/country.json';
-import trTR_badge from './locales/tr-TR/badge.json';
-import trTR_position from './locales/tr-TR/position.json';
-import trTR_system from './locales/tr-TR/system.json';
+import trTR_app from './locales/tr-TR/app.json' with { type: 'json' };
+import trTR_message from './locales/tr-TR/message.json' with { type: 'json' };
+import trTR_rpc from './locales/tr-TR/rpc.json' with { type: 'json' };
+import trTR_country from './locales/tr-TR/country.json' with { type: 'json' };
+import trTR_badge from './locales/tr-TR/badge.json' with { type: 'json' };
+import trTR_position from './locales/tr-TR/position.json' with { type: 'json' };
+import trTR_system from './locales/tr-TR/system.json' with { type: 'json' };
 
 // zh-CN
-import zhCN_app from './locales/zh-CN/app.json';
-import zhCN_message from './locales/zh-CN/message.json';
-import zhCN_rpc from './locales/zh-CN/rpc.json';
-import zhCN_country from './locales/zh-CN/country.json';
-import zhCN_badge from './locales/zh-CN/badge.json';
-import zhCN_position from './locales/zh-CN/position.json';
-import zhCN_system from './locales/zh-CN/system.json';
+import zhCN_app from './locales/zh-CN/app.json' with { type: 'json' };
+import zhCN_message from './locales/zh-CN/message.json' with { type: 'json' };
+import zhCN_rpc from './locales/zh-CN/rpc.json' with { type: 'json' };
+import zhCN_country from './locales/zh-CN/country.json' with { type: 'json' };
+import zhCN_badge from './locales/zh-CN/badge.json' with { type: 'json' };
+import zhCN_position from './locales/zh-CN/position.json' with { type: 'json' };
+import zhCN_system from './locales/zh-CN/system.json' with { type: 'json' };
 
 // zh-TW
-import zhTW_app from './locales/zh-TW/app.json';
-import zhTW_message from './locales/zh-TW/message.json';
-import zhTW_rpc from './locales/zh-TW/rpc.json';
-import zhTW_country from './locales/zh-TW/country.json';
-import zhTW_badge from './locales/zh-TW/badge.json';
-import zhTW_position from './locales/zh-TW/position.json';
-import zhTW_system from './locales/zh-TW/system.json';
+import zhTW_app from './locales/zh-TW/app.json' with { type: 'json' };
+import zhTW_message from './locales/zh-TW/message.json' with { type: 'json' };
+import zhTW_rpc from './locales/zh-TW/rpc.json' with { type: 'json' };
+import zhTW_country from './locales/zh-TW/country.json' with { type: 'json' };
+import zhTW_badge from './locales/zh-TW/badge.json' with { type: 'json' };
+import zhTW_position from './locales/zh-TW/position.json' with { type: 'json' };
+import zhTW_system from './locales/zh-TW/system.json' with { type: 'json' };
 
 const APP_TO_CROWDIN: Record<Types.LanguageKey, string> = {
   'zh-TW': 'zh-TW',
