@@ -2,9 +2,11 @@ import path from 'path';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import { app, dialog } from 'electron';
+
+import { DEV, store } from '@/electron/main';
+
 import { t } from '@/i18n';
 import Logger from '@/logger';
-import { DEV, store } from '@/electron/main';
 
 let isUpdateNotified: boolean = false;
 let checkForUpdatesInterval: NodeJS.Timeout | null = null;

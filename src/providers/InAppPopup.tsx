@@ -44,7 +44,7 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-import { getPopupConfig } from '@/popup.config';
+import { getPopupConfig } from '@/configs/popup';
 
 import header from '@/styles/header.module.css';
 

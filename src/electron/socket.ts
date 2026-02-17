@@ -1,10 +1,14 @@
 import { ipcMain } from 'electron';
 import { io, Socket } from 'socket.io-client';
-import { broadcast } from '@/electron/main';
+
 import * as Types from '@/types';
+
+import { broadcast } from '@/electron/main';
+
+import { NO_LOG_ON_EVENTS, ON_EVENTS, SEND_EVENTS, EMIT_EVENTS } from '@/configs/socket';
+
+import { getEnv } from '@/env';
 import Logger from '@/logger';
-import { getEnv as env } from '@/env';
-import { NO_LOG_ON_EVENTS, ON_EVENTS, SEND_EVENTS, EMIT_EVENTS } from '@/socket.config';
 
 // Socket
 export let socket: Socket | null = null;
@@ -48,7 +52,7 @@ export function connectSocket(token: string) {
 
   seq = 0;
 
-  socket = io(env().WS_URL, {
+  socket = io(getEnv().WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,

@@ -28,9 +28,10 @@ import { registerThemeHandlers } from '@/electron/handlers/theme';
 import { registerToolbarHandlers } from '@/electron/handlers/toolbar';
 import { registerWindowHandlers } from '@/electron/handlers/window';
 
-import { getEnv as env, loadEnv } from '@/env';
+import { POPUP_SIZES, POPUP_BEHAVIORS } from '@/configs/popup';
+
+import { getEnv, loadEnv } from '@/env';
 import { LANGUAGES } from '@/constant';
-import { POPUP_SIZES, POPUP_BEHAVIORS } from '@/popup.config';
 import Logger from '@/logger';
 
 if (process.platform === 'linux') {
@@ -495,7 +496,7 @@ export function configureLogger() {
   log.transports.file.level = 'info';
   log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
   log.transports.file.maxSize = 5 * 1024 * 1024;
-  log.transports.remote.url = `${env().API_URL}/logs`;
+  log.transports.remote.url = `${getEnv().API_URL}/logs`;
   Object.assign(console, log.functions);
   log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 }

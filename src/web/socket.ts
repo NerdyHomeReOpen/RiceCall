@@ -1,9 +1,13 @@
 import { io, Socket } from 'socket.io-client';
+
 import * as Types from '@/types';
-import Logger from '@/logger';
-import { getEnv as env } from '@/env';
-import { NO_LOG_ON_EVENTS, SEND_EVENTS } from '@/socket.config';
+
 import { eventEmitter } from '@/web/event';
+
+import { NO_LOG_ON_EVENTS, SEND_EVENTS } from '@/configs/socket';
+
+import { getEnv } from '@/env';
+import Logger from '@/logger';
 
 export let socket: Socket | null = null;
 export let seq: number = 0;
@@ -46,7 +50,7 @@ export function connectSocket(token: string) {
 
   seq = 0;
 
-  socket = io(env().WS_URL, {
+  socket = io(getEnv().WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,

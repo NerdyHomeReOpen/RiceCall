@@ -44,7 +44,7 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-import { getPopupConfig } from '@/popup.config';
+import { getPopupConfigs } from '@/configs/popup';
 
 import SocketManager from '@/components/SocketManager';
 
@@ -160,20 +160,20 @@ const PopupPageComponent: React.FC = React.memo(() => {
       userSetting: () => <UserInfo id={id} {...initialData} />,
     };
 
-    const config = getPopupConfig(type);
+    const configs = getPopupConfigs(type);
 
     switch (type) {
       case 'channelSetting':
-        config.title = initialData?.channel?.name ?? config.title;
+        configs.title = initialData?.channel?.name ?? configs.title;
         break;
       case 'directMessage':
-        config.title = initialData?.target?.name ?? config.title;
+        configs.title = initialData?.target?.name ?? configs.title;
         break;
       case 'userInfo':
-        config.title = initialData?.target?.name ?? config.title;
+        configs.title = initialData?.target?.name ?? configs.title;
         break;
       case 'serverSetting':
-        config.title = initialData?.server?.name ?? config.title;
+        configs.title = initialData?.server?.name ?? configs.title;
         break;
     }
 
@@ -181,7 +181,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       id,
       type,
       position: { top: 0, left: 0 },
-      ...config,
+      ...configs,
       node: node[type as keyof typeof node],
     };
   }, []);

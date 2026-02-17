@@ -1,4 +1,4 @@
-import Logger from "@/logger";
+import Logger from '@/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export function updateDiscordPresence(_presence: unknown) {

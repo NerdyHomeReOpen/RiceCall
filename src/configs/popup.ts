@@ -199,18 +199,11 @@ export const POPUP_BEHAVIORS: Record<Types.PopupType, PopupBehaviorConfig> = {
 /**
  * Get the full popup configuration for a given type.
  */
-export function getPopupConfig(type: Types.PopupType) {
+export function getPopupConfigs(type: Types.PopupType) {
   return {
     size: POPUP_SIZES[type],
     title: POPUP_TITLE_KEYS[type],
     ...POPUP_HEADERS[type],
     ...POPUP_BEHAVIORS[type],
   };
-}
-
-/**
- * Get all popup types.
- */
-export function getAllPopupTypes(): Types.PopupType[] {
-  return Object.keys(POPUP_SIZES) as Types.PopupType[];
 }

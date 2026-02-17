@@ -1,5 +1,6 @@
 import { ipcMain } from 'electron';
 import DiscordRPC, { Presence } from 'discord-rpc';
+
 import Logger from '@/logger';
 
 const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
