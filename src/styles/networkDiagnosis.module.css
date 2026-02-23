@@ -4,10 +4,10 @@
   display: flex;
   flex-direction: column;
   gap: 14px;
-  padding: 16px 20px;
-  height: 100%;
   width: 100%;
+  height: 100%;
   min-height: 0;
+  padding: 16px 20px;
   overflow: hidden;
 }
 
@@ -27,25 +27,24 @@
 /* Step progress bar */
 .steps {
   display: flex;
+  gap: 4px;
   align-items: stretch;
   justify-content: space-between;
-  gap: 4px;
   padding: 12px 14px;
+  margin-bottom: 4px;
   background-color: var(--popup-background);
   border: 1px solid var(--border);
   border-radius: 8px;
-  margin-bottom: 4px;
 }
 
 .step {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 6px;
   flex: 1;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
   min-width: 0;
-  position: relative;
   opacity: 0.5;
   transition: opacity 0.2s ease;
 }
@@ -58,18 +57,18 @@
 .step-icon-row {
   display: flex;
   flex-direction: row;
+  gap: 8px;
   align-items: center;
   justify-content: center;
-  gap: 8px;
   width: 100%;
   min-height: 40px;
 }
 
 .step-icon {
   display: flex;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
   width: 40px;
   height: 40px;
   font-size: 1.5rem;
@@ -90,14 +89,14 @@
 }
 
 .step-label {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 0.7rem;
   font-weight: 600;
   color: var(--text-color-quaternary);
   text-align: center;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  max-width: 100%;
 }
 
 .step-active .step-label,
@@ -107,11 +106,11 @@
 
 .step-connector {
   display: flex;
+  flex: 0 0 24px;
   align-items: center;
   justify-content: center;
-  flex: 0 0 24px;
-  color: var(--border);
   font-size: 0.85rem;
+  color: var(--border);
   transition: color 0.2s ease;
 }
 
@@ -132,20 +131,20 @@
 .tabs {
   display: flex;
   gap: 0;
-  border-bottom: 1px solid var(--border);
   margin-bottom: 10px;
+  border-bottom: 1px solid var(--border);
 }
 
 .tab {
   display: flex;
-  align-items: center;
   gap: 6px;
+  align-items: center;
   padding: 8px 18px;
+  margin-bottom: -1px;
   font-size: 0.85rem;
   color: var(--text-color-quaternary);
   cursor: pointer;
   border-bottom: 2px solid transparent;
-  margin-bottom: -1px;
   transition:
     color 0.2s ease,
     border-color 0.2s ease;
@@ -162,19 +161,19 @@
 }
 
 .tab-badge {
+  flex-shrink: 0;
   width: 6px;
   height: 6px;
-  border-radius: 50%;
   background-color: #0fb11f;
-  flex-shrink: 0;
+  border-radius: 50%;
 }
 
 /* Content panels */
 .panel {
-  flex: 1;
-  min-height: 0;
   display: flex;
+  flex: 1;
   flex-direction: column;
+  min-height: 0;
   overflow: hidden;
 }
 
@@ -184,13 +183,13 @@
   overflow-y: auto;
   font-family: ui-monospace, monospace;
   font-size: 0.8rem;
-  white-space: pre-wrap;
+  color: var(--text-color-secondary);
   word-break: break-word;
+  white-space: pre-wrap;
+  user-select: text;
   background-color: var(--popup-background);
   border: 1px solid var(--border);
   border-radius: 6px;
-  color: var(--text-color-secondary);
-  user-select: text;
 }
 
 .logs-panel:focus {
@@ -202,28 +201,28 @@
 }
 
 .log-line {
-  margin-bottom: 4px;
   padding-bottom: 4px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 4px;
   color: var(--text-color-secondary);
+  border-bottom: 1px solid var(--border);
 }
 
 .reports-panel {
   flex: 1;
   padding: 14px;
   overflow-y: auto;
+  user-select: text;
   background-color: var(--popup-background);
   border: 1px solid var(--border);
   border-radius: 6px;
-  user-select: text;
 }
 
 .reports-empty {
   display: flex;
   flex-direction: column;
+  gap: 10px;
   align-items: center;
   justify-content: center;
-  gap: 10px;
   height: 100%;
   min-height: 120px;
   color: var(--text-color-quaternary);
@@ -245,12 +244,12 @@
 
 .section-title {
   display: flex;
-  align-items: center;
   gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
   font-size: 0.8rem;
   font-weight: 600;
   color: var(--text-color-tertiary);
-  margin-bottom: 10px;
 }
 
 .section-title-reports {
@@ -262,8 +261,8 @@
 }
 
 .result-card {
-  margin-bottom: 14px;
   padding: 12px;
+  margin-bottom: 14px;
   background-color: var(--popup-background);
   border: 1px solid var(--border);
   border-radius: 8px;
@@ -271,35 +270,35 @@
 
 .result-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  font-weight: 600;
-  margin-bottom: 8px;
+  justify-content: space-between;
   padding-bottom: 6px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-link);
+  margin-bottom: 8px;
   font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-link);
+  border-bottom: 1px solid var(--border);
 }
 
 .result-header-dns {
   font-size: 0.75rem;
-  color: var(--text-color-quaternary);
   font-weight: normal;
+  color: var(--text-color-quaternary);
 }
 
 .result-table {
   width: 100%;
   font-size: 0.8rem;
-  border-collapse: collapse;
   color: var(--text-color-secondary);
+  border-collapse: collapse;
 }
 
 .result-table th {
-  text-align: left;
   padding: 6px 8px;
-  border-bottom: 1px solid var(--border);
-  color: var(--text-color);
   font-weight: 500;
+  color: var(--text-color);
+  text-align: left;
+  border-bottom: 1px solid var(--border);
 }
 
 .result-table td {
@@ -331,7 +330,7 @@
 }
 
 .result-error {
+  padding: 10px;
   font-size: 0.8rem;
   color: var(--text-warning);
-  padding: 10px;
 }
