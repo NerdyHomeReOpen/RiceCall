@@ -513,18 +513,18 @@
 
 .maximized-popup-header {
   display: flex;
-  justify-content: space-between;
+  gap: 8px;
   align-items: center;
+  justify-content: space-between;
+  height: 40px;
   padding: 8px 10px;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  height: 40px;
-  border-radius: 20px;
-  background: var(--main-color, #2f3136);
-  opacity: 0.5;
   color: var(--secondary-color, #fff);
-  gap: 8px;
+  white-space: nowrap;
+  background: var(--main-color, #2f3136);
+  border-radius: 20px;
+  opacity: 0.5;
   transition: opacity 0.1s ease-in-out;
 
   &:hover {
