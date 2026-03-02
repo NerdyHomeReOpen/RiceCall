@@ -16,7 +16,7 @@ import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 import MicModeMenu from '@/components/MicModeMenu';
 
-import { useWebRTC, useWebRTCStore } from '@/providers/WebRTC';
+import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Permission from '@/utils/permission';
@@ -37,13 +37,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   // Hooks
   const { t } = useTranslation();
   const { changeBitrate, takeMic, releaseMic, stopMixing, toggleMixMode, toggleRecording } = useWebRTC();
-  const isSpeakKeyPressed = useWebRTCStore('isSpeakKeyPressed');
-  const isMixModeActive = useWebRTCStore('isMixModeActive');
-  const isMicMuted = useWebRTCStore('isMicMuted');
-  const isSpeakerMuted = useWebRTCStore('isSpeakerMuted');
-  const isRecording = useWebRTCStore('isRecording');
-  const recordTime = useWebRTCStore('recordTime');
-  const volumeLevel = useWebRTCStore('volumeLevel');
   const { showContextMenu, showMicContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
@@ -83,6 +76,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const channelMessages = useAppSelector((state) => state.channelMessages.data, shallowEqual);
   const actionMessages = useAppSelector((state) => state.actionMessages.data, shallowEqual);
   const channelEvents = useAppSelector((state) => state.channelEvents.data, shallowEqual);
+  const isSpeakKeyPressed = useAppSelector((state) => state.webrtc.isSpeakKeyPressed);
+  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive);
+  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
+  const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted);
+  const isRecording = useAppSelector((state) => state.webrtc.isRecording);
+  const recordTime = useAppSelector((state) => state.webrtc.recordTime);
+  const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel);
 
   // Refs
   const isResizingSidebarRef = useRef<boolean>(false);
@@ -555,12 +555,14 @@ export default ServerPage;
 const MicVolumeSlider = React.memo(() => {
   // Hooks
   const { changeMicVolume, toggleMicMuted } = useWebRTC();
-  const isMicMuted = useWebRTCStore('isMicMuted');
-  const micVolume = useWebRTCStore('micVolume');
 
   // Refs
   const sliderRef = useRef<HTMLInputElement>(null);
   const isBtnHoveredRef = useRef<boolean>(false);
+
+  // Selectors
+  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
+  const micVolume = useAppSelector((state) => state.webrtc.micVolume);
 
   // Handlers
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -608,12 +610,14 @@ MicVolumeSlider.displayName = 'MicVolumeSlider';
 const SpeakerVolumeSlider = React.memo(() => {
   // Hooks
   const { changeSpeakerVolume, toggleSpeakerMuted } = useWebRTC();
-  const isSpeakerMuted = useWebRTCStore('isSpeakerMuted');
-  const speakerVolume = useWebRTCStore('speakerVolume');
 
   // Refs
   const sliderRef = useRef<HTMLInputElement>(null);
   const isBtnHoveredRef = useRef<boolean>(false);
+
+  // Selectors
+  const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted);
+  const speakerVolume = useAppSelector((state) => state.webrtc.speakerVolume);
 
   // Handlers
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {

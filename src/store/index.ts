@@ -22,6 +22,7 @@ import socketReducer from './slices/socketSlice';
 import systemNotificationsReducer from './slices/systemNotificationsSlice';
 import uiReducer from './slices/uiSlice';
 import userReducer from './slices/userSlice';
+import webrtcReducer from './slices/webrtcSlice';
 
 export const rootReducer = combineReducers({
   actionMessages: actionMessagesReducer,
@@ -46,6 +47,7 @@ export const rootReducer = combineReducers({
   systemNotifications: systemNotificationsReducer,
   ui: uiReducer,
   user: userReducer,
+  webrtc: webrtcReducer,
 });
 
 export const store = configureStore({

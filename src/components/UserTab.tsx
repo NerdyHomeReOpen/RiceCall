@@ -9,7 +9,7 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
-import { useWebRTC, useWebRTCIsMuted, useWebRTCIsSpeaking } from '@/providers/WebRTC';
+import { useWebRTC } from '@/providers/WebRTC';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
@@ -34,8 +34,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { unmuteUser, muteUser } = useWebRTC();
-  const isSpeaking = useWebRTCIsSpeaking(member.userId);
-  const isMuted = useWebRTCIsMuted(member.userId);
   const { setCurrentUserRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
@@ -72,6 +70,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const isInQueue = useAppSelector((state) => state.queueUsers.data.some((qu) => qu.userId === member.userId), shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `user-${member.userId}`, shallowEqual);
+  const isSpeaking = useAppSelector((state) => (member.userId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[member.userId]));
+  const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[member.userId]);
 
   // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);

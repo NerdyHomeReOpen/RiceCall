@@ -2,7 +2,8 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
-import { useWebRTC, useWebRTCStore } from '@/providers/WebRTC';
+import { useWebRTC } from '@/providers/WebRTC';
+import { useAppSelector } from '@/store/hook';
 
 import * as Color from '@/utils/color';
 
@@ -13,9 +14,11 @@ const MicModeMenu: React.FC = React.memo(() => {
   // Hooks
   const { t } = useTranslation();
   const { changeVoiceThreshold } = useWebRTC();
-  const voiceThreshold = useWebRTCStore('voiceThreshold');
-  const speakingMode = useWebRTCStore('speakingMode');
-  const volumePercent = useWebRTCStore('volumePercent');
+
+  // Selectors
+  const voiceThreshold = useAppSelector((state) => state.webrtc.voiceThreshold);
+  const speakingMode = useAppSelector((state) => state.webrtc.speakingMode);
+  const volumePercent = useAppSelector((state) => state.webrtc.volumePercent);
 
   // Variables
   const volumeThreshold = voiceThreshold;

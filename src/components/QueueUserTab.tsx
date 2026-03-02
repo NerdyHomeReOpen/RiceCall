@@ -8,7 +8,7 @@ import BadgeList from '@/components/BadgeList';
 import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useWebRTC, useWebRTCIsMuted, useWebRTCIsSpeaking } from '@/providers/WebRTC';
+import { useWebRTC } from '@/providers/WebRTC';
 
 import * as Popup from '@/action';
 import * as Default from '@/utils/default';
@@ -28,8 +28,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { unmuteUser, muteUser } = useWebRTC();
-  const isSpeaking = useWebRTCIsSpeaking(queueUserId);
-  const isMuted = useWebRTCIsMuted(queueUserId);
   const dispatch = useAppDispatch();
 
   // Refs
@@ -66,6 +64,8 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const queueUser = useAppSelector((state) => state.queueUsers.data.find((qu) => qu.userId === queueUserId), shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`, shallowEqual);
+  const isSpeaking = useAppSelector((state) => (queueUserId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[queueUserId]));
+  const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[queueUserId]);
 
   // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
@@ -84,7 +84,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   // Functions
   const getStatusIcon = () => {
-    if (isMuted || queueMember.isVoiceMuted || isControlled) return 'muted';
+    if (isMuted || queueMember.isVoiceMuted || (!Permission.isChannelMod(permissionLevel) && isControlled)) return 'muted';
     if (isSpeaking) return 'play';
     return '';
   };

@@ -12,8 +12,6 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
-import { useWebRTC } from '@/providers/WebRTC';
-
 import * as Popup from '@/action';
 import * as Permission from '@/utils/permission';
 import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
@@ -27,7 +25,6 @@ const ChannelList: React.FC = React.memo(() => {
   const { showContextMenu } = useContextMenu();
   const { findMe } = useFindMeContext();
   const dispatch = useAppDispatch();
-  const { rtcLatency } = useWebRTC();
 
   // Selectors
   const user = useAppSelector(
@@ -60,6 +57,7 @@ const ChannelList: React.FC = React.memo(() => {
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
   const queueUserIds = useAppSelector((state) => state.queueUsers.data.filter((q) => q.position >= 0).map((q) => q.userId), shallowEqual);
   const latency = useAppSelector((state) => state.socket.latency, shallowEqual);
+  const rtcLatency = useAppSelector((state) => state.webrtc.latency);
 
   // Refs
   const queueListRef = useRef<HTMLDivElement>(null);
