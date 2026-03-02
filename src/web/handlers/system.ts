@@ -49,7 +49,7 @@ export function getFontSize() {
 }
 
 export function getFontList() {
-  const fonts = SYSTEM_FONT_LIST
+  const fonts = SYSTEM_FONT_LIST;
   return fonts;
 }
 

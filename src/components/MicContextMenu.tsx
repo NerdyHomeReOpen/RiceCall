@@ -108,7 +108,7 @@ const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ dire
 
   return (
     <div
-      className={`${styles['option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? styles['disabled'] : ''}`}
+      className={`${styles['mic-context-menu-option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? styles['disabled'] : ''}`}
       data-type={item.icon || ''}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}

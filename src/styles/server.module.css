@@ -603,15 +603,15 @@
   background-size: auto;
 }
 
-.widget-bar-item-active .widget-bar-item-icon,
-.widget-bar-item:active .widget-bar-item-icon {
-  background-position: -24px 0;
-}
-
 .widget-close .widget-bar-item-icon {
   width: 16px;
   height: 16px;
   background-position: 0 0;
+}
+
+.widget-bar-item-active .widget-bar-item-icon,
+.widget-bar-item:active .widget-bar-item-icon {
+  background-position: -24px 0;
 }
 
 .widget-bar-item:hover .widget-bar-item-icon {

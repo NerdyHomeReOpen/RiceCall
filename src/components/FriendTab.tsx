@@ -137,14 +137,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
           <BadgeList badges={JSON.parse(friend.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
         {isPending ? (
-          <div className={styles['signature']}>{`(${t('pending')})`}</div>
+          <div className={styles['friend-tab-signature']}>{`(${t('pending')})`}</div>
         ) : friendCurrentServer ? (
           <div className={`${styles['box']} ${styles['has-server']}`} onClick={handleServerNameClick}>
-            <div className={styles['location-icon']} />
-            <div className={styles['server-name-text']}>{friendCurrentServer.name}</div>
+            <div className={styles['friend-tab-location-icon']} />
+            <div className={styles['friend-tab-server-name-text']}>{friendCurrentServer.name}</div>
           </div>
         ) : (
-          <div className={styles['signature']}>{friend.signature}</div>
+          <div className={styles['friend-tab-signature']}>{friend.signature}</div>
         )}
       </div>
     </div>

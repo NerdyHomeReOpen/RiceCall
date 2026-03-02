@@ -83,7 +83,7 @@ const StatusItem: React.FC<StatusItemProps> = React.memo(({ status, onStatusSele
     onClose();
   };
 
-  return <div key={status} className={headerStyles['option']} datatype={status} onClick={handleClick} />;
+  return <div key={status} className={headerStyles['status-dropdown-option']} datatype={status} onClick={handleClick} />;
 });
 
 StatusItem.displayName = 'StatusItem';

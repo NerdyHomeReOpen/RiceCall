@@ -175,16 +175,16 @@
   color: var(--text-color-quaternary);
 }
 
-.search-dropdown .item .server-avatar-picture {
+.search-dropdown .item .search-server-avatar-picture {
   min-width: 40px;
   min-height: 40px;
 }
 
-.search-dropdown .item .server-info-text {
+.search-dropdown .item .search-server-info-text {
   justify-content: space-around;
 }
 
-.search-dropdown .item .server-id-box::before {
+.search-dropdown .item .search-server-id-box::before {
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
@@ -194,7 +194,7 @@
   background-position: 0 0;
 }
 
-.search-dropdown .item .server-name-text {
+.search-dropdown .item .search-server-name-text {
   color: var(--text-color-quaternary);
 }
 
