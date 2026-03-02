@@ -1019,9 +1019,9 @@ const ipc = {
   },
 
   webrtc: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     confirmSignal: async (data: { signalState: string; userId: string; channelId: string; info?: any }) => {
-      if (!isElectron) return;
-      return await ipcRenderer.invoke('confirm-webrtc-signal', data);
+      return await modules.default.confirmWebRTC(data);
     },
   },
 };

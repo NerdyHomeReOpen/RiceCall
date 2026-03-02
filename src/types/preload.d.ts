@@ -171,6 +171,7 @@ export type IpcRendererHandlers = {
   getUpdateCheckInterval: () => number;
   getUpdateChannel: () => string;
   serverSelect: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => void;
+  confirmWebRTC: (formData: { signalState: string; userId: string; channelId: string; info?: any }) => void;
 };
 
 declare global {

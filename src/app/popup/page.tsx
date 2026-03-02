@@ -16,7 +16,7 @@ import ChangeTheme from '@/popups/ChangeTheme';
 import ChannelEvent from '@/popups/ChannelEvent';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
-import ChatHistory from '@/popups/chatHistory';
+import ChatHistory from '@/popups/ChatHistory';
 import ConfirmWebRTC from '@/popups/ConfirmWebRTC';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';

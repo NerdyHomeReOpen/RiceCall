@@ -10,23 +10,22 @@ interface ConfirmWebRTCPopupProps {
   count?: number;
 }
 
-// eslint-disable-next-line 
+// eslint-disable-next-line
 const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, count }) => {
+  // State
   const [currentCount, setCurrentCount] = useState(count || 1);
 
   // Handlers
   const handleClose = () => {
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
   useEffect(() => {
-    const removeListener = ipc.socket.on('webrtcDisconnectCountUpdate', (newCount) => {
+    const unsub = ipc.socket.on('webrtcDisconnectCountUpdate', (newCount) => {
       setCurrentCount(newCount);
     });
 
-    return () => {
-      removeListener();
-    };
+    return () => unsub();
   }, []);
 
   return (
@@ -41,7 +40,7 @@ const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, 
       </div>
       <div className={popupStyles['popup-footer']}>
         <div className={popupStyles['button']} onClick={handleClose}>
-          {"確定"}
+          {'確定'}
         </div>
       </div>
     </div>
