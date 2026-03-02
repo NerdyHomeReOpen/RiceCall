@@ -57,7 +57,7 @@ const ChannelList: React.FC = React.memo(() => {
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
   const queueUserIds = useAppSelector((state) => state.queueUsers.data.filter((q) => q.position >= 0).map((q) => q.userId), shallowEqual);
   const latency = useAppSelector((state) => state.socket.latency, shallowEqual);
-  const rtcLatency = useAppSelector((state) => state.webrtc.latency);
+  const rtcLatency = useAppSelector((state) => state.webrtc.latency, shallowEqual);
 
   // Refs
   const queueListRef = useRef<HTMLDivElement>(null);

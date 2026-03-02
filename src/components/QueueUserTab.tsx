@@ -64,8 +64,8 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const queueUser = useAppSelector((state) => state.queueUsers.data.find((qu) => qu.userId === queueUserId), shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`, shallowEqual);
-  const isSpeaking = useAppSelector((state) => (queueUserId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[queueUserId]));
-  const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[queueUserId]);
+  const isSpeaking = useAppSelector((state) => (queueUserId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[queueUserId]), shallowEqual);
+  const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[queueUserId], shallowEqual);
 
   // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
@@ -143,7 +143,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
         Popup.openInviteMember(queueMember.userId, currentServer.serverId),
       )
-      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => { }, getMemberManagementSubmenuItems())
       .build();
 
   // Handlers

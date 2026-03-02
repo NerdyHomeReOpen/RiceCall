@@ -58,7 +58,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
   );
 
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
-
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 

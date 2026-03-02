@@ -76,13 +76,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const channelMessages = useAppSelector((state) => state.channelMessages.data, shallowEqual);
   const actionMessages = useAppSelector((state) => state.actionMessages.data, shallowEqual);
   const channelEvents = useAppSelector((state) => state.channelEvents.data, shallowEqual);
-  const isSpeakKeyPressed = useAppSelector((state) => state.webrtc.isSpeakKeyPressed);
-  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive);
-  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
-  const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted);
-  const isRecording = useAppSelector((state) => state.webrtc.isRecording);
-  const recordTime = useAppSelector((state) => state.webrtc.recordTime);
-  const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel);
+  const isSpeakKeyPressed = useAppSelector((state) => state.webrtc.isSpeakKeyPressed, shallowEqual);
+  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive, shallowEqual);
+  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted, shallowEqual);
+  const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted, shallowEqual);
+  const isRecording = useAppSelector((state) => state.webrtc.isRecording, shallowEqual);
+  const recordTime = useAppSelector((state) => state.webrtc.recordTime, shallowEqual);
+  const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel, shallowEqual);
 
   // Refs
   const isResizingSidebarRef = useRef<boolean>(false);

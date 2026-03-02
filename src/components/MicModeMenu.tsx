@@ -1,4 +1,5 @@
 import React from 'react';
+import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -16,9 +17,9 @@ const MicModeMenu: React.FC = React.memo(() => {
   const { changeVoiceThreshold } = useWebRTC();
 
   // Selectors
-  const voiceThreshold = useAppSelector((state) => state.webrtc.voiceThreshold);
-  const speakingMode = useAppSelector((state) => state.webrtc.speakingMode);
-  const volumePercent = useAppSelector((state) => state.webrtc.volumePercent);
+  const voiceThreshold = useAppSelector((state) => state.webrtc.voiceThreshold, shallowEqual);
+  const speakingMode = useAppSelector((state) => state.webrtc.speakingMode, shallowEqual);
+  const volumePercent = useAppSelector((state) => state.webrtc.volumePercent, shallowEqual);
 
   // Variables
   const volumeThreshold = voiceThreshold;

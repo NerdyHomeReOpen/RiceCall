@@ -142,7 +142,7 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
     shallowEqual,
   );
 
-  const channels = useAppSelector((state) => state.channels.data);
+  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
 
   // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
