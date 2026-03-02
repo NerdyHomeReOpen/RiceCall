@@ -5,34 +5,39 @@ import ipc from '@/ipc';
 import type * as Types from '@/types';
 
 import * as Default from '@/utils/default';
+import * as Popup from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
 interface CreateChannelPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   parent: Types.Channel | null;
 }
 
-const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serverId, parent: parentData }) => {
+const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, serverId, parent }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
-  const [channel, setChannel] = useState<Types.Channel>(Default.channel());
+  const [channelName, setChannelName] = useState<string>(Default.channel().name);
 
   // Variables
-  const { name: channelName } = channel;
-  const { channelId: parentChannelId, name: parentChannelName } = parentData || {};
   const canSubmit = channelName.trim();
 
   // Handlers
-  const handleCreateChannel = (serverId: Types.Server['serverId'], preset: Partial<Types.Channel>) => {
-    ipc.socket.send('createChannel', { serverId, preset });
-    ipc.window.close();
+  const handleChannelNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setChannelName(e.target.value);
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleConfirmBtnClick = () => {
+    if (!canSubmit) return;
+    Popup.createChannel(serverId, { name: channelName, categoryId: parent?.channelId || null });
+    ipc.popup.close(id);
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   return (
@@ -41,22 +46,19 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ serv
         <div className={`${popupStyles['dialog-content']} ${popupStyles['col']}`}>
           <div className={popupStyles['input-box']}>
             <div className={popupStyles['label']}>{t('parent-channel')}</div>
-            <div className={popupStyles['label']}>{parentChannelName || t('none')}</div>
+            <div className={popupStyles['label']}>{parent?.name || t('none')}</div>
           </div>
           <div className={popupStyles['input-box']}>
             <div className={popupStyles['label']}>{t('channel-name')}</div>
-            <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={(e) => setChannel({ ...channel, name: e.target.value })} />
+            <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={handleChannelNameChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div
-          className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`}
-          onClick={() => (canSubmit ? handleCreateChannel(serverId, { name: channelName, categoryId: parentChannelId || null }) : null)}
-        >
+        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

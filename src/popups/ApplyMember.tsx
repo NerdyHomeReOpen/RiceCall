@@ -4,14 +4,17 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/action';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface ApplyMemberPopupProps {
+  id: string;
   server: Types.Server;
   memberApplication: Types.MemberApplication | null;
 }
 
-const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, memberApplication }) => {
+const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, server, memberApplication }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -20,21 +23,31 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
   const [applicationDesc, setApplicationDesc] = useState<Types.MemberApplication['description']>(memberApplication?.description || '');
 
   // Variables
-  const { serverId, name: serverName, avatarUrl: serverAvatarUrl, specialId: serverSpecialId, displayId: serverDisplayId, applyNotice: serverApplyNotice } = server;
+  const isSendSection = section === 0;
+  const isSentSection = section === 1;
+  const isEditSection = section === 2;
 
   // Handlers
-  const handleSendMemberApplication = (serverId: Types.Server['serverId'], preset: Partial<Types.MemberApplication>) => {
-    ipc.socket.send('sendMemberApplication', { serverId, preset });
-    ipc.window.close();
+  const handleApplicationDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setApplicationDesc(e.target.value);
   };
 
-  const handleEditMemberApplication = (serverId: Types.Server['serverId'], update: Partial<Types.MemberApplication>) => {
-    ipc.socket.send('editMemberApplication', { serverId, update });
-    ipc.window.close();
+  const handleModifyBtnClick = () => {
+    setSection(2);
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleSubmitBtnClick = () => {
+    Popup.sendMemberApplication(server.serverId, { description: applicationDesc });
+    ipc.popup.close(id);
+  };
+
+  const handleSubmitEditBtnClick = () => {
+    Popup.editMemberApplication(server.serverId, { description: applicationDesc });
+    ipc.popup.close(id);
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   return (
@@ -43,52 +56,52 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ server, 
         <div className={`${popupStyles['content']} ${popupStyles['col']}`}>
           <div className={popupStyles['row']}>
             <div className={popupStyles['avatar-wrapper']}>
-              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
+              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
             </div>
             <div className={popupStyles['info-wrapper']}>
-              <div className={popupStyles['link-text']}>{serverName}</div>
-              <div className={popupStyles['sub-text']}>{`ID: ${serverSpecialId || serverDisplayId}`}</div>
+              <div className={popupStyles['link-text']}>{server.name}</div>
+              <div className={popupStyles['sub-text']}>{`ID: ${server.specialId || server.displayId}`}</div>
             </div>
           </div>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('apply-member-note')}</div>
-            <div className={popupStyles['hint-text']}>{serverApplyNotice || t('none')}</div>
+            <div className={popupStyles['hint-text']}>{server.applyNotice || t('none')}</div>
           </div>
           <div className={popupStyles['split']} />
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 0 ? {} : { display: 'none' }}>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={isSendSection ? {} : { display: 'none' }}>
             <div className={popupStyles['label']}>{t('note')}</div>
-            <textarea rows={2} value={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
+            <textarea rows={2} value={applicationDesc} onChange={handleApplicationDescChange} />
           </div>
-          <div className={popupStyles['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
+          <div className={popupStyles['hint-text']} style={isSentSection ? {} : { display: 'none' }}>
             {t('member-application-sent')}
           </div>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 2 ? {} : { display: 'none' }}>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={isEditSection ? {} : { display: 'none' }}>
             <div className={popupStyles['label']}>{t('note')}</div>
-            <textarea rows={2} value={applicationDesc} onChange={(e) => setApplicationDesc(e.target.value)} />
+            <textarea rows={2} value={applicationDesc} onChange={handleApplicationDescChange} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => handleSendMemberApplication(serverId, { description: applicationDesc })}>
+      <div className={popupStyles['popup-footer']} style={isSendSection ? {} : { display: 'none' }}>
+        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => setSection(2)}>
+      <div className={popupStyles['popup-footer']} style={isSentSection ? {} : { display: 'none' }}>
+        <div className={popupStyles['button']} onClick={handleModifyBtnClick}>
           {t('modify')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('confirm')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={() => handleEditMemberApplication(serverId, { description: applicationDesc })}>
+      <div className={popupStyles['popup-footer']} style={isEditSection ? {} : { display: 'none' }}>
+        <div className={popupStyles['button']} onClick={handleSubmitEditBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

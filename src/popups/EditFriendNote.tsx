@@ -4,30 +4,34 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/action';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditFriendNotePopupProps {
+  id: string;
   friend: Types.Friend;
 }
 
-const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ friend }) => {
+const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ id, friend }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
   const [friendNote, setFriendNote] = useState<string>(friend.note);
 
-  // Variables
-  const { targetId, name: targetName } = friend;
-
   // Handlers
-  const handleEditFriend = (targetId: Types.User['userId'], update: Partial<Types.Friend>) => {
-    ipc.socket.send('editFriend', { targetId, update });
-    ipc.window.close();
+  const handleFriendNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFriendNote(e.target.value);
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleSaveBtnClick = () => {
+    Popup.editFriend(friend.targetId, { note: friendNote });
+    handleCloseBtnClick();
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   return (
@@ -36,15 +40,15 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ fr
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('friend-note-name')}</div>
-            <input className={popupStyles['input']} type="text" value={friendNote} placeholder={targetName} onChange={(e) => setFriendNote(e.target.value)} />
+            <input className={popupStyles['input']} type="text" value={friendNote} placeholder={friend.name} onChange={handleFriendNoteChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleEditFriend(targetId, { note: friendNote })}>
-          {t('confirm')}
+        <div className={popupStyles['button']} onClick={handleSaveBtnClick}>
+          {t('save')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

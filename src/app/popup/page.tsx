@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -13,11 +12,11 @@ import ApplyFriend from '@/popups/ApplyFriend';
 import ApproveFriend from '@/popups/ApproveFriend';
 import ApplyMember from '@/popups/ApplyMember';
 import BlockMember from '@/popups/BlockMember';
-import ChannelEvent from '@/popups/ChannelEvent';
 import ChangeTheme from '@/popups/ChangeTheme';
+import ChannelEvent from '@/popups/ChannelEvent';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
-import ChatHistory from '@/popups/chatHistory';
+import ChatHistory from '@/popups/ChatHistory';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
@@ -33,67 +32,75 @@ import KickMemberFromChannel from '@/popups/KickMemberFromChannel';
 import KickMemberFromServer from '@/popups/KickMemberFromServer';
 import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
 import MemberInvitation from '@/popups/MemberInvitation';
+import NetworkDiagnosis from '@/popups/NetworkDiagnosis';
+import RTCDisconnect from '@/popups/RTCDisconnect';
 import ImageCropper from '@/popups/ImageCropper';
+import InviteFriend from '@/popups/InviteFriend';
 import InviteMember from '@/popups/InviteMember';
 import SearchUser from '@/popups/SearchUser';
+import ServerAnnouncement from '@/popups/ServerAnnouncement';
 import ServerApplication from '@/popups/ServerApplication';
 import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-import header from '@/styles/header.module.css';
+import { getPopupConfigs } from '@/configs/popup';
+
+import SocketManager from '@/components/SocketManager';
+
+import headerStyle from '@/styles/header.module.css';
 
 interface HeaderProps {
+  id: string;
   title: string;
   buttons: ('minimize' | 'maxsize' | 'close')[];
   titleBoxIcon?: string;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBoxIcon }) => {
+  // Hooks
+  const { t } = useTranslation();
+
   // States
   const [isFullscreen, setIsFullscreen] = useState(false);
 
   // Handlers
-  const handleMaximize = () => {
+  const handleMaximizeBtnClick = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
   };
 
-  const handleUnmaximize = () => {
+  const handleUnmaximizeBtnClick = () => {
     if (!isFullscreen) return;
     ipc.window.unmaximize();
   };
 
-  const handleMinimize = () => {
-    ipc.window.minimize();
+  const handleMinimizeBtnClick = () => {
+    ipc.window.minimize(id);
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   // Effects
   useEffect(() => {
-    const unsub = ipc.window.onUnmaximize(() => setIsFullscreen(false));
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.window.onMaximize(() => setIsFullscreen(true));
-    return () => unsub();
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   return (
-    <header className={`${header['header']} ${header['popup']}`}>
-      <div className={header['title-wrapper']}>
-        <div className={`${header['title-box']} ${titleBoxIcon}`}>
-          <div className={header['title']}>{title}</div>
+    <header className={`${headerStyle['header']} ${headerStyle['popup']}`}>
+      <div className={headerStyle['title-wrapper']}>
+        <div className={`${headerStyle['title-box']} ${titleBoxIcon}`}>
+          <div className={headerStyle['title']}>{t(title)}</div>
         </div>
-        <div className={header['buttons']}>
-          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimize} />}
-          {buttons.includes('maxsize') && (isFullscreen ? <div className={header['restore']} onClick={handleUnmaximize} /> : <div className={header['maxsize']} onClick={handleMaximize} />)}
-          {buttons.includes('close') && <div className={header['close']} onClick={handleClose} />}
+        <div className={headerStyle['buttons']}>
+          {buttons.includes('minimize') && <div className={headerStyle['minimize']} onClick={handleMinimizeBtnClick} />}
+          {buttons.includes('maxsize') &&
+            (isFullscreen ? <div className={headerStyle['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyle['maxsize']} onClick={handleMaximizeBtnClick} />)}
+          {buttons.includes('close') && <div className={headerStyle['close']} onClick={handleCloseBtnClick} />}
         </div>
       </div>
     </header>
@@ -102,271 +109,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon
 
 Header.displayName = 'Header';
 
-const defaultPopup: Record<Types.PopupType, Omit<Popup, 'id' | 'node' | 'title'>> = {
-  aboutus: {
-    type: 'aboutus',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  applyFriend: {
-    type: 'applyFriend',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  applyMember: {
-    type: 'applyMember',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  approveFriend: {
-    type: 'approveFriend',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  blockMember: {
-    type: 'blockMember',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  channelEvent: {
-    type: 'channelEvent',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  changeTheme: {
-    type: 'changeTheme',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  channelPassword: {
-    type: 'channelPassword',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  channelSetting: {
-    type: 'channelSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-
-  chatHistory: {
-    type: 'chatHistory',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  createServer: {
-    type: 'createServer',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  createChannel: {
-    type: 'createChannel',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  createFriendGroup: {
-    type: 'createFriendGroup',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogAlert: {
-    type: 'dialogAlert',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogAlert2: {
-    type: 'dialogAlert2',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogError: {
-    type: 'dialogError',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogInfo: {
-    type: 'dialogInfo',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogSuccess: {
-    type: 'dialogSuccess',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  dialogWarning: {
-    type: 'dialogWarning',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  directMessage: {
-    type: 'directMessage',
-    buttons: ['close', 'minimize', 'maxsize'],
-    hideHeader: false,
-  },
-  editChannelOrder: {
-    type: 'editChannelOrder',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editChannelName: {
-    type: 'editChannelName',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editFriendNote: {
-    type: 'editFriendNote',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editFriendGroupName: {
-    type: 'editFriendGroupName',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  editNickname: {
-    type: 'editNickname',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  friendVerification: {
-    type: 'friendVerification',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-
-  imageCropper: {
-    type: 'imageCropper',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  inviteMember: {
-    type: 'inviteMember',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  kickMemberFromChannel: {
-    type: 'kickMemberFromChannel',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  kickMemberFromServer: {
-    type: 'kickMemberFromServer',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  memberApplicationSetting: {
-    type: 'memberApplicationSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  memberInvitation: {
-    type: 'memberInvitation',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  searchUser: {
-    type: 'searchUser',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  serverApplication: {
-    type: 'serverApplication',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  serverBroadcast: {
-    type: 'serverBroadcast',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  serverSetting: {
-    type: 'serverSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  systemSetting: {
-    type: 'systemSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-  userInfo: {
-    type: 'userInfo',
-    buttons: ['close'],
-    hideHeader: true,
-  },
-  userSetting: {
-    type: 'userSetting',
-    buttons: ['close'],
-    hideHeader: false,
-  },
-};
-
-type Popup = {
-  id: string;
-  type: Types.PopupType;
-  title: string;
-  buttons: ('close' | 'minimize' | 'maxsize')[];
-  node: () => React.ReactNode | null;
-  hideHeader: boolean;
-};
-
 const PopupPageComponent: React.FC = React.memo(() => {
-  // Hooks
-  const { t } = useTranslation();
-
   // States
-  const [id, setId] = useState<string | null>(null);
-  const [type, setType] = useState<Types.PopupType | null>(null);
-  const [initialData, setInitialData] = useState<any | null>(null);
+  const [popup, setPopup] = useState<Types.Popup | null>(null);
 
-  // Variables
-  const { title, buttons, node, hideHeader } = useMemo<Popup>(() => {
-    if (!id || !type || !initialData) return { id: '', type: 'dialogAlert', title: '', buttons: ['close'], node: () => null, hideHeader: true };
-
-    const title = {
-      aboutus: t('about-ricecall'),
-      applyFriend: t('apply-friend'),
-      applyMember: t('apply-member'),
-      approveFriend: t('approve-friend'),
-      blockMember: t('block'),
-      channelEvent: t('channel-event'),
-      changeTheme: t('change-theme'),
-      channelPassword: t('please-enter-the-channel-password'),
-      channelSetting: initialData?.channel?.name || t('edit-channel'),
-      chatHistory: t('chat-history'),
-      createServer: t('create-server'),
-      createChannel: t('create-channel'),
-      createFriendGroup: t('create-friend-group'),
-      dialogAlert: t('alert'),
-      dialogAlert2: t('alert'),
-      dialogError: t('error'),
-      dialogInfo: t('info'),
-      dialogSuccess: t('success'),
-      dialogWarning: t('warning'),
-      directMessage: initialData?.target?.name || t('direct-message'),
-      editChannelOrder: t('edit-channel-order'),
-      editChannelName: t('edit-channel-name'),
-      editFriendNote: t('edit-friend-note'),
-      editFriendGroupName: t('edit-friend-group-name'),
-      editNickname: t('edit-nickname'),
-      friendVerification: t('friend-verification'),
-      imageCropper: t('image-cropper'),
-      inviteMember: t('invite-member'),
-      kickMemberFromChannel: t('kick-channel'),
-      kickMemberFromServer: t('kick-server'),
-      memberApplicationSetting: t('member-application-setting'),
-      memberInvitation: t('member-invitation'),
-      searchUser: t('search-user'),
-      serverApplication: t('server-application'),
-      serverBroadcast: t('server-broadcast'),
-      serverSetting: initialData?.server?.name || t('server-setting'),
-      systemSetting: t('system-setting'),
-      userInfo: t('user-info'),
-      userSetting: t('user-setting'),
-    };
-
-    const node = {
+  // Functions
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
+    const node: Record<Types.PopupType, () => React.ReactNode> = {
       aboutus: () => <About id={id} {...initialData} />,
       applyFriend: () => <ApplyFriend id={id} {...initialData} />,
       applyMember: () => <ApplyMember id={id} {...initialData} />,
@@ -394,12 +144,16 @@ const PopupPageComponent: React.FC = React.memo(() => {
       editNickname: () => <EditNickname id={id} {...initialData} />,
       friendVerification: () => <FriendVerification id={id} {...initialData} />,
       imageCropper: () => <ImageCropper id={id} {...initialData} />,
+      inviteFriend: () => <InviteFriend id={id} {...initialData} />,
       inviteMember: () => <InviteMember id={id} {...initialData} />,
       kickMemberFromChannel: () => <KickMemberFromChannel id={id} {...initialData} />,
       kickMemberFromServer: () => <KickMemberFromServer id={id} {...initialData} />,
       memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
       memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
+      networkDiagnosis: () => <NetworkDiagnosis id={id} {...initialData} />,
+      rtcDisconnect: () => <RTCDisconnect id={id} {...initialData} />,
       searchUser: () => <SearchUser id={id} {...initialData} />,
+      serverAnnouncement: () => <ServerAnnouncement id={id} {...initialData} />,
       serverApplication: () => <ServerApplication id={id} {...initialData} />,
       serverBroadcast: () => <ServerBroadcast id={id} {...initialData} />,
       serverSetting: () => <ServerSetting id={id} {...initialData} />,
@@ -408,13 +162,31 @@ const PopupPageComponent: React.FC = React.memo(() => {
       userSetting: () => <UserInfo id={id} {...initialData} />,
     };
 
+    const configs = getPopupConfigs(type);
+
+    switch (type) {
+      case 'channelSetting':
+        configs.title = initialData?.channel?.name ?? configs.title;
+        break;
+      case 'directMessage':
+        configs.title = initialData?.target?.name ?? configs.title;
+        break;
+      case 'userInfo':
+        configs.title = initialData?.target?.name ?? configs.title;
+        break;
+      case 'serverSetting':
+        configs.title = initialData?.server?.name ?? configs.title;
+        break;
+    }
+
     return {
-      ...defaultPopup[type],
       id,
-      title: title[type],
-      node: node[type],
+      type,
+      position: { top: 0, left: 0 },
+      ...configs,
+      node: node[type as keyof typeof node],
     };
-  }, [id, type, initialData, t]);
+  }, []);
 
   // Effects
   useEffect(() => {
@@ -422,26 +194,26 @@ const PopupPageComponent: React.FC = React.memo(() => {
       const params = new URLSearchParams(window.location.search);
       const type = params.get('type') as Types.PopupType;
       const id = params.get('id') as string;
-      setId(id || null);
-      setType(type || null);
-    }
-  }, []);
+      const initialData = ipc.initialData.get(id);
 
-  useEffect(() => {
-    if (!id) return;
-    setInitialData(ipc.initialData.get(id));
-  }, [id]);
+      const popup = getPopup(type, id, initialData);
+
+      setPopup(popup);
+    }
+  }, [getPopup]);
 
   return (
     <>
-      {!hideHeader && (
+      <SocketManager />
+      {popup && !popup.hideHeader && (
         <Header
-          title={title}
-          buttons={buttons}
-          titleBoxIcon={type === 'changeTheme' ? header['title-box-skin-icon'] : type === 'directMessage' ? header['title-box-direct-message-icon'] : undefined}
+          id={popup.id}
+          title={popup.title}
+          buttons={popup.buttons}
+          titleBoxIcon={popup.type === 'changeTheme' ? headerStyle['title-box-skin-icon'] : popup.type === 'directMessage' ? headerStyle['title-box-direct-message-icon'] : undefined}
         />
       )}
-      {node && node()}
+      {popup && popup.node()}
     </>
   );
 });

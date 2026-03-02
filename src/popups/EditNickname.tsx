@@ -4,36 +4,35 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/action';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface EditNicknamePopupProps {
-  userId: Types.User['userId'];
+  id: string;
   serverId: Types.Server['serverId'];
   member: Types.Member;
 }
 
-const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId, serverId, member }) => {
+const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
   // States
   const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
-  // Variables
-  const { name: memberName } = member;
-
   // Handlers
-  const handleEditMember = (userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Member>) => {
-    ipc.socket.send('editMember', { userId, serverId, update });
-    ipc.window.close();
+  const handleConfirmBtnClick = () => {
+    Popup.editMember(member.userId, serverId, { nickname: memberNickname || null });
+    ipc.popup.close(id);
   };
 
-  const applyEditMember = (userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Member>) => {
-    ipc.socket.send('editMember', { userId, serverId, update });
+  const handleApplyBtnClick = () => {
+    Popup.editMember(member.userId, serverId, { nickname: memberNickname || null });
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   return (
@@ -44,7 +43,7 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
             <div className={popupStyles['label']} style={{ minWidth: '2rem' }}>
               {t('nickname')}:
             </div>
-            <div className={popupStyles['label']}>{memberName}</div>
+            <div className={popupStyles['label']}>{member.name}</div>
           </div>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('please-enter-the-member-nickname')}</div>
@@ -53,13 +52,13 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ userId
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleEditMember(userId, serverId, { nickname: memberNickname || null })}>
+        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
-        <div className={popupStyles['button']} onClick={() => applyEditMember(userId, serverId, { nickname: memberNickname || null })}>
+        <div className={popupStyles['button']} onClick={handleApplyBtnClick}>
           {t('apply')}
         </div>
       </div>

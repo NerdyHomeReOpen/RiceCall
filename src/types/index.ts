@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as mediasoupClient from 'mediasoup-client';
 
 import {
@@ -167,7 +166,7 @@ export type Theme = {
 };
 
 export type Emoji = {
-  id: number;
+  code: string;
   alt: string;
   path: string;
 };
@@ -190,11 +189,24 @@ export type SpeakingMode = 'key' | 'auto';
 
 export type MixMode = 'all' | 'app';
 
+export type RTCStatus = 'disconnected' | 'connecting' | 'connected' | 'failed';
+
 export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
 
 export type RecordFormat = 'wav' | 'mp3';
 
 export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
+
+export type Popup = {
+  id: string;
+  type: PopupType;
+  size: { height: number; width: number };
+  position: { top: number; left: number };
+  title: string;
+  hideHeader: boolean;
+  buttons: ('close' | 'minimize' | 'maxsize')[];
+  node: () => React.ReactNode | null;
+};
 
 export type PopupType =
   | 'aboutus'
@@ -224,12 +236,16 @@ export type PopupType =
   | 'editNickname'
   | 'friendVerification'
   | 'imageCropper'
+  | 'inviteFriend'
   | 'inviteMember'
   | 'kickMemberFromChannel'
   | 'kickMemberFromServer'
   | 'memberApplicationSetting'
   | 'memberInvitation'
+  | 'networkDiagnosis'
+  | 'rtcDisconnect'
   | 'searchUser'
+  | 'serverAnnouncement'
   | 'serverApplication'
   | 'serverBroadcast'
   | 'serverSetting'
@@ -237,7 +253,7 @@ export type PopupType =
   | 'userInfo'
   | 'userSetting';
 
-export type ACK<T = any> = { ok: true; data: T } | { ok: false; error: string };
+export type ACK<T> = { ok: true; data: T } | { ok: false; error: string };
 
 export type ClientToServerEvents = {
   // User
@@ -316,11 +332,11 @@ export type ClientToServerEvents = {
 export type ServerToClientEvents = {
   // Socket
   connect: () => void;
-  connect_error: (error: any) => void;
+  connect_error: (e: unknown) => void;
   connect_timeout: () => void;
   reconnect: () => void;
   reconnect_attempt: (attemptNumbers: number) => void;
-  reconnect_error: (error: any) => void;
+  reconnect_error: (e: unknown) => void;
   reconnect_failed: () => void;
   disconnect: () => void;
   heartbeat: (...args: { seq: number; latency: number }[]) => void;
@@ -371,20 +387,21 @@ export type ServerToClientEvents = {
   // Message
   channelMessage: (...args: ChannelMessage[]) => void;
   actionMessage: (...args: PromptMessage[]) => void;
-  directMessage: (...args: DirectMessage[]) => void;
-  shakeWindow: (...args: DirectMessage[]) => void;
+  directMessage: (...args: (DirectMessage & { event?: 'directMessage'; message?: DirectMessage; initialData?: unknown })[]) => void;
+  shakeWindow: (...args: (DirectMessage & { event?: 'shakeWindow'; message?: DirectMessage; initialData?: unknown })[]) => void;
   chatHistory: (...args: ChatHistory[]) => void;
   // SFU
   SFUJoined: (...args: { channelId: string }[]) => void;
   SFULeft: () => void;
   SFUNewProducer: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
   SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
+  webrtcDisconnectCountUpdate: (count: number) => void;
   // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Popup
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
   // Error
-  error: (error: Error) => void;
+  error: (error: { code: number; message: string }) => void;
 };
 
 export type ClientToServerEventsWithAck = {
@@ -397,7 +414,7 @@ export type ClientToServerEventsWithAck = {
 };
 
 export type StoreType = {
-  accounts: Record<string, any>;
+  accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>;
   language: LanguageKey;
   customThemes: Theme[];
   currentTheme: Theme | null;
@@ -443,7 +460,7 @@ export type StoreType = {
   autoCheckForUpdates: boolean;
   updateCheckInterval: number;
   updateChannel: string;
-  server: 'prod' | 'dev';
+  env: 'prod' | 'dev';
 };
 
 export type SFUCreateTransportParams = {
@@ -453,22 +470,22 @@ export type SFUCreateTransportParams = {
 
 export type SFUCreateTransportReturnType = {
   id: string;
-  iceParameters: any;
-  iceCandidates: any;
-  dtlsParameters: any;
-  routerRtpCapabilities: any;
+  iceParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  iceCandidates: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  dtlsParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  routerRtpCapabilities: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   producers?: SFUCreateProducerReturnType[];
 };
 
 export type SFUConnectTransportParams = {
   transportId: string;
-  dtlsParameters: any;
+  dtlsParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
 export type SFUCreateProducerParams = {
   kind: mediasoupClient.types.MediaKind;
   transportId: string;
-  rtpParameters: any;
+  rtpParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   channelId: string;
 };
 
@@ -481,7 +498,7 @@ export type SFUCreateProducerReturnType = {
 export type SFUCreateConsumerParams = {
   transportId: string;
   producerId: string;
-  rtpCapabilities: any;
+  rtpCapabilities: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   channelId: string;
 };
 
@@ -490,7 +507,65 @@ export type SFUCreateConsumerReturnType = {
   userId: string;
   producerId: string;
   kind: mediasoupClient.types.MediaKind;
-  rtpParameters: any;
+  rtpParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+};
+
+export type Staff = {
+  title: string;
+  contact: string;
+  github: string;
+  discord: string;
+  ricecall: string;
+  email: string;
+};
+
+export type MtrHop = {
+  hop: number;
+  host: string;
+  ip: string;
+  loss: number;
+  avg: number;
+  best: number;
+  worst: number;
+  stdev: number;
+};
+
+export type DiagnosisResult = {
+  domain: string;
+  dns: { resolved: boolean; addresses: string[]; error: string | null };
+  mtr: { executed: boolean; hops: MtrHop[]; error: string | null };
+};
+
+export type ProgressData = {
+  step?: string;
+  cycle?: number;
+  totalCycles?: number;
+  hops?: MtrHop[];
+  domain?: string;
+};
+
+export type FullReport = {
+  timestamp: string;
+  localNetwork: unknown;
+  diagnosis: DiagnosisResult[];
+};
+
+export type ReportError = {
+  error: string;
+};
+
+export type StepStatus = 'pending' | 'active' | 'completed' | 'failed';
+
+export type Stage = {
+  id: string;
+  label: string;
+  icon: React.ReactNode;
+  status: StepStatus;
+};
+
+export type SFUDiagnosisInfo = {
+  ip?: string;
+  port?: number;
 };
 
 export * from './database';

@@ -27,12 +27,7 @@
     },
     {
       "title": "4. Compartir",
-      "items": [
-        "Proveedores/encargados (nube, CDN, RTC, analítica, monitorización) bajo contratos",
-        "Solicitudes legales",
-        "Operaciones corporativas",
-        "No vendemos datos personales"
-      ]
+      "items": ["Proveedores/encargados (nube, CDN, RTC, analítica, monitorización) bajo contratos", "Solicitudes legales", "Operaciones corporativas", "No vendemos datos personales"]
     },
     {
       "title": "5. Datos de voz",
@@ -45,10 +40,7 @@
     },
     {
       "title": "6. Almacenamiento y conservación",
-      "items": [
-        "Centros de datos en varios países/regiones",
-        "Conservación basada en la necesidad y en obligaciones legales"
-      ]
+      "items": ["Centros de datos en varios países/regiones", "Conservación basada en la necesidad y en obligaciones legales"]
     },
     {
       "title": "7. Sus derechos",

@@ -4,14 +4,16 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/action';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface MemberApplicationSettingPopupProps {
-  serverId: Types.Server['serverId'];
+  id: string;
   server: Types.Server;
 }
 
-const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ serverId, server }) => {
+const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ id, server }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -20,13 +22,21 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
   const [serverApplyNote, setServerApplyNote] = useState<string>(server.applyNotice);
 
   // Handlers
-  const handleEditServer = (serverId: Types.Server['serverId'], update: Partial<Types.Server>) => {
-    ipc.socket.send('editServer', { serverId, update });
-    ipc.window.close();
+  const handleReceiveApplicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setServerReceiveApplication(e.target.checked);
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleApplyNoteChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    setServerApplyNote(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    Popup.editServer(server.serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
+    ipc.popup.close(id);
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   return (
@@ -35,19 +45,19 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
         <div className={`${popupStyles['dialog-content']} ${popupStyles['col']}`}>
           <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
             <div className={popupStyles['label']}>{t('is-receive-member-application-label')}</div>
-            <input name="receive-apply" type="checkbox" checked={serverReceiveApplication} onChange={() => setServerReceiveApplication(!serverReceiveApplication)} />
+            <input name="receive-apply" type="checkbox" checked={serverReceiveApplication} onChange={handleReceiveApplicationChange} />
           </div>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('apply-member-note')}</div>
-            <textarea name="apply-note" value={serverApplyNote} maxLength={100} onChange={(e) => setServerApplyNote(e.target.value)} />
+            <textarea name="apply-note" value={serverApplyNote} maxLength={100} onChange={handleApplyNoteChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleEditServer(serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote })}>
+        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

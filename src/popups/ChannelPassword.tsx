@@ -16,13 +16,17 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
   const [password, setPassword] = useState<string>('');
 
   // Handlers
-  const handleSubmit = () => {
-    ipc.popup.submit(id, password);
-    ipc.window.close();
+  const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleSubmitBtnClick = () => {
+    ipc.popup.submit(id, password);
+    ipc.popup.close(id);
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   return (
@@ -31,15 +35,15 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
             <div className={popupStyles['label']}>{t('please-enter-the-channel-password')}</div>
-            <input type="text" maxLength={4} onChange={(e) => setPassword(e.target.value)} />
+            <input type="text" maxLength={4} onChange={handlePasswordChange} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleSubmit}>
+        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

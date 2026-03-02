@@ -1,4 +1,4 @@
-import React, { useEffect, useContext, createContext, ReactNode } from 'react';
+import React, { useEffect, useContext, createContext, ReactNode, useCallback, useMemo } from 'react';
 
 import type * as Types from '@/types';
 
@@ -24,7 +24,6 @@ interface ContextMenuContextType {
     position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
     anchorEl?: HTMLElement | null,
     showFontbar?: boolean,
-    isUserInfo?: boolean,
     fontSize?: string,
     textColor?: string,
     onEmojiSelect?: (code: string, full: string) => void,
@@ -58,166 +57,153 @@ interface ContextMenuProviderProps {
 }
 
 const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
-  // Refs
-  const [isContextMenuVisible, setIsContextMenuVisible] = React.useState(false);
-  const [isMicContextMenuVisible, setIsMicContextMenuVisible] = React.useState(false);
-  const [isNotificationMenuVisible, setIsNotificationMenuVisible] = React.useState(false);
-  const [isUserInfoVisible, setIsUserInfoVisible] = React.useState(false);
-  const [isBadgeInfoVisible, setIsBadgeInfoVisible] = React.useState(false);
-  const [isEmojiPickerVisible, setIsEmojiPickerVisible] = React.useState(false);
-  const [isColorPickerVisible, setIsColorPickerVisible] = React.useState(false);
-  const [isStatusDropdownVisible, setIsStatusDropdownVisible] = React.useState(false);
-  const [isEmbedLinkInputVisible, setIsEmbedLinkInputVisible] = React.useState(false);
-
   // States
-  const [contextMenu, setContextMenu] = React.useState<ReactNode | null>(null);
-  const [micContextMenu, setMicContextMenu] = React.useState<ReactNode | null>(null);
-  const [notificationMenu, setNotificationMenu] = React.useState<ReactNode | null>(null);
-  const [userInfo, setUserInfo] = React.useState<ReactNode | null>(null);
-  const [badgeInfo, setBadgeInfo] = React.useState<ReactNode | null>(null);
-  const [emojiPicker, setEmojiPicker] = React.useState<ReactNode | null>(null);
-  const [colorPicker, setColorPicker] = React.useState<ReactNode | null>(null);
-  const [statusDropdown, setStatusDropdown] = React.useState<ReactNode | null>(null);
-  const [embedLinkInput, setEmbedLinkInput] = React.useState<ReactNode | null>(null);
+  const [contextMenu, setContextMenu] = React.useState<React.ReactNode | null>(null);
+  const [micContextMenu, setMicContextMenu] = React.useState<React.ReactNode | null>(null);
+  const [notificationMenu, setNotificationMenu] = React.useState<React.ReactNode | null>(null);
+  const [userInfo, setUserInfo] = React.useState<React.ReactNode | null>(null);
+  const [badgeInfo, setBadgeInfo] = React.useState<React.ReactNode | null>(null);
+  const [emojiPicker, setEmojiPicker] = React.useState<React.ReactNode | null>(null);
+  const [colorPicker, setColorPicker] = React.useState<React.ReactNode | null>(null);
+  const [statusDropdown, setStatusDropdown] = React.useState<React.ReactNode | null>(null);
+  const [embedLinkInput, setEmbedLinkInput] = React.useState<React.ReactNode | null>(null);
 
-  // Handlers
-  const showContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => {
-    setContextMenu(<ContextMenu items={items} onClose={closeContextMenu} x={x} y={y} direction={direction} />);
-    setIsContextMenuVisible(true);
-  };
-
-  const closeContextMenu = () => {
+  // Functions
+  const closeContextMenu = useCallback(() => {
     setContextMenu(null);
-    setIsContextMenuVisible(false);
-  };
+  }, []);
 
-  const showMicContextMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => {
-    setMicContextMenu(<MicContextMenu items={items} onClose={closeMicContextMenu} x={x} y={y} direction={direction} />);
-    setIsMicContextMenuVisible(true);
-  };
+  const showContextMenu = useCallback(
+    (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => {
+      setContextMenu(<ContextMenu x={x} y={y} direction={direction} items={items} onClose={closeContextMenu} />);
+    },
+    [closeContextMenu],
+  );
 
-  const closeMicContextMenu = () => {
+  const closeMicContextMenu = useCallback(() => {
     setMicContextMenu(null);
-    setIsMicContextMenuVisible(false);
-  };
+  }, []);
 
-  const showNotificationMenu = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.NotificationMenuItem[]) => {
-    setNotificationMenu(<NotificationMenu items={items} onClose={closeNotificationMenu} x={x} y={y} direction={direction} />);
-    setIsNotificationMenuVisible(true);
-  };
+  const showMicContextMenu = useCallback(
+    (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => {
+      setMicContextMenu(<MicContextMenu x={x} y={y} direction={direction} items={items} onClose={closeMicContextMenu} />);
+    },
+    [closeMicContextMenu],
+  );
 
-  const closeNotificationMenu = () => {
+  const closeNotificationMenu = useCallback(() => {
     setNotificationMenu(null);
-    setIsNotificationMenuVisible(false);
-  };
+  }, []);
 
-  const showUserInfoBlock = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: Types.OnlineMember) => {
-    setUserInfo(<UserInfoCard member={member} x={x} y={y} direction={direction} />);
-    setIsUserInfoVisible(true);
-  };
+  const showNotificationMenu = useCallback(
+    (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.NotificationMenuItem[]) => {
+      setNotificationMenu(<NotificationMenu x={x} y={y} direction={direction} items={items} onClose={closeNotificationMenu} />);
+    },
+    [closeNotificationMenu],
+  );
 
-  const closeUserInfoBlock = () => {
+  const closeUserInfoBlock = useCallback(() => {
     setUserInfo(null);
-    setIsUserInfoVisible(false);
-  };
+  }, []);
 
-  const showBadgeInfoCard = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Types.Badge) => {
-    setBadgeInfo(<BadgeInfoCard badge={badge} x={x} y={y} direction={direction} />);
-    setIsBadgeInfoVisible(true);
-  };
+  const showUserInfoBlock = useCallback((x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', member: Types.OnlineMember) => {
+    setUserInfo(<UserInfoCard x={x} y={y} direction={direction} member={member} />);
+  }, []);
 
-  const closeBadgeInfoCard = () => {
+  const closeBadgeInfoCard = useCallback(() => {
     setBadgeInfo(null);
-    setIsBadgeInfoVisible(false);
-  };
+  }, []);
 
-  const showEmojiPicker = (
-    x: number,
-    y: number,
-    direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
-    anchorEl?: HTMLElement | null,
-    showFontbar?: boolean,
-    isUserInfo?: boolean,
-    fontSize?: string,
-    textColor?: string,
-    onEmojiSelect?: (code: string, full: string) => void,
-    onFontSizeChange?: (size: string) => void,
-    onTextColorChange?: (color: string) => void,
-  ) => {
-    setEmojiPicker(
-      <EmojiPicker
-        x={x}
-        y={y}
-        direction={direction}
-        anchorEl={anchorEl}
-        showFontbar={showFontbar}
-        isUserInfo={isUserInfo}
-        fontSize={fontSize}
-        textColor={textColor}
-        onEmojiSelect={onEmojiSelect}
-        onFontSizeChange={onFontSizeChange}
-        onTextColorChange={onTextColorChange}
-      />,
-    );
-    setIsEmojiPickerVisible(true);
-  };
+  const showBadgeInfoCard = useCallback((x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', badge: Types.Badge) => {
+    setBadgeInfo(<BadgeInfoCard x={x} y={y} direction={direction} badge={badge} />);
+  }, []);
 
-  const closeEmojiPicker = () => {
+  const closeEmojiPicker = useCallback(() => {
     setEmojiPicker(null);
-    setIsEmojiPickerVisible(false);
-  };
+  }, []);
 
-  const showColorPicker = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => {
-    setColorPicker(<ColorPicker onColorSelect={onColorSelect} x={x} y={y} direction={direction} />);
-    setIsColorPickerVisible(true);
-  };
+  const showEmojiPicker = useCallback(
+    (
+      x: number,
+      y: number,
+      direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom',
+      anchorEl?: HTMLElement | null,
+      showFontbar?: boolean,
+      fontSize?: string,
+      textColor?: string,
+      onEmojiSelect?: (code: string, full: string) => void,
+      onFontSizeChange?: (size: string) => void,
+      onTextColorChange?: (color: string) => void,
+    ) => {
+      setEmojiPicker(
+        <EmojiPicker
+          x={x}
+          y={y}
+          direction={direction}
+          anchorEl={anchorEl}
+          showFontbar={showFontbar}
+          fontSize={fontSize}
+          textColor={textColor}
+          onEmojiSelect={onEmojiSelect}
+          onFontSizeChange={onFontSizeChange}
+          onTextColorChange={onTextColorChange}
+        />,
+      );
+    },
+    [],
+  );
 
-  const closeColorPicker = () => {
+  const closeColorPicker = useCallback(() => {
     setColorPicker(null);
-    setIsColorPickerVisible(false);
-  };
+  }, []);
 
-  const showStatusDropdown = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: Types.User['status']) => void) => {
-    setStatusDropdown(<StatusDropdown onStatusSelect={onStatusSelect} onClose={closeStatusDropdown} x={x} y={y} direction={direction} />);
-    setIsStatusDropdownVisible(true);
-  };
+  const showColorPicker = useCallback((x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onColorSelect: (color: string) => void) => {
+    setColorPicker(<ColorPicker x={x} y={y} direction={direction} onColorSelect={onColorSelect} />);
+  }, []);
 
-  const closeStatusDropdown = () => {
+  const closeStatusDropdown = useCallback(() => {
     setStatusDropdown(null);
-    setIsStatusDropdownVisible(false);
-  };
+  }, []);
 
-  const showEmbedLinkInput = (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => {
-    setEmbedLinkInput(<EmbedLinkInput onSubmit={onSubmit} onClose={closeEmbedLinkInput} x={x} y={y} direction={direction} />);
-    setIsEmbedLinkInputVisible(true);
-  };
+  const showStatusDropdown = useCallback(
+    (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onStatusSelect: (status: Types.User['status']) => void) => {
+      setStatusDropdown(<StatusDropdown x={x} y={y} direction={direction} onStatusSelect={onStatusSelect} onClose={closeStatusDropdown} />);
+    },
+    [closeStatusDropdown],
+  );
 
-  const closeEmbedLinkInput = () => {
+  const closeEmbedLinkInput = useCallback(() => {
     setEmbedLinkInput(null);
-    setIsEmbedLinkInputVisible(false);
-  };
+  }, []);
+
+  const showEmbedLinkInput = useCallback(
+    (x: number, y: number, direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', onSubmit: (linkUrl: string) => void) => {
+      setEmbedLinkInput(<EmbedLinkInput x={x} y={y} direction={direction} onSubmit={onSubmit} onClose={closeEmbedLinkInput} />);
+    },
+    [closeEmbedLinkInput],
+  );
 
   // Effects
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('.user-info-card-container')) {
-        if (isUserInfoVisible) closeUserInfoBlock();
+        closeUserInfoBlock();
       }
       if (!(e.target as HTMLElement).closest('.badge-info-card-container')) {
-        if (isBadgeInfoVisible) closeBadgeInfoCard();
+        closeBadgeInfoCard();
       }
     };
     const onPointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('.context-menu-container')) {
-        if (isContextMenuVisible) closeContextMenu();
-        if (isMicContextMenuVisible) closeMicContextMenu();
-        if (isEmojiPickerVisible) closeEmojiPicker();
-        if (isNotificationMenuVisible) closeNotificationMenu();
-        if (isStatusDropdownVisible) closeStatusDropdown();
-        if (isEmbedLinkInputVisible) closeEmbedLinkInput();
+        closeContextMenu();
+        closeMicContextMenu();
+        closeEmojiPicker();
+        closeNotificationMenu();
+        closeStatusDropdown();
+        closeEmbedLinkInput();
       }
       if (!(e.target as HTMLElement).closest('.color-picker-container')) {
-        if (isColorPickerVisible) closeColorPicker();
+        closeColorPicker();
       }
     };
     document.addEventListener('pointerdown', onPointerDown);
@@ -226,51 +212,63 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('mousemove', onMouseMove);
     };
-  }, [
-    isContextMenuVisible,
-    isMicContextMenuVisible,
-    isBadgeInfoVisible,
-    isEmojiPickerVisible,
-    isUserInfoVisible,
-    isNotificationMenuVisible,
-    isColorPickerVisible,
-    isStatusDropdownVisible,
-    isEmbedLinkInputVisible,
-  ]);
+  }, [closeContextMenu, closeMicContextMenu, closeNotificationMenu, closeUserInfoBlock, closeBadgeInfoCard, closeEmojiPicker, closeColorPicker, closeStatusDropdown, closeEmbedLinkInput]);
+
+  const contextValue = useMemo(
+    () => ({
+      showContextMenu,
+      showMicContextMenu,
+      showNotificationMenu,
+      showUserInfoBlock,
+      showBadgeInfoCard,
+      showEmojiPicker,
+      showColorPicker,
+      showStatusDropdown,
+      showEmbedLinkInput,
+      closeContextMenu,
+      closeMicContextMenu,
+      closeNotificationMenu,
+      closeUserInfoBlock,
+      closeBadgeInfoCard,
+      closeEmojiPicker,
+      closeColorPicker,
+      closeStatusDropdown,
+      closeEmbedLinkInput,
+    }),
+    [
+      showContextMenu,
+      showMicContextMenu,
+      showNotificationMenu,
+      showUserInfoBlock,
+      showBadgeInfoCard,
+      showEmojiPicker,
+      showColorPicker,
+      showStatusDropdown,
+      showEmbedLinkInput,
+      closeContextMenu,
+      closeMicContextMenu,
+      closeNotificationMenu,
+      closeUserInfoBlock,
+      closeBadgeInfoCard,
+      closeEmojiPicker,
+      closeColorPicker,
+      closeStatusDropdown,
+      closeEmbedLinkInput,
+    ],
+  );
 
   return (
-    <ContextMenuContext.Provider
-      value={{
-        showContextMenu,
-        showMicContextMenu,
-        showNotificationMenu,
-        showUserInfoBlock,
-        showBadgeInfoCard,
-        showEmojiPicker,
-        showColorPicker,
-        showStatusDropdown,
-        showEmbedLinkInput,
-        closeContextMenu,
-        closeMicContextMenu,
-        closeNotificationMenu,
-        closeUserInfoBlock,
-        closeBadgeInfoCard,
-        closeEmojiPicker,
-        closeColorPicker,
-        closeStatusDropdown,
-        closeEmbedLinkInput,
-      }}
-    >
-      {isContextMenuVisible && contextMenu}
-      {isMicContextMenuVisible && micContextMenu}
-      {isNotificationMenuVisible && notificationMenu}
-      {isUserInfoVisible && userInfo}
-      {badgeInfo && badgeInfo}
-      {isEmojiPickerVisible && emojiPicker}
-      {isColorPickerVisible && colorPicker}
-      {isStatusDropdownVisible && statusDropdown}
-      {isEmbedLinkInputVisible && embedLinkInput}
+    <ContextMenuContext.Provider value={contextValue}>
       {children}
+      {contextMenu}
+      {micContextMenu}
+      {notificationMenu}
+      {userInfo}
+      {badgeInfo}
+      {emojiPicker}
+      {colorPicker}
+      {statusDropdown}
+      {embedLinkInput}
     </ContextMenuContext.Provider>
   );
 };

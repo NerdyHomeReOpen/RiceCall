@@ -1,4 +1,5 @@
-import React, { useState, useLayoutEffect, useRef } from 'react';
+import React, { useState, useLayoutEffect, useRef, useMemo } from 'react';
+import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
@@ -32,20 +33,9 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
   const [cardY, setCardY] = useState(y);
 
   // Variables
-  const {
-    name: memberName,
-    avatarUrl: memberAvatarUrl,
-    gender: memberGender,
-    level: memberLevel,
-    xp: memberXp,
-    requiredXp: memberRequiredXp,
-    badges: memberBadges,
-    permissionLevel: memberPermission,
-    contribution: memberContributions,
-    nickname: memberNickname,
-    vip: memberVip,
-  } = member;
-  const vipBoost = Math.min(2, 1 + memberVip * 0.2);
+  const vipBoost = Math.min(2, 1 + member.vip * 0.2);
+  const hasVip = member.vip > 0;
+  const badges = useMemo(() => (typeof member.badges === 'string' ? JSON.parse(member.badges) : member.badges), [member.badges]);
 
   // Effects
   useLayoutEffect(() => {
@@ -84,47 +74,47 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
   return (
     <div
       ref={cardRef}
-      className={`user-info-card-container ${styles['user-info-card']} ${styles[`vip-${memberVip}`]}`}
+      className={`user-info-card-container ${styles['user-info-card']} ${styles[`vip-${member.vip}`]}`}
       style={display ? { top: cardY, left: cardX } : { opacity: 0 }}
       onClick={(e) => e.stopPropagation()}
     >
       <div className={styles['body']}>
         <div className={styles['top']}>
-          <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${memberAvatarUrl})` }} />
+          <Image src={member.avatarUrl} alt={member.name} width={98} height={98} loading="lazy" draggable="false" />
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div className={`${styles['name-text']} ${memberVip > 0 && vip['vip-name-color']}`}>{memberName}</div>
-                <LevelIcon level={memberLevel} xp={memberXp} requiredXp={memberRequiredXp} showTooltip={false} />
+                <div className={`${styles['name-text']} ${hasVip && vip['vip-name-color']}`}>{member.name}</div>
+                <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
               </div>
-              <div className={` ${vip['vip-icon-big']} ${vip[`vip-${memberVip}`]}`} />
-              {memberVip > 0 && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
+              <div className={` ${vip['vip-icon-big']} ${vip[`vip-${member.vip}`]}`} />
+              {hasVip && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
             </div>
             <div className={styles['xp-wrapper']}>
-              <div className={styles['level-text']}>{`${t('level')} ${memberLevel} (${memberXp}/${memberRequiredXp})`}</div>
+              <div className={styles['level-text']}>{`${t('level')} ${member.level} (${member.xp}/${member.requiredXp})`}</div>
               <div className={styles['xp-progress-container']}>
-                <div className={styles['xp-progress']} style={{ width: `${(memberXp / memberRequiredXp) * 100}%` }} />
+                <div className={styles['xp-progress']} style={{ width: `${(member.xp / member.requiredXp) * 100}%` }} />
               </div>
             </div>
           </div>
         </div>
         <div className={styles['bottom']}>
-          <div className={styles['nickname-row']}>{memberNickname && <div className={styles['nickname-text']}>{memberNickname}</div>}</div>
+          <div className={styles['nickname-row']}>{member.nickname && <div className={styles['nickname-text']}>{member.nickname}</div>}</div>
           <div className={styles['info-row']}>
             <div className={styles['permission-wrapper']}>
-              <div className={`${permission[memberGender]} ${permission[`lv-${memberPermission}`]}`} />
-              <div className={styles['permission-text']}>{Language.getPermissionText(t, memberPermission)}</div>
+              <div className={`${permission[member.gender]} ${permission[`lv-${member.permissionLevel}`]}`} />
+              <div className={styles['permission-text']}>{Language.getPermissionText(t, member.permissionLevel)}</div>
             </div>
             <div className={styles['saperator']} />
             <div className={styles['contribution-wrapper']}>
               <div className={styles['contribution-text']}>{t('contribution')}:</div>
-              <div className={styles['contribution-value']}>{memberContributions}</div>
+              <div className={styles['contribution-value']}>{member.contribution}</div>
             </div>
           </div>
         </div>
       </div>
       <div className={styles['footer']}>
-        <BadgeList badges={JSON.parse(memberBadges)} position="left-bottom" direction="right-bottom" maxDisplay={13} />
+        <BadgeList badges={badges} position="left-bottom" direction="right-bottom" maxDisplay={13} />
       </div>
     </div>
   );

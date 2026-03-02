@@ -4,14 +4,17 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import * as Popup from '@/action';
+
 import popupStyles from '@/styles/popup.module.css';
 
 interface BlockMemberPopupProps {
+  id: string;
   serverId: Types.Server['serverId'];
   member: Types.Member;
 }
 
-const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId, member }) => {
+const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serverId, member }) => {
   // Hooks
   const { t } = useTranslation();
 
@@ -19,21 +22,23 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
   const [blockType, setBlockType] = useState<'block-permanent' | 'block-ip'>('block-permanent');
 
   // Variables
-  const { userId, name: memberName, nickname: memberNickname } = member;
   const blockTypeOptions = [
     { key: 'block-permanent', label: t('block-permanent'), disabled: false },
     { key: 'block-ip', label: t('block-ip'), disabled: true },
   ];
 
   // Handlers
-  const handleBlockUserFromServer = (userId: Types.User['userId'], serverId: Types.Server['serverId'], blockUntil: number) => {
-    ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
-    ipc.socket.send('terminateMember', { userId, serverId });
-    ipc.window.close();
+  const handleBlockTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setBlockType(e.target.value as 'block-permanent' | 'block-ip');
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleConfirmBtnClick = () => {
+    Popup.blockUserFromServer(member.userId, serverId, -1);
+    ipc.popup.close(id);
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
 
   return (
@@ -42,12 +47,12 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
           <div className={popupStyles['col']}>
-            <div className={popupStyles['label']}>{t('confirm-block-user', { '0': memberNickname || memberName })}</div>
+            <div className={popupStyles['label']}>{t('confirm-block-user', { '0': member.nickname || member.name })}</div>
             <div className={popupStyles['col']}>
               <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
                 <div className={popupStyles['label']}>{t('block-type')}</div>
                 <div className={popupStyles['select-box']}>
-                  <select value={blockType} onChange={(e) => setBlockType(e.target.value as 'block-permanent' | 'block-ip')}>
+                  <select value={blockType} onChange={handleBlockTypeChange}>
                     {blockTypeOptions.map((option) => (
                       <option key={option.key} value={option.key} disabled={option.disabled}>
                         {option.label}
@@ -61,10 +66,10 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ serverId
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={() => handleBlockUserFromServer(userId, serverId, -1)}>
+        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

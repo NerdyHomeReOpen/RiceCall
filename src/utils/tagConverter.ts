@@ -39,7 +39,7 @@ export function fromTags(raw: string) {
       const date = new Date(parseInt(timestamp) * 1000);
       return date.toLocaleString();
     })
-    .replace(userTagRegex, (_, name, _level, level = '2', _gender, gender = 'Male') => {
+    .replace(userTagRegex, (_, name, _level, level = '2', _gender, gender = 'male') => {
       return `<span data-name='${name}'><span class='${markdownStyles['user-icon']} ${permissionStyles[gender]} ${permissionStyles[`lv-${level}`]}'></span><span class='${markdownStyles['user-name']}'>${name}</span></span>`;
     })
     .replace(ytRegex, (_, videoId) => {
@@ -61,7 +61,7 @@ export function toTags(raw: string) {
     .replace(discordTimestampRegex, (_, timestamp) => {
       return `<time data-timestamp='${escapeHtml(timestamp)}'></time>`;
     })
-    .replace(userTagBackRegex, (_: string, name: string, _level: string, level: string = '2', _gender: string, gender: string = 'Male') => {
+    .replace(userTagBackRegex, (_: string, name: string, _level: string, level: string = '2', _gender: string, gender: string = 'male') => {
       return `<tag data-tag='${escapeHtml(name)}-${escapeHtml(level)}-${escapeHtml(gender)}'></tag>`;
     })
     .replace(ytBackRegex, (_: string, videoId: string) => {

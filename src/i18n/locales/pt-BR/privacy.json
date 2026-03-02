@@ -27,12 +27,7 @@
     },
     {
       "title": "4. Compartilhamento",
-      "items": [
-        "Fornecedores/Operadores (nuvem, CDN, RTC, análise, monitoramento) sob contratos",
-        "Solicitações legais",
-        "Transações comerciais",
-        "Não vendemos dados pessoais"
-      ]
+      "items": ["Fornecedores/Operadores (nuvem, CDN, RTC, análise, monitoramento) sob contratos", "Solicitações legais", "Transações comerciais", "Não vendemos dados pessoais"]
     },
     {
       "title": "5. Dados de voz",
@@ -45,10 +40,7 @@
     },
     {
       "title": "6. Armazenamento e retenção",
-      "items": [
-        "Centros de dados em vários países/regiões",
-        "Retenção baseada na necessidade e em obrigações legais"
-      ]
+      "items": ["Centros de dados em vários países/regiões", "Retenção baseada na necessidade e em obrigações legais"]
     },
     {
       "title": "7. Seus direitos",

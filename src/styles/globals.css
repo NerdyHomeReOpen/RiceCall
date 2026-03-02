@@ -231,7 +231,7 @@ button {
   z-index: 1;
   display: flex;
   align-items: center;
-  height: 20px;
+  height: fit-content;
   padding-right: 3px;
   padding-left: 3px;
   color: var(--text-color-quinary);

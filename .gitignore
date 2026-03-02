@@ -41,3 +41,8 @@ next-env.d.ts
 
 # lock files
 package-lock.json
+tempfix
+.gemini
+.geminiignore
+agent-follow.md
+RiceCall_previous_stable

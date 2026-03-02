@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
@@ -20,27 +20,35 @@ enum DIALOG_ICON {
 interface DialogPopupProps {
   id: string;
   iconType: keyof typeof DIALOG_ICON;
-  message: string;
+  message?: string;
   parameter?: Record<string, string>;
-  timestamp?: number;
+  error?: Error;
 }
 
-const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, message, parameter, timestamp }) => {
+const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, message, parameter, error }) => {
   // Hooks
   const { t } = useTranslation();
 
   // Variables
-  const formattedMessageContents = TagConverter.fromTags(t(message, parameter));
+  const formattedMessageContents = TagConverter.fromTags(t(message ?? error?.message ?? '', parameter));
+  const errorId = error ? crypto.randomUUID().substring(0, 8) : undefined;
 
   // Handlers
-  const handleSubmit = () => {
+  const handleSubmitBtnClick = () => {
     ipc.popup.submit(id);
-    ipc.window.close();
+    ipc.popup.close(id);
   };
 
-  const handleClose = () => {
-    ipc.window.close();
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
   };
+
+  // Effects
+  useEffect(() => {
+    if (errorId && error) {
+      ipc.error.submit(errorId, error);
+    }
+  }, [errorId, error]);
 
   return (
     <div className={popupStyles['popup-wrapper']} tabIndex={0}>
@@ -48,15 +56,15 @@ const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, mess
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['dialog-icon']} ${popupStyles[DIALOG_ICON[iconType]]}`} />
           <div className={popupStyles['dialog-message']}>
-            <MarkdownContent markdownText={`${formattedMessageContents} ${timestamp ? `(${new Date(timestamp).toLocaleString()})` : ''}`} />{' '}
+            <MarkdownContent markdownText={`${error ? `(${errorId}) ` : ''}${formattedMessageContents}`} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleSubmit}>
+        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleClose}>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

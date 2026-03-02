@@ -1,1269 +1,1027 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-require-imports */
 import * as Types from '@/types';
 
-import { Logger } from '@/utils/logger';
+import { isRenderer, isWebsite } from '@/utils/platform';
 
-// Safe reference to electron's ipcRenderer
-let ipcRenderer: any = null;
+let _ipcRenderer: typeof window.ipcRenderer | null = null;
+let _webMain: typeof import('@/web/main') | null = null;
 
-// Initialize ipcRenderer only in client-side and Electron environment
-if (typeof window !== 'undefined' && window.require) {
-  try {
-    const electron = window.require('electron');
-    ipcRenderer = electron.ipcRenderer;
-  } catch (error) {
-    new Logger('IPC').warn(`Not in Electron environment: ${error}`);
-  }
-}
-
-const isElectron = !!ipcRenderer;
+const modules = {
+  get default() {
+    if (isRenderer()) {
+      if (!_ipcRenderer) {
+        _ipcRenderer = window.ipcRenderer;
+      }
+      return _ipcRenderer!;
+    } else if (isWebsite()) {
+      if (!_webMain) {
+        _webMain = require('@/web/main');
+      }
+      return _webMain!;
+    } else {
+      throw new Error('Unsupported platform');
+    }
+  },
+};
 
 const ipc = {
-  exit: () => {
-    if (!isElectron) return;
-    ipcRenderer.send('exit');
+  error: {
+    submit: (errorId: string, error: Error): void => {
+      modules.default.errorSubmit(errorId, error);
+    },
+  },
+
+  webrtc: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    signalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
+      modules.default.webRTCSignalStateChange(formData);
+    },
+  },
+
+  exit: (): void => {
+    modules.default.exit();
   },
 
   socket: {
-    send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => {
-      if (!isElectron) return;
-      ipcRenderer.send(event, ...args);
+    send: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>): void => {
+      modules.default.socketSend(event, ...args);
     },
-    on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>) => {
-      if (!isElectron) return () => {};
-      const listener = (_: any, ...args: Parameters<Types.ServerToClientEvents[T]>) => callback(...args);
-      ipcRenderer.on(event, listener);
-      return () => ipcRenderer.removeListener(event, listener);
+
+    on: <T extends keyof Types.ServerToClientEvents>(event: T, callback: (...args: Parameters<Types.ServerToClientEvents[T]>) => ReturnType<Types.ServerToClientEvents[T]>): (() => void) => {
+      return modules.default.listen(event, callback);
     },
-    emit: <T extends keyof Types.ClientToServerEventsWithAck>(event: T, payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0]): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => {
-      if (!isElectron) return Promise.resolve(null as ReturnType<Types.ClientToServerEventsWithAck[T]>);
-      return new Promise((resolve, reject) => {
-        ipcRenderer.invoke(event, payload).then((ack: Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>) => {
-          if (ack?.ok) resolve(ack.data);
-          else reject(new Error(ack?.error || 'unknown error'));
-        });
-      });
+
+    emit: async <T extends keyof Types.ClientToServerEventsWithAck>(
+      event: T,
+      payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0],
+    ): Promise<ReturnType<Types.ClientToServerEventsWithAck[T]>> => {
+      const ack = await modules.default.socketEmit(event, payload);
+      if (ack?.ok) return ack.data;
+      throw new Error(ack?.error || 'Unknown error');
     },
   },
 
   auth: {
     login: async (formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> => {
-      if (!isElectron) return { success: false };
-      return await ipcRenderer.invoke('auth-login', formData);
+      return await modules.default.login(formData);
     },
 
     logout: async (): Promise<void> => {
-      if (!isElectron) return;
-      return await ipcRenderer.invoke('auth-logout');
+      return await modules.default.logout();
     },
 
     register: async (formData: { account: string; password: string; email: string; username: string; locale: string }): Promise<{ success: true; message: string } | { success: false }> => {
-      if (!isElectron) return { success: false };
-      return await ipcRenderer.invoke('auth-register', formData);
+      return await modules.default.register(formData);
     },
 
     autoLogin: async (token: string): Promise<{ success: true; token: string } | { success: false }> => {
-      if (!isElectron) return { success: false };
-      return await ipcRenderer.invoke('auth-auto-login', token);
+      return await modules.default.autoLogin(token);
     },
   },
 
   data: {
     user: async (params: { userId: string }): Promise<Types.User | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user', params);
+      return await modules.default.dataUser(params);
     },
 
     userHotReload: async (params: { userId: string }): Promise<Types.User | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-user-hot-reload', params);
+      return await modules.default.dataUserHotReload(params);
     },
 
     friend: async (params: { userId: string; targetId: string }): Promise<Types.Friend | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friend', params);
+      return await modules.default.dataFriend(params);
     },
 
     friends: async (params: { userId: string }): Promise<Types.Friend[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friends', params);
+      return await modules.default.dataFriends(params);
     },
 
     friendActivities: async (params: { userId: string }): Promise<Types.FriendActivity[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendActivities', params);
+      return await modules.default.dataFriendActivities(params);
     },
 
     friendGroup: async (params: { userId: string; friendGroupId: string }): Promise<Types.FriendGroup | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendGroup', params);
+      return await modules.default.dataFriendGroup(params);
     },
 
     friendGroups: async (params: { userId: string }): Promise<Types.FriendGroup[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendGroups', params);
+      return await modules.default.dataFriendGroups(params);
     },
 
     friendApplication: async (params: { receiverId: string; senderId: string }): Promise<Types.FriendApplication | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-friendApplication', params);
+      return await modules.default.dataFriendApplication(params);
     },
 
     friendApplications: async (params: { receiverId: string }): Promise<Types.FriendApplication[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-friendApplications', params);
+      return await modules.default.dataFriendApplications(params);
     },
 
     server: async (params: { userId: string; serverId: string }): Promise<Types.Server | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-server', params);
+      return await modules.default.dataServer(params);
     },
 
     servers: async (params: { userId: string }): Promise<Types.Server[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-servers', params);
+      return await modules.default.dataServers(params);
     },
 
     serverMembers: async (params: { serverId: string }): Promise<Types.Member[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverMembers', params);
+      return await modules.default.dataServerMembers(params);
     },
 
     serverOnlineMembers: async (params: { serverId: string }): Promise<Types.OnlineMember[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-serverOnlineMembers', params);
+      return await modules.default.dataServerOnlineMembers(params);
     },
 
     channel: async (params: { userId: string; serverId: string; channelId: string }): Promise<Types.Channel | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-channel', params);
+      return await modules.default.dataChannel(params);
     },
 
     channels: async (params: { userId: string; serverId: string }): Promise<Types.Channel[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channels', params);
+      return await modules.default.dataChannels(params);
     },
 
     channelMembers: async (params: { serverId: string; channelId: string }): Promise<Types.Member[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-channelMembers', params);
+      return await modules.default.dataChannelMembers(params);
     },
 
     member: async (params: { userId: string; serverId: string; channelId?: string }): Promise<Types.Member | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-member', params);
+      return await modules.default.dataMember(params);
     },
 
     memberApplication: async (params: { userId: string; serverId: string }): Promise<Types.MemberApplication | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberApplication', params);
+      return await modules.default.dataMemberApplication(params);
     },
 
     memberApplications: async (params: { serverId: string }): Promise<Types.MemberApplication[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberApplications', params);
+      return await modules.default.dataMemberApplications(params);
     },
 
     memberInvitation: async (params: { receiverId: string; serverId: string }): Promise<Types.MemberInvitation | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-memberInvitation', params);
+      return await modules.default.dataMemberInvitation(params);
     },
 
     memberInvitations: async (params: { receiverId: string }): Promise<Types.MemberInvitation[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-memberInvitations', params);
+      return await modules.default.dataMemberInvitations(params);
     },
 
     notifications: async (params: { region: Types.LanguageKey }): Promise<Types.Notification[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-notifications', params);
+      return await modules.default.dataNotifications(params);
     },
 
     announcements: async (params: { region: Types.LanguageKey }): Promise<Types.Announcement[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-announcements', params);
+      return await modules.default.dataAnnouncements(params);
     },
 
     recommendServers: async (params: { region: Types.LanguageKey }): Promise<Types.RecommendServer[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-recommendServers', params);
+      return await modules.default.dataRecommendServers(params);
     },
 
     uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
-      if (!isElectron) return null;
-      return await ipcRenderer.invoke('data-uploadImage', params);
+      return await modules.default.dataUploadImage(params);
     },
 
     searchServer: async (params: { query: string }): Promise<Types.Server[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchServer', params);
+      return await modules.default.dataSearchServer(params);
     },
 
     searchUser: async (params: { query: string }): Promise<Types.User[]> => {
-      if (!isElectron) return [];
-      return await ipcRenderer.invoke('data-searchUser', params);
+      return await modules.default.dataSearchUser(params);
     },
   },
 
   deepLink: {
-    onDeepLink: (callback: (serverId: string) => void) => {
-      if (!isElectron) return () => {};
-      const listener = (_: any, serverId: string) => callback(serverId);
-      ipcRenderer.on('deepLink', listener);
-      return () => ipcRenderer.removeListener('deepLink', listener);
+    onDeepLink: (callback: (serverId: string) => void): (() => void) => {
+      return modules.default.listen('deepLink', callback);
     },
   },
 
   window: {
-    resize: (width: number, height: number) => {
-      if (!isElectron) return;
-      ipcRenderer.send('resize', width, height);
+    minimize: (popupId?: string): void => {
+      modules.default.windowMinimize(popupId);
     },
 
-    minimize: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('window-control-minimize');
+    maximize: (): void => {
+      modules.default.windowMaximize();
     },
 
-    maximize: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('window-control-maximize');
+    unmaximize: (): void => {
+      modules.default.windowUnmaximize();
     },
 
-    unmaximize: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('window-control-unmaximize');
+    close: (): void => {
+      modules.default.windowClose();
     },
 
-    close: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('window-control-close');
+    onMaximize: (callback: () => void): (() => void) => {
+      return modules.default.listen('maximize', callback);
     },
 
-    onMaximize: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('maximize', listener);
-      return () => ipcRenderer.removeListener('maximize', listener);
-    },
-
-    onUnmaximize: (callback: () => void) => {
-      if (!isElectron) return () => {};
-      const listener = () => callback();
-      ipcRenderer.on('unmaximize', listener);
-      return () => ipcRenderer.removeListener('unmaximize', listener);
+    onUnmaximize: (callback: () => void): (() => void) => {
+      return modules.default.listen('unmaximize', callback);
     },
   },
 
   initialData: {
-    get: (id: string): Record<string, any> | null => {
-      if (!isElectron) return null;
-      return ipcRenderer.sendSync(`get-initial-data?id=${id}`);
+    get: (id: string): unknown | null => {
+      return modules.default.getInitialData(id);
     },
   },
 
   popup: {
-    open: (type: Types.PopupType, id: string, initialData: any, force?: boolean) => {
-      if (!isElectron) return;
-      ipcRenderer.send('open-popup', type, id, initialData, force);
+    open: async (type: Types.PopupType, id: string, initialData: unknown = {}, force?: boolean): Promise<unknown> => {
+      return await modules.default.openPopup(type, id, initialData, force);
     },
 
-    close: (id: string) => {
-      if (!isElectron) return;
-      ipcRenderer.send('close-popup', id);
+    close: (id: string): void => {
+      modules.default.closePopup(id);
     },
 
-    closeAll: () => {
-      if (!isElectron) return;
-      ipcRenderer.send('close-all-popups');
+    closeAll: (): void => {
+      modules.default.closeAllPopups();
     },
 
-    submit: (to: string, data?: any) => {
-      if (!isElectron) return;
-      ipcRenderer.send('popup-submit', to, data);
+    submit: (to: string, data?: unknown): void => {
+      modules.default.popupSubmit(to, data);
     },
 
-    onSubmit: <T>(host: string, callback: (data: T) => void) => {
-      if (!isElectron) return () => {};
-      ipcRenderer.removeAllListeners('popup-submit');
-      const listener = (_: any, from: string, data: T) => {
-        if (from === host) callback(data);
-        ipcRenderer.removeAllListeners('popup-submit');
-      };
-      ipcRenderer.on('popup-submit', listener);
-      return () => ipcRenderer.removeListener('popup-submit', listener);
+    onSubmit: <T>(host: string, callback: (data: T) => void): (() => void) => {
+      modules.default.eventEmitter.removeAllListeners(`popup-submit-${host}`);
+      return modules.default.listen(`popup-submit-${host}`, callback);
     },
   },
 
   accounts: {
     get: (): Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }> => {
-      if (!isElectron) return {};
-      return ipcRenderer.sendSync('get-accounts');
+      return modules.default.getAccounts();
     },
 
-    add: (account: string, { autoLogin, rememberAccount, password }: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
-      if (!isElectron) return;
-      ipcRenderer.send('add-account', account, { autoLogin, rememberAccount, password });
+    add: (account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }): void => {
+      modules.default.addAccount(account, data);
     },
 
-    delete: (account: string) => {
-      if (!isElectron) return;
-      ipcRenderer.send('delete-account', account);
+    delete: (account: string): void => {
+      modules.default.deleteAccount(account);
     },
 
-    onUpdate: (callback: (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => void) => {
-      if (!isElectron) return () => {};
-      ipcRenderer.removeAllListeners('accounts');
-      const listener = (_: any, accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => callback(accounts);
-      ipcRenderer.on('accounts', listener);
-      return () => ipcRenderer.removeListener('accounts', listener);
+    onUpdate: (callback: (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => void): (() => void) => {
+      return modules.default.listen('accounts', callback);
     },
   },
 
   language: {
     get: (): Types.LanguageKey => {
-      if (!isElectron) return 'zh-TW';
-      return ipcRenderer.sendSync('get-language');
+      return modules.default.getLanguage();
     },
 
-    set: (language: Types.LanguageKey) => {
-      if (!isElectron) return;
-      ipcRenderer.send('set-language', language);
+    set: (language: Types.LanguageKey): void => {
+      modules.default.setLanguage(language);
     },
 
-    onUpdate: (callback: (language: Types.LanguageKey) => void) => {
-      if (!isElectron) return () => {};
-      ipcRenderer.removeAllListeners('language');
-      const listener = (_: any, language: Types.LanguageKey) => callback(language);
-      ipcRenderer.on('language', listener);
-      return () => ipcRenderer.removeListener('language', listener);
+    onUpdate: (callback: (language: Types.LanguageKey) => void): (() => void) => {
+      return modules.default.listen('language', callback);
     },
   },
 
   customThemes: {
     get: (): Types.Theme[] => {
-      if (!isElectron) return [];
-      return ipcRenderer.sendSync('get-custom-themes');
+      return modules.default.getCustomThemes();
     },
 
-    add: (theme: Types.Theme) => {
-      if (!isElectron) return;
-      ipcRenderer.send('add-custom-theme', theme);
+    add: (theme: Types.Theme): void => {
+      modules.default.addCustomTheme(theme);
     },
 
-    delete: (index: number) => {
-      if (!isElectron) return;
-      ipcRenderer.send('delete-custom-theme', index);
+    delete: (index: number): void => {
+      modules.default.deleteCustomTheme(index);
     },
 
-    onUpdate: (callback: (themes: Types.Theme[]) => void) => {
-      if (!isElectron) return () => [];
-      ipcRenderer.removeAllListeners('custom-themes');
-      const listener = (_: any, themes: Types.Theme[]) => callback(themes);
-      ipcRenderer.on('custom-themes', listener);
-      return () => ipcRenderer.removeListener('custom-themes', listener);
+    onUpdate: (callback: (themes: Types.Theme[]) => void): (() => void) => {
+      return modules.default.listen('custom-themes', callback);
+    },
+
+    saveImage: async (buffer: ArrayBuffer, directory: string, filenamePrefix: string, extension: string): Promise<string | null> => {
+      return await modules.default.saveImage(buffer, directory, filenamePrefix, extension);
     },
 
     current: {
       get: (): Types.Theme | null => {
-        if (!isElectron) return null;
-        return ipcRenderer.sendSync('get-current-theme');
+        return modules.default.getCurrentTheme();
       },
 
-      set: (theme: Types.Theme | null) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-current-theme', theme);
+      set: (theme: Types.Theme | null): void => {
+        modules.default.setCurrentTheme(theme);
       },
 
-      onUpdate: (callback: (theme: Types.Theme | null) => void) => {
-        if (!isElectron) return () => null;
-        ipcRenderer.removeAllListeners('current-theme');
-        const listener = (_: any, theme: Types.Theme | null) => callback(theme);
-        ipcRenderer.on('current-theme', listener);
-        return () => ipcRenderer.removeListener('current-theme', listener);
+      onUpdate: (callback: (theme: Types.Theme | null) => void): (() => void) => {
+        return modules.default.listen('current-theme', callback);
       },
     },
   },
 
   discord: {
-    updatePresence: (presence: Types.DiscordPresence) => {
-      if (!isElectron) return;
-      ipcRenderer.send('update-discord-presence', presence);
+    updatePresence: (presence: Types.DiscordPresence): void => {
+      modules.default.updateDiscordPresence(presence);
     },
   },
 
   fontList: {
     get: (): string[] => {
-      if (!isElectron) return [];
-      return ipcRenderer.sendSync('get-font-list');
+      return modules.default.getFontList();
     },
   },
 
   record: {
-    save: (record: ArrayBuffer) => {
-      if (!isElectron) return;
-      ipcRenderer.send('save-record', record);
+    save: (record: ArrayBuffer): void => {
+      modules.default.saveRecord(record);
     },
 
     savePath: {
       select: async (): Promise<string | null> => {
-        if (!isElectron) return null;
-        return await ipcRenderer.invoke('select-record-save-path');
-      },
-    },
-  },
-
-  systemSettings: {
-    set: (settings: Partial<Types.SystemSettings>) => {
-      if (!isElectron) return;
-      if (settings.autoLogin !== undefined) ipcRenderer.send('set-auto-login', settings.autoLogin);
-      if (settings.autoLaunch !== undefined) ipcRenderer.send('set-auto-launch', settings.autoLaunch);
-      if (settings.alwaysOnTop !== undefined) ipcRenderer.send('set-always-on-top', settings.alwaysOnTop);
-      if (settings.statusAutoIdle !== undefined) ipcRenderer.send('set-status-auto-idle', settings.statusAutoIdle);
-      if (settings.statusAutoIdleMinutes !== undefined) ipcRenderer.send('set-status-auto-idle-minutes', settings.statusAutoIdleMinutes);
-      if (settings.statusAutoDnd !== undefined) ipcRenderer.send('set-status-auto-dnd', settings.statusAutoDnd);
-      if (settings.channelUIMode !== undefined) ipcRenderer.send('set-channel-ui-mode', settings.channelUIMode);
-      if (settings.closeToTray !== undefined) ipcRenderer.send('set-close-to-tray', settings.closeToTray);
-      if (settings.font !== undefined) ipcRenderer.send('set-font', settings.font);
-      if (settings.fontSize !== undefined) ipcRenderer.send('set-font-size', settings.fontSize);
-      if (settings.inputAudioDevice !== undefined) ipcRenderer.send('set-input-audio-device', settings.inputAudioDevice);
-      if (settings.outputAudioDevice !== undefined) ipcRenderer.send('set-output-audio-device', settings.outputAudioDevice);
-      if (settings.recordFormat !== undefined) ipcRenderer.send('set-record-format', settings.recordFormat);
-      if (settings.recordSavePath !== undefined) ipcRenderer.send('set-record-save-path', settings.recordSavePath);
-      if (settings.mixEffect !== undefined) ipcRenderer.send('set-mix-effect', settings.mixEffect);
-      if (settings.mixEffectType !== undefined) ipcRenderer.send('set-mix-effect-type', settings.mixEffectType);
-      if (settings.autoMixSetting !== undefined) ipcRenderer.send('set-auto-mix-setting', settings.autoMixSetting);
-      if (settings.echoCancellation !== undefined) ipcRenderer.send('set-echo-cancellation', settings.echoCancellation);
-      if (settings.noiseCancellation !== undefined) ipcRenderer.send('set-noise-cancellation', settings.noiseCancellation);
-      if (settings.microphoneAmplification !== undefined) ipcRenderer.send('set-microphone-amplification', settings.microphoneAmplification);
-      if (settings.manualMixMode !== undefined) ipcRenderer.send('set-manual-mix-mode', settings.manualMixMode);
-      if (settings.mixMode !== undefined) ipcRenderer.send('set-mix-mode', settings.mixMode);
-      if (settings.speakingMode !== undefined) ipcRenderer.send('set-speaking-mode', settings.speakingMode);
-      if (settings.defaultSpeakingKey !== undefined) ipcRenderer.send('set-default-speaking-key', settings.defaultSpeakingKey);
-      if (settings.notSaveMessageHistory !== undefined) ipcRenderer.send('set-not-save-message-history', settings.notSaveMessageHistory);
-      if (settings.hotKeyOpenMainWindow !== undefined) ipcRenderer.send('set-hot-key-open-main-window', settings.hotKeyOpenMainWindow);
-      if (settings.hotKeyIncreaseVolume !== undefined) ipcRenderer.send('set-hot-key-increase-volume', settings.hotKeyIncreaseVolume);
-      if (settings.hotKeyDecreaseVolume !== undefined) ipcRenderer.send('set-hot-key-decrease-volume', settings.hotKeyDecreaseVolume);
-      if (settings.hotKeyToggleSpeaker !== undefined) ipcRenderer.send('set-hot-key-toggle-speaker', settings.hotKeyToggleSpeaker);
-      if (settings.hotKeyToggleMicrophone !== undefined) ipcRenderer.send('set-hot-key-toggle-microphone', settings.hotKeyToggleMicrophone);
-      if (settings.disableAllSoundEffect !== undefined) ipcRenderer.send('set-disable-all-sound-effect', settings.disableAllSoundEffect);
-      if (settings.enterVoiceChannelSound !== undefined) ipcRenderer.send('set-enter-voice-channel-sound', settings.enterVoiceChannelSound);
-      if (settings.leaveVoiceChannelSound !== undefined) ipcRenderer.send('set-leave-voice-channel-sound', settings.leaveVoiceChannelSound);
-      if (settings.startSpeakingSound !== undefined) ipcRenderer.send('set-start-speaking-sound', settings.startSpeakingSound);
-      if (settings.stopSpeakingSound !== undefined) ipcRenderer.send('set-stop-speaking-sound', settings.stopSpeakingSound);
-      if (settings.receiveDirectMessageSound !== undefined) ipcRenderer.send('set-receive-direct-message-sound', settings.receiveDirectMessageSound);
-      if (settings.receiveChannelMessageSound !== undefined) ipcRenderer.send('set-receive-channel-message-sound', settings.receiveChannelMessageSound);
-      if (settings.autoCheckForUpdates !== undefined) ipcRenderer.send('set-auto-check-for-updates', settings.autoCheckForUpdates);
-      if (settings.updateCheckInterval !== undefined) ipcRenderer.send('set-update-check-interval', settings.updateCheckInterval);
-      if (settings.updateChannel !== undefined) ipcRenderer.send('set-update-channel', settings.updateChannel);
-    },
-
-    get: (): Types.SystemSettings | null => {
-      if (!isElectron) return null;
-      return ipcRenderer.sendSync('get-system-settings');
-    },
-
-    autoLogin: {
-      set: (enable: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-auto-login', enable);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-auto-login');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('auto-login', listener);
-        return () => ipcRenderer.removeListener('auto-login', listener);
-      },
-    },
-
-    autoLaunch: {
-      set: (enable: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-auto-launch', enable);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-auto-launch');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('auto-launch', listener);
-        return () => ipcRenderer.removeListener('auto-launch', listener);
-      },
-    },
-
-    alwaysOnTop: {
-      set: (enable: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-always-on-top', enable);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-always-on-top');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('always-on-top', listener);
-        return () => ipcRenderer.removeListener('always-on-top', listener);
-      },
-    },
-
-    statusAutoIdle: {
-      set: (enable: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-status-auto-idle', enable);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-status-auto-idle');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('status-auto-idle', listener);
-        return () => ipcRenderer.removeListener('status-auto-idle', listener);
-      },
-    },
-
-    statusAutoIdleMinutes: {
-      set: (fontSize: number) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-status-auto-idle-minutes', fontSize);
-      },
-
-      get: (): number => {
-        if (!isElectron) return 0;
-        return ipcRenderer.sendSync('get-status-auto-idle-minutes');
-      },
-
-      onUpdate: (callback: (fontSize: number) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, fontSize: number) => callback(fontSize);
-        ipcRenderer.on('status-auto-idle-minutes', listener);
-        return () => ipcRenderer.removeListener('status-auto-idle-minutes', listener);
-      },
-    },
-
-    statusAutoDnd: {
-      set: (enable: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-status-auto-dnd', enable);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-status-auto-dnd');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('status-auto-dnd', listener);
-        return () => ipcRenderer.removeListener('status-auto-dnd', listener);
-      },
-    },
-
-    channelUIMode: {
-      set: (key: Types.ChannelUIMode) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-channel-ui-mode', key);
-      },
-
-      get: (): Types.ChannelUIMode => {
-        if (!isElectron) return 'classic';
-        return ipcRenderer.sendSync('get-channel-ui-mode');
-      },
-
-      onUpdate: (callback: (key: Types.ChannelUIMode) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, channelUIMode: Types.ChannelUIMode) => callback(channelUIMode);
-        ipcRenderer.on('channel-ui-mode', listener);
-        return () => ipcRenderer.removeListener('channel-ui-mode', listener);
-      },
-    },
-
-    closeToTray: {
-      set: (enable: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-close-to-tray', enable);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-close-to-tray');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('close-to-tray', listener);
-        return () => ipcRenderer.removeListener('close-to-tray', listener);
-      },
-    },
-
-    font: {
-      set: (font: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-font', font);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-font');
-      },
-
-      onUpdate: (callback: (font: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, font: string) => callback(font);
-        ipcRenderer.on('font', listener);
-        return () => ipcRenderer.removeListener('font', listener);
-      },
-    },
-
-    fontSize: {
-      set: (fontSize: number) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-font-size', fontSize);
-      },
-
-      get: (): number => {
-        if (!isElectron) return 0;
-        return ipcRenderer.sendSync('get-font-size');
-      },
-
-      onUpdate: (callback: (fontSize: number) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, fontSize: number) => callback(fontSize);
-        ipcRenderer.on('font-size', listener);
-        return () => ipcRenderer.removeListener('font-size', listener);
-      },
-    },
-
-    inputAudioDevice: {
-      set: (deviceId: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-input-audio-device', deviceId);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-input-audio-device');
-      },
-
-      onUpdate: (callback: (deviceId: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, deviceId: string) => callback(deviceId);
-        ipcRenderer.on('input-audio-device', listener);
-        return () => ipcRenderer.removeListener('input-audio-device', listener);
-      },
-    },
-
-    outputAudioDevice: {
-      set: (deviceId: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-output-audio-device', deviceId);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-output-audio-device');
-      },
-
-      onUpdate: (callback: (deviceId: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, deviceId: string) => callback(deviceId);
-        ipcRenderer.on('output-audio-device', listener);
-        return () => ipcRenderer.removeListener('output-audio-device', listener);
-      },
-    },
-
-    recordFormat: {
-      set: (format: Types.RecordFormat) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-record-format', format);
-      },
-
-      get: (): Types.RecordFormat => {
-        if (!isElectron) return 'wav';
-        return ipcRenderer.sendSync('get-record-format');
-      },
-
-      onUpdate: (callback: (format: Types.RecordFormat) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, format: Types.RecordFormat) => callback(format);
-        ipcRenderer.on('record-format', listener);
-        return () => ipcRenderer.removeListener('record-format', listener);
-      },
-    },
-
-    recordSavePath: {
-      set: (path: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-record-save-path', path);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-record-save-path');
-      },
-
-      onUpdate: (callback: (path: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, path: string) => callback(path);
-        ipcRenderer.on('record-save-path', listener);
-        return () => ipcRenderer.removeListener('record-save-path', listener);
-      },
-    },
-
-    mixEffect: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-mix-effect', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-mix-effect');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('mix-effect', listener);
-        return () => ipcRenderer.removeListener('mix-effect', listener);
-      },
-    },
-
-    mixEffectType: {
-      set: (key: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-mix-effect-type', key);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-mix-effect-type');
-      },
-
-      onUpdate: (callback: (key: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: string) => callback(key);
-        ipcRenderer.on('mix-effect-type', listener);
-        return () => ipcRenderer.removeListener('mix-effect-type', listener);
-      },
-    },
-
-    autoMixSetting: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-auto-mix-setting', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-auto-mix-setting');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('auto-mix-setting', listener);
-        return () => ipcRenderer.removeListener('auto-mix-setting', listener);
-      },
-    },
-
-    echoCancellation: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-echo-cancellation', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-echo-cancellation');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('echo-cancellation', listener);
-        return () => ipcRenderer.removeListener('echo-cancellation', listener);
-      },
-    },
-
-    noiseCancellation: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-noise-cancellation', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-noise-cancellation');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('noise-cancellation', listener);
-        return () => ipcRenderer.removeListener('noise-cancellation', listener);
-      },
-    },
-
-    microphoneAmplification: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-microphone-amplification', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-microphone-amplification');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('microphone-amplification', listener);
-        return () => ipcRenderer.removeListener('microphone-amplification', listener);
-      },
-    },
-
-    manualMixMode: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-manual-mix-mode', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-manual-mix-mode');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('manual-mix-mode', listener);
-        return () => ipcRenderer.removeListener('manual-mix-mode', listener);
-      },
-    },
-
-    mixMode: {
-      set: (key: Types.MixMode) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-mix-mode', key);
-      },
-
-      get: (): Types.MixMode => {
-        if (!isElectron) return 'app';
-        return ipcRenderer.sendSync('get-mix-mode');
-      },
-
-      onUpdate: (callback: (key: Types.MixMode) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: Types.MixMode) => callback(key);
-        ipcRenderer.on('mix-mode', listener);
-        return () => ipcRenderer.removeListener('mix-mode', listener);
-      },
-    },
-
-    speakingMode: {
-      set: (key: Types.SpeakingMode) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-speaking-mode', key);
-      },
-
-      get: (): Types.SpeakingMode => {
-        if (!isElectron) return 'auto';
-        return ipcRenderer.sendSync('get-speaking-mode');
-      },
-
-      onUpdate: (callback: (key: Types.SpeakingMode) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: Types.SpeakingMode) => callback(key);
-        ipcRenderer.on('speaking-mode', listener);
-        return () => ipcRenderer.removeListener('speaking-mode', listener);
-      },
-    },
-
-    defaultSpeakingKey: {
-      set: (key: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-default-speaking-key', key);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-default-speaking-key');
-      },
-
-      onUpdate: (callback: (key: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: string) => callback(key);
-        ipcRenderer.on('default-speaking-key', listener);
-        return () => ipcRenderer.removeListener('default-speaking-key', listener);
-      },
-    },
-
-    notSaveMessageHistory: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-not-save-message-history', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-not-save-message-history');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('not-save-message-history', listener);
-        return () => ipcRenderer.removeListener('not-save-message-history', listener);
-      },
-    },
-
-    hotKeyOpenMainWindow: {
-      set: (key: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-hot-key-open-main-window', key);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-hot-key-open-main-window');
-      },
-
-      onUpdate: (callback: (key: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: string) => callback(key);
-        ipcRenderer.on('hot-key-open-main-window', listener);
-        return () => ipcRenderer.removeListener('hot-key-open-main-window', listener);
-      },
-    },
-
-    hotKeyIncreaseVolume: {
-      set: (key: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-hot-key-increase-volume', key);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-hot-key-increase-volume');
-      },
-
-      onUpdate: (callback: (key: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: string) => callback(key);
-        ipcRenderer.on('hot-key-increase-volume', listener);
-        return () => ipcRenderer.removeListener('hot-key-increase-volume', listener);
-      },
-    },
-
-    hotKeyDecreaseVolume: {
-      set: (key: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-hot-key-decrease-volume', key);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-hot-key-decrease-volume');
-      },
-
-      onUpdate: (callback: (key: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: string) => callback(key);
-        ipcRenderer.on('hot-key-decrease-volume', listener);
-        return () => ipcRenderer.removeListener('hot-key-decrease-volume', listener);
-      },
-    },
-
-    hotKeyToggleSpeaker: {
-      set: (key: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-hot-key-toggle-speaker', key);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-hot-key-toggle-speaker');
-      },
-
-      onUpdate: (callback: (key: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: string) => callback(key);
-        ipcRenderer.on('hot-key-toggle-speaker', listener);
-        return () => ipcRenderer.removeListener('hot-key-toggle-speaker', listener);
-      },
-    },
-
-    hotKeyToggleMicrophone: {
-      set: (key: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-hot-key-toggle-microphone', key);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-hot-key-toggle-microphone');
-      },
-
-      onUpdate: (callback: (key: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, key: string) => callback(key);
-        ipcRenderer.on('hot-key-toggle-microphone', listener);
-        return () => ipcRenderer.removeListener('hot-key-toggle-microphone', listener);
-      },
-    },
-
-    disableAllSoundEffect: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-disable-all-sound-effect', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-disable-all-sound-effect');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('disable-all-sound-effect', listener);
-        return () => ipcRenderer.removeListener('disable-all-sound-effect', listener);
-      },
-    },
-
-    enterVoiceChannelSound: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-enter-voice-channel-sound', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-enter-voice-channel-sound');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('enter-voice-channel-sound', listener);
-        return () => ipcRenderer.removeListener('enter-voice-channel-sound', listener);
-      },
-    },
-
-    leaveVoiceChannelSound: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-leave-voice-channel-sound', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-leave-voice-channel-sound');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('leave-voice-channel-sound', listener);
-        return () => ipcRenderer.removeListener('leave-voice-channel-sound', listener);
-      },
-    },
-
-    startSpeakingSound: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-start-speaking-sound', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-start-speaking-sound');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('start-speaking-sound', listener);
-        return () => ipcRenderer.removeListener('start-speaking-sound', listener);
-      },
-    },
-
-    stopSpeakingSound: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-stop-speaking-sound', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-stop-speaking-sound');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('stop-speaking-sound', listener);
-        return () => ipcRenderer.removeListener('stop-speaking-sound', listener);
-      },
-    },
-
-    receiveDirectMessageSound: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-receive-direct-message-sound', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-receive-direct-message-sound');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('receive-direct-message-sound', listener);
-        return () => ipcRenderer.removeListener('receive-direct-message-sound', listener);
-      },
-    },
-
-    receiveChannelMessageSound: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-receive-channel-message-sound', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-receive-channel-message-sound');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('receive-channel-message-sound', listener);
-        return () => ipcRenderer.removeListener('receive-channel-message-sound', listener);
-      },
-    },
-
-    autoCheckForUpdates: {
-      set: (enabled: boolean) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-auto-check-for-updates', enabled);
-      },
-
-      get: (): boolean => {
-        if (!isElectron) return false;
-        return ipcRenderer.sendSync('get-auto-check-for-updates');
-      },
-
-      onUpdate: (callback: (enabled: boolean) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, enabled: boolean) => callback(enabled);
-        ipcRenderer.on('auto-check-for-updates', listener);
-        return () => ipcRenderer.removeListener('auto-check-for-updates', listener);
-      },
-    },
-
-    updateCheckInterval: {
-      set: (interval: number) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-update-check-interval', interval);
-      },
-
-      get: (): number => {
-        if (!isElectron) return 0;
-        return ipcRenderer.sendSync('get-update-check-interval');
-      },
-
-      onUpdate: (callback: (interval: number) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, interval: number) => callback(interval);
-        ipcRenderer.on('update-check-interval', listener);
-        return () => ipcRenderer.removeListener('update-check-interval', listener);
-      },
-    },
-
-    updateChannel: {
-      set: (channel: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-update-channel', channel);
-      },
-
-      get: (): string => {
-        if (!isElectron) return '';
-        return ipcRenderer.sendSync('get-update-channel');
-      },
-
-      onUpdate: (callback: (channel: string) => void) => {
-        if (!isElectron) return () => {};
-        const listener = (_: any, channel: string) => callback(channel);
-        ipcRenderer.on('update-channel', listener);
-        return () => ipcRenderer.removeListener('update-channel', listener);
+        return await modules.default.selectRecordSavePath();
       },
     },
   },
 
   tray: {
     title: {
-      set: (title: string) => {
-        if (!isElectron) return;
-        ipcRenderer.send('set-tray-title', title);
+      set: (title: string): void => {
+        modules.default.setTrayTitle(title);
       },
     },
   },
 
-  dontShowDisclaimerNextTime: () => {
-    if (!isElectron) return;
-    ipcRenderer.send('dont-show-disclaimer-next-time');
-  },
-
   loopbackAudio: {
-    enable: () => {
-      if (!isElectron) return;
-      ipcRenderer.invoke('enable-loopback-audio');
+    enable: (): void => {
+      // modules.default.enableLoopbackAudio();
     },
 
-    disable: () => {
-      if (!isElectron) return;
-      ipcRenderer.invoke('disable-loopback-audio');
+    disable: (): void => {
+      // modules.default.disableLoopbackAudio();
     },
   },
 
-  checkForUpdates: () => {
-    if (!isElectron) return;
-    ipcRenderer.send('check-for-updates');
+  dontShowDisclaimerNextTime: (): void => {
+    modules.default.dontShowDisclaimerNextTime();
   },
 
-  changeServer: (server: 'prod' | 'dev') => {
-    if (!isElectron) return;
-    ipcRenderer.send('change-server', server);
+  checkForUpdates: (): void => {
+    modules.default.checkForUpdates();
   },
 
   env: {
-    get: (): Record<string, string> => {
-      if (!isElectron) return {};
-      return ipcRenderer.sendSync('get-env');
+    change: (server: 'prod' | 'dev'): void => {
+      modules.default.changeEnv(server);
+    },
+  },
+
+  server: {
+    select: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }): void => {
+      modules.default.serverSelect(data);
+    },
+
+    onSelect: (callback: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => void): (() => void) => {
+      return modules.default.listen('server-select', callback);
+    },
+  },
+
+  systemSettings: {
+    set: (settings: Partial<Types.SystemSettings>): void => {
+      if (settings.autoLogin !== undefined) modules.default.setAutoLogin(settings.autoLogin);
+      if (settings.autoLaunch !== undefined) modules.default.setAutoLaunch(settings.autoLaunch);
+      if (settings.alwaysOnTop !== undefined) modules.default.setAlwaysOnTop(settings.alwaysOnTop);
+      if (settings.statusAutoIdle !== undefined) modules.default.setStatusAutoIdle(settings.statusAutoIdle);
+      if (settings.statusAutoIdleMinutes !== undefined) modules.default.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
+      if (settings.statusAutoDnd !== undefined) modules.default.setStatusAutoDnd(settings.statusAutoDnd);
+      if (settings.channelUIMode !== undefined) modules.default.setChannelUIMode(settings.channelUIMode);
+      if (settings.closeToTray !== undefined) modules.default.setCloseToTray(settings.closeToTray);
+      if (settings.font !== undefined) modules.default.setFont(settings.font);
+      if (settings.fontSize !== undefined) modules.default.setFontSize(settings.fontSize);
+      if (settings.inputAudioDevice !== undefined) modules.default.setInputAudioDevice(settings.inputAudioDevice);
+      if (settings.outputAudioDevice !== undefined) modules.default.setOutputAudioDevice(settings.outputAudioDevice);
+      if (settings.recordFormat !== undefined) modules.default.setRecordFormat(settings.recordFormat);
+      if (settings.recordSavePath !== undefined) modules.default.setRecordSavePath(settings.recordSavePath);
+      if (settings.mixEffect !== undefined) modules.default.setMixEffect(settings.mixEffect);
+      if (settings.mixEffectType !== undefined) modules.default.setMixEffectType(settings.mixEffectType);
+      if (settings.autoMixSetting !== undefined) modules.default.setAutoMixSetting(settings.autoMixSetting);
+      if (settings.echoCancellation !== undefined) modules.default.setEchoCancellation(settings.echoCancellation);
+      if (settings.noiseCancellation !== undefined) modules.default.setNoiseCancellation(settings.noiseCancellation);
+      if (settings.microphoneAmplification !== undefined) modules.default.setMicrophoneAmplification(settings.microphoneAmplification);
+      if (settings.manualMixMode !== undefined) modules.default.setManualMixMode(settings.manualMixMode);
+      if (settings.mixMode !== undefined) modules.default.setMixMode(settings.mixMode);
+      if (settings.speakingMode !== undefined) modules.default.setSpeakingMode(settings.speakingMode);
+      if (settings.defaultSpeakingKey !== undefined) modules.default.setDefaultSpeakingKey(settings.defaultSpeakingKey);
+      if (settings.notSaveMessageHistory !== undefined) modules.default.setNotSaveMessageHistory(settings.notSaveMessageHistory);
+      if (settings.hotKeyOpenMainWindow !== undefined) modules.default.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
+      if (settings.hotKeyIncreaseVolume !== undefined) modules.default.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
+      if (settings.hotKeyDecreaseVolume !== undefined) modules.default.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
+      if (settings.hotKeyToggleSpeaker !== undefined) modules.default.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
+      if (settings.hotKeyToggleMicrophone !== undefined) modules.default.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
+      if (settings.disableAllSoundEffect !== undefined) modules.default.setDisableAllSoundEffect(settings.disableAllSoundEffect);
+      if (settings.enterVoiceChannelSound !== undefined) modules.default.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
+      if (settings.leaveVoiceChannelSound !== undefined) modules.default.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
+      if (settings.startSpeakingSound !== undefined) modules.default.setStartSpeakingSound(settings.startSpeakingSound);
+      if (settings.stopSpeakingSound !== undefined) modules.default.setStopSpeakingSound(settings.stopSpeakingSound);
+      if (settings.receiveDirectMessageSound !== undefined) modules.default.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
+      if (settings.receiveChannelMessageSound !== undefined) modules.default.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
+      if (settings.autoCheckForUpdates !== undefined) modules.default.setAutoCheckForUpdates(settings.autoCheckForUpdates);
+      if (settings.updateCheckInterval !== undefined) modules.default.setUpdateCheckInterval(settings.updateCheckInterval);
+      if (settings.updateChannel !== undefined) modules.default.setUpdateChannel(settings.updateChannel);
+    },
+
+    get: (): Types.SystemSettings | null => {
+      return modules.default.getSystemSettings();
+    },
+
+    autoLogin: {
+      set: (enable: boolean): void => {
+        modules.default.setAutoLogin(enable);
+      },
+
+      get: (): boolean => {
+        return modules.default.getAutoLogin();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('auto-login', callback);
+      },
+    },
+
+    autoLaunch: {
+      set: (enable: boolean): void => {
+        modules.default.setAutoLaunch(enable);
+      },
+
+      get: (): boolean => {
+        return modules.default.getAutoLaunch();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('auto-launch', callback);
+      },
+    },
+
+    alwaysOnTop: {
+      set: (enable: boolean): void => {
+        modules.default.setAlwaysOnTop(enable);
+      },
+
+      get: (): boolean => {
+        return modules.default.getAlwaysOnTop();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('always-on-top', callback);
+      },
+    },
+
+    statusAutoIdle: {
+      set: (enable: boolean): void => {
+        modules.default.setStatusAutoIdle(enable);
+      },
+
+      get: (): boolean => {
+        return modules.default.getStatusAutoIdle();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('status-auto-idle', callback);
+      },
+    },
+
+    statusAutoIdleMinutes: {
+      set: (fontSize: number): void => {
+        modules.default.setStatusAutoIdleMinutes(fontSize);
+      },
+
+      get: (): number => {
+        return modules.default.getStatusAutoIdleMinutes();
+      },
+
+      onUpdate: (callback: (fontSize: number) => void): (() => void) => {
+        return modules.default.listen('status-auto-idle-minutes', callback);
+      },
+    },
+
+    statusAutoDnd: {
+      set: (enable: boolean): void => {
+        modules.default.setStatusAutoDnd(enable);
+      },
+
+      get: (): boolean => {
+        return modules.default.getStatusAutoDnd();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('status-auto-dnd', callback);
+      },
+    },
+
+    channelUIMode: {
+      set: (key: Types.ChannelUIMode): void => {
+        modules.default.setChannelUIMode(key);
+      },
+
+      get: (): Types.ChannelUIMode => {
+        return modules.default.getChannelUIMode();
+      },
+
+      onUpdate: (callback: (key: Types.ChannelUIMode) => void): (() => void) => {
+        return modules.default.listen('channel-ui-mode', callback);
+      },
+    },
+
+    closeToTray: {
+      set: (enable: boolean): void => {
+        modules.default.setCloseToTray(enable);
+      },
+
+      get: (): boolean => {
+        return modules.default.getCloseToTray();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('close-to-tray', callback);
+      },
+    },
+
+    font: {
+      set: (font: string): void => {
+        modules.default.setFont(font);
+      },
+
+      get: (): string => {
+        return modules.default.getFont();
+      },
+
+      onUpdate: (callback: (font: string) => void): (() => void) => {
+        return modules.default.listen('font', callback);
+      },
+    },
+
+    fontSize: {
+      set: (fontSize: number): void => {
+        modules.default.setFontSize(fontSize);
+      },
+
+      get: (): number => {
+        return modules.default.getFontSize();
+      },
+
+      onUpdate: (callback: (fontSize: number) => void): (() => void) => {
+        return modules.default.listen('font-size', callback);
+      },
+    },
+
+    inputAudioDevice: {
+      set: (deviceId: string): void => {
+        modules.default.setInputAudioDevice(deviceId);
+      },
+
+      get: (): string => {
+        return modules.default.getInputAudioDevice();
+      },
+
+      onUpdate: (callback: (deviceId: string) => void): (() => void) => {
+        return modules.default.listen('input-audio-device', callback);
+      },
+    },
+
+    outputAudioDevice: {
+      set: (deviceId: string): void => {
+        modules.default.setOutputAudioDevice(deviceId);
+      },
+
+      get: (): string => {
+        return modules.default.getOutputAudioDevice();
+      },
+
+      onUpdate: (callback: (deviceId: string) => void): (() => void) => {
+        return modules.default.listen('output-audio-device', callback);
+      },
+    },
+
+    recordFormat: {
+      set: (format: Types.RecordFormat): void => {
+        modules.default.setRecordFormat(format);
+      },
+
+      get: (): Types.RecordFormat => {
+        return modules.default.getRecordFormat();
+      },
+    },
+
+    onUpdate: (callback: (format: Types.RecordFormat) => void): (() => void) => {
+      return modules.default.listen('record-format', callback);
+    },
+
+    recordSavePath: {
+      set: (path: string): void => {
+        modules.default.setRecordSavePath(path);
+      },
+
+      get: (): string => {
+        return modules.default.getRecordSavePath();
+      },
+
+      onUpdate: (callback: (path: string) => void): (() => void) => {
+        return modules.default.listen('record-save-path', callback);
+      },
+    },
+
+    mixEffect: {
+      set: (enabled: boolean): void => {
+        modules.default.setMixEffect(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getMixEffect();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('mix-effect', callback);
+      },
+    },
+
+    mixEffectType: {
+      set: (key: string): void => {
+        modules.default.setMixEffectType(key);
+      },
+
+      get: (): string => {
+        return modules.default.getMixEffectType();
+      },
+
+      onUpdate: (callback: (key: string) => void): (() => void) => {
+        return modules.default.listen('mix-effect-type', callback);
+      },
+    },
+
+    autoMixSetting: {
+      set: (enabled: boolean): void => {
+        modules.default.setAutoMixSetting(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getAutoMixSetting();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('auto-mix-setting', callback);
+      },
+    },
+
+    echoCancellation: {
+      set: (enabled: boolean): void => {
+        modules.default.setEchoCancellation(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getEchoCancellation();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('echo-cancellation', callback);
+      },
+    },
+
+    noiseCancellation: {
+      set: (enabled: boolean): void => {
+        modules.default.setNoiseCancellation(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getNoiseCancellation();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('noise-cancellation', callback);
+      },
+    },
+
+    microphoneAmplification: {
+      set: (enabled: boolean): void => {
+        modules.default.setMicrophoneAmplification(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getMicrophoneAmplification();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('microphone-amplification', callback);
+      },
+    },
+
+    manualMixMode: {
+      set: (enabled: boolean): void => {
+        modules.default.setManualMixMode(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getManualMixMode();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('manual-mix-mode', callback);
+      },
+    },
+
+    mixMode: {
+      set: (key: Types.MixMode): void => {
+        modules.default.setMixMode(key);
+      },
+
+      get: (): Types.MixMode => {
+        return modules.default.getMixMode();
+      },
+
+      onUpdate: (callback: (key: Types.MixMode) => void): (() => void) => {
+        return modules.default.listen('mix-mode', callback);
+      },
+    },
+
+    speakingMode: {
+      set: (key: Types.SpeakingMode): void => {
+        modules.default.setSpeakingMode(key);
+      },
+
+      get: (): Types.SpeakingMode => {
+        return modules.default.getSpeakingMode();
+      },
+
+      onUpdate: (callback: (key: Types.SpeakingMode) => void): (() => void) => {
+        return modules.default.listen('speaking-mode', callback);
+      },
+    },
+
+    defaultSpeakingKey: {
+      set: (key: string): void => {
+        modules.default.setDefaultSpeakingKey(key);
+      },
+
+      get: (): string => {
+        return modules.default.getDefaultSpeakingKey();
+      },
+
+      onUpdate: (callback: (key: string) => void): (() => void) => {
+        return modules.default.listen('default-speaking-key', callback);
+      },
+    },
+
+    notSaveMessageHistory: {
+      set: (enabled: boolean): void => {
+        modules.default.setNotSaveMessageHistory(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getNotSaveMessageHistory();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('not-save-message-history', callback);
+      },
+    },
+
+    hotKeyOpenMainWindow: {
+      set: (key: string): void => {
+        modules.default.setHotKeyOpenMainWindow(key);
+      },
+
+      get: (): string => {
+        return modules.default.getHotKeyOpenMainWindow();
+      },
+
+      onUpdate: (callback: (key: string) => void): (() => void) => {
+        return modules.default.listen('hot-key-open-main-window', callback);
+      },
+    },
+
+    hotKeyIncreaseVolume: {
+      set: (key: string): void => {
+        modules.default.setHotKeyIncreaseVolume(key);
+      },
+
+      get: (): string => {
+        return modules.default.getHotKeyIncreaseVolume();
+      },
+
+      onUpdate: (callback: (key: string) => void): (() => void) => {
+        return modules.default.listen('hot-key-increase-volume', callback);
+      },
+    },
+
+    hotKeyDecreaseVolume: {
+      set: (key: string): void => {
+        modules.default.setHotKeyDecreaseVolume(key);
+      },
+
+      get: (): string => {
+        return modules.default.getHotKeyDecreaseVolume();
+      },
+
+      onUpdate: (callback: (key: string) => void): (() => void) => {
+        return modules.default.listen('hot-key-decrease-volume', callback);
+      },
+    },
+
+    hotKeyToggleSpeaker: {
+      set: (key: string): void => {
+        modules.default.setHotKeyToggleSpeaker(key);
+      },
+
+      get: (): string => {
+        return modules.default.getHotKeyToggleSpeaker();
+      },
+
+      onUpdate: (callback: (key: string) => void): (() => void) => {
+        return modules.default.listen('hot-key-toggle-speaker', callback);
+      },
+    },
+
+    hotKeyToggleMicrophone: {
+      set: (key: string): void => {
+        modules.default.setHotKeyToggleMicrophone(key);
+      },
+
+      get: (): string => {
+        return modules.default.getHotKeyToggleMicrophone();
+      },
+
+      onUpdate: (callback: (key: string) => void): (() => void) => {
+        return modules.default.listen('hot-key-toggle-microphone', callback);
+      },
+    },
+
+    disableAllSoundEffect: {
+      set: (enabled: boolean): void => {
+        modules.default.setDisableAllSoundEffect(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getDisableAllSoundEffect();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('disable-all-sound-effect', callback);
+      },
+    },
+
+    enterVoiceChannelSound: {
+      set: (enabled: boolean): void => {
+        modules.default.setEnterVoiceChannelSound(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getEnterVoiceChannelSound();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('enter-voice-channel-sound', callback);
+      },
+    },
+
+    leaveVoiceChannelSound: {
+      set: (enabled: boolean): void => {
+        modules.default.setLeaveVoiceChannelSound(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getLeaveVoiceChannelSound();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('leave-voice-channel-sound', callback);
+      },
+    },
+
+    startSpeakingSound: {
+      set: (enabled: boolean): void => {
+        modules.default.setStartSpeakingSound(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getStartSpeakingSound();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('start-speaking-sound', callback);
+      },
+    },
+
+    stopSpeakingSound: {
+      set: (enabled: boolean): void => {
+        modules.default.setStopSpeakingSound(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getStopSpeakingSound();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('stop-speaking-sound', callback);
+      },
+    },
+
+    receiveDirectMessageSound: {
+      set: (enabled: boolean): void => {
+        modules.default.setReceiveDirectMessageSound(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getReceiveDirectMessageSound();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('receive-direct-message-sound', callback);
+      },
+    },
+
+    receiveChannelMessageSound: {
+      set: (enabled: boolean): void => {
+        modules.default.setReceiveChannelMessageSound(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getReceiveChannelMessageSound();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('receive-channel-message-sound', callback);
+      },
+    },
+
+    autoCheckForUpdates: {
+      set: (enabled: boolean): void => {
+        modules.default.setAutoCheckForUpdates(enabled);
+      },
+
+      get: (): boolean => {
+        return modules.default.getAutoCheckForUpdates();
+      },
+
+      onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
+        return modules.default.listen('auto-check-for-updates', callback);
+      },
+    },
+
+    updateCheckInterval: {
+      set: (interval: number): void => {
+        modules.default.setUpdateCheckInterval(interval);
+      },
+
+      get: (): number => {
+        return modules.default.getUpdateCheckInterval();
+      },
+
+      onUpdate: (callback: (interval: number) => void): (() => void) => {
+        return modules.default.listen('update-check-interval', callback);
+      },
+    },
+
+    updateChannel: {
+      set: (channel: string): void => {
+        modules.default.setUpdateChannel(channel);
+      },
+
+      get: (): string => {
+        return modules.default.getUpdateChannel();
+      },
+
+      onUpdate: (callback: (channel: string) => void): (() => void) => {
+        return modules.default.listen('update-channel', callback);
+      },
+    },
+  },
+
+  network: {
+    runDiagnosis: async (params: { domains: string[]; duration?: number }): Promise<Types.FullReport | { error: string }> => {
+      return await modules.default.runNetworkDiagnosis(params);
+    },
+
+    cancelDiagnosis: (): void => {
+      modules.default.cancelNetworkDiagnosis();
+    },
+
+    onProgress: (callback: (progress: Types.ProgressData) => void): (() => void) => {
+      return modules.default.listen('network-diagnosis-progress', callback);
+    },
+  },
+
+  sfuDiagnosis: {
+    request: (): void => {
+      modules.default.requestSfuDiagnosis();
+    },
+
+    onRequest: (callback: () => void): (() => void) => {
+      return modules.default.listen('get-sfu-diagnosis', callback);
+    },
+
+    response: (info: Types.SFUDiagnosisInfo | null): void => {
+      modules.default.sfuDiagnosisResponse(info);
+    },
+
+    onResponse: (callback: (info: Types.SFUDiagnosisInfo | null) => void): (() => void) => {
+      return modules.default.listen('sfu-diagnosis-response', callback);
     },
   },
 };

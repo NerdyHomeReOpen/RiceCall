@@ -25,13 +25,6 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 40px;
-  min-height: 40px;
-  object-fit: cover;
-  background-image: url('/im/SecretaryLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
 }
 
 .avatar-picture::before {
@@ -409,14 +402,15 @@
   background-color: var(--hover);
 }
 
-.friend-tab .name-text {
+.friend-tab-name-text {
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: bold;
   white-space: nowrap;
 }
 
-.friend-tab .signature {
+.friend-tab-signature {
+  max-width: 100%;
   min-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -425,7 +419,7 @@
   user-select: none;
 }
 
-.friend-tab .server-name-text {
+.friend-tab-server-name-text {
   min-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -434,7 +428,7 @@
   white-space: nowrap;
 }
 
-.friend-tab .location-icon {
+.friend-tab-location-icon {
   min-width: 16px;
   min-height: 18px;
   content: '';
@@ -497,16 +491,6 @@
   gap: 10px;
   align-items: center;
   width: 100%;
-}
-
-.user-avatar {
-  min-width: 30px;
-  min-height: 30px;
-  cursor: pointer;
-  background-image: url('/im/IMLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: contain;
 }
 
 .right-info {

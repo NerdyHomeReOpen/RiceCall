@@ -11,7 +11,7 @@
   box-shadow: var(--box-shadow);
 }
 
-.notification-menu .option {
+.notification-menu-option {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -24,7 +24,7 @@
   border-radius: 3px;
 }
 
-.notification-menu .option::before {
+.notification-menu-option::before {
   position: absolute;
   left: 6px;
   align-self: center;
@@ -37,16 +37,16 @@
   background-size: auto;
 }
 
-.notification-menu .option:not(.readonly):hover {
+.notification-menu-option:not(.readonly):hover {
   cursor: pointer;
   background-color: var(--hover);
 }
 
-.notification-menu .option[data-type='notification']::before {
+.notification-menu-option[data-type='notification']::before {
   background-image: url('/icon_notice_friend.webp');
 }
 
-.notification-menu .contents {
+.notification-menu-contents {
   display: flex;
   flex-direction: row;
   gap: 5px;
@@ -56,10 +56,7 @@
   padding: 3px 30px;
 }
 
-.notification-menu img {
-  max-width: 32px;
-  max-height: 32px;
-  background-size: cover;
+.notification-menu-image {
   border: solid 1px var(--border);
 }
 

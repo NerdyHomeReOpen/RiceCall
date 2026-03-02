@@ -173,12 +173,6 @@
 .markdown-content img:not(.emoji),
 .markdown-content.image-size-small img:not(.emoji) {
   max-width: calc(min(90%, 256px));
-  margin: 5px;
-  transition: box-shadow 0.3s ease-in-out;
-
-  &:hover {
-    box-shadow: 0 0 5px 2px #0000003f;
-  }
 }
 
 .markdown-content.image-size-medium img:not(.emoji) {

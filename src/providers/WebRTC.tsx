@@ -1,13 +1,19 @@
-import React, { useEffect, useRef, useState, useContext, createContext, useCallback } from 'react';
+import React, { useEffect, useRef, useContext, createContext, useCallback, useMemo } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
+import { store } from '@/store';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
+import { setWebRTC, setSpeakingId, setMutedId } from '@/store/slices/webrtcSlice';
+
 import { useSoundPlayer } from '@/providers/SoundPlayer';
+import { useLoading } from '@/providers/Loading';
 
 import EncodeAudio from '@/utils/encodeAudio';
-import Logger from '@/utils/logger';
+import Logger from '@/logger';
+
+const BASE_VOLUME = 4;
 
 const workletCode = `
 class RecorderProcessor extends AudioWorkletProcessor {
@@ -30,6 +36,8 @@ registerProcessor('recorder-processor', RecorderProcessor);
 `;
 
 interface WebRTCContextType {
+  startSpeaking: () => void;
+  stopSpeaking: () => void;
   startMixing: () => void;
   stopMixing: () => void;
   startRecording: () => void;
@@ -48,22 +56,9 @@ interface WebRTCContextType {
   changeMicVolume: (volume: number) => void;
   changeMixVolume: (volume: number) => void;
   changeSpeakerVolume: (volume: number) => void;
+  addSpeakerVolume: (value?: number) => void;
+  subtractSpeakerVolume: (value?: number) => void;
   changeVoiceThreshold: (voiceThreshold: number) => void;
-  isSpeaking: (targetId: string) => boolean;
-  isMuted: (targetId: string) => boolean;
-  getVolumePercent: (targetId: string) => number;
-  isMicTaken: boolean;
-  isSpeakKeyPressed: boolean;
-  isMixModeActive: boolean;
-  isMicMuted: boolean;
-  isSpeakerMuted: boolean;
-  isRecording: boolean;
-  micVolume: number;
-  mixVolume: number;
-  speakerVolume: number;
-  voiceThreshold: number;
-  speakingMode: Types.SpeakingMode;
-  recordTime: number;
 }
 
 const WebRTCContext = createContext<WebRTCContextType | null>(null);
@@ -80,17 +75,15 @@ interface WebRTCProviderProps {
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   // Hooks
-  const soundPlayer = useSoundPlayer();
+  const { playSound } = useSoundPlayer();
+  const { loadServer } = useLoading();
 
   // Refs
   const rafIdListRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
-  const lastRefreshRef = useRef<number>(0);
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
   const speakerRef = useRef<HTMLAudioElement | null>(null);
-  const soundPlayerRef = useRef(soundPlayer);
-
-  // Nodes
+  const playSoundRef = useRef(playSound);
   const micNodesRef = useRef<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null }>({ stream: null, source: null, gain: null });
   const mixNodesRef = useRef<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null }>({ stream: null, source: null, gain: null });
   const speakerNodesRef = useRef<{ [id: string]: { stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null; analyser: AnalyserNode | null } }>({});
@@ -100,67 +93,19 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const outputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const recorderDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
   const recorderGainRef = useRef<GainNode | null>(null);
-
-  // Speaking Mode
-  const [speakingMode, setSpeakingMode] = useState<Types.SpeakingMode>('key');
-  const speakingModeRef = useRef<Types.SpeakingMode>('key');
-
-  // Bitrate
   const bitrateRef = useRef<number>(64000);
-
-  // SFU
   const deviceRef = useRef<mediasoupClient.Device>(new mediasoupClient.Device());
   const sendTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const consumersRef = useRef<{ [producerId: string]: mediasoupClient.types.Consumer }>({}); // producerId -> consumer
-
-  // States
-  const [isMixModeActive, setIsMixModeActive] = useState<boolean>(false);
-  const isMixModeActiveRef = useRef(false);
-
-  // Mic
-  const isMicTakenRef = useRef<boolean>(false);
-  const isSpeakKeyPressedRef = useRef<boolean>(false);
-  const isMicMutedRef = useRef<boolean>(false);
-  const micVolumeRef = useRef<number>(100);
   const microphoneAmplificationRef = useRef<boolean>(false);
-  const [micVolume, setMicVolume] = useState<number>(100);
-  const [isMicTaken, setIsMicTaken] = useState<boolean>(false);
-  const [isSpeakKeyPressed, setIsSpeakKeyPressed] = useState<boolean>(false);
-  const [isMicMuted, setIsMicMuted] = useState<boolean>(false);
-  const [inputAudioDevice, setInputAudioDevice] = useState<string | null>(null);
-  const [echoCancellation, setEchoCancellation] = useState<boolean>(false);
-  const [noiseCancellation, setNoiseCancellation] = useState<boolean>(false);
+  const inputAudioDeviceRef = useRef<string | null>(null);
+  const echoCancellationRef = useRef<boolean>(false);
+  const noiseCancellationRef = useRef<boolean>(false);
+  const recordBuffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
+  const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Mix
-  const mixVolumeRef = useRef<number>(100);
-  const [mixVolume, setMixVolume] = useState<number>(100);
-
-  // Speaker
-  const speakerVolumeRef = useRef<number>(100);
-  const isSpeakerMutedRef = useRef<boolean>(false);
-  const [speakerVolume, setSpeakerVolume] = useState<number>(100);
-  const [isSpeakerMuted, setIsSpeakerMuted] = useState<boolean>(false);
-
-  // Volume Threshold
-  const voiceThresholdRef = useRef<number>(1);
-  const [voiceThreshold, setVoiceThreshold] = useState<number>(1);
-
-  // Recorder
-  const buffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
-  const isRecordingRef = useRef<boolean>(false);
-  const [isRecording, setIsRecording] = useState<boolean>(false);
-  const [recordTime, setRecordTime] = useState<number>(0);
-
-  // Mute Ids
-  const mutedIdsRef = useRef<string[]>([]);
-  const [mutedIds, setMutedIds] = useState<string[]>([]);
-
-  // Volume Percent
-  const volumePercentRef = useRef<{ [userId: string]: number }>({});
-  const [volumePercent, setVolumePercent] = useState<{ [userId: string]: number }>({});
-
+  // Functions
   const detectSpeaking = useCallback((targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array<ArrayBuffer>) => {
     analyserNode.getByteTimeDomainData(dataArray);
     let sum = 0;
@@ -169,18 +114,30 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       sum += v * v;
     }
     const volume = Math.sqrt(sum / dataArray.length);
-    const volumePercent = Math.min(1, volume / 0.5) * 100;
-    volumePercentRef.current[targetId] = volumePercent;
 
     if (targetId === 'user') {
-      if (volumePercent > voiceThresholdRef.current) audioProducerRef.current?.resume();
-      else audioProducerRef.current?.pause();
-    }
+      const volumePercent = Math.min(100, Math.round((volume / 0.5) * 100) - 1);
+      const volumeLevel = Math.ceil(volumePercent / 10) - 1;
 
-    const now = performance.now();
-    if (now - lastRefreshRef.current >= 10) {
-      lastRefreshRef.current = now;
-      setVolumePercent((prev) => ({ ...prev, ...volumePercentRef.current }));
+      if (volumePercent > store.getState().webrtc.voiceThreshold) {
+        store.dispatch(setWebRTC({ volumePercent, volumeLevel }));
+        audioProducerRef.current?.resume();
+        if (!store.getState().webrtc.speakingById[targetId]) {
+          store.dispatch(setSpeakingId({ id: targetId, value: true }));
+        }
+      } else {
+        store.dispatch(setWebRTC({ volumePercent: 0, volumeLevel: 0 }));
+        audioProducerRef.current?.pause();
+        if (store.getState().webrtc.speakingById[targetId]) {
+          store.dispatch(setSpeakingId({ id: targetId, value: false }));
+        }
+      }
+    } else {
+      if (volume > 0 && !store.getState().webrtc.speakingById[targetId]) {
+        store.dispatch(setSpeakingId({ id: targetId, value: true }));
+      } else if (volume === 0 && store.getState().webrtc.speakingById[targetId]) {
+        store.dispatch(setSpeakingId({ id: targetId, value: false }));
+      }
     }
 
     rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray));
@@ -191,21 +148,19 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const localSpeakerVolume = window.localStorage.getItem('speaker-volume') ?? '100';
     const localIsMicMuted = window.localStorage.getItem('is-mic-mute') ?? 'false';
     const localIsSpeakerMuted = window.localStorage.getItem('is-speaker-mute') ?? 'false';
-    const localMutedIds = window.localStorage.getItem('muted-ids') ?? '';
+    const localMutedById = window.localStorage.getItem('muted-by-id') ?? '{}';
     const localVoiceThreshold = window.localStorage.getItem('voice-threshold') ?? '1';
 
-    setMicVolume(parseInt(localMicVolume));
-    micVolumeRef.current = parseInt(localMicVolume);
-    setSpeakerVolume(parseInt(localSpeakerVolume));
-    speakerVolumeRef.current = parseInt(localSpeakerVolume);
-    setIsMicMuted(localIsMicMuted === 'true');
-    isMicMutedRef.current = localIsMicMuted === 'true';
-    setIsSpeakerMuted(localIsSpeakerMuted === 'true');
-    isSpeakerMutedRef.current = localIsSpeakerMuted === 'true';
-    setMutedIds(localMutedIds.split(','));
-    mutedIdsRef.current = localMutedIds.split(',');
-    setVoiceThreshold(parseInt(localVoiceThreshold));
-    voiceThresholdRef.current = parseInt(localVoiceThreshold);
+    store.dispatch(
+      setWebRTC({
+        micVolume: parseInt(localMicVolume),
+        speakerVolume: parseInt(localSpeakerVolume),
+        isMicMuted: localIsMicMuted === 'true',
+        isSpeakerMuted: localIsSpeakerMuted === 'true',
+        mutedById: JSON.parse(localMutedById),
+        voiceThreshold: parseInt(localVoiceThreshold),
+      }),
+    );
   }, []);
 
   const initAudioContext = useCallback(async () => {
@@ -214,6 +169,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       audioContextRef.current.close();
     }
     const audioContext = new AudioContext();
+    // Resume AudioContext if suspended (required for browsers after user interaction policy)
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
     await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
     audioContextRef.current = audioContext;
 
@@ -252,7 +211,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
     const masterGainNode = audioContextRef.current.createGain();
     masterGainNodeRef.current = masterGainNode;
-    masterGainNode.gain.value = speakerVolumeRef.current / 100;
+    masterGainNode.gain.value = store.getState().webrtc.speakerVolume / 100;
     masterGainNode.connect(outputDesRef.current!);
 
     // Create audio element
@@ -286,12 +245,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       delete speakerNodesRef.current[userId];
     }
 
-    delete volumePercentRef.current[userId];
-    setVolumePercent((prev) => {
-      const newState = { ...prev };
-      delete newState[userId];
-      return newState;
-    });
+    store.dispatch(setSpeakingId({ id: userId, value: false }));
   }, []);
 
   const initSpeakerAudio = useCallback(
@@ -306,7 +260,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
       // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
-        track.enabled = !mutedIdsRef.current.includes(userId);
+        track.enabled = !store.getState().webrtc.mutedById[userId];
       });
 
       // Create nodes
@@ -352,27 +306,33 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       if (stream) stream.getTracks().forEach((t) => t.stop());
       micNodesRef.current = { stream: null, source: null, gain: null };
     }
+
+    store.dispatch(setSpeakingId({ id: 'user', value: false }));
   }, []);
 
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
       if (!audioContextRef.current || !inputDesRef.current || !inputAnalyserRef.current) {
-        initAudioContext();
+        new Logger('WebRTC').info('initMicAudio: AudioContext not ready, initializing...');
+        await initAudioContext();
         return initMicAudio(stream);
       }
+
+      new Logger('WebRTC').info('initMicAudio: Setting up mic audio nodes');
 
       // Remove existing mic audio
       removeMicAudio();
 
       // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
-        track.enabled = speakingModeRef.current === 'key' ? isSpeakKeyPressedRef.current : true;
+        const { speakingMode, isSpeakKeyPressed } = store.getState().webrtc;
+        track.enabled = speakingMode === 'key' ? isSpeakKeyPressed : true;
       });
 
       // Create nodes
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
       const gainNode = audioContextRef.current.createGain();
-      gainNode.gain.value = micVolumeRef.current / (microphoneAmplificationRef.current ? 20 : 100);
+      gainNode.gain.value = store.getState().webrtc.micVolume / (microphoneAmplificationRef.current ? 20 : 100);
 
       micNodesRef.current = { stream, source: sourceNode, gain: gainNode };
 
@@ -382,6 +342,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(inputAnalyserRef.current);
 
       // Start speaking detection
+      new Logger('WebRTC').info('initMicAudio: Starting detectSpeaking for user');
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('user', inputAnalyserRef.current, dataArray);
 
@@ -425,14 +386,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
       const sourceNode = audioContextRef.current.createMediaStreamSource(systemStream);
       const gainNode = audioContextRef.current.createGain();
-      gainNode.gain.value = mixVolumeRef.current / 100;
+      gainNode.gain.value = store.getState().webrtc.mixVolume / 100;
 
       mixNodesRef.current = { stream: systemStream, source: sourceNode, gain: gainNode };
 
       sourceNode.connect(gainNode);
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
-      if (isRecordingRef.current) gainNode.connect(recorderGainRef.current!);
+      if (store.getState().webrtc.isRecording) gainNode.connect(recorderGainRef.current!);
 
       // Start speaking detection
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
@@ -539,8 +500,30 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         })
         .catch(eb);
     });
-    sendTransportRef.current.on('connectionstatechange', (s) => {
+    sendTransportRef.current.on('connectionstatechange', async (s) => {
       new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
+
+      if (s != 'failed' && s != 'disconnected') return;
+
+      let info;
+
+      const stats = await sendTransportRef.current?.getStats();
+      stats?.forEach((report) => {
+        if (report.type === 'candidate-pair') {
+          info = {
+            state: report.state,
+            currentRoundTripTime: report.currentRoundTripTime,
+            requestsSent: report.requestsSent,
+            responsesReceived: report.responsesReceived,
+            localCandidateId: report.localCandidateId,
+            remoteCandidateId: report.remoteCandidateId,
+          };
+        }
+      });
+
+      ipc.webrtc.signalStateChange({ signalState: s, userId: localStorage.getItem('userId') || 'unknown-user', channelId, info });
+
+      new Logger('WebRTC').error(`SendTransport connection stats: ${JSON.stringify(info)}`);
     });
 
     const track = inputDesRef.current?.stream.getAudioTracks()[0];
@@ -613,7 +596,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     [consumeOne],
   );
 
-  const closeSend = useCallback(() => {
+  const closeSend = useCallback(async () => {
     if (sendTransportRef.current) {
       sendTransportRef.current.close();
       sendTransportRef.current = null;
@@ -633,41 +616,79 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const changeMicVolume = useCallback((volume: number) => {
+    volume = Math.min(100, Math.max(0, volume));
     if (micNodesRef.current.gain) micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
-    setMicVolume(volume);
-    micVolumeRef.current = volume;
-    window.localStorage.setItem('mic-volume', volume.toString());
     const isMicMuted = volume === 0;
-    setIsMicMuted(isMicMuted);
-    isMicMutedRef.current = isMicMuted;
+    store.dispatch(setWebRTC({ micVolume: volume, isMicMuted }));
+    window.localStorage.setItem('mic-volume', volume.toString());
     window.localStorage.setItem('is-mic-mute', isMicMuted.toString());
   }, []);
 
   const changeMixVolume = useCallback((volume: number) => {
+    volume = Math.min(100, Math.max(0, volume));
     if (mixNodesRef.current.gain) mixNodesRef.current.gain.gain.value = volume / 100;
-    setMixVolume(volume);
-    mixVolumeRef.current = volume;
+    store.dispatch(setWebRTC({ mixVolume: volume }));
     window.localStorage.setItem('mix-volume', volume.toString());
   }, []);
 
   const changeSpeakerVolume = useCallback((volume: number) => {
+    volume = Math.min(100, Math.max(0, volume));
     if (masterGainNodeRef.current) masterGainNodeRef.current.gain.value = volume / 100;
-    setSpeakerVolume(volume);
-    speakerVolumeRef.current = volume;
-    window.localStorage.setItem('speaker-volume', volume.toString());
     const isSpeakerMuted = volume === 0;
-    setIsSpeakerMuted(isSpeakerMuted);
-    isSpeakerMutedRef.current = isSpeakerMuted;
+    store.dispatch(setWebRTC({ speakerVolume: volume, isSpeakerMuted }));
+    window.localStorage.setItem('speaker-volume', volume.toString());
     window.localStorage.setItem('is-speaker-mute', isSpeakerMuted.toString());
   }, []);
 
+  const addSpeakerVolume = useCallback(
+    (value: number = BASE_VOLUME) => {
+      changeSpeakerVolume(store.getState().webrtc.speakerVolume + value);
+    },
+    [changeSpeakerVolume],
+  );
+
+  const subtractSpeakerVolume = useCallback(
+    (value: number = BASE_VOLUME) => {
+      changeSpeakerVolume(store.getState().webrtc.speakerVolume - value);
+    },
+    [changeSpeakerVolume],
+  );
+
   const changeVoiceThreshold = useCallback((voiceThreshold: number) => {
-    setVoiceThreshold(voiceThreshold);
-    voiceThresholdRef.current = voiceThreshold;
+    store.dispatch(setWebRTC({ voiceThreshold }));
     window.localStorage.setItem('voice-threshold', voiceThreshold.toString());
   }, []);
 
+  const startSpeaking = useCallback(() => {
+    navigator.mediaDevices
+      .getUserMedia({
+        audio: {
+          channelCount: 2,
+          echoCancellation: echoCancellationRef.current,
+          noiseSuppression: noiseCancellationRef.current,
+          autoGainControl: false,
+          ...(inputAudioDeviceRef.current ? { deviceId: { exact: inputAudioDeviceRef.current } } : {}),
+        },
+      })
+      .then((stream) => {
+        initMicAudio(stream);
+      })
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('WebRTC').error(`Access input device failed: ${error.message}`);
+      });
+
+    store.dispatch(setWebRTC({ isMicTaken: true }));
+  }, [initMicAudio]);
+
+  const stopSpeaking = useCallback(() => {
+    removeMicAudio();
+    store.dispatch(setWebRTC({ isMicTaken: false }));
+  }, [removeMicAudio]);
+
   const startMixing = useCallback(async () => {
+    if (!store.getState().webrtc.isMicTaken) return;
+
     ipc.loopbackAudio.enable();
     navigator.mediaDevices
       .getDisplayMedia({
@@ -685,22 +706,20 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           track.stop();
           stream.removeTrack(track);
         }
-        ipc.loopbackAudio.disable();
         initMixAudio(stream);
       })
-      .catch((err) => {
-        new Logger('WebRTC').error(`Error capturing audio from system: ${err}`);
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('WebRTC').error(`Error capturing audio from system: ${error.message}`);
       });
 
-    setIsMixModeActive(true);
-    isMixModeActiveRef.current = true;
+    store.dispatch(setWebRTC({ isMixModeActive: true }));
   }, [initMixAudio]);
 
   const stopMixing = useCallback(() => {
     ipc.loopbackAudio.disable();
     removeMixAudio();
-    setIsMixModeActive(false);
-    isMixModeActiveRef.current = false;
+    store.dispatch(setWebRTC({ isMixModeActive: false }));
   }, [removeMixAudio]);
 
   const startRecording = useCallback(async () => {
@@ -709,7 +728,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       return startRecording();
     }
 
-    setRecordTime(0);
+    store.dispatch(setWebRTC({ recordTime: 0 }));
     recorderGainRef.current = audioContextRef.current.createGain();
     recorderGainRef.current.connect(recorderDesRef.current);
 
@@ -722,11 +741,14 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
     recorderNode.port.onmessage = (e) => {
       const { left, right } = e.data;
-      buffersRef.current.push({ left: left.slice(), right: right.slice() });
+      recordBuffersRef.current.push({ left: left.slice(), right: right.slice() });
     };
 
-    setIsRecording(true);
-    isRecordingRef.current = true;
+    recordTimerRef.current = setInterval(() => {
+      store.dispatch(setWebRTC({ recordTime: store.getState().webrtc.recordTime + 1 }));
+    }, 1000);
+
+    store.dispatch(setWebRTC({ isRecording: true }));
   }, [initAudioContext]);
 
   const stopRecording = useCallback(() => {
@@ -736,167 +758,137 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
 
     recorderGainRef.current?.disconnect();
-    if (timerRef.current) clearInterval(timerRef.current);
+    if (recordTimerRef.current) clearInterval(recordTimerRef.current);
 
-    const arrayBuffer = EncodeAudio(buffersRef.current, audioContextRef.current.sampleRate);
+    const arrayBuffer = EncodeAudio(recordBuffersRef.current, audioContextRef.current.sampleRate);
     ipc.record.save(arrayBuffer);
 
-    buffersRef.current = [];
+    recordBuffersRef.current = [];
 
-    setIsRecording(false);
-    isRecordingRef.current = false;
+    recordTimerRef.current = null;
+
+    store.dispatch(setWebRTC({ isRecording: false }));
   }, [initAudioContext]);
 
   const muteUser = useCallback((userId: string) => {
     Object.values(consumersRef.current).forEach((consumer) => {
       if (consumer.appData.userId === userId) consumer.pause();
     });
-    setMutedIds((prev) => [...prev, userId]);
-    mutedIdsRef.current = [...mutedIdsRef.current, userId];
-    window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
+    store.dispatch(setMutedId({ id: userId, value: true }));
+    window.localStorage.setItem('muted-by-id', JSON.stringify(store.getState().webrtc.mutedById));
   }, []);
 
   const unmuteUser = useCallback((userId: string) => {
     Object.values(consumersRef.current).forEach((consumer) => {
       if (consumer.appData.userId === userId) consumer.resume();
     });
-    setMutedIds((prev) => prev.filter((id) => id !== userId));
-    mutedIdsRef.current = [...mutedIdsRef.current.filter((id) => id !== userId)];
-    window.localStorage.setItem('muted-ids', mutedIdsRef.current.join(','));
+    store.dispatch(setMutedId({ id: userId, value: false }));
+    window.localStorage.setItem('muted-by-id', JSON.stringify(store.getState().webrtc.mutedById));
   }, []);
 
   const pressSpeakKey = useCallback(() => {
-    if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
-    soundPlayerRef.current.playSound('startSpeaking');
+    const { speakingMode, isMicTaken } = store.getState().webrtc;
+    if (speakingMode !== 'key' || !isMicTaken) return;
+    playSoundRef.current?.('startSpeaking');
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = true;
     });
-    setIsSpeakKeyPressed(true);
-    isSpeakKeyPressedRef.current = true;
+    store.dispatch(setWebRTC({ isSpeakKeyPressed: true }));
   }, []);
 
   const releaseSpeakKey = useCallback(() => {
-    if (speakingModeRef.current !== 'key' || !isMicTakenRef.current) return;
-    soundPlayerRef.current.playSound('stopSpeaking');
+    const { speakingMode, isMicTaken } = store.getState().webrtc;
+    if (speakingMode !== 'key' || !isMicTaken) return;
+    playSoundRef.current?.('stopSpeaking');
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = false;
     });
-    setIsSpeakKeyPressed(false);
-    isSpeakKeyPressedRef.current = false;
+    store.dispatch(setWebRTC({ isSpeakKeyPressed: false }));
   }, []);
 
   const takeMic = useCallback(
     async (channelId: string) => {
-      if (isMicTakenRef.current) return;
+      if (store.getState().webrtc.isMicTaken) return;
       await setupSend(channelId);
-      setIsMicTaken(true);
-      isMicTakenRef.current = true;
+      startSpeaking();
     },
-    [setupSend],
+    [setupSend, startSpeaking],
   );
 
   const releaseMic = useCallback(() => {
-    if (!isMicTakenRef.current) return;
+    if (!store.getState().webrtc.isMicTaken) return;
     closeSend();
-    setIsMicTaken(false);
-    isMicTakenRef.current = false;
-  }, [closeSend]);
+    stopSpeaking();
+  }, [closeSend, stopSpeaking]);
 
   const toggleMixMode = useCallback(() => {
-    if (isMixModeActiveRef.current) stopMixing();
+    if (store.getState().webrtc.isMixModeActive) stopMixing();
     else startMixing();
   }, [startMixing, stopMixing]);
 
   const toggleRecording = useCallback(() => {
-    if (isRecordingRef.current) stopRecording();
+    if (store.getState().webrtc.isRecording) stopRecording();
     else startRecording();
   }, [startRecording, stopRecording]);
 
   const toggleMicMuted = useCallback(() => {
-    if (isMicMutedRef.current) {
+    if (store.getState().webrtc.isMicMuted) {
       const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
       changeMicVolume(prevVolume);
     } else {
-      localStorage.setItem('previous-mic-volume', micVolumeRef.current.toString());
+      localStorage.setItem('previous-mic-volume', store.getState().webrtc.micVolume.toString() || '50');
       changeMicVolume(0);
     }
   }, [changeMicVolume]);
 
   const toggleSpeakerMuted = useCallback(() => {
-    if (isSpeakerMutedRef.current) {
+    if (store.getState().webrtc.isSpeakerMuted) {
       const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
       changeSpeakerVolume(prevVolume);
     } else {
-      localStorage.setItem('previous-speaker-volume', speakerVolumeRef.current.toString());
+      localStorage.setItem('previous-speaker-volume', store.getState().webrtc.speakerVolume.toString() || '50');
       changeSpeakerVolume(0);
     }
   }, [changeSpeakerVolume]);
 
-  const isSpeaking = useCallback(
-    (targetId: string | 'user') => (targetId === 'user' ? isMicTaken && volumePercent['user'] > voiceThreshold : !!volumePercent[targetId]),
-    [isMicTaken, volumePercent, voiceThreshold],
-  );
-
-  const isMuted = useCallback((targetId: string | 'user') => mutedIds.includes(targetId), [mutedIds]);
-
-  const getVolumePercent = useCallback((targetId: string | 'user') => volumePercent[targetId] ?? 0, [volumePercent]);
-
   // Effects
-  useEffect(() => {
-    if (!isRecording) return;
-    timerRef.current = setInterval(() => setRecordTime((prev) => prev + 1), 1000);
-    return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
-      timerRef.current = null;
-    };
-  }, [isRecording]);
-
   useEffect(() => {
     initLocalStorage();
     initAudioContext();
-  }, [initAudioContext, initLocalStorage]);
+  }, [initLocalStorage, initAudioContext]);
 
   useEffect(() => {
-    if (!isMicTaken) {
-      removeMicAudio();
-      return;
-    }
-
-    navigator.mediaDevices
-      .getUserMedia({
-        audio: {
-          channelCount: 2,
-          echoCancellation: echoCancellation,
-          noiseSuppression: noiseCancellation,
-          autoGainControl: false,
-          ...(inputAudioDevice ? { deviceId: { exact: inputAudioDevice } } : {}),
-        },
-      })
-      .then((stream) => {
-        initMicAudio(stream);
-      })
-      .catch((err) => {
-        new Logger('WebRTC').error(`Access input device failed: ${err}`);
-      });
-  }, [inputAudioDevice, echoCancellation, noiseCancellation, isMicTaken, initMicAudio, removeMicAudio]);
+    const initAudioOnInteraction = async () => {
+      if (!audioContextRef.current) await initAudioContext();
+      else if (audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
+    };
+    document.addEventListener('click', initAudioOnInteraction, { once: true });
+    document.addEventListener('keydown', initAudioOnInteraction, { once: true });
+    return () => {
+      document.removeEventListener('click', initAudioOnInteraction);
+      document.removeEventListener('keydown', initAudioOnInteraction);
+    };
+  }, [initAudioContext]);
 
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
       new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);
-      setInputAudioDevice(inputAudioDevice);
+      inputAudioDeviceRef.current = inputAudioDevice;
+      if (store.getState().webrtc.isMicTaken) startSpeaking();
     };
     changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
     const unsub = ipc.systemSettings.inputAudioDevice.onUpdate(changeInputAudioDevice);
     return () => unsub();
-  }, []);
+  }, [startSpeaking]);
 
   useEffect(() => {
     const changeOutputAudioDevice = (outputAudioDevice: string) => {
       new Logger('WebRTC').info(`Output audio device updated: ${outputAudioDevice}`);
       const el = speakerRef.current;
       if (el && typeof el.setSinkId === 'function') {
-        el.setSinkId(outputAudioDevice).catch((err) => {
-          new Logger('WebRTC').warn(`Set output device failed: ${err}`);
+        el.setSinkId(outputAudioDevice).catch((e) => {
+          const error = e instanceof Error ? e : new Error('Unknown error');
+          new Logger('WebRTC').warn(`Set output device failed: ${error.message}`);
         });
       }
     };
@@ -908,28 +900,30 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   useEffect(() => {
     const changeEchoCancellation = (echoCancellation: boolean) => {
       new Logger('WebRTC').info(`Echo cancellation updated: ${echoCancellation}`);
-      setEchoCancellation(echoCancellation);
+      echoCancellationRef.current = echoCancellation;
+      if (store.getState().webrtc.isMicTaken) startSpeaking();
     };
     changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
     const unsub = ipc.systemSettings.echoCancellation.onUpdate(changeEchoCancellation);
     return () => unsub();
-  }, []);
+  }, [startSpeaking]);
 
   useEffect(() => {
     const changeNoiseCancellation = (noiseCancellation: boolean) => {
       new Logger('WebRTC').info(`Noise cancellation updated: ${noiseCancellation}`);
-      setNoiseCancellation(noiseCancellation);
+      noiseCancellationRef.current = noiseCancellation;
+      if (store.getState().webrtc.isMicTaken) startSpeaking();
     };
     changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
     const unsub = ipc.systemSettings.noiseCancellation.onUpdate(changeNoiseCancellation);
     return () => unsub();
-  }, []);
+  }, [startSpeaking]);
 
   useEffect(() => {
     const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
       new Logger('WebRTC').info(`Microphone amplification updated: ${microphoneAmplification}`);
       microphoneAmplificationRef.current = microphoneAmplification;
-      changeMicVolume(micVolumeRef.current);
+      changeMicVolume(store.getState().webrtc.micVolume || 100);
     };
     changeMicrophoneAmplification(ipc.systemSettings.microphoneAmplification.get());
     const unsub = ipc.systemSettings.microphoneAmplification.onUpdate(changeMicrophoneAmplification);
@@ -940,10 +934,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
       new Logger('WebRTC').info(`Speaking mode updated: ${speakingMode}`);
       micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
-        track.enabled = speakingMode === 'key' ? isSpeakKeyPressedRef.current : true;
+        track.enabled = speakingMode === 'key' ? store.getState().webrtc.isSpeakKeyPressed : true;
       });
-      setSpeakingMode(speakingMode);
-      speakingModeRef.current = speakingMode;
+      store.dispatch(setWebRTC({ speakingMode }));
     };
     changeSpeakingMode(ipc.systemSettings.speakingMode.get());
     const unsub = ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode);
@@ -984,48 +977,181 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     return () => unsub();
   }, [unconsumeOne]);
 
-  return (
-    <WebRTCContext.Provider
-      value={{
-        startMixing,
-        stopMixing,
-        startRecording,
-        stopRecording,
-        muteUser,
-        unmuteUser,
-        pressSpeakKey,
-        releaseSpeakKey,
-        takeMic,
-        releaseMic,
-        toggleMixMode,
-        toggleRecording,
-        toggleSpeakerMuted,
-        toggleMicMuted,
-        changeBitrate,
-        changeMicVolume,
-        changeMixVolume,
-        changeSpeakerVolume,
-        changeVoiceThreshold,
-        isSpeaking,
-        isMuted,
-        getVolumePercent,
-        isMicTaken,
-        isSpeakKeyPressed,
-        isMixModeActive,
-        isMicMuted,
-        isSpeakerMuted,
-        isRecording,
-        micVolume,
-        mixVolume,
-        speakerVolume,
-        speakingMode,
-        voiceThreshold,
-        recordTime,
-      }}
-    >
-      {children}
-    </WebRTCContext.Provider>
+  useEffect(() => {
+    const unsub = ipc.sfuDiagnosis.onRequest(async () => {
+      let info: { transportId?: string; ip?: string; port?: string } | null = null;
+
+      try {
+        if (!recvTransportRef.current) {
+          new Logger('WebRTC').info('Not in a channel, attempting to join one for diagnosis using standard logic...');
+
+          let targetServer = null;
+
+          const searchResults = await ipc.data.searchServer({ query: '10' });
+          targetServer = searchResults.find((s) => s.displayId === '10' || s.serverId === '10');
+
+          if (!targetServer) {
+            const userId = window.localStorage.getItem('userId');
+            if (userId) {
+              const servers = await ipc.data.servers({ userId });
+              if (servers && servers.length > 0) {
+                targetServer = servers[0];
+              }
+            }
+          }
+
+          if (targetServer) {
+            new Logger('WebRTC').info(`Standard joining server: ${targetServer.name} (${targetServer.displayId})`);
+
+            loadServer(targetServer.specialId || targetServer.displayId);
+            ipc.socket.send('connectServer', { serverId: targetServer.serverId });
+
+            await new Promise<void>((resolve, reject) => {
+              let unsub: () => void = () => {};
+              const timeout = setTimeout(() => {
+                if (unsub) unsub();
+                reject(new Error('Timeout waiting for SFUJoined after standard join'));
+              }, 10000);
+              unsub = ipc.socket.on('SFUJoined', () => {
+                clearTimeout(timeout);
+                if (unsub) unsub();
+                resolve();
+              });
+            }).catch((e) => new Logger('WebRTC').error(e.message));
+
+            for (let i = 0; i < 5; i++) {
+              if (recvTransportRef.current) break;
+              await new Promise((r) => setTimeout(r, 1000));
+            }
+          }
+        } else {
+          new Logger('WebRTC').info('Already in an SFU session, reusing existing transport for diagnosis.');
+        }
+
+        if (recvTransportRef.current) {
+          for (let retry = 0; retry < 10; retry++) {
+            const stats = await recvTransportRef.current.getStats();
+            stats.forEach((report) => {
+              if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+                info = {
+                  transportId: recvTransportRef.current?.id,
+                  ip: report.remoteCandidateId ? stats.get(report.remoteCandidateId)?.ip : 'unknown',
+                  port: report.remoteCandidateId ? stats.get(report.remoteCandidateId)?.port : 'unknown',
+                };
+                if (!info.ip || info.ip === 'unknown') {
+                  const remoteCandidate = stats.get(report.remoteCandidateId);
+                  if (remoteCandidate) {
+                    info.ip = remoteCandidate.ip || remoteCandidate.address;
+                    info.port = remoteCandidate.port;
+                  }
+                }
+              }
+            });
+
+            // if (info && info.ip && info.ip !== 'unknown') break;
+            await new Promise((r) => setTimeout(r, 1000));
+          }
+        }
+      } catch (e) {
+        new Logger('WebRTC').error(`Error getting stats or joining channel: ${e}`);
+      }
+
+      ipc.sfuDiagnosis.response(info);
+    });
+    return () => unsub();
+  }, [loadServer]);
+
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const sendTransport = sendTransportRef.current;
+      const recvTransport = recvTransportRef.current;
+      const transport = sendTransport || recvTransport;
+
+      if (transport) {
+        // Update Status
+        const s = transport.connectionState;
+        if (s === 'connected') store.dispatch(setWebRTC({ status: 'connected' }));
+        else if (s === 'failed') store.dispatch(setWebRTC({ status: 'failed' }));
+        else if (s === 'new' || s === 'connecting') store.dispatch(setWebRTC({ status: 'connecting' }));
+        else store.dispatch(setWebRTC({ status: 'disconnected' }));
+
+        // Update Latency (prefer sendTransport for RTT, fallback to recvTransport)
+        const activeTransport = sendTransport && sendTransport.connectionState === 'connected' ? sendTransport : recvTransport && recvTransport.connectionState === 'connected' ? recvTransport : null;
+
+        if (activeTransport) {
+          const stats = await activeTransport.getStats();
+          stats.forEach((report) => {
+            if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+              if (report.currentRoundTripTime) {
+                store.dispatch(setWebRTC({ latency: Math.round(report.currentRoundTripTime * 1000) }));
+              }
+            }
+          });
+        } else {
+          store.dispatch(setWebRTC({ latency: 0 }));
+        }
+      } else {
+        store.dispatch(setWebRTC({ status: 'disconnected', latency: 0 }));
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  const contextValue = useMemo(
+    () => ({
+      startSpeaking,
+      stopSpeaking,
+      startMixing,
+      stopMixing,
+      startRecording,
+      stopRecording,
+      muteUser,
+      unmuteUser,
+      pressSpeakKey,
+      releaseSpeakKey,
+      takeMic,
+      releaseMic,
+      toggleMixMode,
+      toggleRecording,
+      toggleSpeakerMuted,
+      toggleMicMuted,
+      changeBitrate,
+      changeMicVolume,
+      changeMixVolume,
+      changeSpeakerVolume,
+      addSpeakerVolume,
+      subtractSpeakerVolume,
+      changeVoiceThreshold,
+    }),
+    [
+      startSpeaking,
+      stopSpeaking,
+      startMixing,
+      stopMixing,
+      startRecording,
+      stopRecording,
+      muteUser,
+      unmuteUser,
+      pressSpeakKey,
+      releaseSpeakKey,
+      takeMic,
+      releaseMic,
+      toggleMixMode,
+      toggleRecording,
+      toggleSpeakerMuted,
+      toggleMicMuted,
+      changeBitrate,
+      changeMicVolume,
+      changeMixVolume,
+      changeSpeakerVolume,
+      addSpeakerVolume,
+      subtractSpeakerVolume,
+      changeVoiceThreshold,
+    ],
   );
+
+  return <WebRTCContext.Provider value={contextValue}>{children}</WebRTCContext.Provider>;
 };
 
 WebRTCProvider.displayName = 'WebRTCProvider';
