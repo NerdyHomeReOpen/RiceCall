@@ -670,7 +670,7 @@ export default class ContextMenuClass {
       id: 'free-speech',
       label: 'free-speech',
       icon: params.isFreeMode ? 'checked' : '',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: Permission.isChannelMod(params.permissionLevel),
       onClick: onClick,
     });
     return this;
@@ -681,7 +681,7 @@ export default class ContextMenuClass {
       id: 'admin-speech',
       label: 'admin-speech',
       icon: params.isAdminMode ? 'checked' : '',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: Permission.isChannelMod(params.permissionLevel),
       onClick: onClick,
     });
     return this;
@@ -692,7 +692,7 @@ export default class ContextMenuClass {
       id: 'queue-speech',
       label: 'queue-speech',
       icon: params.isQueueMode ? 'submenu' : '',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: Permission.isChannelMod(params.permissionLevel),
       hasSubmenu: params.isQueueMode,
       submenuItems: submenuItems,
       onClick: onClick,
@@ -705,7 +705,7 @@ export default class ContextMenuClass {
       id: 'forbid-queue',
       label: 'forbid-queue',
       icon: params.isForbidQueue ? 'checked' : '',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: Permission.isChannelMod(params.permissionLevel),
       onClick: onClick,
     });
     return this;
@@ -716,7 +716,7 @@ export default class ContextMenuClass {
       id: 'control-queue',
       label: 'control-queue',
       icon: params.isQueueControlled ? 'checked' : '',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: Permission.isChannelMod(params.permissionLevel),
       onClick: onClick,
     });
     return this;
