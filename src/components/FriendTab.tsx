@@ -67,10 +67,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
       .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(user.userId, friend.targetId))
       .addEditNoteOption({ isSelf, isFriend }, () => Popup.openEditFriendNote(user.userId, friend.targetId))
       .addSeparator()
-      .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => {}, onNotifyFriendOnlineClick: () => {} }, () => {})
+      .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => { }, onNotifyFriendOnlineClick: () => { } }, () => { })
       .addEditFriendFriendGroupOption(
         { isSelf, isStranger, isBlocked: friend.isBlocked },
-        () => {},
+        () => { },
         new CtxMenuBuilder()
           .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => Popup.editFriend(friend.targetId, { friendGroupId }))
           .build(),
@@ -130,7 +130,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
       <div className={styles['base-info-wrapper']}>
         <div className={styles['box']}>
           {hasVip && <div className={`${vip['vip-icon']} ${vip[`vip-${friend.vip}`]}`} />}
-          <div className={`${styles['name-text']} ${hasVip ? vip['vip-name-color'] : ''}`}>
+          <div className={`${styles['friend-tab-name-text']} ${hasVip ? vip['vip-name-color'] : ''}`}>
             {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
           </div>
           <LevelIcon level={friend.level} xp={friend.xp} requiredXp={friend.requiredXp} showTooltip={false} />
