@@ -978,7 +978,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [unconsumeOne]);
 
   useEffect(() => {
-    const handleGetSfuDiagnosis = async ({ senderId }: { senderId: number }) => {
+    const unsub = ipc.sfuDiagnosis.onRequest(async () => {
       let info: { transportId?: string; ip?: string; port?: string } | null = null;
 
       try {
@@ -1056,10 +1056,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         new Logger('WebRTC').error(`Error getting stats or joining channel: ${e}`);
       }
 
-      ipc.sfuDiagnosis.response({ targetSenderId: senderId, info });
-    };
-
-    const unsub = ipc.sfuDiagnosis.onRequest(handleGetSfuDiagnosis);
+      ipc.sfuDiagnosis.response(info);
+    });
     return () => unsub();
   }, [loadServer]);
 

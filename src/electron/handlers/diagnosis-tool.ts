@@ -1,8 +1,8 @@
-import { ipcMain, webContents } from 'electron';
+import { ipcMain } from 'electron';
 
 import * as Types from '@/types';
 
-import { mainWindow } from '@/electron/main';
+import { mainWindow, broadcast } from '@/electron/main';
 
 import Logger from '@/logger';
 
@@ -97,18 +97,13 @@ export function registerDiagnosisToolHandlers() {
 
   ipcMain.on('request-sfu-diagnosis', (event) => {
     if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('get-sfu-diagnosis', { senderId: event.sender.id });
+      mainWindow.webContents.send('get-sfu-diagnosis');
     } else {
       event.sender.send('sfu-diagnosis-response', null);
     }
   });
 
   ipcMain.on('sfu-diagnosis-response', (_, data: { targetSenderId: number; info: unknown } | null) => {
-    if (data?.targetSenderId != null) {
-      const target = webContents.fromId(data.targetSenderId);
-      if (target && !target.isDestroyed()) {
-        target.send('sfu-diagnosis-response', data.info);
-      }
-    }
+    broadcast('sfu-diagnosis-response', data?.info);
   });
 }

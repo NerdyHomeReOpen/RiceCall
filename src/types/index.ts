@@ -563,4 +563,9 @@ export type Stage = {
   status: StepStatus;
 };
 
+export type SFUDiagnosisInfo = {
+  ip?: string;
+  port?: number;
+};
+
 export * from './database';

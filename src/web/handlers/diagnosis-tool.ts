@@ -15,6 +15,6 @@ export function requestSfuDiagnosis() {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function sfuDiagnosisResponse(_data: { targetSenderId: number; info: unknown } | null) {
+export function sfuDiagnosisResponse(_info: unknown) {
   new Logger('NetworkDiagnosisTool').info(`Network diagnosis only available in desktop version`);
 }

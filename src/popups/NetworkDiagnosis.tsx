@@ -116,14 +116,12 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     try {
       ipc.sfuDiagnosis.request();
 
-      const unsubscribe = ipc.sfuDiagnosis.onResponse((response: { targetSenderId: number; info: unknown }) => {
+      const unsubscribe = ipc.sfuDiagnosis.onResponse((info: { ip?: string; port?: number } | null) => {
         unsubscribe();
 
-        const data = response.info as { ip?: string; port?: number } | null;
-
-        if (data?.ip) {
-          const sfuIp = data.ip;
-          addLog(`SFU Connected: ${sfuIp}:${data.port ?? ''}`);
+        if (info?.ip) {
+          const sfuIp = info.ip;
+          addLog(`SFU Connected: ${sfuIp}:${info.port ?? ''}`);
           updateStage('sfu_info', 'completed');
           updateStage('sfu_test', 'active');
 

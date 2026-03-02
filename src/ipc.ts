@@ -1012,15 +1012,15 @@ const ipc = {
       modules.default.requestSfuDiagnosis();
     },
 
-    onRequest: (callback: ({ senderId }: { senderId: number }) => void): (() => void) => {
+    onRequest: (callback: () => void): (() => void) => {
       return modules.default.listen('get-sfu-diagnosis', callback);
     },
 
-    response: (data: { targetSenderId: number; info: unknown }): void => {
-      modules.default.sfuDiagnosisResponse(data);
+    response: (info: Types.SFUDiagnosisInfo | null): void => {
+      modules.default.sfuDiagnosisResponse(info);
     },
 
-    onResponse: (callback: (data: { targetSenderId: number; info: unknown }) => void): (() => void) => {
+    onResponse: (callback: (info: Types.SFUDiagnosisInfo | null) => void): (() => void) => {
       return modules.default.listen('sfu-diagnosis-response', callback);
     },
   },
