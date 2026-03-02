@@ -478,6 +478,7 @@
   "required-xp": "升級仍需積分",
   "right-click-to-process": "右鍵可以進行處理",
   "russia-groups": "俄羅斯語音群",
+  "rtc-disconnect-message": "我們偵測到 {{0}} 次斷線，我們已經蒐集了連線資訊，正在盡力分析，請耐心等待我們修復。",
   "save": "保存",
   "scratch-card": "刮刮樂",
   "search-friend-placeholder": "搜尋好友",

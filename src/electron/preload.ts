@@ -168,6 +168,7 @@ const ipcRendererHandlers = {
   getUpdateCheckInterval: () => ipcRenderer.sendSync('get-update-check-interval'),
   getUpdateChannel: () => ipcRenderer.sendSync('get-update-channel'),
   serverSelect: (...args) => ipcRenderer.send('server-select', ...args),
+  webRTCSignalStateChange: (...args) => ipcRenderer.send('webRTC-signal-state-change', ...args),
 };
 
 const electronLogHandlers = {

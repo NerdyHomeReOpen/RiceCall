@@ -189,6 +189,8 @@ export type SpeakingMode = 'key' | 'auto';
 
 export type MixMode = 'all' | 'app';
 
+export type RTCStatus = 'disconnected' | 'connecting' | 'connected' | 'failed';
+
 export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
 
 export type RecordFormat = 'wav' | 'mp3';
@@ -241,6 +243,7 @@ export type PopupType =
   | 'memberApplicationSetting'
   | 'memberInvitation'
   | 'networkDiagnosis'
+  | 'rtcDisconnect'
   | 'searchUser'
   | 'serverAnnouncement'
   | 'serverApplication'
@@ -392,6 +395,7 @@ export type ServerToClientEvents = {
   SFULeft: () => void;
   SFUNewProducer: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
   SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
+  webrtcDisconnectCountUpdate: (count: number) => void;
   // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   // Popup

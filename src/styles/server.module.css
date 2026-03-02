@@ -237,20 +237,44 @@
   background-position: 0 0;
 }
 
-.current-channel-icon.status1 {
+.rtc-latency-icon {
+  position: relative;
+  min-width: 20px;
+  min-height: 20px;
+  margin-left: 5px;
+  background-image: url('/channel/NetworkStatusRTC.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.current-channel-icon.status1,
+.rtc-latency-icon.status1 {
   background-position: -20px 0;
 }
 
-.current-channel-icon.status2 {
+.current-channel-icon.status2,
+.rtc-latency-icon.status2 {
   background-position: -40px 0;
 }
 
-.current-channel-icon.status3 {
+.current-channel-icon.status3,
+.rtc-latency-icon.status3 {
   background-position: -60px 0;
 }
 
-.current-channel-icon.status4 {
+.current-channel-icon.status4,
+.rtc-latency-icon.status4 {
   background-position: -80px 0;
+}
+
+.rtc-latency-icon.connecting {
+  background-image: url('/loading.gif');
+  background-size: contain;
+}
+
+.rtc-latency-icon.failed {
+  background-image: url('/pic_error.webp');
+  background-size: contain;
 }
 
 .current-channel-icon:not(.current-channel-ping, .current-channel-text):hover .current-channel-ping {

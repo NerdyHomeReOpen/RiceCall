@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useContext, createContext, useCallback, useMemo, useSyncExternalStore } from 'react';
+import React, { useEffect, useRef, useContext, createContext, useCallback, useState, useMemo, useSyncExternalStore } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 import ipc from '@/ipc';
 
@@ -152,6 +152,8 @@ interface WebRTCContextType {
   addSpeakerVolume: (value?: number) => void;
   subtractSpeakerVolume: (value?: number) => void;
   changeVoiceThreshold: (voiceThreshold: number) => void;
+  rtcLatency: number;
+  rtcStatus: Types.RTCStatus;
 }
 
 const WebRTCContext = createContext<WebRTCContextType | null>(null);
@@ -248,6 +250,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const noiseCancellationRef = useRef<boolean>(false);
   const recordBuffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
   const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // States
+  const [rtcLatency, setRtcLatency] = useState<number>(0);
+  const [rtcStatus, setRtcStatus] = useState<Types.RTCStatus>('disconnected');
 
   // Functions
   const detectSpeaking = useCallback((targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array<ArrayBuffer>) => {
@@ -650,8 +656,30 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         })
         .catch(eb);
     });
-    sendTransportRef.current.on('connectionstatechange', (s) => {
+    sendTransportRef.current.on('connectionstatechange', async (s) => {
       new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
+
+      if (s != 'failed' && s != 'disconnected') return;
+
+      let info;
+
+      const stats = await sendTransportRef.current?.getStats();
+      stats?.forEach((report) => {
+        if (report.type === 'candidate-pair') {
+          info = {
+            state: report.state,
+            currentRoundTripTime: report.currentRoundTripTime,
+            requestsSent: report.requestsSent,
+            responsesReceived: report.responsesReceived,
+            localCandidateId: report.localCandidateId,
+            remoteCandidateId: report.remoteCandidateId,
+          };
+        }
+      });
+
+      ipc.webrtc.signalStateChange({ signalState: s, userId: localStorage.getItem('userId') || 'unknown-user', channelId, info });
+
+      new Logger('WebRTC').error(`SendTransport connection stats: ${JSON.stringify(info)}`);
     });
 
     const track = inputDesRef.current?.stream.getAudioTracks()[0];
@@ -1195,6 +1223,44 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     return () => unsub();
   }, [loadServer]);
 
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      const sendTransport = sendTransportRef.current;
+      const recvTransport = recvTransportRef.current;
+      const transport = sendTransport || recvTransport;
+
+      if (transport) {
+        // Update Status
+        const s = transport.connectionState;
+        if (s === 'connected') setRtcStatus('connected');
+        else if (s === 'failed') setRtcStatus('failed');
+        else if (s === 'new' || s === 'connecting') setRtcStatus('connecting');
+        else setRtcStatus('disconnected');
+
+        // Update Latency (prefer sendTransport for RTT, fallback to recvTransport)
+        const activeTransport = sendTransport && sendTransport.connectionState === 'connected' ? sendTransport : recvTransport && recvTransport.connectionState === 'connected' ? recvTransport : null;
+
+        if (activeTransport) {
+          const stats = await activeTransport.getStats();
+          stats.forEach((report) => {
+            if (report.type === 'candidate-pair' && report.state === 'succeeded') {
+              if (report.currentRoundTripTime) {
+                setRtcLatency(Math.round(report.currentRoundTripTime * 1000));
+              }
+            }
+          });
+        } else {
+          setRtcLatency(0);
+        }
+      } else {
+        setRtcStatus('disconnected');
+        setRtcLatency(0);
+      }
+    }, 500);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const contextValue = useMemo(
     () => ({
       startSpeaking,
@@ -1220,6 +1286,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       addSpeakerVolume,
       subtractSpeakerVolume,
       changeVoiceThreshold,
+      rtcLatency,
+      rtcStatus,
     }),
     [
       startSpeaking,
@@ -1245,6 +1313,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       addSpeakerVolume,
       subtractSpeakerVolume,
       changeVoiceThreshold,
+      rtcLatency,
+      rtcStatus,
     ],
   );
 

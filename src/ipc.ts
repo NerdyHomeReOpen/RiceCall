@@ -31,6 +31,13 @@ const ipc = {
     },
   },
 
+  webrtc: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    signalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
+      modules.default.webRTCSignalStateChange(formData);
+    },
+  },
+
   exit: (): void => {
     modules.default.exit();
   },

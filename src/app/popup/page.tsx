@@ -33,6 +33,7 @@ import KickMemberFromServer from '@/popups/KickMemberFromServer';
 import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
 import MemberInvitation from '@/popups/MemberInvitation';
 import NetworkDiagnosis from '@/popups/NetworkDiagnosis';
+import RTCDisconnect from '@/popups/RTCDisconnect';
 import ImageCropper from '@/popups/ImageCropper';
 import InviteFriend from '@/popups/InviteFriend';
 import InviteMember from '@/popups/InviteMember';
@@ -150,6 +151,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
       memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
       networkDiagnosis: () => <NetworkDiagnosis id={id} {...initialData} />,
+      rtcDisconnect: () => <RTCDisconnect id={id} {...initialData} />,
       searchUser: () => <SearchUser id={id} {...initialData} />,
       serverAnnouncement: () => <ServerAnnouncement id={id} {...initialData} />,
       serverApplication: () => <ServerApplication id={id} {...initialData} />,
