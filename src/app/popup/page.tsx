@@ -17,7 +17,6 @@ import ChannelEvent from '@/popups/ChannelEvent';
 import ChannelPassword from '@/popups/ChannelPassword';
 import ChannelSetting from '@/popups/ChannelSetting';
 import ChatHistory from '@/popups/ChatHistory';
-import ConfirmWebRTC from '@/popups/ConfirmWebRTC';
 import CreateChannel from '@/popups/CreateChannel';
 import CreateFriendGroup from '@/popups/CreateFriendGroup';
 import CreateServer from '@/popups/CreateServer';
@@ -34,6 +33,7 @@ import KickMemberFromServer from '@/popups/KickMemberFromServer';
 import MemberApplicationSetting from '@/popups/MemberApplicationSetting';
 import MemberInvitation from '@/popups/MemberInvitation';
 import NetworkDiagnosis from '@/popups/NetworkDiagnosis';
+import RTCDisconnect from '@/popups/RTCDisconnect';
 import ImageCropper from '@/popups/ImageCropper';
 import InviteFriend from '@/popups/InviteFriend';
 import InviteMember from '@/popups/InviteMember';
@@ -127,7 +127,6 @@ const PopupPageComponent: React.FC = React.memo(() => {
       channelPassword: () => <ChannelPassword id={id} {...initialData} />,
       channelSetting: () => <ChannelSetting id={id} {...initialData} />,
       chatHistory: () => <ChatHistory id={id} {...initialData} />,
-      confirmWebRTC: () => <ConfirmWebRTC id={id} {...initialData} />,
       createChannel: () => <CreateChannel id={id} {...initialData} />,
       createFriendGroup: () => <CreateFriendGroup id={id} {...initialData} />,
       createServer: () => <CreateServer id={id} {...initialData} />,
@@ -152,6 +151,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
       memberApplicationSetting: () => <MemberApplicationSetting id={id} {...initialData} />,
       memberInvitation: () => <MemberInvitation id={id} {...initialData} />,
       networkDiagnosis: () => <NetworkDiagnosis id={id} {...initialData} />,
+      rtcDisconnect: () => <RTCDisconnect id={id} {...initialData} />,
       searchUser: () => <SearchUser id={id} {...initialData} />,
       serverAnnouncement: () => <ServerAnnouncement id={id} {...initialData} />,
       serverApplication: () => <ServerApplication id={id} {...initialData} />,

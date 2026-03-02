@@ -16,7 +16,6 @@ export const POPUP_SIZES: Record<Types.PopupType, PopupSizeConfig> = {
   channelPassword: { width: 380, height: 200 },
   changeTheme: { width: 480, height: 335 },
   chatHistory: { width: 714, height: 547 },
-  confirmWebRTC: { width: 380, height: 200 },
   createServer: { width: 478, height: 436 },
   createChannel: { width: 380, height: 200 },
   createFriendGroup: { width: 380, height: 200 },
@@ -40,6 +39,8 @@ export const POPUP_SIZES: Record<Types.PopupType, PopupSizeConfig> = {
   kickMemberFromServer: { width: 400, height: 250 },
   memberApplicationSetting: { width: 380, height: 220 },
   memberInvitation: { width: 500, height: 550 },
+  networkDiagnosis: { width: 400, height: 500 },
+  rtcDisconnect: { width: 380, height: 200 },
   searchUser: { width: 380, height: 200 },
   serverAnnouncement: { width: 500, height: 400 },
   serverApplication: { width: 320, height: 150 },
@@ -48,7 +49,6 @@ export const POPUP_SIZES: Record<Types.PopupType, PopupSizeConfig> = {
   systemSetting: { width: 600, height: 520 },
   userInfo: { width: 440, height: 630 },
   userSetting: { width: 500, height: 700 },
-  networkDiagnosis: { width: 400, height: 500 },
 };
 
 export interface PopupHeaderConfig {
@@ -67,7 +67,6 @@ export const POPUP_HEADERS: Record<Types.PopupType, PopupHeaderConfig> = {
   channelPassword: { buttons: ['close'], hideHeader: false },
   channelSetting: { buttons: ['close'], hideHeader: false },
   chatHistory: { buttons: ['close'], hideHeader: false },
-  confirmWebRTC: { buttons: ['close'], hideHeader: false },
   createServer: { buttons: ['close'], hideHeader: false },
   createChannel: { buttons: ['close'], hideHeader: false },
   createFriendGroup: { buttons: ['close'], hideHeader: false },
@@ -91,6 +90,8 @@ export const POPUP_HEADERS: Record<Types.PopupType, PopupHeaderConfig> = {
   kickMemberFromServer: { buttons: ['close'], hideHeader: false },
   memberApplicationSetting: { buttons: ['close'], hideHeader: false },
   memberInvitation: { buttons: ['close'], hideHeader: false },
+  networkDiagnosis: { buttons: ['close'], hideHeader: false },
+  rtcDisconnect: { buttons: ['close'], hideHeader: false },
   searchUser: { buttons: ['close'], hideHeader: false },
   serverAnnouncement: { buttons: ['close'], hideHeader: true },
   serverApplication: { buttons: ['close'], hideHeader: false },
@@ -99,7 +100,6 @@ export const POPUP_HEADERS: Record<Types.PopupType, PopupHeaderConfig> = {
   systemSetting: { buttons: ['close'], hideHeader: false },
   userInfo: { buttons: ['close'], hideHeader: true },
   userSetting: { buttons: ['close'], hideHeader: false },
-  networkDiagnosis: { buttons: ['close'], hideHeader: false },
 };
 
 export const POPUP_TITLE_KEYS: Record<Types.PopupType, string> = {
@@ -113,7 +113,6 @@ export const POPUP_TITLE_KEYS: Record<Types.PopupType, string> = {
   channelPassword: 'please-enter-the-channel-password',
   channelSetting: 'edit-channel',
   chatHistory: 'chat-history',
-  confirmWebRTC: 'confirm-webrtc',
   createServer: 'create-server',
   createChannel: 'create-channel',
   createFriendGroup: 'create-friend-group',
@@ -137,6 +136,8 @@ export const POPUP_TITLE_KEYS: Record<Types.PopupType, string> = {
   kickMemberFromServer: 'kick-server',
   memberApplicationSetting: 'member-application-setting',
   memberInvitation: 'member-invitation',
+  networkDiagnosis: 'network-diagnosis',
+  rtcDisconnect: 'rtc-disconnect',
   searchUser: 'search-user',
   serverAnnouncement: 'server-announcement',
   serverApplication: 'server-application',
@@ -145,7 +146,6 @@ export const POPUP_TITLE_KEYS: Record<Types.PopupType, string> = {
   systemSetting: 'system-setting',
   userInfo: 'user-info',
   userSetting: 'user-setting',
-  networkDiagnosis: 'network-diagnosis',
 };
 
 export interface PopupBehaviorConfig {
@@ -165,7 +165,6 @@ export const POPUP_BEHAVIORS: Record<Types.PopupType, PopupBehaviorConfig> = {
   channelPassword: { resizable: false, maximizable: false, fullscreenable: false },
   changeTheme: { resizable: false, maximizable: false, fullscreenable: false },
   chatHistory: { resizable: false, maximizable: false, fullscreenable: false },
-  confirmWebRTC: { resizable: false, maximizable: false, fullscreenable: false },
   createServer: { resizable: false, maximizable: false, fullscreenable: false },
   createChannel: { resizable: false, maximizable: false, fullscreenable: false },
   createFriendGroup: { resizable: false, maximizable: false, fullscreenable: false },
@@ -189,6 +188,8 @@ export const POPUP_BEHAVIORS: Record<Types.PopupType, PopupBehaviorConfig> = {
   kickMemberFromServer: { resizable: false, maximizable: false, fullscreenable: false },
   memberApplicationSetting: { resizable: false, maximizable: false, fullscreenable: false },
   memberInvitation: { resizable: false, maximizable: false, fullscreenable: false },
+  networkDiagnosis: { resizable: false, maximizable: false, fullscreenable: false },
+  rtcDisconnect: { resizable: false, maximizable: false, fullscreenable: false },
   searchUser: { resizable: false, maximizable: false, fullscreenable: false },
   serverAnnouncement: { resizable: false, maximizable: false, fullscreenable: false },
   serverApplication: { resizable: false, maximizable: false, fullscreenable: false },
@@ -197,7 +198,6 @@ export const POPUP_BEHAVIORS: Record<Types.PopupType, PopupBehaviorConfig> = {
   systemSetting: { resizable: false, maximizable: false, fullscreenable: false },
   userInfo: { resizable: false, maximizable: false, fullscreenable: false },
   userSetting: { resizable: false, maximizable: false, fullscreenable: false },
-  networkDiagnosis: { resizable: false, maximizable: false, fullscreenable: false },
 };
 
 /**

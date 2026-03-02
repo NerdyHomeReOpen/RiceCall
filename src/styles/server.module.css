@@ -267,6 +267,16 @@
   background-position: -80px 0;
 }
 
+.rtc-latency-icon.connecting {
+  background-image: url('/loading.gif');
+  background-size: contain;
+}
+
+.rtc-latency-icon.failed {
+  background-image: url('/pic_error.webp');
+  background-size: contain;
+}
+
 .current-channel-icon:not(.current-channel-ping, .current-channel-text):hover .current-channel-ping {
   opacity: 1;
 }

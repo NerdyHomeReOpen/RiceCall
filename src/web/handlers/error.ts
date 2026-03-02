@@ -43,12 +43,10 @@ export function errorSubmit(errorId: string, error: Error) {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function confirmWebRTC(formData: { signalState: string; userId: string; channelId: string; info?: any }) {
+export function webRTCSignalStateChange(formData: { signalState: string; userId: string; channelId: string; info?: any }) {
   return new Promise((resolve) => {
-    const id = `webrtc-confirm-${Date.now()}`;
-
     if (formData.signalState === 'disconnected') {
-      createPopup('confirmWebRTC', id, formData);
+      createPopup('rtcDisconnect', `rtcDisconnect-${Date.now()}`, formData);
     }
 
     const fields = [

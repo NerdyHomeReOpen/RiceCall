@@ -657,9 +657,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         .catch(eb);
     });
     sendTransportRef.current.on('connectionstatechange', async (s) => {
-      // @ts-expect-error for debugging
-      window['testSFU'] = sendTransportRef.current;
       new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
+
       if (s != 'failed' && s != 'disconnected') return;
 
       let info;
@@ -668,18 +667,19 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       stats?.forEach((report) => {
         if (report.type === 'candidate-pair') {
           info = {
-            state: report.state, // 通常會變成 'disconnected' 或 'frozen'
-            currentRoundTripTime: report.currentRoundTripTime, // 如果是 undefined 或 0，代表不通了
-            requestsSent: report.requestsSent, // 我送了多少 STUN 請求
-            responsesReceived: report.responsesReceived, // 我收到了多少 STUN 回應
+            state: report.state,
+            currentRoundTripTime: report.currentRoundTripTime,
+            requestsSent: report.requestsSent,
+            responsesReceived: report.responsesReceived,
             localCandidateId: report.localCandidateId,
             remoteCandidateId: report.remoteCandidateId,
           };
         }
       });
-      new Logger('WebRTC').error(`SendTransport connection ${s}, stats: ${JSON.stringify(info)}`);
 
-      ipc.webrtc.confirmSignal({ signalState: s, userId: localStorage.getItem('userId') || 'unknown-user', channelId, info });
+      ipc.webrtc.signalStateChange({ signalState: s, userId: localStorage.getItem('userId') || 'unknown-user', channelId, info });
+
+      new Logger('WebRTC').error(`SendTransport connection stats: ${JSON.stringify(info)}`);
     });
 
     const track = inputDesRef.current?.stream.getAudioTracks()[0];
@@ -1224,7 +1224,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, [loadServer]);
 
   useEffect(() => {
-    const timer = setInterval(async () => {
+    const interval = setInterval(async () => {
       const sendTransport = sendTransportRef.current;
       const recvTransport = recvTransportRef.current;
       const transport = sendTransport || recvTransport;
@@ -1257,7 +1257,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         setRtcLatency(0);
       }
     }, 500);
-    return () => clearInterval(timer);
+
+    return () => clearInterval(interval);
   }, []);
 
   const contextValue = useMemo(

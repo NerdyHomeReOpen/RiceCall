@@ -1,17 +1,20 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ipc from '@/ipc';
 
 import MarkdownContent from '@/components/MarkdownContent';
 
 import popupStyles from '@/styles/popup.module.css';
 
-interface ConfirmWebRTCPopupProps {
+interface RTCDisconnectPopupProps {
   id: string;
   count?: number;
 }
 
-// eslint-disable-next-line
-const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, count }) => {
+const RTCDisconnectPopup: React.FC<RTCDisconnectPopupProps> = React.memo(({ id, count }) => {
+  // Hooks
+  const { t } = useTranslation();
+
   // State
   const [currentCount, setCurrentCount] = useState(count || 1);
 
@@ -20,6 +23,7 @@ const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, 
     ipc.popup.close(id);
   };
 
+  // Effects
   useEffect(() => {
     const unsub = ipc.socket.on('webrtcDisconnectCountUpdate', (newCount) => {
       setCurrentCount(newCount);
@@ -34,19 +38,19 @@ const ConfirmWebRTCPopup: React.FC<ConfirmWebRTCPopupProps> = React.memo(({ id, 
         <div className={popupStyles['dialog-content']}>
           <div className={`${popupStyles['dialog-icon']} ${popupStyles['info']}`} />
           <div className={popupStyles['dialog-message']}>
-            <MarkdownContent markdownText={`我們偵測到 ${currentCount} 次斷線，我們已經蒐集了連線資訊，正在盡力分析 請耐心等待我們修復`} />
+            <MarkdownContent markdownText={t('rtc-disconnect-message', { count: currentCount })} />
           </div>
         </div>
       </div>
       <div className={popupStyles['popup-footer']}>
         <div className={popupStyles['button']} onClick={handleClose}>
-          {'確定'}
+          {t('confirm')}
         </div>
       </div>
     </div>
   );
 });
 
-ConfirmWebRTCPopup.displayName = 'ConfirmWebRTCPopup';
+RTCDisconnectPopup.displayName = 'RTCDisconnectPopup';
 
-export default ConfirmWebRTCPopup;
+export default RTCDisconnectPopup;

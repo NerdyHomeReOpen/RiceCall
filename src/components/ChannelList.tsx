@@ -193,13 +193,7 @@ const ChannelList: React.FC = React.memo(() => {
           <div className={'hover-text'}>{`文字: ${latency}ms`}</div>
         </div>
         {rtcStatus !== 'disconnected' && (
-          <div
-            className={`${styles['rtc-latency-icon']} ${rtcStatus === 'connected' ? styles[`status${4 - Math.floor(rtcLatency / 50)}`] : ''} has-hover-text`}
-            style={{
-              backgroundImage: rtcStatus === 'failed' ? "url('/pic_error.webp')" : rtcStatus === 'connecting' ? "url('/icon_loading.gif')" : undefined,
-              backgroundSize: rtcStatus === 'connected' ? undefined : 'contain',
-            }}
-          >
+          <div className={`${styles['rtc-latency-icon']} ${rtcStatus === 'connected' ? styles[`status${4 - Math.floor(rtcLatency / 50)}`] : styles[rtcStatus]} has-hover-text`}>
             <div className={'hover-text'}>{`音訊: ${rtcStatus === 'connected' ? `${rtcLatency}ms` : rtcStatus}`}</div>
           </div>
         )}

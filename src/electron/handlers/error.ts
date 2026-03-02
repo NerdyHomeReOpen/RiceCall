@@ -46,12 +46,10 @@ export function registerErrorHandlers() {
   });
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ipcMain.handle('confirm-webrtc-signal', async (_, formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
+  ipcMain.handle('webRTC-error', async (_, formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
     return new Promise((resolve) => {
-      const id = `webrtc-confirm-${Date.now()}`;
-
       if (formData.signalState === 'disconnected') {
-        createPopup('confirmWebRTC', id, formData);
+        createPopup('rtcDisconnect', `rtcDisconnect-${Date.now()}`, formData);
       }
 
       const fields = [
