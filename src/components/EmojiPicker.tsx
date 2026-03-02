@@ -1,5 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 import React, { useLayoutEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
@@ -27,6 +28,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
   ({ x, y, direction, anchorEl, showFontbar = false, fontSize: propFontSize = '13px', textColor: propTextColor = '#000000', onEmojiSelect, onFontSizeChange, onTextColorChange }) => {
     // Hooks
     const { showColorPicker } = useContextMenu();
+    const { t } = useTranslation();
 
     // Refs
     const emojiPickerRef = useRef<HTMLDivElement>(null);
@@ -185,7 +187,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
             </div>
           </div>
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'vip' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
-            <div className={emojiStyles['emoji-vip-placeholder']}>{/* TODO: i18n */}即將推出...</div>
+            <div className={emojiStyles['emoji-vip-placeholder']}>{t('soon')}</div>
           </div>
         </div>
         <div className={emojiStyles['emoji-tabs']} role="tablist">

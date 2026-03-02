@@ -27,7 +27,7 @@ const ChannelList: React.FC = React.memo(() => {
   const { showContextMenu } = useContextMenu();
   const { findMe } = useFindMeContext();
   const dispatch = useAppDispatch();
-  const { rtcLatency, rtcStatus } = useWebRTC();
+  const { rtcLatency } = useWebRTC();
 
   // Selectors
   const user = useAppSelector(
@@ -78,7 +78,7 @@ const ChannelList: React.FC = React.memo(() => {
   const isAllTab = selectedTabId === 'all';
   const isCurrentTab = selectedTabId === 'current';
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
-  const connectStatus = 4 - Math.floor(Number(latency) / 50);
+  const connectStatus = 4 - Math.floor(Number(Math.max(latency, rtcLatency)) / 50);
   const hasNewMemberApplications = Permission.isServerAdmin(permissionLevel) && memberApplicationsCount > 0;
 
   // Functions
@@ -190,13 +190,12 @@ const ChannelList: React.FC = React.memo(() => {
       </div>
       <div className={styles['current-channel-box']}>
         <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
-          <div className={'hover-text'}>{`文字: ${latency}ms`}</div>
-        </div>
-        {rtcStatus !== 'disconnected' && (
-          <div className={`${styles['rtc-latency-icon']} ${rtcStatus === 'connected' ? styles[`status${4 - Math.floor(rtcLatency / 50)}`] : styles[rtcStatus]} has-hover-text`}>
-            <div className={'hover-text'}>{`音訊: ${rtcStatus === 'connected' ? `${rtcLatency}ms` : rtcStatus}`}</div>
+          <div className={'hover-text'}>
+            {`${t('latency', { 0: latency || '-' })}`}
+            <br />
+            {`${t('audio-latency', { 0: rtcLatency || '-' })}`}
           </div>
-        )}
+        </div>
         <div className={styles['current-channel-text']}>{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
       </div>
       {isCurrentChannelQueueMode && (
