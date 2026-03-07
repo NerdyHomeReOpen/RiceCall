@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
 import * as Action from '@/action';
+import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constant';
 
 import popupStyles from '@/styles/popup.module.css';
-
-import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constant';
 
 interface KickMemberFromChannelPopupProps {
   id: string;

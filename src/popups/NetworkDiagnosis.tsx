@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaCheckCircle, FaArrowRight, FaSpinner, FaNetworkWired, FaServer, FaCloud } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
-import { getEnv } from '@/env';
+
 import ipc from '@/ipc';
-import { isElectron } from '@/utils/platform';
 
 import type * as Types from '@/types';
+
+import { getEnv } from '@/env';
+import { isElectron } from '@/utils/platform';
 
 import popupStyles from '@/styles/popup.module.css';
 import ndStyles from '@/styles/networkDiagnosis.module.css';

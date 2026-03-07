@@ -3,6 +3,7 @@ import Image from 'next/image';
 import React, { useEffect, useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 

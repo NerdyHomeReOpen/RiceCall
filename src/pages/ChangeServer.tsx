@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import * as Action from '@/action';

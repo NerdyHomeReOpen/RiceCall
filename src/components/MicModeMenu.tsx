@@ -1,10 +1,11 @@
 import React from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
+import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import { useWebRTC } from '@/providers/WebRTC';
-import { useAppSelector } from '@/store/hook';
 
 import * as Color from '@/utils/color';
 

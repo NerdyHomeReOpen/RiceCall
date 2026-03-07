@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import MarkdownContent from '@/components/MarkdownContent';

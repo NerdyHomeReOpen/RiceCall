@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
+
 import packageJson from '../../package.json';
 import ipc from '@/ipc';
 

@@ -6,10 +6,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
-import { EmojiNode } from '@/extensions/EmojiNode';
-import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
-import { ImageNode } from '@/extensions/ImageNode';
-import { ChatEnter } from '@/extensions/ChatEnter';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
@@ -21,6 +18,10 @@ import LevelIcon from '@/components/LevelIcon';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
+import { EmojiNode } from '@/extensions/EmojiNode';
+import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
+import { ImageNode } from '@/extensions/ImageNode';
+import { ChatEnter } from '@/extensions/ChatEnter';
 import * as Action from '@/action';
 import * as Default from '@/utils/default';
 import * as TagConverter from '@/utils/tagConverter';

@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector, useAppDispatch } from '@/store/hook';
 import ipc from '@/ipc';
 

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 

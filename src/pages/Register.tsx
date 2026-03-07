@@ -1,6 +1,7 @@
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 import i18n from '@/i18n';
 
