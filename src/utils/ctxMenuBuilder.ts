@@ -575,11 +575,11 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addAddToQueueOption(params: { isSelf: boolean; isEqualOrLowerLevel: boolean; isQueueMode: boolean; isInQueue: boolean }, onClick: () => void): this {
+  addAddToQueueOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isEqualOrLowerLevel: boolean; isQueueMode: boolean; isInQueue: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'add-to-queue',
       label: 'add-to-queue',
-      show: !params.isSelf && params.isEqualOrLowerLevel && params.isQueueMode,
+      show: !params.isSelf && params.isEqualOrLowerLevel && params.isQueueMode && Permission.isChannelMod(params.permissionLevel),
       disabled: params.isInQueue,
       onClick: onClick,
     });

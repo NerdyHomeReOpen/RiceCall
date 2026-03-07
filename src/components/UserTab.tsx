@@ -118,7 +118,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const getTabContextMenuItems = () =>
     new CtxMenuBuilder()
       .addJoinUserChannelOption({ isSelf, isInSameChannel }, () => Popup.connectChannel(currentServer.serverId, channel.channelId, canJoin, isPasswordNeeded))
-      .addAddToQueueOption({ isSelf, isEqualOrLowerLevel, isQueueMode: isChannelQueueMode, isInQueue }, () => Popup.addUserToQueue(member.userId, currentServer.serverId, channel.channelId))
+      .addAddToQueueOption({ permissionLevel, isSelf, isEqualOrLowerLevel, isQueueMode: isChannelQueueMode, isInQueue }, () => Popup.addUserToQueue(member.userId, currentServer.serverId, channel.channelId))
       .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, member.userId))
       .addViewProfileOption(() => Popup.openUserInfo(user.userId, member.userId))
       .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(user.userId, member.userId))
