@@ -4,7 +4,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -23,12 +23,12 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, se
 
   // Handlers
   const handleConfirmBtnClick = () => {
-    Popup.editMember(member.userId, serverId, { nickname: memberNickname || null });
+    Action.editMember(member.userId, serverId, { nickname: memberNickname || null });
     ipc.popup.close(id);
   };
 
   const handleApplyBtnClick = () => {
-    Popup.editMember(member.userId, serverId, { nickname: memberNickname || null });
+    Action.editMember(member.userId, serverId, { nickname: memberNickname || null });
   };
 
   const handleCloseBtnClick = () => {

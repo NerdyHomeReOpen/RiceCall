@@ -15,9 +15,10 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Default from '@/utils/default';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+
+import { useFriendTabContextMenu } from '@/hooks/ctxMenus/friendTabCtxMenu';
 
 import styles from '@/styles/friend.module.css';
 import vip from '@/styles/vip.module.css';
@@ -50,35 +51,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
 
   // Variables
   const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: -1, userId: user.userId }), [t, user.userId]);
-  const isSelf = friend.targetId === user.userId;
   const isOnline = friend.status === 'online';
   const isOffline = friend.status === 'offline';
-  const isStranger = friend.relationStatus === 0;
   const isPending = friend.relationStatus === 1;
   const isFriend = friend.relationStatus === 2;
   const hasVip = friend.vip > 0;
   const hasNote = friend.note !== '' && friend.note !== null;
 
-  // Functions
-  const getFriendTabContextMenuItems = () =>
-    new CtxMenuBuilder()
-      .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, friend.targetId))
-      .addViewProfileOption(() => Popup.openUserInfo(user.userId, friend.targetId))
-      .addAddFriendOption({ isSelf, isFriend }, () => Popup.openApplyFriend(user.userId, friend.targetId))
-      .addEditNoteOption({ isSelf, isFriend }, () => Popup.openEditFriendNote(user.userId, friend.targetId))
-      .addSeparator()
-      .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => { }, onNotifyFriendOnlineClick: () => { } }, () => { })
-      .addEditFriendFriendGroupOption(
-        { isSelf, isStranger, isBlocked: friend.isBlocked },
-        () => { },
-        new CtxMenuBuilder()
-          .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => Popup.editFriend(friend.targetId, { friendGroupId }))
-          .build(),
-      )
-      .addBlockUserOption({ isSelf, isBlocked: friend.isBlocked }, () => (friend.isBlocked ? Popup.unblockUser(friend.targetId, friend.name) : Popup.blockUser(friend.targetId, friend.name)))
-      .addDeleteFriendOption({ isSelf, isFriend }, () => Popup.deleteFriend(friend.targetId, friend.name))
-      .addDeleteFriendApplicationOption({ isSelf, isPending }, () => Popup.deleteFriendApplication(friend.targetId))
-      .build();
+  const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabContextMenu({ user, friend, friendGroups, defaultFriendGroup });
 
   // Handlers
   const handleServerNameClick = () => {
@@ -93,14 +73,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   };
 
   const handleTabDoubleClick = () => {
-    Popup.openDirectMessage(user.userId, friend.targetId);
+    Action.openDirectMessage(user.userId, friend.targetId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getFriendTabContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', buildFriendTabContextMenu());
   };
 
   // Effects

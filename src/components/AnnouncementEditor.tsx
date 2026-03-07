@@ -14,7 +14,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import { fromTags, toTags } from '@/utils/tagConverter';
 
 import { FONT_LIST, MAX_FILE_SIZE } from '@/constant';
@@ -191,7 +191,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }

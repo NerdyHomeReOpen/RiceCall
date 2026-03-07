@@ -5,7 +5,7 @@ import { useAppSelector } from '@/store/hook';
 
 import FriendGroupTab from '@/components/FriendGroupTab';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Default from '@/utils/default';
 
 import styles from '@/styles/friend.module.css';
@@ -48,11 +48,11 @@ const FriendList: React.FC = React.memo(() => {
   };
 
   const handleCreateFriendGroupBtnClick = () => {
-    Popup.openCreateFriendGroup();
+    Action.openCreateFriendGroup();
   };
 
   const handleAddFriendBtnClick = () => {
-    Popup.openSearchUser();
+    Action.openSearchUser();
   };
 
   return (

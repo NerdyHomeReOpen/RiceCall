@@ -12,9 +12,13 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useFindMeContext } from '@/providers/FindMe';
-import * as Popup from '@/action';
+
+import * as Action from '@/action';
+
 import * as Permission from '@/utils/permission';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+
+import { useChannelListContextMenu } from '@/hooks/ctxMenus/channelListCtxMenu';
+import { useServerSettingContextMenu } from '@/hooks/ctxMenus/serverSettingCtxMenu';
 
 import styles from '@/styles/server.module.css';
 import header from '@/styles/header.module.css';
@@ -80,33 +84,23 @@ const ChannelList: React.FC = React.memo(() => {
   const hasNewMemberApplications = Permission.isServerAdmin(permissionLevel) && memberApplicationsCount > 0;
 
   // Functions
-  const getServerSettingContextMenuItems = () =>
-    new CtxMenuBuilder()
-      .addApplyMemberOption({ permissionLevel }, () => Popup.applyMember(user.userId, currentServer.serverId, currentServer.receiveApply))
-      .addServerSettingOption({ permissionLevel }, () => Popup.openServerSetting(user.userId, currentServer.serverId))
-      .addSeparator()
-      .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => Popup.openEditNickname(user.userId, currentServer.serverId))
-      .addLocateMeOption(() => locateMe())
-      .addSeparator()
-      .addReportOption(() => window.open('https://ricecall.com/report-server', '_blank'))
-      .addFavoriteServerOption({ isFavorite: currentServer.favorite }, () => Popup.favoriteServer(currentServer.serverId))
-      .build();
-
-  const getChannelListContextMenuItems = () =>
-    new CtxMenuBuilder()
-      .addCreateChannelOption({ permissionLevel }, () => Popup.openCreateChannel(user.userId, currentServer.serverId, ''))
-      .addSeparator()
-      .addKickAllUsersFromServerOption({ permissionLevel, movableUserIds: movableServerUserIds }, () => Popup.kickUsersFromServer(movableServerUserIds, currentServer.serverId))
-      .addSeparator()
-      .addBroadcastOption({ permissionLevel }, () => Popup.openServerBroadcast(currentServer.serverId, currentChannel.channelId))
-      .addSeparator()
-      .addEditChannelOrderOption({ permissionLevel }, () => Popup.openEditChannelOrder(user.userId, currentServer.serverId))
-      .build();
-
   const locateMe = () => {
     findMe();
     dispatch(setSelectedItemId(`user-${user.userId}`));
   };
+
+  const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingContextMenu({
+    user,
+    currentServer,
+    onLocateMe: locateMe,
+  });
+
+  const { buildContextMenu: buildChannelListContextMenu } = useChannelListContextMenu({
+    user,
+    currentServer,
+    currentChannel,
+    movableServerUserIds,
+  });
 
   // Handlers
   const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
@@ -120,25 +114,25 @@ const ChannelList: React.FC = React.memo(() => {
   };
 
   const handleInviteFriendClick = () => {
-    Popup.openInviteFriend(user.userId, currentServer.serverId);
+    Action.openInviteFriend(user.userId, currentServer.serverId);
   };
 
   const handleServerSettingClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showContextMenu(x, y, 'right-bottom', getServerSettingContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', buildServerSettingContextMenu());
   };
 
   const handleServerAvatarClick = () => {
-    Popup.openServerSetting(user.userId, currentServer.serverId);
+    Action.openServerSetting(user.userId, currentServer.serverId);
   };
 
   const handleChannelListContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getChannelListContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', buildChannelListContextMenu());
   };
 
   const handleCurrentChannelTabClick = () => {

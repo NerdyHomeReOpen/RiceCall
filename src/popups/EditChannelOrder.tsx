@@ -8,7 +8,7 @@ import type * as Types from '@/types';
 
 import { setSelectedItemId } from '@/store/slices/uiSlice';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import styles from '@/styles/editChannelOrder.module.css';
 import serverPage from '@/styles/server.module.css';
@@ -125,17 +125,17 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   // Handlers
   const handleAddChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Popup.openCreateChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
+    Action.openCreateChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleChangeChannelNameBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Popup.openEditChannelName(user.userId, serverId, selectedChannel?.channelId ?? '');
+    Action.openEditChannelName(user.userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleDeleteChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Popup.deleteChannel(serverId, selectedChannel?.channelId ?? '', selectedChannel?.name ?? '');
+    Action.deleteChannel(serverId, selectedChannel?.channelId ?? '', selectedChannel?.name ?? '');
   };
 
   const handleMoveUpBtnClick = (e: React.MouseEvent) => {
@@ -165,7 +165,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.editChannels(serverId, editedChannels);
+    Action.editChannels(serverId, editedChannels);
     ipc.popup.close(id);
   };
 

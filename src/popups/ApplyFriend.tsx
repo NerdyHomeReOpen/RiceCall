@@ -6,7 +6,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -42,11 +42,11 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
 
   // Handlers
   const handleTargetNameClick = () => {
-    Popup.openUserInfo(user.userId, target.userId);
+    Action.openUserInfo(user.userId, target.userId);
   };
 
   const handleCreateFriendGroupBtnClick = () => {
-    Popup.openCreateFriendGroup();
+    Action.openCreateFriendGroup();
   };
 
   const handleApplicationDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -62,12 +62,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
   };
 
   const handleSubmitBtnClick = () => {
-    Popup.sendFriendApplication(target.userId, { description: applicationDesc }, friendGroupId || null);
+    Action.sendFriendApplication(target.userId, { description: applicationDesc }, friendGroupId || null);
     ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
-    Popup.editFriendApplication(target.userId, { description: applicationDesc });
+    Action.editFriendApplication(target.userId, { description: applicationDesc });
     ipc.popup.close(id);
   };
 

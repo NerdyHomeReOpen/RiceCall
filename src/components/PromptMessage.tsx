@@ -11,8 +11,8 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as TagConverter from '@/utils/tagConverter';
 import * as Language from '@/utils/language';
-import * as Popup from '@/action';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+
+import { usePromptMessageContextMenu } from '@/hooks/ctxMenus/promptMessageCtxMenu';
 
 import styles from '@/styles/message.module.css';
 
@@ -27,13 +27,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   const { showContextMenu } = useContextMenu();
 
   // Selectors
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
+  const user = useAppSelector((state) => ({ userId: state.user.data.userId }), shallowEqual);
 
   // Variables
   const escapedMessageParameter = Object.fromEntries(Object.entries(messageGroup.parameter).map(([key, value]) => [key, TagConverter.escapeHtml(value)]));
@@ -52,19 +46,14 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
     [messageGroup.contents, escapedMessageParameter, messageGroup.parameter, t],
   );
 
-  // Functions
-  const getMessageContextMenuItems = () =>
-    messageGroup.contentMetadata && messageGroup.contentMetadata.userId
-      ? new CtxMenuBuilder().addViewProfileOption(() => Popup.openUserInfo(user.userId, messageGroup.contentMetadata.userId)).build()
-      : [];
+  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageContextMenu({ user, contentMetadata: messageGroup.contentMetadata });
 
   // Handlers
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!messageGroup.contentMetadata) return;
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getMessageContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', buildMessageContextMenu());
   };
 
   return (

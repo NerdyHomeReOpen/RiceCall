@@ -16,7 +16,7 @@ import ipc from '@/ipc';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Permission from '@/utils/permission';
 import * as TagConverter from '@/utils/tagConverter';
 
@@ -146,7 +146,7 @@ const MessageInputBox: React.FC = React.memo(() => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }
@@ -170,7 +170,7 @@ const MessageInputBox: React.FC = React.memo(() => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInputRef.current.trim().length === 0) return;
-      Popup.sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: messageInputRef.current });
+      Action.sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: messageInputRef.current });
       setLastMessageTime(Date.now());
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
       setStyles();

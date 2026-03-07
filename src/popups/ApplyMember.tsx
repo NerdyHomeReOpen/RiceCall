@@ -4,7 +4,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -37,12 +37,12 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, serv
   };
 
   const handleSubmitBtnClick = () => {
-    Popup.sendMemberApplication(server.serverId, { description: applicationDesc });
+    Action.sendMemberApplication(server.serverId, { description: applicationDesc });
     ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
-    Popup.editMemberApplication(server.serverId, { description: applicationDesc });
+    Action.editMemberApplication(server.serverId, { description: applicationDesc });
     ipc.popup.close(id);
   };
 

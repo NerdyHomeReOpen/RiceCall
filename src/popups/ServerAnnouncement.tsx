@@ -32,7 +32,7 @@ const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.me
         </div>
       </div>
       <div className={styles['containers']}>
-        <AnnouncementEditor announcement={announcement} showPreview={true} onChange={() => {}} />
+        <AnnouncementEditor announcement={announcement} showPreview={true} onChange={() => { }} />
       </div>
     </div>
   );

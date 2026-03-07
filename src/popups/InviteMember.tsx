@@ -4,7 +4,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -29,7 +29,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
   };
 
   const handleSubmitBtnClick = () => {
-    Popup.sendMemberInvitation(target.userId, serverId, { description: invitationDesc });
+    Action.sendMemberInvitation(target.userId, serverId, { description: invitationDesc });
     handleCloseBtnClick();
   };
 
@@ -38,7 +38,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
   };
 
   const handleSubmitEditBtnClick = () => {
-    Popup.editMemberInvitation(target.userId, serverId, { description: invitationDesc });
+    Action.editMemberInvitation(target.userId, serverId, { description: invitationDesc });
     handleCloseBtnClick();
   };
 

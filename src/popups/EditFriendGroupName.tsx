@@ -4,7 +4,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -30,7 +30,7 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.editFriendGroup(friendGroup.friendGroupId, { name: friendGroupName });
+    Action.editFriendGroup(friendGroup.friendGroupId, { name: friendGroupName });
     handleCloseBtnClick();
   };
 

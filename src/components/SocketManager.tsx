@@ -29,7 +29,7 @@ import { setUser, updateUser } from '@/store/slices/userSlice';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 import * as Default from '@/utils/default';
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
@@ -49,7 +49,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   // Refs
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const popupOffSubmitRef = useRef<() => void>(() => {});
+  const popupOffSubmitRef = useRef<() => void>(() => { });
   const userRef = useRef(user);
   const currentFriendsRef = useRef(currentFriends);
   const currentServerRef = useRef(currentServer);
@@ -486,7 +486,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error) => {
-      Popup.openErrorDialog(new Error(error.message), () => {});
+      Action.openErrorDialog(new Error(error.message), () => { });
     });
     return () => unsub();
   }, []);

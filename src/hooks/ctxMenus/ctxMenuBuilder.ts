@@ -74,11 +74,14 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addMoveAllUserToChannelOption(params: { isInChannel: boolean; currentPermissionLevel: Types.Permission; permissionLevel: Types.Permission; movableUserIds: string[] }, onClick: () => void): this {
+  addMoveAllUserToChannelOption(
+    params: { isInChannel: boolean; currentPermissionLevel: Types.Permission; permissionLevel: Types.Permission; movableChannelUserIds: string[] },
+    onClick: () => void,
+  ): this {
     this.options.push({
       id: 'move-all-user-to-channel',
       label: 'move-all-user-to-channel',
-      show: !params.isInChannel && Permission.isChannelMod(params.currentPermissionLevel) && Permission.isChannelMod(params.permissionLevel) && params.movableUserIds.length > 0,
+      show: !params.isInChannel && Permission.isChannelMod(params.currentPermissionLevel) && Permission.isChannelMod(params.permissionLevel) && params.movableChannelUserIds.length > 0,
       onClick: onClick,
     });
     return this;
@@ -94,21 +97,21 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addKickChannelUsersFromServerOption(params: { permissionLevel: Types.Permission; movableUserIds: string[] }, onClick: () => void): this {
+  addKickChannelUsersFromServerOption(params: { permissionLevel: Types.Permission; movableChannelUserIds: string[] }, onClick: () => void): this {
     this.options.push({
       id: 'kick-channel-users-from-server',
       label: 'kick-channel-users-from-server',
-      show: params.movableUserIds.length > 0 && Permission.isStaff(params.permissionLevel),
+      show: params.movableChannelUserIds.length > 0 && Permission.isStaff(params.permissionLevel),
       onClick: onClick,
     });
     return this;
   }
 
-  addKickAllUsersFromServerOption(params: { permissionLevel: Types.Permission; movableUserIds: string[] }, onClick: () => void): this {
+  addKickAllUsersFromServerOption(params: { permissionLevel: Types.Permission; movableServerUserIds: string[] }, onClick: () => void): this {
     this.options.push({
       id: 'kick-all-users-from-server',
       label: 'kick-all-users-from-server',
-      show: params.movableUserIds.length > 0 && Permission.isStaff(params.permissionLevel),
+      show: params.movableServerUserIds.length > 0 && Permission.isStaff(params.permissionLevel),
       onClick: onClick,
     });
     return this;
@@ -152,6 +155,17 @@ export default class ContextMenuClass {
       label: 'edit-nickname',
       show: (params.isSelf || (Permission.isServerAdmin(params.permissionLevel) && params.isLowerLevel)) && Permission.isMember(params.permissionLevel),
       icon: 'edit-nickname',
+      onClick: onClick,
+    });
+    return this;
+  }
+
+  addEditNicknameOptionWithNoIcon(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+    this.options.push({
+      id: 'edit-nickname',
+      label: 'edit-nickname',
+      show: (params.isSelf || (Permission.isServerAdmin(params.permissionLevel) && params.isLowerLevel)) && Permission.isMember(params.permissionLevel),
+      icon: 'edit-nickname-no-icon',
       onClick: onClick,
     });
     return this;
@@ -575,11 +589,11 @@ export default class ContextMenuClass {
     return this;
   }
 
-  addAddToQueueOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isEqualOrLowerLevel: boolean; isQueueMode: boolean; isInQueue: boolean }, onClick: () => void): this {
+  addAddToQueueOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isEqualOrLowerLevel: boolean; isChannelQueueMode: boolean; isInQueue: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'add-to-queue',
       label: 'add-to-queue',
-      show: !params.isSelf && params.isEqualOrLowerLevel && params.isQueueMode && Permission.isChannelMod(params.permissionLevel),
+      show: !params.isSelf && params.isEqualOrLowerLevel && params.isChannelQueueMode && Permission.isChannelMod(params.permissionLevel),
       disabled: params.isInQueue,
       onClick: onClick,
     });

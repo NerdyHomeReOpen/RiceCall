@@ -4,7 +4,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -31,7 +31,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.editChannel(serverId, channel.channelId, { name: channelName });
+    Action.editChannel(serverId, channel.channelId, { name: channelName });
     handleCloseBtnClick();
   };
 

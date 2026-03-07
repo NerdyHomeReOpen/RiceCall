@@ -14,7 +14,7 @@ import RecommendServerCard from '@/components/RecommendServerCard';
 
 import { useLoading } from '@/providers/Loading';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Language from '@/utils/language';
 
 import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constant';
@@ -166,7 +166,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   };
 
   const handleCreateServerClick = () => {
-    Popup.openCreateServer(user.userId);
+    Action.openCreateServer(user.userId);
   };
 
   const handlePersonalExclusiveSectionBtnClick = () => {

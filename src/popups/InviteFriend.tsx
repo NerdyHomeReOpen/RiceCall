@@ -6,7 +6,7 @@ import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Default from '@/utils/default';
 
 import styles from '@/styles/inviteFriend.module.css';
@@ -63,7 +63,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
 
   const handleInviteFriendBtnClick = () => {
     if (selectedUserIds.length === 0) return;
-    Popup.openAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
+    Action.openAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
       const invitationLink = `${INVITATION_BASE_URL}?sid=${server.specialId || server.displayId}`;
       const formatedMessage = `<a href='${invitationLink}' type='invitation' customLink='true' >${invitationLink}</a>`;
       for (const userId of selectedUserIds) {

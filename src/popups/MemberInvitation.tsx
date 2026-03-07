@@ -5,7 +5,7 @@ import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Language from '@/utils/language';
 
 import styles from '@/styles/verification.module.css';
@@ -20,7 +20,7 @@ const MemberInvitationPopup: React.FC = React.memo(() => {
 
   // Handlers
   const handleRejectAllBtnClick = () => {
-    Popup.rejectAllMemberInvitation(memberInvitations);
+    Action.rejectAllMemberInvitation(memberInvitations);
   };
 
   return (
@@ -59,11 +59,11 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
 
   // Handlers
   const handleAcceptBtnClick = () => {
-    Popup.acceptMemberInvitation(invitation.serverId);
+    Action.acceptMemberInvitation(invitation.serverId);
   };
 
   const handleRejectBtnClick = () => {
-    Popup.rejectMemberInvitation(invitation.serverId);
+    Action.rejectMemberInvitation(invitation.serverId);
   };
 
   return (

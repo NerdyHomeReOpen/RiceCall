@@ -12,10 +12,10 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Language from '@/utils/language';
 import * as Permission from '@/utils/permission';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 import Sorter from '@/utils/sorter';
 import ObjDiff from '@/utils/objDiff';
 
@@ -103,13 +103,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
 
   const settingPages = Permission.isServerAdmin(permissionLevel)
     ? [
-        t('server-info'),
-        t('server-announcement'),
-        t('member-management'),
-        t('access-permission'),
-        `${t('member-application-management')} (${totalApplicationsCount})`,
-        `${t('blacklist-management')} (${totalBlockMembersCount})`,
-      ]
+      t('server-info'),
+      t('server-announcement'),
+      t('member-management'),
+      t('access-permission'),
+      `${t('member-application-management')} (${totalApplicationsCount})`,
+      `${t('blacklist-management')} (${totalBlockMembersCount})`,
+    ]
     : Permission.isMember(permissionLevel)
       ? [t('server-info'), t('server-announcement'), t('member-management')]
       : [t('server-info'), t('server-announcement')];
@@ -191,10 +191,10 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     const file = e.target.files?.[0];
     if (!file || isUploadingRef.current) return;
     file.arrayBuffer().then((arrayBuffer) => {
-      Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+      Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
           isUploadingRef.current = false;
           return;
         }
@@ -257,12 +257,12 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   };
 
   const handleApplySettingBtnClick = () => {
-    Popup.openMemberApplicationSetting(user.userId, server.serverId);
+    Action.openMemberApplicationSetting(user.userId, server.serverId);
   };
 
   const handleSaveBtnClick = () => {
     if (!canSubmit) return;
-    Popup.editServer(server.serverId, ObjDiff(server, serverData));
+    Action.editServer(server.serverId, ObjDiff(server, serverData));
     ipc.popup.close(id);
   };
 
@@ -432,23 +432,23 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                     const getMemberManagementSubmenuItems = () =>
                       new CtxMenuBuilder()
                         .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
-                          Popup.terminateMember(member.userId, server.serverId, member.name),
+                          Action.terminateMember(member.userId, server.serverId, member.name),
                         )
                         .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
                           Permission.isServerAdmin(member.permissionLevel)
-                            ? Popup.editServerPermission(member.userId, server.serverId, { permissionLevel: 2 })
-                            : Popup.editServerPermission(member.userId, server.serverId, { permissionLevel: 5 }),
+                            ? Action.editServerPermission(member.userId, server.serverId, { permissionLevel: 2 })
+                            : Action.editServerPermission(member.userId, server.serverId, { permissionLevel: 5 }),
                         )
                         .build();
 
                     const getContextMenuItems = () =>
                       new CtxMenuBuilder()
-                        .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, member.userId))
-                        .addViewProfileOption(() => Popup.openUserInfo(user.userId, member.userId))
-                        .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(member.userId, server.serverId))
-                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(member.userId, server.serverId))
+                        .addDirectMessageOption({ isSelf }, () => Action.openDirectMessage(user.userId, member.userId))
+                        .addViewProfileOption(() => Action.openUserInfo(user.userId, member.userId))
+                        .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openEditNickname(member.userId, server.serverId))
+                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openBlockMember(member.userId, server.serverId))
                         .addSeparator()
-                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
+                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, getMemberManagementSubmenuItems())
                         .build();
 
                     // Handlers
@@ -554,14 +554,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         id: 'view-profile',
                         label: t('view-profile'),
                         show: !isSelf,
-                        onClick: () => Popup.openUserInfo(user.userId, application.userId),
+                        onClick: () => Action.openUserInfo(user.userId, application.userId),
                       },
                       {
                         id: 'accept-application',
                         label: t('accept-application'),
                         show: !isSelf && Permission.isServerAdmin(permissionLevel),
                         onClick: () => {
-                          Popup.approveMemberApplication(application.userId, server.serverId);
+                          Action.approveMemberApplication(application.userId, server.serverId);
                         },
                       },
                       {
@@ -569,7 +569,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         label: t('deny-application'),
                         show: !isSelf && Permission.isServerAdmin(permissionLevel),
                         onClick: () => {
-                          Popup.rejectMemberApplication(application.userId, server.serverId);
+                          Action.rejectMemberApplication(application.userId, server.serverId);
                         },
                       },
                     ];
@@ -638,8 +638,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                     // Functions
                     const getContextMenuItems = () =>
                       new CtxMenuBuilder()
-                        .addViewProfileOption(() => Popup.openUserInfo(user.userId, member.userId))
-                        .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => Popup.unblockUserFromServer(member.userId, server.serverId, member.name))
+                        .addViewProfileOption(() => Action.openUserInfo(user.userId, member.userId))
+                        .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => Action.unblockUserFromServer(member.userId, server.serverId, member.name))
                         .build();
 
                     // Handlers

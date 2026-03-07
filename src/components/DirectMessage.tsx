@@ -8,7 +8,7 @@ import type * as Types from '@/types';
 import MarkdownContent from '@/components/MarkdownContent';
 
 import * as Language from '@/utils/language';
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import { ALLOWED_MESSAGE_KEYS } from '@/constant';
 
@@ -45,7 +45,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
 
   // Handlers
   const handleUsernameClick = () => {
-    Popup.openUserInfo(user.userId, messageGroup.userId);
+    Action.openUserInfo(user.userId, messageGroup.userId);
   };
 
   return (

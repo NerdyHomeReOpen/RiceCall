@@ -25,7 +25,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 import { useActionScanner } from '@/providers/ActionScanner';
 
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 import { isRenderer } from '@/utils/platform';
 
 import { LANGUAGES } from '@/constant';
@@ -120,7 +120,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
           onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
           onAboutUsClick: Action.openAboutUs,
         },
-        () => {},
+        () => { },
       )
       .addNetworkDiagnosisOption(() => Action.openNetworkDiagnosis())
       .addLogoutOption(() => logout())
@@ -165,7 +165,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: false,
       contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => {},
+      onClick: () => { },
     },
   ];
 

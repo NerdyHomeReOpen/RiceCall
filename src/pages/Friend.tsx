@@ -15,7 +15,7 @@ import LevelIcon from '@/components/LevelIcon';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Language from '@/utils/language';
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import friendStyles from '@/styles/friend.module.css';
 import vipStyles from '@/styles/vip.module.css';
@@ -42,7 +42,7 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
 
   // Handlers
   const handleUserNameClick = () => {
-    Popup.openUserInfo(user.userId, friendActivity.userId);
+    Action.openUserInfo(user.userId, friendActivity.userId);
   };
 
   return (

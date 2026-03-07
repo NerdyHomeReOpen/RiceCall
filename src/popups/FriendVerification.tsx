@@ -5,7 +5,7 @@ import { useAppSelector } from '@/store/hook';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Language from '@/utils/language';
 
 import styles from '@/styles/verification.module.css';
@@ -20,7 +20,7 @@ const FriendVerificationPopup: React.FC = React.memo(() => {
 
   // Handlers
   const handleRejectAllBtnClick = () => {
-    Popup.rejectAllFriendApplication(friendApplications);
+    Action.rejectAllFriendApplication(friendApplications);
   };
 
   return (
@@ -67,19 +67,19 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
 
   // Handlers
   const handleSenderAvatarClick = () => {
-    Popup.openUserInfo(user.userId, application.senderId);
+    Action.openUserInfo(user.userId, application.senderId);
   };
 
   const handleAcceptBtnClick = () => {
-    Popup.openApproveFriend(user.userId, application.senderId);
+    Action.openApproveFriend(user.userId, application.senderId);
   };
 
   const handleRejectBtnClick = () => {
-    Popup.rejectFriendApplication(application.senderId, application.name);
+    Action.rejectFriendApplication(application.senderId, application.name);
   };
 
   const handleDirectMessageBtnClick = () => {
-    Popup.openDirectMessage(user.userId, application.senderId);
+    Action.openDirectMessage(user.userId, application.senderId);
   };
 
   return (

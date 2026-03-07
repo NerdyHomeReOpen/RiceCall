@@ -12,7 +12,7 @@ import BadgeItem from '@/components/BadgeItem';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Permission from '@/utils/permission';
 import ObjDiff from '@/utils/objDiff';
 
@@ -119,17 +119,17 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
       const image = (e.target as HTMLInputElement).files?.[0];
       if (!image || isUploadingRef.current) return;
       image.arrayBuffer().then((arrayBuffer) => {
-        Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+        Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }
           ipc.data.uploadImage({ folder: 'user', imageName: target.userId, imageUnit8Array }).then((response) => {
             if (response) {
               setTarget((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
-              Popup.editUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
+              Action.editUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
             }
             isUploadingRef.current = false;
           });
@@ -162,19 +162,19 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 
   const handleConfirmBtnClick = () => {
     if (!countries.includes(target.country)) {
-      Popup.openErrorDialog(new Error('invalid-country'), () => {});
+      Action.openErrorDialog(new Error('invalid-country'), () => { });
       return;
     }
-    Popup.editUser(ObjDiff(target, targetData));
+    Action.editUser(ObjDiff(target, targetData));
     setSelectedTabId('about');
   };
 
   const handleApplyFriendBtnClick = () => {
-    Popup.openApplyFriend(user.userId, target.userId);
+    Action.openApplyFriend(user.userId, target.userId);
   };
 
   const handleChatBtnClick = () => {
-    Popup.openDirectMessage(user.userId, target.userId);
+    Action.openDirectMessage(user.userId, target.userId);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
