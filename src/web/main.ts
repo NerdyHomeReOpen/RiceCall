@@ -176,6 +176,14 @@ export function getInitialData(id: string) {
   return id ? null : null;
 }
 
+export async function enableLoopbackAudio(): Promise<void> {
+  return;
+}
+
+export async function disableLoopbackAudio(): Promise<void> {
+  return;
+}
+
 export * from '@/web/discord';
 export * from '@/web/socket';
 export * from '@/web/handlers/account';

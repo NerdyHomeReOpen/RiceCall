@@ -351,12 +351,12 @@ const ipc = {
   },
 
   loopbackAudio: {
-    enable: (): void => {
-      // modules.default.enableLoopbackAudio();
+    enable: async (): Promise<void> => {
+      return await modules.default.enableLoopbackAudio();
     },
 
-    disable: (): void => {
-      // modules.default.disableLoopbackAudio();
+    disable: async (): Promise<void> => {
+      return await modules.default.disableLoopbackAudio();
     },
   },
 

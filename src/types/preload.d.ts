@@ -172,6 +172,8 @@ export type IpcRendererHandlers = {
   getUpdateChannel: () => string;
   serverSelect: (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => void;
   webRTCSignalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: any }) => void;
+  enableLoopbackAudio: () => Promise<void>;
+  disableLoopbackAudio: () => Promise<void>;
 };
 
 declare global {

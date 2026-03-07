@@ -169,6 +169,8 @@ const ipcRendererHandlers = {
   getUpdateChannel: () => ipcRenderer.sendSync('get-update-channel'),
   serverSelect: (...args) => ipcRenderer.send('server-select', ...args),
   webRTCSignalStateChange: (...args) => ipcRenderer.send('webRTC-signal-state-change', ...args),
+  enableLoopbackAudio: () => ipcRenderer.invoke('enable-loopback-audio'),
+  disableLoopbackAudio: () => ipcRenderer.invoke('disable-loopback-audio'),
 };
 
 const electronLogHandlers = {
