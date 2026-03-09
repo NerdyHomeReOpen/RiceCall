@@ -7,7 +7,7 @@ import { accounts } from './accounts';
 import { language } from './language';
 import { customThemes } from './themes';
 import { systemSettings } from './systemSettings';
-import { network, sfuDiagnosis } from './network';
+import { networkDiagnosis, sfuDiagnosis } from './network';
 import { error, webrtc, deepLink, discord, fontList, record, tray, loopbackAudio, env, server, dontShowDisclaimerNextTime, checkForUpdates, exit } from './misc';
 
 const ipc = {
@@ -34,7 +34,7 @@ const ipc = {
   env,
   server,
   systemSettings,
-  network,
+  networkDiagnosis,
   sfuDiagnosis,
 };
 

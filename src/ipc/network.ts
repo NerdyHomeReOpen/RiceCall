@@ -1,12 +1,12 @@
 import * as Types from '@/types';
 import { modules } from './modules';
 
-export const network = {
-  runDiagnosis: async (params: { domains: string[]; duration?: number }): Promise<Types.FullReport | { error: string }> => {
+export const networkDiagnosis = {
+  run: async (params: { domains: string[]; duration?: number }): Promise<Types.FullReport | { error: string }> => {
     return await modules.default.runNetworkDiagnosis(params);
   },
 
-  cancelDiagnosis: (): void => {
+  cancel: (): void => {
     modules.default.cancelNetworkDiagnosis();
   },
 
@@ -21,7 +21,7 @@ export const sfuDiagnosis = {
   },
 
   onRequest: (callback: () => void): (() => void) => {
-    return modules.default.listen('get-sfu-diagnosis', callback);
+    return modules.default.listen('request-sfu-diagnosis', callback);
   },
 
   response: (info: Types.SFUDiagnosisInfo | null): void => {

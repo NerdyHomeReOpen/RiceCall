@@ -50,7 +50,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
       addLog(`Starting diagnosis for: ${domains.join(', ')}`);
       setProgress({ current: 0, cycle: 0, totalCycles: duration });
       try {
-        const report = await ipc.network.runDiagnosis({ domains, duration });
+        const report = await ipc.networkDiagnosis.run({ domains, duration });
         if (report && 'error' in report && (report as Types.ReportError).error) {
           addLog(`Diagnosis error: ${(report as Types.ReportError).error}`);
           return null;
@@ -240,7 +240,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   }, [logs, activeTab]);
 
   useEffect(() => {
-    const unsub = ipc.network.onProgress((progress: Types.ProgressData) => {
+    const unsub = ipc.networkDiagnosis.onProgress((progress: Types.ProgressData) => {
       const { step, cycle, totalCycles, hops, domain } = progress;
 
       if (step === 'mtr_ping_progress' && cycle !== undefined && totalCycles !== undefined) {
