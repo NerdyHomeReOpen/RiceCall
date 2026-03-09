@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 
 import * as Types from '@/types';
 
-import { mainWindow, broadcast } from '@/electron/main';
+import { broadcast } from '@/electron/main';
 
 import Logger from '@/logger';
 
@@ -95,12 +95,8 @@ export function registerDiagnosisToolHandlers() {
     }
   });
 
-  ipcMain.on('request-sfu-diagnosis', (event) => {
-    if (mainWindow && !mainWindow.isDestroyed()) {
-      mainWindow.webContents.send('get-sfu-diagnosis');
-    } else {
-      event.sender.send('sfu-diagnosis-response', null);
-    }
+  ipcMain.on('request-sfu-diagnosis', () => {
+    broadcast('request-sfu-diagnosis');
   });
 
   ipcMain.on('sfu-diagnosis-response', (_, data: { targetSenderId: number; info: unknown } | null) => {

@@ -25,7 +25,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 import { useActionScanner } from '@/providers/ActionScanner';
 
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 import { isRenderer } from '@/utils/platform';
 
 import { LANGUAGES } from '@/constant';

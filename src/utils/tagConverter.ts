@@ -1,4 +1,4 @@
-import { emojis } from '@/emojis';
+import { EMOJIS } from '@/emojis';
 
 import markdownStyles from '@/styles/markdown.module.css';
 import permissionStyles from '@/styles/permission.module.css';
@@ -31,7 +31,7 @@ export function escapeHtml(str: unknown): string {
 export function fromTags(raw: string) {
   return raw
     .replace(emojiRegex, (_, code) => {
-      const emoji = emojis.find((e) => e.code === code);
+      const emoji = EMOJIS.find((e) => e.code === code);
       if (!emoji) return code;
       return `<img data-emoji='${code}' loading='lazy' class='${markdownStyles['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
     })

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector, useAppDispatch } from '@/store/hook';
 
 import type * as Types from '@/types';
@@ -9,9 +10,9 @@ import { setChannelEvents } from '@/store/slices/channelEventsSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Language from '@/utils/language';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 
 import popupStyles from '@/styles/popup.module.css';
 import styles from '@/styles/channelEvent.module.css';
@@ -152,9 +153,9 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
   // Functions
   const getContextMenuItems = () =>
     new CtxMenuBuilder()
-      .addViewProfileOption(() => Popup.openUserInfo(user.userId, event.userId))
-      .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openKickMemberFromServer(event.userId, currentServer.serverId))
-      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(event.userId, currentServer.serverId))
+      .addViewProfileOption(() => Action.openUserInfo(user.userId, event.userId))
+      .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openKickMemberFromServer(event.userId, currentServer.serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openBlockMember(event.userId, currentServer.serverId))
       .build();
 
   const getChannelName = (channelId: string | null) => {

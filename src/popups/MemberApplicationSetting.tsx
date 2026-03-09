@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -31,7 +32,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.editServer(server.serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
+    Action.editServer(server.serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
     ipc.popup.close(id);
   };
 

@@ -1,14 +1,14 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
+import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constant';
 
 import popupStyles from '@/styles/popup.module.css';
-
-import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constant';
 
 interface KickMemberFromServerPopupProps {
   id: string;
@@ -82,7 +82,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.blockUserFromServer(member.userId, serverId, Date.now() + getBlockTime());
+    Action.blockUserFromServer(member.userId, serverId, Date.now() + getBlockTime());
     ipc.popup.close(id);
   };
 

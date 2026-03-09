@@ -10,8 +10,7 @@ import type * as Types from '@/types';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
-import * as Popup from '@/action';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import { useRecommendServerContextMenu } from '@/hooks/ctxMenus/recommendServerCtxMenu';
 
 import homeStyles from '@/styles/home.module.css';
 
@@ -38,24 +37,24 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   const hasOnline = recommendServer.online >= 0;
 
   // Functions
-  const getServerCardContextMenuItems = () =>
-    new CtxMenuBuilder()
-      .addJoinServerOption(handleServerCardClick)
-      .addViewServerInfoOption(() => Popup.openServerSetting(user.userId, recommendServer.serverId))
-      .build();
-
-  // Handlers
-  const handleServerCardClick = () => {
+  const joinServer = () => {
     if (getIsLoading() || user.currentServerId === recommendServer.serverId) return;
     loadServer(recommendServer.specialId || recommendServer.displayId);
     ipc.socket.send('connectServer', { serverId: recommendServer.serverId });
+  };
+
+  const { buildContextMenu: buildServerCardContextMenu } = useRecommendServerContextMenu({ user, recommendServer, onJoinServer: joinServer });
+
+  // Handlers
+  const handleServerCardClick = () => {
+    joinServer();
   };
 
   const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getServerCardContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', buildServerCardContextMenu());
   };
 
   return (

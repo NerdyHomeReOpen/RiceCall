@@ -1,11 +1,13 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaCheckCircle, FaArrowRight, FaSpinner, FaNetworkWired, FaServer, FaCloud } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
-import { getEnv } from '@/env';
+
 import ipc from '@/ipc';
-import { isElectron } from '@/utils/platform';
 
 import type * as Types from '@/types';
+
+import { getEnv } from '@/env';
+import { isElectron } from '@/utils/platform';
 
 import popupStyles from '@/styles/popup.module.css';
 import ndStyles from '@/styles/networkDiagnosis.module.css';
@@ -34,7 +36,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     { id: 'sfu_test', label: t('diagnosis-sfu-test'), icon: <FaCheckCircle />, status: 'pending' },
   ]);
 
-  // Handlers
+  // Functions
   const addLog = useCallback((message: string) => {
     setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
   }, []);
@@ -48,7 +50,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
       addLog(`Starting diagnosis for: ${domains.join(', ')}`);
       setProgress({ current: 0, cycle: 0, totalCycles: duration });
       try {
-        const report = await ipc.network.runDiagnosis({ domains, duration });
+        const report = await ipc.networkDiagnosis.run({ domains, duration });
         if (report && 'error' in report && (report as Types.ReportError).error) {
           addLog(`Diagnosis error: ${(report as Types.ReportError).error}`);
           return null;
@@ -63,6 +65,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     [addLog],
   );
 
+  // Handlers
   const handleStartTestClick = useCallback(async () => {
     if (isTesting) return;
     setIsTesting(true);
@@ -114,8 +117,6 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     updateStage('sfu_info', 'active');
 
     try {
-      ipc.sfuDiagnosis.request();
-
       const unsubscribe = ipc.sfuDiagnosis.onResponse((info: { ip?: string; port?: number } | null) => {
         unsubscribe();
 
@@ -151,11 +152,16 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
           });
         } else {
           addLog('No active SFU connection found.');
-          updateStage('sfu_info', 'failed');
+          updateStage('sfu_info', 'completed');
+          updateStage('sfu_test', 'active');
+          addLog('Skipping SFU test (no active connection).');
+          updateStage('sfu_test', 'completed');
+          setActiveTab('reports');
           addLog(t('diagnosis-finished'));
           setIsTesting(false);
         }
       });
+      ipc.sfuDiagnosis.request();
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');
       addLog(`Error requesting SFU info: ${error.message}`);
@@ -234,7 +240,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   }, [logs, activeTab]);
 
   useEffect(() => {
-    return ipc.network.onProgress((progress: Types.ProgressData) => {
+    const unsub = ipc.networkDiagnosis.onProgress((progress: Types.ProgressData) => {
       const { step, cycle, totalCycles, hops, domain } = progress;
 
       if (step === 'mtr_ping_progress' && cycle !== undefined && totalCycles !== undefined) {
@@ -252,6 +258,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
         }
       }
     });
+    return () => unsub();
   }, []);
 
   const renderVisualProgress = () => (
@@ -324,26 +331,8 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   if (!isElectron()) {
     return (
       <div className={popupStyles['popup-wrapper']}>
-        <div
-          className={popupStyles['popup-body']}
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-            height: '100%',
-            gap: '20px',
-          }}
-        >
-          <div
-            style={{
-              fontSize: '1.2rem',
-              color: '#555',
-              fontWeight: 'bold',
-            }}
-          >
-            {t('app-only-feature')}
-          </div>
+        <div className={`${popupStyles['popup-body']} ${ndStyles['app-only-body']}`}>
+          <div className={ndStyles['app-only-text']}>{t('app-only-feature')}</div>
         </div>
         <div className={popupStyles['popup-footer']}>
           <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
@@ -391,7 +380,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
               <div className={ndStyles['reports-panel']}>
                 {!reports.domain && !reports.sfu && (
                   <div className={ndStyles['reports-empty']}>
-                    <FaSpinner className={ndStyles['reports-empty-spinner']} style={{ fontSize: '1.5rem' }} />
+                    <FaSpinner className={ndStyles['reports-empty-spinner']} />
                     <span>{t('Diagnosis in progress...')}</span>
                   </div>
                 )}
@@ -418,18 +407,10 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
       </div>
 
       <div className={popupStyles['popup-footer']}>
-        <div
-          className={popupStyles['button']}
-          onClick={handleExportReportClick}
-          style={{
-            opacity: logs.length === 0 || isTesting ? 0.5 : 1,
-            pointerEvents: logs.length === 0 || isTesting ? 'none' : 'auto',
-            marginRight: 'auto',
-          }}
-        >
+        <div className={`${popupStyles['button']} ${ndStyles['btn-export']} ${logs.length === 0 || isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleExportReportClick}>
           {t('export-report')}
         </div>
-        <div className={popupStyles['button']} onClick={handleStartTestClick} style={{ opacity: isTesting ? 0.5 : 1, pointerEvents: isTesting ? 'none' : 'auto' }}>
+        <div className={`${popupStyles['button']} ${isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleStartTestClick}>
           {isTesting ? t('testing') : t('start-test')}
         </div>
         <div className={popupStyles['button']} onClick={handleCloseBtnClick}>

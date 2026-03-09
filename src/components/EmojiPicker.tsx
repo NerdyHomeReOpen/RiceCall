@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { defEmojis, otherEmojis } from '@/emojis';
+import { DEFAULT_EMOJIS, TW_EMOJIS } from '@/emojis';
 
 import emojiStyles from '@/styles/emoji.module.css';
 import popupStyles from '@/styles/popup.module.css';
@@ -174,14 +174,14 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
         <div className={emojiStyles['emoji-pages']}>
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'def' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
             <div className={emojiStyles['emoji-grid']}>
-              {defEmojis.map((e) => (
+              {DEFAULT_EMOJIS.map((e) => (
                 <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
           <div className={`${emojiStyles['emoji-page']} ${activeTab === 'other' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
             <div className={emojiStyles['emoji-grid']}>
-              {otherEmojis.map((e) => (
+              {TW_EMOJIS.map((e) => (
                 <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>

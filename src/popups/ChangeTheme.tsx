@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
@@ -7,7 +8,7 @@ import type * as Types from '@/types';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Color from '@/utils/color';
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import Logger from '@/logger';
 
 import styles from '@/styles/changeTheme.module.css';
@@ -110,7 +111,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const image = e.target.files?.[0];
     if (!image) return;
     image.arrayBuffer().then((arrayBuffer) => {
-      Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+      Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         const buffer = imageUnit8Array.buffer;
         const imageUrl = await ipc.customThemes.saveImage(buffer as ArrayBuffer, 'custom_themes', 'theme', 'webp').catch((e) => {
           const error = e instanceof Error ? e : new Error('Unknown error');

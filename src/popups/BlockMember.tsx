@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -33,7 +34,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serv
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.blockUserFromServer(member.userId, serverId, -1);
+    Action.blockUserFromServer(member.userId, serverId, -1);
     ipc.popup.close(id);
   };
 

@@ -1,7 +1,8 @@
 import { t } from 'i18next';
-import ipc from '@/ipc';
 
 import * as Types from '@/types';
+
+import ipc from '@/ipc';
 
 export function openAlertDialog(message: string, callback: () => void) {
   ipc.popup.open('dialogAlert', 'dialogAlert', { message });
@@ -156,6 +157,10 @@ export function openServerApplication(userId: Types.User['userId'], serverId: Ty
 
 export function openServerAnnouncement(announcement: Types.Server['announcement']) {
   ipc.popup.open('serverAnnouncement', 'serverAnnouncement', { announcement });
+}
+
+export function openNetworkDiagnosis() {
+  ipc.popup.open('networkDiagnosis', 'networkDiagnosis');
 }
 
 export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, isPasswordNeeded: boolean) {
@@ -406,8 +411,4 @@ export function leaveQueue(serverId: Types.Server['serverId'], channelId: Types.
 
 export function controlQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
   ipc.socket.send('controlQueue', { serverId, channelId });
-}
-
-export function openNetworkDiagnosis() {
-  ipc.popup.open('networkDiagnosis', 'networkDiagnosis');
 }

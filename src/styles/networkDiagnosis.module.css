@@ -208,11 +208,8 @@
 
 .reports-panel {
   flex: 1;
-  padding: 14px;
   overflow-y: auto;
   user-select: text;
-  background-color: var(--popup-background);
-  border: 1px solid var(--border);
   border-radius: 6px;
 }
 
@@ -228,6 +225,7 @@
 }
 
 .reports-empty-spinner {
+  font-size: 1.5rem;
   animation: nd-spin 1s linear infinite;
 }
 
@@ -262,12 +260,16 @@
 .result-card {
   padding: 12px;
   margin-bottom: 14px;
+  overflow-x: scroll;
   background-color: var(--popup-background);
   border: 1px solid var(--border);
   border-radius: 8px;
 }
 
 .result-header {
+  position: sticky;
+  top: 0;
+  left: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -332,4 +334,30 @@
   padding: 10px;
   font-size: 0.8rem;
   color: var(--text-warning);
+}
+
+/* App-only feature placeholder */
+.app-only-body {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.app-only-text {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #555;
+}
+
+/* Footer button variants */
+.btn-export {
+  margin-right: auto;
+}
+
+.btn-disabled {
+  pointer-events: none;
+  opacity: 0.5;
 }

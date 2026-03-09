@@ -10,8 +10,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import FriendTab from '@/components/FriendTab';
 
-import * as Popup from '@/action';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import { useFriendGroupContextMenu } from '@/hooks/ctxMenus/friendGroupCtxMenu';
 
 import styles from '@/styles/friend.module.css';
 
@@ -55,12 +54,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
   const sortedFriendGroupFriends = useMemo(() => [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)), [friendGroupFriends]);
   const onlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
 
-  // Functions
-  const getFriendGroupTabContextMenuItems = () =>
-    new CtxMenuBuilder()
-      .addEditFriendGroupNameOption({ friendGroupId: friendGroup.friendGroupId }, () => Popup.openEditFriendGroupName(user.userId, friendGroup.friendGroupId))
-      .addDeleteFriendGroupOption({ friendGroupId: friendGroup.friendGroupId }, () => Popup.deleteFriendGroup(friendGroup.friendGroupId, friendGroup.name))
-      .build();
+  const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupContextMenu({ user, friendGroup });
 
   // Handlers
   const handleTabClick = () => {
@@ -73,7 +67,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getFriendGroupTabContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', buildFriendGroupContextMenu());
   };
 
   return (

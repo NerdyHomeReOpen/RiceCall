@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -28,7 +29,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, 
 
   // Handlers
   const handleCreateFriendGroupBtnClick = () => {
-    Popup.openCreateFriendGroup();
+    Action.openCreateFriendGroup();
   };
 
   const handleFriendGroupIdChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -40,7 +41,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, 
   };
 
   const handleAddBtnClick = () => {
-    Popup.approveFriendApplication(targetId, friendGroupId || null, friendNotes);
+    Action.approveFriendApplication(targetId, friendGroupId || null, friendNotes);
     ipc.popup.close(id);
   };
 

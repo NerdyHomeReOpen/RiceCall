@@ -1,9 +1,10 @@
 import dynamic from 'next/dynamic';
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import { SERVER_OPTIONS } from '@/constant';
 
@@ -21,7 +22,7 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
   // Handlers
   const handleServerSelect = (value: 'prod' | 'dev') => {
     if (value === 'dev') {
-      Popup.openAlertDialog(t('confirm-change-server-to-dev'), () => {
+      Action.openAlertDialog(t('confirm-change-server-to-dev'), () => {
         ipc.env.change(value);
         onBackToLoginBtnClick();
       });

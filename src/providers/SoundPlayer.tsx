@@ -1,4 +1,5 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useCallback, useMemo } from 'react';
+
 import ipc from '@/ipc';
 
 import Logger from '@/logger';

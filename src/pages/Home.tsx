@@ -3,6 +3,7 @@ import Image from 'next/image';
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
@@ -14,7 +15,7 @@ import RecommendServerCard from '@/components/RecommendServerCard';
 
 import { useLoading } from '@/providers/Loading';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Language from '@/utils/language';
 
 import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constant';
@@ -166,7 +167,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   };
 
   const handleCreateServerClick = () => {
-    Popup.openCreateServer(user.userId);
+    Action.openCreateServer(user.userId);
   };
 
   const handlePersonalExclusiveSectionBtnClick = () => {

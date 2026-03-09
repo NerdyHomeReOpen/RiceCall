@@ -1,6 +1,7 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppDispatch, useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
@@ -12,10 +13,10 @@ import { setSelectedItemId } from '@/store/slices/uiSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Language from '@/utils/language';
 import * as Permission from '@/utils/permission';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 import ObjDiff from '@/utils/objDiff';
 import Sorter from '@/utils/sorter';
 
@@ -234,7 +235,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   };
 
   const handleConfirmBtnClick = () => {
-    Popup.editChannel(server.serverId, channel.channelId, ObjDiff(channel, channelData));
+    Action.editChannel(server.serverId, channel.channelId, ObjDiff(channel, channelData));
     ipc.popup.close(id);
   };
 
@@ -517,31 +518,31 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                     const getMemberManagementSubmenuItems = () =>
                       new CtxMenuBuilder()
                         .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
-                          Popup.terminateMember(moderator.userId, server.serverId, moderator.name),
+                          Action.terminateMember(moderator.userId, server.serverId, moderator.name),
                         )
                         .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
                           Permission.isChannelMod(moderator.permissionLevel)
-                            ? Popup.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
-                            : Popup.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
+                            ? Action.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
+                            : Action.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
                         )
                         .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
                           Permission.isChannelAdmin(moderator.permissionLevel)
-                            ? Popup.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
-                            : Popup.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
+                            ? Action.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
+                            : Action.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
                         )
                         .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
                           Permission.isServerAdmin(moderator.permissionLevel)
-                            ? Popup.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
-                            : Popup.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
+                            ? Action.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
+                            : Action.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
                         )
                         .build();
 
                     const getContextMenuItems = () =>
                       new CtxMenuBuilder()
-                        .addDirectMessageOption({ isSelf }, () => Popup.openDirectMessage(user.userId, moderator.userId))
-                        .addViewProfileOption(() => Popup.openUserInfo(user.userId, moderator.userId))
-                        .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openEditNickname(moderator.userId, server.serverId))
-                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Popup.openBlockMember(moderator.userId, server.serverId))
+                        .addDirectMessageOption({ isSelf }, () => Action.openDirectMessage(user.userId, moderator.userId))
+                        .addViewProfileOption(() => Action.openUserInfo(user.userId, moderator.userId))
+                        .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openEditNickname(moderator.userId, server.serverId))
+                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openBlockMember(moderator.userId, server.serverId))
                         .addSeparator()
                         .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
                         .build();
@@ -615,8 +616,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                     // Functions
                     const getContextMenuItems = () =>
                       new CtxMenuBuilder()
-                        .addViewProfileOption(() => Popup.openUserInfo(user.userId, member.userId))
-                        .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => Popup.unblockUserFromChannel(member.userId, server.serverId, channel.channelId, member.name))
+                        .addViewProfileOption(() => Action.openUserInfo(user.userId, member.userId))
+                        .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => Action.unblockUserFromChannel(member.userId, server.serverId, channel.channelId, member.name))
                         .build();
 
                     // Functions

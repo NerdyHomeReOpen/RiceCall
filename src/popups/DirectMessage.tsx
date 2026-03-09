@@ -6,10 +6,7 @@ import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
-import { EmojiNode } from '@/extensions/EmojiNode';
-import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
-import { ImageNode } from '@/extensions/ImageNode';
-import { ChatEnter } from '@/extensions/ChatEnter';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
@@ -21,7 +18,11 @@ import LevelIcon from '@/components/LevelIcon';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Popup from '@/action';
+import { EmojiNode } from '@/extensions/EmojiNode';
+import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
+import { ImageNode } from '@/extensions/ImageNode';
+import { ChatEnter } from '@/extensions/ChatEnter';
+import * as Action from '@/action';
 import * as Default from '@/utils/default';
 import * as TagConverter from '@/utils/tagConverter';
 
@@ -110,7 +111,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
@@ -133,7 +134,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInput.trim().length === 0) return;
-      Popup.sendMessage(target.userId, { type: 'dm', content: messageInput });
+      Action.sendMessage(target.userId, { type: 'dm', content: messageInput });
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
       syncStyles();
     }
@@ -189,15 +190,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleApplyFriendBtnClick = () => {
-    Popup.openApplyFriend(user.userId, target.userId);
+    Action.openApplyFriend(user.userId, target.userId);
   };
 
   const handleBlockUserBtnClick = () => {
-    Popup.blockUser(target.userId, target.name);
+    Action.blockUser(target.userId, target.name);
   };
 
   const handleUnblockUserBtnClick = () => {
-    Popup.unblockUser(target.userId, target.name);
+    Action.unblockUser(target.userId, target.name);
   };
 
   const handleReportBtnClick = () => {
@@ -205,11 +206,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleTargetAvatarClick = () => {
-    Popup.openUserInfo(user.userId, target.userId);
+    Action.openUserInfo(user.userId, target.userId);
   };
 
   const handleUserAvatarClick = () => {
-    Popup.openUserInfo(user.userId, user.userId);
+    Action.openUserInfo(user.userId, user.userId);
   };
 
   const handleServerNameClick = () => {
@@ -217,7 +218,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleMessageHistoryBtnClick = () => {
-    Popup.openChatHistory(user.userId, target.userId);
+    Action.openChatHistory(user.userId, target.userId);
   };
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {

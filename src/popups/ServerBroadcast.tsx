@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import { MAX_BROADCAST_LENGTH } from '@/constant';
 
@@ -51,8 +52,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
 
   const handleConfirmBtnClick = () => {
     if (!canSend) return;
-    if (broadcastType === 'channel') Popup.broadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
-    else Popup.broadcastServer(serverId, { type: 'alert', content: broadcastContent });
+    if (broadcastType === 'channel') Action.broadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
+    else Action.broadcastServer(serverId, { type: 'alert', content: broadcastContent });
     ipc.popup.close(id);
   };
 

@@ -1,10 +1,11 @@
 import dynamic from 'next/dynamic';
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 import i18n from '@/i18n';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import styles from '@/styles/register.module.css';
 
@@ -141,7 +142,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     await ipc.auth.register({ account, password, email, username, locale: i18n.language ?? 'zh-TW' }).then((res) => {
       if (res.success) {
-        Popup.openAlertDialog(t(res.message, { '0': email }), onBackToLoginBtnClick);
+        Action.openAlertDialog(t(res.message, { '0': email }), onBackToLoginBtnClick);
       }
     });
 

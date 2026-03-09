@@ -2,6 +2,7 @@ import dynamic from 'next/dynamic';
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector, useAppDispatch } from '@/store/hook';
 import ipc from '@/ipc';
 
@@ -21,8 +22,8 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Permission from '@/utils/permission';
 import * as Language from '@/utils/language';
-import * as Popup from '@/action';
-import CtxMenuBuilder from '@/utils/ctxMenuBuilder';
+import * as Action from '@/action';
+import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 
 import { SHOW_FRAME_ORIGIN, MESSAGE_VIERER_DEVIATION } from '@/constant';
 
@@ -168,22 +169,22 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const getContextMenuItems2 = () =>
     new CtxMenuBuilder()
       .addCleanUpMessageOption(() => clearMessages())
-      .addOpenChannelEventOption(() => Popup.openChannelEvent(user.userId, currentServer.serverId, channelEvents))
+      .addOpenChannelEventOption(() => Action.openChannelEvent(user.userId, currentServer.serverId, channelEvents))
       .addOpenAnnouncementOption(() => setCentralAreaMode('announcement'))
       .build();
 
   const getContextMenuItems3 = () =>
     new CtxMenuBuilder()
-      .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Popup.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
-      .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Popup.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
+      .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Action.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
+      .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Action.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
       .addQueueSpeechOption(
         { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
-        () => Popup.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),
+        () => Action.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),
         new CtxMenuBuilder()
           .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannel.forbidQueue }, () =>
-            Popup.editChannel(currentServer.serverId, currentChannel.channelId, { forbidQueue: !currentChannel.forbidQueue }),
+            Action.editChannel(currentServer.serverId, currentChannel.channelId, { forbidQueue: !currentChannel.forbidQueue }),
           )
-          .addControlQueueOption({ permissionLevel, isQueueControlled }, () => Popup.controlQueue(currentServer.serverId, currentChannel.channelId))
+          .addControlQueueOption({ permissionLevel, isQueueControlled }, () => Action.controlQueue(currentServer.serverId, currentChannel.channelId))
           .build(),
       )
       .build();
@@ -204,7 +205,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
             id: 'untake-mic',
             label: t('untake-mic'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Popup.leaveQueue(currentServer.serverId, currentChannel.channelId),
+            onClick: () => Action.leaveQueue(currentServer.serverId, currentChannel.channelId),
           },
         ]);
       } else if (Permission.isChannelMod(permissionLevel)) {
@@ -214,7 +215,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
             id: 'take-mic-in-queue',
             label: t('take-mic-in-queue'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Popup.joinQueue(currentServer.serverId, currentChannel.channelId),
+            onClick: () => Action.joinQueue(currentServer.serverId, currentChannel.channelId),
           },
           {
             id: 'separator',
@@ -224,17 +225,17 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
             id: 'take-mic-directly',
             label: t('take-mic-directly'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Popup.joinQueue(currentServer.serverId, currentChannel.channelId, -2),
+            onClick: () => Action.joinQueue(currentServer.serverId, currentChannel.channelId, -2),
           },
         ]);
       } else {
-        Popup.joinQueue(currentServer.serverId, currentChannel.channelId);
+        Action.joinQueue(currentServer.serverId, currentChannel.channelId);
       }
     } else {
       if (isMicTaken) {
-        Popup.leaveQueue(currentServer.serverId, currentChannel.channelId);
+        Action.leaveQueue(currentServer.serverId, currentChannel.channelId);
       } else {
-        Popup.joinQueue(currentServer.serverId, currentChannel.channelId);
+        Action.joinQueue(currentServer.serverId, currentChannel.channelId);
       }
     }
   };
@@ -285,9 +286,9 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   };
 
   const handleWidgetMoreClick = () => {
-    Popup.openServerApplication(user.userId, currentServer.serverId, (action) => {
+    Action.openServerApplication(user.userId, currentServer.serverId, (action) => {
       if (action === 'openShowFrame') setCentralAreaMode('show');
-      if (action === 'openChannelEvent') Popup.openChannelEvent(user.userId, currentServer.serverId, channelEvents);
+      if (action === 'openChannelEvent') Action.openChannelEvent(user.userId, currentServer.serverId, channelEvents);
     });
     setIsWidgetExpanded(false);
   };
@@ -354,7 +355,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   }, [actionMessages]);
 
   useEffect(() => {
-    if (currentServer.serverId && currentServer.announcement) Popup.openServerAnnouncement(currentServer.announcement);
+    if (currentServer.serverId && currentServer.announcement) Action.openServerAnnouncement(currentServer.announcement);
   }, [currentServer.serverId, currentServer.announcement]);
 
   useEffect(() => {

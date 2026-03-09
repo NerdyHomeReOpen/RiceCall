@@ -1,12 +1,13 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 import * as Default from '@/utils/default';
 
 import { MAX_FILE_SIZE, SERVER_TYPES } from '@/constant';
@@ -56,10 +57,10 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
     const image = e.target.files?.[0];
     if (!image || isUploadingRef.current) return;
     image.arrayBuffer().then((arrayBuffer) => {
-      Popup.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+      Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Popup.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }
@@ -88,7 +89,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
+    Action.createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
     ipc.popup.close(id);
   };
 

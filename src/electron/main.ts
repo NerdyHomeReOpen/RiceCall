@@ -13,20 +13,20 @@ import { configureAutoUpdater } from '@/electron/auto-updater';
 import { configureTray } from '@/electron/tray';
 import { configureDiscordRPC, clearDiscordPresence } from '@/electron/discord';
 import { disconnectSocket } from '@/electron/socket';
-import { registerAuthHandlers } from '@/electron/handlers/auth';
-import { registerAppHandlers } from '@/electron/handlers/app';
-import { registerAccountHandlers } from '@/electron/handlers/account';
-import { registerDataHandlers } from '@/electron/handlers/data';
-import { registerDiagnosisToolHandlers } from '@/electron/handlers/diagnosis-tool';
-import { registerEnvHandlers } from '@/electron/handlers/env';
-import { registerErrorHandlers } from '@/electron/handlers/error';
-import { registerLogHandlers } from '@/electron/handlers/log';
-import { registerPopupHandlers } from '@/electron/handlers/popup';
-import { registerRecordHandlers } from '@/electron/handlers/record';
-import { registerSystemHandlers } from '@/electron/handlers/system';
-import { registerThemeHandlers } from '@/electron/handlers/theme';
-import { registerToolbarHandlers } from '@/electron/handlers/toolbar';
-import { registerWindowHandlers } from '@/electron/handlers/window';
+import { registerAuthHandlers } from '@/electron/auth';
+import { registerAppHandlers } from '@/electron/app';
+import { registerAccountHandlers } from '@/electron/account';
+import { registerDataHandlers } from '@/electron/data';
+import { registerDiagnosisToolHandlers } from '@/electron/diagnosis-tool';
+import { registerEnvHandlers } from '@/electron/env';
+import { registerErrorHandlers } from '@/electron/error';
+import { registerLogHandlers } from '@/electron/log';
+import { registerPopupHandlers } from '@/electron/popup';
+import { registerRecordHandlers } from '@/electron/record';
+import { registerSystemHandlers } from '@/electron/system';
+import { registerThemeHandlers } from '@/electron/theme';
+import { registerToolbarHandlers } from '@/electron/toolbar';
+import { registerWindowHandlers } from '@/electron/window';
 
 import { POPUP_SIZES, POPUP_BEHAVIORS } from '@/configs/popup';
 
@@ -165,6 +165,22 @@ export function isAutoLaunchEnabled(): boolean {
     const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('System').error(`Get auto launch error: ${error.message}`);
     return false;
+  }
+}
+
+async function openDeepLink(url: string) {
+  if (!url) return;
+  try {
+    const { hostname } = new URL(url);
+    switch (hostname) {
+      case 'join':
+        const serverId = new URL(url).searchParams.get('sid');
+        broadcast('deepLink', serverId);
+        break;
+    }
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('System').error(`Error parsing deep link: ${error.message}`);
   }
 }
 
@@ -501,22 +517,6 @@ export function configureLogger() {
   log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 }
 
-async function handleDeepLink(url: string) {
-  if (!url) return;
-  try {
-    const { hostname } = new URL(url);
-    switch (hostname) {
-      case 'join':
-        const serverId = new URL(url).searchParams.get('sid');
-        broadcast('deepLink', serverId);
-        break;
-    }
-  } catch (e) {
-    const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('System').error(`Error parsing deep link: ${error.message}`);
-  }
-}
-
 app.on('ready', async () => {
   loadEnv(store.get('env', 'prod'));
 
@@ -567,7 +567,7 @@ app.on('activate', () => {
 
 app.on('open-url', (event, url) => {
   event.preventDefault();
-  handleDeepLink(url);
+  openDeepLink(url);
 });
 
 app.whenReady().then(() => {
@@ -589,14 +589,14 @@ if (!app.requestSingleInstanceLock()) {
 } else {
   app.on('second-instance', (_, argv) => {
     const url = argv.find((arg) => arg.startsWith('ricecall://'));
-    if (url) handleDeepLink(url);
-    else {
-      const window = authWindow && authWindow.isDestroyed() === false ? authWindow : mainWindow && mainWindow.isDestroyed() === false ? mainWindow : null;
-      if (window) {
-        if (window.isMinimized()) window.restore();
-        window.focus();
-      }
-    }
+    if (url) openDeepLink(url);
+    // else {
+    //   const window = authWindow && authWindow.isDestroyed() === false ? authWindow : mainWindow && mainWindow.isDestroyed() === false ? mainWindow : null;
+    //   if (window) {
+    //     if (window.isMinimized()) window.restore();
+    //     window.focus();
+    //   }
+    // }
   });
 }
 

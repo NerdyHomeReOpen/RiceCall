@@ -1,10 +1,12 @@
 import otaClient from '@crowdin/ota-client';
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
-import { isMain } from '@/utils/platform';
-import { getEnv } from '@/env';
 
 import type * as Types from '@/types';
+
+import { isMain } from '@/utils/platform';
+
+import { getEnv } from '@/env';
 
 import enUS_app from './locales/en-US/app.json' with { type: 'json' };
 import enUS_message from './locales/en-US/message.json' with { type: 'json' };

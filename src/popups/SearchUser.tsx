@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+
 import { useAppSelector } from '@/store/hook';
 import ipc from '@/ipc';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -45,7 +46,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
         else {
-          Popup.openApplyFriend(user.userId, target.userId);
+          Action.openApplyFriend(user.userId, target.userId);
           ipc.popup.close(id);
         }
       });

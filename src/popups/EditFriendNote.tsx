@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -26,7 +27,7 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ id
   };
 
   const handleSaveBtnClick = () => {
-    Popup.editFriend(friend.targetId, { note: friendNote });
+    Action.editFriend(friend.targetId, { note: friendNote });
     handleCloseBtnClick();
   };
 

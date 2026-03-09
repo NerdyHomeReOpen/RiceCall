@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import ipc from '@/ipc';
 
 import type * as Types from '@/types';
 
 import * as Default from '@/utils/default';
-import * as Popup from '@/action';
+import * as Action from '@/action';
 
 import popupStyles from '@/styles/popup.module.css';
 
@@ -32,7 +33,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, 
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Popup.createChannel(serverId, { name: channelName, categoryId: parent?.channelId || null });
+    Action.createChannel(serverId, { name: channelName, categoryId: parent?.channelId || null });
     ipc.popup.close(id);
   };
 
