@@ -60,7 +60,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
       Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }

@@ -104,13 +104,13 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
 
   const settingPages = Permission.isServerAdmin(permissionLevel)
     ? [
-      t('server-info'),
-      t('server-announcement'),
-      t('member-management'),
-      t('access-permission'),
-      `${t('member-application-management')} (${totalApplicationsCount})`,
-      `${t('blacklist-management')} (${totalBlockMembersCount})`,
-    ]
+        t('server-info'),
+        t('server-announcement'),
+        t('member-management'),
+        t('access-permission'),
+        `${t('member-application-management')} (${totalApplicationsCount})`,
+        `${t('blacklist-management')} (${totalBlockMembersCount})`,
+      ]
     : Permission.isMember(permissionLevel)
       ? [t('server-info'), t('server-announcement'), t('member-management')]
       : [t('server-info'), t('server-announcement')];
@@ -195,7 +195,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }
@@ -449,7 +449,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openEditNickname(member.userId, server.serverId))
                         .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openBlockMember(member.userId, server.serverId))
                         .addSeparator()
-                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, getMemberManagementSubmenuItems())
+                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
                         .build();
 
                     // Handlers

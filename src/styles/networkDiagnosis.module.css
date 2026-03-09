@@ -260,10 +260,10 @@
 .result-card {
   padding: 12px;
   margin-bottom: 14px;
+  overflow-x: scroll;
   background-color: var(--popup-background);
   border: 1px solid var(--border);
   border-radius: 8px;
-  overflow-x: scroll;
 }
 
 .result-header {
@@ -340,10 +340,10 @@
 .app-only-body {
   display: flex;
   flex-direction: column;
+  gap: 20px;
   align-items: center;
   justify-content: center;
   height: 100%;
-  gap: 20px;
 }
 
 .app-only-text {
@@ -358,6 +358,6 @@
 }
 
 .btn-disabled {
-  opacity: 0.5;
   pointer-events: none;
+  opacity: 0.5;
 }

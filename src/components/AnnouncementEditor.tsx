@@ -191,7 +191,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
