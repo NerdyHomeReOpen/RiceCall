@@ -95,7 +95,7 @@ export function registerDiagnosisToolHandlers() {
     }
   });
 
-  ipcMain.on('request-sfu-diagnosis', (_) => {
+  ipcMain.on('request-sfu-diagnosis', () => {
     broadcast('request-sfu-diagnosis');
   });
 
