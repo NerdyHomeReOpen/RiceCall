@@ -3,7 +3,7 @@ import twemoji from 'twemoji';
 
 import type * as Types from '@/types';
 
-export const defEmojis: Types.Emoji[] = [
+export const DEFAULT_EMOJIS: Types.Emoji[] = [
   { code: '1', alt: '微笑', path: '/smiles/1.gif' },
   { code: '2', alt: '開懷笑', path: '/smiles/2.gif' },
   { code: '3', alt: '眨眼', path: '/smiles/3.gif' },
@@ -66,7 +66,7 @@ export const defEmojis: Types.Emoji[] = [
   { code: '61', alt: '帶血的刀', path: '/smiles/61.gif' },
 ];
 
-export const otherEmojis: Types.Emoji[] = emojiData
+export const TW_EMOJIS: Types.Emoji[] = emojiData
   .filter((emoji) => emoji.codes.length <= 5)
   .map((emoji) => {
     const code = twemoji.convert.toCodePoint(emoji.char);
@@ -77,4 +77,4 @@ export const otherEmojis: Types.Emoji[] = emojiData
     };
   });
 
-export const emojis: Types.Emoji[] = [...defEmojis, ...otherEmojis];
+export const EMOJIS: Types.Emoji[] = [...DEFAULT_EMOJIS, ...TW_EMOJIS];

@@ -1,9 +1,10 @@
+import packageJson from '../../package.json';
+
 import * as Types from '@/types';
 
 import { eventEmitter } from '@/web/event';
 
 import { LANGUAGES } from '@/constant';
-import packageJson from '../../package.json';
 
 export const START_TIMESTAMP = Date.now();
 export const MAIN_TITLE = 'RiceCall';
@@ -186,19 +187,19 @@ export async function disableLoopbackAudio(): Promise<void> {
 
 export * from '@/web/discord';
 export * from '@/web/socket';
-export * from '@/web/handlers/account';
-export * from '@/web/handlers/app';
-export * from '@/web/handlers/auth';
-export * from '@/web/handlers/data';
-export * from '@/web/handlers/diagnosis-tool';
-export * from '@/web/handlers/env';
-export * from '@/web/handlers/error';
-export * from '@/web/handlers/log';
-export * from '@/web/handlers/popup';
-export * from '@/web/handlers/record';
-export * from '@/web/handlers/system';
-export * from '@/web/handlers/theme';
-export * from '@/web/handlers/toolbar';
-export * from '@/web/handlers/window';
+export * from '@/web/account';
+export * from '@/web/app';
+export * from '@/web/auth';
+export * from '@/web/data';
+export * from '@/web/diagnosis-tool';
+export * from '@/web/env';
+export * from '@/web/error';
+export * from '@/web/log';
+export * from '@/web/popup';
+export * from '@/web/record';
+export * from '@/web/system';
+export * from '@/web/theme';
+export * from '@/web/toolbar';
+export * from '@/web/window';
 
 export { eventEmitter };

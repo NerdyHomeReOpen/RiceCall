@@ -1,6 +1,6 @@
 import { Node } from '@tiptap/core';
 
-import { emojis } from '@/emojis';
+import { EMOJIS } from '@/emojis';
 
 import markdownStyles from '@/styles/markdown.module.css';
 
@@ -43,7 +43,7 @@ export const EmojiNode = Node.create({
       'img',
       {
         'data-emoji': node.attrs.code,
-        'src': emojis.find((e) => e.code === node.attrs.code)?.path,
+        'src': EMOJIS.find((e) => e.code === node.attrs.code)?.path,
         'class': `${markdownStyles['emoji']}`,
       },
     ];

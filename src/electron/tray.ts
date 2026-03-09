@@ -2,8 +2,7 @@ import path from 'path';
 import { app, Menu, Tray, nativeImage } from 'electron';
 
 import { authWindow, mainWindow, VERSION_TITLE } from '@/electron/main';
-
-import { logout } from '@/electron/handlers/auth';
+import { logout } from '@/electron/auth';
 
 import { t } from '@/i18n';
 
