@@ -27,14 +27,11 @@ interface DialogPopupProps {
 }
 
 const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, message, parameter, error }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Variables
   const formattedMessageContents = TagConverter.fromTags(t(message ?? error?.message ?? '', parameter));
   const errorId = error ? crypto.randomUUID().substring(0, 8) : undefined;
 
-  // Handlers
   const handleSubmitBtnClick = () => {
     ipc.popup.submit(id);
     ipc.popup.close(id);
@@ -44,7 +41,6 @@ const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, mess
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     if (errorId && error) {
       ipc.error.submit(errorId, error);

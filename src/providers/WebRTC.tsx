@@ -75,11 +75,9 @@ interface WebRTCProviderProps {
 }
 
 const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
-  // Hooks
   const { playSound } = useSoundPlayer();
   const { loadServer } = useLoading();
 
-  // Refs
   const rafIdListRef = useRef<{ [userId: string]: number }>({}); // userId -> rAF id
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
@@ -106,7 +104,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const recordBuffersRef = useRef<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>([]);
   const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Functions
   const detectSpeaking = useCallback((targetId: string | 'user', analyserNode: AnalyserNode, dataArray: Uint8Array<ArrayBuffer>) => {
     analyserNode.getByteTimeDomainData(dataArray);
     let sum = 0;
@@ -165,40 +162,35 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   }, []);
 
   const initAudioContext = useCallback(async () => {
-    // Create audio context
     if (audioContextRef.current) {
       audioContextRef.current.close();
     }
     const audioContext = new AudioContext();
-    // Resume AudioContext if suspended (required for browsers after user interaction policy)
+
     if (audioContext.state === 'suspended') {
       await audioContext.resume();
     }
     await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
     audioContextRef.current = audioContext;
 
-    // Create input destination node
     if (inputDesRef.current) {
       inputDesRef.current.disconnect();
     }
     const inputDestination = audioContextRef.current.createMediaStreamDestination();
     inputDesRef.current = inputDestination;
 
-    // Create output destination node
     if (outputDesRef.current) {
       outputDesRef.current.disconnect();
     }
     const outputDestination = audioContextRef.current.createMediaStreamDestination();
     outputDesRef.current = outputDestination;
 
-    // Create record destination node
     if (recorderDesRef.current) {
       recorderDesRef.current.disconnect();
     }
     const recordDestination = audioContextRef.current.createMediaStreamDestination();
     recorderDesRef.current = recordDestination;
 
-    // Create input analyser node
     if (inputAnalyserRef.current) {
       inputAnalyserRef.current.disconnect();
     }
@@ -206,7 +198,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     inputAnalyserRef.current = inputAnalyser;
     inputAnalyser.fftSize = 2048;
 
-    // Create master gain node
     if (masterGainNodeRef.current) {
       masterGainNodeRef.current.disconnect();
     }
@@ -215,7 +206,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     masterGainNode.gain.value = store.getState().webrtc.speakerVolume / 100;
     masterGainNode.connect(outputDesRef.current!);
 
-    // Create audio element
     if (speakerRef.current) {
       speakerRef.current.srcObject = null;
       speakerRef.current.pause();
@@ -226,7 +216,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     speaker.volume = 1;
     speaker.autoplay = true;
     speaker.style.display = 'none';
-    speaker.play().catch(() => {});
+    speaker.play().catch(() => { });
     speakerRef.current = speaker;
     document.body.appendChild(speaker);
   }, []);
@@ -256,15 +246,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         return initSpeakerAudio(userId, stream);
       }
 
-      // Remove existing speaker audio
       removeSpeakerAudio(userId);
 
-      // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
         track.enabled = !store.getState().webrtc.mutedById[userId];
       });
 
-      // Create nodes
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
       const gainNode = audioContextRef.current.createGain();
       gainNode.gain.value = 1;
@@ -272,23 +259,20 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
       speakerNodesRef.current[userId] = { stream, source: sourceNode, gain: gainNode, analyser: analyserNode };
 
-      // Connect nodes
       sourceNode.connect(gainNode);
       gainNode.connect(analyserNode);
       gainNode.connect(masterGainNodeRef.current);
 
-      // Initialize analyser
       analyserNode.fftSize = 2048;
       const dataArray = new Uint8Array(analyserNode.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking(userId, analyserNode, dataArray);
 
-      // Create audio element to force stream to play
       const speaker = new Audio();
       speaker.srcObject = stream;
       speaker.volume = 0;
       speaker.autoplay = true;
       speaker.style.display = 'none';
-      speaker.play().catch(() => {});
+      speaker.play().catch(() => { });
       speaker.remove();
     },
     [detectSpeaking, removeSpeakerAudio, initAudioContext],
@@ -321,33 +305,27 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
       new Logger('WebRTC').info('initMicAudio: Setting up mic audio nodes');
 
-      // Remove existing mic audio
       removeMicAudio();
 
-      // Disable tracks if muted
       stream.getAudioTracks().forEach((track) => {
         const { speakingMode, isSpeakKeyPressed } = store.getState().webrtc;
         track.enabled = speakingMode === 'key' ? isSpeakKeyPressed : true;
       });
 
-      // Create nodes
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
       const gainNode = audioContextRef.current.createGain();
       gainNode.gain.value = store.getState().webrtc.micVolume / (microphoneAmplificationRef.current ? 20 : 100);
 
       micNodesRef.current = { stream, source: sourceNode, gain: gainNode };
 
-      // Connect nodes
       sourceNode.connect(gainNode);
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
 
-      // Start speaking detection
       new Logger('WebRTC').info('initMicAudio: Starting detectSpeaking for user');
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('user', inputAnalyserRef.current, dataArray);
 
-      // Replace track
       const newTrack = inputDesRef.current.stream.getAudioTracks()[0];
       if (audioProducerRef.current && newTrack) {
         await audioProducerRef.current.replaceTrack({ track: newTrack });
@@ -396,7 +374,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       gainNode.connect(inputAnalyserRef.current);
       if (store.getState().webrtc.isRecording) gainNode.connect(recorderGainRef.current!);
 
-      // Start speaking detection
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('system', inputAnalyserRef.current, dataArray);
     },
@@ -587,7 +564,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
         new Logger('WebRTC').info(`RecvTransport connection state = ${s}`);
       });
 
-      // consume existing producers
       for (const producer of transport.producers ?? []) {
         consumeOne(producer.id, channelId).catch((e) => {
           new Logger('WebRTC').error(`Error consuming producer: ${e}`);
@@ -852,7 +828,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     }
   }, [changeSpeakerVolume]);
 
-  // Effects
   useEffect(() => {
     initLocalStorage();
     initAudioContext();
@@ -1008,7 +983,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             ipc.socket.send('connectServer', { serverId: targetServer.serverId });
 
             await new Promise<void>((resolve, reject) => {
-              let unsub: () => void = () => {};
+              let unsub: () => void = () => { };
               const timeout = setTimeout(() => {
                 if (unsub) unsub();
                 reject(new Error('Timeout waiting for SFUJoined after standard join'));
@@ -1069,14 +1044,12 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       const transport = sendTransport || recvTransport;
 
       if (transport) {
-        // Update Status
         const s = transport.connectionState;
         if (s === 'connected') store.dispatch(setWebRTC({ status: 'connected' }));
         else if (s === 'failed') store.dispatch(setWebRTC({ status: 'failed' }));
         else if (s === 'new' || s === 'connecting') store.dispatch(setWebRTC({ status: 'connecting' }));
         else store.dispatch(setWebRTC({ status: 'disconnected' }));
 
-        // Update Latency (prefer sendTransport for RTT, fallback to recvTransport)
         const activeTransport = sendTransport && sendTransport.connectionState === 'connected' ? sendTransport : recvTransport && recvTransport.connectionState === 'connected' ? recvTransport : null;
 
         if (activeTransport) {

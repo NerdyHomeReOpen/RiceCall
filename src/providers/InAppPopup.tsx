@@ -60,10 +60,8 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon, id }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Handlers
   const handleCloseBtnClick = () => {
     ipc.popup.close(id);
   };
@@ -98,10 +96,8 @@ interface MaximizedPopupProps {
 }
 
 const MaximizedPopup: React.FC<MaximizedPopupProps> = React.memo(({ title, buttons, id, onRestore }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Handlers
   const handleRestoreBtnClick = () => {
     onRestore();
   };
@@ -125,16 +121,13 @@ interface PopupProviderProps {
 }
 
 const PopupProvider = ({ children }: PopupProviderProps) => {
-  // States
   const [popups, setPopups] = useState<Types.Popup[]>([]);
   const [minimizedIds, setMinimizedIds] = useState<Set<string>>(new Set());
 
-  // Refs
   const holdingPopupIdRef = useRef<string | null>(null);
   const topZIndexRef = useRef(201);
   const popupsRef = useRef<Types.Popup[]>([]);
 
-  // Variables
   const minimizedPopups = popups.filter((p) => minimizedIds.has(p.id));
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -240,7 +233,6 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     async (type: Types.PopupType, id: string, initialData: unknown = {}, force = true) => {
       new Logger('Popup').info(`Opening ${type} (${id})...`);
 
-      // If force is true, destroy the popup
       if (force) {
         close(id);
       } else {
@@ -272,7 +264,6 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     [getPopup, close, restore],
   );
 
-  // Effects
   useEffect(() => {
     eventEmitter.on('open-popup', open);
     return () => {

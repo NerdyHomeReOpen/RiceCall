@@ -14,7 +14,6 @@ interface ServerApplicationPopupProps {
 }
 
 const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo(({ id, server }) => {
-  // Hooks
   const { t } = useTranslation();
 
   const handleShowFrameBtnClick = () => {

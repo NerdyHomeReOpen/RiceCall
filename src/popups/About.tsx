@@ -17,17 +17,13 @@ interface AboutPopupProps {
 }
 
 const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [dontShowNextTime, setDontShowNextTime] = useState(false);
   const [staffs, setStaffs] = useState<Types.Staff[]>([]);
 
-  // Variables
   const currentYear = new Date().getFullYear();
 
-  // Handlers
   const handleGetHelpLinkClick = () => {
     window.open('https://discord.com/invite/adCWzv6wwS', '_blank');
   };
@@ -49,7 +45,6 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     (async () => {
       const res = await fetch('https://nerdyhomereopen.github.io/Details/staff.json');
@@ -110,10 +105,8 @@ interface StaffCardProps {
 }
 
 const StaffCard: React.FC<StaffCardProps> = React.memo(({ staff }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Functions
   const getTitleColorClass = (title: string) => {
     if (['project-owner'].some((t) => title.includes(t))) return styles['color-1'];
     if (['official-staff'].some((t) => title.includes(t))) return styles['color-2'];
@@ -122,7 +115,6 @@ const StaffCard: React.FC<StaffCardProps> = React.memo(({ staff }) => {
     return styles['color-5'];
   };
 
-  // Handlers
   const handleRiceCallIdClick = () => {
     navigator.clipboard.writeText(staff.ricecall);
   };

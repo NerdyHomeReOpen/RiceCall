@@ -24,14 +24,11 @@ interface LoadingProviderProps {
 }
 
 const LoadingProvider = ({ children }: LoadingProviderProps) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingServerId, setLoadingServerId] = useState<string>('');
 
-  // Functions
   const getIsLoading = useCallback(() => {
     return isLoading;
   }, [isLoading]);
@@ -45,7 +42,6 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
     setIsLoading(false);
   }, []);
 
-  // Handlers
   const handleCloseLoading = () => {
     stopLoading();
   };

@@ -20,15 +20,12 @@ interface ImageViewerProviderProps {
 }
 
 const ImageViewerProvider = ({ children }: ImageViewerProviderProps) => {
-  // States
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Functions
   const selectImage = useCallback((image: string) => {
     setSelectedImage(image);
   }, []);
 
-  // Handlers
   const handleUnselectImage = () => {
     setSelectedImage(null);
   };

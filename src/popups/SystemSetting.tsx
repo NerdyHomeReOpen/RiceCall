@@ -19,15 +19,12 @@ interface SystemSettingPopupProps {
 }
 
 const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, userSettings: userSettingsData, systemSettings: systemSettingsData }) => {
-  // Hooks
   const { t } = useTranslation();
   const { playSound } = useSoundPlayer();
 
-  // Refs
   const activeInputRef = useRef<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // States
   const [systemSettings, setSystemSettings] = useState<Types.SystemSettings>(systemSettingsData);
   const [userSettings, setUserSettings] = useState<Types.UserSetting>(userSettingsData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -37,7 +34,6 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
   const [inputFocus, setInputFocus] = useState<string | null>(null);
   const [conflicts, setConflicts] = useState<string[]>([]);
 
-  // Handlers
   const handleAutoLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSystemSettings((prev) => ({ ...prev, autoLogin: e.target.checked }));
   };
@@ -290,7 +286,6 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     const defaultHotKeyConfig = {
       speakingKey: { default: 'v', setFunc: (value: string) => setSystemSettings((prev) => ({ ...prev, defaultSpeakingKey: value })) },
@@ -313,7 +308,6 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
 
       e.preventDefault();
 
-      // Reset to default
       if (e.key === 'Escape') {
         const target = defaultHotKeyConfig[current as keyof typeof defaultHotKeyConfig];
         target.setFunc(target.default);
@@ -321,7 +315,6 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
         return;
       }
 
-      // Set to empty
       if (e.key === 'Backspace') {
         const target = defaultHotKeyConfig[current as keyof typeof defaultHotKeyConfig];
         target.setFunc('');

@@ -13,13 +13,10 @@ import styles from '@/styles/verification.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
 const MemberInvitationPopup: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
 
-  // Handlers
   const handleRejectAllBtnClick = () => {
     Action.rejectAllMemberInvitation(memberInvitations);
   };
@@ -55,10 +52,8 @@ interface MemberInvitationItemProps {
 }
 
 const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ invitation }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Handlers
   const handleAcceptBtnClick = () => {
     Action.acceptMemberInvitation(invitation.serverId);
   };

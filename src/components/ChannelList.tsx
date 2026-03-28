@@ -24,13 +24,11 @@ import styles from '@/styles/server.module.css';
 import header from '@/styles/header.module.css';
 
 const ChannelList: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { findMe } = useFindMeContext();
   const dispatch = useAppDispatch();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -63,14 +61,11 @@ const ChannelList: React.FC = React.memo(() => {
   const latency = useAppSelector((state) => state.socket.latency, shallowEqual);
   const rtcLatency = useAppSelector((state) => state.webrtc.latency, shallowEqual);
 
-  // Refs
   const queueListRef = useRef<HTMLDivElement>(null);
   const isResizingQueueListRef = useRef<boolean>(false);
 
-  // States
   const [selectedTabId, setSelectedTabId] = useState<'all' | 'current'>('all');
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
   const movableServerUserIds = useMemo(
     () => onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId),
@@ -83,7 +78,6 @@ const ChannelList: React.FC = React.memo(() => {
   const connectStatus = 4 - Math.floor(Number(Math.max(latency, rtcLatency)) / 50);
   const hasNewMemberApplications = Permission.isServerAdmin(permissionLevel) && memberApplicationsCount > 0;
 
-  // Functions
   const locateMe = () => {
     findMe();
     dispatch(setSelectedItemId(`user-${user.userId}`));
@@ -102,7 +96,6 @@ const ChannelList: React.FC = React.memo(() => {
     movableServerUserIds,
   });
 
-  // Handlers
   const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingQueueListRef.current = true;

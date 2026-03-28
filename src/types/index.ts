@@ -256,26 +256,21 @@ export type PopupType =
 export type ACK<T> = { ok: true; data: T } | { ok: false; error: string };
 
 export type ClientToServerEvents = {
-  // User
   editUser: (...args: { update: Partial<table_users> }[]) => void;
   editUserSetting: (...args: { update: Partial<table_user_settings> }[]) => void;
-  // Friend
   editFriend: (...args: { targetId: string; update: Partial<table_friends> }[]) => void;
   deleteFriend: (...args: { targetId: string }[]) => void;
   blockUser: (...args: { targetId: string }[]) => void;
   unblockUser: (...args: { targetId: string }[]) => void;
   stranger: (...args: { targetId: string }[]) => void;
-  // Friend Group
   createFriendGroup: (...args: { preset: Partial<table_friend_groups> }[]) => void;
   editFriendGroup: (...args: { friendGroupId: string; update: Partial<table_friend_groups> }[]) => void;
   deleteFriendGroup: (...args: { friendGroupId: string }[]) => void;
-  // Friend Application
   sendFriendApplication: (...args: { receiverId: string; preset: Partial<table_friend_applications>; friendGroupId: string | null }[]) => void;
   editFriendApplication: (...args: { receiverId: string; update: Partial<table_friend_applications> }[]) => void;
   deleteFriendApplication: (...args: { receiverId: string }[]) => void;
   approveFriendApplication: (...args: { senderId: string; friendGroupId: string | null; note: string }[]) => void;
   rejectFriendApplication: (...args: { senderId: string }[]) => void;
-  // Server
   favoriteServer: (...args: { serverId: string }[]) => void;
   connectServer: (...args: { serverId: string }[]) => void;
   disconnectServer: (...args: { serverId: string }[]) => void;
@@ -284,7 +279,6 @@ export type ClientToServerEvents = {
   createServer: (...args: { preset: Partial<table_servers> }[]) => void;
   editServer: (...args: { serverId: string; update: Partial<table_servers> }[]) => void;
   deleteServer: (...args: { serverId: string }[]) => void;
-  // Channel
   connectChannel: (...args: { serverId: string; channelId: string; password?: string }[]) => void;
   moveUserToChannel: (...args: { userId: string; serverId: string; channelId: string }[]) => void;
   disconnectChannel: (...args: { serverId: string; channelId: string }[]) => void;
@@ -294,25 +288,20 @@ export type ClientToServerEvents = {
   editChannel: (...args: { serverId: string; channelId: string; update: Partial<table_channels> }[]) => void;
   deleteChannel: (...args: { serverId: string; channelId: string }[]) => void;
   muteUserInChannel: (...args: { userId: string; serverId: string; channelId: string; mute: Partial<table_channel_muted_users> }[]) => void;
-  // Member
   editMember: (...args: { userId: string; serverId: string; update: Partial<table_members> }[]) => void;
   terminateMember: (...args: { userId: string; serverId: string }[]) => void;
-  // Permission
   editServerPermission: (...args: { userId: string; serverId: string; update: Partial<table_server_permissions> }[]) => void;
   editChannelPermission: (...args: { userId: string; serverId: string; channelId: string; update: Partial<table_channel_permissions> }[]) => void;
-  // Member Application
   sendMemberApplication: (...args: { serverId: string; preset: Partial<table_member_applications> }[]) => void;
   editMemberApplication: (...args: { serverId: string; update: Partial<table_member_applications> }[]) => void;
   deleteMemberApplication: (...args: { serverId: string }[]) => void;
   approveMemberApplication: (...args: { userId: string; serverId: string }[]) => void;
   rejectMemberApplication: (...args: { userId: string; serverId: string }[]) => void;
-  // Member Invitation
   sendMemberInvitation: (...args: { receiverId: string; serverId: string; preset: Partial<table_member_invitations> }[]) => void;
   editMemberInvitation: (...args: { receiverId: string; serverId: string; update: Partial<table_member_invitations> }[]) => void;
   deleteMemberInvitation: (...args: { receiverId: string; serverId: string }[]) => void;
   acceptMemberInvitation: (...args: { serverId: string }[]) => void;
   rejectMemberInvitation: (...args: { serverId: string }[]) => void;
-  // Queue
   joinQueue: (...args: { serverId: string; channelId: string; position?: number }[]) => void;
   addUserToQueue: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
   leaveQueue: (...args: { serverId: string; channelId: string }[]) => void;
@@ -321,7 +310,6 @@ export type ClientToServerEvents = {
   increaseUserQueueTime: (...args: { serverId: string; channelId: string; userId: string }[]) => void;
   moveUserQueuePosition: (...args: { serverId: string; channelId: string; userId: string; position: number }[]) => void;
   controlQueue: (...args: { serverId: string; channelId: string }[]) => void;
-  // Message
   channelMessage: (...args: { serverId: string; channelId: string; preset: Partial<ChannelMessage> }[]) => void;
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
   directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
@@ -330,7 +318,6 @@ export type ClientToServerEvents = {
 };
 
 export type ServerToClientEvents = {
-  // Socket
   connect: () => void;
   connect_error: (e: unknown) => void;
   connect_timeout: () => void;
@@ -340,67 +327,49 @@ export type ServerToClientEvents = {
   reconnect_failed: () => void;
   disconnect: () => void;
   heartbeat: (...args: { seq: number; latency: number }[]) => void;
-  // Notification
-  notification: (...args: { message: string }[]) => void; // not used yet
-  // User
+  notification: (...args: { message: string }[]) => void; // TODO: Not used yet
   userUpdate: (...args: { update: Partial<User> }[]) => void;
-  // Friend Group
   friendGroupAdd: (...args: { data: FriendGroup }[]) => void;
   friendGroupUpdate: (...args: { friendGroupId: string; update: Partial<FriendGroup> }[]) => void;
   friendGroupRemove: (...args: { friendGroupId: string }[]) => void;
-  // Friend
   friendAdd: (...args: { data: Friend }[]) => void;
   friendUpdate: (...args: { targetId: string; update: Partial<Friend> }[]) => void;
   friendRemove: (...args: { targetId: string }[]) => void;
-  // Friend Application
   friendApplicationAdd: (...args: { data: FriendApplication }[]) => void;
   friendApplicationUpdate: (...args: { senderId: string; update: Partial<FriendApplication> }[]) => void;
   friendApplicationRemove: (...args: { senderId: string }[]) => void;
-  // Server
   serverAdd: (...args: { data: Server }[]) => void;
   serverUpdate: (...args: { serverId: string; update: Partial<Server> }[]) => void;
   serverRemove: (...args: { serverId: string }[]) => void;
-  // Server Member
   serverMemberAdd: (...args: { data: Member }[]) => void;
   serverMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<Member> }[]) => void;
   serverMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
-  // Server Online Member
   serverOnlineMemberAdd: (...args: { data: OnlineMember }[]) => void;
   serverOnlineMemberUpdate: (...args: { userId: string; serverId: string; update: Partial<OnlineMember> }[]) => void;
   serverOnlineMemberRemove: (...args: { userId: string; serverId: string }[]) => void;
-  // Member Application
   serverMemberApplicationAdd: (...args: { data: MemberApplication }[]) => void;
   serverMemberApplicationUpdate: (...args: { userId: string; serverId: string; update: Partial<MemberApplication> }[]) => void;
   serverMemberApplicationRemove: (...args: { userId: string; serverId: string }[]) => void;
-  // Channel
   channelAdd: (...args: { data: Channel }[]) => void;
   channelUpdate: (...args: { channelId: string; update: Partial<Channel> }[]) => void;
   channelRemove: (...args: { channelId: string }[]) => void;
-  // Channel Member
   channelMemberUpdate: (...args: { userId: string; serverId: string; channelId: string; update: Partial<Member> }[]) => void;
-  // Queue Member
   queueMembersSet: (...args: QueueUser[]) => void;
-  // Member Invitation
   memberInvitationAdd: (...args: { data: MemberInvitation }[]) => void;
   memberInvitationUpdate: (...args: { serverId: string; update: Partial<MemberInvitation> }[]) => void;
   memberInvitationRemove: (...args: { serverId: string }[]) => void;
-  // Message
   channelMessage: (...args: ChannelMessage[]) => void;
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: (DirectMessage & { event?: 'directMessage'; message?: DirectMessage; initialData?: unknown })[]) => void;
   shakeWindow: (...args: (DirectMessage & { event?: 'shakeWindow'; message?: DirectMessage; initialData?: unknown })[]) => void;
   chatHistory: (...args: ChatHistory[]) => void;
-  // SFU
   SFUJoined: (...args: { channelId: string }[]) => void;
   SFULeft: () => void;
   SFUNewProducer: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
   SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
   webrtcDisconnectCountUpdate: (count: number) => void;
-  // Play Sound
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
-  // Popup
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
-  // Error
   error: (error: { code: number; message: string }) => void;
 };
 

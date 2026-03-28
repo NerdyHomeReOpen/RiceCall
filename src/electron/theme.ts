@@ -16,7 +16,6 @@ export function registerThemeHandlers() {
 
   ipcMain.on('add-custom-theme', (_, theme: Types.Theme) => {
     const customThemes = store.get('customThemes');
-    // Keep total 7 themes
     customThemes.unshift(theme);
     store.set('customThemes', customThemes);
     broadcast(
@@ -27,7 +26,6 @@ export function registerThemeHandlers() {
 
   ipcMain.on('delete-custom-theme', (_, index: number) => {
     const customThemes = store.get('customThemes');
-    // Keep total 7 themes
     customThemes.splice(index, 1);
     store.set('customThemes', customThemes);
     broadcast(

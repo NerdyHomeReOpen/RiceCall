@@ -200,12 +200,9 @@ export const systemSettings = {
     get: (): Types.RecordFormat => {
       return modules.default.getRecordFormat();
     },
-  },
-
-  // Note: this onUpdate is intentionally at systemSettings level (not inside recordFormat)
-  // to preserve existing API: ipc.systemSettings.onUpdate(...)
-  onUpdate: (callback: (format: Types.RecordFormat) => void): (() => void) => {
-    return modules.default.listen('record-format', callback);
+    onUpdate: (callback: (format: Types.RecordFormat) => void): (() => void) => {
+      return modules.default.listen('record-format', callback);
+    },
   },
 
   recordSavePath: {

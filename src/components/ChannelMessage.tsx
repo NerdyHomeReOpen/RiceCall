@@ -27,11 +27,9 @@ interface ChannelMessageProps {
 }
 
 const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -78,7 +76,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     member: messageGroup,
   });
 
-  // Handlers
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();

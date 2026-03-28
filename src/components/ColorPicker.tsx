@@ -11,22 +11,18 @@ interface ColorPickerProps {
 }
 
 const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, onColorSelect }) => {
-  // Refs
   const colorPickerRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [display, setDisplay] = useState(false);
   const [pickerX, setPickerX] = useState<number>(x);
   const [pickerY, setPickerY] = useState<number>(y);
   const [color, setColor] = useState<string>('#FFFFFF');
 
-  // Handlers
   const handleColorChange = (color: ColorResult) => {
     setColor(color.hex);
     onColorSelect(color.hex);
   };
 
-  // Effects
   useLayoutEffect(() => {
     if (!colorPickerRef.current) return;
     const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = colorPickerRef.current;

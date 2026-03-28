@@ -23,7 +23,6 @@ interface ProvidersProps {
 }
 
 const ProvidersComponent = ({ children }: ProvidersProps) => {
-  // Effects
   useEffect(() => {
     const changeFont = (font: string | null) => {
       new Logger('Font').info(`Font updated: ${font}`);

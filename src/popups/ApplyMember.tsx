@@ -16,19 +16,15 @@ interface ApplyMemberPopupProps {
 }
 
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, server, memberApplication }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [section, setSection] = useState<number>(memberApplication ? 1 : 0); // 0: send, 1: sent, 2: edit
   const [applicationDesc, setApplicationDesc] = useState<Types.MemberApplication['description']>(memberApplication?.description || '');
 
-  // Variables
   const isSendSection = section === 0;
   const isSentSection = section === 1;
   const isEditSection = section === 2;
 
-  // Handlers
   const handleApplicationDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setApplicationDesc(e.target.value);
   };

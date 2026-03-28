@@ -13,10 +13,8 @@ import ChangeServerPage from '@/pages/ChangeServer';
 import headerStyles from '@/styles/header.module.css';
 
 const Header: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Handlers
   const handleMinimizeBtnClick = () => {
     ipc.window.minimize();
   };
@@ -25,7 +23,6 @@ const Header: React.FC = React.memo(() => {
     ipc.window.close();
   };
 
-  // Effects
   useEffect(() => {
     ipc.discord.updatePresence({
       details: t('rpc:login-page'),
@@ -60,18 +57,14 @@ const Header: React.FC = React.memo(() => {
 Header.displayName = 'Header';
 
 const AuthPageComponent: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
 
-  // Variables
   const isDisplayLoginPage = section === 'login';
   const isDisplayRegisterPage = section === 'register';
   const isDisplayChangeServerPage = section === 'change-server';
 
-  // Handlers
   const handleBackToLoginBtnClick = () => {
     setSection('login');
   };
@@ -84,7 +77,6 @@ const AuthPageComponent: React.FC = React.memo(() => {
     setSection('change-server');
   };
 
-  // Effects
   useEffect(() => {
     const autoLogin = async () => {
       const token = localStorage.getItem('token');

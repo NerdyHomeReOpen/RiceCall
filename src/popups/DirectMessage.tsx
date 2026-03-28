@@ -42,7 +42,6 @@ interface DirectMessagePopupProps {
 }
 
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ friend: friendData, target, event, message }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
   const editor = useEditor({
@@ -52,7 +51,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     immediatelyRender: false,
   });
 
-  // Refs
   const isUploadingRef = useRef<boolean>(false);
   const isComposingRef = useRef<boolean>(false);
   const fontSizeRef = useRef<string>('13px');
@@ -60,7 +58,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   const cooldownRef = useRef<number>(0);
   const messageAreaRef = useRef<HTMLDivElement>(null);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -69,7 +66,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     shallowEqual,
   );
 
-  // States
   const [messageInput, setMessageInput] = useState<string>('');
   const [targetCurrentServer, setTargetCurrentServer] = useState<Types.Server | null>(null);
   const [friend, setFriend] = useState<Types.Friend | null>(friendData);
@@ -78,7 +74,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
 
-  // Variables
   const textLength = editor?.getText().length || 0;
   const isWarning = textLength > MAX_INPUT_LENGTH;
   const isFriend = friend?.relationStatus === 2;
@@ -88,7 +83,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   const badges = typeof target.badges === 'string' ? JSON.parse(target.badges) : target.badges;
   const hasBadges = badges.length > 0;
 
-  // Functions
   const syncStyles = useCallback(() => {
     fontSizeRef.current = editor?.getAttributes('textStyle').fontSize || '13px';
     textColorRef.current = editor?.getAttributes('textStyle').color || '#000000';
@@ -100,7 +94,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     setIsAtBottom(true);
   }, []);
 
-  // Handlers
   const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
     for (const item of items) {
@@ -111,7 +104,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }
@@ -228,7 +221,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     showEmojiPicker(x, y, 'right-top', e.currentTarget as HTMLElement, true, fontSizeRef.current, textColorRef.current, handleEmojiSelect, handleFontSizeChange, handleTextColorChange);
   };
 
-  // Effects
   useEffect(() => {
     editor?.on('selectionUpdate', syncStyles);
   }, [editor, syncStyles]);
@@ -299,8 +291,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
         // !! THIS IS IMPORTANT !!
         const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
         const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
-        // Check if the message array is in the current conversation
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
+
         if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
       });
     };
@@ -316,8 +308,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
         // !! THIS IS IMPORTANT !!
         const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
         const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
-        // Check if the message array is in the current conversation
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
+
         if (isCurrentConversation) {
           setDirectMessages((prev) => [...prev, item]);
 

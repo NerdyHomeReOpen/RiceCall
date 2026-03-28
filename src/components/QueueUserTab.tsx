@@ -26,15 +26,12 @@ interface QueueUserTabProps {
 }
 
 const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) => {
-  // Hooks
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { unmuteUser, muteUser } = useWebRTC();
   const dispatch = useAppDispatch();
 
-  // Refs
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -68,7 +65,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const isSpeaking = useAppSelector((state) => (queueUserId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[queueUserId]), shallowEqual);
   const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[queueUserId], shallowEqual);
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const queueMember = useMemo(() => {
     const onlineMember = onlineMembers.find((om) => om.userId === queueUserId);
@@ -81,7 +77,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const isOnMic = queueMember.position === 0;
   const isControlled = isOnMic && queueMember.isQueueControlled && !Permission.isChannelMod(permissionLevel);
 
-  // Functions
   const getStatusIcon = () => {
     if (isMuted || queueMember.isVoiceMuted || (!Permission.isChannelMod(permissionLevel) && isControlled)) return 'muted';
     if (isSpeaking) return 'play';
@@ -99,7 +94,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
     onUnmuteUser: unmuteUser,
   });
 
-  // Handlers
   const handleTabClick = () => {
     if (isSelected) dispatch(setSelectedItemId(null));
     else dispatch(setSelectedItemId(`queue-${queueMember.userId}`));

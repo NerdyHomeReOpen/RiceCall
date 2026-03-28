@@ -13,7 +13,6 @@ interface UseServerSettingContextMenuProps {
 }
 
 export const useServerSettingContextMenu = ({ user, currentServer, onLocateMe }: UseServerSettingContextMenuProps) => {
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
 
   const buildContextMenu = useCallback(

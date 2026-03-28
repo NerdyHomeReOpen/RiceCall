@@ -15,10 +15,8 @@ interface RegisterPageProps {
 }
 
 const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, onBackToLoginBtnClick }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [account, setAccount] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
@@ -31,7 +29,6 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
   const [usernameError, setUsernameError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  // Variables
   const canSubmit =
     !!account.trim() &&
     !!password.trim() &&
@@ -44,7 +41,6 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     !usernameError &&
     !emailError;
 
-  // Functions
   function validateAccount(value: string): string {
     value = value.trim();
     if (!value) return t('account-required');
@@ -83,7 +79,6 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     return '';
   }
 
-  // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     if (name === 'account') {

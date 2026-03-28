@@ -20,10 +20,8 @@ interface UseQueueUserContextMenuProps {
 }
 
 export const useQueueUserContextMenu = ({ user, currentServer, currentChannel, queueMember, isMuted, isFriend, onMuteUser, onUnmuteUser }: UseQueueUserContextMenuProps) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isSelf = queueMember.userId === user.userId;
   const isLowerLevel = queueMember.permissionLevel < permissionLevel;

@@ -14,21 +14,16 @@ interface BadgeInfoCardProps {
 }
 
 const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, direction, badge }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [display, setDisplay] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
-  // Variables
   const isPermanent = badge.showTo <= 0;
 
-  // Effects
   useLayoutEffect(() => {
     if (!cardRef.current) return;
     const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;

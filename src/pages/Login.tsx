@@ -13,13 +13,10 @@ interface LoginPageProps {
 }
 
 const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRegisterBtnClick, onChangeServerBtnClick }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const comboRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [account, setAccount] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [rememberAccount, setRememberAccount] = useState<boolean>(false);
@@ -32,7 +29,6 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     ipc.accounts.delete(account);
   };
 
-  // Handlers
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target;
     if (name === 'account') {
@@ -88,7 +84,6 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     onRegisterBtnClick();
   };
 
-  // Effects
   useEffect(() => {
     const loginAccount = localStorage.getItem('login-account') || '';
     setAccount(accounts[loginAccount] ? loginAccount : '');

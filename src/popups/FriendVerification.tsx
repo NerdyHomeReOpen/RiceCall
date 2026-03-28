@@ -13,13 +13,10 @@ import styles from '@/styles/verification.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
 const FriendVerificationPopup: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
 
-  // Handlers
   const handleRejectAllBtnClick = () => {
     Action.rejectAllFriendApplication(friendApplications);
   };
@@ -55,10 +52,8 @@ interface FriendApplicationItemProps {
 }
 
 const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo(({ application }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -66,7 +61,6 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
     shallowEqual,
   );
 
-  // Handlers
   const handleSenderAvatarClick = () => {
     Action.openUserInfo(user.userId, application.senderId);
   };

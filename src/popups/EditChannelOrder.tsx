@@ -22,10 +22,8 @@ interface EditChannelOrderPopupProps {
 }
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId, channels: channelsData }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const orderMapRef = useRef<Record<string, number>>(
     channelsData.reduce(
       (acc, channel) => {
@@ -36,7 +34,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     ),
   );
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -44,12 +41,10 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     shallowEqual,
   );
 
-  // States
   const [channels, setChannels] = useState<(Types.Channel | Types.Category)[]>(channelsData);
   const [selectedChannel, setSelectedChannel] = useState<Types.Channel | Types.Category | null>(null);
   const [categoryChildren, setCategoryChildren] = useState<(Types.Channel | Types.Category)[]>([]);
 
-  // Variables
   const currentIndex = categoryChildren.findIndex((c) => c.channelId === selectedChannel?.channelId);
   const firstChannel = categoryChildren[0];
   const lastChannel = categoryChildren[categoryChildren.length - 1];
@@ -90,14 +85,13 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, [channels]);
   const canSubmit = editedChannels.length > 0;
 
-  // Functions
   const changeOrder = (currentIndex: number, targetIndex: number) => {
     if (currentIndex === targetIndex) return;
     if (currentIndex < 0 || currentIndex > categoryChildren.length - 1) return;
     if (targetIndex < 0 || targetIndex > categoryChildren.length - 1) return;
 
     const newChannels = [...channels];
-    const newCategoryChildren = categoryChildren.map((c) => ({ ...c })); // Deep copy for local sort logic
+    const newCategoryChildren = categoryChildren.map((c) => ({ ...c }));
 
     if (currentIndex < targetIndex) {
       for (let i = currentIndex; i < targetIndex; i++) {
@@ -123,7 +117,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     setCategoryChildren(newCategoryChildren.sort((a, b) => a.order - b.order));
   };
 
-  // Handlers
   const handleAddChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     Action.openCreateChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
@@ -174,7 +167,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
@@ -266,19 +258,14 @@ interface CategoryTabProps {
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category, onSelect }) => {
-  // Hooks
   const dispatch = useAppDispatch();
 
-  // Selectors
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
 
-  // States
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  // Variables
   const categoryChildren = channels?.filter((c) => c.categoryId === category.channelId);
 
-  // Handlers
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isSelected) dispatch(setSelectedItemId(null));
@@ -323,16 +310,12 @@ interface ChannelTabProps {
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect }) => {
-  // Hooks
   const dispatch = useAppDispatch();
 
-  // Selectors
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 
-  // States
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
-  // Handlers
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
     if (isSelected) dispatch(setSelectedItemId(null));

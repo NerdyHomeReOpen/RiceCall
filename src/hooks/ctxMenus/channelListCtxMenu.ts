@@ -14,7 +14,6 @@ interface UseChannelListContextMenuProps {
 }
 
 export const useChannelListContextMenu = ({ user, currentServer, currentChannel, movableServerUserIds }: UseChannelListContextMenuProps) => {
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
 
   const buildContextMenu = useCallback(

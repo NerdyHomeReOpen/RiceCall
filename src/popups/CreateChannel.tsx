@@ -17,16 +17,12 @@ interface CreateChannelPopupProps {
 }
 
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, serverId, parent }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [channelName, setChannelName] = useState<string>(Default.channel().name);
 
-  // Variables
   const canSubmit = channelName.trim();
 
-  // Handlers
   const handleChannelNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChannelName(e.target.value);
   };

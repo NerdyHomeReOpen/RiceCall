@@ -13,19 +13,15 @@ interface EmbedLinkInputProps {
 }
 
 const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direction, onSubmit, onClose }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const embedLinkInputRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [display, setDisplay] = useState(false);
   const [pickerX, setPickerX] = useState<number>(x);
   const [pickerY, setPickerY] = useState<number>(y);
   const [linkUrl, setLinkUrl] = useState<string>('');
 
-  // Handlers
   const handleLinkUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setLinkUrl(e.target.value);
   };
@@ -39,7 +35,6 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
     onClose();
   };
 
-  // Effects
   useLayoutEffect(() => {
     if (!embedLinkInputRef.current) return;
     const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = embedLinkInputRef.current;

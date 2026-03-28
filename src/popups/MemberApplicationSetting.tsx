@@ -15,14 +15,11 @@ interface MemberApplicationSettingPopupProps {
 }
 
 const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ id, server }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [serverReceiveApplication, setServerReceiveApplication] = useState<boolean>(server.receiveApply);
   const [serverApplyNote, setServerApplyNote] = useState<string>(server.applyNotice);
 
-  // Handlers
   const handleReceiveApplicationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setServerReceiveApplication(e.target.checked);
   };

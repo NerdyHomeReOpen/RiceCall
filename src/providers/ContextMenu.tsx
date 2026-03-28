@@ -57,7 +57,6 @@ interface ContextMenuProviderProps {
 }
 
 const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
-  // States
   const [contextMenu, setContextMenu] = React.useState<React.ReactNode | null>(null);
   const [micContextMenu, setMicContextMenu] = React.useState<React.ReactNode | null>(null);
   const [notificationMenu, setNotificationMenu] = React.useState<React.ReactNode | null>(null);
@@ -68,7 +67,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   const [statusDropdown, setStatusDropdown] = React.useState<React.ReactNode | null>(null);
   const [embedLinkInput, setEmbedLinkInput] = React.useState<React.ReactNode | null>(null);
 
-  // Functions
   const closeContextMenu = useCallback(() => {
     setContextMenu(null);
   }, []);
@@ -183,7 +181,6 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
     [closeEmbedLinkInput],
   );
 
-  // Effects
   useEffect(() => {
     const onMouseMove = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('.user-info-card-container')) {

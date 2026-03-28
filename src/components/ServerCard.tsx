@@ -19,11 +19,9 @@ interface ServerCardProps {
 }
 
 const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
-  // Hooks
   const { showContextMenu } = useContextMenu();
   const { getIsLoading, loadServer } = useLoading();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -32,10 +30,8 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
     shallowEqual,
   );
 
-  // Variables
   const isOwned = server.ownerId === user.userId && server.owned;
 
-  // Functions
   const joinServer = () => {
     if (getIsLoading() || user.currentServerId === server.serverId) return;
     loadServer(server.specialId || server.displayId);
@@ -44,7 +40,6 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
 
   const { buildContextMenu: buildServerCardContextMenu } = useServerCardContextMenu({ user, server, onJoinServer: joinServer });
 
-  // Handlers
   const handleServerCardClick = () => {
     joinServer();
   };

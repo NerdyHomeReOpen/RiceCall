@@ -21,7 +21,6 @@ interface SoundPlayerProviderProps {
 }
 
 const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
-  // Refs
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const disableAllSoundEffectRef = useRef(false);
   const enterVoiceChannelSoundRef = useRef(false);
@@ -86,7 +85,6 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
     }
   }, []);
 
-  // Effects
   useEffect(() => {
     const changeOutputAudioDevice = (deviceId: string) => {
       new Logger('SoundPlayer').info(`Output device updated: ${deviceId}`);

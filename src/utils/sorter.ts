@@ -7,8 +7,8 @@ type SortField<T> = keyof T;
  * Example usage:
  * ```ts
  * const users = [{ name: 'Alice', age: 25 }, { name: 'Bob', age: 30 }];
- * users.sort(createSorter('age', -1)); // Sort by age in descending order
- * users.sort(createSorter('name')); // Sort by name in ascending order
+ * users.sort(Sorter('age', -1)); // Sort by age in descending order
+ * users.sort(Sorter('name')); // Sort by name in ascending order
  * ```
  *
  * @param field - The field to sort by
@@ -20,17 +20,14 @@ export function Sorter<T extends object>(field: SortField<T>, direction: SortDir
     const valueA = a[field];
     const valueB = b[field];
 
-    // Handle number sorting
     if (typeof valueA === 'number' && typeof valueB === 'number') {
       return direction * (valueA - valueB);
     }
 
-    // Handle string sorting
     if (typeof valueA === 'string' && typeof valueB === 'string') {
       return direction * valueA.localeCompare(valueB);
     }
 
-    // Handle date sorting
     if (valueA instanceof Date && valueB instanceof Date) {
       return direction * (valueA.getTime() - valueB.getTime());
     }

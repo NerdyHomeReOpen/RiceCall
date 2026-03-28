@@ -19,7 +19,6 @@ interface UseChannelContextMenuProps {
 }
 
 export const useChannelContextMenu = ({ channel, user, currentServer, currentChannel, movableChannelUserIds, movableServerUserIds, canJoin, isPasswordNeeded }: UseChannelContextMenuProps) => {
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isInChannel = currentChannel.channelId === channel.channelId;

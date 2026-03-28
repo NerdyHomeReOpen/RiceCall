@@ -17,17 +17,13 @@ interface ApproveFriendPopupProps {
 }
 
 const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, targetId }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
-  // States
   const [friendNotes, setFriendNotes] = useState<string>('');
   const [friendGroupId, setFriendGroupId] = useState<Types.FriendGroup['friendGroupId']>('');
 
-  // Handlers
   const handleCreateFriendGroupBtnClick = () => {
     Action.openCreateFriendGroup();
   };

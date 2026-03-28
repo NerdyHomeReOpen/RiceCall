@@ -15,13 +15,10 @@ interface EditFriendNotePopupProps {
 }
 
 const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ id, friend }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [friendNote, setFriendNote] = useState<string>(friend.note);
 
-  // Handlers
   const handleFriendNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFriendNote(e.target.value);
   };

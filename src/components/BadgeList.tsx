@@ -15,7 +15,6 @@ interface BadgeListProps {
 }
 
 const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21, grid = false }) => {
-  // Variables
   const filteredBadges = useMemo(
     () =>
       badges

@@ -30,7 +30,6 @@ interface AnnouncementEditorProps {
 }
 
 const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, showPreview = false, onChange }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showColorPicker, showEmojiPicker, showEmbedLinkInput } = useContextMenu();
   const editor = useEditor({
@@ -40,10 +39,8 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     immediatelyRender: false,
   });
 
-  // Refs
   const isUploadingRef = useRef(false);
 
-  // States
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -54,7 +51,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const [fontFamily, setFontFamily] = useState('Arial');
   const [textColor, setTextColor] = useState('#000000');
 
-  // Functions
   const syncStyles = useCallback(() => {
     setIsBold(editor?.isActive('bold') || false);
     setIsItalic(editor?.isActive('italic') || false);
@@ -67,7 +63,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     setTextColor(editor?.getAttributes('textStyle').color || '#000000');
   }, [editor]);
 
-  // Handlers
   const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const fontFamily = e.target.value;
     editor?.chain().setFontFamily(fontFamily).focus().run();
@@ -191,7 +186,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }
@@ -207,7 +202,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     }
   };
 
-  // Effects
   useEffect(() => {
     editor?.on('selectionUpdate', syncStyles);
   }, [editor, syncStyles]);

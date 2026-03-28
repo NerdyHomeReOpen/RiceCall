@@ -15,20 +15,16 @@ import styles from '@/styles/changeTheme.module.css';
 import popupStyles from '@/styles/popup.module.css';
 
 const ChangeThemePopup: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const isSelectingColorRef = useRef<boolean>(false);
   const ImageInputRef = useRef<HTMLInputElement>(null);
   const colorSelectorRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
   const [pickedColor, setPickedColor] = useState<Color.RGB>({ r: 0, g: 0, b: 0 });
   const [customThemes, setCustomThemes] = useState<Types.Theme[]>(Array.from({ length: 7 }));
 
-  // Handlers
   const handleThemeSelect = (event: React.MouseEvent<HTMLDivElement>) => {
     const clickedElement = event.currentTarget;
     const computedStyle = window.getComputedStyle(clickedElement as Element);
@@ -137,7 +133,6 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     });
   };
 
-  // Effects
   useEffect(() => {
     const changeCustomTheme = (customThemes: Types.Theme[]) => {
       new Logger('CustomThemes').info(`Custom themes updated: ${customThemes}`);
@@ -228,11 +223,9 @@ interface CustomThemeItemProps {
 }
 
 const CustomThemeItem: React.FC<CustomThemeItemProps> = React.memo(({ index, customTheme, onThemeSelect, onThemeRemove }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  // Handlers
   const handleThemeSelect = (e: React.MouseEvent<HTMLDivElement>) => {
     onThemeSelect(e);
   };

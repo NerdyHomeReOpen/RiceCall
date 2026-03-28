@@ -35,12 +35,10 @@ interface ServerSettingPopupProps {
 }
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
-  // Refs
   const startXRef = useRef<number>(0);
   const startWidthRef = useRef<number>(0);
   const isResizingMemberColumn = useRef<boolean>(false);
@@ -48,7 +46,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const isResizingBlockMemberColumn = useRef<boolean>(false);
   const isUploadingRef = useRef<boolean>(false);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -60,7 +57,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const memberApplications = useAppSelector((state) => state.memberApplications.data, shallowEqual);
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
 
-  // States
   const [server, setServer] = useState<Types.Server>(serverData);
   const [serverMembers, setServerMembers] = useState<Types.Member[]>(serverMembersData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -78,7 +74,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const [applicationColumnWidths, setApplicationColumnWidths] = useState<number[]>(MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel);
   const isReadOnly = !Permission.isServerAdmin(permissionLevel);
   const canSubmit = server.name.trim();
@@ -106,18 +101,17 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
 
   const settingPages = Permission.isServerAdmin(permissionLevel)
     ? [
-        t('server-info'),
-        t('server-announcement'),
-        t('member-management'),
-        t('access-permission'),
-        `${t('member-application-management')} (${totalApplicationsCount})`,
-        `${t('blacklist-management')} (${totalBlockMembersCount})`,
-      ]
+      t('server-info'),
+      t('server-announcement'),
+      t('member-management'),
+      t('access-permission'),
+      `${t('member-application-management')} (${totalApplicationsCount})`,
+      `${t('blacklist-management')} (${totalBlockMembersCount})`,
+    ]
     : Permission.isMember(permissionLevel)
       ? [t('server-info'), t('server-announcement'), t('member-management')]
       : [t('server-info'), t('server-announcement')];
 
-  // Handlers
   const handleMemberSort = (field: keyof Types.Member) => {
     setMemberSortField(field);
     setMemberSortDirection((d) => (field === memberSortField ? (d === 1 ? -1 : 1) : -1));
@@ -197,7 +191,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
           isUploadingRef.current = false;
           return;
         }
@@ -273,7 +267,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     const onPointerup = () => {
       isResizingMemberColumn.current = false;
@@ -426,14 +419,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </thead>
                 <tbody className={settingStyles['table-container']}>
                   {sortedMembers.map((member) => (
-                    <ServerSettingMemberRow
-                      key={member.userId}
-                      user={user}
-                      server={server}
-                      member={member}
-                      permissionLevel={permissionLevel}
-                      columnWidths={memberColumnWidths}
-                    />
+                    <ServerSettingMemberRow key={member.userId} user={user} server={server} member={member} permissionLevel={permissionLevel} columnWidths={memberColumnWidths} />
                   ))}
                 </tbody>
               </table>
@@ -503,11 +489,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </thead>
                 <tbody className={settingStyles['table-container']}>
                   {sortedApplications.map((application) => {
-                    // Variables
                     const isSelf = application.userId === user.userId;
                     const isSelected = selectedItemId === `application-${application.userId}`;
 
-                    // Functions
                     const getContextMenuItems = () => [
                       {
                         id: 'view-profile',
@@ -533,7 +517,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                       },
                     ];
 
-                    // Handlers
                     const handleClick = () => {
                       if (isSelected) dispatch(setSelectedItemId(null));
                       else dispatch(setSelectedItemId(`application-${application.userId}`));
@@ -590,14 +573,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </thead>
                 <tbody className={settingStyles['table-container']}>
                   {sortedBlockMembers.map((member) => (
-                    <ServerSettingBlockedMemberRow
-                      key={member.userId}
-                      user={user}
-                      server={server}
-                      member={member}
-                      permissionLevel={permissionLevel}
-                      columnWidths={blockMemberColumnWidths}
-                    />
+                    <ServerSettingBlockedMemberRow key={member.userId} user={user} server={server} member={member} permissionLevel={permissionLevel} columnWidths={blockMemberColumnWidths} />
                   ))}
                 </tbody>
               </table>

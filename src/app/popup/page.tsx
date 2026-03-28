@@ -60,13 +60,10 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBoxIcon }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Handlers
   const handleMaximizeBtnClick = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
@@ -85,7 +82,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBox
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
     return () => unsubs.forEach((unsub) => unsub());
@@ -111,10 +107,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBox
 Header.displayName = 'Header';
 
 const PopupPageComponent: React.FC = React.memo(() => {
-  // States
   const [popup, setPopup] = useState<Types.Popup | null>(null);
 
-  // Functions
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
     const node: Record<Types.PopupType, () => React.ReactNode> = {
@@ -189,7 +183,6 @@ const PopupPageComponent: React.FC = React.memo(() => {
     };
   }, []);
 
-  // Effects
   useEffect(() => {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);

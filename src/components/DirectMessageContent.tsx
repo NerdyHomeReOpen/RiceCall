@@ -14,10 +14,8 @@ interface DirectMessageContentProps {
 }
 
 const DirectMessageContent: React.FC<DirectMessageContentProps> = React.memo(({ messages }) => {
-  // Refs
   const messagesViewerRef = useRef<HTMLDivElement>(null);
 
-  // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
     return sortedMessages.reduce<MessageGroup[]>((acc, message) => {

@@ -20,11 +20,9 @@ interface FriendGroupTabProps {
 }
 
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup, friends }) => {
-  // Hooks
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -34,21 +32,19 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
 
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-group-${friendGroup.friendGroupId}`, shallowEqual);
 
-  // States
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
-  // Variables
   const isStranger = friendGroup.friendGroupId === 'stranger';
   const isBlacklist = friendGroup.friendGroupId === 'blacklist';
   const friendGroupFriends = useMemo(() => {
     if (friendGroup.friendGroupId === 'default') {
-      return friends.filter((f) => !f.isBlocked && !f.friendGroupId && f.relationStatus !== 0); // Default
+      return friends.filter((f) => !f.isBlocked && !f.friendGroupId && f.relationStatus !== 0);
     } else if (friendGroup.friendGroupId === 'blacklist') {
-      return friends.filter((f) => f.isBlocked); // Blacklist
+      return friends.filter((f) => f.isBlocked);
     } else if (friendGroup.friendGroupId === 'stranger') {
-      return friends.filter((f) => !f.isBlocked && f.relationStatus === 0); // Stranger
+      return friends.filter((f) => !f.isBlocked && f.relationStatus === 0);
     } else {
-      return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroup.friendGroupId && f.relationStatus !== 0); // Other
+      return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroup.friendGroupId && f.relationStatus !== 0);
     }
   }, [friendGroup.friendGroupId, friends]);
   const sortedFriendGroupFriends = useMemo(() => [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)), [friendGroupFriends]);
@@ -56,7 +52,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
 
   const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupContextMenu({ user, friendGroup });
 
-  // Handlers
   const handleTabClick = () => {
     if (isSelected) dispatch(setSelectedItemId(null));
     else dispatch(setSelectedItemId(`friend-group-${friendGroup.friendGroupId}`));

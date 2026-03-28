@@ -16,10 +16,8 @@ interface ChangeServerPageProps {
 }
 
 const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({ display, onBackToLoginBtnClick }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Handlers
   const handleServerSelect = (value: 'prod' | 'dev') => {
     if (value === 'dev') {
       Action.openAlertDialog(t('confirm-change-server-to-dev'), () => {
@@ -67,10 +65,8 @@ interface ServerOptionProps {
 }
 
 const ServerOption: React.FC<ServerOptionProps> = React.memo(({ option, onServerSelect }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Handlers
   const handleClick = () => {
     onServerSelect(option.value);
   };

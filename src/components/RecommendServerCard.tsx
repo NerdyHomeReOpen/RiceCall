@@ -19,12 +19,10 @@ interface RecommendServerCardProps {
 }
 
 const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ recommendServer }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { getIsLoading, loadServer } = useLoading();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -33,10 +31,8 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
     shallowEqual,
   );
 
-  // Variables
   const hasOnline = recommendServer.online >= 0;
 
-  // Functions
   const joinServer = () => {
     if (getIsLoading() || user.currentServerId === recommendServer.serverId) return;
     loadServer(recommendServer.specialId || recommendServer.displayId);
@@ -45,7 +41,6 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
 
   const { buildContextMenu: buildServerCardContextMenu } = useRecommendServerContextMenu({ user, recommendServer, onJoinServer: joinServer });
 
-  // Handlers
   const handleServerCardClick = () => {
     joinServer();
   };

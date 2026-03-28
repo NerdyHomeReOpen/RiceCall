@@ -28,13 +28,11 @@ interface FriendTabProps {
 }
 
 const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { getIsLoading, loadServer } = useLoading();
   const dispatch = useAppDispatch();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -46,10 +44,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-${friend.targetId}`, shallowEqual);
 
-  // States
   const [friendCurrentServer, setFriendCurrentServer] = useState<Types.Server | null>(null);
 
-  // Variables
   const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: -1, userId: user.userId }), [t, user.userId]);
   const isOnline = friend.status === 'online';
   const isOffline = friend.status === 'offline';
@@ -60,7 +56,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
 
   const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabContextMenu({ user, friend, friendGroups, defaultFriendGroup });
 
-  // Handlers
   const handleServerNameClick = () => {
     if (getIsLoading() || !friendCurrentServer || user.currentServerId === friendCurrentServer.serverId) return;
     loadServer(friendCurrentServer.specialId || friendCurrentServer.displayId);
@@ -83,7 +78,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
     showContextMenu(x, y, 'right-bottom', buildFriendTabContextMenu());
   };
 
-  // Effects
   useEffect(() => {
     if (!friend.targetId || friend.isBlocked || !friend.shareCurrentServer || !friend.currentServerId || !isFriend) {
       setFriendCurrentServer(null);

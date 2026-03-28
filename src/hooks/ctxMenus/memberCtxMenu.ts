@@ -39,10 +39,8 @@ export const useMemberContextMenu = ({
   onMuteUser,
   onUnmuteUser,
 }: UseMemberContextMenuProps) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isSelf = member.userId === user.userId;

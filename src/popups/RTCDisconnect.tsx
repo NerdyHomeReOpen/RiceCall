@@ -13,18 +13,14 @@ interface RTCDisconnectPopupProps {
 }
 
 const RTCDisconnectPopup: React.FC<RTCDisconnectPopupProps> = React.memo(({ id, count }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // State
   const [currentCount, setCurrentCount] = useState(count || 1);
 
-  // Handlers
   const handleClose = () => {
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     const unsub = ipc.socket.on('webrtcDisconnectCountUpdate', (newCount) => {
       setCurrentCount(newCount);

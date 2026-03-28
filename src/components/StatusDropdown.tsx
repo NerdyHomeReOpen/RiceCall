@@ -15,15 +15,12 @@ interface StatusDropdownProps {
 }
 
 const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direction, onClose, onStatusSelect }) => {
-  // Refs
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [display, setDisplay] = useState(false);
   const [dropdownX, setDropdownX] = useState(x);
   const [dropdownY, setDropdownY] = useState(y);
 
-  // Effects
   useLayoutEffect(() => {
     if (!dropdownRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = dropdownRef.current;
@@ -77,7 +74,6 @@ interface StatusItemProps {
 }
 
 const StatusItem: React.FC<StatusItemProps> = React.memo(({ status, onStatusSelect, onClose }) => {
-  // Handlers
   const handleClick = () => {
     onStatusSelect(status);
     onClose();

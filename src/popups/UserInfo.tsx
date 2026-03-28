@@ -33,15 +33,12 @@ interface UserInfoPopupProps {
 }
 
 const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, target: targetData, targetServers }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
 
-  // Refs
   const signatureInputRef = useRef<HTMLInputElement>(null);
   const isUploadingRef = useRef<boolean>(false);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -49,13 +46,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
     shallowEqual,
   );
 
-  // States
   const [target, setTarget] = useState(targetData);
   const [serversView, setServersView] = useState<'joined' | 'favorite'>('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
   const [countries, setCountries] = useState<string[]>([]);
 
-  // Variables
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
   const currentDay = new Date().getDate();
@@ -87,7 +82,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
       .slice(0, 4);
   }, [targetServers]);
 
-  // Functions
   const getUserAge = () => {
     const birthDate = new Date(target.birthYear, target.birthMonth - 1, target.birthDay);
     let age = currentYear - birthDate.getFullYear();
@@ -106,7 +100,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
     [currentYear, currentMonth, currentDay],
   );
 
-  // Handlers
   const handleServerSelect = (server: Types.Server) => {
     ipc.server.select({ serverDisplayId: server.specialId || server.displayId, serverId: server.serverId, timestamp: Date.now() });
   };
@@ -123,7 +116,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
         Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }
@@ -163,7 +156,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 
   const handleConfirmBtnClick = () => {
     if (!countries.includes(target.country)) {
-      Action.openErrorDialog(new Error('invalid-country'), () => {});
+      Action.openErrorDialog(new Error('invalid-country'), () => { });
       return;
     }
     Action.editUser(ObjDiff(target, targetData));
@@ -232,7 +225,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     (async () => {
       const res = await fetch('https://nerdyhomereopen.github.io/Details/country.json');
@@ -489,7 +481,6 @@ interface RecentServerCardProps {
 }
 
 const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -497,11 +488,9 @@ const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, 
     shallowEqual,
   );
 
-  // Variables
   const isSelf = user.userId === target.userId;
   const isOwned = server.ownerId === target.userId && server.owned;
 
-  // Handlers
   const handleServerDoubleClick = () => {
     onServerSelect(server);
   };
@@ -529,7 +518,6 @@ interface JoinedServerCardProps {
 }
 
 const JoinedServerCard: React.FC<JoinedServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  // Handlers
   const handleServerDoubleClick = () => {
     onServerSelect(server);
   };
@@ -557,7 +545,6 @@ interface FavoriteServerCardProps {
 }
 
 const FavoriteServerCard: React.FC<FavoriteServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  // Handlers
   const handleServerDoubleClick = () => {
     onServerSelect(server);
   };

@@ -18,10 +18,8 @@ interface ApplyFriendPopupProps {
 }
 
 const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, target, friendApplication }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -31,17 +29,14 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
 
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
-  // States
   const [section, setSection] = useState<number>(friendApplication ? 1 : 0); // 0: send, 1: sent, 2: edit
   const [friendGroupId, setFriendGroupId] = useState<Types.FriendGroup['friendGroupId']>('');
   const [applicationDesc, setApplicationDesc] = useState<Types.FriendApplication['description']>(friendApplication?.description || '');
 
-  // Variables
   const isSendSection = section === 0;
   const isSentSection = section === 1;
   const isEditSection = section === 2;
 
-  // Handlers
   const handleTargetNameClick = () => {
     Action.openUserInfo(user.userId, target.userId);
   };

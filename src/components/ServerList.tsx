@@ -13,17 +13,13 @@ interface ServerListProps {
 }
 
 const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [expanded, setExpanded] = useState(false);
 
-  // Variables
   const displayedServers = expanded ? servers : servers.slice(0, 6);
   const canExpand = servers.length > 6;
 
-  // Handlers
   const handleExpandBtnClick = () => {
     setExpanded((prev) => !prev);
   };

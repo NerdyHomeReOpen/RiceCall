@@ -31,17 +31,14 @@ interface UserTabProps {
 }
 
 const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswordNeeded, canJoin }) => {
-  // Hooks
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { muteUser, unmuteUser } = useWebRTC();
   const { setCurrentUserRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
-  // Refs
   const userTabRef = useRef<HTMLDivElement>(null);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -73,7 +70,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const isSpeaking = useAppSelector((state) => (member.userId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[member.userId]), shallowEqual);
   const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[member.userId], shallowEqual);
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const isSelf = member.userId === user.userId;
   const isFriend = useMemo(() => friends.some((f) => f.targetId === member.userId && f.relationStatus === 2), [friends, member.userId]);
@@ -98,14 +94,12 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
     onUnmuteUser: unmuteUser,
   });
 
-  // Functions
   const getStatusIcon = () => {
     if (isMuted || member.isVoiceMuted) return 'muted';
     if (isSpeaking) return 'play';
     return '';
   };
 
-  // Handlers
   const handleTabClick = () => {
     if (isSelected) dispatch(setSelectedItemId(null));
     else dispatch(setSelectedItemId(`user-${member.userId}`));
@@ -145,7 +139,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
     hoverTimerRef.current = null;
   };
 
-  // Effects
   useEffect(() => {
     if (!isSelf) return;
     setCurrentUserRef(userTabRef.current);

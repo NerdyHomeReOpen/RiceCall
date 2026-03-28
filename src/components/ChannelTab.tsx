@@ -26,13 +26,11 @@ interface ChannelTabProps {
 }
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannelMembersWithRules = false }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { setExpandedChannelHandlerRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -63,10 +61,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 
-  // States
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const channelMembers = useMemo(() => onlineMembers.filter((om) => om.currentChannelId === channel.channelId), [onlineMembers, channel.channelId]);
   const movableServerUserIds = useMemo(
@@ -82,16 +78,13 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
     return [...channelMembers].sort((a, b) => {
       if (!sortChannelMembersWithRules) return b.lastJoinChannelAt - a.lastJoinChannelAt;
 
-      // Self first
       if (a.userId === user.userId && b.userId !== user.userId) return -1;
       if (b.userId === user.userId && a.userId !== user.userId) return 1;
 
-      // Friends next
       const aIsFriend = friendIds.has(a.userId);
       const bIsFriend = friendIds.has(b.userId);
       if (aIsFriend !== bIsFriend) return aIsFriend ? -1 : 1;
 
-      // Then by permission level and last joined time
       return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
     });
   }, [channelMembers, user, friends, sortChannelMembersWithRules]);
@@ -118,7 +111,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
     isPasswordNeeded,
   });
 
-  // Handlers
   const handleTabClick = () => {
     if (isSelected) dispatch(setSelectedItemId(null));
     else dispatch(setSelectedItemId(`channel-${channel.channelId}`));
@@ -162,7 +154,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
     setIsExpanded(!isExpanded);
   };
 
-  // Effect
   useEffect(() => {
     if (!isInChannel) return;
     setExpandedChannelHandlerRef(() => setIsExpanded(true));

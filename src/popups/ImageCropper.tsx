@@ -14,21 +14,17 @@ const INITIAL_CROP_SIZE = 200;
 const MIN_CROP_SIZE = 100;
 
 const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageUnit8Array }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(new Image());
   const imageInfoRef = useRef({ drawX: 0, drawY: 0, drawWidth: 0, drawHeight: 0 });
   const startPosRef = useRef({ x: 0, y: 0 });
 
-  // States
   const [cropBox, setCropBox] = useState({ x: 100, y: 100, size: INITIAL_CROP_SIZE });
   const [draggingBox, setDraggingBox] = useState(false);
 
-  // Functions
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     const ctx = canvas?.getContext('2d');
@@ -66,7 +62,6 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     }
   }, [cropBox]);
 
-  // Handlers
   const handleMouseDown = (e: React.MouseEvent) => {
     const rect = canvasRef.current!.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -141,7 +136,6 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     const blob = new Blob([imageUnit8Array]);
     const imageUrl = URL.createObjectURL(blob);

@@ -18,18 +18,14 @@ interface ServerBroadcastPopupProps {
 }
 
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ id, serverId, channelId }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [sendType, setSendType] = useState<'text' | 'voice'>('text');
   const [broadcastType, setBroadcastType] = useState<'channel' | 'server'>('channel');
   const [broadcastContent, setBroadcastContent] = useState<string>('');
 
-  // Variables
   const canSend = broadcastContent.trim() && broadcastContent.length <= MAX_BROADCAST_LENGTH;
 
-  // Handlers
   const handleBroadcastChannelClick = () => {
     setBroadcastType('channel');
   };

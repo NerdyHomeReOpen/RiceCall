@@ -18,12 +18,10 @@ export const useFindMeContext = () => {
 };
 
 const FindMeProvider = ({ children }: { children: React.ReactNode }) => {
-  // Refs
   const expandedCategoryHandlerRef = useRef<() => void>(null);
   const expandedChannelHandlerRef = useRef<() => void>(null);
   const currentUserRef = useRef<HTMLDivElement>(null);
 
-  // Functions
   const findMe = useCallback((useSmooth: boolean = true) => {
     expandedCategoryHandlerRef.current?.();
     expandedChannelHandlerRef.current?.();

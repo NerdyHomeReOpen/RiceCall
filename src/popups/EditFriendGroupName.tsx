@@ -15,16 +15,12 @@ interface EditFriendGroupNamePopupProps {
 }
 
 const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ id, friendGroup }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [friendGroupName, setFriendGroupName] = useState<string>(friendGroup.name);
 
-  // Variables
   const canSubmit = friendGroupName.trim();
 
-  // Handlers
   const handleFriendGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setFriendGroupName(e.target.value);
   };

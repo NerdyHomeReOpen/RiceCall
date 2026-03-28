@@ -14,21 +14,16 @@ interface ActionLinkProps {
 }
 
 const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [server, setServer] = useState<Types.Server>(Default.server());
 
-  // Variables
   const displayId = new URL(href).searchParams.get('sid') || '';
 
-  // Handlers
   const handleLinkClick = () => {
     ipc.server.select({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
-  // Effects
   useEffect(() => {
     if (!displayId) return;
     const refresh = async () => {

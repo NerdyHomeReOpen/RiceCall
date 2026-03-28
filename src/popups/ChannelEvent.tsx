@@ -10,7 +10,6 @@ import { setChannelEvents } from '@/store/slices/channelEventsSlice';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import * as Action from '@/action';
 import * as Language from '@/utils/language';
 
 import { useChannelEventContextMenu } from '@/hooks/ctxMenus/channelEventCtxMenu';
@@ -25,15 +24,12 @@ interface ChannelEventPopupProps {
 }
 
 const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channelEvents: channelEventsData }) => {
-  // Hooks
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
 
-  // Refs
   const [selectTab, setSelectTab] = useState<'current' | 'all'>('current');
   const [query, setQuery] = useState<string>('');
 
-  // Selectors
   const currentChannel = useAppSelector(
     (state) => ({
       channelId: state.currentChannel.data.channelId,
@@ -45,7 +41,6 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
 
   const channelEvents = useAppSelector((state) => state.channelEvents.data, shallowEqual);
 
-  // Variables
   const isCurrentChannelTab = selectTab === 'current';
   const isAllChannelTab = selectTab === 'all';
   const filteredChannelEvents = channelEvents.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()));
@@ -53,7 +48,6 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
     .filter((e) => e.prevChannelId === currentChannel.channelId || e.nextChannelId === currentChannel.channelId)
     .filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()));
 
-  // Handlers
   const handleCurrentChannelTabClick = () => {
     setSelectTab('current');
   };
@@ -66,7 +60,6 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
     setQuery(e.target.value);
   };
 
-  // Effect
   useEffect(() => {
     dispatch(setChannelEvents(channelEventsData));
   }, [channelEventsData, dispatch]);
@@ -115,11 +108,9 @@ interface EventTabProps {
 }
 
 const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -146,13 +137,10 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
 
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
 
-  // Context Menus
   const { buildContextMenu } = useChannelEventContextMenu({ user, currentServer, event, permissionLevel });
 
-  // Functions
   const getChannelName = (channelId: string | null) => {
     const channel = channels.find((c) => c.channelId === channelId);
     if (!channel) return '';
@@ -199,7 +187,6 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
     }
   };
 
-  // Handlers
   const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();

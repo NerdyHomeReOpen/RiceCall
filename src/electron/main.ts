@@ -54,14 +54,10 @@ export let popups: Record<string, BrowserWindow> = {};
 
 export const store = new Store<Types.StoreType>({
   defaults: {
-    // Accounts
     accounts: {},
-    // Language
     language: getRegion(),
-    // Custom Themes
     customThemes: [],
     currentTheme: null,
-    // Basic settings
     autoLogin: false,
     autoLaunch: false,
     alwaysOnTop: false,
@@ -72,7 +68,6 @@ export const store = new Store<Types.StoreType>({
     channelUIMode: 'classic',
     font: '',
     fontSize: 13,
-    // Mix settings
     inputAudioDevice: '',
     outputAudioDevice: '',
     recordFormat: 'wav',
@@ -85,19 +80,15 @@ export const store = new Store<Types.StoreType>({
     microphoneAmplification: false,
     manualMixMode: false,
     mixMode: 'all',
-    // Voice settings
     speakingMode: 'auto',
     defaultSpeakingKey: '',
-    // Privacy settings
     notSaveMessageHistory: true,
-    // Hotkeys Settings
     hotKeyOpenMainWindow: '',
     hotKeyScreenshot: '',
     hotKeyIncreaseVolume: '',
     hotKeyDecreaseVolume: '',
     hotKeyToggleSpeaker: '',
     hotKeyToggleMicrophone: '',
-    // SoundEffect settings
     disableAllSoundEffect: false,
     enterVoiceChannelSound: true,
     leaveVoiceChannelSound: true,
@@ -105,13 +96,10 @@ export const store = new Store<Types.StoreType>({
     stopSpeakingSound: true,
     receiveDirectMessageSound: true,
     receiveChannelMessageSound: true,
-    // Disclaimer settings
     dontShowDisclaimer: false,
-    // Update settings
     autoCheckForUpdates: true,
-    updateCheckInterval: 1 * 60 * 1000, // 1 minute
+    updateCheckInterval: 1 * 60 * 1000,
     updateChannel: 'latest',
-    // Env settings
     env: 'prod',
   },
 });
@@ -120,7 +108,7 @@ const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
 function waitForPort(port: number) {
   return new Promise((resolve, reject) => {
-    let timeout = 30000; // 30 seconds timeout
+    let timeout = 30000;
 
     function tryConnect() {
       const client = new net.Socket();
@@ -396,7 +384,6 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
   const behavior = POPUP_BEHAVIORS[type] ?? { resizable: false, maximizable: false, fullscreenable: false };
   const size = POPUP_SIZES[type] ?? { width: 400, height: 300 };
 
-  // If force is true, destroy the popup
   if (force) {
     if (popups[id] && !popups[id].isDestroyed()) {
       popups[id].destroy();

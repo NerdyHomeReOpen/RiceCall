@@ -5,7 +5,7 @@ import headerStyles from '@/styles/header.module.css';
 interface PopupHeaderProps {
   title: string;
   buttons: ('minimize' | 'maxsize' | 'close')[];
-  titleBoxIcon?: string; // CSS class name for the icon
+  titleBoxIcon?: string;
   isFullscreen?: boolean;
   onMinimize?: () => void;
   onMaximize?: () => void;

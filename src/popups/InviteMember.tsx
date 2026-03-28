@@ -17,14 +17,11 @@ interface InviteMemberPopupProps {
 }
 
 const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, serverId, target, memberInvitation }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [section, setSection] = useState<number>(memberInvitation ? 1 : 0); // 0: send, 1: sent, 2: edit
   const [invitationDesc, setInvitationDesc] = useState<string>(memberInvitation?.description || '');
 
-  // Handlers
   const handleInvitationDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     setInvitationDesc(e.target.value);
   };

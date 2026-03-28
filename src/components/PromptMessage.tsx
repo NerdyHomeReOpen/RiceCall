@@ -22,14 +22,11 @@ interface PromptMessageProps {
 }
 
 const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, messageType = 'info' }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  // Selectors
   const user = useAppSelector((state) => ({ userId: state.user.data.userId }), shallowEqual);
 
-  // Variables
   const escapedMessageParameter = Object.fromEntries(Object.entries(messageGroup.parameter).map(([key, value]) => [key, TagConverter.escapeHtml(value)]));
   const formattedMessagesContents = useMemo(
     () =>
@@ -48,7 +45,6 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
 
   const { buildContextMenu: buildMessageContextMenu } = usePromptMessageContextMenu({ user, contentMetadata: messageGroup.contentMetadata });
 
-  // Handlers
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();

@@ -27,11 +27,9 @@ interface HomePageProps {
 }
 
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
-  // Hooks
   const { t } = useTranslation();
   const { getIsLoading, loadServer } = useLoading();
 
-  // Refs
   const canSearchRef = useRef<boolean>(true);
   const searchRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -40,7 +38,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -53,7 +50,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const announcements = useAppSelector((state) => state.announcements.data, shallowEqual);
   const recommendServers = useAppSelector((state) => state.recommendServers.data, shallowEqual);
 
-  // States
   const [exactMatch, setExactMatch] = useState<Types.Server | null>(null);
   const [personalResults, setPersonalResults] = useState<Types.Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Types.Server[]>([]);
@@ -61,7 +57,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
 
-  // Variables
   const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
   const isHomeSection = section === 'home';
   const isPersonalExclusiveSection = section === 'personal-exclusive';
@@ -73,7 +68,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const filteredRecommendServers = useMemo(() => recommendServers.filter((server) => !server.tags.includes('official')), [recommendServers]);
   const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official')), [recommendServers]);
 
-  // Functions
   const searchServers = async (query: string) => {
     if (!query) {
       clearSearchState(true);
@@ -136,7 +130,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
     [user.currentServerId, getIsLoading, loadServer],
   );
 
-  // Handlers
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (canSearchRef.current) searchServers(e.target.value);
   };
@@ -182,7 +175,6 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
     setSection('home');
   };
 
-  // Effects
   useEffect(() => {
     if (!containerRef.current) return;
     const number = selectedAnnIndex % filteredAnns.length;
@@ -387,7 +379,6 @@ interface SearchResultItemProps {
 }
 
 const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, onServerSelect }) => {
-  // Handlers
   const handleClick = () => {
     onServerSelect(server);
   };

@@ -21,23 +21,18 @@ interface UserInfoCardProps {
 }
 
 const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction, member }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const cardRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [display, setDisplay] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
-  // Variables
   const vipBoost = Math.min(2, 1 + member.vip * 0.2);
   const hasVip = member.vip > 0;
   const badges = useMemo(() => (typeof member.badges === 'string' ? JSON.parse(member.badges) : member.badges), [member.badges]);
 
-  // Effects
   useLayoutEffect(() => {
     if (!cardRef.current) return;
     const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;

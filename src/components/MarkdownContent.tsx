@@ -15,7 +15,6 @@ import { fromTags } from '@/utils/tagConverter';
 import 'highlight.js/styles/github.css';
 import markdown from '@/styles/markdown.module.css';
 
-// DOMPurify
 const ALLOWED_TAGS = [
   'span',
   'img',
@@ -75,7 +74,6 @@ interface MarkdownContentProps {
 }
 
 const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, selectable = true, imageSize = 'small' }) => {
-  // Hooks
   const { selectImage } = useImageViewer();
 
   const components: Components = {
@@ -115,8 +113,6 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     pre: ({ ...props }: React.HTMLAttributes<HTMLPreElement>) => <pre {...props} />,
   };
 
-  // Variables
-  // Parse <@username-level-gender> to <tag data-tag='username-level-gender'></tag> and <t:timestamp:format> to <time data-timestamp='timestamp'></time>
   const parsed = markdownText.replace(/<@([^>]+)-([^>]+)-([^>]+)>/g, '<tag data-tag="$1-$2-$3"></tag>').replace(/<t:(\d+):(.*?)>/g, '<time data-timestamp="$1"></time>');
   const sanitized = useMemo(() => DOMPurify.sanitize(parsed, { ALLOWED_TAGS, ALLOWED_ATTR }), [parsed]);
   const converted = useMemo(() => fromTags(sanitized), [sanitized]);

@@ -26,14 +26,11 @@ interface EmojiPickerProps {
 
 const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
   ({ x, y, direction, anchorEl, showFontbar = false, fontSize: propFontSize = '13px', textColor: propTextColor = '#000000', onEmojiSelect, onFontSizeChange, onTextColorChange }) => {
-    // Hooks
     const { showColorPicker } = useContextMenu();
     const { t } = useTranslation();
 
-    // Refs
     const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-    // States
     const [display, setDisplay] = useState(false);
     const [pickerX, setPickerX] = useState<number>(x);
     const [pickerY, setPickerY] = useState<number>(y);
@@ -41,7 +38,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     const [fontSize, setFontSize] = useState<string>(propFontSize);
     const [selectedColor, setSelectedColor] = useState<string>(propTextColor);
 
-    // Handlers
     const handleFontSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const size = e.target.value;
       setFontSize(size);
@@ -74,7 +70,6 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       onEmojiSelect?.(code, full);
     };
 
-    // Effects
     useLayoutEffect(() => {
       setFontSize(propFontSize);
     }, [propFontSize]);
@@ -210,7 +205,6 @@ interface EmojiItemProps {
 }
 
 const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }) => {
-  // Handlers
   const handleClick = () => {
     onEmojiSelect?.(emoji.code, `:${emoji.code}:`);
   };

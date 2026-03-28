@@ -19,10 +19,8 @@ interface DirectMessageProps {
 }
 
 const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -30,7 +28,6 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
     shallowEqual,
   );
 
-  // Variables
   const formattedTimestamp = Language.getFormatTimestamp(t, messageGroup.timestamp);
   const formattedMessageContents = useMemo(
     () =>
@@ -43,7 +40,6 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
     [messageGroup.contents, t],
   );
 
-  // Handlers
   const handleUsernameClick = () => {
     Action.openUserInfo(user.userId, messageGroup.userId);
   };

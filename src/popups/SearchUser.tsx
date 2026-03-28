@@ -14,10 +14,8 @@ interface SearchUserPopupProps {
 }
 
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -25,14 +23,11 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
     shallowEqual,
   );
 
-  // States
   const [query, setQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
 
-  // Variables
   const canSubmit = query.trim();
 
-  // Functions
   const searchUser = (query: string) => {
     ipc.data.searchUser({ query }).then((users) => {
       const target = users[0];
@@ -53,7 +48,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
     });
   };
 
-  // Handlers
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   };
@@ -67,7 +61,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     setError(null);
   }, [query]);

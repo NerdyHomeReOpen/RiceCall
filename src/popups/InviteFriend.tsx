@@ -22,10 +22,8 @@ interface InviteFriendPopupProps {
 }
 
 const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, server }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -36,18 +34,15 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
-  // States
   const [query, setQuery] = useState<string>('');
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
-  // Variables
   const selectedUserIdSet = useMemo(() => new Set(selectedUserIds), [selectedUserIds]);
   const defaultFriendGroup = useMemo(() => Default.friendGroup({ name: t('my-friends'), order: 0, userId: user.userId }), [t, user.userId]);
   const filteredFriends = useMemo(() => friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.name.includes(query)), [friends, query]);
   const sortedFriendGroups = useMemo(() => [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order), [defaultFriendGroup, friendGroups]);
   const isAllSelected = useMemo(() => filteredFriends.every((f) => selectedUserIdSet.has(f.targetId)), [filteredFriends, selectedUserIdSet]);
 
-  // Handlers
   const handleSelect = (userId: Types.User['userId']) => {
     if (selectedUserIdSet.has(userId)) setSelectedUserIds((prev) => prev.filter((userId) => userId !== userId));
     else setSelectedUserIds((prev) => [...prev, userId]);
@@ -119,17 +114,14 @@ interface FriendGroupTabProps {
 }
 
 const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, friendGroup, selectedUserIdSet, onSelect }) => {
-  // States
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
-  // Variables
   const friendGroupFriends = useMemo(() => {
     if (friendGroup.friendGroupId) return friends.filter((f) => f.friendGroupId === friendGroup.friendGroupId);
     else return friends.filter((f) => !f.friendGroupId);
   }, [friendGroup.friendGroupId, friends]);
   const isAllSelected = useMemo(() => friendGroupFriends.every((f) => selectedUserIdSet.has(f.targetId)), [friendGroupFriends, selectedUserIdSet]);
 
-  // Functions
   const handleSelectAllChange = () => {
     if (isAllSelected) friendGroupFriends.map((f) => f.targetId).forEach((userId) => (selectedUserIdSet.has(userId) ? onSelect(userId) : null));
     else friendGroupFriends.map((f) => f.targetId).forEach((userId) => (selectedUserIdSet.has(userId) ? null : onSelect(userId)));
@@ -171,12 +163,10 @@ interface FriendTabProps {
 }
 
 const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserIdSet, onSelect }) => {
-  // Variables
   const isSelected = selectedUserIdSet.has(friend.targetId);
   const hasVip = friend.vip > 0;
   const hasNote = !!friend.note;
 
-  // Handlers
   const handleTabClick = () => {
     onSelect(friend.targetId);
   };

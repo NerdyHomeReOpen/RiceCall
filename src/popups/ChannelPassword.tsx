@@ -10,13 +10,10 @@ interface ChannelPasswordPopupProps {
 }
 
 const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ id }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [password, setPassword] = useState<string>('');
 
-  // Handlers
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value);
   };

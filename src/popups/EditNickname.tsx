@@ -16,13 +16,10 @@ interface EditNicknamePopupProps {
 }
 
 const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, serverId, member }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
-  // Handlers
   const handleConfirmBtnClick = () => {
     Action.editMember(member.userId, serverId, { nickname: memberNickname || null });
     ipc.popup.close(id);

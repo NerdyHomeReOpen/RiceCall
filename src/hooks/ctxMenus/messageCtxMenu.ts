@@ -15,7 +15,6 @@ interface UseMessageContextMenuProps {
 }
 
 export const useMessageContextMenu = ({ user, currentServer, currentChannel, member }: UseMessageContextMenuProps) => {
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isSelf = member.userId === user.userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;

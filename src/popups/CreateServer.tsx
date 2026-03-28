@@ -21,10 +21,8 @@ interface CreateServerPopupProps {
 }
 
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       level: state.user.data.level,
@@ -34,10 +32,8 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
 
   const servers = useAppSelector((state) => state.servers.data, shallowEqual);
 
-  // Refs
   const isUploadingRef = useRef<boolean>(false);
 
-  // States
   const [section, setSection] = useState<number>(0);
   const [serverType, setServerType] = useState<Types.Server['type']>(Default.server().type);
   const [serverName, setServerName] = useState<Types.Server['name']>(Default.server().name);
@@ -45,14 +41,12 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
   const [serverAvatar, setServerAvatar] = useState<Types.Server['avatar']>(Default.server().avatar);
   const [serverAvatarUrl, setServerAvatarUrl] = useState<Types.Server['avatarUrl']>(Default.server().avatarUrl);
 
-  // Variables
   const remainingServers = useMemo(() => {
     const maxGroups = user.level >= 16 ? 5 : user.level >= 6 && user.level < 16 ? 4 : 3;
     return maxGroups - servers.filter((s) => s.owned).length;
   }, [user.level, servers]);
   const canSubmit = remainingServers > 0 && serverName.trim();
 
-  // Handlers
   const handleImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     if (!image || isUploadingRef.current) return;
@@ -60,7 +54,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
       Action.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
           isUploadingRef.current = false;
           return;
         }

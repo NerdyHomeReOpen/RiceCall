@@ -17,16 +17,13 @@ interface KickMemberFromServerPopupProps {
 }
 
 const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = React.memo(({ id, serverId, member }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [formatType, setFormatType] = useState<string>('hours');
   const [time, setTime] = useState<number>(1);
   const [reason, setReason] = useState<string>('');
   const [otherReason, setOtherReason] = useState<string>('');
 
-  // Handlers
   const getLengthOptions = () => {
     switch (formatType) {
       case 'seconds':

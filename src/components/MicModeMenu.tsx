@@ -13,16 +13,13 @@ import server from '@/styles/server.module.css';
 import popup from '@/styles/popup.module.css';
 
 const MicModeMenu: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
   const { changeVoiceThreshold } = useWebRTC();
 
-  // Selectors
   const voiceThreshold = useAppSelector((state) => state.webrtc.voiceThreshold, shallowEqual);
   const speakingMode = useAppSelector((state) => state.webrtc.speakingMode, shallowEqual);
   const volumePercent = useAppSelector((state) => state.webrtc.volumePercent, shallowEqual);
 
-  // Variables
   const volumeThreshold = voiceThreshold;
   const isActive = volumePercent > volumeThreshold;
   const activeColor = isActive ? Color.getLerpColor('#0fb300', '#be0000', Math.pow(volumePercent / 100, 2)) : 'gray';
@@ -31,7 +28,6 @@ const MicModeMenu: React.FC = React.memo(() => {
   const isKeyMode = speakingMode === 'key';
   const isAutoMode = speakingMode === 'auto';
 
-  // Handlers
   const handleKeyModeSelect = () => {
     if (isKeyMode) return;
     ipc.systemSettings.speakingMode.set('key');

@@ -34,22 +34,19 @@ import * as Action from '@/action';
 import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constant';
 
 const SocketManager: React.FC = React.memo(() => {
-  // Hooks
   const { playSound } = useSoundPlayer();
   const dispatch = useAppDispatch();
 
   const [region, setRegion] = useState<Types.LanguageKey>('en-US');
 
-  // Selectors
   const user = useAppSelector((state) => state.user.data, shallowEqual);
   const currentFriends = useAppSelector((state) => state.friends.data, shallowEqual);
   const currentServer = useAppSelector((state) => state.currentServer.data, shallowEqual);
   const currentOnlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const currentChannel = useAppSelector((state) => state.currentChannel.data, shallowEqual);
 
-  // Refs
   const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const popupOffSubmitRef = useRef<() => void>(() => {});
+  const popupOffSubmitRef = useRef<() => void>(() => { });
   const userRef = useRef(user);
   const currentFriendsRef = useRef(currentFriends);
   const currentServerRef = useRef(currentServer);
@@ -76,7 +73,6 @@ const SocketManager: React.FC = React.memo(() => {
     currentChannelRef.current = currentChannel;
   }, [currentChannel]);
 
-  // Effects
   useEffect(() => {
     if (user.userId) return;
 
@@ -213,7 +209,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('userUpdate', (...args) => {
-      // Add activity when signature is updated
       const newActives = args.reduce<Types.FriendActivity[]>((acc, curr) => {
         if (curr.update.signature && userRef.current.signature !== curr.update.signature) {
           acc.push(Default.friendActivity({ ...userRef.current, content: curr.update.signature, timestamp: Date.now() }));
@@ -221,7 +216,7 @@ const SocketManager: React.FC = React.memo(() => {
         return acc;
       }, []);
       dispatch(addFriendActivities(newActives));
-      // Clear state when current server is changed
+
       const newCurrentServerId = args[0].update.currentServerId;
       if (newCurrentServerId !== undefined && newCurrentServerId !== userRef.current.currentServerId) {
         dispatch(clearChannels());
@@ -233,7 +228,7 @@ const SocketManager: React.FC = React.memo(() => {
         dispatch(clearChannelEvents());
       }
       dispatch(updateUser(args[0].update));
-      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId); // For hot reload
+      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
     });
     return () => unsub();
   }, [dispatch]);
@@ -247,7 +242,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args) => {
-      // Add activity when signature is updated
       const newActivities = args.reduce<Types.FriendActivity[]>((acc, curr) => {
         const targetFriend = currentFriendsRef.current.find((f) => f.targetId === curr.targetId && f.relationStatus === 2);
         if (targetFriend && curr.update.signature && targetFriend.signature !== curr.update.signature) {
@@ -319,7 +313,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverUpdate', (...args) => {
-      // Update current server
       const currentServerUpdate = args.filter((i) => i.serverId === currentServerRef.current.serverId).reduce<Partial<Types.Server>>((acc, curr) => ({ ...acc, ...curr.update }), {});
       dispatch(updateCurrentServer(currentServerUpdate));
       dispatch(updateServers(args));
@@ -336,7 +329,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberAdd', (...args) => {
-      // Add channel events
       const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
         const originMember = currentOnlineMembersRef.current.find((om) => om.userId === curr.data.userId && om.serverId === curr.data.serverId);
         if (!originMember) {
@@ -352,7 +344,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberUpdate', (...args) => {
-      // Add channel events
       const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
         const originMember = currentOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
         if (originMember && curr.update.currentChannelId) {
@@ -368,7 +359,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverOnlineMemberRemove', (...args) => {
-      // Add channel events
       const newChannelEvents = args.reduce<Types.ChannelEvent[]>((acc, curr) => {
         const originMember = currentOnlineMembersRef.current.find((om) => om.userId === curr.userId && om.serverId === curr.serverId);
         if (originMember) {
@@ -405,7 +395,6 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelUpdate', (...args) => {
-      // Update current channel
       const currentChannelUpdate = args.filter((i) => i.channelId === currentChannelRef.current.channelId).reduce<Partial<Types.Channel>>((acc, curr) => ({ ...acc, ...curr.update }), {});
       dispatch(updateCurrentChannel(currentChannelUpdate));
       dispatch(updateChannels(args));
@@ -486,7 +475,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error) => {
-      Action.openErrorDialog(new Error(error.message), () => {});
+      Action.openErrorDialog(new Error(error.message), () => { });
     });
     return () => unsub();
   }, []);

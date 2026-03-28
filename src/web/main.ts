@@ -41,14 +41,10 @@ class Store {
 
 export const store = new Store({
   defaults: {
-    // Accounts
     accounts: {},
-    // Language
     language: getRegion(),
-    // Custom Themes
     customThemes: [],
     currentTheme: null,
-    // Basic settings
     autoLogin: false,
     autoLaunch: false,
     alwaysOnTop: false,
@@ -59,7 +55,6 @@ export const store = new Store({
     channelUIMode: 'classic',
     font: '',
     fontSize: 13,
-    // Mix settings
     inputAudioDevice: '',
     outputAudioDevice: '',
     recordFormat: 'wav',
@@ -72,19 +67,15 @@ export const store = new Store({
     microphoneAmplification: false,
     manualMixMode: false,
     mixMode: 'all',
-    // Voice settings
     speakingMode: 'auto',
     defaultSpeakingKey: '',
-    // Privacy settings
     notSaveMessageHistory: true,
-    // Hotkeys Settings
     hotKeyOpenMainWindow: '',
     hotKeyScreenshot: '',
     hotKeyIncreaseVolume: '',
     hotKeyDecreaseVolume: '',
     hotKeyToggleSpeaker: '',
     hotKeyToggleMicrophone: '',
-    // SoundEffect settings
     disableAllSoundEffect: false,
     enterVoiceChannelSound: true,
     leaveVoiceChannelSound: true,
@@ -92,13 +83,10 @@ export const store = new Store({
     stopSpeakingSound: true,
     receiveDirectMessageSound: true,
     receiveChannelMessageSound: true,
-    // Disclaimer settings
     dontShowDisclaimer: false,
-    // Update settings
     autoCheckForUpdates: true,
-    updateCheckInterval: 1 * 60 * 1000, // 1 minute
+    updateCheckInterval: 1 * 60 * 1000,
     updateChannel: 'latest',
-    // Env settings
     env: 'prod',
   },
 });

@@ -25,12 +25,10 @@ interface CategoryTabProps {
 }
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
-  // Hooks
   const { showContextMenu } = useContextMenu();
   const { setExpandedCategoryHandlerRef } = useFindMeContext();
   const dispatch = useAppDispatch();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -61,10 +59,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
 
-  // States
   const [isExpanded, setIsExpanded] = useState(true);
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, category.permissionLevel);
   const categoryChannels = channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === category.channelId);
   const categoryMembers = onlineMembers.filter((om) => om.currentChannelId === category.channelId);
@@ -95,7 +91,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     isPasswordNeeded,
   });
 
-  // Handlers
   const handleTabClick = () => {
     if (isSelected) dispatch(setSelectedItemId(null));
     else dispatch(setSelectedItemId(`category-${category.channelId}`));
@@ -139,7 +134,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     setIsExpanded(!isExpanded);
   };
 
-  // Effect
   useEffect(() => {
     if (!isInCategory) return;
     setExpandedCategoryHandlerRef(() => setIsExpanded(true));

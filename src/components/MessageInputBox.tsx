@@ -27,7 +27,6 @@ import markdown from '@/styles/markdown.module.css';
 import emoji from '@/styles/emoji.module.css';
 
 const MessageInputBox: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
   const editor = useEditor({
@@ -51,7 +50,6 @@ const MessageInputBox: React.FC = React.memo(() => {
     immediatelyRender: true,
   });
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -82,18 +80,15 @@ const MessageInputBox: React.FC = React.memo(() => {
     shallowEqual,
   );
 
-  // Refs
   const messageInputRef = useRef<string>('');
   const isUploadingRef = useRef<boolean>(false);
   const isComposingRef = useRef<boolean>(false);
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
 
-  // States
   const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const textLength = editor?.getText().length || 0;
   const isCloseToMaxLength = textLength >= currentChannel.guestTextMaxLength - 100;
@@ -108,12 +103,10 @@ const MessageInputBox: React.FC = React.memo(() => {
   const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
   const maxLength = !Permission.isMember(permissionLevel) ? currentChannel.guestTextMaxLength : 3000;
 
-  // Functions
   const setStyles = useCallback(() => {
     editor?.chain().setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
   }, [editor]);
 
-  // Handlers
   const handleEmojiSelect = (code: string) => {
     editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
     setStyles();
@@ -146,7 +139,7 @@ const MessageInputBox: React.FC = React.memo(() => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Action.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }
@@ -185,7 +178,6 @@ const MessageInputBox: React.FC = React.memo(() => {
     isComposingRef.current = false;
   };
 
-  // Effects
   useEffect(() => {
     editor?.on('selectionUpdate', setStyles);
   }, [editor, setStyles]);

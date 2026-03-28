@@ -25,10 +25,8 @@ interface ActionScannerProviderProps {
 }
 
 const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
-  // Hooks
   const { pressSpeakKey, releaseSpeakKey, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted, toggleMicMuted } = useWebRTC();
 
-  // Refs
   const idleCheck = useRef<boolean>(false);
   const idleMinutes = useRef<number>(0);
   const speakingKeyRef = useRef<string>('v');
@@ -41,10 +39,8 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   const isSpeakingRef = useRef<boolean>(false);
   const isManualIdlingRef = useRef<boolean>(false);
 
-  // States
   const [isIdling, setIsIdling] = useState<boolean>(false);
 
-  // Handlers
   const buildKey = (e: KeyboardEvent) => {
     const parts: string[] = [];
     if (e.ctrlKey) parts.push('Ctrl');
@@ -100,7 +96,6 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
     });
   }, []);
 
-  // Effects
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();

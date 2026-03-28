@@ -15,12 +15,10 @@ const luminance = (rLin: number, gLin: number, bLin: number) => 0.2126 * rLin + 
  * @returns contrast
  */
 export function contrastWithWhite({ r, g, b }: RGB): number {
-  // Convert to linear space
   const R = srgbToLinear(norm(r));
   const G = srgbToLinear(norm(g));
   const B = srgbToLinear(norm(b));
   const L = luminance(R, G, B);
-  // Contrast (L1+0.05)/(L2+0.05), white is 1
   return 1.05 / (L + 0.05);
 }
 
@@ -37,25 +35,20 @@ export function isTooWhite(rgb: RGB, minContrast = 3): boolean {
  * @returns color, contrast, and whether the color was changed
  */
 export function getVisibleColor({ r, g, b }: RGB, minContrast = 3): RGB {
-  // Convert to linear space
   const R = srgbToLinear(norm(r));
   const G = srgbToLinear(norm(g));
   const B = srgbToLinear(norm(b));
   const L = luminance(R, G, B);
 
-  // Target maximum luminance (by inverting the contrast threshold)
-  // ratio = 1.05 / (L + 0.05) >= minContrast  =>  L <= 1.05/minContrast - 0.05
   const Lmax = 1.05 / minContrast - 0.05;
 
   if (L <= Lmax) return { r, g, b };
 
-  // Scale proportionally in linear RGB to the target luminance, preserving the hue trend
-  const scale = Lmax / L; // (0,1)
+  const scale = Lmax / L;
   const R2 = Math.max(0, Math.min(1, R * scale));
   const G2 = Math.max(0, Math.min(1, G * scale));
   const B2 = Math.max(0, Math.min(1, B * scale));
 
-  // Back to sRGB 0..255
   const to8bit = (x: number) => Math.round(Math.max(0, Math.min(1, linearToSrgb(x))) * 255);
   const out: RGB = { r: to8bit(R2), g: to8bit(G2), b: to8bit(B2) };
 

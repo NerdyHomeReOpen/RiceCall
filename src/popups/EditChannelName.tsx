@@ -16,16 +16,12 @@ interface EditChannelNamePopupProps {
 }
 
 const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ id, serverId, channel }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [channelName, setChannelName] = useState<string>(channel.name);
 
-  // Variables
   const canSubmit = channelName.trim();
 
-  // Handlers
   const handleChannelNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setChannelName(e.target.value);
   };

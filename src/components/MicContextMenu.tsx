@@ -16,18 +16,14 @@ interface MicContextMenuProps {
 }
 
 const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
-  // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // State
   const [display, setDisplay] = useState(false);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
 
-  // Variables
   const filteredItems = useMemo(() => cleanMenu(items).filter((item) => item?.show ?? true), [items]);
 
-  // Effect
   useLayoutEffect(() => {
     if (!menuRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
@@ -81,13 +77,10 @@ interface MicContextMenuItemProps {
 }
 
 const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
 
-  // Handlers
   const handleClick = () => {
     if (item.disabled) return;
     item.onClick?.();

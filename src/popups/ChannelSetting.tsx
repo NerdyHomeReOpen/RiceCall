@@ -36,18 +36,15 @@ interface ChannelSettingPopupProps {
 }
 
 const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id, server, channel: channelData, channelMembers: channelMembersData }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
-  // Refs
   const startXRef = useRef<number>(0);
   const startWidthRef = useRef<number>(0);
   const isResizingModeratorColumn = useRef<boolean>(false);
   const isResizingBlockMemberColumn = useRef<boolean>(false);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -58,7 +55,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
 
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
 
-  // States
   const [channel, setChannel] = useState<Types.Channel>(channelData);
   const [channelMembers, setChannelMembers] = useState<Types.Member[]>(channelMembersData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -72,7 +68,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   const [moderatorColumnWidths, setModeratorColumnWidths] = useState<number[]>(MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, channel.permissionLevel);
   const isReadOnly = !Permission.isChannelMod(permissionLevel);
   const isLobby = server.lobbyId === channel.channelId;
@@ -97,21 +92,20 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
     () =>
       Permission.isChannelMod(permissionLevel)
         ? [
-            t('channel-info'),
-            t('channel-announcement'),
-            t('access-permission'),
-            t('speaking-permission'),
-            t('text-permission'),
-            `${t('channel-management')} (${totalModeratorsCount})`,
-            `${t('blacklist-management')} (${totalBlockMembersCount})`,
-          ]
+          t('channel-info'),
+          t('channel-announcement'),
+          t('access-permission'),
+          t('speaking-permission'),
+          t('text-permission'),
+          `${t('channel-management')} (${totalModeratorsCount})`,
+          `${t('blacklist-management')} (${totalBlockMembersCount})`,
+        ]
         : isReadOnly
           ? [t('channel-info'), t('channel-announcement')]
           : [t('channel-info')],
     [isReadOnly, permissionLevel, t, totalModeratorsCount, totalBlockMembersCount],
   );
 
-  // Handlers
   const handleModeratorSort = (field: keyof Types.Member) => {
     setModeratorSortField(field);
     setModeratorSortDirection((d) => (field === moderatorSortField ? (d === 1 ? -1 : 1) : -1));
@@ -245,7 +239,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
     ipc.popup.close(id);
   };
 
-  // Effects
   useEffect(() => {
     const onPointerup = () => {
       isResizingModeratorColumn.current = false;

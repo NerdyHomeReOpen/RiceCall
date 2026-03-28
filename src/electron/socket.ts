@@ -10,7 +10,6 @@ import { NO_LOG_ON_EVENTS, ON_EVENTS, SEND_EVENTS, EMIT_EVENTS } from '@/configs
 import { getEnv } from '@/env';
 import Logger from '@/logger';
 
-// Socket
 export let socket: Socket | null = null;
 export let seq: number = 0;
 export let interval: NodeJS.Timeout | null = null;
@@ -71,7 +70,6 @@ export function connectSocket(token: string) {
       socket?.removeAllListeners(event);
     }
 
-    // Register event listeners
     EMIT_EVENTS.forEach((event) => {
       ipcMain.handle(event, (_, payload) => {
         new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(payload)}`);
@@ -114,7 +112,6 @@ export function connectSocket(token: string) {
   });
 
   socket.on('disconnect', (reason) => {
-    // Clean up event listeners
     for (const event of EMIT_EVENTS) {
       ipcMain.removeHandler(event);
     }

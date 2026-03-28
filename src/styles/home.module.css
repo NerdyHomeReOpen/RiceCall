@@ -181,7 +181,7 @@
 }
 
 .search-server-info-text {
-   display: flex;
+  display: flex;
   flex: 1;
   flex-direction: column;
   justify-content: space-around;

@@ -28,7 +28,6 @@ import { useActionScanner } from '@/providers/ActionScanner';
 import { useHeaderContextMenu } from '@/hooks/ctxMenus/headerCtxMenu';
 import { isRenderer } from '@/utils/platform';
 
-
 import headerStyles from '@/styles/header.module.css';
 
 type Tab = {
@@ -42,12 +41,10 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) => {
-  // Hooks
   const { t, i18n } = useTranslation();
   const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
   const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -69,11 +66,8 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
   const systemNotifications = useAppSelector((state) => state.systemNotifications.data, shallowEqual);
 
-  // States
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Variables
-  // Guard here to avoid hard crashes like "Cannot read properties of undefined (reading 'length')".
   const safeFriendApplications = friendApplications ?? [];
   const safeMemberInvitations = memberInvitations ?? [];
   const safeSystemNotifications = systemNotifications ?? [];
@@ -91,7 +85,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     [currentServer.name, t],
   );
 
-  // Functions
   const logout = () => {
     ipc.auth.logout();
   };
@@ -154,7 +147,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     },
   ];
 
-  // Handlers
   const handleMaximizeBtnClick = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
@@ -207,7 +199,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     onTabSelect(tabId);
   };
 
-  // Effects
   useEffect(() => {
     const next = isIdling ? 'idle' : 'online';
     if (user.status !== next && !isManualIdling) {
@@ -262,7 +253,6 @@ interface TabItemProps {
 }
 
 const TabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: TabItemProps) => {
-  // Handlers
   const handleTabClick = () => {
     onTabSelect(tab.id);
   };
@@ -291,14 +281,11 @@ const TabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: T
 TabItem.displayName = 'TabItem';
 
 const RootPageComponent: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
   const { getIsLoading, loadServer, stopLoading } = useLoading();
 
-  // States
   const [selectedTab, setSelectedTab] = useState<'home' | 'friends' | 'server'>('home');
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -318,17 +305,14 @@ const RootPageComponent: React.FC = React.memo(() => {
   const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length, shallowEqual);
   const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
-  // Variables
   const isSelectedHomePage = selectedTab === 'home';
   const isSelectedFriendsPage = selectedTab === 'friends';
   const isSelectedServerPage = selectedTab === 'server';
 
-  // Handlers
   const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
     setSelectedTab(tabId);
   };
 
-  // Effects
   useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
@@ -398,27 +382,24 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [selectedTab, user.name, currentServer.name, onlineMembersLength, t]);
 
   return (
-    <>
-      {/* {isWebMode && <WebSocketProvider />} */}
-      <WebRTCProvider>
-        <ActionScannerProvider>
-          <ExpandedProvider>
-            <SocketManager />
-            <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
-            {!user.userId || !isSocketConnected ? (
-              <LoadingSpinner />
-            ) : (
-              <>
-                <HomePage display={isSelectedHomePage} />
-                <FriendPage display={isSelectedFriendsPage} />
-                <ServerPage display={isSelectedServerPage} />
-                <NotificationToaster />
-              </>
-            )}
-          </ExpandedProvider>
-        </ActionScannerProvider>
-      </WebRTCProvider>
-    </>
+    <WebRTCProvider>
+      <ActionScannerProvider>
+        <ExpandedProvider>
+          <SocketManager />
+          <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
+          {!user.userId || !isSocketConnected ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <HomePage display={isSelectedHomePage} />
+              <FriendPage display={isSelectedFriendsPage} />
+              <ServerPage display={isSelectedServerPage} />
+              <NotificationToaster />
+            </>
+          )}
+        </ExpandedProvider>
+      </ActionScannerProvider>
+    </WebRTCProvider>
   );
 });
 

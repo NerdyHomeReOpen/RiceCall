@@ -16,19 +16,15 @@ interface BlockMemberPopupProps {
 }
 
 const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serverId, member }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [blockType, setBlockType] = useState<'block-permanent' | 'block-ip'>('block-permanent');
 
-  // Variables
   const blockTypeOptions = [
     { key: 'block-permanent', label: t('block-permanent'), disabled: false },
     { key: 'block-ip', label: t('block-ip'), disabled: true },
   ];
 
-  // Handlers
   const handleBlockTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setBlockType(e.target.value as 'block-permanent' | 'block-ip');
   };

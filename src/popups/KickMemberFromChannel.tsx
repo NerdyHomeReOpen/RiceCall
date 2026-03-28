@@ -18,16 +18,13 @@ interface KickMemberFromChannelPopupProps {
 }
 
 const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = React.memo(({ id, serverId, channel, member }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // States
   const [formatType, setFormatType] = useState<string>('hours');
   const [time, setTime] = useState<number>(1);
   const [reason, setReason] = useState<string>('');
   const [otherReason, setOtherReason] = useState<string>('');
 
-  // Functions
   const getLengthOptions = () => {
     switch (formatType) {
       case 'seconds':
@@ -66,7 +63,6 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
     }
   };
 
-  // Handlers
   const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setTime(parseInt(e.target.value));
   };

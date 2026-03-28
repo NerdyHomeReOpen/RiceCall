@@ -15,18 +15,14 @@ interface NotificationMenuProps {
 }
 
 const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
-  // Ref
   const menuRef = useRef<HTMLDivElement>(null);
 
-  // State
   const [display, setDisplay] = useState(false);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
 
-  // Variables
   const filteredItems = useMemo(() => items.filter((item) => item?.show ?? true), [items]);
 
-  // Effect
   useLayoutEffect(() => {
     if (!menuRef.current) return;
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
@@ -79,7 +75,6 @@ interface NotificationMenuItemProps {
 }
 
 const NotificationMenuItem: React.FC<NotificationMenuItemProps> = React.memo(({ item, onClose }) => {
-  // Handlers
   const handleClick = () => {
     if (item.disabled) return;
     item.onClick?.();

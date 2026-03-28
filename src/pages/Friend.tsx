@@ -27,10 +27,8 @@ interface FriendActivityProps {
 }
 
 const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivity }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -38,10 +36,8 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
     shallowEqual,
   );
 
-  // Variables
   const hasVip = friendActivity.vip > 0;
 
-  // Handlers
   const handleUserNameClick = () => {
     Action.openUserInfo(user.userId, friendActivity.userId);
   };
@@ -70,17 +66,14 @@ interface FriendPageProps {
 }
 
 const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) => {
-  // Hooks
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
 
-  // Refs
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizingSidebarRef = useRef<boolean>(false);
   const signatureInputRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef<boolean>(false);
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -98,17 +91,14 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
 
   const friendActivities = useAppSelector((state) => state.friendActivities.data, shallowEqual);
 
-  // Variables
   const userHasVip = user.vip > 0;
   const userBadges = useMemo(() => (typeof user.badges === 'string' ? JSON.parse(user.badges) : user.badges), [user.badges]);
 
-  // Functions
   const changeSignature = (signature: Types.User['signature']) => {
     if (signature === user.signature) return;
     ipc.socket.send('editUser', { update: { signature } });
   };
 
-  // Handlers
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingSidebarRef.current = true;
@@ -148,7 +138,6 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
     });
   };
 
-  // Effects
   useEffect(() => {
     signatureInputRef.current!.value = user.signature;
   }, [user.signature]);

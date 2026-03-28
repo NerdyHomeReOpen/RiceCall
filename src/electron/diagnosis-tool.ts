@@ -48,7 +48,6 @@ export function registerDiagnosisToolHandlers() {
         try {
           activeTool.cancel?.();
         } catch {
-          // ignore
         }
       }
 

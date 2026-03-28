@@ -14,7 +14,6 @@ interface UseFriendTabContextMenuProps {
 }
 
 export const useFriendTabContextMenu = ({ user, friend, friendGroups, defaultFriendGroup }: UseFriendTabContextMenuProps) => {
-  // Variables
   const isSelf = friend.targetId === user.userId;
   const isFriend = friend.relationStatus === 2;
   const isStranger = friend.relationStatus === 0;

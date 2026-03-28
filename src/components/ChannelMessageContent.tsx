@@ -14,7 +14,6 @@ interface ChannelMessageContentProps {
 }
 
 const ChannelMessageContent: React.FC<ChannelMessageContentProps> = React.memo(({ messages }) => {
-  // Variables
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
     return sortedMessages.reduce<MessageGroup[]>((acc, message) => {

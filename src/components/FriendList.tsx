@@ -11,18 +11,14 @@ import * as Default from '@/utils/default';
 import styles from '@/styles/friend.module.css';
 
 const FriendList: React.FC = React.memo(() => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Selectors
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
-  // States
   const [query, setQuery] = useState<string>('');
   const [selectedTabId, setSelectedTabId] = useState<'friend' | 'recent'>('friend');
 
-  // Variables
   const defaultFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'default', name: t('my-friends'), order: -1 }), [t]);
   const strangerFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000 }), [t]);
   const blacklistFriendGroup = useMemo(() => Default.friendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001 }), [t]);
@@ -34,7 +30,6 @@ const FriendList: React.FC = React.memo(() => {
   const isFriendTab = selectedTabId === 'friend';
   const isRecentTab = selectedTabId === 'recent';
 
-  // Handlers
   const handleFriendTabClick = () => {
     setSelectedTabId('friend');
   };

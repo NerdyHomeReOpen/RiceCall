@@ -38,13 +38,11 @@ interface ServerPageProps {
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) => {
-  // Hooks
   const { t } = useTranslation();
   const { changeBitrate, takeMic, releaseMic, stopMixing, toggleMixMode, toggleRecording } = useWebRTC();
   const { showContextMenu, showMicContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -88,7 +86,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const recordTime = useAppSelector((state) => state.webrtc.recordTime, shallowEqual);
   const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel, shallowEqual);
 
-  // Refs
   const isResizingSidebarRef = useRef<boolean>(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const isResizingAnnAreaRef = useRef<boolean>(false);
@@ -96,7 +93,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const showAreaRef = useRef<HTMLIFrameElement>(null);
   const messageAreaRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
   const [speakingMode, setSpeakingMode] = useState<Types.SpeakingMode>('key');
   const [speakingKey, setSpeakingKey] = useState<string>('');
@@ -107,7 +103,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
   const [centralAreaMode, setCentralAreaMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
-  // Context Menus
   const { buildContextMenu: buildAnnouncementAreaContextMenu } = useAnnouncementAreaContextMenu({
     onCloseAnnouncement: () => setCentralAreaMode('none'),
   });
@@ -128,7 +123,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     isQueueControlled,
   });
 
-  // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
   const isCentralAreaNoneMode = centralAreaMode === 'none';
@@ -141,7 +135,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const isMicTaken = queuePosition !== undefined && queuePosition <= 0;
   const isIdling = !isMicTaken && !isQueuing;
 
-  // Functions
   const getMicText = () => {
     if (isMicTaken) return t('mic-taken');
     if (isQueuing) return t('mic-queued');
@@ -187,7 +180,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     return null;
   };
 
-  // Handlers
   const handleMicBtnClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (isCurrentChannelQueueMode) {
       if (!isIdling) {
@@ -330,7 +322,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     toggleRecording();
   };
 
-  // Effects
   useEffect(() => {
     changeBitrate(currentChannel.bitrate);
   }, [currentChannel.bitrate, changeBitrate]);
@@ -546,18 +537,14 @@ const ServerPage = dynamic(() => Promise.resolve(ServerPageComponent), { ssr: fa
 export default ServerPage;
 
 const MicVolumeSlider = React.memo(() => {
-  // Hooks
   const { changeMicVolume, toggleMicMuted } = useWebRTC();
 
-  // Refs
   const sliderRef = useRef<HTMLInputElement>(null);
   const isBtnHoveredRef = useRef<boolean>(false);
 
-  // Selectors
   const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
   const micVolume = useAppSelector((state) => state.webrtc.micVolume);
 
-  // Handlers
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     changeMicVolume(parseInt(e.target.value));
   };
@@ -601,18 +588,14 @@ const MicVolumeSlider = React.memo(() => {
 MicVolumeSlider.displayName = 'MicVolumeSlider';
 
 const SpeakerVolumeSlider = React.memo(() => {
-  // Hooks
   const { changeSpeakerVolume, toggleSpeakerMuted } = useWebRTC();
 
-  // Refs
   const sliderRef = useRef<HTMLInputElement>(null);
   const isBtnHoveredRef = useRef<boolean>(false);
 
-  // Selectors
   const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted);
   const speakerVolume = useAppSelector((state) => state.webrtc.speakerVolume);
 
-  // Handlers
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     changeSpeakerVolume(parseInt(e.target.value));
   };
@@ -656,11 +639,9 @@ const SpeakerVolumeSlider = React.memo(() => {
 SpeakerVolumeSlider.displayName = 'SpeakerVolumeSlider';
 
 const ShowFrame: React.FC = React.memo(() => {
-  // Refs
   const showFrameRef = useRef<HTMLIFrameElement>(null);
   const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Types.Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
 
-  // Selectors
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -680,7 +661,6 @@ const ShowFrame: React.FC = React.memo(() => {
 
   const queueUsers = useAppSelector((state) => state.queueUsers.data, shallowEqual);
 
-  // Functions
   const updateShowFrameState = useCallback(
     (userId: string, anchorId: string | null, channelMode: Types.Channel['voiceMode']) => {
       if (!showFrameRef.current?.contentWindow) return;
@@ -690,7 +670,6 @@ const ShowFrame: React.FC = React.memo(() => {
     [showFrameRef],
   );
 
-  // Handlers
   const handleShowFrameLoad = () => {
     const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
     updateShowFrameState(user.userId, anchorId, currentChannel.voiceMode);

@@ -11,7 +11,6 @@ export function getCustomThemes() {
 
 export function addCustomTheme(theme: Types.Theme) {
   const customThemes = store.get('customThemes');
-  // Keep total 7 themes
   customThemes.unshift(theme);
   store.set('customThemes', customThemes);
   eventEmitter.emit(
@@ -22,7 +21,6 @@ export function addCustomTheme(theme: Types.Theme) {
 
 export function deleteCustomTheme(index: number) {
   const customThemes = store.get('customThemes');
-  // Keep total 7 themes
   customThemes.splice(index, 1);
   store.set('customThemes', customThemes);
   eventEmitter.emit(

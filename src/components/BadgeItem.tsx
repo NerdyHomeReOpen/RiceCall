@@ -12,13 +12,10 @@ interface BadgeItemProps {
 }
 
 const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direction }) => {
-  // Hooks
   const { showBadgeInfoCard } = useContextMenu();
 
-  // Refs
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Handlers
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     const { left, right, top, bottom } = e.currentTarget.getBoundingClientRect();
     const x = position === 'left-top' || position === 'left-bottom' ? left : right;

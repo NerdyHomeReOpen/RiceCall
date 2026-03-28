@@ -17,13 +17,10 @@ interface NetworkDiagnosisPopupProps {
 }
 
 const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo(({ id }) => {
-  // Hooks
   const { t } = useTranslation();
 
-  // Refs
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  // States
   const [logs, setLogs] = useState<string[]>([]);
   const [isTesting, setIsTesting] = useState(false);
   const [progress, setProgress] = useState({ current: 0, cycle: 0, totalCycles: 0 });
@@ -36,7 +33,6 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     { id: 'sfu_test', label: t('diagnosis-sfu-test'), icon: <FaCheckCircle />, status: 'pending' },
   ]);
 
-  // Functions
   const addLog = useCallback((message: string) => {
     setLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${message}`]);
   }, []);
@@ -65,7 +61,6 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     [addLog],
   );
 
-  // Handlers
   const handleStartTestClick = useCallback(async () => {
     if (isTesting) return;
     setIsTesting(true);
@@ -232,7 +227,6 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   const handleTabLogsClick = useCallback(() => setActiveTab('logs'), []);
   const handleTabReportsClick = useCallback(() => setActiveTab('reports'), []);
 
-  // Effects
   useEffect(() => {
     if (scrollRef.current && activeTab === 'logs') {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
