@@ -28,7 +28,7 @@ const Header: React.FC = React.memo(() => {
       details: t('rpc:login-page'),
       state: `${t('rpc:un-login')}`,
       largeImageKey: 'app_icon',
-      largeImageText: 'RC Voice',
+      largeImageText: 'RiceCall',
       smallImageKey: 'login_icon',
       smallImageText: t('rpc:login-page'),
       timestamp: Date.now(),

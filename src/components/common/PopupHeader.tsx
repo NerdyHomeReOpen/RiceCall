@@ -14,7 +14,7 @@ interface PopupHeaderProps {
   className?: string;
 }
 
-export const PopupHeader: React.FC<PopupHeaderProps> = React.memo(({ title, buttons, titleBoxIcon, isFullscreen, onMinimize, onMaximize, onRestore, onClose, className }) => {
+const PopupHeader: React.FC<PopupHeaderProps> = React.memo(({ title, buttons, titleBoxIcon, isFullscreen, onMinimize, onMaximize, onRestore, onClose, className }) => {
   return (
     <header className={`${headerStyles['header']} ${headerStyles['popup']} ${className || ''}`}>
       <div className={headerStyles['title-wrapper']}>
@@ -32,3 +32,5 @@ export const PopupHeader: React.FC<PopupHeaderProps> = React.memo(({ title, butt
 });
 
 PopupHeader.displayName = 'PopupHeader';
+
+export default PopupHeader;

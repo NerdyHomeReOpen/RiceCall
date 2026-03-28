@@ -2,7 +2,6 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 
 import ipc from '@/ipc';
 
@@ -49,65 +48,38 @@ import UserInfo from '@/popups/UserInfo';
 import { getPopupConfigs } from '@/configs/popup';
 
 import SocketManager from '@/components/SocketManager';
+import PopupHeader from '@/components/common/PopupHeader';
 
 import headerStyle from '@/styles/header.module.css';
 
-interface HeaderProps {
-  id: string;
-  title: string;
-  buttons: ('minimize' | 'maxsize' | 'close')[];
-  titleBoxIcon?: string;
-}
-
-const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBoxIcon }) => {
-  const { t } = useTranslation();
-
+const PopupPageComponent: React.FC = React.memo(() => {
+  const [popup, setPopup] = useState<Types.Popup | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  const handleMaximizeBtnClick = () => {
+  const handleMaximize = () => {
     if (isFullscreen) return;
     ipc.window.maximize();
   };
 
-  const handleUnmaximizeBtnClick = () => {
+  const handleUnmaximize = () => {
     if (!isFullscreen) return;
     ipc.window.unmaximize();
   };
 
-  const handleMinimizeBtnClick = () => {
-    ipc.window.minimize(id);
+  const handleMinimize = () => {
+    if (!popup?.id) return;
+    ipc.window.minimize(popup.id);
   };
 
-  const handleCloseBtnClick = () => {
-    ipc.popup.close(id);
+  const handleClose = () => {
+    if (!popup?.id) return;
+    ipc.popup.close(popup.id);
   };
 
   useEffect(() => {
     const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
-
-  return (
-    <header className={`${headerStyle['header']} ${headerStyle['popup']}`}>
-      <div className={headerStyle['title-wrapper']}>
-        <div className={`${headerStyle['title-box']} ${titleBoxIcon}`}>
-          <div className={headerStyle['title']}>{t(title)}</div>
-        </div>
-        <div className={headerStyle['buttons']}>
-          {buttons.includes('minimize') && <div className={headerStyle['minimize']} onClick={handleMinimizeBtnClick} />}
-          {buttons.includes('maxsize') &&
-            (isFullscreen ? <div className={headerStyle['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyle['maxsize']} onClick={handleMaximizeBtnClick} />)}
-          {buttons.includes('close') && <div className={headerStyle['close']} onClick={handleCloseBtnClick} />}
-        </div>
-      </div>
-    </header>
-  );
-});
-
-Header.displayName = 'Header';
-
-const PopupPageComponent: React.FC = React.memo(() => {
-  const [popup, setPopup] = useState<Types.Popup | null>(null);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
@@ -200,11 +172,15 @@ const PopupPageComponent: React.FC = React.memo(() => {
     <>
       <SocketManager />
       {popup && !popup.hideHeader && (
-        <Header
-          id={popup.id}
+        <PopupHeader
           title={popup.title}
           buttons={popup.buttons}
           titleBoxIcon={popup.type === 'changeTheme' ? headerStyle['title-box-skin-icon'] : popup.type === 'directMessage' ? headerStyle['title-box-direct-message-icon'] : undefined}
+          isFullscreen={isFullscreen}
+          onMinimize={handleMinimize}
+          onMaximize={handleMaximize}
+          onRestore={handleUnmaximize}
+          onClose={handleClose}
         />
       )}
       {popup && popup.node()}

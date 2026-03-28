@@ -4,11 +4,14 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useAppSelector } from '@/store/hook';
+
 import ipc from '@/ipc';
+
 import * as Action from '@/action';
 
 import type * as Types from '@/types';
+
+import { useAppSelector } from '@/store/hook';
 
 import SocketManager from '@/components/SocketManager';
 import LoadingSpinner from '@/components/common/LoadingSpinner';
@@ -26,6 +29,7 @@ import { useLoading } from '@/providers/Loading';
 import { useActionScanner } from '@/providers/ActionScanner';
 
 import { useHeaderContextMenu } from '@/hooks/ctxMenus/headerCtxMenu';
+
 import { isRenderer } from '@/utils/platform';
 
 import headerStyles from '@/styles/header.module.css';
@@ -347,7 +351,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           details: t('rpc:viewing-home-page'),
           state: `${t('rpc:user', { '0': user.name })}`,
           largeImageKey: 'app_icon',
-          largeImageText: 'RC Voice',
+          largeImageText: 'RiceCall',
           smallImageKey: 'home_icon',
           smallImageText: t('rpc:home-page'),
           timestamp: Date.now(),
@@ -359,7 +363,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           details: t('rpc:viewing-friend-page'),
           state: `${t('rpc:user', { '0': user.name })}`,
           largeImageKey: 'app_icon',
-          largeImageText: 'RC Voice',
+          largeImageText: 'RiceCall',
           smallImageKey: 'home_icon',
           smallImageText: t('rpc:vewing-friend-page'),
           timestamp: Date.now(),
@@ -371,7 +375,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           details: `${t('in')} ${currentServer.name}`,
           state: `${t('rpc:chat-with-members', { '0': onlineMembersLength.toString() })}`,
           largeImageKey: 'app_icon',
-          largeImageText: 'RC Voice',
+          largeImageText: 'RiceCall',
           smallImageKey: 'home_icon',
           smallImageText: t('rpc:viewing-server-page'),
           timestamp: Date.now(),
