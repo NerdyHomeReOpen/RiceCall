@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 
 interface UseServerSettingContextMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
@@ -18,7 +18,7 @@ export const useServerSettingContextMenu = ({ user, currentServer, onLocateMe }:
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addApplyMemberOption({ permissionLevel }, () => Action.applyMember(user.userId, currentServer.serverId, currentServer.receiveApply))
         .addServerSettingOption({ permissionLevel }, () => Action.openServerSetting(user.userId, currentServer.serverId))
         .addSeparator()

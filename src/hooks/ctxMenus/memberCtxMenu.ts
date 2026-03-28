@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 import { useMemberManagementSubmenu } from '@/hooks/ctxMenus/memberManagementSubmenu';
 
 interface UseMemberContextMenuProps {
@@ -55,7 +55,7 @@ export const useMemberContextMenu = ({
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addJoinUserChannelOption({ isSelf, isInSameChannel }, () => Action.connectChannel(currentServer.serverId, channel.channelId, canJoin, isPasswordNeeded))
         .addAddToQueueOption({ permissionLevel, isSelf, isEqualOrLowerLevel, isChannelQueueMode, isInQueue }, () => Action.addUserToQueue(member.userId, currentServer.serverId, channel.channelId))
         .addDirectMessageOption({ isSelf }, () => Action.openDirectMessage(user.userId, member.userId))

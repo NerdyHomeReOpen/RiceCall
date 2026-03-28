@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 import { useMemberManagementSubmenu } from '@/hooks/ctxMenus/memberManagementSubmenu';
 
 interface UseQueueUserContextMenuProps {
@@ -38,7 +38,7 @@ export const useQueueUserContextMenu = ({ user, currentServer, currentChannel, q
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addIncreaseQueueTimeOption({ queuePosition: queueMember.position, permissionLevel }, () => Action.increaseUserQueueTime(queueMember.userId, currentServer.serverId, currentChannel.channelId))
         .addMoveUpQueueOption({ queuePosition: queueMember.position, permissionLevel }, () =>
           Action.moveUserQueuePositionUp(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.position - 1),

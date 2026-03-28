@@ -2,7 +2,7 @@ import type * as Types from '@/types';
 
 import * as Permission from '@/utils/permission';
 
-export default class ContextMenuClass {
+export default class ContextMenu {
   private options: Types.ContextMenuItem[] = [];
 
   addSeparator(): this {

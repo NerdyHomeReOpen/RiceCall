@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 
 interface UseFriendGroupContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -14,7 +14,7 @@ interface UseFriendGroupContextMenuProps {
 export const useFriendGroupContextMenu = ({ user, friendGroup }: UseFriendGroupContextMenuProps) => {
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addEditFriendGroupNameOption({ friendGroupId: friendGroup.friendGroupId }, () => Action.openEditFriendGroupName(user.userId, friendGroup.friendGroupId))
         .addDeleteFriendGroupOption({ friendGroupId: friendGroup.friendGroupId }, () => Action.deleteFriendGroup(friendGroup.friendGroupId, friendGroup.name))
         .build(),

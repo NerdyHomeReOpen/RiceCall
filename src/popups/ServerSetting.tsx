@@ -16,9 +16,11 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as Action from '@/action';
 import * as Language from '@/utils/language';
 import * as Permission from '@/utils/permission';
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 import Sorter from '@/utils/sorter';
 import ObjDiff from '@/utils/objDiff';
+
+import { useServerSettingMemberContextMenu } from '@/hooks/ctxMenus/serverSettingMemberCtxMenu';
+import { useServerSettingBlockedMemberContextMenu } from '@/hooks/ctxMenus/serverSettingBlockedMemberCtxMenu';
 
 import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constant';
 
@@ -423,60 +425,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   </tr>
                 </thead>
                 <tbody className={settingStyles['table-container']}>
-                  {sortedMembers.map((member) => {
-                    // Variables
-                    const isSelf = member.userId === user.userId;
-                    const isLowerLevel = member.permissionLevel < permissionLevel;
-                    const isSelected = selectedItemId === `member-${member.userId}`;
-
-                    // Functions
-                    const getMemberManagementSubmenuItems = () =>
-                      new CtxMenuBuilder()
-                        .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
-                          Action.terminateMember(member.userId, server.serverId, member.name),
-                        )
-                        .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
-                          Permission.isServerAdmin(member.permissionLevel)
-                            ? Action.editServerPermission(member.userId, server.serverId, { permissionLevel: 2 })
-                            : Action.editServerPermission(member.userId, server.serverId, { permissionLevel: 5 }),
-                        )
-                        .build();
-
-                    const getContextMenuItems = () =>
-                      new CtxMenuBuilder()
-                        .addDirectMessageOption({ isSelf }, () => Action.openDirectMessage(user.userId, member.userId))
-                        .addViewProfileOption(() => Action.openUserInfo(user.userId, member.userId))
-                        .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openEditNickname(member.userId, server.serverId))
-                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openBlockMember(member.userId, server.serverId))
-                        .addSeparator()
-                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
-                        .build();
-
-                    // Handlers
-                    const handleClick = () => {
-                      if (isSelected) setSelectedItemId('');
-                      else setSelectedItemId(`member-${member.userId}`);
-                    };
-
-                    const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const { clientX: x, clientY: y } = e;
-                      showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-                    };
-
-                    return (
-                      <tr key={member.userId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
-                        <td title={member.nickname || member.name} style={{ width: `${memberColumnWidths[0]}px` }}>
-                          <div className={`${permissionStyles[member.gender]} ${permissionStyles[`lv-${member.permissionLevel}`]}`} />
-                          <div className={`${popupStyles['name']} ${member.nickname ? popupStyles['highlight'] : ''}`}>{member.nickname || member.name}</div>
-                        </td>
-                        <td style={{ width: `${memberColumnWidths[1]}px` }}>{Language.getPermissionText(t, member.permissionLevel)}</td>
-                        <td style={{ width: `${memberColumnWidths[2]}px` }}>{member.contribution}</td>
-                        <td style={{ width: `${memberColumnWidths[3]}px` }}>{new Date(member.joinAt).toLocaleDateString()}</td>
-                      </tr>
-                    );
-                  })}
+                  {sortedMembers.map((member) => (
+                    <ServerSettingMemberRow
+                      key={member.userId}
+                      user={user}
+                      server={server}
+                      member={member}
+                      permissionLevel={permissionLevel}
+                      columnWidths={memberColumnWidths}
+                    />
+                  ))}
                 </tbody>
               </table>
               <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
@@ -631,38 +589,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   </tr>
                 </thead>
                 <tbody className={settingStyles['table-container']}>
-                  {sortedBlockMembers.map((member) => {
-                    // Variables
-                    const isSelf = member.userId === user.userId;
-                    const isSelected = selectedItemId === `blocked-${member.userId}`;
-
-                    // Functions
-                    const getContextMenuItems = () =>
-                      new CtxMenuBuilder()
-                        .addViewProfileOption(() => Action.openUserInfo(user.userId, member.userId))
-                        .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => Action.unblockUserFromServer(member.userId, server.serverId, member.name))
-                        .build();
-
-                    // Handlers
-                    const handleClick = () => {
-                      if (isSelected) dispatch(setSelectedItemId(null));
-                      else dispatch(setSelectedItemId(`blocked-${member.userId}`));
-                    };
-
-                    const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const { clientX: x, clientY: y } = e;
-                      showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-                    };
-
-                    return (
-                      <tr key={member.userId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
-                        <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
-                        <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
-                      </tr>
-                    );
-                  })}
+                  {sortedBlockMembers.map((member) => (
+                    <ServerSettingBlockedMemberRow
+                      key={member.userId}
+                      user={user}
+                      server={server}
+                      member={member}
+                      permissionLevel={permissionLevel}
+                      columnWidths={blockMemberColumnWidths}
+                    />
+                  ))}
                 </tbody>
               </table>
               <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
@@ -690,3 +626,88 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
 ServerSettingPopup.displayName = 'ServerSettingPopup';
 
 export default ServerSettingPopup;
+
+interface ServerSettingMemberRowProps {
+  user: { userId: string };
+  server: Pick<Types.Server, 'serverId'>;
+  member: Types.Member;
+  permissionLevel: Types.Permission;
+  columnWidths: number[];
+}
+
+const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo(({ user, server, member, permissionLevel, columnWidths }) => {
+  const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+  const dispatch = useAppDispatch();
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+
+  const isSelected = selectedItemId === `member-${member.userId}`;
+
+  const { buildContextMenu } = useServerSettingMemberContextMenu({ user, server, member, permissionLevel });
+
+  const handleClick = () => {
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`member-${member.userId}`));
+  };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+  };
+
+  return (
+    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+      <td title={member.nickname || member.name} style={{ width: `${columnWidths[0]}px` }}>
+        <div className={`${permissionStyles[member.gender]} ${permissionStyles[`lv-${member.permissionLevel}`]}`} />
+        <div className={`${popupStyles['name']} ${member.nickname ? popupStyles['highlight'] : ''}`}>{member.nickname || member.name}</div>
+      </td>
+      <td style={{ width: `${columnWidths[1]}px` }}>{Language.getPermissionText(t, member.permissionLevel)}</td>
+      <td style={{ width: `${columnWidths[2]}px` }}>{member.contribution}</td>
+      <td style={{ width: `${columnWidths[3]}px` }}>{new Date(member.joinAt).toLocaleDateString()}</td>
+    </tr>
+  );
+});
+
+ServerSettingMemberRow.displayName = 'ServerSettingMemberRow';
+
+interface ServerSettingBlockedMemberRowProps {
+  user: { userId: string };
+  server: Pick<Types.Server, 'serverId'>;
+  member: Types.Member;
+  permissionLevel: Types.Permission;
+  columnWidths: number[];
+}
+
+const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps> = React.memo(({ user, server, member, permissionLevel, columnWidths }) => {
+  const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+  const dispatch = useAppDispatch();
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+
+  const isSelected = selectedItemId === `blocked-${member.userId}`;
+
+  const { buildContextMenu } = useServerSettingBlockedMemberContextMenu({ user, server, member, permissionLevel });
+
+  const handleClick = () => {
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`blocked-${member.userId}`));
+  };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+  };
+
+  return (
+    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+      <td style={{ width: `${columnWidths[0]}px` }}>{member.nickname || member.name}</td>
+      <td style={{ width: `${columnWidths[1]}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
+    </tr>
+  );
+});
+
+ServerSettingBlockedMemberRow.displayName = 'ServerSettingBlockedMemberRow';

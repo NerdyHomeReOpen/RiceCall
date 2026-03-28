@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 
 interface UseChannelContextMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
@@ -30,7 +30,7 @@ export const useChannelContextMenu = ({ channel, user, currentServer, currentCha
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addJoinChannelOption({ canJoin, isInChannel }, () => Action.connectChannel(currentServer.serverId, channel.channelId, canJoin, isPasswordNeeded))
         .addViewOrEditOption(() => Action.openChannelSetting(user.userId, currentServer.serverId, channel.channelId))
         .addSeparator()

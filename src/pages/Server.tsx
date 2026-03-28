@@ -23,7 +23,10 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as Permission from '@/utils/permission';
 import * as Language from '@/utils/language';
 import * as Action from '@/action';
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+
+import { useAnnouncementAreaContextMenu } from '@/hooks/ctxMenus/announcementAreaCtxMenu';
+import { useMessageAreaContextMenu } from '@/hooks/ctxMenus/messageAreaCtxMenu';
+import { useVoiceModeContextMenu } from '@/hooks/ctxMenus/voiceModeCtxMenu';
 
 import { SHOW_FRAME_ORIGIN, MESSAGE_VIERER_DEVIATION } from '@/constant';
 
@@ -104,10 +107,29 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
   const [centralAreaMode, setCentralAreaMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
+  // Context Menus
+  const { buildContextMenu: buildAnnouncementAreaContextMenu } = useAnnouncementAreaContextMenu({
+    onCloseAnnouncement: () => setCentralAreaMode('none'),
+  });
+  const { buildContextMenu: buildMessageAreaContextMenu } = useMessageAreaContextMenu({
+    user,
+    currentServer,
+    channelEvents,
+    onOpenAnnouncement: () => setCentralAreaMode('announcement'),
+    onClearMessages: () => {
+      dispatch(clearChannelMessages());
+      dispatch(clearActionMessages());
+    },
+  });
+  const { buildContextMenu: buildVoiceModeContextMenu } = useVoiceModeContextMenu({
+    currentServer,
+    currentChannel,
+    permissionLevel: Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel),
+    isQueueControlled,
+  });
+
   // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const isCurrentChannelFreeMode = currentChannel.voiceMode === 'free';
-  const isCurrentChannelAdminMode = currentChannel.voiceMode === 'admin';
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
   const isCentralAreaNoneMode = centralAreaMode === 'none';
   const isCentralAreaAnnouncementMode = centralAreaMode === 'announcement';
@@ -148,11 +170,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     return className;
   };
 
-  const clearMessages = () => {
-    dispatch(clearChannelMessages());
-    dispatch(clearActionMessages());
-  };
-
   const clearUnreadMessageNotification = () => {
     setIsAtBottom(true);
     setUnreadMessageCount(0);
@@ -163,31 +180,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
     clearUnreadMessageNotification();
   }, []);
-
-  const getContextMenuItems1 = () => new CtxMenuBuilder().addCloseAnnouncementOption(() => setCentralAreaMode('none')).build();
-
-  const getContextMenuItems2 = () =>
-    new CtxMenuBuilder()
-      .addCleanUpMessageOption(() => clearMessages())
-      .addOpenChannelEventOption(() => Action.openChannelEvent(user.userId, currentServer.serverId, channelEvents))
-      .addOpenAnnouncementOption(() => setCentralAreaMode('announcement'))
-      .build();
-
-  const getContextMenuItems3 = () =>
-    new CtxMenuBuilder()
-      .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Action.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
-      .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Action.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
-      .addQueueSpeechOption(
-        { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
-        () => Action.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),
-        new CtxMenuBuilder()
-          .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannel.forbidQueue }, () =>
-            Action.editChannel(currentServer.serverId, currentChannel.channelId, { forbidQueue: !currentChannel.forbidQueue }),
-          )
-          .addControlQueueOption({ permissionLevel, isQueueControlled }, () => Action.controlQueue(currentServer.serverId, currentChannel.channelId))
-          .build(),
-      )
-      .build();
 
   const getResizableAreaRef = () => {
     if (isCentralAreaAnnouncementMode) return annAreaRef;
@@ -297,21 +289,21 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getContextMenuItems2());
+    showContextMenu(x, y, 'right-bottom', buildMessageAreaContextMenu());
   };
 
   const handleAnnAreaContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getContextMenuItems1());
+    showContextMenu(x, y, 'right-bottom', buildAnnouncementAreaContextMenu());
   };
 
   const handleVoiceModeDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-top', getContextMenuItems3());
+    showContextMenu(x, y, 'right-top', buildVoiceModeContextMenu());
   };
 
   const handleNewMessageAlertClick = () => {

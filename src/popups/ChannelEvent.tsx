@@ -12,7 +12,8 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import * as Action from '@/action';
 import * as Language from '@/utils/language';
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+
+import { useChannelEventContextMenu } from '@/hooks/ctxMenus/channelEventCtxMenu';
 
 import popupStyles from '@/styles/popup.module.css';
 import styles from '@/styles/channelEvent.module.css';
@@ -147,17 +148,11 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
 
   // Variables
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const isSelf = event.userId === user.userId;
-  const isLowerLevel = event.permissionLevel < permissionLevel;
+
+  // Context Menus
+  const { buildContextMenu } = useChannelEventContextMenu({ user, currentServer, event, permissionLevel });
 
   // Functions
-  const getContextMenuItems = () =>
-    new CtxMenuBuilder()
-      .addViewProfileOption(() => Action.openUserInfo(user.userId, event.userId))
-      .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openKickMemberFromServer(event.userId, currentServer.serverId))
-      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openBlockMember(event.userId, currentServer.serverId))
-      .build();
-
   const getChannelName = (channelId: string | null) => {
     const channel = channels.find((c) => c.channelId === channelId);
     if (!channel) return '';
@@ -209,7 +204,7 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', getContextMenuItems());
+    showContextMenu(x, y, 'right-bottom', buildContextMenu());
   };
 
   return (

@@ -16,8 +16,10 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import * as Action from '@/action';
 import * as Language from '@/utils/language';
 import * as Permission from '@/utils/permission';
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
 import ObjDiff from '@/utils/objDiff';
+
+import { useChannelSettingModeratorContextMenu } from '@/hooks/ctxMenus/channelSettingModeratorCtxMenu';
+import { useChannelSettingBlockedMemberContextMenu } from '@/hooks/ctxMenus/channelSettingBlockedMemberCtxMenu';
 import Sorter from '@/utils/sorter';
 
 import { MEMBER_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constant';
@@ -508,70 +510,17 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   </tr>
                 </thead>
                 <tbody className={settingStyles['table-container']}>
-                  {sortedModerators.map((moderator) => {
-                    // Variables
-                    const isSelf = moderator.userId === user.userId;
-                    const isLowerLevel = moderator.permissionLevel < permissionLevel;
-                    const isSelected = selectedItemId === `member-${moderator.userId}`;
-
-                    // Handlers
-                    const getMemberManagementSubmenuItems = () =>
-                      new CtxMenuBuilder()
-                        .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
-                          Action.terminateMember(moderator.userId, server.serverId, moderator.name),
-                        )
-                        .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-                          Permission.isChannelMod(moderator.permissionLevel)
-                            ? Action.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
-                            : Action.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
-                        )
-                        .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-                          Permission.isChannelAdmin(moderator.permissionLevel)
-                            ? Action.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
-                            : Action.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
-                        )
-                        .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
-                          Permission.isServerAdmin(moderator.permissionLevel)
-                            ? Action.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
-                            : Action.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
-                        )
-                        .build();
-
-                    const getContextMenuItems = () =>
-                      new CtxMenuBuilder()
-                        .addDirectMessageOption({ isSelf }, () => Action.openDirectMessage(user.userId, moderator.userId))
-                        .addViewProfileOption(() => Action.openUserInfo(user.userId, moderator.userId))
-                        .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openEditNickname(moderator.userId, server.serverId))
-                        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Action.openBlockMember(moderator.userId, server.serverId))
-                        .addSeparator()
-                        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => {}, getMemberManagementSubmenuItems())
-                        .build();
-
-                    // Handlers
-                    const handleClick = () => {
-                      if (isSelected) dispatch(setSelectedItemId(null));
-                      else dispatch(setSelectedItemId(`member-${moderator.userId}`));
-                    };
-
-                    const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const { clientX: x, clientY: y } = e;
-                      showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-                    };
-
-                    return (
-                      <tr key={moderator.userId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
-                        <td style={{ width: `${moderatorColumnWidths[0]}px` }}>
-                          <div className={`${permissionStyles[moderator.gender]} ${permissionStyles[`lv-${moderator.permissionLevel}`]}`} />
-                          <div className={`${popupStyles['name']} ${moderator.nickname ? popupStyles['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
-                        </td>
-                        <td style={{ width: `${moderatorColumnWidths[1]}px` }}>{Language.getPermissionText(t, moderator.permissionLevel)}</td>
-                        <td style={{ width: `${moderatorColumnWidths[2]}px` }}>{moderator.contribution}</td>
-                        <td style={{ width: `${moderatorColumnWidths[3]}px` }}>{new Date(moderator.joinAt).toLocaleDateString()}</td>
-                      </tr>
-                    );
-                  })}
+                  {sortedModerators.map((moderator) => (
+                    <ChannelSettingModeratorRow
+                      key={moderator.userId}
+                      user={user}
+                      server={server}
+                      channel={channel}
+                      moderator={moderator}
+                      permissionLevel={permissionLevel}
+                      columnWidths={moderatorColumnWidths}
+                    />
+                  ))}
                 </tbody>
               </table>
               <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
@@ -607,39 +556,17 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   </tr>
                 </thead>
                 <tbody className={settingStyles['table-container']}>
-                  {sortedBlockMembers.map((member) => {
-                    // Variables
-                    const isSelf = member.userId === user.userId;
-                    const isSelected = selectedItemId === `blocked-${member.userId}`;
-                    const isBlockedPermanently = member.blockedUntil === -1;
-
-                    // Functions
-                    const getContextMenuItems = () =>
-                      new CtxMenuBuilder()
-                        .addViewProfileOption(() => Action.openUserInfo(user.userId, member.userId))
-                        .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => Action.unblockUserFromChannel(member.userId, server.serverId, channel.channelId, member.name))
-                        .build();
-
-                    // Functions
-                    const handleClick = () => {
-                      if (isSelected) dispatch(setSelectedItemId(null));
-                      else dispatch(setSelectedItemId(`blocked-${member.userId}`));
-                    };
-
-                    const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      const { clientX: x, clientY: y } = e;
-                      showContextMenu(x, y, 'right-bottom', getContextMenuItems());
-                    };
-
-                    return (
-                      <tr key={member.userId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
-                        <td style={{ width: `${blockMemberColumnWidths[0]}px` }}>{member.nickname || member.name}</td>
-                        <td style={{ width: `${blockMemberColumnWidths[1]}px` }}>{isBlockedPermanently ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
-                      </tr>
-                    );
-                  })}
+                  {sortedBlockMembers.map((member) => (
+                    <ChannelSettingBlockedMemberRow
+                      key={member.userId}
+                      user={user}
+                      server={server}
+                      channel={channel}
+                      member={member}
+                      permissionLevel={permissionLevel}
+                      columnWidths={blockMemberColumnWidths}
+                    />
+                  ))}
                 </tbody>
               </table>
               <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
@@ -667,3 +594,91 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
 ChannelSettingPopup.displayName = 'ChannelSettingPopup';
 
 export default ChannelSettingPopup;
+
+interface ChannelSettingModeratorRowProps {
+  user: { userId: string };
+  server: Pick<Types.Server, 'serverId'>;
+  channel: Pick<Types.Channel, 'channelId' | 'categoryId'>;
+  moderator: Types.Member;
+  permissionLevel: Types.Permission;
+  columnWidths: number[];
+}
+
+const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = React.memo(({ user, server, channel, moderator, permissionLevel, columnWidths }) => {
+  const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+  const dispatch = useAppDispatch();
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+
+  const isSelected = selectedItemId === `member-${moderator.userId}`;
+
+  const { buildContextMenu } = useChannelSettingModeratorContextMenu({ user, server, channel, moderator, permissionLevel });
+
+  const handleClick = () => {
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`member-${moderator.userId}`));
+  };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+  };
+
+  return (
+    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+      <td style={{ width: `${columnWidths[0]}px` }}>
+        <div className={`${permissionStyles[moderator.gender]} ${permissionStyles[`lv-${moderator.permissionLevel}`]}`} />
+        <div className={`${popupStyles['name']} ${moderator.nickname ? popupStyles['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
+      </td>
+      <td style={{ width: `${columnWidths[1]}px` }}>{Language.getPermissionText(t, moderator.permissionLevel)}</td>
+      <td style={{ width: `${columnWidths[2]}px` }}>{moderator.contribution}</td>
+      <td style={{ width: `${columnWidths[3]}px` }}>{new Date(moderator.joinAt).toLocaleDateString()}</td>
+    </tr>
+  );
+});
+
+ChannelSettingModeratorRow.displayName = 'ChannelSettingModeratorRow';
+
+interface ChannelSettingBlockedMemberRowProps {
+  user: { userId: string };
+  server: Pick<Types.Server, 'serverId'>;
+  channel: Pick<Types.Channel, 'channelId'>;
+  member: Types.Member;
+  permissionLevel: Types.Permission;
+  columnWidths: number[];
+}
+
+const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowProps> = React.memo(({ user, server, channel, member, permissionLevel, columnWidths }) => {
+  const { t } = useTranslation();
+  const { showContextMenu } = useContextMenu();
+  const dispatch = useAppDispatch();
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+
+  const isSelected = selectedItemId === `blocked-${member.userId}`;
+  const isBlockedPermanently = member.blockedUntil === -1;
+
+  const { buildContextMenu } = useChannelSettingBlockedMemberContextMenu({ user, server, channel, member, permissionLevel });
+
+  const handleClick = () => {
+    if (isSelected) dispatch(setSelectedItemId(null));
+    else dispatch(setSelectedItemId(`blocked-${member.userId}`));
+  };
+
+  const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
+    const { clientX: x, clientY: y } = e;
+    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+  };
+
+  return (
+    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+      <td style={{ width: `${columnWidths[0]}px` }}>{member.nickname || member.name}</td>
+      <td style={{ width: `${columnWidths[1]}px` }}>{isBlockedPermanently ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
+    </tr>
+  );
+});
+
+ChannelSettingBlockedMemberRow.displayName = 'ChannelSettingBlockedMemberRow';

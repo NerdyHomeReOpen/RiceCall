@@ -25,10 +25,9 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 import { useActionScanner } from '@/providers/ActionScanner';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import { useHeaderContextMenu } from '@/hooks/ctxMenus/headerCtxMenu';
 import { isRenderer } from '@/utils/platform';
 
-import { LANGUAGES } from '@/constant';
 
 import headerStyles from '@/styles/header.module.css';
 
@@ -106,29 +105,15 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     i18n.changeLanguage(language);
   };
 
-  const getContextMenuItems = () =>
-    new CtxMenuBuilder()
-      .addSystemSettingOption(() => Action.openSystemSetting(user.userId))
-      .addChangeThemeOption(() => Action.openChangeTheme())
-      .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
-      .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
-      .addHelpCenterOption(
-        {
-          onFaqClick: () => window.open('https://ricecall.com/#faq', '_blank'),
-          onAgreementClick: () => window.open('https://ricecall.com/terms', '_blank'),
-          onSpecificationClick: () => window.open('https://ricecall.com/specification', '_blank'),
-          onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
-          onAboutUsClick: Action.openAboutUs,
-        },
-        () => {},
-      )
-      .addNetworkDiagnosisOption(() => Action.openNetworkDiagnosis())
-      .addLogoutOption(() => logout())
-      .addExitOption(() => exit())
-      .build();
+  const { buildContextMenu: buildHeaderContextMenu } = useHeaderContextMenu({
+    user,
+    onChangeLanguage: changeLanguage,
+    onLogout: logout,
+    onExit: exit,
+  });
 
   // TODO: Make a NotificationMenuBuilder
-  const getNotificationMenuItems = () => [
+  const buildNotificationMenuItems = () => [
     {
       id: 'no-unread-notify',
       label: t('no-unread-notify'),
@@ -165,7 +150,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: false,
       contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => {},
+      onClick: () => { },
     },
   ];
 
@@ -204,14 +189,14 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     e.preventDefault();
     e.stopPropagation();
     const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showContextMenu(x + 50, y, 'left-bottom', getContextMenuItems());
+    showContextMenu(x + 50, y, 'left-bottom', buildHeaderContextMenu());
   };
 
   const handleNotificationMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showNotificationMenu(x, y, 'right-bottom', getNotificationMenuItems());
+    showNotificationMenu(x, y, 'right-bottom', buildNotificationMenuItems());
   };
 
   const handleNameClick = () => {

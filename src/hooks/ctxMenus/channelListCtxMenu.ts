@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 
 interface UseChannelListContextMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
@@ -19,7 +19,7 @@ export const useChannelListContextMenu = ({ user, currentServer, currentChannel,
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addCreateChannelOption({ permissionLevel }, () => Action.openCreateChannel(user.userId, currentServer.serverId, ''))
         .addSeparator()
         .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => Action.kickUsersFromServer(movableServerUserIds, currentServer.serverId))

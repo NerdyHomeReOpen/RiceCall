@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 
 interface UseFriendTabContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -22,7 +22,7 @@ export const useFriendTabContextMenu = ({ user, friend, friendGroups, defaultFri
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addDirectMessageOption({ isSelf }, () => Action.openDirectMessage(user.userId, friend.targetId))
         .addViewProfileOption(() => Action.openUserInfo(user.userId, friend.targetId))
         .addAddFriendOption({ isSelf, isFriend }, () => Action.openApplyFriend(user.userId, friend.targetId))
@@ -32,7 +32,7 @@ export const useFriendTabContextMenu = ({ user, friend, friendGroups, defaultFri
         .addEditFriendFriendGroupOption(
           { isSelf, isStranger, isBlocked: friend.isBlocked },
           () => {},
-          new CtxMenuBuilder()
+          new ContextMenu()
             .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) =>
               Action.editFriend(friend.targetId, { friendGroupId }),
             )

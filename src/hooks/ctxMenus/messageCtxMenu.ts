@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 import { useMemberManagementSubmenu } from '@/hooks/ctxMenus/memberManagementSubmenu';
 
 interface UseMessageContextMenuProps {
@@ -25,7 +25,7 @@ export const useMessageContextMenu = ({ user, currentServer, currentChannel, mem
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addDirectMessageOption({ isSelf }, () => Action.openDirectMessage(user.userId, member.userId))
         .addViewProfileOption(() => Action.openUserInfo(user.userId, member.userId))
         .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => Action.openKickMemberFromChannel(member.userId, currentServer.serverId, currentChannel.channelId))

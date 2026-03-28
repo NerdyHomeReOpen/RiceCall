@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 
 import * as Permission from '@/utils/permission';
 
@@ -22,7 +22,7 @@ export const useMemberManagementSubmenu = ({ user, currentServer, channel, membe
 
   const buildMemberManagementSubmenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
           Action.terminateMember(member.userId, currentServer.serverId, member.name),
         )

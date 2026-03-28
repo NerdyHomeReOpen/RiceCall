@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as Action from '@/action';
 
-import CtxMenuBuilder from '@/hooks/ctxMenus/ctxMenuBuilder';
+import ContextMenu from '@/contextMenu';
 
 interface UseServerCardContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -18,7 +18,7 @@ export const useServerCardContextMenu = ({ user, server, onJoinServer }: UseServ
 
   const buildContextMenu = useCallback(
     () =>
-      new CtxMenuBuilder()
+      new ContextMenu()
         .addJoinServerOption(onJoinServer)
         .addViewServerInfoOption(() => Action.openServerSetting(user.userId, server.serverId))
         .addFavoriteServerOption({ isFavorite: server.favorite }, () => Action.favoriteServer(server.serverId))
