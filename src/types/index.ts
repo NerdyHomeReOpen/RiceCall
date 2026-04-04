@@ -430,6 +430,7 @@ export type StoreType = {
   updateCheckInterval: number;
   updateChannel: string;
   env: 'prod' | 'dev';
+  token: string;
 };
 
 export type SFUCreateTransportParams = {

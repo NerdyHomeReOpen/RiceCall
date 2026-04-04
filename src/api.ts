@@ -1,6 +1,8 @@
-import { getEnv } from '@/env';
-import { getToken } from '@/token';
 import Logger from '@/logger';
+
+import { getEnv } from '@/env';
+
+import { getToken } from '@/token';
 
 type RequestOptions = {
   headers?: Record<string, string>;

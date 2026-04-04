@@ -3,9 +3,9 @@
  * Used to share authentication tokens between services without depending on Electron's main.ts.
  */
 
-let _token: string = '';
+let _token: string | null = null;
 
-export function getToken(): string {
+export function getToken(): string | null {
   return _token;
 }
 
@@ -14,5 +14,5 @@ export function setToken(token: string): void {
 }
 
 export function removeToken(): void {
-  _token = '';
+  _token = null;
 }

@@ -1,8 +1,8 @@
 import { Node } from '@tiptap/core';
 
-import { EMOJIS } from '@/emojis';
+import { EMOJIS } from '@/constants';
 
-import markdownStyles from '@/styles/markdown.module.css';
+import markdownStyles from '@/styles/Markdown.module.css';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {

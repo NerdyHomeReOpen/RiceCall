@@ -4,16 +4,34 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/ipc';
+import ipc from '@/main/ipc';
+
+import AuthHeader from '@/components/AuthHeader';
 
 import LoginPage from '@/pages/Login';
 import RegisterPage from '@/pages/Register';
 import ChangeServerPage from '@/pages/ChangeServer';
 
-import headerStyles from '@/styles/header.module.css';
-
-const Header: React.FC = React.memo(() => {
+const AuthPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
+
+  const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
+
+  const isDisplayLoginPage = section === 'login';
+  const isDisplayRegisterPage = section === 'register';
+  const isDisplayChangeServerPage = section === 'change-server';
+
+  const handleBackToLoginBtnClick = () => {
+    setSection('login');
+  };
+
+  const handleRegisterBtnClick = () => {
+    setSection('register');
+  };
+
+  const handleChangeServerBtnClick = () => {
+    setSection('change-server');
+  };
 
   const handleMinimizeBtnClick = () => {
     ipc.window.minimize();
@@ -42,54 +60,8 @@ const Header: React.FC = React.memo(() => {
   }, [t]);
 
   return (
-    <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
-      <div className={headerStyles['title-box']}>
-        <div className={headerStyles['app-icon']} />
-      </div>
-      <div className={headerStyles['buttons']}>
-        <div className={headerStyles['minimize']} onClick={handleMinimizeBtnClick} />
-        <div className={headerStyles['close']} onClick={handleCloseBtnClick} />
-      </div>
-    </header>
-  );
-});
-
-Header.displayName = 'Header';
-
-const AuthPageComponent: React.FC = React.memo(() => {
-  const { t } = useTranslation();
-
-  const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
-
-  const isDisplayLoginPage = section === 'login';
-  const isDisplayRegisterPage = section === 'register';
-  const isDisplayChangeServerPage = section === 'change-server';
-
-  const handleBackToLoginBtnClick = () => {
-    setSection('login');
-  };
-
-  const handleRegisterBtnClick = () => {
-    setSection('register');
-  };
-
-  const handleChangeServerBtnClick = () => {
-    setSection('change-server');
-  };
-
-  useEffect(() => {
-    const autoLogin = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      await ipc.auth.autoLogin(token);
-    };
-    autoLogin();
-  }, [t]);
-
-  return (
     <>
-      <Header />
+      <AuthHeader onMinimize={handleMinimizeBtnClick} onClose={handleCloseBtnClick} />
       <LoginPage display={isDisplayLoginPage} onRegisterBtnClick={handleRegisterBtnClick} onChangeServerBtnClick={handleChangeServerBtnClick} />
       <RegisterPage display={isDisplayRegisterPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
       <ChangeServerPage display={isDisplayChangeServerPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />

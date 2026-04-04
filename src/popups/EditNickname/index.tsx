@@ -1,0 +1,69 @@
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import ipc from '@/main/ipc';
+
+import type * as Types from '@/types';
+
+import * as Actions from '@/action';
+
+import popupStyles from '@/styles/Popup.module.css';
+
+interface EditNicknamePopupProps {
+  id: string;
+  serverId: Types.Server['serverId'];
+  member: Types.Member;
+}
+
+const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, serverId, member }) => {
+  const { t } = useTranslation();
+
+  const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
+
+  const handleConfirmBtnClick = () => {
+    Actions.editMember(member.userId, serverId, { nickname: memberNickname || null });
+    ipc.popup.close(id);
+  };
+
+  const handleApplyBtnClick = () => {
+    Actions.editMember(member.userId, serverId, { nickname: memberNickname || null });
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
+  };
+
+  return (
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={`${popupStyles['dialog-content']} ${popupStyles['col']}`}>
+          <div className={popupStyles['input-box']}>
+            <div className={popupStyles['label']} style={{ minWidth: '2rem' }}>
+              {t('nickname')}:
+            </div>
+            <div className={popupStyles['label']}>{member.name}</div>
+          </div>
+          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className={popupStyles['label']}>{t('please-enter-the-member-nickname')}</div>
+            <input name="nickname" type="text" value={memberNickname} maxLength={32} onChange={(e) => setMemberNickname(e.target.value)} />
+          </div>
+        </div>
+      </div>
+      <div className={popupStyles['popup-footer']}>
+        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
+          {t('confirm')}
+        </div>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+          {t('cancel')}
+        </div>
+        <div className={popupStyles['button']} onClick={handleApplyBtnClick}>
+          {t('apply')}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+EditNicknamePopup.displayName = 'EditNicknamePopup';
+
+export default EditNicknamePopup;

@@ -1,6 +1,13 @@
 import { TFunction } from 'i18next';
+
 import i18n from '@/i18n';
 
+/**
+ * Get the translated text for a permission level
+ * @param t - The translation function
+ * @param permission - The permission level
+ * @returns The translated text for the permission level
+ */
 export function getPermissionText(t: TFunction<'translation', undefined>, permission: number): string {
   const permissionMap: Record<number, string> = {
     1: t('guest'),
@@ -15,6 +22,12 @@ export function getPermissionText(t: TFunction<'translation', undefined>, permis
   return permissionMap[permission] || t('unknown-user');
 }
 
+/**
+ * Get the formatted time difference
+ * @param t - The translation function
+ * @param timestamp - The timestamp
+ * @returns The formatted time difference
+ */
 export function getFormatTimeDiff(t: TFunction<'translation', undefined>, timestamp: number): string {
   const now = Date.now();
   const diff = Math.floor((timestamp - now) / 1000);
@@ -46,6 +59,12 @@ export function getFormatTimeDiff(t: TFunction<'translation', undefined>, timest
   return t('just-now');
 }
 
+/**
+ * Get the formatted date
+ * @param timestamp - The timestamp
+ * @param type - The type of date to format
+ * @returns The formatted date
+ */
 export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't' | 'all'): string {
   const date = new Date(timestamp);
   const year = date.getFullYear();
@@ -64,6 +83,11 @@ export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't'
   }
 }
 
+/**
+ * Get the formatted time from seconds
+ * @param seconds - The seconds
+ * @returns The formatted time
+ */
 export function getFormatTimeFromSecond(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -72,6 +96,12 @@ export function getFormatTimeFromSecond(seconds: number): string {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
+/**
+ * Get the formatted timestamp
+ * @param t - The translation function
+ * @param timestamp - The timestamp
+ * @returns The formatted timestamp
+ */
 export function getFormatTimestamp(t: TFunction<'translation', undefined>, timestamp: number): string {
   const timezoneLang = i18n.language;
   const now = new Date();

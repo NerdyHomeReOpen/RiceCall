@@ -1,7 +1,7 @@
 import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import homeStyles from '@/styles/home.module.css';
+import homeStyles from '@/styles/Home.module.css';
 
 interface LoadingContextType {
   getIsLoading: () => boolean;

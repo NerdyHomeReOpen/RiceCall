@@ -1,7 +1,7 @@
-import { EMOJIS } from '@/emojis';
+import { EMOJIS } from '@/constants';
 
-import markdownStyles from '@/styles/markdown.module.css';
-import permissionStyles from '@/styles/permission.module.css';
+import markdownStyles from '@/styles/Markdown.module.css';
+import permissionStyles from '@/styles/Permission.module.css';
 
 /* ---------- forward  ---------- */
 const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g; // :code:
@@ -19,6 +19,11 @@ const twitchBackRegex = /<iframe[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const kickBackRegex = /<iframe[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const pTagRegex = /<p><\/p>/g;
 
+/**
+ * Escape HTML characters
+ * @param str - The string to escape
+ * @returns The escaped string
+ */
 export function escapeHtml(str: unknown): string {
   if (typeof str !== 'string') return str as string;
   return str
@@ -28,6 +33,11 @@ export function escapeHtml(str: unknown): string {
     .replace(/(^|\n)&gt;\s/g, '$1> ');
 }
 
+/**
+ * Convert tags to HTML
+ * @param raw - The raw string
+ * @returns The HTML string
+ */
 export function fromTags(raw: string) {
   return raw
     .replace(emojiRegex, (_, code) => {
@@ -53,6 +63,11 @@ export function fromTags(raw: string) {
     });
 }
 
+/**
+ * Convert HTML to tags
+ * @param raw - The HTML string
+ * @returns The tags string
+ */
 export function toTags(raw: string) {
   return raw
     .replace(emojiBackRegex, (_: string, code: string) => {

@@ -1,0 +1,103 @@
+.main-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  max-width: 200px;
+  height: 30px;
+  padding: 0 13px;
+  overflow: hidden;
+  font-size: 1.06rem;
+  white-space: nowrap;
+}
+
+.main-tab::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  min-width: 10px;
+  min-height: 31px;
+  content: '';
+  background-image: url('/tab_item_mainframe.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.main-tab::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  min-width: 10px;
+  min-height: 31px;
+  content: '';
+  background-image: url('/tab_item_mainframe.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.main-tab-close {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12px;
+  min-height: 12px;
+  cursor: pointer;
+  background-color: rgb(55 144 206);
+  border-radius: 50%;
+  box-shadow: 0 0 2px rgb(255 255 255 / 35%);
+}
+
+.main-tab-close:hover {
+  background-position: -15px 0;
+}
+
+.main-tab-close:active {
+  background-position: -30px 0;
+}
+
+.main-tab .main-tab-bg {
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  width: calc(100% - 20px);
+  height: 30px;
+  overflow: hidden;
+}
+
+.main-tab.selected::before {
+  content: '';
+  background-position: 0 -32px;
+}
+
+.main-tab.selected::after {
+  content: '';
+  background-position: -11px -32px;
+}
+
+.main-tab.selected .main-tab-bg {
+  background-color: var(--background);
+}
+
+.main-tab .main-tab-label {
+  z-index: 1;
+  width: 100%;
+  margin: 0 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--secondary-color);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.main-tab.selected .main-tab-label {
+  color: var(--main-color);
+}
+
+.main-tab.selected .main-tab-close {
+  color: var(--main-color);
+}

@@ -1,7 +1,7 @@
 import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
 
-import styles from '@/styles/imageViewer.module.css';
+import styles from '@/styles/ImageViewer.module.css';
 
 type ImageViewerContextType = {
   selectImage: (image: string) => void;

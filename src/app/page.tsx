@@ -1,288 +1,29 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState, useMemo } from 'react';
+import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/ipc';
-
-import * as Action from '@/action';
-
 import type * as Types from '@/types';
 
-import { useAppSelector } from '@/store/hook';
+import ipc from '@/main/ipc';
 
+import WebRTCProvider from '@/providers/WebRTC';
+import ActionScannerProvider from '@/providers/ActionScanner';
+import ExpandedProvider from '@/providers/FindMe';
+import { useLoading } from '@/providers/Loading';
+
+import { useAppSelector } from '@/hooks/Store';
+
+import Header from '@/components/Header';
 import SocketManager from '@/components/SocketManager';
-import LoadingSpinner from '@/components/common/LoadingSpinner';
+import LoadingSpinner from '@/components/LoadingSpinner';
 import NotificationToaster from '@/components/NotificationToaster';
 
 import FriendPage from '@/pages/Friend';
 import HomePage from '@/pages/Home';
 import ServerPage from '@/pages/Server';
-
-import WebRTCProvider from '@/providers/WebRTC';
-import ActionScannerProvider from '@/providers/ActionScanner';
-import ExpandedProvider from '@/providers/FindMe';
-import { useContextMenu } from '@/providers/ContextMenu';
-import { useLoading } from '@/providers/Loading';
-import { useActionScanner } from '@/providers/ActionScanner';
-
-import { useHeaderContextMenu } from '@/hooks/ctxMenus/headerCtxMenu';
-
-import { isRenderer } from '@/utils/platform';
-
-import headerStyles from '@/styles/header.module.css';
-
-type Tab = {
-  id: 'home' | 'friends' | 'server';
-  label: string;
-};
-
-interface HeaderProps {
-  selectedTab: 'home' | 'friends' | 'server';
-  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
-}
-
-const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) => {
-  const { t, i18n } = useTranslation();
-  const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
-  const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
-
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      name: state.user.data.name,
-      status: state.user.data.status,
-      currentServerId: state.currentServer.data.serverId,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      name: state.currentServer.data.name,
-    }),
-    shallowEqual,
-  );
-
-  const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
-  const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
-  const systemNotifications = useAppSelector((state) => state.systemNotifications.data, shallowEqual);
-
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  const safeFriendApplications = friendApplications ?? [];
-  const safeMemberInvitations = memberInvitations ?? [];
-  const safeSystemNotifications = systemNotifications ?? [];
-  const hasNotification = !!safeFriendApplications.length || !!safeMemberInvitations.length || !!safeSystemNotifications.length;
-  const hasFriendApplication = !!safeFriendApplications.length;
-  const hasMemberInvitation = !!safeMemberInvitations.length;
-  const hasSystemNotification = !!safeSystemNotifications.length;
-
-  const mainTabs: Tab[] = useMemo(
-    () => [
-      { id: 'home', label: t('home') },
-      { id: 'friends', label: t('friends') },
-      { id: 'server', label: currentServer.name },
-    ],
-    [currentServer.name, t],
-  );
-
-  const logout = () => {
-    ipc.auth.logout();
-  };
-
-  const exit = () => {
-    ipc.exit();
-  };
-
-  const changeLanguage = (language: Types.LanguageKey) => {
-    ipc.language.set(language);
-    i18n.changeLanguage(language);
-  };
-
-  const { buildContextMenu: buildHeaderContextMenu } = useHeaderContextMenu({
-    user,
-    onChangeLanguage: changeLanguage,
-    onLogout: logout,
-    onExit: exit,
-  });
-
-  // TODO: Make a NotificationMenuBuilder
-  const buildNotificationMenuItems = () => [
-    {
-      id: 'no-unread-notify',
-      label: t('no-unread-notify'),
-      show: !hasNotification,
-      className: 'readonly',
-    },
-    {
-      id: 'friend-verification',
-      label: t('friend-verification'),
-      icon: 'notification',
-      show: hasFriendApplication,
-      contentType: 'image',
-      showContentLength: true,
-      showContent: true,
-      contents: safeFriendApplications.map((fa) => fa.avatarUrl),
-      onClick: () => Action.openFriendVerification(user.userId),
-    },
-    {
-      id: 'member-invitation',
-      label: t('member-invitation'),
-      icon: 'notification',
-      show: hasMemberInvitation,
-      contentType: 'image',
-      showContentLength: true,
-      showContent: true,
-      contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
-      onClick: () => Action.openMemberInvitation(user.userId),
-    },
-    {
-      id: 'system-notify',
-      label: t('system-notify'),
-      icon: 'notification',
-      show: hasSystemNotification,
-      showContentLength: true,
-      showContent: false,
-      contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => { },
-    },
-  ];
-
-  const handleMaximizeBtnClick = () => {
-    if (isFullscreen) return;
-    ipc.window.maximize();
-  };
-
-  const handleUnmaximizeBtnClick = () => {
-    if (!isFullscreen) return;
-    ipc.window.unmaximize();
-  };
-
-  const handleMinimizeBtnClick = () => {
-    ipc.window.minimize();
-  };
-
-  const handleCloseBtnClick = () => {
-    const isCloseToTray = ipc.systemSettings.closeToTray.get();
-    if (isCloseToTray) ipc.window.close();
-    else ipc.exit();
-  };
-
-  const handleStatusDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showStatusDropdown(x, y, 'right-bottom', (status) => {
-      setIsManualIdling(status !== 'online');
-      Action.editUserStatus(status);
-    });
-  };
-
-  const handleMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showContextMenu(x + 50, y, 'left-bottom', buildHeaderContextMenu());
-  };
-
-  const handleNotificationMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
-    e.preventDefault();
-    e.stopPropagation();
-    const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showNotificationMenu(x, y, 'right-bottom', buildNotificationMenuItems());
-  };
-
-  const handleNameClick = () => {
-    Action.openUserInfo(user.userId, user.userId);
-  };
-
-  const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
-    onTabSelect(tabId);
-  };
-
-  useEffect(() => {
-    const next = isIdling ? 'idle' : 'online';
-    if (user.status !== next && !isManualIdling) {
-      Action.editUserStatus(next);
-    }
-  }, [isIdling, isManualIdling, user.status]);
-
-  useEffect(() => {
-    const unsubs = [ipc.window.onMaximize(() => setIsFullscreen(true)), ipc.window.onUnmaximize(() => setIsFullscreen(false))];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, []);
-
-  return (
-    <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
-      <div className={headerStyles['title-box']}>
-        <div className={headerStyles['name-box']} onClick={handleNameClick}>
-          {user.name}
-        </div>
-        <div className={headerStyles['status-box']} onClick={handleStatusDropdownClick}>
-          <div className={headerStyles['status-display']} datatype={user.status} />
-          <div className={headerStyles['status-triangle']} />
-        </div>
-      </div>
-      <div className={headerStyles['main-tabs']}>
-        {mainTabs.map((tab) => (
-          <TabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
-        ))}
-      </div>
-      <div className={headerStyles['buttons']}>
-        <div className={headerStyles['gift']} />
-        <div className={headerStyles['game']} />
-        <div className={headerStyles['notice']} onClick={handleNotificationMenuClick}>
-          <div className={`${headerStyles['overlay']} ${hasNotification && headerStyles['new']}`} />
-        </div>
-        <div className={headerStyles['spliter']} />
-        <div className={headerStyles['menu']} onClick={handleMenuClick} />
-        <div className={headerStyles['minimize']} onClick={handleMinimizeBtnClick} />
-        {isFullscreen ? <div className={headerStyles['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyles['maxsize']} onClick={handleMaximizeBtnClick} />}
-        <div className={headerStyles['close']} onClick={handleCloseBtnClick} />
-      </div>
-    </header>
-  );
-});
-
-Header.displayName = 'Header';
-
-interface TabItemProps {
-  tab: Tab;
-  currentServerId: string | null;
-  isSelected: boolean;
-  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
-}
-
-const TabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: TabItemProps) => {
-  const handleTabClick = () => {
-    onTabSelect(tab.id);
-  };
-
-  const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
-    e.stopPropagation();
-    if (!currentServerId) return;
-    Action.leaveServer(currentServerId);
-  };
-
-  if (tab.id === 'server' && !currentServerId) return null;
-  return (
-    <div key={`tabs-${tab.id}`} data-tab-id={tab.id} className={`${headerStyles['tab']} ${isSelected ? headerStyles['selected'] : ''}`} onClick={handleTabClick}>
-      <div className={headerStyles['tab-lable']}>{tab.label}</div>
-      <div className={headerStyles['tab-bg']} />
-      {tab.id === 'server' && (
-        <svg className={`${headerStyles['tab-close']} themeTabClose`} onClick={handleCloseButtonClick} xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="12" fill="var(--main-color, rgb(55 144 206))" />
-          <path d="M17 7L7 17M7 7l10 10" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" />
-        </svg>
-      )}
-    </div>
-  );
-});
-
-TabItem.displayName = 'TabItem';
 
 const RootPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -320,13 +61,6 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     ipc.tray.title.set(user.name);
   }, [user.name]);
-
-  // Web-mode: establish socket.io connection directly (Electron does this in main process).
-  useEffect(() => {
-    const token = localStorage.getItem('token') || '';
-    if (isRenderer()) return;
-    ipc.auth.autoLogin(token);
-  }, []);
 
   useEffect(() => {
     if (user.currentServerId) setSelectedTab('server');

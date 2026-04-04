@@ -1,6 +1,6 @@
 import { Node } from '@tiptap/core';
 
-import markdownStyles from '@/styles/markdown.module.css';
+import markdownStyles from '@/styles/Markdown.module.css';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {

@@ -1,0 +1,218 @@
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import ipc from '@/main/ipc';
+
+import popupStyles from '@/styles/Popup.module.css';
+
+interface ImageCropperPopupProps {
+  id: string;
+  imageUnit8Array: Uint8Array;
+}
+
+const INITIAL_CROP_SIZE = 200;
+const MIN_CROP_SIZE = 100;
+
+const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageUnit8Array }) => {
+  const { t } = useTranslation();
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const previewRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement>(new Image());
+  const imageInfoRef = useRef({ drawX: 0, drawY: 0, drawWidth: 0, drawHeight: 0 });
+  const startPosRef = useRef({ x: 0, y: 0 });
+
+  const [cropBox, setCropBox] = useState({ x: 100, y: 100, size: INITIAL_CROP_SIZE });
+  const [draggingBox, setDraggingBox] = useState(false);
+
+  const draw = useCallback(() => {
+    const canvas = canvasRef.current;
+    const ctx = canvas?.getContext('2d');
+    if (!canvas || !ctx) return;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
+    ctx.drawImage(imgRef.current, drawX, drawY, drawWidth, drawHeight);
+
+    const { x: cropX, y: cropY, size } = cropBox;
+    ctx.save();
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+    ctx.beginPath();
+    ctx.rect(0, 0, canvas.width, canvas.height);
+    ctx.rect(cropX, cropY, size, size);
+    ctx.fill('evenodd');
+    ctx.restore();
+
+    const previewCanvas = previewRef.current;
+    const previewCtx = previewCanvas?.getContext('2d');
+    if (previewCanvas && previewCtx) {
+      const sx = ((cropX - drawX) / drawWidth) * imgRef.current.width;
+      const sy = ((cropY - drawY) / drawHeight) * imgRef.current.height;
+      const sSize = (cropBox.size / drawWidth) * imgRef.current.width;
+
+      const previewSize = 500;
+      previewCanvas.width = previewSize;
+      previewCanvas.height = previewSize;
+      previewCtx.clearRect(0, 0, previewSize, previewSize);
+
+      previewCtx.imageSmoothingEnabled = true;
+      previewCtx.imageSmoothingQuality = 'high';
+
+      previewCtx.drawImage(imgRef.current, sx, sy, sSize, sSize, 0, 0, previewSize, previewSize);
+    }
+  }, [cropBox]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const { x: bx, y: by, size } = cropBox;
+    if (x >= bx && x <= bx + size && y >= by && y <= by + size) {
+      setDraggingBox(true);
+      startPosRef.current = { x, y };
+    }
+  };
+
+  const handleMouseUp = () => setDraggingBox(false);
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!draggingBox) return;
+    const rect = canvasRef.current!.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const dx = x - startPosRef.current.x;
+    const dy = y - startPosRef.current.y;
+    const size = cropBox.size;
+    const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
+
+    const newX = Math.min(Math.max(drawX, cropBox.x + dx), drawX + drawWidth - size);
+    const newY = Math.min(Math.max(drawY, cropBox.y + dy), drawY + drawHeight - size);
+
+    setCropBox({ ...cropBox, x: newX, y: newY });
+    startPosRef.current = { x, y };
+  };
+
+  const handleMouseLeave = () => setDraggingBox(false);
+
+  const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
+    const rect = canvasRef.current!.getBoundingClientRect();
+
+    const mouseX = e.clientX - rect.left;
+    const mouseY = e.clientY - rect.top;
+
+    const delta = e.deltaY < 0 ? -10 : 10;
+    const newSize = cropBox.size + delta;
+    const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
+
+    const maxSize = Math.min(drawWidth, drawHeight);
+    const clampedSize = Math.min(maxSize, Math.max(MIN_CROP_SIZE, newSize));
+
+    const relX = (mouseX - cropBox.x) / cropBox.size;
+    const relY = (mouseY - cropBox.y) / cropBox.size;
+
+    let newX = mouseX - relX * clampedSize;
+    let newY = mouseY - relY * clampedSize;
+
+    newX = Math.min(drawX + drawWidth - clampedSize, Math.max(drawX, newX));
+    newY = Math.min(drawY + drawHeight - clampedSize, Math.max(drawY, newY));
+
+    setCropBox({ x: newX, y: newY, size: clampedSize });
+  };
+
+  const handleUploadBtnClick = async () => {
+    const canvas = previewRef.current;
+    if (!canvas) return;
+
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      const arrayBuffer = await blob.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+      ipc.popup.submit(id, uint8Array);
+      ipc.popup.close(id);
+    }, 'image/webp');
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
+  };
+
+  useEffect(() => {
+    const blob = new Blob([imageUnit8Array]);
+    const imageUrl = URL.createObjectURL(blob);
+    imgRef.current.src = imageUrl;
+    imgRef.current.onload = () => {
+      const canvas = canvasRef.current;
+      if (!canvas) return;
+      const scale = Math.min(canvas.width / imgRef.current.width, canvas.height / imgRef.current.height);
+      const drawWidth = imgRef.current.width * scale;
+      const drawHeight = imgRef.current.height * scale;
+      const drawX = (canvas.width - drawWidth) / 2;
+      const drawY = (canvas.height - drawHeight) / 2;
+      imageInfoRef.current = { drawX, drawY, drawWidth, drawHeight };
+      const borderSize = 20;
+      const maxCropSize = Math.max(borderSize, Math.min(drawWidth, drawHeight) - borderSize);
+      const cropX = drawX + (drawWidth - maxCropSize) / 2;
+      const cropY = drawY + (drawHeight - maxCropSize) / 2;
+      setCropBox({ x: cropX, y: cropY, size: maxCropSize });
+    };
+  }, [imageUnit8Array]);
+
+  useEffect(() => {
+    draw();
+  }, [cropBox, draw]);
+
+  return (
+    <div className={popupStyles['popup-wrapper']}>
+      <div className={popupStyles['popup-body']}>
+        <div className={`${popupStyles['content']} ${popupStyles['row']}`} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+          <canvas
+            ref={canvasRef}
+            width={400}
+            height={400}
+            style={{ border: '1px solid #000' }}
+            onMouseDown={handleMouseDown}
+            onMouseMove={handleMouseMove}
+            onMouseUp={handleMouseUp}
+            onMouseLeave={handleMouseLeave}
+            onWheel={handleWheel}
+          />
+          <div className={popupStyles['col']}>
+            <div
+              className={`${popupStyles['input-box']} ${popupStyles['col']}`}
+              style={{
+                width: '150px',
+                height: '150px',
+                boxShadow: '0 1px 1px #00000080',
+                padding: '5px',
+                border: '1px solid #888',
+                borderRadius: '12px',
+              }}
+            >
+              <canvas
+                ref={previewRef}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  border: '1px solid #888',
+                  borderRadius: '8px',
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className={popupStyles['popup-footer']}>
+        <div className={`${popupStyles['button']}`} onClick={handleUploadBtnClick}>
+          {t('upload')}
+        </div>
+        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+          {t('close')}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+ImageCropperPopup.displayName = 'ImageCropperPopup';
+
+export default ImageCropperPopup;

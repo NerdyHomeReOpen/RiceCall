@@ -204,9 +204,10 @@ button {
 
 *:disabled,
 .disabled {
-  color: #c5c5c5 !important;
+  color: var(--text-color-senary) !important;
   pointer-events: none !important;
   filter: grayscale(100%) !important;
+  cursor: not-allowed !important;
 }
 
 *[datatype='read-only'] {
