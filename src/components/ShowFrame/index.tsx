@@ -7,8 +7,6 @@ import { SHOW_FRAME_ORIGIN } from '@/constants';
 
 import { useAppSelector } from '@/hooks/Store';
 
-import styles from '@/pages/Server/Server.module.css';
-
 const ShowFrame: React.FC = React.memo(() => {
   const showFrameRef = useRef<HTMLIFrameElement>(null);
   const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Types.Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
@@ -52,7 +50,7 @@ const ShowFrame: React.FC = React.memo(() => {
     updateShowFrameState(user.userId, anchorId, currentChannel.voiceMode);
   }, [user.userId, queueUsers, currentChannel.voiceMode, updateShowFrameState]);
 
-  return <iframe ref={showFrameRef} className={styles['rcshow-area']} id="showFrame" src={SHOW_FRAME_ORIGIN} height="100%" width="100%" onLoad={handleShowFrameLoad} />;
+  return <iframe ref={showFrameRef} id="showFrame" src={SHOW_FRAME_ORIGIN} height="100%" width="100%" onLoad={handleShowFrameLoad} />;
 });
 
 ShowFrame.displayName = 'ShowFrame';

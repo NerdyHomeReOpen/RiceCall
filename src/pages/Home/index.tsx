@@ -13,7 +13,7 @@ import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constants';
 import { useAppSelector } from '@/hooks/Store';
 
 import ServerList from '@/components/ServerList';
-import ServerSearchBar from '@/components/ServerSeachBar';
+import ServerSearchBar from '@/components/ServerSearchBar';
 import MarkdownContent from '@/components/MarkdownContent';
 import RecommendServerCard from '@/components/RecommendServerCard';
 

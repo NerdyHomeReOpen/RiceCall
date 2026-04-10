@@ -12,7 +12,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import SearchResultItem from './SearchResultItem';
 
-import styles from '@/pages/Home/Home.module.css';
+import styles from './ServerSearchBar.module.css';
 
 const ServerSearchBar: React.FC = () => {
   const { t } = useTranslation();
@@ -147,21 +147,21 @@ const ServerSearchBar: React.FC = () => {
   }, [user.userId, selectServer]);
 
   return (
-    <div className={styles['search-bar']} ref={searchRef}>
+    <div className={styles['server-search-bar']} ref={searchRef}>
       <input
         ref={inputRef}
         placeholder={t('search-server-placeholder')}
-        className={styles['search-input']}
+        className={styles['server-search-input']}
         onFocus={handleSearchInputFocus}
         onChange={handleSearchInputChange}
         onKeyDown={handleSearchInputKeyDown}
       />
-      <div className={styles['search-input-clear-btn']} onClick={handleClearSearchInputBtnClick} style={hasInput ? {} : { display: 'none' }} />
-      <div className={styles['search-input-icon']} style={hasInput ? {} : { display: 'none' }} />
-      <div className={styles['search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
+      <div className={styles['server-search-input-clear-button']} onClick={handleClearSearchInputBtnClick} style={hasInput ? {} : { display: 'none' }} />
+      <div className={styles['server-search-input-icon']} style={hasInput ? {} : { display: 'none' }} />
+      <div className={styles['server-search-dropdown']} style={hasResults ? {} : { display: 'none' }}>
         {exactMatch && (
           <>
-            <div className={`${styles['header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
+            <div className={`${styles['server-search-dropdown-header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
               {t('quick-enter-server', { '0': queryRef.current })}
             </div>
             <SearchResultItem key={exactMatch.serverId} server={exactMatch} onServerSelect={handleServerSelect} />
@@ -169,7 +169,7 @@ const ServerSearchBar: React.FC = () => {
         )}
         {personalResults.length > 0 && (
           <>
-            <div className={styles['header-text']}>{t('personal-exclusive')}</div>
+            <div className={styles['server-search-dropdown-header-text']}>{t('personal-exclusive')}</div>
             {personalResults.map((server) => (
               <SearchResultItem key={server.serverId} server={server} onServerSelect={handleServerSelect} />
             ))}
@@ -177,7 +177,7 @@ const ServerSearchBar: React.FC = () => {
         )}
         {relatedResults.length > 0 && (
           <>
-            <div className={styles['header-text']}>{t('related-search')}</div>
+            <div className={styles['server-search-dropdown-header-text']}>{t('related-search')}</div>
             {relatedResults.map((server) => (
               <SearchResultItem key={server.serverId} server={server} onServerSelect={handleServerSelect} />
             ))}
