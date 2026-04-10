@@ -188,6 +188,22 @@
   background-position: -48px 0;
 }
 
+.setting-overlay {
+  position: absolute;
+  display: inline-block;
+  min-width: 24px;
+  min-height: 24px;
+  cursor: pointer;
+  background-image: url('/icon_notice_overlay.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &.new {
+    background-position: -24px 0;
+  }
+}
+
 .saperator-1 {
   min-width: 2px;
   min-height: 16px;

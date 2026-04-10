@@ -166,8 +166,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
               <div className={styles['invitation-icon']} onClick={handleInviteFriendClick} />
               <div className={styles['saperator-1']} />
               <div className={styles['setting-icon']} onClick={handleServerSettingClick}>
-                {/* <div className={`${header['overlay']} ${hasNewMemberApplications ? header['new'] : ''}`} /> */}
-                {/* TODO: Add new member applications overlay */}
+                <div className={`${styles['setting-overlay']} ${hasNewMemberApplications ? styles['new'] : ''}`} />
               </div>
             </div>
           </div>
