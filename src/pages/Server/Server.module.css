@@ -386,25 +386,6 @@
   background-color: var(--selected);
 }
 
-.queue-position {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--text-color-quaternary);
-  white-space: nowrap;
-}
-
-.queue-seconds-remaining-box {
-  display: flex;
-  align-items: center;
-  padding-right: 3px;
-  padding-left: 3px;
-  margin-left: auto;
-  color: var(--text-color-quaternary);
-  background-color: var(--notification-toaster-background);
-  border: 1px solid var(--notification-toaster-border);
-  border-radius: 3px;
-}
-
 .my-location-icon {
   position: absolute;
   right: 2px;

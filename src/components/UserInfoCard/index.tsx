@@ -77,7 +77,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div className={`${styles['name-text']} ${hasVip && 'vip-name-color'}`}>{member.name}</div>
+                <div className={`${styles['name-text']} ${hasVip ? styles['vip'] : ''}`}>{member.name}</div>
                 <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
               </div>
               <div className={`vip-icon-big vip-${member.vip}`} />

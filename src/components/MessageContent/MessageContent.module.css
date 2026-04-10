@@ -93,6 +93,14 @@
   }
 }
 
+.details .username-text.vip {
+  color: var(--text-vip-name);
+
+  &:hover {
+    color: var(--text-vip-name-hover);
+  }
+}
+
 .details .timestamp-text {
   min-width: fit-content;
   margin-left: 5px;

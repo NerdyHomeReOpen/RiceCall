@@ -17,7 +17,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 import { getDefaultQueueMember } from '@/utils/default';
 import { isChannelMod } from '@/utils/permission';
 
-import styles from '@/pages/Server/Server.module.css';
+import styles from './QueueUserTab.module.css';
 
 interface QueueUserTabProps {
   queueUserId: string;
@@ -124,20 +124,20 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   return (
     <div
-      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['queue-user-tab']} ${isSelected ? styles['selected'] : ''}`}
       onClick={handleTabClick}
       onDoubleClick={handleTabDoubleClick}
       onMouseEnter={handleTabMouseEnter}
       onMouseLeave={handleTabMouseLeave}
       onContextMenu={handleTabContextMenu}
     >
-      <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
+      <div className={`${styles['queue-user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`permission-${queueMember.gender} permission-lv-${queueMember.permissionLevel}`} />
-      <div className={`${styles['user-queue-position']}`}>{queueMember.position + 1}.</div>
+      <div className={`${styles['queue-user-position-text']}`}>{queueMember.position + 1}.</div>
       {hasVip && <div className={`vip-icon vip-${queueMember.vip}`} />}
-      <div className={`${styles['user-tab-name']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? 'vip-name-color' : ''}`}>{queueMember.nickname || queueMember.name}</div>
+      <div className={`${styles['queue-user-tab-name-text']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{queueMember.nickname || queueMember.name}</div>
       <BadgeList badges={JSON.parse(queueMember.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
-      {isOnMic && <div className={styles['queue-seconds-remaining-box']}>{queueMember.leftTime}s</div>}
+      {isOnMic && <div className={styles['queue-user-seconds-remaining-box']}>{queueMember.leftTime}s</div>}
     </div>
   );
 });

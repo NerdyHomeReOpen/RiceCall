@@ -30,6 +30,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
     shallowEqual,
   );
 
+  const hasVip = messageGroup.vip > 0;
   const formattedTimestamp = getFormatTimestamp(t, messageGroup.timestamp);
   const formattedMessageContents = useMemo(
     () =>
@@ -49,7 +50,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   return (
     <div className={styles['message-box']}>
       <div className={styles['details']}>
-        <div className={styles['username-text']} onClick={handleUsernameClick}>
+        <div className={`${styles['username-text']} ${hasVip ? styles['vip'] : ''}`} onClick={handleUsernameClick}>
           {messageGroup.name}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>

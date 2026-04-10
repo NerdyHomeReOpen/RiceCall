@@ -90,7 +90,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       <div className={`${styles['details']}`} onContextMenu={handleMessageContextMenu}>
         {isChannelMod(messageGroup.permissionLevel) && <div className={`permission-${messageGroup.gender} permission-lv-${messageGroup.permissionLevel}`} />}
         {hasVip && <div className={`vip-icon vip-${messageGroup.vip}`} />}
-        <div className={`${styles['username-text']} ${hasVip ? 'vip-name-color' : ''}`} onClick={handleUsernameClick}>
+        <div className={`${styles['username-text']} ${hasVip ? styles['vip'] : ''}`} onClick={handleUsernameClick}>
           {messageGroup.nickname || messageGroup.name}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>

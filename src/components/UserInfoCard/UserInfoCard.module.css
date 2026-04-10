@@ -131,6 +131,10 @@
   white-space: nowrap;
 }
 
+.name-text.vip {
+  color: var(--text-vip-name);
+}
+
 .vip-boost-text {
   color: var(--text-warning);
 }

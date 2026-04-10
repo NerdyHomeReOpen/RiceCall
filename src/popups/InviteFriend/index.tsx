@@ -78,18 +78,17 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
             <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
           </div>
         </div>
-        <div className={`${styles['confirm-button']} ${selectedUserIds.length === 0 ? styles['disabled'] : ''}`} onClick={handleInviteFriendBtnClick}>
+        <div className={`button ${selectedUserIds.length === 0 ? 'disabled' : ''}`} onClick={handleInviteFriendBtnClick}>
           {t('invite')}
         </div>
       </div>
       <div className="popup-body">
         <div className={styles['friend-group-list']}>
-          <div className="row space-between">
+          <div className="row">
             <div className={styles['checkbox']}>
               <input type="checkbox" checked={isAllSelected} onChange={handleSelectAllChange} />
-              {t('select-all')}
+              {t('select-all')} {t('invite-total-for', { 0: selectedUserIds.length })}
             </div>
-            {t('invite-total-for', { 0: selectedUserIds.length })}
           </div>
           <div className={styles['scroll-view']}>
             {sortedFriendGroups.map((friendGroup) => (
@@ -139,13 +138,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, fri
     <>
       <div className={`${styles['friend-group-tab']}`}>
         <input type="checkbox" checked={isAllSelected} onChange={handleSelectAllChange} />
-        <div className={`${styles['friend-group-details']} ${selectedUserIdSet.has(friendGroup.friendGroupId) ? styles['selected'] : ''}`} onClick={handleTabClick}>
-          <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
-          <div className={styles['tab-label']}>{friendGroup.name}</div>
-          <div className={styles['tab-count']}>{`(${friendGroupFriends.length})`}</div>
+        <div className={`${styles['friend-group-tab-details']} ${selectedUserIdSet.has(friendGroup.friendGroupId) ? styles['selected'] : ''}`} onClick={handleTabClick}>
+          <div className={`${styles['friend-group-tab-toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
+          <div className={styles['friend-group-tab-label']}>{friendGroup.name}</div>
+          <div className={styles['friend-group-tab-count-text']}>{`(${friendGroupFriends.length})`}</div>
         </div>
       </div>
-      <div className={styles['tab-content']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className={styles['friend-group-tab-content']} style={isExpanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
           <FriendTab key={friend.targetId} friend={friend} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
         ))}
@@ -174,10 +173,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserId
   return (
     <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <input type="checkbox" checked={isSelected} readOnly />
-      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} />
-      <div className={styles['friend-info']}>
+      <div className={styles['friend-tab-avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} />
+      <div className={styles['friend-tab-base-info-box']}>
         {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
-        <div className={`${styles['name-text']} ${hasVip ? 'vip-name-color' : ''}`}>
+        <div className={`${styles['friend-tab-name-text']} ${hasVip ? styles['vip'] : ''}`}>
           {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
         </div>
       </div>

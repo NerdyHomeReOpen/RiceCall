@@ -617,14 +617,6 @@ textarea {
 
 /* Vip */
 
-.vip-name-color {
-  color: var(--text-vip-name) /* #d16059 */ !important;
-}
-
-.vip-name-color.clickable:hover {
-  color: var(--text-vip-name-hover) !important;
-}
-
 .vip-icon {
   min-width: 14px;
   min-height: 14px;

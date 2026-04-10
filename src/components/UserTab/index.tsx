@@ -158,7 +158,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
       {hasVip && <div className={`vip-icon vip-${member.vip}`} />}
-      <div className={`${styles['user-tab-name']} ${member.nickname ? styles['member'] : ''} ${hasVip ? 'vip-name-color' : ''}`}>{member.nickname || member.name}</div>
+      <div className={`${styles['user-tab-name-text']} ${member.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{member.nickname || member.name}</div>
       <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
       <BadgeList badges={JSON.parse(member.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isSelf && <div className={styles['my-location-icon']} />}

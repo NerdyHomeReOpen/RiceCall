@@ -23,6 +23,10 @@
   white-space: nowrap;
 }
 
+.friend-tab-name-text.vip {
+  color: var(--text-vip-name);
+}
+
 .friend-tab-signature-text {
   max-width: 100%;
   min-height: 18px;
