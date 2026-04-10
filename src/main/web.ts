@@ -187,13 +187,14 @@ export * from '@/main/log/web';
 export * from '@/main/network/web';
 export * from '@/main/popup/web';
 export * from '@/main/record/web';
+export * from '@/main/socket/web';
 export * from '@/main/systemSettings/web';
 export * from '@/main/tray/web';
 export * from '@/main/window/web';
 export * from '@/main/tray/web';
 
 function onReady() {
-  const token = localStorage.getItem('token') || '';
+  const token = store.get('token');
   if (!token) return;
   autoLogin(token);
 }
