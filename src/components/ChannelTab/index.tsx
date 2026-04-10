@@ -22,10 +22,9 @@ import styles from './ChannelTab.module.css';
 
 interface ChannelTabProps {
   channel: Types.Channel;
-  sortChannelMembersWithRules?: boolean;
 }
 
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannelMembersWithRules = false }) => {
+const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { setExpandedChannelHandlerRef } = useFindMeContext();
@@ -76,8 +75,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
   const sortedChannelMembers = useMemo(() => {
     const friendIds = new Set(friends.filter((f) => f.relationStatus === 2).map((f) => f.targetId));
     return [...channelMembers].sort((a, b) => {
-      if (!sortChannelMembersWithRules) return b.lastJoinChannelAt - a.lastJoinChannelAt;
-
       if (a.userId === user.userId && b.userId !== user.userId) return -1;
       if (b.userId === user.userId && a.userId !== user.userId) return 1;
 
@@ -87,7 +84,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
 
       return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
     });
-  }, [channelMembers, user, friends, sortChannelMembersWithRules]);
+  }, [channelMembers, user, friends]);
 
   const isInChannel = currentChannel.channelId === channel.channelId;
   const isLobby = currentServer.lobbyId === channel.channelId;

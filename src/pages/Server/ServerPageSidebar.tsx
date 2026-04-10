@@ -199,7 +199,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
       <div className={styles['scroll-view']} onContextMenu={handleChannelListContextMenu}>
         <div className={styles['channel-list']}>
           {isCurrentTab ? (
-            <ChannelTab key={currentChannel.channelId} channel={currentChannel} sortChannelMembersWithRules={true} />
+            <ChannelTab key={currentChannel.channelId} channel={currentChannel} />
           ) : (
             sortedChannels.map((item) => (item.type === 'category' ? <CategoryTab key={item.channelId} category={item} /> : <ChannelTab key={item.channelId} channel={item} />))
           )}

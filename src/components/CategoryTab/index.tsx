@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
@@ -55,6 +55,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     shallowEqual,
   );
 
+  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
@@ -66,6 +67,21 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const categoryMembers = onlineMembers.filter((om) => om.currentChannelId === category.channelId);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
+  const filteredCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
+  const filteredCategoryMembers = useMemo(() => {
+    const friendIds = new Set(friends.filter((f) => f.relationStatus === 2).map((f) => f.targetId));
+    return [...categoryMembers].sort((a, b) => {
+      if (a.userId === user.userId && b.userId !== user.userId) return -1;
+      if (b.userId === user.userId && a.userId !== user.userId) return 1;
+
+      const aIsFriend = friendIds.has(a.userId);
+      const bIsFriend = friendIds.has(b.userId);
+      if (aIsFriend !== bIsFriend) return aIsFriend ? -1 : 1;
+
+      return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
+    });
+  }, [categoryMembers, user, friends]);
+
   const isInChannel = currentChannel.channelId === category.channelId;
   const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannel.channelId);
   const isReceptionLobby = currentServer.receptionLobbyId === category.channelId;
@@ -76,8 +92,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const isDraggable = isChannelMod(permissionLevel) && movableCategoryUserIds.length > 0;
   const isPasswordNeeded = !isChannelMod(permissionLevel) && isPrivateChannel;
   const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel));
-  const filteredCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
-  const filteredCategoryMembers = [...categoryMembers].sort((a, b) => b.lastJoinChannelAt - a.lastJoinChannelAt);
 
   const { buildContextMenu } = useChannelContextMenu({
     user,

@@ -72,3 +72,14 @@
 .user-text-state.muted {
   background-position: 0 0;
 }
+
+.my-location-icon {
+  position: absolute;
+  right: 2px;
+  min-width: 15px;
+  min-height: 15px;
+  cursor: pointer;
+  background-image: url('/mylocation.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+}
