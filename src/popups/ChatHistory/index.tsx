@@ -1,7 +1,6 @@
 import React from 'react';
 
 import styles from './ChatHistory.module.css';
-import friendStyles from '@/pages/Friend/Friend.module.css';
 
 const ChatHistoryPopup: React.FC = React.memo(() => {
   return (
@@ -33,10 +32,10 @@ const ChatHistoryPopup: React.FC = React.memo(() => {
             </div>
           </div>
           <div className={styles['body-box']}>
-            <div className={`${styles['body-left']} ${friendStyles['friend-group-list']}`}>
+            <div className={styles['body-left']}>
               <div className={styles['friend-group-box']}>
-                <div className={`${friendStyles['friend-group-tab']}`}>
-                  <div className={`${friendStyles['toggle-icon']} ${friendStyles['expanded']}`} />
+                <div className={styles['friend-group-tab']}>
+                  <div className={`${styles['friend-group-tab-toggle-icon']} ${styles['expanded']}`} />
                   <div>黑名單</div>
                   <div>(0)</div>
                 </div>
