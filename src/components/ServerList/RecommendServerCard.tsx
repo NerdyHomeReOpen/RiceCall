@@ -13,7 +13,7 @@ import { useRecommendServerContextMenu } from '@/hooks/ContextMenus/RecommendSer
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
-import styles from '@/pages/Home/Home.module.css';
+import styles from './ServerList.module.css';
 
 interface RecommendServerCardProps {
   recommendServer: Types.RecommendServer;
@@ -31,8 +31,6 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
     }),
     shallowEqual,
   );
-
-  const hasOnline = recommendServer.online >= 0;
 
   const joinServer = () => {
     if (getIsLoading() || user.currentServerId === recommendServer.serverId) return;
@@ -55,18 +53,14 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
 
   return (
     <div className={styles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <Image className={styles['server-avatar-picture']} src={recommendServer.avatarUrl} alt={recommendServer.name} width={70} height={70} loading="lazy" draggable="false" />
-      <div className={styles['server-info-text']}>
-        <div className={styles['server-name-text']}>{recommendServer.name}</div>
-        <div className={styles['server-id-box']}>
-          <div className={styles['server-id-text']}>{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>
+      <Image className={styles['server-card-avatar-picture']} src={recommendServer.avatarUrl} alt={recommendServer.name} width={70} height={70} loading="lazy" draggable="false" />
+      <div className={styles['server-card-info-text']}>
+        <div className={styles['server-card-name-text']}>{recommendServer.name}</div>
+        <div className={styles['server-card-id-text']}>{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>
+        <div className={styles['server-card-slogen-text']}>{recommendServer.slogan}</div>
+        <div className={styles['server-card-online-text']}>
+          {t('online')}: {recommendServer.online}
         </div>
-        <div className={styles['server-slogen']}>{recommendServer.slogan}</div>
-        {hasOnline && (
-          <div className={styles['server-online']}>
-            {t('online')}: {recommendServer.online}
-          </div>
-        )}
       </div>
     </div>
   );

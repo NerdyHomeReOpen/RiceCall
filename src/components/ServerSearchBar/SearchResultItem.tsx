@@ -3,7 +3,7 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
-import styles from './ServerSeachBar.module.css';
+import styles from './ServerSearchBar.module.css';
 
 interface SearchResultItemProps {
   server: Types.Server;

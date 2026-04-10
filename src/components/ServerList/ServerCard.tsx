@@ -13,7 +13,7 @@ import { useServerCardContextMenu } from '@/hooks/ContextMenus/ServerCard';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
-import styles from '@/pages/Home/Home.module.css';
+import styles from './ServerList.module.css';
 
 interface ServerCardProps {
   server: Types.Server;
@@ -54,13 +54,11 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
 
   return (
     <div className={styles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <Image className={styles['server-avatar-picture']} src={server.avatarUrl} alt={server.name} width={70} height={70} loading="lazy" draggable="false" />
-      <div className={styles['server-info-text']}>
-        <div className={styles['server-name-text']}>{server.name}</div>
-        <div className={styles['server-id-box']}>
-          <div className={`${styles['server-id-text']} ${isOwned ? styles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
-        </div>
-        <div className={styles['server-slogen']}>{server.slogan}</div>
+      <Image className={styles['server-card-avatar-picture']} src={server.avatarUrl} alt={server.name} width={70} height={70} loading="lazy" draggable="false" />
+      <div className={styles['server-card-info-text']}>
+        <div className={styles['server-card-name-text']}>{server.name}</div>
+        <div className={`${styles['server-card-id-text']} ${isOwned ? styles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
+        <div className={styles['server-card-slogen-text']}>{server.slogan}</div>
       </div>
     </div>
   );

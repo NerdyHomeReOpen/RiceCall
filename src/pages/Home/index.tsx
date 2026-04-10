@@ -15,7 +15,6 @@ import { useAppSelector } from '@/hooks/Store';
 import ServerList from '@/components/ServerList';
 import ServerSearchBar from '@/components/ServerSearchBar';
 import MarkdownContent from '@/components/MarkdownContent';
-import RecommendServerCard from '@/components/RecommendServerCard';
 
 import { getFormatDate } from '@/utils/language';
 
@@ -162,24 +161,10 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
           </div>
         </div>
         <div className={styles['home-wrapper']}>
-          <div className={styles['server-list-title']}>{t('recommend-server')}</div>
-          <section className={styles['servers-container']}>
-            <div className={styles['server-list']}>
-              {filteredRecommendServers.map((server) => (
-                <RecommendServerCard key={server.serverId} recommendServer={server} />
-              ))}
-            </div>
-          </section>
+          <ServerList title={t('recommend-server')} servers={filteredRecommendServers} />
         </div>
         <div className={styles['home-wrapper']}>
-          <div className={styles['server-list-title']}>{t('official-server')}</div>
-          <section className={styles['servers-container']}>
-            <div className={styles['server-list']}>
-              {filteredOfficialServers.map((server) => (
-                <RecommendServerCard key={server.serverId} recommendServer={server} />
-              ))}
-            </div>
-          </section>
+          <ServerList title={t('official-server')} servers={filteredOfficialServers} />
         </div>
       </main>
       <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>

@@ -3,13 +3,14 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import ServerCard from '@/components/ServerCard';
+import ServerCard from './ServerCard';
+import RecommendServerCard from './RecommendServerCard';
 
-import styles from '@/pages/Home/Home.module.css';
+import styles from './ServerList.module.css';
 
 interface ServerListProps {
   title: string;
-  servers: Types.Server[];
+  servers: (Types.Server | Types.RecommendServer)[];
 }
 
 const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) => {
@@ -27,18 +28,16 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) =>
   return (
     <>
       <div className={styles['server-list-title']}>{title}</div>
-      <div className={styles['servers-container']}>
+      <div className={styles['server-list-container']}>
         <div className={styles['server-list']}>
-          {displayedServers.map((server) => (
-            <ServerCard key={server.serverId} server={server} />
-          ))}
+          {displayedServers.map((server) => ('online' in server ? <RecommendServerCard key={server.serverId} recommendServer={server} /> : <ServerCard key={server.serverId} server={server} />))}
         </div>
         {!canExpand ? null : expanded ? (
-          <div className={`${styles['view-more-btn']} ${styles['more-icon']}`} onClick={handleExpandBtnClick}>
+          <div className={styles['view-less-button']} onClick={handleExpandBtnClick}>
             {t('view-less')}
           </div>
         ) : (
-          <div className={`${styles['view-more-btn']} ${styles['less-icon']}`} onClick={handleExpandBtnClick}>
+          <div className={styles['view-more-button']} onClick={handleExpandBtnClick}>
             {t('view-more')}
           </div>
         )}
