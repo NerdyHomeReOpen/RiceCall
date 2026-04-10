@@ -18,7 +18,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { isChannelMod, isMember, isServerAdmin } from '@/utils/permission';
 
-import styles from '@/pages/Server/Server.module.css';
+import styles from './ChannelTab.module.css';
 
 interface ChannelTabProps {
   channel: Types.Channel;
@@ -171,12 +171,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, sortChannel
         onDrop={handleTabDrop}
         onContextMenu={handleTabContextMenu}
       >
-        <div className={`${styles['tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channel.visibility]}`} onClick={handleTabExpandedClick} />
+        <div className={`${styles['channel-tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channel.visibility]}`} onClick={handleTabExpandedClick} />
         <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{isLobby ? t(`lobby`) : channel.name}</div>
-        {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
+        {!isReadonlyChannel && <div className={styles['channel-tab-user-count-text']}>{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
         {isInChannel && !isExpanded && <div className={styles['my-location-icon']} />}
       </div>
-      <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className={styles['channel-tab-user-list']} style={isExpanded ? {} : { display: 'none' }}>
         {sortedChannelMembers.map((member) => (
           <UserTab key={member.userId} member={member} channel={channel} canJoin={canJoin} isPasswordNeeded={isPasswordNeeded} />
         ))}

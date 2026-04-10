@@ -18,7 +18,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { isMember, isChannelMod, isServerAdmin } from '@/utils/permission';
 
-import styles from '@/pages/Server/Server.module.css';
+import styles from './CategoryTab.module.css';
 
 interface CategoryTabProps {
   category: Types.Category;
@@ -151,17 +151,17 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
         onDrop={handleTabDrop}
         onContextMenu={handleTabContextMenu}
       >
-        <div className={`${styles['tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]}`} onClick={handleTabExpandedClick} />
+        <div className={`${styles['channel-tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]}`} onClick={handleTabExpandedClick} />
         <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{category.name}</div>
-        {!isReadonlyChannel && <div className={styles['channel-user-count-text']}>{`(${categoryMembers.length}${category.userLimit > 0 ? `/${category.userLimit}` : ''})`}</div>}
+        {!isReadonlyChannel && <div className={styles['channel-tab-user-count-text']}>{`(${categoryMembers.length}${category.userLimit > 0 ? `/${category.userLimit}` : ''})`}</div>}
         {!isExpanded && isInCategory && <div className={styles['my-location-icon']} />}
       </div>
-      <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className={styles['channel-tab-user-list']} style={isExpanded ? {} : { display: 'none' }}>
         {filteredCategoryMembers.map((member) => (
           <UserTab key={member.userId} member={member} channel={category} canJoin={canJoin} isPasswordNeeded={isPasswordNeeded} />
         ))}
       </div>
-      <div className={styles['channel-list']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className={styles['channel-tab-channel-list']} style={isExpanded ? {} : { display: 'none' }}>
         {filteredCategoryChannels.map((channel) => (
           <ChannelTab key={channel.channelId} channel={channel} />
         ))}
