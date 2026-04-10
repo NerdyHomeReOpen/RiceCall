@@ -19,9 +19,9 @@ import { useAnnouncementAreaContextMenu } from '@/hooks/ContextMenus/Announcemen
 import { useMessageAreaContextMenu } from '@/hooks/ContextMenus/MessageArea';
 import { useVoiceModeContextMenu } from '@/hooks/ContextMenus/VoiceMode';
 
+import ServerPageSidebar from './ServerPageSidebar';
 import MarkdownContent from '@/components/MarkdownContent';
 import MessageContent from '@/components/MessageContent';
-import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 import MicVolumeSlider from '@/components/MicVolumeSlider';
 import SpeakerVolumeSlider from '@/components/SpeakerVolumeSlider';
@@ -409,7 +409,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     <main className={styles['server']} style={display ? {} : { display: 'none' }}>
       <main className={styles['server-body']}>
         <aside ref={sidebarRef} className={styles['sidebar']}>
-          <ChannelList />
+          <ServerPageSidebar />
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
         <main className={styles['content']}>

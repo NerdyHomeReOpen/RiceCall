@@ -20,9 +20,9 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { isServerAdmin } from '@/utils/permission';
 
-import styles from '@/pages/Server/Server.module.css';
+import styles from './Server.module.css';
 
-const ChannelList: React.FC = React.memo(() => {
+const ServerPageSidebar: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { findMe } = useFindMeContext();
@@ -219,6 +219,6 @@ const ChannelList: React.FC = React.memo(() => {
   );
 });
 
-ChannelList.displayName = 'ChannelList';
+ServerPageSidebar.displayName = 'ServerPageSidebar';
 
-export default ChannelList;
+export default ServerPageSidebar;
