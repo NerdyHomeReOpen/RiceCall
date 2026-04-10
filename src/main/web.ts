@@ -183,7 +183,6 @@ export * from '@/main/data/web';
 export * from '@/main/discord/web';
 export * from '@/main/env/web';
 export * from '@/main/error/web';
-export * from '@/main/log/web';
 export * from '@/main/network/web';
 export * from '@/main/popup/web';
 export * from '@/main/record/web';

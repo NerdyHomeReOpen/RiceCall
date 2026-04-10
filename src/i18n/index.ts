@@ -98,26 +98,11 @@ class CrowdinBackend {
   }
 }
 
-(async () => {
-  if (!isMain() && getHash()) {
-    i18next
-      .use(new CrowdinBackend())
-      .use(initReactI18next)
-      .init({
-        lng: 'zh-TW',
-        fallbackLng: 'zh-TW',
-        supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
-
-        ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
-        defaultNS: 'app',
-        fallbackNS: ['message'],
-
-        interpolation: { escapeValue: false },
-        load: 'currentOnly' as const,
-        nonExplicitSupportedLngs: false,
-      });
-  } else {
-    i18next.use(initReactI18next).init({
+if (!isMain() && getHash()) {
+  i18next
+    .use(new CrowdinBackend())
+    .use(initReactI18next)
+    .init({
       lng: 'zh-TW',
       fallbackLng: 'zh-TW',
       supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
@@ -126,21 +111,34 @@ class CrowdinBackend {
       defaultNS: 'app',
       fallbackNS: ['message'],
 
-      resources: {
-        'en-US': { app: enUS_app, rpc: enUS_rpc, message: enUS_message, country: enUS_country, badge: enUS_badge, position: enUS_position, system: enUS_system },
-        'es-ES': { app: esES_app, rpc: esES_rpc, message: esES_message, country: esES_country, badge: esES_badge, position: esES_position, system: esES_system },
-        'fa-IR': { app: faIR_app, rpc: faIR_rpc, message: faIR_message, country: faIR_country, badge: faIR_badge, position: faIR_position, system: faIR_system },
-        'pt-BR': { app: ptBR_app, rpc: ptBR_rpc, message: ptBR_message, country: ptBR_country, badge: ptBR_badge, position: ptBR_position, system: ptBR_system },
-        'ru-RU': { app: ruRU_app, rpc: ruRU_rpc, message: ruRU_message, country: ruRU_country, badge: ruRU_badge, position: ruRU_position, system: ruRU_system },
-        'tr-TR': { app: trTR_app, rpc: trTR_rpc, message: trTR_message, country: trTR_country, badge: trTR_badge, position: trTR_position, system: trTR_system },
-        'zh-CN': { app: zhCN_app, rpc: zhCN_rpc, message: zhCN_message, country: zhCN_country, badge: zhCN_badge, position: zhCN_position, system: zhCN_system },
-        'zh-TW': { app: zhTW_app, rpc: zhTW_rpc, message: zhTW_message, country: zhTW_country, badge: zhTW_badge, position: zhTW_position, system: zhTW_system },
-      },
-
       interpolation: { escapeValue: false },
+      load: 'currentOnly' as const,
+      nonExplicitSupportedLngs: false,
     });
-  }
-})();
+} else {
+  i18next.use(initReactI18next).init({
+    lng: 'zh-TW',
+    fallbackLng: 'zh-TW',
+    supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
+
+    ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
+    defaultNS: 'app',
+    fallbackNS: ['message'],
+
+    resources: {
+      'en-US': { app: enUS_app, rpc: enUS_rpc, message: enUS_message, country: enUS_country, badge: enUS_badge, position: enUS_position, system: enUS_system },
+      'es-ES': { app: esES_app, rpc: esES_rpc, message: esES_message, country: esES_country, badge: esES_badge, position: esES_position, system: esES_system },
+      'fa-IR': { app: faIR_app, rpc: faIR_rpc, message: faIR_message, country: faIR_country, badge: faIR_badge, position: faIR_position, system: faIR_system },
+      'pt-BR': { app: ptBR_app, rpc: ptBR_rpc, message: ptBR_message, country: ptBR_country, badge: ptBR_badge, position: ptBR_position, system: ptBR_system },
+      'ru-RU': { app: ruRU_app, rpc: ruRU_rpc, message: ruRU_message, country: ruRU_country, badge: ruRU_badge, position: ruRU_position, system: ruRU_system },
+      'tr-TR': { app: trTR_app, rpc: trTR_rpc, message: trTR_message, country: trTR_country, badge: trTR_badge, position: trTR_position, system: trTR_system },
+      'zh-CN': { app: zhCN_app, rpc: zhCN_rpc, message: zhCN_message, country: zhCN_country, badge: zhCN_badge, position: zhCN_position, system: zhCN_system },
+      'zh-TW': { app: zhTW_app, rpc: zhTW_rpc, message: zhTW_message, country: zhTW_country, badge: zhTW_badge, position: zhTW_position, system: zhTW_system },
+    },
+
+    interpolation: { escapeValue: false },
+  });
+}
 
 export function t(key: string, params?: Record<string, string>) {
   return i18next.t(key, params);

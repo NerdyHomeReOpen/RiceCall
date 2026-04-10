@@ -6,7 +6,6 @@ import { discord } from '@/main/discord';
 import { env } from '@/main/env';
 import { error } from '@/main/error';
 import { language } from '@/main/language';
-import { log } from '@/main/log';
 import { webrtc, deepLink, fontList, loopbackAudio, exit, initialData } from '@/main/misc';
 import { networkDiagnosis, sfuDiagnosis } from '@/main/network';
 import { popup } from '@/main/popup';
@@ -28,7 +27,6 @@ const ipc = {
   env,
   error,
   language,
-  log,
   webrtc,
   deepLink,
   fontList,

@@ -27,7 +27,6 @@ import { configureDiscordRPC, clearDiscordPresence } from '@/main/discord/electr
 import { registerEnvHandlers } from '@/main/env/electron';
 import { registerErrorHandlers } from '@/main/error/electron';
 import { registerLanguageHandlers } from '@/main/language/electron';
-import { registerLogHandlers } from '@/main/log/electron';
 import { registerNetworkHandlers } from '@/main/network/electron';
 import { registerPopupHandlers } from '@/main/popup/electron';
 import { registerRecordHandlers } from '@/main/record/electron';
@@ -582,7 +581,6 @@ app.on('ready', async () => {
   registerEnvHandlers();
   registerErrorHandlers();
   registerLanguageHandlers();
-  registerLogHandlers();
   registerNetworkHandlers();
   registerPopupHandlers();
   registerRecordHandlers();
