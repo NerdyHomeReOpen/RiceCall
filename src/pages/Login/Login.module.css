@@ -1,4 +1,4 @@
-.login {
+.login-page {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -9,7 +9,7 @@
   background-color: var(--background);
 }
 
-.login-body {
+.login-page-body {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -29,6 +29,11 @@
   background-size: contain;
 }
 
+.loading-text {
+  font-size: 0.9rem;
+  color: var(--text-color-secondary);
+}
+
 .loading-bar {
   display: flex;
   align-items: center;
@@ -41,7 +46,7 @@
   background-size: auto;
 }
 
-.form-wrapper {
+.login-form-wrapper {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -85,7 +90,7 @@
   border-color: var(--border-secondary);
 }
 
-.combo-arrow {
+.account-dropdown-arrow {
   position: relative;
   display: flex;
   align-items: center;
@@ -94,7 +99,7 @@
   height: 100%;
 }
 
-.combo-arrow::before {
+.account-dropdown-arrow::before {
   width: 2px;
   height: 20px;
   margin-right: 3px;
@@ -104,7 +109,7 @@
   background-position: 0 0;
 }
 
-.combo-arrow::after {
+.account-dropdown-arrow::after {
   width: 20px;
   height: 12px;
   content: '';
@@ -113,23 +118,23 @@
   background-position: -7px 0;
 }
 
-.input-box:hover .combo-arrow {
+.input-box:hover .account-dropdown-arrow {
   background: linear-gradient(to bottom, #fff 0%, #f3f3f3 50%, #e0e0e0 100%);
 }
 
-.input-box .combo-arrow:active {
+.input-box .account-dropdown-arrow:active {
   background: linear-gradient(to bottom, #e0e0e0 0%, #f3f3f3 50%, #fff 100%);
 }
 
-.input-box:hover .combo-arrow::after {
+.input-box:hover .account-dropdown-arrow::after {
   background-position: -33px 0;
 }
 
-.input-box .combo-arrow:active::after {
+.input-box .account-dropdown-arrow:active::after {
   background-position: -59px 0;
 }
 
-.account-select-box {
+.account-options {
   position: absolute;
   top: 30px;
   z-index: 1;
@@ -142,7 +147,7 @@
   border: 1px solid var(--border);
 }
 
-.account-select-option-box {
+.account-option {
   position: relative;
   display: flex;
   flex-shrink: 0;
@@ -153,15 +158,15 @@
   padding: 0 3px;
 }
 
-.account-select-option-box:hover {
+.account-option:hover {
   background-color: var(--hover);
 }
 
-.account-select-option-box.selected {
+.account-option.selected {
   background-color: var(--selected);
 }
 
-.account-select-delete-btn {
+.account-delete-button {
   min-width: 18px;
   min-height: 18px;
   cursor: pointer;
@@ -170,15 +175,15 @@
   background-size: cover;
 }
 
-.account-select-delete-btn:hover {
+.account-delete-button:hover {
   background-position: -18px 0;
 }
 
-.account-select-delete-btn:active {
+.account-delete-button:active {
   background-position: -36px 0;
 }
 
-.check-wrapper {
+.check-box-wrapper {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -188,12 +193,12 @@
   color: var(--text-color-quaternary);
 }
 
-.check-wrapper .check-box {
+.check-box-wrapper .check-box {
   display: flex;
   align-items: center;
 }
 
-.check-wrapper .check {
+.check-box-wrapper .check {
   appearance: none;
   cursor: pointer;
 }
@@ -245,7 +250,7 @@
   opacity: 0.6;
 }
 
-.login-footer {
+.login-page-footer {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -257,23 +262,23 @@
   border-top: 1px solid var(--border);
 }
 
-.create-account,
-.forget-password,
-.change-server {
+.create-account-button,
+.forget-password-button,
+.change-server-button {
   display: flex;
   align-items: flex-end;
   text-decoration: none;
   cursor: pointer;
 }
 
-.create-account:hover,
-.forget-password:hover,
-.change-server:hover {
+.create-account-button:hover,
+.forget-password-button:hover,
+.change-server-button:hover {
   color: #0073c6;
 }
 
-.create-account::before,
-.forget-password::before {
+.create-account-button::before,
+.forget-password-button::before {
   min-width: 14px;
   min-height: 14px;
   margin-right: 5px;
@@ -283,13 +288,13 @@
   background-size: cover;
 }
 
-.create-account::before {
+.create-account-button::before {
   background-image: url('/icon_createaccount.webp');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
 
-.forget-password::before {
+.forget-password-button::before {
   background-image: url('/icon_getpass.webp');
   background-repeat: no-repeat;
   background-position: 0 0;

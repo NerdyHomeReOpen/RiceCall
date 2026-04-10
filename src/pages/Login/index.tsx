@@ -110,13 +110,13 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
   }, []);
 
   return (
-    <main className={styles['login']} style={display ? {} : { display: 'none' }}>
-      <main className={styles['login-body']}>
+    <main className={styles['login-page']} style={display ? {} : { display: 'none' }}>
+      <main className={styles['login-page-body']}>
         <div className={styles['app-logo']} />
-        <form className={styles['form-wrapper']} onSubmit={handleSubmit}>
+        <form className={styles['login-form-wrapper']} onSubmit={handleSubmit}>
           {isLoading ? (
             <>
-              <div className={styles['loading-indicator']}>{`${t('logining')}...`}</div>
+              <div className={styles['loading-text']}>{`${t('logining')}...`}</div>
               <div className={styles['loading-bar']} />
             </>
           ) : (
@@ -125,12 +125,12 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
                 <div className={styles['label']}>{t('account')}</div>
                 <div className={styles['input-box']} ref={comboRef}>
                   <input type="text" name="account" value={account} onChange={handleInputChange} placeholder={t('please-input-account')} className={styles['input']} />
-                  <div className={styles['combo-arrow']} onClick={handleAccountSelectClick} />
-                  <div className={styles['account-select-box']} style={showAccountselectBox ? {} : { display: 'none' }}>
+                  <div className={styles['account-dropdown-arrow']} onClick={handleAccountSelectClick} />
+                  <div className={styles['account-options']} style={showAccountselectBox ? {} : { display: 'none' }}>
                     {Object.entries(accounts).map(([account, { autoLogin, rememberAccount, password }]) => (
                       <div
                         key={account}
-                        className={styles['account-select-option-box']}
+                        className={styles['account-option']}
                         onClick={() => {
                           setAccount(account);
                           setRememberAccount(rememberAccount);
@@ -141,7 +141,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
                       >
                         {account}
                         <div
-                          className={styles['account-select-delete-btn']}
+                          className={styles['account-delete-button']}
                           onClick={(e) => {
                             e.stopPropagation();
                             deleteAccount(account);
@@ -158,7 +158,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
                   <input type="password" name="password" value={password} onChange={handleInputChange} placeholder={t('please-input-password')} className={styles['input']} />
                 </div>
               </div>
-              <div className={styles['check-wrapper']}>
+              <div className={styles['check-box-wrapper']}>
                 <div className={styles['check-box']}>
                   <input type="checkbox" name="rememberAccount" checked={rememberAccount} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('remember-account')}
@@ -175,17 +175,17 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
           )}
         </form>
       </main>
-      <div className={styles['login-footer']}>
+      <div className={styles['login-page-footer']}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <div className={styles['create-account']} onClick={handleRegisterBtnClick}>
+          <div className={styles['create-account-button']} onClick={handleRegisterBtnClick}>
             {t('register-account')}
           </div>
           {'/'}
-          <div className={styles['change-server']} onClick={handleChangeServerBtnClick}>
+          <div className={styles['change-server-button']} onClick={handleChangeServerBtnClick}>
             {t('change-server')}
           </div>
         </div>
-        <div className={styles['forget-password']} onClick={handleForgotPasswordClick}>
+        <div className={styles['forget-password-button']} onClick={handleForgotPasswordClick}>
           {t('forgot-password')}
         </div>
       </div>
