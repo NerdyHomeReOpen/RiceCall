@@ -1,10 +1,12 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 
 import { useAppSelector } from '@/hooks/Store';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
-import styles from '@/pages/Server/Server.module.css';
+import MicModeMenu from '@/components/MicModeMenu';
+
+import styles from './MicVolumeSlider.module.css';
 
 const MicVolumeSlider = React.memo(() => {
   const { changeMicVolume, toggleMicMuted } = useWebRTC();
@@ -14,6 +16,8 @@ const MicVolumeSlider = React.memo(() => {
 
   const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
   const micVolume = useAppSelector((state) => state.webrtc.micVolume);
+
+  const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     changeMicVolume(parseInt(e.target.value));
@@ -31,6 +35,10 @@ const MicVolumeSlider = React.memo(() => {
     isBtnHoveredRef.current = false;
   };
 
+  const handleMicModeDropdownBtnClick = () => {
+    setIsMicModeMenuVisible(true);
+  };
+
   const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
     if (!isBtnHoveredRef.current) return;
     const newValue = parseInt(sliderRef.current!.value);
@@ -39,18 +47,34 @@ const MicVolumeSlider = React.memo(() => {
     changeMicVolume(parseInt(sliderRef.current!.value));
   };
 
+  useEffect(() => {
+    const onPointerDown = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest(`.${styles['mic-mode-menu']}`)) {
+        setIsMicModeMenuVisible(false);
+      }
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, []);
+
   return (
-    <div className={styles['volume-slider']}>
-      <div className={styles['slider-container']}>
-        <input ref={sliderRef} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
+    <div className={styles['mic-volume-container']}>
+      <div className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
+      <div className={styles['mic-volume-slider']}>
+        <div className={styles['mic-volume-slider-container']}>
+          <input ref={sliderRef} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
+        </div>
+        <div
+          className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`}
+          onClick={handleBtnClick}
+          onMouseEnter={handleBtnMouseDown}
+          onMouseLeave={handleBtnMouseUp}
+          onWheel={handleBtnWheel}
+        />
       </div>
-      <div
-        className={`${styles['mic-btn']} ${isMicMuted ? styles['muted'] : styles['active']}`}
-        onClick={handleBtnClick}
-        onMouseEnter={handleBtnMouseDown}
-        onMouseLeave={handleBtnMouseUp}
-        onWheel={handleBtnWheel}
-      />
+      <div className={styles['mic-mode-dropdown-button']} onClick={handleMicModeDropdownBtnClick}>
+        {isMicModeMenuVisible ? <MicModeMenu /> : ''}
+      </div>
     </div>
   );
 });

@@ -23,7 +23,6 @@ import MarkdownContent from '@/components/MarkdownContent';
 import MessageContent from '@/components/MessageContent';
 import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
-import MicModeMenu from '@/components/MicModeMenu';
 import MicVolumeSlider from '@/components/MicVolumeSlider';
 import SpeakerVolumeSlider from '@/components/SpeakerVolumeSlider';
 import ShowFrame from '@/components/ShowFrame';
@@ -85,7 +84,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const isSpeakKeyPressed = useAppSelector((state) => state.webrtc.isSpeakKeyPressed, shallowEqual);
   const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive, shallowEqual);
   const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted, shallowEqual);
-  const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted, shallowEqual);
   const isRecording = useAppSelector((state) => state.webrtc.isRecording, shallowEqual);
   const recordTime = useAppSelector((state) => state.webrtc.recordTime, shallowEqual);
   const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel, shallowEqual);
@@ -101,7 +99,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   const [speakingMode, setSpeakingMode] = useState<Types.SpeakingMode>('key');
   const [speakingKey, setSpeakingKey] = useState<string>('');
   const [channelUIMode, setChannelUIMode] = useState<Types.ChannelUIMode>('three-line');
-  const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
@@ -318,10 +315,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     toggleMixMode();
   };
 
-  const handleMicModeDropdownBtnClick = () => {
-    setIsMicModeMenuVisible(true);
-  };
-
   const handleRecordModeBtnClick = () => {
     toggleRecording();
   };
@@ -360,9 +353,6 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
 
   useEffect(() => {
     const onPointerDown = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest(`.${styles['mic-mode-menu']}`)) {
-        setIsMicModeMenuVisible(false);
-      }
       if (!(e.target as HTMLElement).closest(`.${styles['widget-bar']}`)) {
         setIsWidgetExpanded(false);
       }
@@ -507,17 +497,8 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
                 {t('mixing')}
               </div>
               <div className={styles['saperator-1']} />
-              <div className={styles['mic-volume-container']}>
-                <div className={`${styles['mic-btn']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
-                <MicVolumeSlider />
-                <div className={styles['mic-mode-dropdown-btn']} onClick={handleMicModeDropdownBtnClick}>
-                  {isMicModeMenuVisible ? <MicModeMenu /> : ''}
-                </div>
-              </div>
-              <div className={styles['speaker-volume-container']}>
-                <div className={`${styles['speaker-btn']} ${isSpeakerMuted ? styles['muted'] : ''}`} />
-                <SpeakerVolumeSlider />
-              </div>
+              <MicVolumeSlider />
+              <SpeakerVolumeSlider />
               <div className={`${styles['record-mode']} ${isRecording ? styles['active'] : ''}`}>
                 <div className={`${styles['record-mode-btn']} ${isRecording ? styles['active'] : ''}`} onClick={handleRecordModeBtnClick} />
                 <div className={`${styles['record-mode-text']} ${isRecording ? styles['active'] : ''}`}>{getFormatTimeFromSecond(recordTime)}</div>
