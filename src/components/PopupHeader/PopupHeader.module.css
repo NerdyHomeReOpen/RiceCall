@@ -43,6 +43,13 @@
   background-size: auto;
 }
 
+.title-text {
+  font-size: 13px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .buttons {
   display: flex;
   gap: 5px;

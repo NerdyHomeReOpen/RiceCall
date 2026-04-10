@@ -20,9 +20,9 @@ const PopupHeader: React.FC<PopupHeaderProps> = React.memo(({ title, buttons, po
   const { t } = useTranslation();
 
   return (
-    <header className={styles['header']}>
+    <header className={styles['header']} data-draggable>
       <div className={styles['title-box']} data-popup-type={popupType}>
-        <div style={{ fontWeight: 'bold', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t(title)}</div>
+        <div className={styles['title-text']}>{t(title)}</div>
       </div>
       <div className={styles['buttons']}>
         {buttons.includes('minimize') && <div className={styles['minimize-button']} onClick={onMinimize} />}
