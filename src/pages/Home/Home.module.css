@@ -7,15 +7,6 @@
   min-height: 0;
 }
 
-.home-page-body {
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  min-width: 0;
-  height: 100%;
-  min-height: 0;
-}
-
 .home-page-header {
   display: flex;
   align-items: center;
@@ -152,6 +143,12 @@
   content: '';
   background-image: url('/back.webp');
   background-position: 0 0;
+}
+
+.home-page-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
 }
 
 .home-page-content {

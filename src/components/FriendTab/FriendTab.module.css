@@ -58,6 +58,8 @@
 
 .friend-tab-avatar-picture {
   position: relative;
+  min-width: 40px;
+  min-height: 40px;
 }
 
 .friend-tab-avatar-picture::before {

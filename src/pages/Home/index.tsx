@@ -63,34 +63,34 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
 
   return (
     <main className={styles['home-page']} style={display ? {} : { display: 'none' }}>
-      <main className={styles['home-page-body']}>
-        <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
-          {selectedAnn && (
-            <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
-              <div className={styles['announcement-detail-header']}>
-                <div className={styles['announcement-type']} data-category={selectedAnn.category}>
-                  {t(`${selectedAnn.category}`)}
-                </div>
-                <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
-                <div className={styles['announcement-datail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
+      <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
+        {selectedAnn && (
+          <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
+            <div className={styles['announcement-detail-header']}>
+              <div className={styles['announcement-type']} data-category={selectedAnn.category}>
+                {t(`${selectedAnn.category}`)}
               </div>
-              {selectedAnn.attachmentUrl && <Image className={styles['banner']} src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />}
-              <div className={styles['announcement-detail-content']}>
-                <MarkdownContent markdownText={selectedAnn.content} />
-              </div>
+              <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
+              <div className={styles['announcement-datail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
             </div>
-          )}
-        </div>
-        <header className={styles['home-page-header']}>
-          <HomePageHeader
-            isHomeSection={isHomeSection}
-            isPersonalExclusiveSection={isPersonalExclusiveSection}
-            onHomeSectionBtnClick={handleHomeSectionBtnClick}
-            onCreateServerBtnClick={handleCreateServerClick}
-            onPersonalExclusiveSectionBtnClick={handlePersonalExclusiveSectionBtnClick}
-            onBackBtnClick={handleBackBtnClick}
-          />
-        </header>
+            {selectedAnn.attachmentUrl && <Image className={styles['banner']} src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />}
+            <div className={styles['announcement-detail-content']}>
+              <MarkdownContent markdownText={selectedAnn.content} />
+            </div>
+          </div>
+        )}
+      </div>
+      <header className={styles['home-page-header']}>
+        <HomePageHeader
+          isHomeSection={isHomeSection}
+          isPersonalExclusiveSection={isPersonalExclusiveSection}
+          onHomeSectionBtnClick={handleHomeSectionBtnClick}
+          onCreateServerBtnClick={handleCreateServerClick}
+          onPersonalExclusiveSectionBtnClick={handlePersonalExclusiveSectionBtnClick}
+          onBackBtnClick={handleBackBtnClick}
+        />
+      </header>
+      <main className={styles['home-page-body']}>
         <main className={styles['home-page-content']} style={isHomeSection ? {} : { display: 'none' }}>
           <HomePageContent onAnnouncementSelect={handleAnnouncementSelect} />
         </main>
