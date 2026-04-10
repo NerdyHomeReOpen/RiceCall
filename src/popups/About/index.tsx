@@ -10,7 +10,6 @@ import StaffCard from './StaffCard';
 import MarkdownContent from '@/components/MarkdownContent';
 
 import styles from './About.module.css';
-import popupStyles from '@/styles/Popup.module.css';
 
 interface AboutPopupProps {
   id: string;
@@ -46,21 +45,21 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['content']} style={{ justifyContent: 'flex-start', gap: '10px' }}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="popup-content" style={{ justifyContent: 'flex-start', gap: '10px' }}>
           <div className={styles['app-logo']} />
           <div className={styles['app-info']}>
             <div className={styles['app-version-text']}>{`RiceCall v${packageJson.version}`}</div>
             <div className={styles['copyright-text']}>{`COPYRIGHT @ ${currentYear} ricecall.com ,ALL RIGHTS RESERVED.`}</div>
-            <div className={popupStyles['row']} style={{ alignSelf: 'center' }}>
-              <div className={popupStyles['link-text']} onClick={handleGetHelpLinkClick}>
+            <div className="row" style={{ alignSelf: 'center' }}>
+              <div className="link-text" onClick={handleGetHelpLinkClick}>
                 {t('get-help')}
               </div>
-              <div className={popupStyles['link-text']} onClick={handleProjectRepoLinkClick}>
+              <div className="link-text" onClick={handleProjectRepoLinkClick}>
                 {t('project-repo')}
               </div>
-              <div className={popupStyles['link-text']} onClick={handleOfficialWebsiteLinkClick}>
+              <div className="link-text" onClick={handleOfficialWebsiteLinkClick}>
                 {t('official-website')}
               </div>
             </div>
@@ -74,12 +73,12 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
           </div>
         </div>
       </div>
-      <div className={`${popupStyles['popup-footer']} aboutFooter`}>
-        <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
+      <div className="popup-footer aboutFooter">
+        <div className="input-box row" style={{ width: 'fit-content' }}>
           <input type="checkbox" name="showDisclaimer" onChange={handleShowDisclaimerChange} />
-          <div className={popupStyles['label']}>{t('dont-show-next-time')}</div>
+          <div className="label">{t('dont-show-next-time')}</div>
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('close')}
         </div>
       </div>

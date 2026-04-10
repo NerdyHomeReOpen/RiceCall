@@ -92,8 +92,6 @@
   color: var(--text-color-quaternary);
 }
 
-/* Footer */
-
 .change-server-footer {
   display: flex;
   align-items: center;

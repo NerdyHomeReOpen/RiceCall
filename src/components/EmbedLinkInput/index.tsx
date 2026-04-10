@@ -1,9 +1,7 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-// TODO: Refactor styles
-import settingStyles from '@/styles/Setting.module.css';
-import popupStyles from '@/styles/Popup.module.css';
+import styles from './EmbedLinkInput.module.css';
 
 interface EmbedLinkInputProps {
   x: number;
@@ -70,16 +68,16 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
   }, [x, y, direction]);
 
   return (
-    <div ref={embedLinkInputRef} className={`context-menu-container ${settingStyles['input-dropdown']} ${popupStyles['col']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
-      <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-        <div className={popupStyles['label']}>{t('link')}</div>
+    <div ref={embedLinkInputRef} className={`context-menu-container col ${styles['input-dropdown']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
+      <div className="input-box col">
+        <div className="label">{t('link')}</div>
         <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={handleLinkUrlChange} />
       </div>
-      <div className={popupStyles['row']} style={{ justifyContent: 'space-between' }}>
-        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
+      <div className="row" style={{ justifyContent: 'space-between' }}>
+        <div className="button" onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

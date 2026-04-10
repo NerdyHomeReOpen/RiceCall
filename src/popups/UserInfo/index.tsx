@@ -23,10 +23,6 @@ import { isMember, isStaff } from '@/utils/permission';
 import { objDiff } from '@/utils/objDiff';
 
 import styles from './UserSetting.module.css';
-import popupStyles from '@/styles/Popup.module.css';
-import vipStyles from '@/styles/Vip.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
-import emojiStyles from '@/styles/Emoji.module.css';
 
 interface UserInfoPopupProps {
   id: string;
@@ -239,7 +235,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
   }, [target.birthYear, target.birthMonth, target.birthDay, currentYear, currentMonth, currentDay, isFutureDate]);
 
   return (
-    <div className={`${popupStyles['popup-wrapper']} ${styles['user-profile']}`}>
+    <div className={`popup-wrapper ${styles['user-profile']}`}>
       <div className={styles['profile-box']}>
         <div data-draggable className={styles['header']}>
           <div className={styles['window-action-buttons']}>
@@ -247,9 +243,9 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
             <div className={styles['close-btn']} onClick={handleCloseBtnClick} />
           </div>
           <div className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`} style={{ backgroundImage: `url(${target.avatarUrl})` }} onClick={handleAvatarClick} />
-          <div className={`${popupStyles['row']} ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
+          <div className={`row ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
             <p className={styles['user-name-text']}>{target.name}</p>
-            {target.vip > 0 && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${target.vip}`]}`} />}
+            {target.vip > 0 && <div className={`vip-icon vip-${target.vip}`} />}
             <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={true} />
             {target.isVerified ? <div className={styles['official-icon']} title={t('is-official')} /> : null}
           </div>
@@ -275,15 +271,15 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
         <div className={styles['edit-tab-bar']} style={isSelf && !isGroupsTab ? {} : { display: 'none' }}>
           {isUserSettingTab ? (
             <>
-              <div className={`${popupStyles['button']} ${popupStyles['blue']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+              <div className={`button button-primary ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
                 {t('confirm')}
               </div>
-              <div className={popupStyles['button']} onClick={handleCancelBtnClick}>
+              <div className="button" onClick={handleCancelBtnClick}>
                 {t('cancel')}
               </div>
             </>
           ) : (
-            <div className={popupStyles['button']} onClick={handleEditProfileBtnClick}>
+            <div className="button" onClick={handleEditProfileBtnClick}>
               {t('edit-profile')}
             </div>
           )}
@@ -295,7 +291,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
             </div>
           )}
           <div className={styles['user-profile-content']}>
-            <div className={popupStyles['label']}>{t('recent-servers')}</div>
+            <div className="label">{t('recent-servers')}</div>
             <div className={styles['server-list']}>
               {!isSelf && !target.shareRecentServers ? (
                 <div className={styles['user-recent-visits-private']}>
@@ -309,7 +305,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
                 recentServers.map((server) => <RecentServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
               )}
             </div>
-            <div className={popupStyles['label']}>{t('recent-earned')}</div>
+            <div className="label">{t('recent-earned')}</div>
             <div className={styles['badge-viewer']}>
               {badges.map((badge: Types.Badge) => (
                 <div key={badge.badgeId} className={styles['badge-item']}>
@@ -321,7 +317,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
         </div>
         <div className={styles['content']} style={isGroupsTab ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
-            <div className={popupStyles['select-box']}>
+            <div className="select-box">
               <select value={serversView} onChange={handleServersViewChange}>
                 <option value="joined">{t('joined-servers')}</option>
                 <option value="favorite">{t('favorited-servers')}</option>
@@ -357,15 +353,15 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
         </div>
         <div className={styles['content']} style={isUserSettingTab ? {} : { display: 'none' }}>
           <div className={styles['user-profile-content']}>
-            <div className={popupStyles['col']}>
-              <div className={popupStyles['row']}>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('nickname')}</div>
+            <div className="col">
+              <div className="row">
+                <div className="input-box col">
+                  <div className="label">{t('nickname')}</div>
                   <input name="name" type="text" value={target.name} maxLength={32} onChange={handleNameChange} />
                 </div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('gender')}</div>
-                  <div className={popupStyles['select-box']} style={{ width: '100%' }}>
+                <div className="input-box col">
+                  <div className="label">{t('gender')}</div>
+                  <div className="select-box" style={{ width: '100%' }}>
                     <select value={target.gender} onChange={handleGenderChange}>
                       <option value="male">{t('male')}</option>
                       <option value="female">{t('female')}</option>
@@ -373,10 +369,10 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
                   </div>
                 </div>
               </div>
-              <div className={popupStyles['row']}>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('country')}</div>
-                  <div className={popupStyles['select-box']} style={{ width: '100%' }}>
+              <div className="row">
+                <div className="input-box col">
+                  <div className="label">{t('country')}</div>
+                  <div className="select-box" style={{ width: '100%' }}>
                     <select value={target.country} onChange={handleCountryChange}>
                       {countries.map((country) => (
                         <option key={country} value={country}>
@@ -387,10 +383,10 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
                   </div>
                 </div>
                 <div style={{ width: '100%' }}>
-                  <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                    <div className={popupStyles['label']}>{t('birthdate')}</div>
-                    <div className={popupStyles['row']}>
-                      <div className={popupStyles['select-box']} style={{ width: '100%' }}>
+                  <div className="input-box col">
+                    <div className="label">{t('birthdate')}</div>
+                    <div className="row">
+                      <div className="select-box" style={{ width: '100%' }}>
                         <select id="birthYear" value={target.birthYear} onChange={handleBirthYearChange}>
                           {yearOptions.map((year) => (
                             <option key={year} value={year} disabled={year > currentYear}>
@@ -399,7 +395,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
                           ))}
                         </select>
                       </div>
-                      <div className={popupStyles['select-box']} style={{ width: '100%' }}>
+                      <div className="select-box" style={{ width: '100%' }}>
                         <select id="birthMonth" value={target.birthMonth} onChange={handleBirthMonthChange}>
                           {monthOptions.map((month) => (
                             <option key={month} value={month} disabled={target.birthYear === currentYear && month > currentMonth}>
@@ -408,7 +404,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
                           ))}
                         </select>
                       </div>
-                      <div className={popupStyles['select-box']} style={{ width: '100%' }}>
+                      <div className="select-box" style={{ width: '100%' }}>
                         <select id="birthDay" value={target.birthDay} onChange={handleBirthDayChange}>
                           {dayOptions.map((day) => (
                             <option key={day} value={day} disabled={target.birthYear === currentYear && target.birthMonth === currentMonth && day > currentDay}>
@@ -421,8 +417,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
                   </div>
                 </div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('signature')}</div>
+              <div className="input-box col">
+                <div className="label">{t('signature')}</div>
                 <div style={{ position: 'relative', width: '100%' }}>
                   <input
                     ref={signatureInputRef}
@@ -433,29 +429,29 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
                     onChange={handleSignatureChange}
                     style={{ paddingRight: '28px', width: '100%' }}
                   />
-                  <div className={`${emojiStyles['emoji-icon']} ${emojiStyles['emoji-in-input']}`} onMouseDown={handleEmojiPickerClick} />
+                  <div className="emoji-icon emoji-in-input" onMouseDown={handleEmojiPickerClick} />
                 </div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('about-me')}</div>
+              <div className="input-box col">
+                <div className="label">{t('about-me')}</div>
                 <textarea name="about" value={target.about} maxLength={200} onChange={handleAboutChange} />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
+      <div className="popup-footer">
         {!isFriend && !isSelf && (
-          <div className={`${popupStyles['button']} ${popupStyles['green']}`} onClick={handleApplyFriendBtnClick}>
+          <div className="button button-success" onClick={handleApplyFriendBtnClick}>
             {t('add-friend')}
           </div>
         )}
         {isSelf ? (
-          <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+          <div className="button" onClick={handleCloseBtnClick}>
             {t('close')}
           </div>
         ) : (
-          <div className={popupStyles['button']} onClick={handleChatBtnClick}>
+          <div className="button" onClick={handleChatBtnClick}>
             {t('chat')}
           </div>
         )}
@@ -522,7 +518,7 @@ const JoinedServerCard: React.FC<JoinedServerCardProps> = React.memo(({ target, 
       <div className={styles['server-info-box']}>
         <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className={`${permissionStyles[target.gender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
+          <div className={`permission-${target.gender} permission-lv-${server.permissionLevel}`} />
           <div className={styles['contribution-value-text']}>{server.contribution}</div>
         </div>
       </div>
@@ -549,7 +545,7 @@ const FavoriteServerCard: React.FC<FavoriteServerCardProps> = React.memo(({ targ
       <div className={styles['server-info-box']}>
         <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className={`${permissionStyles[target.gender]} ${permissionStyles[`lv-${server.permissionLevel}`]}`} />
+          <div className={`permission-${target.gender} permission-lv-${server.permissionLevel}`} />
           <div className={styles['contribution-box']}>
             <div className={styles['contribution-icon']} />
             <div className={styles['contribution-value-text']}>{server.contribution}</div>

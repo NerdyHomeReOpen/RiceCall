@@ -9,7 +9,6 @@ import type * as Types from '@/types';
 import { getEnv } from '@/env';
 import { isElectron } from '@/utils/platform';
 
-import popupStyles from '@/styles/Popup.module.css';
 import ndStyles from './NetworkDiagnosis.module.css';
 
 interface NetworkDiagnosisPopupProps {
@@ -324,12 +323,12 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
 
   if (!isElectron()) {
     return (
-      <div className={popupStyles['popup-wrapper']}>
-        <div className={`${popupStyles['popup-body']} ${ndStyles['app-only-body']}`}>
+      <div className="popup-wrapper">
+        <div className={`'popup-body ${ndStyles['app-only-body']}`}>
           <div className={ndStyles['app-only-text']}>{t('app-only-feature')}</div>
         </div>
-        <div className={popupStyles['popup-footer']}>
-          <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="popup-footer">
+          <div className="button" onClick={handleCloseBtnClick}>
             {t('close')}
           </div>
         </div>
@@ -338,8 +337,8 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   }
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
         <div className={ndStyles['content']}>
           <div className={ndStyles['header']}>
             <h2 className={ndStyles['title']}>{t('network-diagnosis')}</h2>
@@ -400,14 +399,14 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
         </div>
       </div>
 
-      <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${ndStyles['btn-export']} ${logs.length === 0 || isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleExportReportClick}>
+      <div className="popup-footer">
+        <div className={`button ${ndStyles['btn-export']} ${logs.length === 0 || isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleExportReportClick}>
           {t('export-report')}
         </div>
-        <div className={`${popupStyles['button']} ${isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleStartTestClick}>
+        <div className={`button ${isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleStartTestClick}>
           {isTesting ? t('testing') : t('start-test')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('close')}
         </div>
       </div>

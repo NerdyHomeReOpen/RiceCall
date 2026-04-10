@@ -7,8 +7,6 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface EditChannelNamePopupProps {
   id: string;
   serverId: Types.Server['serverId'];
@@ -37,20 +35,20 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-            <div className={popupStyles['label']}>{t('channel-name-label')}</div>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="input-box col">
+            <div className="label">{t('channel-name-label')}</div>
             <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={handleChannelNameChange} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className={`button ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('save')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

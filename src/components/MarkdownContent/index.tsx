@@ -13,7 +13,6 @@ import ActionLink from '@/components/ActionLink';
 import { fromTags } from '@/utils/tagConverter';
 
 import 'highlight.js/styles/github.css';
-import styles from '@/styles/Markdown.module.css';
 
 const ALLOWED_TAGS = [
   'span',
@@ -93,7 +92,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
       if (!isInvitelink) return <a {...props} target="_blank" rel="noreferrer" />;
       return <ActionLink href={props.href} />;
     },
-    table: ({ ...props }: React.TableHTMLAttributes<HTMLTableElement>) => <table className={styles['table-wrapper']} {...props} />,
+    table: ({ ...props }: React.TableHTMLAttributes<HTMLTableElement>) => <table className="markdown-table-wrapper" {...props} />,
     th: ({ ...props }: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => <th {...props} />,
     td: ({ ...props }: React.TdHTMLAttributes<HTMLTableCellElement>) => <td {...props} />,
     hr: ({ ...props }: React.HTMLAttributes<HTMLHRElement>) => <hr {...props} />,
@@ -118,7 +117,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   const converted = useMemo(() => fromTags(sanitized), [sanitized]);
 
   return (
-    <div className={`${styles['markdown-content']} ${styles[`image-size-${imageSize}`]}`} style={{ userSelect: selectable ? 'text' : 'none' }}>
+    <div className={`markdown-content image-size-${imageSize}`} style={{ userSelect: selectable ? 'text' : 'none' }}>
       <ReactMarkdown remarkPlugins={[]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={components} skipHtml={false} unwrapDisallowed={false}>
         {converted}
       </ReactMarkdown>

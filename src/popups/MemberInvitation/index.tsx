@@ -8,8 +8,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import MemberInvitationItem from './MemberInvitationItem';
 
-import styles from '@/styles/Verification.module.css';
-import popupStyles from '@/styles/Popup.module.css';
+import styles from './MemberInvitation.module.css';
 
 const MemberInvitationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -21,8 +20,8 @@ const MemberInvitationPopup: React.FC = React.memo(() => {
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']} tabIndex={0}>
-      <div className={popupStyles['popup-body']} style={{ flexDirection: 'column' }}>
+    <div className="popup-wrapper" tabIndex={0}>
+      <div className="popup-body" style={{ flexDirection: 'column' }}>
         <div className={styles['header']}>
           <div className={styles['processing-status']}>
             {t('unprocessed')}

@@ -11,8 +11,7 @@ import { useAppSelector } from '@/hooks/Store';
 import { getLerpColor } from '@/utils/color';
 
 // TODO: Refactor styles
-import server from '@/styles/Server.module.css';
-import popup from '@/styles/Popup.module.css';
+import server from '@/pages/Server/Server.module.css';
 
 const MicModeMenu: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -46,18 +45,18 @@ const MicModeMenu: React.FC = React.memo(() => {
 
   return (
     <div className={server['mic-mode-menu']}>
-      <div className={popup['col']}>
-        <div className={popup['label']}>{t('current-speaking-mode')}</div>
-        <div className={`${popup['input-box']} ${popup['row']}`}>
+      <div className="col">
+        <div className="label">{t('current-speaking-mode')}</div>
+        <div className="input-box row">
           <input type="radio" name="visibility" checked={isKeyMode} onChange={handleKeyModeSelect} />
-          <div className={popup['label']}>{t('default-speaking-mode-key-label')}</div>
-          <div style={isKeyMode ? {} : { display: 'none' }} className={popup['input-box']}>
+          <div className="label">{t('default-speaking-mode-key-label')}</div>
+          <div style={isKeyMode ? {} : { display: 'none' }} className="input-box">
             <input name="speaking-key" type="text" value={defaultSpeakingKey} style={{ maxWidth: '200px' }} readOnly />
           </div>
         </div>
-        <div className={`${popup['input-box']} ${popup['row']}`}>
+        <div className="input-box row">
           <input type="radio" name="visibility" checked={isAutoMode} onChange={handleAutoModeSelect} />
-          <div className={popup['label']}>{t('default-speaking-mode-auto-label')}</div>
+          <div className="label">{t('default-speaking-mode-auto-label')}</div>
           <div style={isAutoMode ? {} : { display: 'none' }} className={server['voice-threshold-input-wrapper']}>
             <div className={server['voice-threshold-input-wrapper']}>
               <input

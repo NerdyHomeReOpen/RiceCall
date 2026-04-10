@@ -1,7 +1,5 @@
 import { Node } from '@tiptap/core';
 
-import markdownStyles from '@/styles/Markdown.module.css';
-
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     yt: {
@@ -43,7 +41,7 @@ export const YouTubeNode = Node.create({
         'src': `https://www.youtube.com/embed/${node.attrs.videoId}`,
         'data-yt': node.attrs.videoId,
         'allowfullscreen': 'true',
-        'class': `${markdownStyles['embed-video']}`,
+        'class': 'markdown-embed-video',
       },
     ];
   },
@@ -87,7 +85,7 @@ export const TwitchNode = Node.create({
         'src': `https://player.twitch.tv/?channel=${node.attrs.channel}&autoplay=true&parent=localhost`,
         'data-tw': node.attrs.channel,
         'allowfullscreen': 'true',
-        'class': `${markdownStyles['embed-video']}`,
+        'class': 'markdown-embed-video',
       },
     ];
   },
@@ -120,7 +118,7 @@ export const KickNode = Node.create({
         'src': `https://player.kick.com/${node.attrs.username}`,
         'data-kick': node.attrs.username,
         'allowfullscreen': 'true',
-        'class': `${markdownStyles['embed-video']}`,
+        'class': 'markdown-embed-video',
       },
     ];
   },

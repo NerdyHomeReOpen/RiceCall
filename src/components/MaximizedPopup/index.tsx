@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import ipc from '@/main/ipc';
 
-import styles from '@/styles/Header.module.css';
+import styles from './MaximizedPopup.module.css';
 
 interface MaximizedPopupProps {
   id: string;

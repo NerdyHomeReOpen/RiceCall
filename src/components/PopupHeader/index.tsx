@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import styles from '@/styles/Header.module.css';
+import styles from './PopupHeader.module.css';
 
 interface PopupHeaderProps {
   title: string;
@@ -20,16 +20,14 @@ const PopupHeader: React.FC<PopupHeaderProps> = React.memo(({ title, buttons, po
   const { t } = useTranslation();
 
   return (
-    <header className={`${styles['header']} ${styles['popup']}`}>
-      <div className={styles['title-wrapper']}>
-        <div className={`${styles['title-box']} ${popupType === 'changeTheme' ? styles['title-box-skin-icon'] : popupType === 'directMessage' ? styles['title-box-direct-message-icon'] : ''}`}>
-          <div style={{ fontWeight: 'bold', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t(title)}</div>
-        </div>
-        <div className={styles['buttons']}>
-          {buttons.includes('minimize') && <div className={styles['minimize']} onClick={onMinimize} />}
-          {buttons.includes('maxsize') && (isFullscreen ? <div className={styles['restore']} onClick={onRestore} /> : <div className={styles['maxsize']} onClick={onMaximize} />)}
-          {buttons.includes('close') && <div className={styles['close']} onClick={onClose} />}
-        </div>
+    <header className={styles['header']}>
+      <div className={styles['title-box']} data-popup-type={popupType}>
+        <div style={{ fontWeight: 'bold', fontSize: '13px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{t(title)}</div>
+      </div>
+      <div className={styles['buttons']}>
+        {buttons.includes('minimize') && <div className={styles['minimize-button']} onClick={onMinimize} />}
+        {buttons.includes('maxsize') && (isFullscreen ? <div className={styles['restore-button']} onClick={onRestore} /> : <div className={styles['maxsize-button']} onClick={onMaximize} />)}
+        {buttons.includes('close') && <div className={styles['close-button']} onClick={onClose} />}
       </div>
     </header>
   );

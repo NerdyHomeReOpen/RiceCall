@@ -13,7 +13,7 @@ import { useServerCardContextMenu } from '@/hooks/ContextMenus/ServerCard';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/pages/Home/Home.module.css';
 
 interface ServerCardProps {
   server: Types.Server;

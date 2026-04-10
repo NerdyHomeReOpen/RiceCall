@@ -7,8 +7,6 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface InviteMemberPopupProps {
   id: string;
   serverId: Types.Server['serverId'];
@@ -45,58 +43,58 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={`${popupStyles['content']} ${popupStyles['col']}`}>
-          <div className={popupStyles['label']}>{t('invite-member-label')}</div>
-          <div className={popupStyles['row']}>
-            <div className={popupStyles['avatar-wrapper']}>
-              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${target.avatarUrl})` }} />
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="content col">
+          <div className="label">{t('invite-member-label')}</div>
+          <div className="row">
+            <div className="avatar-wrapper">
+              <div className="avatar-picture" style={{ backgroundImage: `url(${target.avatarUrl})` }} />
             </div>
-            <div className={popupStyles['info-wrapper']}>
-              <div className={popupStyles['link-text']}>
+            <div className="info-wrapper">
+              <div className="link-text">
                 {target.name} ({target.displayId})
               </div>
-              <div className={popupStyles['sub-text']}>
+              <div className="sub-text">
                 {t('contribution')}: {target.contribution}
               </div>
             </div>
           </div>
-          <div className={popupStyles['split']} />
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 0 ? {} : { display: 'none' }}>
-            <div className={popupStyles['label']}>{t('note')}</div>
+          <div className="split" />
+          <div className="input-box col" style={section === 0 ? {} : { display: 'none' }}>
+            <div className="label">{t('note')}</div>
             <textarea rows={2} value={invitationDesc} onChange={handleInvitationDescChange} />
           </div>
-          <div className={popupStyles['hint-text']} style={section === 1 ? {} : { display: 'none' }}>
+          <div className="hint-text" style={section === 1 ? {} : { display: 'none' }}>
             {t('member-invitation-sent')}
           </div>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={section === 2 ? {} : { display: 'none' }}>
-            <div className={popupStyles['label']}>{t('note')}</div>
+          <div className="input-box col" style={section === 2 ? {} : { display: 'none' }}>
+            <div className="label">{t('note')}</div>
             <textarea rows={2} value={invitationDesc} onChange={handleInvitationDescChange} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={section === 0 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
+      <div className="popup-footer" style={section === 0 ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleSubmitBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={section === 1 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleModifyBtnClick}>
+      <div className="popup-footer" style={section === 1 ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleModifyBtnClick}>
           {t('modify')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={section === 2 ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleSubmitEditBtnClick}>
+      <div className="popup-footer" style={section === 2 ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleSubmitEditBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

@@ -12,7 +12,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import SearchResultItem from './SearchResultItem';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/pages/Home/Home.module.css';
 
 const ServerSearchBar: React.FC = () => {
   const { t } = useTranslation();

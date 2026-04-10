@@ -6,7 +6,6 @@ import ipc from '@/main/ipc';
 import type * as Types from '@/types';
 
 import styles from './ServerApplication.module.css';
-import popupStyles from '@/styles/Popup.module.css';
 
 interface ServerApplicationPopupProps {
   id: string;
@@ -27,8 +26,8 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
         <div className={styles['middle-area']}>
           <div className={`${styles['button-item-box']} disabled`}>
             <div className={styles['button-item-icon']} />
@@ -52,7 +51,7 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
+      <div className="popup-footer">
         <div className={styles['placeholder']} />
       </div>
     </div>

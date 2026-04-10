@@ -7,7 +7,6 @@ import type * as Types from '@/types';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
-import popupStyles from '@/styles/Popup.module.css';
 import styles from './ServerAnnouncement.module.css';
 
 interface ServerAnnouncementPopupProps {
@@ -23,7 +22,7 @@ const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.me
   };
 
   return (
-    <div data-draggable className={`${popupStyles['popup-wrapper']}`}>
+    <div data-draggable className="popup-wrapper">
       <div className={styles['headers']}>
         <div className={styles['tabs']}>
           <span>{t('announcement')}</span>

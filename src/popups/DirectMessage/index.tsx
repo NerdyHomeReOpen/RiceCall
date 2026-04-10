@@ -24,18 +24,15 @@ import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
 import { ChatEnter } from '@/extensions/ChatEnter';
 
-import DirectMessageContent from '@/components/DirectMessageContent';
+import MessageContent from '@/components/MessageContent';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
+import UnreadMessageAlert from '@/components/UnreadMessageAlert';
 
 import { getDefaultFriend } from '@/utils/default';
 import { toTags } from '@/utils/tagConverter';
 
 import styles from './DirectMessage.module.css';
-import markdownStyles from '@/styles/Markdown.module.css';
-import popupStyles from '@/styles/Popup.module.css';
-import messageStyles from '@/styles/Message.module.css';
-import vipStyles from '@/styles/Vip.module.css';
 
 interface DirectMessagePopupProps {
   friend: Types.Friend | null;
@@ -181,7 +178,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     setIsAtBottom(isBottom);
   };
 
-  const handleNewMessageAlertClick = () => {
+  const handleUnreadMessageAlertClick = () => {
     scrollToBottom();
   };
 
@@ -338,7 +335,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   }, [event, message, user.userId, target.userId]);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
+    <div className="popup-wrapper">
       <div className={styles['header']}>
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
@@ -354,7 +351,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
           <div className={styles['report']} onClick={handleReportBtnClick} />
         </div>
       </div>
-      <div className={popupStyles['popup-body']}>
+      <div className="popup-body">
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
             <div
@@ -362,7 +359,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
               style={{ backgroundImage: `url(${target.avatarUrl})` }}
               onClick={handleTargetAvatarClick}
             />
-            {hasVip && <div className={`${vipStyles['vip-icon-big']} ${vipStyles[`vip-${target.vip}`]}`} />}
+            {hasVip && <div className={`vip-icon-big vip-${target.vip}`} />}
             <div className={styles['user-state-box']}>
               <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={false} />
               {hasBadges ? <div className={styles['user-friend-split']} /> : ''}
@@ -397,13 +394,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
             ) : null}
           </div>
           <div ref={messageAreaRef} onScroll={handleScroll} className={styles['message-area']}>
-            <DirectMessageContent messages={directMessages} />
+            <MessageContent messages={directMessages} />
             <div style={{ minHeight: '10px' }} />
-            {unreadMessageCount > 0 && (
-              <div className={messageStyles['new-message-alert']} onClick={handleNewMessageAlertClick}>
-                {t('has-new-message', { 0: unreadMessageCount })}
-              </div>
-            )}
+            <UnreadMessageAlert unreadMessageCount={unreadMessageCount} onAlertClick={handleUnreadMessageAlertClick} />
           </div>
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>
@@ -422,7 +415,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
             <EditorContent
               editor={editor}
               placeholder={t('input-message')}
-              className={`${styles['input']} ${markdownStyles['markdown-content']} ${isWarning ? styles['warning'] : ''}`}
+              className={`${styles['input']} markdown-content ${isWarning ? styles['warning'] : ''}`}
               style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
               onPaste={handleInputPaste}
               onKeyDown={handleInputKeyDown}

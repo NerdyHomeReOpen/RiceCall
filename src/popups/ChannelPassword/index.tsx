@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import ipc from '@/main/ipc';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface ChannelPasswordPopupProps {
   id: string;
 }
@@ -28,20 +26,20 @@ const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ 
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-            <div className={popupStyles['label']}>{t('please-enter-the-channel-password')}</div>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="input-box col">
+            <div className="label">{t('please-enter-the-channel-password')}</div>
             <input type="text" maxLength={4} onChange={handlePasswordChange} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleSubmitBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

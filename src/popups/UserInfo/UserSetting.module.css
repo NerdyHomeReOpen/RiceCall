@@ -81,8 +81,6 @@
   -webkit-app-region: no-drag;
 }
 
-/* User Profile */
-
 .user-profile {
   flex: unset;
   justify-content: space-between;
@@ -290,8 +288,6 @@
   background-position: 0 0;
   background-size: contain;
 }
-
-/* Server List */
 
 .server-list {
   display: flex;

@@ -18,7 +18,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { isMember, isChannelMod, isServerAdmin } from '@/utils/permission';
 
-import styles from '@/styles/Server.module.css';
+import styles from '@/pages/Server/Server.module.css';
 
 interface CategoryTabProps {
   category: Types.Category;

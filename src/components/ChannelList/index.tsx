@@ -20,8 +20,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { isServerAdmin } from '@/utils/permission';
 
-import styles from '@/styles/Server.module.css';
-import header from '@/styles/Header.module.css'; // TODO: Remove this style import
+import styles from '@/pages/Server/Server.module.css';
 
 const ChannelList: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -167,7 +166,8 @@ const ChannelList: React.FC = React.memo(() => {
               <div className={styles['invitation-icon']} onClick={handleInviteFriendClick} />
               <div className={styles['saperator-1']} />
               <div className={styles['setting-icon']} onClick={handleServerSettingClick}>
-                <div className={`${header['overlay']} ${hasNewMemberApplications ? header['new'] : ''}`} />
+                {/* <div className={`${header['overlay']} ${hasNewMemberApplications ? header['new'] : ''}`} /> */}
+                {/* TODO: Add new member applications overlay */}
               </div>
             </div>
           </div>

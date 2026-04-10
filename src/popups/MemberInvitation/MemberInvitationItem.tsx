@@ -7,8 +7,7 @@ import * as Actions from '@/action';
 
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
-import styles from '@/styles/Verification.module.css';
-import popupStyles from '@/styles/Popup.module.css';
+import styles from './MemberInvitation.module.css';
 
 interface MemberInvitationItemProps {
   invitation: Types.MemberInvitation;
@@ -36,13 +35,13 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
           </div>
         </div>
         <div className={styles['application-content-box']}>
-          <div className={popupStyles['col']}>
+          <div className="col">
             <div className={styles['content-text']}>{t('invite-you-to-be-member')}</div>
             <div className={styles['content-text']}>
               {t('note')}: {invitation.description}
             </div>
           </div>
-          <div className={popupStyles['row']} style={{ alignSelf: 'flex-end' }}>
+          <div className="row" style={{ alignSelf: 'flex-end' }}>
             <div className={styles['action-buttons']}>
               <div className={styles['button']} onClick={handleAcceptBtnClick}>
                 {t('accept')}

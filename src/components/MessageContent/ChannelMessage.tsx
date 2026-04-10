@@ -18,9 +18,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import { getFormatTimestamp } from '@/utils/language';
 import { isChannelMod } from '@/utils/permission';
 
-import styles from '@/styles/Message.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
-import vipStyles from '@/styles/Vip.module.css';
+import styles from './MessageContent.module.css';
 
 interface ChannelMessageProps {
   messageGroup: Types.ChannelMessage & { contents: string[] };
@@ -90,9 +88,9 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   return (
     <div className={styles['message-box']}>
       <div className={`${styles['details']}`} onContextMenu={handleMessageContextMenu}>
-        {isChannelMod(messageGroup.permissionLevel) && <div className={`${permissionStyles[messageGroup.gender]} ${permissionStyles[`lv-${messageGroup.permissionLevel}`]}`} />}
-        {hasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${messageGroup.vip}`]}`} />}
-        <div className={`${styles['username-text']} ${hasVip ? `${vipStyles['vip-name-color']}` : ''}`} onClick={handleUsernameClick}>
+        {isChannelMod(messageGroup.permissionLevel) && <div className={`permission-${messageGroup.gender} permission-lv-${messageGroup.permissionLevel}`} />}
+        {hasVip && <div className={`vip-icon vip-${messageGroup.vip}`} />}
+        <div className={`${styles['username-text']} ${hasVip ? 'vip-name-color' : ''}`} onClick={handleUsernameClick}>
           {messageGroup.nickname || messageGroup.name}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>

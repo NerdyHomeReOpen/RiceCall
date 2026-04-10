@@ -10,8 +10,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
-import styles from '@/styles/Verification.module.css';
-import popupStyles from '@/styles/Popup.module.css';
+import styles from './FriendVerification.module.css';
 
 const FriendVerificationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -23,8 +22,8 @@ const FriendVerificationPopup: React.FC = React.memo(() => {
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']} tabIndex={0}>
-      <div className={popupStyles['popup-body']} style={{ flexDirection: 'column' }}>
+    <div className="popup-wrapper" tabIndex={0}>
+      <div className="popup-body" style={{ flexDirection: 'column' }}>
         <div className={styles['header']}>
           <div className={styles['processing-status']}>
             {t('unprocessed')}
@@ -89,18 +88,18 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
           </div>
         </div>
         <div className={styles['application-content-box']}>
-          <div className={popupStyles['col']}>
+          <div className="col">
             <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
             <div className={styles['content-text']}>
               {t('note')}: {application.description}
             </div>
           </div>
-          <div className={popupStyles['row']} style={{ alignSelf: 'flex-end' }}>
+          <div className="row" style={{ alignSelf: 'flex-end' }}>
             <div className={styles['action-buttons']}>
-              <div className={styles['button']} onClick={handleAcceptBtnClick}>
+              <div className={styles['action-button']} onClick={handleAcceptBtnClick}>
                 {t('accept')}
               </div>
-              <div className={styles['button']} onClick={handleRejectBtnClick}>
+              <div className={styles['action-button']} onClick={handleRejectBtnClick}>
                 {t('reject')}
               </div>
             </div>

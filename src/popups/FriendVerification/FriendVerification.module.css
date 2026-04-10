@@ -89,29 +89,31 @@
   align-items: center;
   justify-content: flex-end;
   min-width: max-content;
+  height: 28px;
   cursor: pointer;
 }
 
-.action-buttons .button {
+.action-button {
   display: flex;
   align-items: center;
   justify-content: center;
   height: 23px;
   padding: 3px;
+  margin-bottom: 2px;
   background-color: var(--background);
   border: 1px solid var(--border);
 }
 
-.action-buttons .button:last-child {
+.action-button:last-child {
   border-right: 1px solid var(--border);
 }
 
-.action-buttons .button:hover {
+.action-button:hover {
   background-color: var(--hover);
   border-color: var(--border);
 }
 
-.action-buttons .button:active {
+.action-button:active {
   background-color: var(--selected);
   border-color: var(--border);
 }

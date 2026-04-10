@@ -22,8 +22,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
-import styles from '@/styles/FriendTab.module.css';
-import vipStyles from '@/styles/Vip.module.css';
+import styles from './FriendTab.module.css';
 
 interface FriendTabProps {
   friend: Types.Friend;
@@ -105,8 +104,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
       />
       <div className={styles['friend-tab-base-info']}>
         <div className={styles['friend-tab-box']}>
-          {hasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${friend.vip}`]}`} />}
-          <div className={`${styles['friend-tab-name-text']} ${hasVip ? vipStyles['vip-name-color'] : ''}`}>
+          {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
+          <div className={`${styles['friend-tab-name-text']} ${hasVip ? 'vip-name-color' : ''}`}>
             {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
           </div>
           <LevelIcon level={friend.level} xp={friend.xp} requiredXp={friend.requiredXp} showTooltip={false} />

@@ -7,8 +7,6 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface EditFriendNotePopupProps {
   id: string;
   friend: Types.Friend;
@@ -33,20 +31,20 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ id
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-            <div className={popupStyles['label']}>{t('friend-note-name')}</div>
-            <input className={popupStyles['input']} type="text" value={friendNote} placeholder={friend.name} onChange={handleFriendNoteChange} />
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="input-box col">
+            <div className="label">{t('friend-note-name')}</div>
+            <input className="input" type="text" value={friendNote} placeholder={friend.name} onChange={handleFriendNoteChange} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleSaveBtnClick}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleSaveBtnClick}>
           {t('save')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import styles from '@/styles/Header.module.css';
+import styles from './AuthHeader.module.css';
 
 interface AuthHeaderProps {
   onMinimize?: () => void;
@@ -22,8 +22,8 @@ const AuthHeader: React.FC<AuthHeaderProps> = React.memo(({ onMinimize, onClose 
         <div className={styles['app-icon']} />
       </div>
       <div className={styles['buttons']}>
-        <div className={styles['minimize']} onClick={handleMinimizeClick} />
-        <div className={styles['close']} onClick={handleCloseClick} />
+        <div className={styles['minimize-button']} onClick={handleMinimizeClick} />
+        <div className={styles['close-button']} onClick={handleCloseClick} />
       </div>
     </header>
   );

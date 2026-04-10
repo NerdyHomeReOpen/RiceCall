@@ -10,8 +10,6 @@ import LevelIcon from '@/components/LevelIcon';
 import { getPermissionText } from '@/utils/language';
 
 import styles from './UserInfoCard.module.css';
-import vipStyles from '@/styles/Vip.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
 
 interface UserInfoCardProps {
   x: number;
@@ -79,10 +77,10 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div className={`${styles['name-text']} ${hasVip && vipStyles['vip-name-color']}`}>{member.name}</div>
+                <div className={`${styles['name-text']} ${hasVip && 'vip-name-color'}`}>{member.name}</div>
                 <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
               </div>
-              <div className={` ${vipStyles['vip-icon-big']} ${vipStyles[`vip-${member.vip}`]}`} />
+              <div className={`vip-icon-big vip-${member.vip}`} />
               {hasVip && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
             </div>
             <div className={styles['xp-wrapper']}>
@@ -97,7 +95,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
           <div className={styles['nickname-row']}>{member.nickname && <div className={styles['nickname-text']}>{member.nickname}</div>}</div>
           <div className={styles['info-row']}>
             <div className={styles['permission-wrapper']}>
-              <div className={`${permissionStyles[member.gender]} ${permissionStyles[`lv-${member.permissionLevel}`]}`} />
+              <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
               <div className={styles['permission-text']}>{getPermissionText(t, member.permissionLevel)}</div>
             </div>
             <div className={styles['saperator']} />

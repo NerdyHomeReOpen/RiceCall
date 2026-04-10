@@ -27,8 +27,6 @@ import { isChannelMod, isMember } from '@/utils/permission';
 import { toTags } from '@/utils/tagConverter';
 
 import styles from './MessageInputBox.module.css';
-import markdownStyles from '@/styles/Markdown.module.css';
-import emojiStyles from '@/styles/Emoji.module.css';
 
 const MessageInputBox: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -195,10 +193,10 @@ const MessageInputBox: React.FC = React.memo(() => {
 
   return (
     <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
-      <div className={emojiStyles['emoji-icon']} onMouseDown={handleEmojiPickerClick} />
+      <div className="emoji-icon" onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}
-        className={`${styles['textarea']} ${markdownStyles['markdown-content']}`}
+        className={`${styles['textarea']} markdown-content`}
         style={{ wordBreak: 'break-all', border: 'none' }}
         onPaste={handleInputPaste}
         onKeyDown={handleInputKeyDown}

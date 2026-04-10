@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import ipc from '@/main/ipc';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface ImageCropperPopupProps {
   id: string;
   imageUnit8Array: Uint8Array;
@@ -162,9 +160,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   }, [cropBox, draw]);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={`${popupStyles['content']} ${popupStyles['row']}`} style={{ alignItems: 'center', justifyContent: 'space-between' }}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="popup-content row" style={{ alignItems: 'center', justifyContent: 'space-between' }}>
           <canvas
             ref={canvasRef}
             width={400}
@@ -176,9 +174,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
             onMouseLeave={handleMouseLeave}
             onWheel={handleWheel}
           />
-          <div className={popupStyles['col']}>
+          <div className="col">
             <div
-              className={`${popupStyles['input-box']} ${popupStyles['col']}`}
+              className="input-box col"
               style={{
                 width: '150px',
                 height: '150px',
@@ -201,11 +199,11 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']}`} onClick={handleUploadBtnClick}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleUploadBtnClick}>
           {t('upload')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('close')}
         </div>
       </div>

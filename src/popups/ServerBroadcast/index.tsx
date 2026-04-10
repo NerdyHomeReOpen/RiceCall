@@ -9,8 +9,6 @@ import * as Actions from '@/action';
 
 import { MAX_BROADCAST_LENGTH } from '@/constants';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface ServerBroadcastPopupProps {
   id: string;
   serverId: Types.Server['serverId'];
@@ -58,45 +56,45 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={`${popupStyles['content']} ${popupStyles['col']}`}>
-          <div className={popupStyles['row']}>
-            <div className={popupStyles['label']}>{t('receive-channel')}</div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="content col">
+          <div className="row">
+            <div className="label">{t('receive-channel')}</div>
+            <div className="input-box row" style={{ width: 'fit-content' }}>
               <input name="channelType" type="radio" checked={broadcastType === 'channel'} onChange={handleBroadcastChannelClick} />
-              <div className={popupStyles['label']}>{t('current-channel')}</div>
+              <div className="label">{t('current-channel')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
+            <div className="input-box row" style={{ width: 'fit-content' }}>
               <input name="channelType" type="radio" checked={broadcastType === 'server'} onChange={handleBroadcastServerClick} />
-              <div className={popupStyles['label']}>{t('all-channel')}</div>
+              <div className="label">{t('all-channel')}</div>
             </div>
           </div>
-          <div className={popupStyles['row']}>
-            <div className={popupStyles['label']}>{t('broadcast-type')}</div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']}`} style={{ width: 'fit-content' }}>
+          <div className="row">
+            <div className="label">{t('broadcast-type')}</div>
+            <div className="input-box row" style={{ width: 'fit-content' }}>
               <input name="sendType" type="radio" checked={sendType === 'text'} onChange={handleSendTextClick} />
-              <div className={popupStyles['label']}>{t('text-broadcast')}</div>
+              <div className="label">{t('text-broadcast')}</div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${'disabled'}`} style={{ width: 'fit-content' }}>
+            <div className="input-box row disabled" style={{ width: 'fit-content' }}>
               <input name="sendType" type="radio" checked={sendType === 'voice'} onChange={handleSendVoiceClick} />
-              <div className={popupStyles['label']}>{`${t('voice-broadcast')} ${t('soon')}`}</div>
+              <div className="label">{`${t('voice-broadcast')} ${t('soon')}`}</div>
             </div>
           </div>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-            <div className={popupStyles['label']}>{t('broadcast-content')}</div>
+          <div className="input-box col">
+            <div className="label">{t('broadcast-content')}</div>
             <textarea name="content" maxLength={MAX_BROADCAST_LENGTH} style={{ minHeight: '90px' }} onChange={handleBroadcastContentChange} />
-            <div className={popupStyles['hint-text']}>
+            <div className="hint-text">
               {broadcastContent.length}/{MAX_BROADCAST_LENGTH}
             </div>
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSend ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className={`button ${!canSend ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

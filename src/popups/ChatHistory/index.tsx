@@ -1,24 +1,23 @@
 import React from 'react';
 
 import styles from './ChatHistory.module.css';
-import popupStyles from '@/styles/Popup.module.css';
-import friendStyles from '@/styles/Friend.module.css';
+import friendStyles from '@/pages/Friend/Friend.module.css';
 
 const ChatHistoryPopup: React.FC = React.memo(() => {
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={`${styles['content']} ${popupStyles['content']} ${popupStyles['col']}`}>
-          <div className={`${styles['header-box']} ${popupStyles['row']}`}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="popup-content col">
+          <div className={`${styles['header-box']} row`}>
             <div className={styles['select-wrapper']}>
-              <div className={popupStyles['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className={popupStyles['select']}>
+              <div className="select-box" style={{ maxWidth: '100px', minWidth: '0' }}>
+                <select className="select">
                   <option value="當前聯繫人">當前聯繫人</option>
                   <option value="語音群訊息">語音群訊息</option>
                 </select>
               </div>
-              <div className={popupStyles['select-box']} style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className={popupStyles['select']}>
+              <div className="select-box" style={{ maxWidth: '100px', minWidth: '0' }}>
+                <select className="select">
                   <option value="最近一週">最近一週</option>
                   <option value="最近一個月">最近一個月</option>
                   <option value="最近三個月">最近三個月</option>
@@ -27,7 +26,7 @@ const ChatHistoryPopup: React.FC = React.memo(() => {
             </div>
             <div className={styles['search-wrapper']}>
               <span className={styles['search-title']}>關鍵字</span>
-              <div className={`${styles['search-input-box']} ${popupStyles['input-box']} ${popupStyles['col']}`}>
+              <div className={`${styles['search-input-box']} input-box col`}>
                 <input type="text" />
                 <div className={styles['search-icon']} />
               </div>

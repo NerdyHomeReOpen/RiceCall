@@ -13,7 +13,7 @@ import { useRecommendServerContextMenu } from '@/hooks/ContextMenus/RecommendSer
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/pages/Home/Home.module.css';
 
 interface RecommendServerCardProps {
   recommendServer: Types.RecommendServer;

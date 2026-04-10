@@ -5,8 +5,6 @@ import ipc from '@/main/ipc';
 
 import MarkdownContent from '@/components/MarkdownContent';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface RTCDisconnectPopupProps {
   id: string;
   count?: number;
@@ -30,17 +28,17 @@ const RTCDisconnectPopup: React.FC<RTCDisconnectPopupProps> = React.memo(({ id, 
   }, []);
 
   return (
-    <div className={popupStyles['popup-wrapper']} tabIndex={0}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['dialog-icon']} ${popupStyles['info']}`} />
-          <div className={popupStyles['dialog-message']}>
+    <div className="popup-wrapper" tabIndex={0}>
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="dialog-icon info" />
+          <div className="dialog-message">
             <MarkdownContent markdownText={t('rtc-disconnect-message', { count: currentCount })} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleClose}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleClose}>
           {t('confirm')}
         </div>
       </div>

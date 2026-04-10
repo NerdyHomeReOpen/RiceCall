@@ -20,9 +20,7 @@ import LevelIcon from '@/components/LevelIcon';
 
 import { getFormatTimeDiff } from '@/utils/language';
 
-import styles from '@/styles/Friend.module.css';
-import vipStyles from '@/styles/Vip.module.css';
-import emojiStyles from '@/styles/Emoji.module.css';
+import styles from './Friend.module.css';
 
 interface FriendActivityProps {
   friendActivity: Types.FriendActivity;
@@ -49,7 +47,7 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
       <Image className={styles['user-avatar']} src={friendActivity.avatarUrl} alt={friendActivity.name} width={30} height={30} loading="lazy" draggable="false" />
       <div className={styles['right-info']}>
         <div className={styles['user-activity-top']}>
-          {hasVip && <div className={`${styles['vip-icon']} ${vipStyles['vip-icon']} ${vipStyles[`vip-${friendActivity.vip}`]}`} />}
+          {hasVip && <div className={`vip-icon vip-${friendActivity.vip}`} />}
           <div className={styles['user-name']} onClick={handleUserNameClick}>
             {friendActivity.name}
           </div>
@@ -162,7 +160,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
             <LevelIcon level={user.level} xp={user.xp} requiredXp={user.requiredXp} showTooltip={true} />
             <div className={styles['wealth-icon']} />
             <div className={styles['wealth-value-text']}>{'0'}</div>
-            {userHasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${user.vip}`]}`} />}
+            {userHasVip && <div className={`vip-icon vip-${user.vip}`} />}
           </div>
           <div className={styles['user-base-info-box']}>
             <BadgeList badges={userBadges} position="left-bottom" direction="right-bottom" maxDisplay={5} />
@@ -180,7 +178,7 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
             onCompositionStart={handleSignatureInputCompositionStart}
             onCompositionEnd={handleSignatureInputCompositionEnd}
           />
-          <div className={emojiStyles['emoji-icon']} onMouseDown={handleEmojiPickerClick} />
+          <div className="emoji-icon" onMouseDown={handleEmojiPickerClick} />
         </div>
       </header>
       <main className={styles['friend-page-body']}>

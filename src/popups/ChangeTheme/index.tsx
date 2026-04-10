@@ -14,7 +14,6 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { getDominantColor, getVisibleColor, getContrastColor, toRGBString, RGB } from '@/utils/color';
 
 import styles from './ChangeTheme.module.css';
-import popupStyles from '@/styles/Popup.module.css';
 
 const ChangeThemePopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -163,8 +162,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   }, []);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
         <div className={styles['ct-wrapper']}>
           <div className={styles['ct-contain']}>
             <div className={styles['theme-selector']}>

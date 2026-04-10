@@ -7,8 +7,6 @@ import ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface ApplyMemberPopupProps {
   id: string;
   server: Types.Server;
@@ -48,57 +46,57 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, serv
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={`${popupStyles['content']} ${popupStyles['col']}`}>
-          <div className={popupStyles['row']}>
-            <div className={popupStyles['avatar-wrapper']}>
-              <div className={popupStyles['avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="popup-content col">
+          <div className="row">
+            <div className="avatar-wrapper">
+              <div className="avatar-picture" style={{ backgroundImage: `url(${server.avatarUrl})` }} />
             </div>
-            <div className={popupStyles['info-wrapper']}>
-              <div className={popupStyles['link-text']}>{server.name}</div>
-              <div className={popupStyles['sub-text']}>{`ID: ${server.specialId || server.displayId}`}</div>
+            <div className="info-wrapper">
+              <div className="link-text">{server.name}</div>
+              <div className="sub-text">{`ID: ${server.specialId || server.displayId}`}</div>
             </div>
           </div>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-            <div className={popupStyles['label']}>{t('apply-member-note')}</div>
-            <div className={popupStyles['hint-text']}>{server.applyNotice || t('none')}</div>
+          <div className="input-box col">
+            <div className="label">{t('apply-member-note')}</div>
+            <div className="hint-text">{server.applyNotice || t('none')}</div>
           </div>
-          <div className={popupStyles['split']} />
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={isSendSection ? {} : { display: 'none' }}>
-            <div className={popupStyles['label']}>{t('note')}</div>
+          <div className="split" />
+          <div className="input-box col" style={isSendSection ? {} : { display: 'none' }}>
+            <div className="label">{t('note')}</div>
             <textarea rows={2} value={applicationDesc} onChange={handleApplicationDescChange} />
           </div>
-          <div className={popupStyles['hint-text']} style={isSentSection ? {} : { display: 'none' }}>
+          <div className="hint-text" style={isSentSection ? {} : { display: 'none' }}>
             {t('member-application-sent')}
           </div>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={isEditSection ? {} : { display: 'none' }}>
-            <div className={popupStyles['label']}>{t('note')}</div>
+          <div className="input-box col" style={isEditSection ? {} : { display: 'none' }}>
+            <div className="label">{t('note')}</div>
             <textarea rows={2} value={applicationDesc} onChange={handleApplicationDescChange} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={isSendSection ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
+      <div className="popup-footer" style={isSendSection ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleSubmitBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={isSentSection ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleModifyBtnClick}>
+      <div className="popup-footer" style={isSentSection ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleModifyBtnClick}>
           {t('modify')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('confirm')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={isEditSection ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleSubmitEditBtnClick}>
+      <div className="popup-footer" style={isEditSection ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleSubmitEditBtnClick}>
           {t('submit')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

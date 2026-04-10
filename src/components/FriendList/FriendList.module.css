@@ -24,7 +24,6 @@
   background-position: 0 -36px;
 }
 
-
 .search-bar {
   display: flex;
   align-items: center;
@@ -54,7 +53,6 @@
 .search-bar:hover:not(:has(.prev-icon:hover, .next-icon:hover)) .search-icon {
   background-position: -20px 0;
 }
-
 
 .scroll-view {
   display: flex;

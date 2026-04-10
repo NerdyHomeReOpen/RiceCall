@@ -20,13 +20,14 @@ import { useMessageAreaContextMenu } from '@/hooks/ContextMenus/MessageArea';
 import { useVoiceModeContextMenu } from '@/hooks/ContextMenus/VoiceMode';
 
 import MarkdownContent from '@/components/MarkdownContent';
-import ChannelMessageContent from '@/components/ChannelMessageContent';
+import MessageContent from '@/components/MessageContent';
 import ChannelList from '@/components/ChannelList';
 import MessageInputBox from '@/components/MessageInputBox';
 import MicModeMenu from '@/components/MicModeMenu';
 import MicVolumeSlider from '@/components/MicVolumeSlider';
 import SpeakerVolumeSlider from '@/components/SpeakerVolumeSlider';
 import ShowFrame from '@/components/ShowFrame';
+import UnreadMessageAlert from '@/components/UnreadMessageAlert';
 
 import { clearChannelMessages } from '@/store/slices/ChannelMessages';
 import { clearActionMessages } from '@/store/slices/ActionMessages';
@@ -34,8 +35,7 @@ import { clearActionMessages } from '@/store/slices/ActionMessages';
 import { isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
 
-import styles from '@/styles/Server.module.css';
-import messageStyles from '@/styles/Message.module.css';
+import styles from '@/pages/Server/Server.module.css';
 
 interface ServerPageProps {
   display: boolean;
@@ -302,7 +302,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     showContextMenu(x, y, 'right-top', buildVoiceModeContextMenu());
   };
 
-  const handleNewMessageAlertClick = () => {
+  const handleUnreadMessageAlertClick = () => {
     clearUnreadMessageNotification();
   };
 
@@ -474,17 +474,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
             </div>
             <div className={styles['bottom-area']}>
               <div ref={messageAreaRef} className={styles['message-area']} onScroll={handleScroll} onContextMenu={handleMessageAreaContextMenu}>
-                <ChannelMessageContent messages={channelMessages} />
+                <MessageContent messages={channelMessages} />
                 <div style={{ minHeight: '10px' }} />
-                {unreadMessageCount > 0 && (
-                  <div className={messageStyles['new-message-alert']} onClick={handleNewMessageAlertClick}>
-                    {t('has-new-message', { 0: unreadMessageCount })}
-                  </div>
-                )}
+                <UnreadMessageAlert unreadMessageCount={unreadMessageCount} onAlertClick={handleUnreadMessageAlertClick} />
               </div>
               <div className={styles['input-area']}>
                 <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
-                  <ChannelMessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} />
+                  <MessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} />
                   <div className={styles['close-button']} onClick={handleCloseActionMessageBtnClick} />
                 </div>
                 <MessageInputBox />

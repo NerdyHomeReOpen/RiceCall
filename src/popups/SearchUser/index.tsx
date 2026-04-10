@@ -8,8 +8,6 @@ import * as Actions from '@/action';
 
 import { useAppSelector } from '@/hooks/Store';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface SearchUserPopupProps {
   id: string;
 }
@@ -67,25 +65,25 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
   }, [query]);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`} style={{ position: 'relative' }}>
-            <div className={popupStyles['label']}>{t('please-input-user-account')}</div>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="input-box col" style={{ position: 'relative' }}>
+            <div className="label">{t('please-input-user-account')}</div>
             <input name="search-query" type="text" value={query} onChange={handleQueryChange} required />
             {error && (
-              <div style={{ position: 'absolute', top: '2rem', right: '0' }} className={`${popupStyles['label']} ${popupStyles['error-message']}`}>
+              <div style={{ position: 'absolute', top: '2rem', right: '0' }} className="label-error">
                 {`(${t(error)})`}
               </div>
             )}
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className={`button ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

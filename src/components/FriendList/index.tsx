@@ -10,7 +10,7 @@ import FriendGroupTab from '@/components/FriendGroupTab';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
-import styles from '@/styles/FriendList.module.css';
+import styles from './FriendList.module.css';
 
 const FriendList: React.FC = React.memo(() => {
   const { t } = useTranslation();

@@ -17,9 +17,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 import { getDefaultQueueMember } from '@/utils/default';
 import { isChannelMod } from '@/utils/permission';
 
-import styles from '@/styles/Server.module.css';
-import vipStyles from '@/styles/Vip.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
+import styles from '@/pages/Server/Server.module.css';
 
 interface QueueUserTabProps {
   queueUserId: string;
@@ -134,10 +132,10 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       onContextMenu={handleTabContextMenu}
     >
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
-      <div className={`${permissionStyles[queueMember.gender]} ${permissionStyles[`lv-${queueMember.permissionLevel}`]}`} />
+      <div className={`permission-${queueMember.gender} permission-lv-${queueMember.permissionLevel}`} />
       <div className={`${styles['user-queue-position']}`}>{queueMember.position + 1}.</div>
-      {hasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${queueMember.vip}`]}`} />}
-      <div className={`${styles['user-tab-name']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? vipStyles['vip-name-color'] : ''}`}>{queueMember.nickname || queueMember.name}</div>
+      {hasVip && <div className={`vip-icon vip-${queueMember.vip}`} />}
+      <div className={`${styles['user-tab-name']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? 'vip-name-color' : ''}`}>{queueMember.nickname || queueMember.name}</div>
       <BadgeList badges={JSON.parse(queueMember.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isOnMic && <div className={styles['queue-seconds-remaining-box']}>{queueMember.leftTime}s</div>}
     </div>

@@ -25,9 +25,7 @@ import { sorter } from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 import { isChannelMod, isServerAdmin } from '@/utils/permission';
 
-import popupStyles from '@/styles/Popup.module.css';
-import settingStyles from '@/styles/Setting.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
+import styles from './ChannelSetting.module.css';
 
 interface ChannelSettingPopupProps {
   id: string;
@@ -270,22 +268,22 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   }, []);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={settingStyles['left']}>
-          <div className={settingStyles['tabs']}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="popup-sidebar">
+          <div className="popup-sidebar-tabs">
             {settingPages.map((title, index) => (
-              <div key={index} className={`${settingStyles['tab']} ${activeTabIndex === index ? settingStyles['active'] : ''}`} onClick={() => setActiveTabIndex(index)}>
+              <div key={index} className={`popup-sidebar-tab ${activeTabIndex === index ? 'active' : ''}`} onClick={() => setActiveTabIndex(index)}>
                 {title}
               </div>
             ))}
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['row']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('channel-name')}</div>
+        <div className="popup-content" style={activeTabIndex === 0 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="row">
+              <div className="input-box col">
+                <div className="label">{t('channel-name')}</div>
                 <input
                   name="channel-name"
                   type="text"
@@ -296,15 +294,15 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   readOnly={isReadOnly}
                 />
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('user-limit')}</div>
+              <div className="input-box col">
+                <div className="label">{t('user-limit')}</div>
                 <input name="user-limit" type="number" value={channel.userLimit} min={0} max={999} disabled={isReadOnly || isLobby} onChange={handleUserLimitChange} readOnly={isReadOnly} />
               </div>
             </div>
-            <div className={popupStyles['row']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('channel-mode')}</div>
-                <div className={popupStyles['select-box']}>
+            <div className="row">
+              <div className="input-box col">
+                <div className="label">{t('channel-mode')}</div>
+                <div className="select-box">
                   <select value={channel.voiceMode} onChange={handleVoiceModeChange} datatype={isReadOnly ? 'read-only' : ''}>
                     <option value="free">{t('free-speech')}</option>
                     <option value="admin">{t('admin-speech')}</option>
@@ -313,40 +311,40 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                 </div>
               </div>
               {channel.voiceMode === 'queue' && (
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('queue-time')}</div>
+                <div className="input-box col">
+                  <div className="label">{t('queue-time')}</div>
                   <input name="queue-time" type="number" value={channel.queueTime} min={10} max={3600} onChange={handleQueueTimeChange} readOnly={isReadOnly} />
                 </div>
               )}
             </div>
           </div>
-          <div className={settingStyles['separator']} />
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['label']}>{t('channel-audio-quality')}</div>
-            <div className={popupStyles['col']}>
+          <div className={styles['separator']} />
+          <div className="col">
+            <div className="label">{t('channel-audio-quality')}</div>
+            <div className="col">
               <div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <div className="input-box row">
                   <input name="bitrate-64000" type="radio" checked={channel.bitrate === 64000} onChange={handleBitrateChange} readOnly={isReadOnly} />
-                  <div className={popupStyles['label']}>{t('chat-mode')}</div>
+                  <div className="label">{t('chat-mode')}</div>
                 </div>
-                <div className={popupStyles['hint-text']}>{t('chat-mode-description')}</div>
+                <div className="hint-text">{t('chat-mode-description')}</div>
               </div>
               <div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <div className="input-box row">
                   <input name="bitrate-256000" type="radio" checked={channel.bitrate === 256000} onChange={handleBitrateChange} readOnly={isReadOnly} />
-                  <div className={popupStyles['label']}>{t('entertainment-mode')}</div>
+                  <div className="label">{t('entertainment-mode')}</div>
                 </div>
-                <div className={popupStyles['hint-text']}>{t('entertainment-mode-description')}</div>
+                <div className="hint-text">{t('entertainment-mode-description')}</div>
               </div>
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${settingStyles['header-bar']} ${popupStyles['row']}`}>
-              <div className={popupStyles['label']}>{t('input-announcement')}</div>
+        <div className="popup-content" style={activeTabIndex === 1 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="input-box row" style={{ justifyContent: 'space-between' }}>
+              <div className="label">{t('input-announcement')}</div>
               {!isReadOnly && (
-                <div className={popupStyles['button']} onClick={handleShowPreviewBtnClick}>
+                <div className="button" onClick={handleShowPreviewBtnClick}>
                   {showPreview ? t('edit') : t('preview')}
                 </div>
               )}
@@ -354,30 +352,30 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
             <AnnouncementEditor announcement={channel.announcement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} />
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['header']}>
-              <div className={popupStyles['label']}>{t('access-permission')}</div>
+        <div className="popup-content" style={activeTabIndex === 2 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="label-header">
+              <div className="label">{t('access-permission')}</div>
             </div>
-            <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
+            <div className="col">
+              <div className={`input-box row ${isLobby ? 'disabled' : ''}`}>
                 <input type="radio" name="visibility" value="public" checked={channel.visibility === 'public'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('anyone-can-access-label')}</div>
+                <div className="label">{t('anyone-can-access-label')}</div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby ? 'disabled' : ''}`}>
+              <div className={`input-box row ${isLobby ? 'disabled' : ''}`}>
                 <input type="radio" name="visibility" value="member" checked={channel.visibility === 'member'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('forbid-guest-access-label')}</div>
+                <div className="label">{t('forbid-guest-access-label')}</div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
+              <div className={`input-box row ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input type="radio" name="visibility" value="readonly" checked={channel.visibility === 'readonly'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('message-only-label')}</div>
+                <div className="label">{t('message-only-label')}</div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']} ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
+              <div className={`input-box row ${isLobby || isReceptionLobby ? 'disabled' : ''}`}>
                 <input type="radio" name="visibility" value="private" checked={channel.visibility === 'private'} onChange={handleVisibilityChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('require-password-label')}</div>
+                <div className="label">{t('require-password-label')}</div>
               </div>
               {channel.visibility === 'private' && !isReadOnly && (
-                <div className={popupStyles['input-box']}>
+                <div className="input-box">
                   <input
                     name="channel-password"
                     type="text"
@@ -392,43 +390,43 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['header']}>
-              <div className={popupStyles['label']}>{t('speaking-permission')}</div>
+        <div className="popup-content" style={activeTabIndex === 3 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="label-header">
+              <div className="label">{t('speaking-permission')}</div>
             </div>
-            <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <div className="col">
+              <div className="input-box row">
                 <input name="forbidGuestQueue" type="checkbox" checked={channel.forbidGuestQueue} onChange={handleForbidGuestQueueChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('forbid-guest-queue-label')}</div>
+                <div className="label">{t('forbid-guest-queue-label')}</div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              <div className="input-box row">
                 <input name="forbidGuestVoice" type="checkbox" checked={channel.forbidGuestVoice} onChange={handleForbidGuestVoiceChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('forbid-guest-voice-label')}</div>
+                <div className="label">{t('forbid-guest-voice-label')}</div>
               </div>
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['header']}>
-              <div className={popupStyles['label']}>{t('text-permission')}</div>
+        <div className="popup-content" style={activeTabIndex === 4 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="label-header">
+              <div className="label">{t('text-permission')}</div>
             </div>
-            <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <div className="col">
+              <div className="input-box row">
                 <input name="forbid-text" type="checkbox" checked={channel.forbidText} onChange={handleForbidTextChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('forbid-only-admin-text-label')}</div>
+                <div className="label">{t('forbid-only-admin-text-label')}</div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              <div className="input-box row">
                 <input name="forbid-guest-text" type="checkbox" checked={channel.forbidGuestText} onChange={handleForbidGuestTextChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('forbid-guest-text-label')}</div>
+                <div className="label">{t('forbid-guest-text-label')}</div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+              <div className="input-box row">
                 <input name="forbid-guest-url" type="checkbox" checked={channel.forbidGuestUrl} onChange={handleForbidGuestUrlChange} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('forbid-guest-url-label')}</div>
+                <div className="label">{t('forbid-guest-url-label')}</div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <div className={popupStyles['label']}>
+              <div className="input-box row">
+                <div className="label">
                   {t('guest-text-max-length-label')}
                   <input
                     name="guest-text-max-length"
@@ -443,8 +441,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   {t('characters')}
                 </div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <div className={popupStyles['label']}>
+              <div className="input-box row">
+                <div className="label">
                   {t('guest-text-wait-time-label')}
                   <input
                     name="guest-text-wait-time"
@@ -459,8 +457,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   {t('second')}
                 </div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <div className={popupStyles['label']}>
+              <div className="input-box row">
+                <div className="label">
                   {t('guest-text-gap-time-label')}
                   <input
                     name="guest-text-gap-time"
@@ -478,28 +476,28 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${settingStyles['header-bar']} ${popupStyles['row']}`}>
-              <div className={popupStyles['label']}>{`${t('channel-management')} (${totalModeratorsCount})`}</div>
-              <div className={settingStyles['search-box']}>
-                <div className={settingStyles['search-icon']} />
-                <input name="search-query" type="text" className={settingStyles['search-input']} placeholder={t('search-placeholder')} value={moderatorQuery} onChange={handleModeratorQueryChange} />
+        <div className="popup-content" style={activeTabIndex === 5 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="input-box row" style={{ justifyContent: 'space-between' }}>
+              <div className="label">{`${t('channel-management')} (${totalModeratorsCount})`}</div>
+              <div className="search-box">
+                <div className="search-icon" />
+                <input name="search-query" type="text" className="search-input" placeholder={t('search-placeholder')} value={moderatorQuery} onChange={handleModeratorQueryChange} />
               </div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className="input-box col">
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
                     {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${moderatorColumnWidths[index]}px` }} onClick={() => handleModeratorSort(field.key as keyof Types.Member)}>
                         {`${t(field.tKey)} ${moderatorSortField === field.key ? (moderatorSortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                        <div className={popupStyles['resizer']} onPointerDown={(e) => handleModeratorColumnHandleDown(e, index)} onPointerMove={(e) => handleModeratorColumnHandleMove(e, index)} />
+                        <div className="resizer" onPointerDown={(e) => handleModeratorColumnHandleDown(e, index)} onPointerMove={(e) => handleModeratorColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className={settingStyles['table-container']}>
+                <tbody className="table">
                   {sortedModerators.map((moderator) => (
                     <ChannelSettingModeratorRow
                       key={moderator.userId}
@@ -513,39 +511,32 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   ))}
                 </tbody>
               </table>
-              <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
+              <div className="note-text">{t('right-click-to-process')}</div>
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 6 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${settingStyles['header-bar']} ${popupStyles['row']}`}>
-              <div className={popupStyles['label']}>{`${t('blacklist')} (${totalBlockMembersCount})`}</div>
-              <div className={settingStyles['search-box']}>
-                <div className={settingStyles['search-icon']} />
-                <input
-                  name="search-query"
-                  type="text"
-                  className={settingStyles['search-input']}
-                  placeholder={t('search-placeholder')}
-                  value={blockMemberQuery}
-                  onChange={handleBlockMemberQueryChange}
-                />
+        <div className="popup-content" style={activeTabIndex === 6 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="input-box row" style={{ justifyContent: 'space-between' }}>
+              <div className="label">{`${t('blacklist')} (${totalBlockMembersCount})`}</div>
+              <div className="search-box">
+                <div className="search-icon" />
+                <input name="search-query" type="text" className="search-input" placeholder={t('search-placeholder')} value={blockMemberQuery} onChange={handleBlockMemberQueryChange} />
               </div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className="input-box col">
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
                     {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }} onClick={() => handleBlockMemberSort(field.key as keyof Types.Member)}>
                         {`${t(field.tKey)} ${blockMemberSortField === field.key ? (blockMemberSortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                        <div className={popupStyles['resizer']} onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
+                        <div className="resizer" onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className={settingStyles['table-container']}>
+                <tbody className="table">
                   {sortedBlockMembers.map((member) => (
                     <ChannelSettingBlockedMemberRow
                       key={member.userId}
@@ -559,21 +550,21 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   ))}
                 </tbody>
               </table>
-              <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
+              <div className="note-text">{t('right-click-to-process')}</div>
             </div>
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={!isReadOnly ? {} : { display: 'none' }}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer" style={!isReadOnly ? {} : { display: 'none' }}>
+        <div className={`button ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={isReadOnly ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+      <div className="popup-footer" style={isReadOnly ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('close')}
         </div>
       </div>
@@ -617,10 +608,10 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
   };
 
   return (
-    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+    <tr className={`${isSelected ? 'selected' : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
       <td style={{ width: `${columnWidths[0]}px` }}>
-        <div className={`${permissionStyles[moderator.gender]} ${permissionStyles[`lv-${moderator.permissionLevel}`]}`} />
-        <div className={`${popupStyles['name']} ${moderator.nickname ? popupStyles['highlight'] : ''}`}>{moderator.nickname || moderator.name}</div>
+        <div className={`permission-${moderator.gender} permission-lv-${moderator.permissionLevel}`} />
+        <div className={`name ${moderator.nickname ? 'highlight' : ''}`}>{moderator.nickname || moderator.name}</div>
       </td>
       <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
       <td style={{ width: `${columnWidths[2]}px` }}>{moderator.contribution}</td>
@@ -664,7 +655,7 @@ const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowPro
   };
 
   return (
-    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+    <tr className={`${isSelected ? 'selected' : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
       <td style={{ width: `${columnWidths[0]}px` }}>{member.nickname || member.name}</td>
       <td style={{ width: `${columnWidths[1]}px` }}>{isBlockedPermanently ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
     </tr>

@@ -6,9 +6,8 @@ import ipc from '@/main/ipc';
 import type * as Types from '@/types';
 
 import * as Actions from '@/action';
-import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constants';
 
-import popupStyles from '@/styles/Popup.module.css';
+import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constants';
 
 interface KickMemberFromServerPopupProps {
   id: string;
@@ -88,17 +87,17 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['label']}>{t('confirm-kick-user-from-server', { '0': member.nickname || member.name })}</div>
-            <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('kick-time')}</div>
-                <div className={`${popupStyles['row']}`}>
-                  <div className={popupStyles['select-box']}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="dialog-icon alert" />
+          <div className="col">
+            <div className="label">{t('confirm-kick-user-from-server', { '0': member.nickname || member.name })}</div>
+            <div className="col">
+              <div className="input-box col">
+                <div className="label">{t('kick-time')}</div>
+                <div className="row">
+                  <div className="select-box">
                     <select value={time} onChange={handleTimeChange}>
                       {getLengthOptions().map((option) => (
                         <option key={option} value={option}>
@@ -107,7 +106,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
                       ))}
                     </select>
                   </div>
-                  <div className={popupStyles['select-box']}>
+                  <div className="select-box">
                     <select value={formatType} onChange={handleFormatTypeChange}>
                       {KICK_TIME_FORMAT_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -118,10 +117,10 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
                   </div>
                 </div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('kick-reason')}</div>
-                <div className={`${popupStyles['row']}`}>
-                  <div className={popupStyles['select-box']}>
+              <div className="input-box col">
+                <div className="label">{t('kick-reason')}</div>
+                <div className="row">
+                  <div className="select-box">
                     <select value={reason} onChange={handleReasonChange}>
                       {KICK_REASON_OPTIONS.map((option) => (
                         <option key={option.value} value={option.value}>
@@ -131,7 +130,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
                     </select>
                   </div>
                   {reason === 'other' && (
-                    <div className={popupStyles['input-box']}>
+                    <div className="input-box">
                       <input
                         type="text"
                         value={otherReason}
@@ -147,11 +146,11 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

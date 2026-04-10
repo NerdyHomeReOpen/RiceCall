@@ -4,7 +4,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
-import styles from '@/styles/Server.module.css';
+import styles from '@/pages/Server/Server.module.css';
 
 const SpeakerVolumeSlider = React.memo(() => {
   const { changeSpeakerVolume, toggleSpeakerMuted } = useWebRTC();

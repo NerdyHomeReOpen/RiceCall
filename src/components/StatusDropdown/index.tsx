@@ -4,7 +4,9 @@ import type * as Types from '@/types';
 
 import { STATUS_OPTIONS } from '@/constants';
 
-import styles from '@/styles/Header.module.css';
+import StatusItem from './StatusItem';
+
+import styles from './StatusDropdown.module.css';
 
 interface StatusDropdownProps {
   x: number;
@@ -66,20 +68,3 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
 StatusDropdown.displayName = 'StatusDropdown';
 
 export default StatusDropdown;
-
-interface StatusItemProps {
-  status: Types.User['status'];
-  onStatusSelect: (status: Types.User['status']) => void;
-  onClose: () => void;
-}
-
-const StatusItem: React.FC<StatusItemProps> = React.memo(({ status, onStatusSelect, onClose }) => {
-  const handleClick = () => {
-    onStatusSelect(status);
-    onClose();
-  };
-
-  return <div key={status} className={styles['status-dropdown-option']} datatype={status} onClick={handleClick} />;
-});
-
-StatusItem.displayName = 'StatusItem';

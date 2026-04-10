@@ -13,8 +13,6 @@ import SendSection from './SendSection';
 import SentSection from './SentSection';
 import EditSection from './EditSection';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface ApplyFriendPopupProps {
   id: string;
   target: Types.User;
@@ -70,7 +68,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
+    <div className="popup-wrapper">
       {section === 0 && (
         <SendSection
           target={target}

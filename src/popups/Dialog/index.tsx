@@ -7,8 +7,6 @@ import MarkdownContent from '@/components/MarkdownContent';
 
 import { fromTags } from '@/utils/tagConverter';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 enum DIALOG_ICON {
   ALERT = 'alert',
   ALERT2 = 'alert2',
@@ -48,20 +46,20 @@ const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, mess
   }, [errorId, error]);
 
   return (
-    <div className={popupStyles['popup-wrapper']} tabIndex={0}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['dialog-icon']} ${popupStyles[DIALOG_ICON[iconType]]}`} />
-          <div className={popupStyles['dialog-message']}>
+    <div className="popup-wrapper" tabIndex={0}>
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className={`dialog-icon ${DIALOG_ICON[iconType]}`} />
+          <div className="dialog-message">
             <MarkdownContent markdownText={`${error ? `(${errorId}) ` : ''}${formattedMessageContents}`} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleSubmitBtnClick}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleSubmitBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

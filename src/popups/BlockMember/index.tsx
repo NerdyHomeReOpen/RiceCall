@@ -7,8 +7,6 @@ import ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface BlockMemberPopupProps {
   id: string;
   serverId: Types.Server['serverId'];
@@ -39,16 +37,16 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serv
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={popupStyles['dialog-content']}>
-          <div className={`${popupStyles['dialog-icon']} ${popupStyles['alert']}`} />
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['label']}>{t('confirm-block-user', { '0': member.nickname || member.name })}</div>
-            <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <div className={popupStyles['label']}>{t('block-type')}</div>
-                <div className={popupStyles['select-box']}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="dialog-icon alert" />
+          <div className="col">
+            <div className="label">{t('confirm-block-user', { '0': member.nickname || member.name })}</div>
+            <div className="col">
+              <div className="input-box row">
+                <div className="label">{t('block-type')}</div>
+                <div className="select-box">
                   <select value={blockType} onChange={handleBlockTypeChange}>
                     {blockTypeOptions.map((option) => (
                       <option key={option.key} value={option.key} disabled={option.disabled}>
@@ -62,11 +60,11 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serv
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

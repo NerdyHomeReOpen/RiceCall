@@ -14,7 +14,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import { escapeHtml } from '@/utils/tagConverter';
 import { getPermissionText } from '@/utils/language';
 
-import styles from '@/styles/Message.module.css';
+import styles from './MessageContent.module.css';
 
 interface PromptMessageProps {
   messageGroup: Types.PromptMessage & { contents: string[] };

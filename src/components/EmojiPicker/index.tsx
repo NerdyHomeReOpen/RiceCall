@@ -7,8 +7,7 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import EmojiItem from './EmojiItem';
 
-import emojiStyles from '@/styles/Emoji.module.css';
-import popupStyles from '@/styles/Popup.module.css';
+import styles from './EmojiPicker.module.css';
 
 interface EmojiPickerProps {
   x: number;
@@ -142,15 +141,15 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     return (
       <div
         ref={emojiPickerRef}
-        className={`context-menu-container ${emojiStyles['emoji-panel']} ${!showFontbar ? emojiStyles['emoji-panel-compact'] : ''}`}
+        className={`context-menu-container ${styles['emoji-panel']} ${!showFontbar ? styles['emoji-panel-compact'] : ''}`}
         style={display ? { left: pickerX, top: pickerY, position: 'fixed' } : { opacity: 0, position: 'fixed' }}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {showFontbar && (
-          <div className={emojiStyles['emoji-fontbar']}>
-            <div className={emojiStyles['emoji-font-icon']} aria-hidden="true" />
-            <div className={`${popupStyles['select-box']} ${emojiStyles['font-select-box']}`}>
-              <div className={popupStyles['select-box']}>
+          <div className={styles['emoji-fontbar']}>
+            <div className={styles['emoji-font-icon']} aria-hidden="true" />
+            <div className="select-box ${styles['font-select-box']}">
+              <div className="select-box">
                 <select value={fontSize} onChange={handleFontSizeChange}>
                   {Array.from({ length: 17 }, (_, i) => (
                     <option key={i} value={`${i + 8}px`}>
@@ -160,34 +159,34 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
                 </select>
               </div>
             </div>
-            <div className={`${emojiStyles['color-select-box']}`} onMouseDown={handleColorPickerClick}>
-              <div className={emojiStyles['color-swatch']} style={{ backgroundColor: selectedColor }} />
+            <div className={`${styles['color-select-box']}`} onMouseDown={handleColorPickerClick}>
+              <div className={styles['color-swatch']} style={{ backgroundColor: selectedColor }} />
             </div>
           </div>
         )}
-        <div className={emojiStyles['emoji-pages']}>
-          <div className={`${emojiStyles['emoji-page']} ${activeTab === 'def' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
-            <div className={emojiStyles['emoji-grid']}>
+        <div className={styles['emoji-pages']}>
+          <div className={`${styles['emoji-page']} ${activeTab === 'def' ? styles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
+            <div className={styles['emoji-grid']}>
               {DEFAULT_EMOJIS.map((e) => (
                 <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${emojiStyles['emoji-page']} ${activeTab === 'other' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
-            <div className={emojiStyles['emoji-grid']}>
+          <div className={`${styles['emoji-page']} ${activeTab === 'other' ? styles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
+            <div className={styles['emoji-grid']}>
               {TW_EMOJIS.map((e) => (
                 <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${emojiStyles['emoji-page']} ${activeTab === 'vip' ? emojiStyles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
-            <div className={emojiStyles['emoji-vip-placeholder']}>{t('soon')}</div>
+          <div className={`${styles['emoji-page']} ${activeTab === 'vip' ? styles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
+            <div className={styles['emoji-vip-placeholder']}>{t('soon')}</div>
           </div>
         </div>
-        <div className={emojiStyles['emoji-tabs']} role="tablist">
-          <button id="btn-def" className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-def']}`} role="tab" aria-selected={activeTab === 'def'} onClick={handleDefTabClick} />
-          <button id="btn-other" className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-other']}`} role="tab" aria-selected={activeTab === 'other'} onClick={handleOtherTabClick} />
-          <button id="btn-vip" className={`${emojiStyles['emoji-tab-btn']} ${emojiStyles['tab-vip']}`} role="tab" aria-selected={activeTab === 'vip'} onClick={handleVipTabClick} />
+        <div className={styles['emoji-tabs']} role="tablist">
+          <button id="btn-def" className={`${styles['emoji-tab-btn']} ${styles['tab-def']}`} role="tab" aria-selected={activeTab === 'def'} onClick={handleDefTabClick} />
+          <button id="btn-other" className={`${styles['emoji-tab-btn']} ${styles['tab-other']}`} role="tab" aria-selected={activeTab === 'other'} onClick={handleOtherTabClick} />
+          <button id="btn-vip" className={`${styles['emoji-tab-btn']} ${styles['tab-vip']}`} role="tab" aria-selected={activeTab === 'vip'} onClick={handleVipTabClick} />
         </div>
       </div>
     );

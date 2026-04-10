@@ -19,9 +19,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { isChannelMod } from '@/utils/permission';
 
-import styles from '@/styles/Server.module.css';
-import vipStyles from '@/styles/Vip.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
+import styles from '@/pages/Server/Server.module.css';
 
 interface UserTabProps {
   member: Types.OnlineMember;
@@ -158,9 +156,9 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
     >
       <div className={`${styles['user-text-state']} ${member.isTextMuted ? styles['muted'] : ''}`} />
       <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
-      <div className={`${permissionStyles[member.gender]} ${permissionStyles[`lv-${member.permissionLevel}`]}`} />
-      {hasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${member.vip}`]}`} />}
-      <div className={`${styles['user-tab-name']} ${member.nickname ? styles['member'] : ''} ${hasVip ? vipStyles['vip-name-color'] : ''}`}>{member.nickname || member.name}</div>
+      <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
+      {hasVip && <div className={`vip-icon vip-${member.vip}`} />}
+      <div className={`${styles['user-tab-name']} ${member.nickname ? styles['member'] : ''} ${hasVip ? 'vip-name-color' : ''}`}>{member.nickname || member.name}</div>
       <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
       <BadgeList badges={JSON.parse(member.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isSelf && <div className={styles['my-location-icon']} />}

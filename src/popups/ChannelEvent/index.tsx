@@ -14,9 +14,6 @@ import { setChannelEvents } from '@/store/slices/ChannelEvents';
 import { getFormatDate } from '@/utils/language';
 
 import styles from './ChannelEvent.module.css';
-import popupStyles from '@/styles/Popup.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
-import settingStyles from '@/styles/Setting.module.css';
 
 interface ChannelEventPopupProps {
   channelEvents: Types.ChannelEvent[];
@@ -64,7 +61,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
   }, [channelEventsData, dispatch]);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
+    <div className="popup-wrapper">
       <div className={styles['options-viewer']}>
         <div className={`${styles['option-tab']} ${isCurrentChannelTab ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
           {t('current-channel')}
@@ -74,7 +71,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
           {t('all-channel')}
         </div>
       </div>
-      <div className={popupStyles['popup-body']}>
+      <div className="popup-body">
         <div className={styles['event-list']} style={isCurrentChannelTab ? {} : { display: 'none' }}>
           <div className={styles['current-channel']}>{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
           {currentChannelEvents.map((event, index) => (
@@ -87,10 +84,10 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
           ))}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={settingStyles['search-box']}>
-          <div className={settingStyles['search-icon']} />
-          <input name="search-query" type="text" className={settingStyles['search-input']} placeholder={t('search-placeholder')} value={query} onChange={handleQueryChange} />
+      <div className="popup-footer">
+        <div className="search-box">
+          <div className="search-icon" />
+          <input name="search-query" type="text" className="search-input" placeholder={t('search-placeholder')} value={query} onChange={handleQueryChange} />
         </div>
       </div>
     </div>
@@ -196,7 +193,7 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
   return (
     <div className={styles['event-box']} onContextMenu={handleContextMenu}>
       <div className={styles['user-detail']}>
-        <div className={`${permissionStyles[event.gender]} ${permissionStyles[`lv-${event.permissionLevel}`]}`} />
+        <div className={`permission-${event.gender} permission-lv-${event.permissionLevel}`} />
         <div className={`${styles['name']} ${event.nickname ? styles['highlight'] : ''}`}>{event.nickname || event.name}</div>
       </div>
       {section === 'current' ? getCurrentActionContent(event) : getActionContent(event)}

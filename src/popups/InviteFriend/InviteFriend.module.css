@@ -1,4 +1,3 @@
-/* Headers */
 .header {
   display: flex;
   flex: 1;
@@ -65,7 +64,6 @@
   background-position: -20px 0;
 }
 
-/* Body */
 .friend-group-list {
   display: flex;
   flex: 1;
@@ -181,7 +179,6 @@
   background-size: cover;
 }
 
-/* Utils */
 .disabled {
   cursor: not-allowed;
   opacity: 0.6;

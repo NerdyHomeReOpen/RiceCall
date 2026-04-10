@@ -22,10 +22,7 @@ import { ImageNode } from '@/extensions/ImageNode';
 
 import { fromTags, toTags } from '@/utils/tagConverter';
 
-// TODO: Refactor styles
-import popupStyles from '@/styles/Popup.module.css';
-import settingStyles from '@/styles/Setting.module.css';
-import markdownStyles from '@/styles/Markdown.module.css';
+import styles from './AnnouncementEditor.module.css';
 
 interface AnnouncementEditorProps {
   announcement: string;
@@ -211,11 +208,11 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   }, [editor, syncStyles]);
 
   return (
-    <div className={popupStyles['input-box']}>
+    <div className="input-box">
       {!showPreview ? (
         <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid #ccc', height: '380px' }}>
-          <div className={settingStyles['toolbar']}>
-            <div className={popupStyles['select-box']}>
+          <div className={styles['toolbar']}>
+            <div className="select-box">
               <select value={fontFamily} onChange={handleFontFamilyChange}>
                 {FONT_LIST.map((font) => (
                   <option key={font.value} value={font.value}>
@@ -224,7 +221,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 ))}
               </select>
             </div>
-            <div className={popupStyles['select-box']}>
+            <div className="select-box">
               <select value={fontSize} onChange={handleFontSizeChange}>
                 {Array.from({ length: 17 }, (_, i) => (
                   <option key={i} value={`${i + 8}px`}>
@@ -233,7 +230,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 ))}
               </select>
             </div>
-            <div className={`${settingStyles['button']} ${isTextAlignLeft ? settingStyles['active'] : ''}`} onClick={handleTextAlignLeftClick}>
+            <div className={`${styles['toolbar-button']} ${isTextAlignLeft ? styles['active'] : ''}`} onClick={handleTextAlignLeftClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path
                   fillRule="evenodd"
@@ -241,7 +238,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 />
               </svg>
             </div>
-            <div className={`${settingStyles['button']} ${isTextAlignCenter ? settingStyles['active'] : ''}`} onClick={handleTextAlignCenterClick}>
+            <div className={`${styles['toolbar-button']} ${isTextAlignCenter ? styles['active'] : ''}`} onClick={handleTextAlignCenterClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path
                   fillRule="evenodd"
@@ -249,7 +246,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 />
               </svg>
             </div>
-            <div className={`${settingStyles['button']} ${isTextAlignRight ? settingStyles['active'] : ''}`} onClick={handleTextAlignRightClick}>
+            <div className={`${styles['toolbar-button']} ${isTextAlignRight ? styles['active'] : ''}`} onClick={handleTextAlignRightClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path
                   fillRule="evenodd"
@@ -257,31 +254,31 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 />
               </svg>
             </div>
-            <div className={`${settingStyles['button']} ${isBold ? settingStyles['active'] : ''}`} onClick={handleBoldClick}>
+            <div className={`${styles['toolbar-button']} ${isBold ? styles['active'] : ''}`} onClick={handleBoldClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z" />
               </svg>
             </div>
-            <div className={`${settingStyles['button']} ${isItalic ? settingStyles['active'] : ''}`} onClick={handleItalicClick}>
+            <div className={`${styles['toolbar-button']} ${isItalic ? styles['active'] : ''}`} onClick={handleItalicClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M7.991 11.674 9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z" />
               </svg>
             </div>
-            <div className={`${settingStyles['button']} ${isUnderline ? settingStyles['active'] : ''}`} onClick={handleUnderlineClick}>
+            <div className={`${styles['toolbar-button']} ${isUnderline ? styles['active'] : ''}`} onClick={handleUnderlineClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M5.313 3.136h-1.23V9.54c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V3.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57s-2.687-1.08-2.687-2.57zM12.5 15h-9v-1h9z" />
               </svg>
             </div>
-            <div className={settingStyles['button']} onClick={handleTextColorClick}>
+            <div className={styles['toolbar-button']} onClick={handleTextColorClick}>
               <div style={{ backgroundColor: textColor || '#FFFFFF', width: '16px', height: '16px', borderRadius: '2px' }} />
             </div>
-            <div className={settingStyles['button']} onClick={handleEmojiPickerClick}>
+            <div className={styles['toolbar-button']} onClick={handleEmojiPickerClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14m0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16" />
                 <path d="M4.285 9.567a.5.5 0 0 1 .683.183A3.5 3.5 0 0 0 8 11.5a3.5 3.5 0 0 0 3.032-1.75.5.5 0 1 1 .866.5A4.5 4.5 0 0 1 8 12.5a4.5 4.5 0 0 1-3.898-2.25.5.5 0 0 1 .183-.683M7 6.5C7 7.328 6.552 8 6 8s-1-.672-1-1.5S5.448 5 6 5s1 .672 1 1.5m4 0c0 .828-.448 1.5-1 1.5s-1-.672-1-1.5S9.448 5 10 5s1 .672 1 1.5" />
               </svg>
             </div>
-            <div className={settingStyles['button']} onClick={handleEmbedLinkInputClick}>
+            <div className={styles['toolbar-button']} onClick={handleEmbedLinkInputClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8.051 1.999h.089c.822.003 4.987.033 6.11.335a2.01 2.01 0 0 1 1.415 1.42c.101.38.172.883.22 1.402l.01.104.022.26.008.104c.065.914.073 1.77.074 1.957v.075c-.001.194-.01 1.108-.082 2.06l-.008.105-.009.104c-.05.572-.124 1.14-.235 1.558a2.01 2.01 0 0 1-1.415 1.42c-1.16.312-5.569.334-6.18.335h-.142c-.309 0-1.587-.006-2.927-.052l-.17-.006-.087-.004-.171-.007-.171-.007c-1.11-.049-2.167-.128-2.654-.26a2.01 2.01 0 0 1-1.415-1.419c-.111-.417-.185-.986-.235-1.558L.09 9.82l-.008-.104A31 31 0 0 1 0 7.68v-.123c.002-.215.01-.958.064-1.778l.007-.103.003-.052.008-.104.022-.26.01-.104c.048-.519.119-1.023.22-1.402a2.01 2.01 0 0 1 1.415-1.42c.487-.13 1.544-.21 2.654-.26l.17-.007.172-.006.086-.003.171-.007A100 100 0 0 1 7.858 2zM6.4 5.209v4.818l4.157-2.408z" />
               </svg>
@@ -289,14 +286,14 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           </div>
           <EditorContent
             editor={editor}
-            className={`${markdownStyles['setting-markdown-container']} ${markdownStyles['markdown-content']}`}
+            className="editable-markdown-container markdown-content"
             style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
             onPaste={handlePaste}
             maxLength={1000}
           />
         </div>
       ) : (
-        <div className={markdownStyles['setting-markdown-container']} style={{ height: '380px' }}>
+        <div className="editable-markdown-container" style={{ height: '380px' }}>
           <MarkdownContent markdownText={announcement} />
         </div>
       )}

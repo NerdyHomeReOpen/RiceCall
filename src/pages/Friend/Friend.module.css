@@ -158,15 +158,13 @@
   height: 20px;
 }
 
-/* Content */
-
-.friend-body {
+.friend-page-body {
   display: flex;
   flex: 1;
   min-height: 0;
 }
 
-.sidebar {
+.friend-page-sidebar {
   display: flex;
   flex-direction: column;
   width: 280px;
@@ -198,7 +196,6 @@
   background-position: -64px 0;
 }
 
-
 .prev-icon {
   min-width: 29px;
   min-height: 30px;
@@ -227,9 +224,7 @@
   background-position: -58px 0;
 }
 
-/* Main Content */
-
-.content {
+.friend-page-content {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -239,13 +234,13 @@
   border-top: 1px solid var(--border);
 }
 
-.content .header {
+.friend-page-content-header {
   padding: 10px;
   font-size: 1rem;
   font-weight: bold;
 }
 
-.content-layout {
+.friend-page-content-layout {
   display: flex;
   flex: 1;
   flex-direction: column;

@@ -14,7 +14,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 
 import { getFormatTimestamp } from '@/utils/language';
 
-import styles from '@/styles/Message.module.css';
+import styles from './MessageContent.module.css';
 
 interface DirectMessageProps {
   messageGroup: Types.DirectMessage & { contents: string[] };

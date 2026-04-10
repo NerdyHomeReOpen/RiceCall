@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import ServerCard from '@/components/ServerCard';
 
-import styles from '@/styles/Home.module.css';
+import styles from '@/pages/Home/Home.module.css';
 
 interface ServerListProps {
   title: string;

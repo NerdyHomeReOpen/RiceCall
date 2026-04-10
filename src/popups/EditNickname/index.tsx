@@ -7,8 +7,6 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface EditNicknamePopupProps {
   id: string;
   serverId: Types.Server['serverId'];
@@ -34,29 +32,29 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, se
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={`${popupStyles['dialog-content']} ${popupStyles['col']}`}>
-          <div className={popupStyles['input-box']}>
-            <div className={popupStyles['label']} style={{ minWidth: '2rem' }}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content col">
+          <div className="input-box">
+            <div className="label" style={{ minWidth: '2rem' }}>
               {t('nickname')}:
             </div>
-            <div className={popupStyles['label']}>{member.name}</div>
+            <div className="label">{member.name}</div>
           </div>
-          <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-            <div className={popupStyles['label']}>{t('please-enter-the-member-nickname')}</div>
+          <div className="input-box col">
+            <div className="label">{t('please-enter-the-member-nickname')}</div>
             <input name="nickname" type="text" value={memberNickname} maxLength={32} onChange={(e) => setMemberNickname(e.target.value)} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={popupStyles['button']} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className="button" onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
-        <div className={popupStyles['button']} onClick={handleApplyBtnClick}>
+        <div className="button" onClick={handleApplyBtnClick}>
           {t('apply')}
         </div>
       </div>

@@ -15,8 +15,6 @@ import { useAppSelector } from '@/hooks/Store';
 import { getDefaultServer } from '@/utils/default';
 
 import styles from './CreateServer.module.css';
-import popupStyles from '@/styles/Popup.module.css';
-import settingStyles from '@/styles/Setting.module.css';
 
 interface CreateServerPopupProps {
   id: string;
@@ -95,14 +93,14 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
 
   return (
     <>
-      <div className={popupStyles['popup-wrapper']} style={section === 0 ? {} : { display: 'none' }}>
-        <div className={popupStyles['popup-tabs']}>
-          <div className={`${popupStyles['tab']} ${popupStyles['active']}`}>{t('select-server-type')}</div>
-          <div className={popupStyles['tab']}>{t('fill-info')}</div>
+      <div className="popup-wrapper" style={section === 0 ? {} : { display: 'none' }}>
+        <div className="popup-tabs">
+          <div className="popup-tab active">{t('select-server-type')}</div>
+          <div className="popup-tab">{t('fill-info')}</div>
         </div>
-        <div className={popupStyles['popup-body']}>
-          <div className={settingStyles['content']}>
-            <div className={`${styles['message']}`}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
+        <div className="popup-body">
+          <div className={styles['create-server-content']}>
+            <div className={styles['message']}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
             <div className={styles['select-type-text']}>{t('please-select-server-type')}</div>
             <div className={styles['button-group']}>
               {SERVER_TYPES.map((type) => (
@@ -120,41 +118,41 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
             </div>
           </div>
         </div>
-        <div className={popupStyles['popup-footer']}>
-          <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="popup-footer">
+          <div className="button" onClick={handleCloseBtnClick}>
             {t('cancel')}
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-wrapper']} style={section === 1 ? {} : { display: 'none' }}>
-        <div className={popupStyles['popup-tabs']}>
-          <div className={popupStyles['tab']}>{t('select-server-type')}</div>
-          <div className={`${popupStyles['tab']}  ${popupStyles['active']}`}>{t('fill-info')}</div>
+      <div className="popup-wrapper" style={section === 1 ? {} : { display: 'none' }}>
+        <div className="popup-tabs">
+          <div className="popup-tab">{t('select-server-type')}</div>
+          <div className="popup-tab active">{t('fill-info')}</div>
         </div>
-        <div className={popupStyles['popup-body']}>
-          <div className={`${settingStyles['content']} ${popupStyles['col']}`} style={{ justifyContent: 'space-evenly' }}>
+        <div className="popup-body">
+          <div className={styles['create-server-content']} style={{ justifyContent: 'space-evenly' }}>
             <div className={styles['avatar-wrapper']}>
               <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${serverAvatarUrl})` }} />
               <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
-              <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className={popupStyles['button']}>
+              <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className="button">
                 {t('upload-avatar')}
               </label>
             </div>
-            <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <div className={popupStyles['label']} style={{ width: '100px' }}>
+            <div className="col">
+              <div className="input-box row">
+                <div className="label" style={{ width: '100px' }}>
                   {t('server-type')}
                 </div>
                 <input name="type" type="text" disabled value={t(serverType as keyof typeof t)} />
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <div className={popupStyles['label']} style={{ width: '100px' }}>
+              <div className="input-box row">
+                <div className="label" style={{ width: '100px' }}>
                   {t('server-name')}
                 </div>
                 <input name="server-name" type="text" placeholder={t('server-name-placeholder')} maxLength={32} onChange={handleServerNameChange} />
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
-                <div className={popupStyles['label']} style={{ width: '100px' }}>
+              <div className="input-box row">
+                <div className="label" style={{ width: '100px' }}>
                   {t('server-slogan')}
                 </div>
                 <input name="server-slogan" type="text" placeholder={t('server-slogan-placeholder')} maxLength={32} onChange={handleServerSloganChange} />
@@ -162,14 +160,14 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
             </div>
           </div>
         </div>
-        <div className={popupStyles['popup-footer']}>
-          <div className={popupStyles['button']} onClick={handlePreviousBtnClick}>
+        <div className="popup-footer">
+          <div className="button" onClick={handlePreviousBtnClick}>
             {t('previous')}
           </div>
-          <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+          <div className={`button ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
             {t('confirm')}
           </div>
-          <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+          <div className="button" onClick={handleCloseBtnClick}>
             {t('cancel')}
           </div>
         </div>

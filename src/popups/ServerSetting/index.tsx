@@ -25,9 +25,7 @@ import { isServerAdmin, isMember, isStaff } from '@/utils/permission';
 import { sorter } from '@/utils/sorter';
 import { objDiff } from '@/utils/objDiff';
 
-import settingStyles from '@/styles/Setting.module.css';
-import popupStyles from '@/styles/Popup.module.css';
-import permissionStyles from '@/styles/Permission.module.css';
+import styles from './ServerSetting.module.css';
 
 interface ServerSettingPopupProps {
   id: string;
@@ -303,38 +301,38 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   }, []);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={settingStyles['left']}>
-          <div className={settingStyles['tabs']}>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="popup-sidebar">
+          <div className="popup-sidebar-tabs">
             {settingPages.map((title, index) => (
-              <div className={`${settingStyles['tab']} ${activeTabIndex === index ? settingStyles['active'] : ''}`} onClick={() => setActiveTabIndex(index)} key={index}>
+              <div className={`popup-sidebar-tab ${activeTabIndex === index ? 'active' : ''}`} onClick={() => setActiveTabIndex(index)} key={index}>
                 {title}
               </div>
             ))}
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 0 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['row']}>
-              <div className={popupStyles['col']}>
-                <div className={popupStyles['row']}>
-                  <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                    <div className={popupStyles['label']}>{t('name')}</div>
+        <div className="popup-content" style={activeTabIndex === 0 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="row">
+              <div className="col">
+                <div className="row">
+                  <div className="input-box col">
+                    <div className="label">{t('name')}</div>
                     <input name="name" type="text" value={server.name} maxLength={32} onChange={handleNameChange} readOnly={isReadOnly} />
                   </div>
-                  <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                    <div className={popupStyles['label']}>{t('id')}</div>
+                  <div className="input-box col">
+                    <div className="label">{t('id')}</div>
                     <input name="server-display-id" type="text" value={server.specialId || server.displayId} readOnly />
                   </div>
                 </div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('slogan')}</div>
+                <div className="input-box col">
+                  <div className="label">{t('slogan')}</div>
                   <input name="slogan" type="text" value={server.slogan} maxLength={100} onChange={handleSloganChange} readOnly={isReadOnly} />
                 </div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('type')}</div>
-                  <div className={popupStyles['select-box']}>
+                <div className="input-box col">
+                  <div className="label">{t('type')}</div>
+                  <div className="select-box">
                     <select name="type" value={server.type} onChange={handleTypeChange} datatype={isReadOnly ? 'read-only' : ''}>
                       <option value="other">{t('other')}</option>
                       <option value="game">{t('game')}</option>
@@ -343,11 +341,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   </div>
                 </div>
               </div>
-              <div className={settingStyles['avatar-wrapper']}>
-                <div className={settingStyles['avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+              <div className={styles['server-avatar-wrapper']}>
+                <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
                 <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
                 {!isReadOnly ? (
-                  <label htmlFor="avatar-upload" className={popupStyles['button']} style={{ marginTop: '10px', height: '2em' }}>
+                  <label htmlFor="avatar-upload" className="button" style={{ marginTop: '10px', height: '2em' }}>
                     {t('change-avatar')}
                   </label>
                 ) : (
@@ -355,41 +353,41 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 )}
               </div>
             </div>
-            <div className={popupStyles['col']}>
-              <div className={popupStyles['row']}>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('level')}</div>
+            <div className="col">
+              <div className="row">
+                <div className="input-box col">
+                  <div className="label">{t('level')}</div>
                   <input name="level" type="text" value={server.level} readOnly />
                 </div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                  <div className={popupStyles['label']}>{t('create-at')}</div>
+                <div className="input-box col">
+                  <div className="label">{t('create-at')}</div>
                   <input name="created-at" type="text" value={new Date(server.createdAt).toLocaleString()} readOnly />
                 </div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+                <div className="input-box col">
                   <div style={{ display: 'flex', alignItems: 'center' }}>
-                    <div className={popupStyles['label']}>{t('wealth')}</div>
-                    <div className={settingStyles['wealth-coin-icon']} />
+                    <div className="label">{t('wealth')}</div>
+                    <div className={styles['wealth-coin-icon']} />
                   </div>
                   <input name="wealth" type="text" value={server.wealth} readOnly />
                 </div>
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('server-link')}</div>
+              <div className="input-box col">
+                <div className="label">{t('server-link')}</div>
                 <input name="link" type="text" value={`https://ricecall.com/join?sid=${server.specialId || server.displayId}`} readOnly />
               </div>
-              <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
-                <div className={popupStyles['label']}>{t('description')}</div>
+              <div className="input-box col">
+                <div className="label">{t('description')}</div>
                 <textarea name="description" value={server.description} onChange={handleDescriptionChange} readOnly={isReadOnly} />
               </div>
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 1 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${settingStyles['header-bar']} ${popupStyles['row']}`}>
-              <div className={popupStyles['label']}>{t('input-announcement')}</div>
+        <div className="popup-content" style={activeTabIndex === 1 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="input-box row" style={{ justifyContent: 'space-between' }}>
+              <div className="label">{t('input-announcement')}</div>
               {!isReadOnly && (
-                <div className={popupStyles['button']} onClick={handleShowPreviewBtnClick}>
+                <div className="button" onClick={handleShowPreviewBtnClick}>
                   {showPreview ? t('edit') : t('preview')}
                 </div>
               )}
@@ -397,98 +395,91 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
             <AnnouncementEditor announcement={server.announcement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} />
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 2 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${settingStyles['header-bar']} ${popupStyles['row']}`}>
-              <div className={popupStyles['label']}>{`${t('member')} (${totalMembersCount})`}</div>
-              <div className={settingStyles['search-box']}>
-                <div className={settingStyles['search-icon']} />
-                <input name="search-query" type="text" className={settingStyles['search-input']} placeholder={t('search-placeholder')} value={memberQuery} onChange={handleMemberQueryChange} />
+        <div className="popup-content" style={activeTabIndex === 2 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="input-box row" style={{ justifyContent: 'space-between' }}>
+              <div className="label">{`${t('member')} (${totalMembersCount})`}</div>
+              <div className="search-box">
+                <div className="search-icon" />
+                <input name="search-query" type="text" className="search-input" placeholder={t('search-placeholder')} value={memberQuery} onChange={handleMemberQueryChange} />
               </div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className="input-box col">
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
                     {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }} onClick={() => handleMemberSort(field.key as keyof Types.Member)}>
                         {`${t(field.tKey)} ${memberSortField === field.key ? (memberSortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                        <div className={popupStyles['resizer']} onPointerDown={(e) => handleMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleMemberColumnHandleMove(e, index)} />
+                        <div className="resizer" onPointerDown={(e) => handleMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className={settingStyles['table-container']}>
+                <tbody className="table">
                   {sortedMembers.map((member) => (
                     <ServerSettingMemberRow key={member.userId} user={user} server={server} member={member} permissionLevel={permissionLevel} columnWidths={memberColumnWidths} />
                   ))}
                 </tbody>
               </table>
-              <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
+              <div className="note-text">{t('right-click-to-process')}</div>
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 3 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={popupStyles['header']}>
-              <div className={popupStyles['label']}>{t('access-permission')}</div>
+        <div className="popup-content" style={activeTabIndex === 3 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="label-header">
+              <div className="label">{t('access-permission')}</div>
             </div>
-            <div className={popupStyles['col']}>
-              <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+            <div className="col">
+              <div className="input-box row">
                 <input name="visibility" type="radio" value="public" checked={server.visibility === 'public'} onChange={handleVisibilityPublicClick} readOnly={isReadOnly} />
-                <div className={popupStyles['label']}>{t('public-server')}</div>
+                <div className="label">{t('public-server')}</div>
               </div>
               <div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <div className="input-box row">
                   <input name="visibility" type="radio" value="private" checked={server.visibility === 'private'} onChange={handleVisibilityPrivateClick} readOnly={isReadOnly} />
-                  <div className={popupStyles['label']}>{t('semi-public-server')}</div>
+                  <div className="label">{t('semi-public-server')}</div>
                 </div>
-                <div className={popupStyles['hint-text']}>{t('semi-public-server-description')}</div>
+                <div className="hint-text">{t('semi-public-server-description')}</div>
               </div>
               <div>
-                <div className={`${popupStyles['input-box']} ${popupStyles['row']}`}>
+                <div className="input-box row">
                   <input name="visibility" type="radio" value="invisible" checked={server.visibility === 'invisible'} onChange={handleVisibilityInvisibleClick} readOnly={isReadOnly} />
-                  <div className={popupStyles['label']}>{t('private-server')}</div>
+                  <div className="label">{t('private-server')}</div>
                 </div>
-                <div className={popupStyles['hint-text']}>{t('private-server-description')}</div>
+                <div className="hint-text">{t('private-server-description')}</div>
               </div>
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 4 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${settingStyles['header-bar']} ${popupStyles['row']}`}>
-              <div className={popupStyles['label']}>{`${t('applicants')} (${totalApplicationsCount})`}</div>
-              <div className={popupStyles['row']}>
-                <div className={popupStyles['button']} onClick={handleApplySettingBtnClick}>
+        <div className="popup-content" style={activeTabIndex === 4 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="input-box row" style={{ justifyContent: 'space-between' }}>
+              <div className="label">{`${t('applicants')} (${totalApplicationsCount})`}</div>
+              <div className="row">
+                <div className="button" onClick={handleApplySettingBtnClick}>
                   {t('apply-setting')}
                 </div>
-                <div className={settingStyles['search-box']}>
-                  <div className={settingStyles['search-icon']} />
-                  <input
-                    name="search-query"
-                    type="text"
-                    className={settingStyles['search-input']}
-                    placeholder={t('search-placeholder')}
-                    value={applicationQuery}
-                    onChange={handleApplicationQueryChange}
-                  />
+                <div className="search-box">
+                  <div className="search-icon" />
+                  <input name="search-query" type="text" className="search-input" placeholder={t('search-placeholder')} value={applicationQuery} onChange={handleApplicationQueryChange} />
                 </div>
               </div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className="input-box col">
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
                     {MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${applicationColumnWidths[index]}px` }} onClick={() => handleApplicationSort(field.key as keyof Types.MemberApplication)}>
                         {`${t(field.tKey)} ${applicationSortField === field.key ? (applicationSortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                        <div className={popupStyles['resizer']} onPointerDown={(e) => handleApplicationColumnHandleDown(e, index)} onPointerMove={(e) => handleApplicationColumnHandleMove(e, index)} />
+                        <div className="resizer" onPointerDown={(e) => handleApplicationColumnHandleDown(e, index)} onPointerMove={(e) => handleApplicationColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className={settingStyles['table-container']}>
+                <tbody className="table">
                   {sortedApplications.map((application) => {
                     const isSelf = application.userId === user.userId;
                     const isSelected = selectedItemId === `application-${application.userId}`;
@@ -531,7 +522,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                     };
 
                     return (
-                      <tr key={application.userId} className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+                      <tr key={application.userId} className={`${isSelected ? 'selected' : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
                         <td style={{ width: `${applicationColumnWidths[0]}px` }}>{application.name}</td>
                         <td style={{ width: `${applicationColumnWidths[1]}px` }}>{application.description}</td>
                         <td style={{ width: `${applicationColumnWidths[2]}px` }}>{new Date(application.createdAt).toLocaleDateString()}</td>
@@ -540,59 +531,52 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   })}
                 </tbody>
               </table>
-              <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
+              <div className="note-text">{t('right-click-to-process')}</div>
             </div>
           </div>
         </div>
-        <div className={settingStyles['right']} style={activeTabIndex === 5 ? {} : { display: 'none' }}>
-          <div className={popupStyles['col']}>
-            <div className={`${popupStyles['input-box']} ${settingStyles['header-bar']} ${popupStyles['row']}`}>
-              <div className={popupStyles['label']}>{`${t('blacklist')} (${totalBlockMembersCount})`}</div>
-              <div className={settingStyles['search-box']}>
-                <div className={settingStyles['search-icon']} />
-                <input
-                  name="search-query"
-                  type="text"
-                  className={settingStyles['search-input']}
-                  placeholder={t('search-placeholder')}
-                  value={blockMemberQuery}
-                  onChange={handleBlockMemberQueryChange}
-                />
+        <div className="popup-content" style={activeTabIndex === 5 ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="input-box row" style={{ justifyContent: 'space-between' }}>
+              <div className="label">{`${t('blacklist')} (${totalBlockMembersCount})`}</div>
+              <div className="search-box">
+                <div className="search-icon" />
+                <input name="search-query" type="text" className="search-input" placeholder={t('search-placeholder')} value={blockMemberQuery} onChange={handleBlockMemberQueryChange} />
               </div>
             </div>
-            <div className={`${popupStyles['input-box']} ${popupStyles['col']}`}>
+            <div className="input-box col">
               <table style={{ height: '330px' }}>
                 <thead>
                   <tr>
                     {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }} onClick={() => handleBlockMemberSort(field.key as keyof Types.Member)}>
                         {`${t(field.tKey)} ${blockMemberSortField === field.key ? (blockMemberSortDirection === 1 ? '⏶' : '⏷') : ''}`}
-                        <div className={popupStyles['resizer']} onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
+                        <div className="resizer" onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className={settingStyles['table-container']}>
+                <tbody className="table">
                   {sortedBlockMembers.map((member) => (
                     <ServerSettingBlockedMemberRow key={member.userId} user={user} server={server} member={member} permissionLevel={permissionLevel} columnWidths={blockMemberColumnWidths} />
                   ))}
                 </tbody>
               </table>
-              <div className={settingStyles['note-text']}>{t('right-click-to-process')}</div>
+              <div className="note-text">{t('right-click-to-process')}</div>
             </div>
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={!isReadOnly ? {} : { display: 'none' }}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleSaveBtnClick}>
+      <div className="popup-footer" style={!isReadOnly ? {} : { display: 'none' }}>
+        <div className={`button ${!canSubmit ? 'disabled' : ''}`} onClick={handleSaveBtnClick}>
           {t('save')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
-      <div className={popupStyles['popup-footer']} style={isReadOnly ? {} : { display: 'none' }}>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+      <div className="popup-footer" style={isReadOnly ? {} : { display: 'none' }}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('close')}
         </div>
       </div>
@@ -635,10 +619,10 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
   };
 
   return (
-    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+    <tr className={`${isSelected ? 'selected' : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
       <td title={member.nickname || member.name} style={{ width: `${columnWidths[0]}px` }}>
-        <div className={`${permissionStyles[member.gender]} ${permissionStyles[`lv-${member.permissionLevel}`]}`} />
-        <div className={`${popupStyles['name']} ${member.nickname ? popupStyles['highlight'] : ''}`}>{member.nickname || member.name}</div>
+        <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
+        <div className={`name ${member.nickname ? 'highlight' : ''}`}>{member.nickname || member.name}</div>
       </td>
       <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(t, member.permissionLevel)}</td>
       <td style={{ width: `${columnWidths[2]}px` }}>{member.contribution}</td>
@@ -680,7 +664,7 @@ const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps
   };
 
   return (
-    <tr className={`${isSelected ? popupStyles['selected'] : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
+    <tr className={`${isSelected ? 'selected' : ''}`} onClick={handleClick} onContextMenu={handleContextMenu}>
       <td style={{ width: `${columnWidths[0]}px` }}>{member.nickname || member.name}</td>
       <td style={{ width: `${columnWidths[1]}px` }}>{member.blockedUntil === -1 ? t('permanent') : `${t('until')} ${new Date(member.blockedUntil).toLocaleString()}`}</td>
     </tr>

@@ -15,8 +15,6 @@ import { useAppSelector } from '@/hooks/Store';
 import { getDefaultFriendGroup } from '@/utils/default';
 
 import styles from './InviteFriend.module.css';
-import popupStyles from '@/styles/Popup.module.css';
-import vipStyles from '@/styles/Vip.module.css';
 
 interface InviteFriendPopupProps {
   id: string;
@@ -72,7 +70,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
+    <div className="popup-wrapper">
       <div className={styles['header']}>
         <div className={styles['options-content']}>
           <div className={styles['search-bar']}>
@@ -84,9 +82,9 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
           {t('invite')}
         </div>
       </div>
-      <div className={`${popupStyles['popup-body']}`}>
+      <div className="popup-body">
         <div className={styles['friend-group-list']}>
-          <div className={`${popupStyles['row']} ${styles['space-between']}`}>
+          <div className="row space-between">
             <div className={styles['checkbox']}>
               <input type="checkbox" checked={isAllSelected} onChange={handleSelectAllChange} />
               {t('select-all')}
@@ -178,8 +176,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserId
       <input type="checkbox" checked={isSelected} readOnly />
       <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} />
       <div className={styles['friend-info']}>
-        {hasVip && <div className={`${vipStyles['vip-icon']} ${vipStyles[`vip-${friend.vip}`]}`} />}
-        <div className={`${styles['name-text']} ${hasVip ? vipStyles['vip-name-color'] : ''}`}>
+        {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
+        <div className={`${styles['name-text']} ${hasVip ? 'vip-name-color' : ''}`}>
           {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
         </div>
       </div>

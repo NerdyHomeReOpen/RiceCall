@@ -7,8 +7,6 @@
   min-height: 0;
 }
 
-/* Content */
-
 .server-body {
   display: flex;
   flex: 1;
@@ -492,8 +490,6 @@
   background-repeat: no-repeat;
   background-size: cover;
 }
-
-/* Content */
 
 .content-layout {
   display: flex;

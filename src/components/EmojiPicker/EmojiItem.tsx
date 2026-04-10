@@ -3,7 +3,7 @@ import React from 'react';
 
 import type * as Types from '@/types';
 
-import emojiStyles from '@/styles/Emoji.module.css';
+import styles from './EmojiPicker.module.css';
 
 interface EmojiItemProps {
   emoji: Types.Emoji;
@@ -16,7 +16,7 @@ const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }
   };
 
   return (
-    <div className={emojiStyles['emoji']}>
+    <div className={styles['emoji']}>
       <img src={emoji.path} alt={emoji.alt} width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
     </div>
   );

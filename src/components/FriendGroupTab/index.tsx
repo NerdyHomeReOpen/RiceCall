@@ -12,7 +12,7 @@ import FriendTab from '@/components/FriendTab';
 
 import { setSelectedItemId } from '@/store/slices/UI';
 
-import styles from '@/styles/FriendGroupTab.module.css';
+import styles from './FriendGroupTab.module.css';
 
 interface FriendGroupTabProps {
   friendGroup: Types.FriendGroup;

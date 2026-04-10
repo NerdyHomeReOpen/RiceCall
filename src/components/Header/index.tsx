@@ -14,9 +14,9 @@ import { useActionScanner } from '@/providers/ActionScanner';
 import { useAppSelector } from '@/hooks/Store';
 import { useHeaderContextMenu } from '@/hooks/ContextMenus/Header';
 
-import MainTabItem from '@/components/MainTabItem';
+import MainTabItem from './MainTabItem';
 
-import headerStyles from '@/styles/Header.module.css';
+import styles from './Header.module.css';
 
 interface HeaderProps {
   selectedTab: 'home' | 'friends' | 'server';
@@ -195,32 +195,32 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   }, []);
 
   return (
-    <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
-      <div className={headerStyles['title-box']}>
-        <div className={headerStyles['name-box']} onClick={handleNameClick}>
+    <header className={styles['header']}>
+      <div className={styles['title-box']}>
+        <div className={styles['name-box']} onClick={handleNameClick}>
           {user.name}
         </div>
-        <div className={headerStyles['status-box']} onClick={handleStatusDropdownClick}>
-          <div className={headerStyles['status-display']} datatype={user.status} />
-          <div className={headerStyles['status-triangle']} />
+        <div className={styles['status-box']} onClick={handleStatusDropdownClick}>
+          <div className={styles['status-display']} datatype={user.status} />
+          <div className={styles['status-triangle']} />
         </div>
       </div>
-      <div className={headerStyles['main-tabs']}>
+      <div className={styles['main-tabs']}>
         {mainTabs.map((tab) => (
           <MainTabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
         ))}
       </div>
-      <div className={headerStyles['buttons']}>
-        <div className={headerStyles['gift']} />
-        <div className={headerStyles['game']} />
-        <div className={headerStyles['notice']} onClick={handleNotificationMenuClick}>
-          <div className={`${headerStyles['overlay']} ${hasNotification && headerStyles['new']}`} />
+      <div className={styles['buttons']}>
+        <div className={styles['gift-button']} />
+        <div className={styles['game-button']} />
+        <div className={styles['notice-button']} onClick={handleNotificationMenuClick}>
+          <div className={`${styles['notice-overlay']} ${hasNotification && styles['new']}`} />
         </div>
-        <div className={headerStyles['spliter']} />
-        <div className={headerStyles['menu']} onClick={handleMenuClick} />
-        <div className={headerStyles['minimize']} onClick={handleMinimizeBtnClick} />
-        {isFullscreen ? <div className={headerStyles['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyles['maxsize']} onClick={handleMaximizeBtnClick} />}
-        <div className={headerStyles['close']} onClick={handleCloseBtnClick} />
+        <div className={styles['spliter']} />
+        <div className={styles['menu-button']} onClick={handleMenuClick} />
+        <div className={styles['minimize-button']} onClick={handleMinimizeBtnClick} />
+        {isFullscreen ? <div className={styles['restore-button']} onClick={handleUnmaximizeBtnClick} /> : <div className={styles['maxsize-button']} onClick={handleMaximizeBtnClick} />}
+        <div className={styles['close-button']} onClick={handleCloseBtnClick} />
       </div>
     </header>
   );

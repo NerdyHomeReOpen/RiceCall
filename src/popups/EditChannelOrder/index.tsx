@@ -13,8 +13,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { setSelectedItemId } from '@/store/slices/UI';
 
 import styles from './EditChannelOrder.module.css';
-import serverPage from '@/styles/Server.module.css';
-import popupStyles from '@/styles/Popup.module.css';
+import serverPage from '@/pages/Server/Server.module.css';
 
 interface EditChannelOrderPopupProps {
   id: string;
@@ -203,7 +202,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   }, []);
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
+    <div className="popup-wrapper">
       <div className={styles['header']}>
         <div className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`} onClick={handleAddChannelBtnClick}>
           {t('create')}
@@ -227,7 +226,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           {t('move-bottom')}
         </div>
       </div>
-      <div className={popupStyles['popup-body']}>
+      <div className="popup-body">
         <div className={styles['body']}>
           <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
             {filteredChannels.map((c) =>
@@ -236,11 +235,11 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className={`button ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>

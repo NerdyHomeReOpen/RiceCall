@@ -7,7 +7,7 @@ import { SHOW_FRAME_ORIGIN } from '@/constants';
 
 import { useAppSelector } from '@/hooks/Store';
 
-import styles from '@/styles/Server.module.css';
+import styles from '@/pages/Server/Server.module.css';
 
 const ShowFrame: React.FC = React.memo(() => {
   const showFrameRef = useRef<HTMLIFrameElement>(null);

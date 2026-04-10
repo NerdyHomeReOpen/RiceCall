@@ -9,8 +9,6 @@ import * as Actions from '@/action';
 
 import { getDefaultChannel } from '@/utils/default';
 
-import popupStyles from '@/styles/Popup.module.css';
-
 interface CreateChannelPopupProps {
   id: string;
   serverId: Types.Server['serverId'];
@@ -39,24 +37,24 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, 
   };
 
   return (
-    <div className={popupStyles['popup-wrapper']}>
-      <div className={popupStyles['popup-body']}>
-        <div className={`${popupStyles['dialog-content']} ${popupStyles['col']}`}>
-          <div className={popupStyles['input-box']}>
-            <div className={popupStyles['label']}>{t('parent-channel')}</div>
-            <div className={popupStyles['label']}>{parent?.name || t('none')}</div>
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content col">
+          <div className="input-box">
+            <div className="label">{t('parent-channel')}</div>
+            <div className="label">{parent?.name || t('none')}</div>
           </div>
-          <div className={popupStyles['input-box']}>
-            <div className={popupStyles['label']}>{t('channel-name')}</div>
+          <div className="input-box">
+            <div className="label">{t('channel-name')}</div>
             <input name="channel-name" type="text" value={channelName} maxLength={32} onChange={handleChannelNameChange} />
           </div>
         </div>
       </div>
-      <div className={popupStyles['popup-footer']}>
-        <div className={`${popupStyles['button']} ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
+      <div className="popup-footer">
+        <div className={`button ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
           {t('confirm')}
         </div>
-        <div className={popupStyles['button']} onClick={handleCloseBtnClick}>
+        <div className="button" onClick={handleCloseBtnClick}>
           {t('cancel')}
         </div>
       </div>
