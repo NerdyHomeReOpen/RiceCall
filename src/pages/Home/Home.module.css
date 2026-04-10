@@ -1,4 +1,4 @@
-.home {
+.home-page {
   display: flex;
   flex-direction: column;
   width: 100%;
@@ -7,7 +7,16 @@
   min-height: 0;
 }
 
-.home-header {
+.home-page-body {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.home-page-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -16,23 +25,23 @@
   border-bottom: 1px solid var(--border);
 }
 
-.home-header .left,
-.home-header .mid,
-.home-header .right {
+.home-page-header-left,
+.home-page-header-mid,
+.home-page-header-right {
   display: flex;
   align-items: center;
   width: auto;
 }
 
-.home-header .mid {
+.home-page-header-mid {
   -webkit-overflow-scrolling: touch;
 }
 
-.home-header .mid::-webkit-scrollbar {
+.home-page-header-mid::-webkit-scrollbar {
   height: 0;
 }
 
-.back-btn {
+.back-button {
   min-width: 15px;
   min-height: 15px;
   margin-right: 15px;
@@ -42,7 +51,7 @@
   border: none;
 }
 
-.forward-btn {
+.forward-button {
   min-width: 15px;
   min-height: 15px;
   margin-right: 15px;
@@ -52,12 +61,12 @@
   border: none;
 }
 
-.back-btn:hover,
-.forward-btn:hover {
+.back-button:hover,
+.forward-button:hover {
   background-position: -16px 0;
 }
 
-.navegate-tab {
+.navegate-button {
   position: relative;
   display: flex;
   flex-direction: row;
@@ -75,12 +84,12 @@
   border-radius: 5px;
 }
 
-.navegate-tab:hover {
+.navegate-button:hover {
   background-color: var(--hover);
   border: 1px solid var(--border);
 }
 
-.navegate-tab.active::after {
+.navegate-button.active::after {
   position: absolute;
   bottom: -5px;
   left: 50%;
@@ -91,7 +100,7 @@
   transform: translateX(-50%);
 }
 
-.navegate-tab[data-key='60060']::before {
+.navegate-button[data-key='60060']::before {
   min-width: 20px;
   min-height: 20px;
   margin-right: 5px;
@@ -100,7 +109,7 @@
   background-position: 0 0;
 }
 
-.navegate-tab[data-key='40007']::before {
+.navegate-button[data-key='40007']::before {
   min-width: 20px;
   min-height: 20px;
   margin-right: 5px;
@@ -109,7 +118,7 @@
   background-position: 0 0;
 }
 
-.navegate-tab[data-key='30375']::before {
+.navegate-button[data-key='30375']::before {
   min-width: 20px;
   min-height: 20px;
   margin-right: 5px;
@@ -118,7 +127,7 @@
   background-position: 0 0;
 }
 
-.navegate-tab[data-key='30014']::before {
+.navegate-button[data-key='30014']::before {
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
@@ -127,7 +136,7 @@
   background-position: 0 0;
 }
 
-.navegate-tab[data-key='60004']::before {
+.navegate-button[data-key='60004']::before {
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
@@ -136,7 +145,7 @@
   background-position: 0 0;
 }
 
-.navegate-tab[data-key='60005']::before {
+.navegate-button[data-key='60005']::before {
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
@@ -145,7 +154,7 @@
   background-position: 0 0;
 }
 
-.home-body {
+.home-page-content {
   position: relative;
   display: flex;
   flex-direction: column;
@@ -160,75 +169,9 @@
   background-color: var(--background-secondary);
 }
 
-.home-body .home-wrapper {
+.home-wrapper {
   width: 100%;
   max-width: 900px;
-}
-
-.sidebar {
-  display: flex;
-  flex-direction: column;
-  width: 280px;
-  min-width: 280px;
-  min-height: 0;
-  background-color: var(--sidebar);
-  border-right: 1px solid var(--border);
-}
-
-.scroll-view {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  min-width: 0;
-  min-height: 0;
-  padding: 10px;
-  overflow-y: auto;
-}
-
-.category-list {
-  flex: 1;
-}
-
-.category-tab {
-  display: flex;
-  gap: 3px;
-  align-items: center;
-  padding: 5px;
-  margin-top: 3px;
-  cursor: pointer;
-  border-radius: 3px;
-
-  &.selected {
-    background-color: var(--selected);
-  }
-
-  &:not(.selected):hover {
-    background-color: var(--hover);
-  }
-}
-
-.category-name {
-  font-size: 1.1rem;
-  font-weight: bold;
-}
-
-.category-flag {
-  width: 16px;
-  height: 16px;
-}
-
-.category-list .category-list .category-tab {
-  margin-top: 0;
-}
-
-.category-list .category-list .category-name {
-  font-size: 1rem;
-  font-weight: unset;
-}
-
-.webview {
-  width: 100%;
-  height: 100%;
 }
 
 .banner-wrapper {
@@ -250,7 +193,7 @@
   }
 }
 
-.banners {
+.banner-list {
   display: flex;
   flex-direction: row;
   width: 100%;

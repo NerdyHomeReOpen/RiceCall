@@ -1,6 +1,6 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
-import React, { useState, useEffect, useRef, useMemo } from 'react';
+import React, { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -8,12 +8,12 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constants';
-
 import { useAppSelector } from '@/hooks/Store';
 
-import ServerList from '@/components/ServerList';
-import ServerSearchBar from '@/components/ServerSearchBar';
+import HomePageHeader from './HomePageHeader';
+import HomePageContent from './HomePageContent';
+import HomePagePersonalExclusive from './HomePagePersonalExclusive';
+import HomePageNotAvailable from './HomePageNotAvailable';
 import MarkdownContent from '@/components/MarkdownContent';
 
 import { getFormatDate } from '@/utils/language';
@@ -27,9 +27,6 @@ interface HomePageProps {
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const { t } = useTranslation();
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -38,30 +35,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
     shallowEqual,
   );
 
-  const servers = useAppSelector((state) => state.servers.data, shallowEqual);
-  const announcements = useAppSelector((state) => state.announcements.data, shallowEqual);
-  const recommendServers = useAppSelector((state) => state.recommendServers.data, shallowEqual);
-
   const [section, setSection] = useState<'home' | 'personal-exclusive'>('home');
-  const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
 
   const isHomeSection = section === 'home';
   const isPersonalExclusiveSection = section === 'personal-exclusive';
-  const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
-  const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
-  const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
-  const filteredAnns = useMemo(() => [...announcements].sort((a, b) => b.timestamp - a.timestamp), [announcements]);
-  const filteredRecommendServers = useMemo(() => recommendServers.filter((server) => !server.tags.includes('official')), [recommendServers]);
-  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official')), [recommendServers]);
-
-  const handleNextAnnBtnClick = () => {
-    setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length);
-  };
-
-  const handlePrevAnnBtnClick = () => {
-    setSelectedAnnIndex((prev) => (prev === 0 ? filteredAnns.length - 1 : prev - 1));
-  };
 
   const handleCreateServerClick = () => {
     Actions.openCreateServer(user.userId);
@@ -79,120 +57,49 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
     setSection('home');
   };
 
-  useEffect(() => {
-    if (!containerRef.current) return;
-    const number = selectedAnnIndex % filteredAnns.length;
-    const width = containerRef.current.clientWidth;
-    containerRef.current.scrollTo({
-      left: width * number,
-      behavior: 'smooth',
-    });
-  }, [selectedAnnIndex, filteredAnns]);
-
-  useEffect(() => {
-    if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length), ANNOUNCEMENT_SLIDE_INTERVAL);
-    return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
-      intervalRef.current = null;
-    };
-  }, [filteredAnns]);
+  const handleAnnouncementSelect = (announcement: Types.Announcement) => {
+    setSelectedAnn(announcement);
+  };
 
   return (
-    <main className={styles['home']} style={display ? {} : { display: 'none' }}>
-      <header className={styles['home-header']}>
-        <div className={styles['left']}>
-          <div className={styles['back-btn']} />
-          <div className={styles['forward-btn']} />
-          <ServerSearchBar />
-        </div>
-        <div className={styles['mid']}>
-          <div className={`${styles['navegate-tab']} ${isHomeSection ? styles['active'] : ''}`} data-key="60060" onClick={handleHomeSectionBtnClick}>
-            {t('home')}
-          </div>
-        </div>
-        <div className={styles['right']}>
-          <div className={styles['navegate-tab']} data-key="30014" onClick={handleCreateServerClick}>
-            {t('create-server')}
-          </div>
-          {!isPersonalExclusiveSection && (
-            <div className={styles['navegate-tab']} data-key="60004" onClick={handlePersonalExclusiveSectionBtnClick}>
-              {t('personal-exclusive')}
-            </div>
-          )}
-          {isPersonalExclusiveSection && (
-            <div className={styles['navegate-tab']} data-key="60005" onClick={handleBackBtnClick}>
-              {t('back')}
-            </div>
-          )}
-        </div>
-      </header>
-      <main className={styles['home-body']} style={isHomeSection ? {} : { display: 'none' }}>
-        <div className={styles['banner-wrapper']}>
-          <div className={styles['banner-container']}>
-            <div ref={containerRef} className={styles['banners']}>
-              {filteredAnns.length > 0 ? (
-                filteredAnns.map((ann) => (
-                  <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => setSelectedAnn(ann)}>
-                    {!ann.attachmentUrl ? <DefaultAnnouncement announcement={ann} /> : null}
-                  </div>
-                ))
-              ) : (
-                <div className={styles['banner']}>
-                  <DefaultAnnouncement announcement={{} as Types.Announcement} />
+    <main className={styles['home-page']} style={display ? {} : { display: 'none' }}>
+      <main className={styles['home-page-body']}>
+        <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
+          {selectedAnn && (
+            <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
+              <div className={styles['announcement-detail-header']}>
+                <div className={styles['announcement-type']} data-category={selectedAnn.category}>
+                  {t(`${selectedAnn.category}`)}
                 </div>
-              )}
-            </div>
-            {filteredAnns.length > 0 && (
-              <>
-                <div className={styles['number-list']}>
-                  {filteredAnns.map((_, index) => (
-                    <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)} />
-                  ))}
-                </div>
-                <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnnBtnClick}>
-                  {'◀'}
-                </nav>
-                <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnnBtnClick}>
-                  {'▶'}
-                </nav>
-              </>
-            )}
-          </div>
-        </div>
-        <div className={styles['home-wrapper']}>
-          <ServerList title={t('recommend-server')} servers={filteredRecommendServers} />
-        </div>
-        <div className={styles['home-wrapper']}>
-          <ServerList title={t('official-server')} servers={filteredOfficialServers} />
-        </div>
-      </main>
-      <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
-        {selectedAnn && (
-          <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
-            <div className={styles['announcement-detail-header']}>
-              <div className={styles['announcement-type']} data-category={selectedAnn.category}>
-                {t(`${selectedAnn.category}`)}
+                <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
+                <div className={styles['announcement-datail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
               </div>
-              <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
-              <div className={styles['announcement-datail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
+              {selectedAnn.attachmentUrl && <Image className={styles['banner']} src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />}
+              <div className={styles['announcement-detail-content']}>
+                <MarkdownContent markdownText={selectedAnn.content} />
+              </div>
             </div>
-            {selectedAnn.attachmentUrl && <Image className={styles['banner']} src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />}
-            <div className={styles['announcement-detail-content']}>
-              <MarkdownContent markdownText={selectedAnn.content} />
-            </div>
-          </div>
-        )}
-      </div>
-      <main className={styles['home-body']} style={isPersonalExclusiveSection ? {} : { display: 'none' }}>
-        <div className={styles['home-wrapper']}>
-          <ServerList title={t('recent-servers')} servers={recentServers} />
-          <ServerList title={t('my-servers')} servers={ownedServers} />
-          <ServerList title={t('favorited-servers')} servers={favoriteServers} />
+          )}
         </div>
-      </main>
-      <main className={styles['home-body']} style={!isHomeSection && !isPersonalExclusiveSection ? {} : { display: 'none' }}>
-        <div>{t('not-available-page')}</div>
+        <header className={styles['home-page-header']}>
+          <HomePageHeader
+            isHomeSection={isHomeSection}
+            isPersonalExclusiveSection={isPersonalExclusiveSection}
+            onHomeSectionBtnClick={handleHomeSectionBtnClick}
+            onCreateServerBtnClick={handleCreateServerClick}
+            onPersonalExclusiveSectionBtnClick={handlePersonalExclusiveSectionBtnClick}
+            onBackBtnClick={handleBackBtnClick}
+          />
+        </header>
+        <main className={styles['home-page-content']} style={isHomeSection ? {} : { display: 'none' }}>
+          <HomePageContent onAnnouncementSelect={handleAnnouncementSelect} />
+        </main>
+        <main className={styles['home-page-content']} style={isPersonalExclusiveSection ? {} : { display: 'none' }}>
+          <HomePagePersonalExclusive />
+        </main>
+        <main className={styles['home-page-content']} style={!isHomeSection && !isPersonalExclusiveSection ? {} : { display: 'none' }}>
+          <HomePageNotAvailable />
+        </main>
       </main>
     </main>
   );
@@ -203,16 +110,3 @@ HomePageComponent.displayName = 'HomePageComponent';
 const HomePage = dynamic(() => Promise.resolve(HomePageComponent), { ssr: false });
 
 export default HomePage;
-
-interface DefaultAnnouncementProps {
-  announcement: Types.Announcement;
-}
-
-const DefaultAnnouncement: React.FC<DefaultAnnouncementProps> = React.memo(({ announcement }) => (
-  <>
-    <Image loading="lazy" src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
-    <span>{announcement.title}</span>
-  </>
-));
-
-DefaultAnnouncement.displayName = 'DefaultAnnouncement';
