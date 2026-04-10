@@ -2,18 +2,18 @@ import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/main/ipc';
+import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import type * as Types from '@/types';
+import ipc from '@/main/ipc';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/Store';
 
-import { setSelectedItemId } from '@/store/slices/UI';
+import CategoryTab from './CategoryTab';
+import ChannelTab from './ChannelTab';
 
 import styles from './EditChannelOrder.module.css';
-import serverPage from '@/pages/Server/Server.module.css';
 
 interface EditChannelOrderPopupProps {
   id: string;
@@ -170,7 +170,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest(`.${serverPage['channel-tab']}`) || target.closest('[class*="Btn"]')) return;
+      if (target.closest(`.${styles['channel-tab']}`) || target.closest('[class*="Btn"]')) return;
       setSelectedChannel(null);
     };
     window.addEventListener('click', onClick);
@@ -203,32 +203,32 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   return (
     <div className="popup-wrapper">
-      <div className={styles['header']}>
-        <div className={`${styles['add-channel-btn']} ${!canAdd ? 'disabled' : ''}`} onClick={handleAddChannelBtnClick}>
+      <div className={styles['edit-channel-order-header']}>
+        <div className={`${styles['add-channel-button']} ${!canAdd ? 'disabled' : ''}`} onClick={handleAddChannelBtnClick}>
           {t('create')}
         </div>
-        <div className={`${styles['change-channel-name-btn']} ${!canRename ? 'disabled' : ''}`} onClick={handleChangeChannelNameBtnClick}>
+        <div className={`${styles['change-channel-name-button']} ${!canRename ? 'disabled' : ''}`} onClick={handleChangeChannelNameBtnClick}>
           {t('change-name')}
         </div>
-        <div className={`${styles['delete-channel-btn']} ${!canDelete ? 'disabled' : ''}`} onClick={handleDeleteChannelBtnClick}>
+        <div className={`${styles['delete-channel-button']} ${!canDelete ? 'disabled' : ''}`} onClick={handleDeleteChannelBtnClick}>
           {t('delete')}
         </div>
-        <div className={`${styles['up-channel-order-btn']} ${!canMoveUp ? 'disabled' : ''}`} onClick={handleMoveUpBtnClick}>
+        <div className={`${styles['up-channel-order-button']} ${!canMoveUp ? 'disabled' : ''}`} onClick={handleMoveUpBtnClick}>
           {t('move-up')}
         </div>
-        <div className={`${styles['down-channel-order-btn']} ${!canMoveDown ? 'disabled' : ''}`} onClick={handleMoveDownBtnClick}>
+        <div className={`${styles['down-channel-order-button']} ${!canMoveDown ? 'disabled' : ''}`} onClick={handleMoveDownBtnClick}>
           {t('move-down')}
         </div>
-        <div className={`${styles['top-channel-order-btn']} ${!canTop ? 'disabled' : ''}`} onClick={handleTopBtnClick}>
+        <div className={`${styles['top-channel-order-button']} ${!canTop ? 'disabled' : ''}`} onClick={handleTopBtnClick}>
           {t('move-top')}
         </div>
-        <div className={`${styles['bottom-channel-order-btn']} ${!canBottom ? 'disabled' : ''}`} onClick={handleBottomBtnClick}>
+        <div className={`${styles['bottom-channel-order-button']} ${!canBottom ? 'disabled' : ''}`} onClick={handleBottomBtnClick}>
           {t('move-bottom')}
         </div>
       </div>
       <div className="popup-body">
-        <div className={styles['body']}>
-          <div className={serverPage['channel-list']} onClick={(e) => e.stopPropagation()}>
+        <div className={styles['edit-channel-order-body']}>
+          <div className={styles['channel-list']} onClick={(e) => e.stopPropagation()}>
             {filteredChannels.map((c) =>
               c.type === 'category' ? <CategoryTab key={c.channelId} channels={channels} category={c} onSelect={handleSelect} /> : <ChannelTab key={c.channelId} channel={c} onSelect={handleSelect} />,
             )}
@@ -250,96 +250,3 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 EditChannelOrderPopup.displayName = 'EditChannelOrderPopup';
 
 export default EditChannelOrderPopup;
-
-interface CategoryTabProps {
-  channels: (Types.Channel | Types.Category)[];
-  category: Types.Category;
-  onSelect: (channel: Types.Channel | Types.Category) => void;
-}
-
-const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category, onSelect }) => {
-  const dispatch = useAppDispatch();
-
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
-
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
-
-  const categoryChildren = channels?.filter((c) => c.categoryId === category.channelId);
-
-  const handleTabClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`category-${category.channelId}`));
-    onSelect(category);
-  };
-
-  const handleTabExpandedClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <div key={category.channelId}>
-      <div className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
-        <div
-          className={`${serverPage['tab-icon']} ${isExpanded ? serverPage['expanded'] : ''} ${serverPage[category.visibility]} ${category.isLobby ? serverPage['lobby'] : ''}`}
-          onClick={handleTabExpandedClick}
-        />
-        <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
-          {category.name}
-          <div className={styles['channel-tab-index-text']}>{`(${category.order})`}</div>
-        </div>
-      </div>
-      <div className={serverPage['channel-list']} style={isExpanded ? {} : { display: 'none' }}>
-        {categoryChildren
-          .sort((a, b) => a.order - b.order)
-          .filter((c) => c.type === 'channel')
-          .map((c) => (
-            <ChannelTab key={c.channelId} channel={c} onSelect={onSelect} />
-          ))}
-      </div>
-    </div>
-  );
-});
-
-CategoryTab.displayName = 'CategoryTab';
-
-interface ChannelTabProps {
-  channel: Types.Channel;
-  onSelect: (channel: Types.Channel) => void;
-}
-
-const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect }) => {
-  const dispatch = useAppDispatch();
-
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
-
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
-
-  const handleTabClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`channel-${channel.channelId}`));
-    onSelect(channel);
-  };
-
-  const handleTabExpandedClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsExpanded(!isExpanded);
-  };
-
-  return (
-    <div className={`${serverPage['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
-      <div
-        className={`${serverPage['tab-icon']} ${isExpanded ? serverPage['expanded'] : ''} ${serverPage[channel.visibility]} ${channel.isLobby ? serverPage['lobby'] : ''}`}
-        onClick={handleTabExpandedClick}
-      />
-      <div className={serverPage['channel-tab-lable']} style={{ display: 'inline-flex' }}>
-        {channel.name}
-        <div className={styles['channel-tab-index-text']}>{`(${channel.order})`}</div>
-      </div>
-    </div>
-  );
-});
-
-ChannelTab.displayName = 'ChannelTab';
