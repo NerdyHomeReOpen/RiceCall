@@ -10,8 +10,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import { getLerpColor } from '@/utils/color';
 
-// TODO: Refactor styles
-import server from '@/pages/Server/Server.module.css';
+import styles from './MicVolumeSlider.module.css';
 
 const MicModeMenu: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -44,7 +43,7 @@ const MicModeMenu: React.FC = React.memo(() => {
   };
 
   return (
-    <div className={server['mic-mode-menu']}>
+    <div className={styles['mic-mode-menu']}>
       <div className="col">
         <div className="label">{t('current-speaking-mode')}</div>
         <div className="input-box row">
@@ -57,10 +56,10 @@ const MicModeMenu: React.FC = React.memo(() => {
         <div className="input-box row">
           <input type="radio" name="visibility" checked={isAutoMode} onChange={handleAutoModeSelect} />
           <div className="label">{t('default-speaking-mode-auto-label')}</div>
-          <div style={isAutoMode ? {} : { display: 'none' }} className={server['voice-threshold-input-wrapper']}>
-            <div className={server['voice-threshold-input-wrapper']}>
+          <div style={isAutoMode ? {} : { display: 'none' }} className={styles['voice-threshold-input-wrapper']}>
+            <div className={styles['voice-threshold-input-wrapper']}>
               <input
-                className={server['voice-threshold-input']}
+                className={styles['voice-threshold-input']}
                 type="range"
                 min="0"
                 max="100"
@@ -68,7 +67,7 @@ const MicModeMenu: React.FC = React.memo(() => {
                 style={{ background: voiceThresholdColor }}
                 onChange={handleVoiceThresholdChange}
               />
-              <div className={`${server['voice-state-icon']} ${isActive ? server['active'] : ''}`} />
+              <div className={`${styles['voice-state-icon']} ${isActive ? styles['active'] : ''}`} />
             </div>
           </div>
         </div>

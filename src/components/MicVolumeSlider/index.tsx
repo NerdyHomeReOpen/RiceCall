@@ -4,7 +4,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
-import MicModeMenu from '@/components/MicModeMenu';
+import MicModeMenu from './MicModeMenu';
 
 import styles from './MicVolumeSlider.module.css';
 
