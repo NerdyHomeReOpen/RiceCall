@@ -73,13 +73,6 @@
   background-position: 0 0;
 }
 
-.queue-user-position-text {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--text-color-quaternary);
-  white-space: nowrap;
-}
-
 .queue-user-seconds-remaining-box {
   display: flex;
   align-items: center;
