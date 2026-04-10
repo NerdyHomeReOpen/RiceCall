@@ -35,7 +35,7 @@ import { clearActionMessages } from '@/store/slices/ActionMessages';
 import { isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
 
-import styles from '@/pages/Server/Server.module.css';
+import styles from './Server.module.css';
 
 interface ServerPageProps {
   display: boolean;

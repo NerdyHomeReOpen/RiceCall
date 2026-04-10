@@ -19,7 +19,7 @@ import RecommendServerCard from '@/components/RecommendServerCard';
 
 import { getFormatDate } from '@/utils/language';
 
-import styles from '@/pages/Home/Home.module.css';
+import styles from './Home.module.css';
 
 interface HomePageProps {
   display: boolean;

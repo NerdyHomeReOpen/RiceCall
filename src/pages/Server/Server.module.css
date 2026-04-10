@@ -378,87 +378,12 @@
   color: #808080;
 }
 
-.user-list {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  text-shadow: 0 1px 0 #fff;
-}
-
-.user-tab {
-  position: relative;
-  display: flex;
-  gap: 2px;
-  align-items: center;
-  height: 25px;
-  padding: 2px 20px 2px 10px;
-  margin-right: 5px;
-  text-shadow: 0 1px #fff;
-}
-
-.user-tab:not(.selected):hover {
-  background-color: var(--hover);
-}
-
-.user-tab .user-queue-position {
-  color: var(--text-color-quaternary);
-}
-
-.user-tab .user-tab-name {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: var(--text-color-quaternary);
-  white-space: nowrap;
-}
-
-.user-tab .user-tab-name.member {
-  color: var(--text-nickname);
-}
-
 .channel-list .channel-list .user-list .user-tab {
   padding-left: 25px;
 }
 
-.user-tab.selected,
 .channel-tab.selected {
   background-color: var(--selected);
-}
-
-.user-audio-state {
-  left: 0;
-  min-width: 12px;
-  min-height: 12px;
-  background-image: url('/channel/audioState.webp');
-  background-repeat: no-repeat;
-  background-position: -36px 0;
-  background-size: auto;
-}
-
-.user-text-state {
-  min-width: 12px;
-  min-height: 12px;
-  background-image: url('/channel/audioState.webp');
-  background-repeat: no-repeat;
-  background-position: -36px 0;
-  background-size: auto;
-}
-
-.user-audio-state.loading {
-  background-image: url('/loading.gif');
-  background-position: 0 0;
-  background-size: cover;
-}
-
-.user-audio-state.play {
-  background-position: -24px 0;
-}
-
-.user-audio-state.muted {
-  background-position: -12px 0;
-}
-
-.user-text-state.muted {
-  background-position: 0 0;
 }
 
 .queue-position {

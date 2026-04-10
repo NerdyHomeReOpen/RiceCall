@@ -19,7 +19,7 @@ import { setSelectedItemId } from '@/store/slices/UI';
 
 import { isChannelMod } from '@/utils/permission';
 
-import styles from '@/pages/Server/Server.module.css';
+import styles from './UserTab.module.css';
 
 interface UserTabProps {
   member: Types.OnlineMember;
