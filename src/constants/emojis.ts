@@ -1,4 +1,4 @@
-import emojiData from 'emoji.json';
+import emojiData from 'emoji.json' with { type: 'json' };
 import twemoji from 'twemoji';
 
 import type * as Types from '@/types';

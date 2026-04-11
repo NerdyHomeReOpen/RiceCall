@@ -44,10 +44,10 @@
 }
 
 .title-text {
-  font-size: 13px;
-  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  font-size: 13px;
+  white-space: nowrap;
 }
 
 .buttons {

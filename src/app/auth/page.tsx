@@ -8,9 +8,9 @@ import ipc from '@/main/ipc';
 
 import AuthHeader from '@/components/AuthHeader';
 
-import LoginPage from '@/pages/Login';
-import RegisterPage from '@/pages/Register';
-import ChangeServerPage from '@/pages/ChangeServer';
+import LoginPage from '@/page-components/Login';
+import RegisterPage from '@/page-components/Register';
+import ChangeServerPage from '@/page-components/ChangeServer';
 
 const AuthPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();

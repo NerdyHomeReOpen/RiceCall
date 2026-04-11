@@ -21,9 +21,9 @@ import SocketManager from '@/components/SocketManager';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import NotificationToaster from '@/components/NotificationToaster';
 
-import FriendPage from '@/pages/Friend';
-import HomePage from '@/pages/Home';
-import ServerPage from '@/pages/Server';
+import FriendPage from '@/page-components/Friend';
+import HomePage from '@/page-components/Home';
+import ServerPage from '@/page-components/Server';
 
 const RootPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
