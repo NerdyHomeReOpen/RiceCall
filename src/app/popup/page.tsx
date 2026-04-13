@@ -3,9 +3,14 @@
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useCallback } from 'react';
 
-import ipc from '@/ipc';
-
 import type * as Types from '@/types';
+
+import ipc from '@/main/ipc';
+
+import { POPUP_CONFIGS } from '@/configs/popup';
+
+import SocketManager from '@/components/SocketManager';
+import PopupHeader from '@/components/PopupHeader';
 
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
@@ -45,41 +50,9 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-import { getPopupConfigs } from '@/configs/popup';
-
-import SocketManager from '@/components/SocketManager';
-import PopupHeader from '@/components/common/PopupHeader';
-
-import headerStyle from '@/styles/header.module.css';
-
 const PopupPageComponent: React.FC = React.memo(() => {
   const [popup, setPopup] = useState<Types.Popup | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-
-  const handleMaximize = () => {
-    if (isFullscreen) return;
-    ipc.window.maximize();
-  };
-
-  const handleUnmaximize = () => {
-    if (!isFullscreen) return;
-    ipc.window.unmaximize();
-  };
-
-  const handleMinimize = () => {
-    if (!popup?.id) return;
-    ipc.window.minimize(popup.id);
-  };
-
-  const handleClose = () => {
-    if (!popup?.id) return;
-    ipc.popup.close(popup.id);
-  };
-
-  useEffect(() => {
-    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, []);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
@@ -129,20 +102,20 @@ const PopupPageComponent: React.FC = React.memo(() => {
       userSetting: () => <UserInfo id={id} {...initialData} />,
     };
 
-    const configs = getPopupConfigs(type);
+    const config = POPUP_CONFIGS[type];
 
     switch (type) {
       case 'channelSetting':
-        configs.title = initialData?.channel?.name ?? configs.title;
+        config.title = initialData?.channel?.name ?? config.title;
         break;
       case 'directMessage':
-        configs.title = initialData?.target?.name ?? configs.title;
+        config.title = initialData?.target?.name ?? config.title;
         break;
       case 'userInfo':
-        configs.title = initialData?.target?.name ?? configs.title;
+        config.title = initialData?.target?.name ?? config.title;
         break;
       case 'serverSetting':
-        configs.title = initialData?.server?.name ?? configs.title;
+        config.title = initialData?.server?.name ?? config.title;
         break;
     }
 
@@ -150,9 +123,34 @@ const PopupPageComponent: React.FC = React.memo(() => {
       id,
       type,
       position: { top: 0, left: 0 },
-      ...configs,
+      ...config,
       node: node[type as keyof typeof node],
     };
+  }, []);
+
+  const handleMaximize = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximize = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
+  };
+
+  const handleMinimize = () => {
+    if (!popup?.id) return;
+    ipc.window.minimize(popup.id);
+  };
+
+  const handleClose = () => {
+    if (!popup?.id) return;
+    ipc.popup.close(popup.id);
+  };
+
+  useEffect(() => {
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   useEffect(() => {
@@ -175,7 +173,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
         <PopupHeader
           title={popup.title}
           buttons={popup.buttons}
-          titleBoxIcon={popup.type === 'changeTheme' ? headerStyle['title-box-skin-icon'] : popup.type === 'directMessage' ? headerStyle['title-box-direct-message-icon'] : undefined}
+          popupType={popup.type}
           isFullscreen={isFullscreen}
           onMinimize={handleMinimize}
           onMaximize={handleMaximize}

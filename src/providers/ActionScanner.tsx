@@ -1,10 +1,10 @@
 import React, { useContext, createContext, ReactNode, useRef, useEffect, useCallback, useState, useMemo } from 'react';
 
-import ipc from '@/ipc';
-
-import { useWebRTC } from '@/providers/WebRTC';
+import ipc from '@/main/ipc';
 
 import Logger from '@/logger';
+
+import { useWebRTC } from '@/providers/WebRTC';
 
 type ActionScannerContextType = {
   isIdling: boolean;

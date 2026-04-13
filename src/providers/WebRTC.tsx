@@ -1,18 +1,19 @@
 import React, { useEffect, useRef, useContext, createContext, useCallback, useMemo } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 
-import { store } from '@/store';
-import ipc from '@/ipc';
-
 import type * as Types from '@/types';
 
-import { setWebRTC, setSpeakingId, setMutedId } from '@/store/slices/webrtcSlice';
+import ipc from '@/main/ipc';
+
+import Logger from '@/logger';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 import { useLoading } from '@/providers/Loading';
 
-import EncodeAudio from '@/utils/encodeAudio';
-import Logger from '@/logger';
+import { store } from '@/store';
+import { setWebRTC, setSpeakingId, setMutedId } from '@/store/slices/WebRTC';
+
+import { encodeAudio } from '@/utils/encodeAudio';
 
 const BASE_VOLUME = 4;
 
@@ -216,7 +217,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     speaker.volume = 1;
     speaker.autoplay = true;
     speaker.style.display = 'none';
-    speaker.play().catch(() => { });
+    speaker.play().catch(() => {});
     speakerRef.current = speaker;
     document.body.appendChild(speaker);
   }, []);
@@ -272,7 +273,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       speaker.volume = 0;
       speaker.autoplay = true;
       speaker.style.display = 'none';
-      speaker.play().catch(() => { });
+      speaker.play().catch(() => {});
       speaker.remove();
     },
     [detectSpeaking, removeSpeakerAudio, initAudioContext],
@@ -737,7 +738,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     recorderGainRef.current?.disconnect();
     if (recordTimerRef.current) clearInterval(recordTimerRef.current);
 
-    const arrayBuffer = EncodeAudio(recordBuffersRef.current, audioContextRef.current.sampleRate);
+    const arrayBuffer = encodeAudio(recordBuffersRef.current, audioContextRef.current.sampleRate);
     ipc.record.save(arrayBuffer);
 
     recordBuffersRef.current = [];
@@ -983,7 +984,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             ipc.socket.send('connectServer', { serverId: targetServer.serverId });
 
             await new Promise<void>((resolve, reject) => {
-              let unsub: () => void = () => { };
+              let unsub: () => void = () => {};
               const timeout = setTimeout(() => {
                 if (unsub) unsub();
                 reject(new Error('Timeout waiting for SFUJoined after standard join'));

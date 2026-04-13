@@ -1,0 +1,80 @@
+.create-server-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  padding: 15px;
+}
+
+.message {
+  padding: 8px;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: var(--text-color-quaternary);
+  background-color: var(--notification-toaster-background);
+  border: 1px solid var(--notification-toaster-border);
+}
+
+.select-type-text {
+  font-weight: bold;
+  color: var(--text-color-quaternary);
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  padding: 30px;
+}
+
+.button-group .button {
+  width: 50%;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  background: var(--button-background);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+
+.button-group .button:hover {
+  background: var(--hover);
+}
+
+.button-group .button:active {
+  background: var(--selected);
+}
+
+.input-box {
+  flex-direction: column;
+}
+
+.avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+}
+
+.avatar-picture {
+  position: relative;
+  min-width: 100px;
+  min-height: 100px;
+  cursor: pointer;
+  object-fit: cover;
+  background-image: url('/logo_server_def.webp');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: cover;
+}
+
+.input-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}

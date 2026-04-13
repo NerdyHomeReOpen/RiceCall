@@ -12,5 +12,3 @@ export function objDiff<T extends object>(newObj: Partial<T>, originalObj: T): P
     return acc;
   }, {} as Partial<T>);
 }
-
-export default objDiff;

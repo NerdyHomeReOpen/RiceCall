@@ -1,0 +1,35 @@
+.friend-group-tab {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 25px;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.friend-group-tab.selected {
+  background-color: var(--selected);
+}
+
+.friend-group-tab:hover {
+  background-color: var(--hover);
+}
+
+.friend-group-tab-toggle-icon {
+  display: inline-block;
+  min-width: 14px;
+  min-height: 14px;
+  content: '';
+  background-image: url('/channel/channelIcon.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.friend-group-tab-toggle-icon.expanded {
+  background-position: -14px 0;
+}
+
+.friend-group-tab-content {
+  margin-left: 20px;
+}

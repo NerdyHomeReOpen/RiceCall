@@ -1,0 +1,156 @@
+.server-list-container {
+  display: flex;
+  flex-direction: column;
+  place-items: center;
+  width: 100%;
+  padding: 10px;
+  background-color: var(--background-secondary);
+}
+
+.server-list-title {
+  padding: 10px;
+  margin: 10px auto;
+  font-size: 1.5em;
+  font-weight: bold;
+  border-bottom: 2px solid var(--border);
+}
+
+.server-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-start;
+  width: 830px;
+}
+
+@media only screen and (width <=900px) {
+  .server-list {
+    width: 550px;
+  }
+}
+
+.server-card {
+  display: flex;
+  align-items: center;
+  width: 270px;
+  height: 90px;
+  padding: 10px;
+  cursor: pointer;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+}
+
+.server-card-avatar-picture {
+  cursor: pointer;
+}
+
+.server-card-info-text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  height: 100%;
+  margin-left: 10px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.server-card-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-link);
+  white-space: nowrap;
+}
+
+.server-card-id-text {
+  display: flex;
+  align-items: center;
+  color: var(--text-color-quaternary);
+}
+
+.server-card-slogen-text {
+  display: flex;
+  align-items: center;
+  height: 1rem;
+  color: var(--text-color-quaternary);
+}
+
+.server-card-online-text {
+  display: flex;
+  align-items: center;
+  height: 1rem;
+  color: var(--text-color-quaternary);
+}
+
+.server-card-id-text.is-owner::before {
+  display: block;
+  width: 13px;
+  height: 15px;
+  margin-right: 2px;
+  content: '';
+  background-image: url('/icon_creator.webp');
+  background-position: 0 0;
+  background-size: contain;
+}
+
+.view-less-button,
+.view-more-button {
+  position: relative;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: center;
+  width: fit-content;
+  padding: 5px;
+  margin: 8px auto 16px;
+  cursor: pointer;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+.view-less-button:hover,
+.view-more-button:hover {
+  background-color: var(--hover);
+}
+
+.view-more-button::before {
+  display: inline-block;
+  min-width: 16px;
+  min-height: 16px;
+  content: '';
+  background-image: url('/btn_fold_person.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.view-more-button:hover::before {
+  background-position: -16px 0;
+}
+
+.view-more-button:active::before {
+  background-position: -32px 0;
+}
+
+.view-less-button::before {
+  display: inline-block;
+  min-width: 16px;
+  min-height: 16px;
+  content: '';
+  background-image: url('/btn_fold_person.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+  transform: rotate(180deg);
+}
+
+.view-less-button:hover::before {
+  background-position: -16px 0;
+}
+
+.view-less-button:active::before {
+  background-position: -32px 0;
+}

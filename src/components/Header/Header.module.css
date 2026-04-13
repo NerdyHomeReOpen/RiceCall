@@ -1,0 +1,427 @@
+.header {
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  min-height: 40px;
+  color: var(--secondary-color);
+  background-color: var(--main-color);
+  background-image: var(--header-image);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+  border: none;
+  -webkit-app-region: drag;
+}
+
+.title-box {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.title-box::before {
+  display: inline-block;
+  min-width: 18px;
+  min-height: 18px;
+  content: '';
+  background-image: url('/rc_logo_small.webp');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto;
+}
+
+.buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: fit-content;
+  margin-right: 10px;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+
+.gift-button {
+  display: inline-block;
+  min-width: 28px;
+  min-height: 28px;
+  cursor: pointer;
+  background-image: url('/gift.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -28px 0;
+  }
+
+  &:active {
+    background-position: -56px 0;
+  }
+}
+
+.game-button {
+  display: inline-block;
+  min-width: 28px;
+  min-height: 28px;
+  cursor: pointer;
+  background-image: url('/game.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -28px 0;
+  }
+
+  &:active {
+    background-position: -56px 0;
+  }
+}
+
+.notice-button {
+  display: inline-block;
+  min-width: 24px;
+  min-height: 24px;
+  cursor: pointer;
+  background-image: url('/icon_notice.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -24px 0;
+  }
+
+  &:active {
+    background-position: -48px 0;
+  }
+}
+
+.notice-overlay {
+  position: absolute;
+  display: inline-block;
+  min-width: 24px;
+  min-height: 24px;
+  cursor: pointer;
+  background-image: url('/icon_notice_overlay.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &.new {
+    background-position: -24px 0;
+  }
+}
+
+.spliter {
+  display: inline-block;
+  min-width: 2px;
+  min-height: 19px;
+  cursor: pointer;
+  background-image: url('/mf_spliter.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+}
+
+.menu-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/BtnMenu.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover:not(:has(.menu-dropdown:hover)) {
+    background-position: -20px 0;
+  }
+
+  &:active:not(:has(.menu-dropdown:active)) {
+    background-position: -40px 0;
+  }
+}
+
+.minimize-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Minsize.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}
+
+.restore-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Restore.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}
+
+.maxsize-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Maxsize.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}
+
+.close-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Close.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}
+
+.main-tabs {
+  display: flex;
+  align-items: flex-end;
+  margin-right: auto;
+  margin-left: 5%;
+}
+
+.main-tab {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: max-content;
+  max-width: 200px;
+  height: 30px;
+  padding: 0 13px;
+  overflow: hidden;
+  font-size: 1.06rem;
+  white-space: nowrap;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+
+.main-tab::before {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  min-width: 10px;
+  min-height: 31px;
+  content: '';
+  background-image: url('/tab_item_mainframe.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.main-tab::after {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  min-width: 10px;
+  min-height: 31px;
+  content: '';
+  background-image: url('/tab_item_mainframe.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.main-tab-close-button {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 12px;
+  min-height: 12px;
+  cursor: pointer;
+  background-color: rgb(55 144 206);
+  border-radius: 50%;
+  box-shadow: 0 0 2px rgb(255 255 255 / 35%);
+}
+
+.main-tab-close-button:hover {
+  background-position: -15px 0;
+}
+
+.main-tab-close-button:active {
+  background-position: -30px 0;
+}
+
+.main-tab-background {
+  position: absolute;
+  bottom: 0;
+  left: 10px;
+  width: calc(100% - 20px);
+  height: 30px;
+  overflow: hidden;
+}
+
+.main-tab-label {
+  z-index: 1;
+  width: 100%;
+  margin: 0 20px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--secondary-color);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.main-tab.selected::before {
+  content: '';
+  background-position: 0 -32px;
+}
+
+.main-tab.selected::after {
+  content: '';
+  background-position: -11px -32px;
+}
+
+.main-tab.selected .main-tab-background {
+  background-color: var(--background);
+}
+
+.main-tab.selected .main-tab-label {
+  color: var(--main-color);
+}
+
+.main-tab.selected .main-tab-close-button {
+  color: var(--main-color);
+}
+
+.name-box {
+  max-width: 150px;
+  max-height: 26px;
+  padding: 0 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 0.9rem;
+  font-weight: bold;
+  line-height: 16px;
+  color: var(--text-color);
+  white-space: nowrap;
+  text-shadow: 0 0 4px #fff9;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+
+.name-box:hover {
+  text-shadow: 0 0 4px #fff;
+  background-color: #ffffff1f;
+  border-radius: 3px;
+}
+
+.name-box:active {
+  text-shadow: 0 0 4px #fff;
+  background-color: #ffffff36;
+}
+
+.status-box {
+  position: relative;
+  display: flex;
+  height: fit-content;
+  padding: 2px;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+
+.status-box:hover:not(:has(.status-dropdown:hover)) {
+  text-shadow: 0 0 4px #fff;
+  background-color: #ffffff1f;
+  border-radius: 3px;
+}
+
+.status-box:active:not(:has(.status-dropdown:active)) {
+  text-shadow: 0 0 4px #fff;
+  background-color: #ffffff36;
+}
+
+.status-display {
+  display: inline-block;
+  min-width: 13px;
+  min-height: 13px;
+  background-image: url('/user_state.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0 !important;
+}
+
+.status-display[datatype='online'] {
+  background-position: 0 0 !important;
+}
+
+.status-display[datatype='dnd'] {
+  background-position: -13px 0 !important;
+}
+
+.status-display[datatype='idle'] {
+  background-position: -26px 0 !important;
+}
+
+.status-display[datatype='gn'] {
+  background-position: -39px 0 !important;
+}
+
+.status-triangle {
+  display: inline-block;
+  min-width: 8px;
+  min-height: 13px;
+  margin-left: 5px;
+  background-image: url('/state_triangle.webp');
+  background-repeat: no-repeat;
+  background-position: 0 4px;
+}
+
+.status-box:hover:not(:has(.status-dropdown:hover)) .status-triangle {
+  background-position: -9px 4px;
+}
+
+.status-box:active:not(:has(.status-dropdown:active)) .status-triangle {
+  background-position: -18px 4px;
+}

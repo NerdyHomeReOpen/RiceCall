@@ -1,11 +1,15 @@
-import { EventEmitter } from 'events';
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
-import { useTranslation } from 'react-i18next';
-import { eventEmitter } from '@/web/event';
-import ipc from '@/ipc';
-import Logger from '@/logger';
 
 import * as Types from '@/types';
+
+import Logger from '@/logger';
+
+import { POPUP_CONFIGS } from '@/configs/popup';
+
+import { eventEmitter } from '@/main/event';
+
+import PopupHeader from '@/components/PopupHeader';
+import MaximizedPopup from '@/components/MaximizedPopup';
 
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
@@ -44,77 +48,6 @@ import ServerSetting from '@/popups/ServerSetting';
 import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
-
-import { getPopupConfigs } from '@/configs/popup';
-
-import header from '@/styles/header.module.css';
-
-const PopupEmitter = new EventEmitter();
-PopupEmitter.setMaxListeners(100);
-
-interface HeaderProps {
-  title: string;
-  buttons: ('minimize' | 'maxsize' | 'close')[];
-  titleBoxIcon?: string;
-  id: string;
-}
-
-const Header: React.FC<HeaderProps> = React.memo(({ title, buttons, titleBoxIcon, id }) => {
-  const { t } = useTranslation();
-
-  const handleCloseBtnClick = () => {
-    ipc.popup.close(id);
-  };
-
-  const handleMinimizeBtnClick = () => {
-    ipc.window.minimize(id);
-  };
-
-  return (
-    <header data-draggable className={`${header['header']} ${header['popup']}`}>
-      <div className={header['title-wrapper']}>
-        <div className={`${header['title-box']} ${titleBoxIcon}`}>
-          <div className={header['title']}>{t(title)}</div>
-        </div>
-        <div className={header['buttons']}>
-          {buttons.includes('minimize') && <div className={header['minimize']} onClick={handleMinimizeBtnClick} title={t('minimize')} />}
-          {buttons.includes('maxsize') && <div className={header['maxsize']} title={t('maximize')} />}
-          {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} title={t('close')} />}
-        </div>
-      </div>
-    </header>
-  );
-});
-
-Header.displayName = 'Header';
-
-interface MaximizedPopupProps {
-  id: string;
-  title: string;
-  buttons: ('minimize' | 'maxsize' | 'close')[];
-  onRestore: () => void;
-}
-
-const MaximizedPopup: React.FC<MaximizedPopupProps> = React.memo(({ title, buttons, id, onRestore }) => {
-  const { t } = useTranslation();
-
-  const handleRestoreBtnClick = () => {
-    onRestore();
-  };
-
-  const handleCloseBtnClick = () => {
-    ipc.popup.close(id);
-  };
-
-  return (
-    <button key={id} type="button" onClick={handleRestoreBtnClick} title={t(title)} className={header['maximized-popup-header']}>
-      <div className={header['title']}>{t(title)}</div>
-      {buttons.includes('close') && <div className={header['close']} onClick={handleCloseBtnClick} title={t('close')} />}
-    </button>
-  );
-});
-
-MaximizedPopup.displayName = 'MaximizedPopup';
 
 interface PopupProviderProps {
   children: ReactNode;
@@ -178,20 +111,20 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
       userSetting: () => <UserInfo id={id} {...initialData} />,
     };
 
-    const configs = getPopupConfigs(type);
+    const config = POPUP_CONFIGS[type];
 
     switch (type) {
       case 'channelSetting':
-        configs.title = initialData?.channel?.name ?? configs.title;
+        config.title = initialData?.channel?.name ?? config.title;
         break;
       case 'directMessage':
-        configs.title = initialData?.target?.name ?? configs.title;
+        config.title = initialData?.target?.name ?? config.title;
         break;
       case 'userInfo':
-        configs.title = initialData?.target?.name ?? configs.title;
+        config.title = initialData?.target?.name ?? config.title;
         break;
       case 'serverSetting':
-        configs.title = initialData?.server?.name ?? configs.title;
+        config.title = initialData?.server?.name ?? config.title;
         break;
     }
 
@@ -199,7 +132,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
       id,
       type,
       position: { top: 0, left: 0 },
-      ...configs,
+      ...config,
       node: node[type as keyof typeof node],
     };
   }, []);
@@ -382,11 +315,15 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
           }}
         >
           {!popup.hideHeader && (
-            <Header
+            <PopupHeader
               title={popup.title}
               buttons={popup.buttons}
-              titleBoxIcon={popup.type === 'changeTheme' ? header['title-box-skin-icon'] : popup.type === 'directMessage' ? header['title-box-direct-message-icon'] : undefined}
-              id={popup.id}
+              popupType={popup.type}
+              isFullscreen={false}
+              onMinimize={() => minimize(popup.id)}
+              onMaximize={() => restore(popup.id)}
+              onRestore={() => restore(popup.id)}
+              onClose={() => close(popup.id)}
             />
           )}
           {popup.node()}

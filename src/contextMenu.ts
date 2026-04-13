@@ -1,6 +1,5 @@
 import type * as Types from '@/types';
-
-import * as Permission from '@/utils/permission';
+import { Permission } from '@/types';
 
 export default class ContextMenu {
   private options: Types.ContextMenuItem[] = [];
@@ -38,7 +37,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'create-channel',
       label: 'create-channel',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -48,7 +47,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'create-sub-channel',
       label: 'create-sub-channel',
-      show: Permission.isChannelAdmin(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelAdmin,
       onClick: onClick,
     });
     return this;
@@ -58,7 +57,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'delete-channel',
       label: 'delete-channel',
-      show: params.isSubChannel ? Permission.isChannelAdmin(params.permissionLevel) : Permission.isServerAdmin(params.permissionLevel),
+      show: params.isSubChannel ? params.permissionLevel >= Permission.ChannelAdmin : params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -68,7 +67,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'broadcast',
       label: 'broadcast',
-      show: Permission.isChannelAdmin(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelAdmin,
       onClick: onClick,
     });
     return this;
@@ -81,7 +80,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'move-all-user-to-channel',
       label: 'move-all-user-to-channel',
-      show: !params.isInChannel && Permission.isChannelMod(params.currentPermissionLevel) && Permission.isChannelMod(params.permissionLevel) && params.movableChannelUserIds.length > 0,
+      show: !params.isInChannel && params.currentPermissionLevel >= Permission.ChannelMod && params.permissionLevel >= Permission.ChannelMod && params.movableChannelUserIds.length > 0,
       onClick: onClick,
     });
     return this;
@@ -91,7 +90,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'edit-channel-order',
       label: 'edit-channel-order',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -101,7 +100,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'kick-channel-users-from-server',
       label: 'kick-channel-users-from-server',
-      show: params.movableChannelUserIds.length > 0 && Permission.isStaff(params.permissionLevel),
+      show: params.movableChannelUserIds.length > 0 && params.permissionLevel >= Permission.Staff,
       onClick: onClick,
     });
     return this;
@@ -111,7 +110,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'kick-all-users-from-server',
       label: 'kick-all-users-from-server',
-      show: params.movableServerUserIds.length > 0 && Permission.isStaff(params.permissionLevel),
+      show: params.movableServerUserIds.length > 0 && params.permissionLevel >= Permission.Staff,
       onClick: onClick,
     });
     return this;
@@ -121,7 +120,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'set-reception-lobby',
       label: 'set-reception-lobby',
-      show: !params.isReceptionLobby && Permission.isServerAdmin(params.permissionLevel),
+      show: !params.isReceptionLobby && params.permissionLevel >= Permission.ServerAdmin,
       disabled: params.isPrivateChannel || params.isReadonlyChannel,
       onClick: onClick,
     });
@@ -132,7 +131,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'apply-member',
       label: 'apply-member',
-      show: !Permission.isMember(params.permissionLevel),
+      show: params.permissionLevel < Permission.Member,
       onClick: onClick,
     });
     return this;
@@ -143,7 +142,7 @@ export default class ContextMenu {
       id: 'member-management',
       label: 'member-management',
       icon: 'member-management',
-      show: Permission.isServerAdmin(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -153,7 +152,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'edit-nickname',
       label: 'edit-nickname',
-      show: (params.isSelf || (Permission.isServerAdmin(params.permissionLevel) && params.isLowerLevel)) && Permission.isMember(params.permissionLevel),
+      show: (params.isSelf || (params.permissionLevel >= Permission.ServerAdmin && params.isLowerLevel)) && params.permissionLevel >= Permission.Member,
       icon: 'edit-nickname',
       onClick: onClick,
     });
@@ -164,7 +163,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'edit-nickname',
       label: 'edit-nickname',
-      show: (params.isSelf || (Permission.isServerAdmin(params.permissionLevel) && params.isLowerLevel)) && Permission.isMember(params.permissionLevel),
+      show: (params.isSelf || (params.permissionLevel >= Permission.ServerAdmin && params.isLowerLevel)) && params.permissionLevel >= Permission.Member,
       icon: 'edit-nickname-no-icon',
       onClick: onClick,
     });
@@ -311,7 +310,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'kick-channel',
       label: 'kick-channel',
-      show: !params.isSelf && params.isLowerLevel && !params.isInLobby && Permission.isChannelMod(params.permissionLevel),
+      show: !params.isSelf && params.isLowerLevel && !params.isInLobby && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -321,7 +320,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'kick-server',
       label: 'kick-server',
-      show: !params.isSelf && params.isLowerLevel && Permission.isServerAdmin(params.permissionLevel),
+      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -331,7 +330,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'block',
       label: 'block',
-      show: !params.isSelf && params.isLowerLevel && Permission.isServerAdmin(params.permissionLevel),
+      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -341,7 +340,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'unblock-user-from-server',
       label: 'unblock-user-from-server',
-      show: !params.isSelf && Permission.isServerAdmin(params.permissionLevel),
+      show: !params.isSelf && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -351,7 +350,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'unblock-user-from-channel',
       label: 'unblock-user-from-channel',
-      show: !params.isSelf && Permission.isChannelAdmin(params.permissionLevel),
+      show: !params.isSelf && params.permissionLevel >= Permission.ChannelAdmin,
       onClick: onClick,
     });
     return this;
@@ -361,7 +360,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'invite-to-be-member',
       label: 'invite-to-be-member',
-      show: !params.isSelf && !Permission.isMember(params.targetPermissionLevel) && Permission.isServerAdmin(params.permissionLevel),
+      show: !params.isSelf && params.targetPermissionLevel < Permission.Member && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -379,8 +378,8 @@ export default class ContextMenu {
       show:
         !params.isSelf &&
         params.isLowerLevel &&
-        Permission.isMember(params.targetPermissionLevel) &&
-        Permission.isChannelMod(params.permissionLevel) &&
+        params.targetPermissionLevel >= Permission.Guest &&
+        params.permissionLevel >= Permission.ChannelMod &&
         submenuItems.filter((item) => item.show).length > 0,
       hasSubmenu: true,
       submenuItems: submenuItems,
@@ -396,9 +395,9 @@ export default class ContextMenu {
       show:
         !params.isSelf &&
         params.isLowerLevel &&
-        Permission.isMember(params.targetPermissionLevel) &&
-        !Permission.isServerOwner(params.targetPermissionLevel) &&
-        Permission.isServerAdmin(params.permissionLevel),
+        params.targetPermissionLevel >= Permission.Guest &&
+        params.targetPermissionLevel < Permission.ServerOwner &&
+        params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -410,8 +409,8 @@ export default class ContextMenu {
   ): this {
     this.options.push({
       id: 'set-channel-mod',
-      label: Permission.isChannelMod(params.targetPermissionLevel) ? 'unset-channel-mod' : 'set-channel-mod',
-      show: !!params.channelCategoryId && Permission.isChannelAdmin(params.permissionLevel) && !Permission.isChannelAdmin(params.targetPermissionLevel),
+      label: params.targetPermissionLevel >= Permission.ChannelMod ? 'unset-channel-mod' : 'set-channel-mod',
+      show: !!params.channelCategoryId && params.permissionLevel >= Permission.ChannelAdmin && params.targetPermissionLevel < Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -423,8 +422,8 @@ export default class ContextMenu {
   ): this {
     this.options.push({
       id: 'set-channel-admin',
-      label: Permission.isChannelAdmin(params.targetPermissionLevel) ? 'unset-channel-admin' : 'set-channel-admin',
-      show: Permission.isServerAdmin(params.permissionLevel) && !Permission.isServerAdmin(params.targetPermissionLevel),
+      label: params.targetPermissionLevel >= Permission.ChannelAdmin ? 'unset-channel-admin' : 'set-channel-admin',
+      show: params.permissionLevel >= Permission.ServerAdmin && params.targetPermissionLevel < Permission.ChannelAdmin,
       onClick: onClick,
     });
     return this;
@@ -433,8 +432,8 @@ export default class ContextMenu {
   addSetServerAdminOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'set-server-admin',
-      label: Permission.isServerAdmin(params.targetPermissionLevel) ? 'unset-server-admin' : 'set-server-admin',
-      show: Permission.isServerOwner(params.permissionLevel) && !Permission.isServerOwner(params.targetPermissionLevel),
+      label: params.targetPermissionLevel >= Permission.ServerAdmin ? 'unset-server-admin' : 'set-server-admin',
+      show: params.permissionLevel >= Permission.ServerOwner && params.targetPermissionLevel < Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -573,7 +572,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'terminate-self-membership',
       label: 'terminate-self-membership',
-      show: params.isSelf && Permission.isMember(params.permissionLevel) && !Permission.isServerOwner(params.permissionLevel),
+      show: params.isSelf && params.permissionLevel >= Permission.Member && params.permissionLevel < Permission.ServerOwner,
       onClick: onClick,
     });
     return this;
@@ -593,7 +592,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'add-to-queue',
       label: 'add-to-queue',
-      show: !params.isSelf && params.isEqualOrLowerLevel && params.isChannelQueueMode && Permission.isChannelMod(params.permissionLevel),
+      show: !params.isSelf && params.isEqualOrLowerLevel && params.isChannelQueueMode && params.permissionLevel >= Permission.ChannelMod,
       disabled: params.isInQueue,
       onClick: onClick,
     });
@@ -617,7 +616,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'move-to-channel',
       label: 'move-to-channel',
-      show: !params.isSelf && !params.isInSameChannel && params.isEqualOrLowerLevel && Permission.isChannelMod(params.currentPermissionLevel) && Permission.isChannelMod(params.permissionLevel),
+      show: !params.isSelf && !params.isInSameChannel && params.isEqualOrLowerLevel && params.currentPermissionLevel >= Permission.ChannelMod && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -627,7 +626,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'forbid-voice',
       label: params.isVoiceMuted ? 'unforbid-voice' : 'forbid-voice',
-      show: !params.isSelf && params.isLowerLevel && Permission.isChannelMod(params.permissionLevel),
+      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -637,7 +636,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'forbid-text',
       label: params.isTextMuted ? 'unforbid-text' : 'forbid-text',
-      show: !params.isSelf && params.isLowerLevel && Permission.isChannelMod(params.permissionLevel),
+      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -684,7 +683,7 @@ export default class ContextMenu {
       id: 'free-speech',
       label: 'free-speech',
       icon: params.isFreeMode ? 'checked' : '',
-      show: Permission.isChannelMod(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -695,7 +694,7 @@ export default class ContextMenu {
       id: 'admin-speech',
       label: 'admin-speech',
       icon: params.isAdminMode ? 'checked' : '',
-      show: Permission.isChannelMod(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -706,7 +705,7 @@ export default class ContextMenu {
       id: 'queue-speech',
       label: 'queue-speech',
       icon: params.isQueueMode ? 'submenu' : '',
-      show: Permission.isChannelMod(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelMod,
       hasSubmenu: params.isQueueMode,
       submenuItems: submenuItems,
       onClick: onClick,
@@ -719,7 +718,7 @@ export default class ContextMenu {
       id: 'forbid-queue',
       label: 'forbid-queue',
       icon: params.isForbidQueue ? 'checked' : '',
-      show: Permission.isChannelMod(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -730,7 +729,7 @@ export default class ContextMenu {
       id: 'control-queue',
       label: 'control-queue',
       icon: params.isQueueControlled ? 'checked' : '',
-      show: Permission.isChannelMod(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -740,7 +739,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'increase-queue-time',
       label: 'increase-queue-time',
-      show: params.queuePosition === 0 && Permission.isChannelMod(params.permissionLevel),
+      show: params.queuePosition === 0 && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -750,7 +749,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'move-up-queue',
       label: 'move-up-queue',
-      show: params.queuePosition > 1 && Permission.isChannelMod(params.permissionLevel),
+      show: params.queuePosition > 1 && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -760,7 +759,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'move-down-queue',
       label: 'move-down-queue',
-      show: params.queuePosition > 0 && Permission.isChannelMod(params.permissionLevel),
+      show: params.queuePosition > 0 && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -770,7 +769,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'remove-from-queue',
       label: 'remove-from-queue',
-      show: Permission.isChannelMod(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -780,7 +779,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'clear-queue',
       label: 'clear-queue',
-      show: Permission.isChannelMod(params.permissionLevel),
+      show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
     return this;

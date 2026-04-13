@@ -1,0 +1,233 @@
+.content {
+  gap: 0;
+  padding: 0;
+  overflow: hidden;
+}
+
+.header-box {
+  display: flex;
+  gap: 0.77rem;
+  place-items: center;
+  width: 100%;
+  height: 50px;
+  padding: 10px;
+  background-color: #f7f7f7;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.select-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 1rem;
+}
+
+.search-wrapper {
+  display: flex;
+  flex-direction: row;
+  place-items: center;
+}
+
+.search-title {
+  display: flex;
+  align-items: center;
+  width: 80px;
+  height: 25px;
+}
+
+.search-input-box {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  box-shadow: var(--box-shadow);
+}
+
+.search-input-box input {
+  padding: 0.5rem;
+  background-color: unset !important;
+  border: unset !important;
+  box-shadow: unset !important;
+}
+
+.search-icon {
+  width: 16px;
+  height: 16px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  background-image: url('/icon_search.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.search-input-box:hover .search-icon {
+  background-position: -16px 0;
+}
+
+.search-input-box:hover .search-icon:active {
+  background-position: -33px 0;
+}
+
+.body-box {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  background-color: #fcfcfc;
+}
+
+.body-left {
+  flex: 1;
+  width: 250px;
+  height: calc(100% - 4.5rem);
+  min-height: 467.34px;
+  overflow: auto;
+  border-right: 1px solid #d6d6d6;
+}
+
+.friend-group-box,
+.friend-group-list {
+  display: flex;
+  flex-direction: column;
+}
+
+.friend-group {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 25px;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.friend-group-tab {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 25px;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.friend-group-tab.selected {
+  background-color: var(--selected);
+}
+
+.friend-group-tab:hover {
+  background-color: var(--hover);
+}
+
+.friend-group-tab-toggle-icon {
+  display: inline-block;
+  min-width: 14px;
+  min-height: 14px;
+  content: '';
+  background-image: url('/channel/channelIcon.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.friend-group-tab-toggle-icon.expanded {
+  background-position: -14px 0;
+}
+
+.friend-info-box {
+  position: relative;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5px 10px 5px 50px;
+  border-radius: 3px;
+}
+
+.friend-info-box.selected {
+  background-color: var(--selected);
+}
+
+.friend-info-box:hover {
+  background-color: var(--hover);
+}
+
+.avatar-box {
+  display: flex;
+}
+
+.avatar-border {
+  position: absolute;
+  z-index: 1;
+  width: 30px;
+  height: 30px;
+  background-image: url('/win_border.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.avatar {
+  position: relative;
+  min-width: 30px;
+  min-height: 30px;
+  object-fit: cover;
+  background-image: url('/im/SecretaryLogo.webp');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.body-right {
+  width: 100%;
+  height: 100%;
+}
+
+.body-right-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  height: 28px;
+  background-color: #fafcff;
+  border-bottom: 1px solid #d6d6d6;
+}
+
+.body-right-top-title {
+  margin-left: 0.8rem;
+}
+
+.body-right-top-delete-button-box {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 80px;
+  height: 22px;
+  padding: 2px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  border: 1px solid #b1b1b1;
+}
+
+.delete-button-icon {
+  width: 16px;
+  height: 16px;
+  background-image: url('/Delete_ico.webp');
+  background-size: auto;
+}
+
+.body-right-botton {
+  display: flex;
+  justify-content: center;
+}
+
+.message-date {
+  width: 95%;
+  height: 32px;
+  background: linear-gradient(180deg, #fff 0%, #f4f7fc 100%);
+  border-bottom: 1px solid #b6cedc;
+}

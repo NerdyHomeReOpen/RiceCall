@@ -1,0 +1,11 @@
+.input-dropdown {
+  position: absolute;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  padding: 5px;
+  background-color: var(--background);
+  border-radius: 5px;
+  box-shadow: var(--box-shadow);
+}

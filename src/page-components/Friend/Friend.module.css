@@ -1,0 +1,370 @@
+.friend-page {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-width: 0;
+  height: 100%;
+  min-height: 0;
+}
+
+.friend-page-header {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  height: 50px;
+  padding: 4px 10px;
+}
+
+.user-avatar-box {
+  padding: 2px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.user-avatar-picture {
+  position: relative;
+}
+
+.user-avatar-picture::before {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  z-index: 1;
+  min-width: 42px;
+  min-height: 42px;
+  content: '';
+  background-image: url('/win_border.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+}
+
+.user-avatar-picture::after {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  display: inline-block;
+  min-width: 13px;
+  min-height: 13px;
+  content: '';
+  background-image: url('/user_state.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0 !important;
+}
+
+.user-avatar-picture[datatype='']::after {
+  background-image: none;
+}
+
+.user-avatar-picture[datatype='online']::after {
+  background-position: 0 0 !important;
+}
+
+.user-avatar-picture[datatype='dnd']::after {
+  background-position: -13px 0 !important;
+}
+
+.user-avatar-picture[datatype='idle']::after {
+  background-position: -26px 0 !important;
+}
+
+.user-avatar-picture[datatype='gn']::after {
+  background-position: -39px 0 !important;
+}
+
+.user-base-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 40px;
+  overflow: hidden;
+}
+
+.user-base-info-box {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+}
+
+.level-icon {
+  min-width: 16px;
+  min-height: 16px;
+  background-image: url('/im/LV.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.wealth-icon {
+  min-width: 16px;
+  min-height: 16px;
+  margin-left: 20px;
+  background-image: url('/silver_pea.webp');
+  background-repeat: no-repeat;
+  background-size: cover;
+  border: none;
+}
+
+.wealth-value-text {
+  color: var(--text-color-quaternary);
+  text-align: left;
+}
+
+.user-signature-wrapper {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  width: 60%;
+  height: 40px;
+  padding: 2px 5px;
+  margin-left: 100px;
+  border: 1px solid #fff0;
+}
+
+.user-signature-wrapper:focus-within {
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.user-signature-input {
+  z-index: 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  resize: none;
+}
+
+.user-signature-input:empty::before {
+  display: block;
+  pointer-events: none;
+  content: attr(data-placeholder-text);
+}
+
+.user-signature-emoji-button {
+  display: none;
+}
+
+.user-signature-wrapper:focus-within .user-signature-emoji-button {
+  display: flex;
+}
+
+.user-badge-box {
+  display: flex;
+  gap: 1px;
+  align-items: center;
+  height: 20px;
+}
+
+.friend-page-body {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+}
+
+.friend-page-sidebar {
+  display: flex;
+  flex-direction: column;
+  width: 280px;
+  min-width: 280px;
+  min-height: 0;
+  background-color: var(--sidebar);
+}
+
+.friend-page-sidebar-navigate-tabs {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  height: 36px;
+  cursor: pointer;
+}
+
+.friend-page-sidebar-navigate-tab {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  text-align: center;
+  cursor: pointer;
+  background-image: url('/friend_tab_item_bg.webp');
+  background-position: 0 0;
+  background-size: 100% 72px;
+}
+
+.friend-page-sidebar-navigate-tab.selected {
+  background-position: 0 -36px;
+}
+
+.friend-list-icon {
+  min-width: 16px;
+  min-height: 16px;
+  background-image: url('/im/friend_list_page.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.recent-icon {
+  min-width: 16px;
+  min-height: 16px;
+  background-image: url('/im/recently_list_page.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.friend-page-sidebar-navigate-tab.selected .friend-list-icon,
+.friend-page-sidebar-navigate-tab.selected .recent-icon {
+  background-position: -64px 0;
+}
+
+.friend-page-sidebar-search-bar {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  background-color: var(--background);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+
+.friend-page-sidebar-search-input {
+  flex: 1;
+  width: 125px;
+  padding: 5px;
+}
+
+.search-icon {
+  min-width: 20px;
+  min-height: 20px;
+  background-image: url('/channel/channel_search.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.friend-page-sidebar-search-bar:hover:not(:has(.prev-icon:hover, .next-icon:hover)) .friend-page-sidebar-search-icon {
+  background-position: -20px 0;
+}
+
+.scroll-view {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 10px;
+  overflow-y: auto;
+}
+
+.friend-group-list {
+  flex: 1;
+}
+
+.recent-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+}
+
+.friend-page-sidebar-footer {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  padding: 6px;
+  background-color: var(--sidebar);
+  border-top: 1px solid var(--border);
+  border-bottom-left-radius: 5px;
+}
+
+.friend-page-sidebar-footer-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 20px;
+  color: var(--text-color-quaternary);
+  text-align: left;
+  cursor: pointer;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+.friend-page-sidebar-footer-button:hover {
+  background-color: var(--hover);
+}
+
+.friend-page-sidebar-footer-button[datatype='addGroup']::before {
+  min-width: 16px;
+  min-height: 16px;
+  margin-right: 5px;
+  content: '';
+  background-image: url('/im/add_group.webp');
+  background-repeat: no-repeat;
+}
+
+.friend-page-sidebar-footer-button[datatype='addFriend']::before {
+  min-width: 16px;
+  min-height: 16px;
+  margin-right: 5px;
+  content: '';
+  background-image: url('/im/add_friend.webp');
+  background-repeat: no-repeat;
+}
+
+.prev-icon {
+  min-width: 29px;
+  min-height: 30px;
+  cursor: pointer;
+  background-image: url('/channel/search_pre.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.next-icon {
+  min-width: 29px;
+  min-height: 30px;
+  cursor: pointer;
+  background-image: url('/channel/search_next.webp');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.prev-icon:hover,
+.next-icon:hover {
+  background-position: -29px 0;
+}
+
+.prev-icon:active,
+.next-icon:active {
+  background-position: -58px 0;
+}
+
+.friend-page-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 500px;
+  min-height: 0;
+  background-color: var(--sidebar);
+  border-top: 1px solid var(--border);
+}
+
+.friend-page-content-header {
+  padding: 10px;
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.friend-activity-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 15px;
+}

@@ -1,7 +1,6 @@
 import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
 
-import homeStyles from '@/styles/home.module.css';
+import LoadingOverlay from '@/components/LoadingOverlay';
 
 interface LoadingContextType {
   getIsLoading: () => boolean;
@@ -24,8 +23,6 @@ interface LoadingProviderProps {
 }
 
 const LoadingProvider = ({ children }: LoadingProviderProps) => {
-  const { t } = useTranslation();
-
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingServerId, setLoadingServerId] = useState<string>('');
 
@@ -50,15 +47,7 @@ const LoadingProvider = ({ children }: LoadingProviderProps) => {
 
   return (
     <LoadingContext.Provider value={contextValue}>
-      {isLoading && (
-        <div className={homeStyles['loading-wrapper']}>
-          <div className={homeStyles['loading-box']}>
-            <div className={homeStyles['loading-title-contain']}>{t('connecting-server', { '0': loadingServerId })}</div>
-            <div className={homeStyles['loading-gif']} />
-            <div className={homeStyles['loading-close-btn']} onClick={handleCloseLoading} />
-          </div>
-        </div>
-      )}
+      {isLoading && <LoadingOverlay loadingServerId={loadingServerId} onClose={handleCloseLoading} />}
       {children}
     </LoadingContext.Provider>
   );

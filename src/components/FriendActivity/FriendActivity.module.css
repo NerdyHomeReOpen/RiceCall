@@ -1,0 +1,81 @@
+.user-activity-wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.friend-activity {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.friend-activity-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+}
+
+.friend-activity-content-top {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+}
+
+.friend-activity-content-top > div:first-child,
+.friend-activity-content-top > div:nth-child(2) {
+  flex-shrink: 0;
+}
+
+.friend-activity-content-top > div:last-child {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.vip-icon {
+  width: 14px;
+}
+
+.friend-name-text {
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-username);
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.friend-name-text.vip {
+  color: var(--text-vip-name);
+
+  &:hover {
+    color: var(--text-vip-name-hover);
+  }
+}
+
+.friend-activity-timestamp-text {
+  color: var(--text-color-quinary);
+}
+
+.friend-activity-content-bottom {
+  max-width: 100%;
+  min-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-quaternary);
+  white-space: nowrap;
+  user-select: text;
+}

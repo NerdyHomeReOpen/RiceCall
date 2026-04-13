@@ -4,21 +4,21 @@ import dynamic from 'next/dynamic';
 import React, { useEffect } from 'react';
 import { Provider } from 'react-redux';
 
-import { store } from '@/store';
+import type * as Types from '@/types';
+
+import ipc from '@/main/ipc';
 
 import i18n from '@/i18n';
 
-import ipc from '@/ipc';
+import Logger from '@/logger';
 
-import type * as Types from '@/types';
+import { store } from '@/store';
 
 import ContextMenuProvider from '@/providers/ContextMenu';
 import LoadingProvider from '@/providers/Loading';
 import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
 import InAppPopupProvider from '@/providers/InAppPopup';
-
-import Logger from '@/logger';
 
 interface ProvidersProps {
   children: React.ReactNode;

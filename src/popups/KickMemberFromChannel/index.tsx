@@ -1,0 +1,166 @@
+import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
+
+import ipc from '@/main/ipc';
+
+import type * as Types from '@/types';
+
+import * as Actions from '@/action';
+
+import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constants';
+
+interface KickMemberFromChannelPopupProps {
+  id: string;
+  serverId: Types.Server['serverId'];
+  channel: Types.Channel;
+  member: Types.Member;
+}
+
+const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = React.memo(({ id, serverId, channel, member }) => {
+  const { t } = useTranslation();
+
+  const [formatType, setFormatType] = useState<string>('hours');
+  const [time, setTime] = useState<number>(1);
+  const [reason, setReason] = useState<string>('');
+  const [otherReason, setOtherReason] = useState<string>('');
+
+  const getLengthOptions = () => {
+    switch (formatType) {
+      case 'seconds':
+        return Array.from({ length: 60 }, (_, i) => i + 1);
+      case 'minutes':
+        return Array.from({ length: 60 }, (_, i) => i + 1);
+      case 'hours':
+        return Array.from({ length: 24 }, (_, i) => i + 1);
+      case 'days':
+        return Array.from({ length: 30 }, (_, i) => i + 1);
+      case 'month':
+        return Array.from({ length: 12 }, (_, i) => i + 1);
+      case 'years':
+        return Array.from({ length: 100 }, (_, i) => i + 1);
+      default:
+        return [];
+    }
+  };
+
+  const getBlockTime = () => {
+    switch (formatType) {
+      case 'seconds':
+        return 1000 * time;
+      case 'minutes':
+        return 1000 * 60 * time;
+      case 'hours':
+        return 1000 * 60 * 60 * time;
+      case 'days':
+        return 1000 * 60 * 60 * 24 * time;
+      case 'month':
+        return 1000 * 60 * 60 * 24 * 30 * time;
+      case 'years':
+        return 1000 * 60 * 60 * 24 * 30 * 12 * time;
+      default:
+        return 1000;
+    }
+  };
+
+  const handleTimeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setTime(parseInt(e.target.value));
+  };
+
+  const handleFormatTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setFormatType(e.target.value);
+  };
+
+  const handleReasonChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    setReason(e.target.value);
+  };
+
+  const handleOtherReasonChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setOtherReason(e.target.value);
+  };
+
+  const handleConfirmBtnClick = () => {
+    Actions.blockUserFromChannel(member.userId, serverId, channel.channelId, Date.now() + getBlockTime());
+    ipc.popup.close(id);
+  };
+
+  const handleCloseBtnClick = () => {
+    ipc.popup.close(id);
+  };
+
+  return (
+    <div className="popup-wrapper">
+      <div className="popup-body">
+        <div className="dialog-content">
+          <div className="dialog-icon alert" />
+          <div className="col">
+            <div className="label" style={{ minWidth: '0' }}>
+              {t('confirm-kick-user-from-channel', { '0': member.nickname || member.name, '1': channel.name })}
+            </div>
+            <div className="col">
+              <div className="input-box col">
+                <div className="label">{t('kick-time')}</div>
+                <div className="row">
+                  <div className="select-box">
+                    <select value={time} onChange={handleTimeChange}>
+                      {getLengthOptions().map((option) => (
+                        <option key={option} value={option}>
+                          {option}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="select-box">
+                    <select value={formatType} onChange={handleFormatTypeChange}>
+                      {KICK_TIME_FORMAT_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {t(option.tKey)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+              </div>
+              <div className="input-box col">
+                <div className="label">{t('kick-reason')}</div>
+                <div className="row">
+                  <div className="select-box">
+                    <select value={reason} onChange={handleReasonChange}>
+                      {KICK_REASON_OPTIONS.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {t(option.tKey)}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {reason === 'other' && (
+                    <div className="input-box">
+                      <input
+                        type="text"
+                        value={otherReason}
+                        placeholder={`${t('reason')}(${t('limit-text', { 0: KICK_REASON_OTHER_MAX_LENGTH.toString() })})`}
+                        maxLength={KICK_REASON_OTHER_MAX_LENGTH}
+                        onChange={handleOtherReasonChange}
+                      />
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="popup-footer">
+        <div className="button" onClick={handleConfirmBtnClick}>
+          {t('confirm')}
+        </div>
+        <div className="button" onClick={handleCloseBtnClick}>
+          {t('cancel')}
+        </div>
+      </div>
+    </div>
+  );
+});
+
+KickMemberFromChannelPopup.displayName = 'KickMemberFromChannelPopup';
+
+export default KickMemberFromChannelPopup;

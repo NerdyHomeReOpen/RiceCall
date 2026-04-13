@@ -42,5 +42,3 @@ export function encodeAudio(buffers: StereoBuffer[], sampleRate: number): ArrayB
 
   return buffer;
 }
-
-export default encodeAudio;

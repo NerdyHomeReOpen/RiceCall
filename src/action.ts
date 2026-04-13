@@ -2,7 +2,7 @@ import { t } from 'i18next';
 
 import * as Types from '@/types';
 
-import ipc from '@/ipc';
+import ipc from '@/main/ipc';
 
 export function openAlertDialog(message: string, callback: () => void) {
   ipc.popup.open('dialogAlert', 'dialogAlert', { message });
