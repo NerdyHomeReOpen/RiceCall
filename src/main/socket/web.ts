@@ -61,56 +61,41 @@ export function connectSocket(token: string) {
     query: { token: token },
   });
 
-  socket.on('connect', () => {
-    for (const event of SEND_EVENTS) {
-      socket?.removeAllListeners(event);
-    }
-
-    SEND_EVENTS.forEach((event) => {
-      socket?.on(event, (...args: unknown[]) => {
-        if (!NO_LOG_ON_EVENTS.includes(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
-        eventEmitter.emit(event, ...args);
-      });
+  SEND_EVENTS.forEach((event) => {
+    socket?.on(event, (...args: unknown[]) => {
+      if (!NO_LOG_ON_EVENTS.includes(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
+      eventEmitter.emit(event, ...args);
     });
+  });
 
+  socket.on('connect', () => {
     sendHeartbeat();
     if (interval) clearInterval(interval);
     interval = setInterval(sendHeartbeat, 30000);
-
     new Logger('Socket').info(`Socket connected`);
-
     eventEmitter.emit('connect', null);
   });
 
   socket.on('disconnect', (reason) => {
-    for (const event of SEND_EVENTS) {
-      socket?.removeAllListeners(event);
-    }
-
     if (interval) clearInterval(interval);
-
     new Logger('Socket').info(`Socket disconnected, reason: ${reason}`);
-
     eventEmitter.emit('disconnect', reason);
   });
 
   socket.on('connect_error', (e) => {
     const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('Socket').error(`Socket connect error: ${error.message}`);
-
     eventEmitter.emit('connect_error', e);
   });
 
   socket.on('reconnect', (attemptNumber) => {
     new Logger('Socket').info(`Socket reconnected, attempt number: ${attemptNumber}`);
-
     eventEmitter.emit('reconnect', attemptNumber);
   });
 
   socket.on('reconnect_error', (e) => {
     const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('Socket').error(`Socket reconnect error: ${error.message}`);
-
     eventEmitter.emit('reconnect_error', e);
   });
 

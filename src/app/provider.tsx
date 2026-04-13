@@ -67,8 +67,8 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
       if (!language) return;
       i18n.changeLanguage(language);
     };
-    changeLanguage(ipc.language.get());
-    const unsub = ipc.language.onUpdate(changeLanguage);
+    changeLanguage(ipc.systemSettings.language.get());
+    const unsub = ipc.systemSettings.language.onUpdate(changeLanguage);
     return () => unsub();
   }, []);
 

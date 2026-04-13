@@ -190,7 +190,6 @@ export * from '@/main/socket/web';
 export * from '@/main/systemSettings/web';
 export * from '@/main/tray/web';
 export * from '@/main/window/web';
-export * from '@/main/tray/web';
 
 function onReady() {
   const token = store.get('token');
