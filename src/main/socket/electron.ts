@@ -105,17 +105,7 @@ export function connectSocket(token: string) {
 
 export function disconnectSocket() {
   if (!socket) return;
-
   socket.emit('disconnectUser');
-
-  for (const event of ON_EVENTS) {
-    ipcMain.removeAllListeners(event);
-  }
-
-  for (const event of SEND_EVENTS) {
-    socket?.removeAllListeners(event);
-  }
-
   socket.disconnect();
   socket = null;
 }
