@@ -8,6 +8,8 @@ import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 
+import { Permission } from '@/types';
+
 import ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
@@ -23,7 +25,6 @@ import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';
 import { ImageNode } from '@/extensions/ImageNode';
 import { ChatEnter } from '@/extensions/ChatEnter';
 
-import { isChannelMod, isMember } from '@/utils/permission';
 import { toTags } from '@/utils/tagConverter';
 
 import styles from './MessageInputBox.module.css';
@@ -98,12 +99,12 @@ const MessageInputBox: React.FC = React.memo(() => {
   const leftGapTime = currentChannel.guestTextGapTime ? currentChannel.guestTextGapTime - (Date.now() - lastMessageTime) : 0;
   const leftWaitTime = currentChannel.guestTextWaitTime ? currentChannel.guestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
   const isForbidByMutedText = currentChannel.isTextMuted;
-  const isForbidByForbidText = !isChannelMod(permissionLevel) && currentChannel.forbidText;
-  const isForbidByForbidGuestText = !isMember(permissionLevel) && currentChannel.forbidGuestText;
-  const isForbidByForbidGuestTextWait = !isMember(permissionLevel) && leftWaitTime > 0;
-  const isForbidByForbidGuestTextGap = !isMember(permissionLevel) && leftGapTime > 0;
+  const isForbidByForbidText = permissionLevel < Permission.ChannelMod && currentChannel.forbidText;
+  const isForbidByForbidGuestText = permissionLevel < Permission.Member && currentChannel.forbidGuestText;
+  const isForbidByForbidGuestTextWait = permissionLevel < Permission.Member && leftWaitTime > 0;
+  const isForbidByForbidGuestTextGap = permissionLevel < Permission.Member && leftGapTime > 0;
   const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
-  const maxLength = !isMember(permissionLevel) ? currentChannel.guestTextMaxLength : 3000;
+  const maxLength = permissionLevel < Permission.Member ? currentChannel.guestTextMaxLength : 3000;
 
   const setStyles = useCallback(() => {
     editor?.chain().setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
@@ -141,7 +142,7 @@ const MessageInputBox: React.FC = React.memo(() => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }

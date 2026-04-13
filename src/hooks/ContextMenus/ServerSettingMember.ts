@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import ContextMenu from '@/contextMenu';
 
 import * as Actions from '@/action';
-
-import { isServerAdmin } from '@/utils/permission';
 
 interface UseServerSettingMemberContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -23,7 +22,7 @@ export const useServerSettingMemberContextMenu = ({ user, server, member, permis
     const submenuItems = new ContextMenu()
       .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => Actions.terminateMember(member.userId, server.serverId, member.name))
       .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
-        isServerAdmin(member.permissionLevel)
+        member.permissionLevel >= Permission.ServerAdmin
           ? Actions.editServerPermission(member.userId, server.serverId, { permissionLevel: 2 })
           : Actions.editServerPermission(member.userId, server.serverId, { permissionLevel: 5 }),
       )

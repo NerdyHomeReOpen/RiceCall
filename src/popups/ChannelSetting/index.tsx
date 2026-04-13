@@ -3,6 +3,7 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import ipc from '@/main/ipc';
 
@@ -23,7 +24,6 @@ import { setSelectedItemId } from '@/store/slices/UI';
 import { objDiff } from '@/utils/objDiff';
 import { sorter } from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
-import { isChannelMod, isServerAdmin } from '@/utils/permission';
 
 import styles from './ChannelSetting.module.css';
 
@@ -64,13 +64,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
   const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, channel.permissionLevel);
-  const isReadOnly = !isChannelMod(permissionLevel);
+  const isReadOnly = permissionLevel < Permission.ChannelMod;
   const isLobby = server.lobbyId === channel.channelId;
   const isReceptionLobby = server.receptionLobbyId === channel.channelId;
   const canSubmit = channel.name.trim();
 
   const { totalModeratorsCount, sortedModerators } = useMemo(() => {
-    const total = channelMembers.filter((m) => isChannelMod(m.permissionLevel) && !isServerAdmin(m.permissionLevel));
+    const total = channelMembers.filter((m) => m.permissionLevel >= Permission.ChannelMod && m.permissionLevel < Permission.ServerAdmin);
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(moderatorQuery.toLowerCase()) || m.name.toLowerCase().includes(moderatorQuery.toLowerCase()));
     const sorted = filtered.sort(sorter(moderatorSortField, moderatorSortDirection));
     return { totalModeratorsCount: total.length, filteredModerators: filtered, sortedModerators: sorted };
@@ -85,16 +85,16 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
 
   const settingPages = useMemo(
     () =>
-      isChannelMod(permissionLevel)
+      permissionLevel >= Permission.ChannelMod
         ? [
-            t('channel-info'),
-            t('channel-announcement'),
-            t('access-permission'),
-            t('speaking-permission'),
-            t('text-permission'),
-            `${t('channel-management')} (${totalModeratorsCount})`,
-            `${t('blacklist-management')} (${totalBlockMembersCount})`,
-          ]
+          t('channel-info'),
+          t('channel-announcement'),
+          t('access-permission'),
+          t('speaking-permission'),
+          t('text-permission'),
+          `${t('channel-management')} (${totalModeratorsCount})`,
+          `${t('blacklist-management')} (${totalBlockMembersCount})`,
+        ]
         : isReadOnly
           ? [t('channel-info'), t('channel-announcement')]
           : [t('channel-info')],

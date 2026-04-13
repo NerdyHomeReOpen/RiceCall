@@ -3,6 +3,7 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import ipc from '@/main/ipc';
 
@@ -29,7 +30,6 @@ import SpeakerVolumeSlider from '@/components/SpeakerVolumeSlider';
 import ShowFrame from '@/components/ShowFrame';
 import UnreadMessageAlert from '@/components/UnreadMessageAlert';
 
-import { isChannelMod } from '@/utils/permission';
 import { getFormatTimeFromSecond } from '@/utils/language';
 
 import styles from './Server.module.css';
@@ -123,7 +123,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   const isCentralAreaShowMode = centralAreaMode === 'show';
   const isChannelUIClassicMode = channelUIMode === 'classic' || (channelUIMode === 'auto' && isCentralAreaAnnouncementMode);
   const isChannelUIThreeLineMode = channelUIMode === 'three-line' || (channelUIMode === 'auto' && isCentralAreaShowMode);
-  const isControlled = !isChannelMod(permissionLevel) && isQueueControlled;
+  const isControlled = permissionLevel < Permission.ChannelMod && isQueueControlled;
   const isQueuing = queuePosition !== undefined && queuePosition > 0;
   const isMicTaken = queuePosition !== undefined && queuePosition <= 0;
   const isIdling = !isMicTaken && !isQueuing;
@@ -152,7 +152,7 @@ const ServerPageContent: React.FC = React.memo(() => {
     if (isMicTaken) className += ` ${styles['speaking']}`;
     if (isQueuing) className += ` ${styles['queuing']}`;
     if (currentChannel.isVoiceMuted || isControlled) className += ` ${styles['muted']}`;
-    if (!isCurrentChannelQueueMode || (!isChannelMod(permissionLevel) && isIdling)) className += ` ${styles['no-selection']}`;
+    if (!isCurrentChannelQueueMode || (permissionLevel < Permission.ChannelMod && isIdling)) className += ` ${styles['no-selection']}`;
     return className;
   };
 
@@ -185,7 +185,7 @@ const ServerPageContent: React.FC = React.memo(() => {
             onClick: () => Actions.leaveQueue(currentServer.serverId, currentChannel.channelId),
           },
         ]);
-      } else if (isChannelMod(permissionLevel)) {
+      } else if (permissionLevel >= Permission.ChannelMod) {
         const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
         showMicContextMenu(x, y, 'right-top', [
           {
@@ -454,7 +454,7 @@ const ServerPageContent: React.FC = React.memo(() => {
       </div>
       <div className={styles['control-area']}>
         <div className={styles['control-buttons']}>
-          <div className={styles['voice-mode-dropdown']} style={isChannelMod(permissionLevel) ? {} : { display: 'none' }} onClick={handleVoiceModeDropdownClick}>
+          <div className={styles['voice-mode-dropdown']} style={permissionLevel >= Permission.ChannelMod ? {} : { display: 'none' }} onClick={handleVoiceModeDropdownClick}>
             {currentChannel.voiceMode === 'queue' ? t('queue-speech') : currentChannel.voiceMode === 'free' ? t('free-speech') : currentChannel.voiceMode === 'admin' ? t('admin-speech') : ''}
           </div>
         </div>

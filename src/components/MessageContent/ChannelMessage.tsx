@@ -3,6 +3,7 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
@@ -16,7 +17,6 @@ import { useMessageContextMenu } from '@/hooks/ContextMenus/Message';
 import MarkdownContent from '@/components/MarkdownContent';
 
 import { getFormatTimestamp } from '@/utils/language';
-import { isChannelMod } from '@/utils/permission';
 
 import styles from './MessageContent.module.css';
 
@@ -88,7 +88,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   return (
     <div className={styles['message-box']}>
       <div className={`${styles['details']}`} onContextMenu={handleMessageContextMenu}>
-        {isChannelMod(messageGroup.permissionLevel) && <div className={`permission-${messageGroup.gender} permission-lv-${messageGroup.permissionLevel}`} />}
+        {messageGroup.permissionLevel >= Permission.ChannelMod && <div className={`permission-${messageGroup.gender} permission-lv-${messageGroup.permissionLevel}`} />}
         {hasVip && <div className={`vip-icon vip-${messageGroup.vip}`} />}
         <div className={`${styles['username-text']} ${hasVip ? styles['vip'] : ''}`} onClick={handleUsernameClick}>
           {messageGroup.nickname || messageGroup.name}

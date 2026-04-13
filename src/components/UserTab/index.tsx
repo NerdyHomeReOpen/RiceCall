@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
@@ -16,8 +17,6 @@ import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
 import { setSelectedItemId } from '@/store/slices/UI';
-
-import { isChannelMod } from '@/utils/permission';
 
 import styles from './UserTab.module.css';
 
@@ -73,7 +72,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const isFriend = useMemo(() => friends.some((f) => f.targetId === member.userId && f.relationStatus === 2), [friends, member.userId]);
   const isLowerLevel = member.permissionLevel < permissionLevel;
   const isChannelQueueMode = channel.voiceMode === 'queue';
-  const isDraggable = !isSelf && isLowerLevel && isChannelMod(permissionLevel);
+  const isDraggable = !isSelf && isLowerLevel && permissionLevel >= Permission.ChannelMod;
   const hasVip = member.vip > 0;
 
   const { buildContextMenu } = useMemberContextMenu({

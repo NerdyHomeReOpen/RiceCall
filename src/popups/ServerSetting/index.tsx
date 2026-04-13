@@ -3,6 +3,7 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import ipc from '@/main/ipc';
 
@@ -21,7 +22,6 @@ import AnnouncementEditor from '@/components/AnnouncementEditor';
 import { setSelectedItemId } from '@/store/slices/UI';
 
 import { getPermissionText } from '@/utils/language';
-import { isServerAdmin, isMember, isStaff } from '@/utils/permission';
 import { sorter } from '@/utils/sorter';
 import { objDiff } from '@/utils/objDiff';
 
@@ -74,11 +74,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
   const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel);
-  const isReadOnly = !isServerAdmin(permissionLevel);
+  const isReadOnly = permissionLevel < Permission.ServerAdmin;
   const canSubmit = server.name.trim();
 
   const { totalMembersCount, sortedMembers } = useMemo(() => {
-    const total = serverMembers.filter((m) => isMember(m.permissionLevel) && !isStaff(m.permissionLevel));
+    const total = serverMembers.filter((m) => m.permissionLevel >= Permission.Member && m.permissionLevel < Permission.ServerAdmin);
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(memberQuery.toLowerCase()) || m.name.toLowerCase().includes(memberQuery.toLowerCase()));
     const sorted = filtered.sort(sorter(memberSortField, memberSortDirection));
     return { totalMembersCount: total.length, filteredMembers: filtered, sortedMembers: sorted };
@@ -98,16 +98,16 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     return { totalBlockMembersCount: total.length, filteredBlockMembers: filtered, sortedBlockMembers: sorted };
   }, [serverMembers, blockMemberQuery, blockMemberSortField, blockMemberSortDirection]);
 
-  const settingPages = isServerAdmin(permissionLevel)
+  const settingPages = permissionLevel >= Permission.ServerAdmin
     ? [
-        t('server-info'),
-        t('server-announcement'),
-        t('member-management'),
-        t('access-permission'),
-        `${t('member-application-management')} (${totalApplicationsCount})`,
-        `${t('blacklist-management')} (${totalBlockMembersCount})`,
-      ]
-    : isMember(permissionLevel)
+      t('server-info'),
+      t('server-announcement'),
+      t('member-management'),
+      t('access-permission'),
+      `${t('member-application-management')} (${totalApplicationsCount})`,
+      `${t('blacklist-management')} (${totalBlockMembersCount})`,
+    ]
+    : permissionLevel >= Permission.Member
       ? [t('server-info'), t('server-announcement'), t('member-management')]
       : [t('server-info'), t('server-announcement')];
 
@@ -190,7 +190,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
           isUploadingRef.current = false;
           return;
         }
@@ -494,7 +494,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                       {
                         id: 'accept-application',
                         label: t('accept-application'),
-                        show: !isSelf && isServerAdmin(permissionLevel),
+                        show: !isSelf && permissionLevel >= Permission.ServerAdmin,
                         onClick: () => {
                           Actions.approveMemberApplication(application.userId, server.serverId);
                         },
@@ -502,7 +502,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                       {
                         id: 'deny-application',
                         label: t('deny-application'),
-                        show: !isSelf && isServerAdmin(permissionLevel),
+                        show: !isSelf && permissionLevel >= Permission.ServerAdmin,
                         onClick: () => {
                           Actions.rejectMemberApplication(application.userId, server.serverId);
                         },

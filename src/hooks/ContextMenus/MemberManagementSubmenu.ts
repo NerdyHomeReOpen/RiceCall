@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import ContextMenu from '@/contextMenu';
 
 import * as Actions from '@/action';
-
-import { isChannelMod, isChannelAdmin, isServerAdmin } from '@/utils/permission';
 
 interface UseMemberManagementSubmenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
@@ -27,17 +26,17 @@ export const useMemberManagementSubmenu = ({ user, currentServer, channel, membe
           Actions.terminateMember(member.userId, currentServer.serverId, member.name),
         )
         .addSetChannelModOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-          isChannelMod(member.permissionLevel)
+          member.permissionLevel >= Permission.ChannelMod
             ? Actions.editChannelPermission(member.userId, currentServer.serverId, channel.channelId, { permissionLevel: 2 })
             : Actions.editChannelPermission(member.userId, currentServer.serverId, channel.channelId, { permissionLevel: 3 }),
         )
         .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-          isChannelAdmin(member.permissionLevel)
+          member.permissionLevel >= Permission.ChannelAdmin
             ? Actions.editChannelPermission(member.userId, currentServer.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
             : Actions.editChannelPermission(member.userId, currentServer.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
         )
         .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
-          isServerAdmin(member.permissionLevel)
+          member.permissionLevel >= Permission.ServerAdmin
             ? Actions.editServerPermission(member.userId, currentServer.serverId, { permissionLevel: 2 })
             : Actions.editServerPermission(member.userId, currentServer.serverId, { permissionLevel: 5 }),
         )

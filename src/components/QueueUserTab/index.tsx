@@ -1,6 +1,8 @@
 import React, { useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
+import { Permission } from '@/types';
+
 import * as Actions from '@/action';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
@@ -15,7 +17,6 @@ import { useWebRTC } from '@/providers/WebRTC';
 import { setSelectedItemId } from '@/store/slices/UI';
 
 import { getDefaultQueueMember } from '@/utils/default';
-import { isChannelMod } from '@/utils/permission';
 
 import styles from './QueueUserTab.module.css';
 
@@ -73,10 +74,10 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const isSelf = queueMember.userId === user.userId;
   const hasVip = queueMember.vip > 0;
   const isOnMic = queueMember.position === 0;
-  const isControlled = isOnMic && queueMember.isQueueControlled && !isChannelMod(permissionLevel);
+  const isControlled = isOnMic && queueMember.isQueueControlled && permissionLevel < Permission.ChannelMod;
 
   const getStatusIcon = () => {
-    if (isMuted || queueMember.isVoiceMuted || (!isChannelMod(permissionLevel) && isControlled)) return 'muted';
+    if (isMuted || queueMember.isVoiceMuted || (permissionLevel < Permission.ChannelMod && isControlled)) return 'muted';
     if (isSpeaking) return 'play';
     return '';
   };

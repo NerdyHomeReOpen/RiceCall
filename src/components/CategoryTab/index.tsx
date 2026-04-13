@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
@@ -15,8 +16,6 @@ import ChannelTab from '@/components/ChannelTab';
 import UserTab from '@/components/UserTab';
 
 import { setSelectedItemId } from '@/store/slices/UI';
-
-import { isMember, isChannelMod, isServerAdmin } from '@/utils/permission';
 
 import styles from './CategoryTab.module.css';
 
@@ -89,9 +88,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const isPrivateChannel = category.visibility === 'private';
   const isReadonlyChannel = category.visibility === 'readonly';
   const isFull = category.userLimit && category.userLimit <= categoryMembers.length;
-  const isDraggable = isChannelMod(permissionLevel) && movableCategoryUserIds.length > 0;
-  const isPasswordNeeded = !isChannelMod(permissionLevel) && isPrivateChannel;
-  const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && !isMember(permissionLevel)) && (!isFull || isServerAdmin(permissionLevel));
+  const isDraggable = permissionLevel >= Permission.ChannelMod && movableCategoryUserIds.length > 0;
+  const isPasswordNeeded = permissionLevel < Permission.ChannelMod && isPrivateChannel;
+  const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && permissionLevel < Permission.Member) && (!isFull || permissionLevel >= Permission.ServerAdmin);
 
   const { buildContextMenu } = useChannelContextMenu({
     user,
@@ -122,7 +121,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   const handleTabDragOver = (e: React.DragEvent) => {
-    if (isChannelMod(permissionLevel) && !isReadonlyChannel) e.preventDefault();
+    if (permissionLevel >= Permission.ChannelMod && !isReadonlyChannel) e.preventDefault();
     else e.dataTransfer.dropEffect = 'none';
   };
 

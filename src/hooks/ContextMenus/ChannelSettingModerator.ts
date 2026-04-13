@@ -1,12 +1,11 @@
 import { useCallback } from 'react';
 
 import type * as Types from '@/types';
+import { Permission } from '@/types';
 
 import ContextMenu from '@/contextMenu';
 
 import * as Actions from '@/action';
-
-import { isChannelMod, isChannelAdmin, isServerAdmin } from '@/utils/permission';
 
 interface UseChannelSettingModeratorContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -26,17 +25,17 @@ export const useChannelSettingModeratorContextMenu = ({ user, server, channel, m
         Actions.terminateMember(moderator.userId, server.serverId, moderator.name),
       )
       .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-        isChannelMod(moderator.permissionLevel)
+        moderator.permissionLevel >= Permission.ChannelMod
           ? Actions.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
           : Actions.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
       )
       .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-        isChannelAdmin(moderator.permissionLevel)
+        moderator.permissionLevel >= Permission.ChannelAdmin
           ? Actions.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
           : Actions.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
       )
       .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
-        isServerAdmin(moderator.permissionLevel)
+        moderator.permissionLevel >= Permission.ServerAdmin
           ? Actions.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
           : Actions.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
       )

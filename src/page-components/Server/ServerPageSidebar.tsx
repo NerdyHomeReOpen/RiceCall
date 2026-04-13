@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
+import { Permission } from '@/types';
+
 import * as Actions from '@/action';
 
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -17,8 +19,6 @@ import CategoryTab from '@/components/CategoryTab';
 import QueueUserTab from '@/components/QueueUserTab';
 
 import { setSelectedItemId } from '@/store/slices/UI';
-
-import { isServerAdmin } from '@/utils/permission';
 
 import styles from './Server.module.css';
 
@@ -75,7 +75,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   const isCurrentTab = selectedTabId === 'current';
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
   const connectStatus = 4 - Math.floor(Number(Math.max(latency, rtcLatency)) / 50);
-  const hasNewMemberApplications = isServerAdmin(permissionLevel) && memberApplicationsCount > 0;
+  const hasNewMemberApplications = permissionLevel >= Permission.ServerAdmin && memberApplicationsCount > 0;
 
   const locateMe = () => {
     findMe();
