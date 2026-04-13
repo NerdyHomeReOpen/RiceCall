@@ -8,7 +8,7 @@ import { Permission } from '@/types';
 import * as Actions from '@/action';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useFindMeContext } from '@/providers/FindMe';
+import { useLocateMeContext } from '@/providers/LocateMe';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { useChannelListContextMenu } from '@/hooks/ContextMenus/ChannelList';
@@ -25,7 +25,7 @@ import styles from './Server.module.css';
 const ServerPageSidebar: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { findMe } = useFindMeContext();
+  const { locateMe } = useLocateMeContext();
   const dispatch = useAppDispatch();
 
   const user = useAppSelector(
@@ -77,15 +77,15 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   const connectStatus = 4 - Math.floor(Number(Math.max(latency, rtcLatency)) / 50);
   const hasNewMemberApplications = permissionLevel >= Permission.ServerAdmin && memberApplicationsCount > 0;
 
-  const locateMe = () => {
-    findMe();
+  const handleLocateMe = () => {
+    locateMe();
     dispatch(setSelectedItemId(`user-${user.userId}`));
   };
 
   const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingContextMenu({
     user,
     currentServer,
-    onLocateMe: locateMe,
+    onLocateMe: handleLocateMe,
   });
 
   const { buildContextMenu: buildChannelListContextMenu } = useChannelListContextMenu({
@@ -145,8 +145,8 @@ const ServerPageSidebar: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (isCurrentTab) return;
-    findMe();
-  }, [isCurrentTab, findMe]);
+    locateMe();
+  }, [isCurrentTab, locateMe]);
 
   return (
     <>

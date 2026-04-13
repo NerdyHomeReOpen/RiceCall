@@ -7,7 +7,7 @@ import { Permission } from '@/types';
 import * as Actions from '@/action';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useFindMeContext } from '@/providers/FindMe';
+import { useLocateMeContext } from '@/providers/LocateMe';
 import { useWebRTC } from '@/providers/WebRTC';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
@@ -30,7 +30,7 @@ interface UserTabProps {
 const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswordNeeded, canJoin }) => {
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { muteUser, unmuteUser } = useWebRTC();
-  const { setCurrentUserRef } = useFindMeContext();
+  const { setCurrentUserRef } = useLocateMeContext();
   const dispatch = useAppDispatch();
 
   const userTabRef = useRef<HTMLDivElement>(null);

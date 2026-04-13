@@ -8,7 +8,7 @@ import { Permission } from '@/types';
 import * as Actions from '@/action';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useFindMeContext } from '@/providers/FindMe';
+import { useLocateMeContext } from '@/providers/LocateMe';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { useChannelContextMenu } from '@/hooks/ContextMenus/Channel';
@@ -26,7 +26,7 @@ interface ChannelTabProps {
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-  const { setExpandedChannelHandlerRef } = useFindMeContext();
+  const { setExpandChannelHandlerRef } = useLocateMeContext();
   const dispatch = useAppDispatch();
 
   const user = useAppSelector(
@@ -152,8 +152,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
 
   useEffect(() => {
     if (!isInChannel) return;
-    setExpandedChannelHandlerRef(() => setIsExpanded(true));
-  }, [isInChannel, setExpandedChannelHandlerRef]);
+    setExpandChannelHandlerRef(() => setIsExpanded(true));
+  }, [isInChannel, setExpandChannelHandlerRef]);
 
   return (
     <>

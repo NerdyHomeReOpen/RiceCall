@@ -10,7 +10,7 @@ import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { useChannelContextMenu } from '@/hooks/ContextMenus/Channel';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-import { useFindMeContext } from '@/providers/FindMe';
+import { useLocateMeContext } from '@/providers/LocateMe';
 
 import ChannelTab from '@/components/ChannelTab';
 import UserTab from '@/components/UserTab';
@@ -25,7 +25,7 @@ interface CategoryTabProps {
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const { showContextMenu } = useContextMenu();
-  const { setExpandedCategoryHandlerRef } = useFindMeContext();
+  const { setExpandCategoryHandlerRef } = useLocateMeContext();
   const dispatch = useAppDispatch();
 
   const user = useAppSelector(
@@ -149,8 +149,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
 
   useEffect(() => {
     if (!isInCategory) return;
-    setExpandedCategoryHandlerRef(() => setIsExpanded(true));
-  }, [isInCategory, setExpandedCategoryHandlerRef]);
+    setExpandCategoryHandlerRef(() => setIsExpanded(true));
+  }, [isInCategory, setExpandCategoryHandlerRef]);
 
   return (
     <>

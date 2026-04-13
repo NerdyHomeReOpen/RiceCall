@@ -11,7 +11,7 @@ import ipc from '@/main/ipc';
 
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';
-import ExpandedProvider from '@/providers/FindMe';
+import ExpandedProvider from '@/providers/LocateMe';
 import { useLoading } from '@/providers/Loading';
 
 import { useAppSelector } from '@/hooks/Store';
