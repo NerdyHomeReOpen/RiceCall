@@ -1,5 +1,7 @@
 import { TFunction } from 'i18next';
 
+import { Permission } from '@/types';
+
 import i18n from '@/i18n';
 
 /**
@@ -8,16 +10,16 @@ import i18n from '@/i18n';
  * @param permission - The permission level
  * @returns The translated text for the permission level
  */
-export function getPermissionText(t: TFunction<'translation', undefined>, permission: number): string {
-  const permissionMap: Record<number, string> = {
-    1: t('guest'),
-    2: t('member'),
-    3: t('channel-mod'),
-    4: t('channel-admin'),
-    5: t('server-admin'),
-    6: t('server-owner'),
-    7: t('staff'),
-    8: t('super-admin'),
+export function getPermissionText(t: TFunction<'translation', undefined>, permission: Permission): string {
+  const permissionMap: Record<Permission, string> = {
+    [Permission.Guest]: t('guest'),
+    [Permission.Member]: t('member'),
+    [Permission.ChannelMod]: t('channel-mod'),
+    [Permission.ChannelAdmin]: t('channel-admin'),
+    [Permission.ServerAdmin]: t('server-admin'),
+    [Permission.ServerOwner]: t('server-owner'),
+    [Permission.Staff]: t('staff'),
+    [Permission.SuperAdmin]: t('super-admin'),
   };
   return permissionMap[permission] || t('unknown-user');
 }
