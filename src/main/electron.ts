@@ -67,6 +67,9 @@ export const APP_TRAY_ICON = {
 };
 
 export let tray: Tray | null = null;
+export let mainWindow: BrowserWindow | null = null;
+export let authWindow: BrowserWindow | null = null;
+export let popups: Record<string, BrowserWindow> = {};
 
 let _isLogin: boolean = false;
 
@@ -75,6 +78,16 @@ export function configureTray() {
   const trayIconPath = APP_TRAY_ICON.gray;
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
   setTrayDetail();
+}
+
+export function configureLogger() {
+  log.initialize();
+  log.transports.file.level = 'info';
+  log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
+  log.transports.file.maxSize = 5 * 1024 * 1024;
+  log.transports.remote.url = `${Env.get().API_URL}/logs`;
+  Object.assign(console, log.functions);
+  log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 }
 
 export function setTrayDetail(isLogin?: boolean) {
@@ -118,10 +131,6 @@ export function setTrayDetail(isLogin?: boolean) {
   tray.setImage(nativeImage.createFromPath(trayIconPath));
   tray.setContextMenu(contextMenu);
 }
-
-export let mainWindow: BrowserWindow | null = null;
-export let authWindow: BrowserWindow | null = null;
-export let popups: Record<string, BrowserWindow> = {};
 
 export const store = new Store<Types.StoreType>({
   defaults: {
@@ -564,16 +573,6 @@ export function broadcast(channel: string, ...args: unknown[]) {
   BrowserWindow.getAllWindows().forEach((window) => {
     window.webContents.send(channel, ...args);
   });
-}
-
-export function configureLogger() {
-  log.initialize();
-  log.transports.file.level = 'info';
-  log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
-  log.transports.file.maxSize = 5 * 1024 * 1024;
-  log.transports.remote.url = `${Env.get().API_URL}/logs`;
-  Object.assign(console, log.functions);
-  log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 }
 
 app.on('ready', async () => {
