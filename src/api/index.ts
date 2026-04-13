@@ -1,8 +1,6 @@
 import Logger from '@/logger';
 
-import { getEnv } from '@/env';
-
-import { getToken } from '@/token';
+import Env from '@/env';
 
 type RequestOptions = {
   headers?: Record<string, string>;
@@ -10,6 +8,20 @@ type RequestOptions = {
 };
 
 type ApiRequestData = Record<string, unknown>;
+
+let _token: string | null = null;
+
+export function setToken(token: string): void {
+  _token = token;
+}
+
+export function getToken(): string | null {
+  return _token;
+}
+
+export function removeToken(): void {
+  _token = null;
+}
 
 export async function handleResponse<T>(response: Response, method: 'GET' | 'POST' | 'PATCH'): Promise<T> {
   const result = await response.json();
@@ -25,10 +37,10 @@ export async function handleResponse<T>(response: Response, method: 'GET' | 'POS
 
 export async function get<T>(endpoint: string, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<T | null> {
   try {
-    const response = await fetch(`${getEnv().API_URL}${endpoint}`, {
+    const response = await fetch(`${Env.get().API_URL}${endpoint}`, {
       headers: {
         ...(options?.headers || {}),
-        Authorization: `Bearer ${getToken()}`,
+        Authorization: `Bearer ${_token}`,
       },
     });
 
@@ -48,10 +60,10 @@ export async function post<T>(endpoint: string, data: ApiRequestData | FormData,
     const headers = new Headers({
       ...(options?.headers || {}),
       ...(isFormData ? {} : { 'Content-Type': 'application/json' }),
-      Authorization: `Bearer ${getToken()}`,
+      Authorization: `Bearer ${_token}`,
     });
 
-    const response = await fetch(`${getEnv().API_URL}${endpoint}`, {
+    const response = await fetch(`${Env.get().API_URL}${endpoint}`, {
       method: 'POST',
       headers: headers,
       credentials: options?.credentials || 'omit',
@@ -72,10 +84,10 @@ export async function patch<T>(endpoint: string, data: Record<string, unknown>, 
     const headers = new Headers({
       ...(options?.headers || {}),
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${getToken()}`,
+      'Authorization': `Bearer ${_token}`,
     });
 
-    const response = await fetch(`${getEnv().API_URL}${endpoint}`, {
+    const response = await fetch(`${Env.get().API_URL}${endpoint}`, {
       method: 'PATCH',
       headers: headers,
       body: JSON.stringify(data),

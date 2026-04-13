@@ -47,8 +47,7 @@ export function registerNetworkHandlers() {
       if (activeTool) {
         try {
           activeTool.cancel?.();
-        } catch {
-        }
+        } catch {}
       }
 
       return new Promise<Types.FullReport | { error: string }>((resolve) => {

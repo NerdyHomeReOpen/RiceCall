@@ -1,5 +1,5 @@
+import { setToken, removeToken } from '@/api';
 import { login as _login, register as _register, autoLogin as _autoLogin } from '@/api/auth';
-import { setToken, removeToken } from '@/token';
 
 import { createPopup, store } from '@/main/web';
 import { connectSocket, disconnectSocket } from '@/main/socket/web';

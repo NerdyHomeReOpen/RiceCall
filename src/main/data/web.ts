@@ -1,6 +1,5 @@
+import { getToken } from '@/api';
 import * as Data from '@/api/data';
-
-import { getToken } from '@/token';
 
 export async function dataUser(params: { userId: string }) {
   return await Data.user(params);

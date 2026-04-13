@@ -1,11 +1,14 @@
 import Logger from '@/logger';
 
-import { getEnv } from '@/env';
+import Env from '@/env';
 
 import { createPopup } from '@/main/web';
 
 export function errorSubmit(errorId: string, error: Error) {
-  fetch(getEnv().ERROR_SUBMISSION_URL, {
+  const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
+  if (!errorSubmissionUrl) return;
+
+  fetch(errorSubmissionUrl, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -46,6 +49,9 @@ export function errorSubmit(errorId: string, error: Error) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function webRTCSignalStateChange(formData: { signalState: string; userId: string; channelId: string; info?: any }) {
   return new Promise((resolve) => {
+    const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
+    if (!errorSubmissionUrl) return;
+
     if (formData.signalState === 'disconnected') {
       createPopup('rtcDisconnect', `rtcDisconnect-${Date.now()}`, formData);
     }
@@ -63,7 +69,7 @@ export function webRTCSignalStateChange(formData: { signalState: string; userId:
       });
     }
 
-    fetch(getEnv().ERROR_SUBMISSION_URL, {
+    fetch(errorSubmissionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

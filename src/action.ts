@@ -194,7 +194,7 @@ export function kickUsersFromServer(userIds: Types.User['userId'][], serverId: T
 }
 
 export function applyMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], isReceiveApply: boolean) {
-  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => { });
+  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => {});
   else openApplyMember(userId, serverId);
 }
 

@@ -4,7 +4,7 @@ import { initReactI18next } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import { getEnv } from '@/env';
+import Env from '@/env';
 
 import { isMain } from '@/utils/platform';
 
@@ -83,7 +83,7 @@ const APP_TO_CROWDIN: Record<Types.LanguageKey, string> = {
   'tr-TR': 'tr',
 };
 
-const getHash = () => getEnv().CROWDIN_DISTRIBUTION_HASH || '';
+const getHash = () => Env.get().CROWDIN_DISTRIBUTION_HASH || '';
 
 /** OTA backend */
 class CrowdinBackend {

@@ -31,7 +31,7 @@ export const useHeaderContextMenu = ({ user, onChangeLanguage, onLogout, onExit 
             onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
             onAboutUsClick: Actions.openAboutUs,
           },
-          () => { },
+          () => {},
         )
         .addNetworkDiagnosisOption(() => Actions.openNetworkDiagnosis())
         .addLogoutOption(onLogout)

@@ -2,13 +2,16 @@ import { ipcMain } from 'electron';
 
 import Logger from '@/logger';
 
-import { getEnv } from '@/env';
+import Env from '@/env';
 
 import { createPopup } from '@/main/electron';
 
 export function registerErrorHandlers() {
   ipcMain.on('error-submit', (_, errorId: string, error: Error) => {
-    fetch(getEnv().ERROR_SUBMISSION_URL, {
+    const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
+    if (!errorSubmissionUrl) return;
+
+    fetch(errorSubmissionUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -49,6 +52,9 @@ export function registerErrorHandlers() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ipcMain.handle('webRTC-error', async (_, formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
     return new Promise((resolve) => {
+      const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
+      if (!errorSubmissionUrl) return;
+
       if (formData.signalState === 'disconnected') {
         createPopup('rtcDisconnect', `rtcDisconnect-${Date.now()}`, formData);
       }
@@ -66,7 +72,7 @@ export function registerErrorHandlers() {
         });
       }
 
-      fetch(getEnv().ERROR_SUBMISSION_URL, {
+      fetch(errorSubmissionUrl, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

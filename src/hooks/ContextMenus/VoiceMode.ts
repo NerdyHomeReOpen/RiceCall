@@ -21,12 +21,8 @@ export const useVoiceModeContextMenu = ({ currentServer, currentChannel, permiss
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () =>
-          Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }),
-        )
-        .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () =>
-          Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }),
-        )
+        .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
+        .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
         .addQueueSpeechOption(
           { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
           () => Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),

@@ -376,12 +376,7 @@ export default class ContextMenu {
       id: 'member-management',
       label: 'member-management',
       icon: 'submenu',
-      show:
-        !params.isSelf &&
-        params.isLowerLevel &&
-        isMember(params.targetPermissionLevel) &&
-        isChannelMod(params.permissionLevel) &&
-        submenuItems.filter((item) => item.show).length > 0,
+      show: !params.isSelf && params.isLowerLevel && isMember(params.targetPermissionLevel) && isChannelMod(params.permissionLevel) && submenuItems.filter((item) => item.show).length > 0,
       hasSubmenu: true,
       submenuItems: submenuItems,
       onClick: onClick,
@@ -393,12 +388,7 @@ export default class ContextMenu {
     this.options.push({
       id: 'terminate-member',
       label: 'terminate-member',
-      show:
-        !params.isSelf &&
-        params.isLowerLevel &&
-        isMember(params.targetPermissionLevel) &&
-        !isServerOwner(params.targetPermissionLevel) &&
-        isServerAdmin(params.permissionLevel),
+      show: !params.isSelf && params.isLowerLevel && isMember(params.targetPermissionLevel) && !isServerOwner(params.targetPermissionLevel) && isServerAdmin(params.permissionLevel),
       onClick: onClick,
     });
     return this;

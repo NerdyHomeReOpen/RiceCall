@@ -11,9 +11,9 @@ import * as Types from '@/types';
 
 import Logger from '@/logger';
 
-import { t } from '@/i18n';
+import Env from '@/env';
 
-import { getEnv, loadEnv } from '@/env';
+import { t } from '@/i18n';
 
 import { LANGUAGES } from '@/constants';
 
@@ -560,13 +560,13 @@ export function configureLogger() {
   log.transports.file.level = 'info';
   log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
   log.transports.file.maxSize = 5 * 1024 * 1024;
-  log.transports.remote.url = `${getEnv().API_URL}/logs`;
+  log.transports.remote.url = `${Env.get().API_URL}/logs`;
   Object.assign(console, log.functions);
   log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 }
 
 app.on('ready', async () => {
-  loadEnv(store.get('env', 'prod'));
+  Env.load(store.get('env', 'prod'));
 
   configureAutoUpdater();
   configureDiscordRPC();

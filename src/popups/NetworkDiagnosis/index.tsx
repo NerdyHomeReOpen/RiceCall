@@ -6,7 +6,7 @@ import ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import { getEnv } from '@/env';
+import Env from '@/env';
 import { isElectron } from '@/utils/platform';
 
 import ndStyles from './NetworkDiagnosis.module.css';
@@ -72,7 +72,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     addLog('Starting Network Diagnosis');
     updateStage('init', 'active');
 
-    const env = getEnv();
+    const env = Env.get();
     const getDomain = (url: string) => {
       try {
         return new URL(url).hostname;

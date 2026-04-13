@@ -1,9 +1,9 @@
 import { store, eventEmitter } from '@/main/web';
 
-import { loadEnv } from '@/env';
+import Env from '@/env';
 
-export function changeEnv(env: 'prod' | 'dev') {
-  store.set('env', env);
-  loadEnv(env);
-  eventEmitter.emit('env', env);
+export function changeEnv(enviroment: 'prod' | 'dev') {
+  store.set('env', enviroment);
+  Env.load(enviroment);
+  eventEmitter.emit('env', enviroment);
 }

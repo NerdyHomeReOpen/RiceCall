@@ -7,10 +7,7 @@ interface UseAnnouncementAreaContextMenuProps {
 }
 
 export const useAnnouncementAreaContextMenu = ({ onCloseAnnouncement }: UseAnnouncementAreaContextMenuProps) => {
-  const buildContextMenu = useCallback(
-    () => new ContextMenu().addCloseAnnouncementOption(onCloseAnnouncement).build(),
-    [onCloseAnnouncement],
-  );
+  const buildContextMenu = useCallback(() => new ContextMenu().addCloseAnnouncementOption(onCloseAnnouncement).build(), [onCloseAnnouncement]);
 
   return { buildContextMenu };
 };

@@ -4,7 +4,7 @@ import * as Types from '@/types';
 
 import Logger from '@/logger';
 
-import { getEnv } from '@/env';
+import Env from '@/env';
 
 import { NO_LOG_ON_EVENTS, SEND_EVENTS } from '@/configs/socket';
 
@@ -51,7 +51,7 @@ export function connectSocket(token: string) {
 
   seq = 0;
 
-  socket = io(getEnv().WS_URL, {
+  socket = io(Env.get().WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,

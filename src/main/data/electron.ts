@@ -1,8 +1,7 @@
 import { ipcMain } from 'electron';
 
+import { getToken } from '@/api';
 import * as Data from '@/api/data';
-
-import { getToken } from '@/token';
 
 export function registerDataHandlers() {
   ipcMain.handle('data-user', async (_, params: { userId: string }) => {
