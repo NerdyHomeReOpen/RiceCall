@@ -3,17 +3,17 @@ import React from 'react';
 import styles from './AuthHeader.module.css';
 
 interface AuthHeaderProps {
-  onMinimize?: () => void;
-  onClose?: () => void;
+  onMinimize: () => void;
+  onClose: () => void;
 }
 
 const AuthHeader: React.FC<AuthHeaderProps> = React.memo(({ onMinimize, onClose }) => {
   const handleMinimizeClick = () => {
-    onMinimize?.();
+    onMinimize();
   };
 
   const handleCloseClick = () => {
-    onClose?.();
+    onClose();
   };
 
   return (
