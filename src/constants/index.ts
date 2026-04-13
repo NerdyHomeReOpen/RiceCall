@@ -1,15 +1,6 @@
 import type * as Types from '@/types';
 
-export type RecommendServerCategory = {
-  id: string;
-  label: string[];
-  tags: string[];
-  emoji?: string;
-  subCategories?: RecommendServerCategory[];
-};
-
 export const SYSTEM_FONT_LIST = ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans TC', 'Microsoft JhengHei', 'Heiti TC', 'LiHei Pro', 'sans-serif'];
-
 export const FONT_LIST = [
   // Recommended Fonts
   {
@@ -98,104 +89,6 @@ export const SHAKE_COOLDOWN = 3;
 export const MAX_INPUT_LENGTH = 1000;
 export const MAX_BROADCAST_LENGTH = 300;
 export const ALLOWED_MESSAGE_KEYS = ['guest-send-an-external-link', 'message:send-shake-window', 'message:receive-shake-window'];
-export const CATEGORIES: RecommendServerCategory[] = [
-  {
-    id: 'official-groups',
-    label: ['official-groups'],
-    tags: ['official'],
-    emoji: '2705',
-  },
-  {
-    id: 'taiwan-groups',
-    label: ['taiwan-groups'],
-    tags: ['taiwan'],
-    emoji: '1f1f9-1f1fc',
-    subCategories: [
-      {
-        id: 'taiwan-official-groups',
-        label: ['taiwan-groups', 'official-groups'],
-        tags: ['taiwan', 'official'],
-      },
-      {
-        id: 'taiwan-entertainment-groups',
-        label: ['taiwan-groups', 'entertainment-groups'],
-        tags: ['taiwan', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'russia-groups',
-    label: ['russia-groups'],
-    tags: ['russia'],
-    emoji: '1f1f7-1f1fa',
-    subCategories: [
-      {
-        id: 'russia-official-groups',
-        label: ['russia-groups', 'official-groups'],
-        tags: ['russia', 'official'],
-      },
-      {
-        id: 'russia-entertainment-groups',
-        label: ['russia-groups', 'entertainment-groups'],
-        tags: ['russia', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'brazil-groups',
-    label: ['brazil-groups'],
-    tags: ['brazil'],
-    emoji: '1f1e7-1f1f7',
-    subCategories: [
-      {
-        id: 'brazil-official-groups',
-        label: ['brazil-groups', 'official-groups'],
-        tags: ['brazil', 'official'],
-      },
-      {
-        id: 'brazil-entertainment-groups',
-        label: ['brazil-groups', 'entertainment-groups'],
-        tags: ['brazil', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'turkey-groups',
-    label: ['turkey-groups'],
-    tags: ['turkey'],
-    emoji: '1f1f9-1f1f7',
-    subCategories: [
-      {
-        id: 'turkey-official-groups',
-        label: ['turkey-groups', 'official-groups'],
-        tags: ['turkey', 'official'],
-      },
-      {
-        id: 'turkey-entertainment-groups',
-        label: ['turkey-groups', 'entertainment-groups'],
-        tags: ['turkey', 'entertainment'],
-      },
-    ],
-  },
-  {
-    id: 'iran-groups',
-    label: ['iran-groups'],
-    tags: ['iran'],
-    emoji: '1f1ee-1f1f7',
-    subCategories: [
-      {
-        id: 'iran-official-groups',
-        label: ['iran-groups', 'official-groups'],
-        tags: ['iran', 'official'],
-      },
-      {
-        id: 'iran-entertainment-groups',
-        label: ['iran-groups', 'entertainment-groups'],
-        tags: ['iran', 'entertainment'],
-      },
-    ],
-  },
-];
 export const STATUS_OPTIONS: Types.User['status'][] = ['online', 'dnd', 'idle', 'gn'];
 export const MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWidth: number }[] = [
   {
@@ -275,7 +168,6 @@ export const SERVER_OPTIONS: { tKey: string; value: 'prod' | 'dev' }[] = [
   { tKey: 'prod-server', value: 'prod' },
   { tKey: 'test-server', value: 'dev' },
 ];
-
 export const KICK_TIME_FORMAT_OPTIONS = [
   { tKey: 'second', value: 'seconds' },
   { tKey: 'minute', value: 'minutes' },
