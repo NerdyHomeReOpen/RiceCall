@@ -16,7 +16,7 @@ interface SendSectionProps {
   onCloseClick: () => void;
 }
 
-const SendSection: React.FC<SendSectionProps> = ({
+const SendSection: React.FC<SendSectionProps> = React.memo(({
   target,
   friendGroups,
   applicationDesc,
@@ -78,6 +78,8 @@ const SendSection: React.FC<SendSectionProps> = ({
       </div>
     </>
   );
-};
+});
+
+SendSection.displayName = 'SendSection';
 
 export default SendSection;

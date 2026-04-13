@@ -14,7 +14,7 @@ interface HomePageHeaderProps {
   onBackBtnClick: () => void;
 }
 
-const HomePageHeader: React.FC<HomePageHeaderProps> = ({
+const HomePageHeader: React.FC<HomePageHeaderProps> = React.memo(({
   isHomeSection,
   isPersonalExclusiveSection,
   onHomeSectionBtnClick,
@@ -53,7 +53,7 @@ const HomePageHeader: React.FC<HomePageHeaderProps> = ({
       </div>
     </>
   );
-};
+});
 
 HomePageHeader.displayName = 'HomePageHeader';
 

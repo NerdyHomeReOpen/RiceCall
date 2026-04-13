@@ -14,7 +14,7 @@ import SearchResultItem from './SearchResultItem';
 
 import styles from './ServerSearchBar.module.css';
 
-const ServerSearchBar: React.FC = () => {
+const ServerSearchBar: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { getIsLoading, loadServer } = useLoading();
 
@@ -186,7 +186,7 @@ const ServerSearchBar: React.FC = () => {
       </div>
     </div>
   );
-};
+});
 
 ServerSearchBar.displayName = 'ServerSearchBar';
 

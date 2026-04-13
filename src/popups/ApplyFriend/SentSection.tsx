@@ -10,7 +10,7 @@ interface SentSectionProps {
   onCloseClick: () => void;
 }
 
-const SentSection: React.FC<SentSectionProps> = ({ target, onTargetNameClick, onModifyClick, onCloseClick }) => {
+const SentSection: React.FC<SentSectionProps> = React.memo(({ target, onTargetNameClick, onModifyClick, onCloseClick }) => {
   const { t } = useTranslation();
 
   return (
@@ -43,6 +43,8 @@ const SentSection: React.FC<SentSectionProps> = ({ target, onTargetNameClick, on
       </div>
     </>
   );
-};
+});
+
+SentSection.displayName = 'SentSection';
 
 export default SentSection;

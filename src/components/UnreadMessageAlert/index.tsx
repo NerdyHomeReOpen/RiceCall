@@ -8,7 +8,7 @@ interface UnreadMessageAlertProps {
   onAlertClick: () => void;
 }
 
-const UnreadMessageAlert: React.FC<UnreadMessageAlertProps> = ({ unreadMessageCount, onAlertClick }) => {
+const UnreadMessageAlert: React.FC<UnreadMessageAlertProps> = React.memo(({ unreadMessageCount, onAlertClick }) => {
   const { t } = useTranslation();
 
   return (
@@ -20,6 +20,8 @@ const UnreadMessageAlert: React.FC<UnreadMessageAlertProps> = ({ unreadMessageCo
       )}
     </>
   );
-};
+});
+
+UnreadMessageAlert.displayName = 'UnreadMessageAlert';
 
 export default UnreadMessageAlert;

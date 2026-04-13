@@ -155,7 +155,7 @@ export function listen(channel: string, listener: (...args: unknown[]) => void) 
   return () => eventEmitter.removeListener(channel, listener);
 }
 
-export function createPopup(type: Types.PopupType, id: string, initialData: unknown, force = true) {
+export function createPopup(type: Types.PopupType, id: string, initialData: unknown = {}, force = true) {
   eventEmitter.emit('open-popup', type, id, initialData, force);
 }
 

@@ -33,7 +33,7 @@ const RTCDisconnectPopup: React.FC<RTCDisconnectPopupProps> = React.memo(({ id, 
         <div className="dialog-content">
           <div className="dialog-icon info" />
           <div className="dialog-message">
-            <MarkdownContent markdownText={t('rtc-disconnect-message', { count: currentCount })} />
+            <MarkdownContent markdownText={t('rtc-disconnect-message', { '0': currentCount })} />
           </div>
         </div>
       </div>

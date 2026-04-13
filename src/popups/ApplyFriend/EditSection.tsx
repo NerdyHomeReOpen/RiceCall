@@ -12,7 +12,7 @@ interface EditSectionProps {
   onCloseClick: () => void;
 }
 
-const EditSection: React.FC<EditSectionProps> = ({ target, applicationDesc, onTargetNameClick, onApplicationDescChange, onSubmitClick, onCloseClick }) => {
+const EditSection: React.FC<EditSectionProps> = React.memo(({ target, applicationDesc, onTargetNameClick, onApplicationDescChange, onSubmitClick, onCloseClick }) => {
   const { t } = useTranslation();
 
   return (
@@ -48,6 +48,8 @@ const EditSection: React.FC<EditSectionProps> = ({ target, applicationDesc, onTa
       </div>
     </>
   );
-};
+});
+
+EditSection.displayName = 'EditSection';
 
 export default EditSection;

@@ -8,13 +8,13 @@ interface ImageViewerProps {
   onUnselectImage: () => void;
 }
 
-const ImageViewer: React.FC<ImageViewerProps> = ({ selectedImage, onUnselectImage }) => {
+const ImageViewer: React.FC<ImageViewerProps> = React.memo(({ selectedImage, onUnselectImage }) => {
   return (
     <div className={`${styles['image-viewer']} ${selectedImage ? styles['visible'] : styles['hidden']}`} onClick={onUnselectImage}>
       {selectedImage && <Image loading="lazy" src={selectedImage} alt="image" onClick={(e) => e.stopPropagation()} width={-1} height={-1} />}
     </div>
   );
-};
+});
 
 ImageViewer.displayName = 'ImageViewer';
 
