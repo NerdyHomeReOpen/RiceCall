@@ -1,4 +1,4 @@
-import packageJson from '../package.json' with { type: 'json' };
+import packageJson from '../../package.json' with { type: 'json' };
 
 import { post } from '@/api';
 
@@ -10,17 +10,17 @@ type RegisterFormData = {
   locale: string;
 };
 
-type LoginFormData = {
-  account: string;
-  password: string;
-};
-
 export async function register(formData: RegisterFormData): Promise<{ success: true; message: string } | { success: false }> {
   const res = await post('/account/register', formData);
   if (!res || typeof res !== 'object' || !('message' in res) || typeof res.message !== 'string') return { success: false };
 
   return { success: true, message: res.message };
 }
+
+type LoginFormData = {
+  account: string;
+  password: string;
+};
 
 export async function login(formData: LoginFormData): Promise<{ success: true; token: string } | { success: false }> {
   const res = await post('/account/login', { ...formData, version: packageJson.version });

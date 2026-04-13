@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 
-import { login as _login, register as _register, autoLogin as _autoLogin } from '@/auth';
+import { login as _login, register as _register, autoLogin as _autoLogin } from '@/api/auth';
 
 import { setToken, removeToken } from '@/token';
 

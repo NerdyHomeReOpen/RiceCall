@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 
-import * as Data from '@/data';
+import * as Data from '@/api/data';
 
 import { getToken } from '@/token';
 
