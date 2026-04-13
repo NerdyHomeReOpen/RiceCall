@@ -48,10 +48,22 @@ export const DEV = process.argv.includes('--dev');
 export const PORT = 3000;
 export const PRELOAD_PATH = DEV ? path.join(app.getAppPath(), 'preload.ts') : path.join(app.getAppPath(), 'build', 'src', 'main', 'preload.js');
 export const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
-export const APP_ICON = process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'icon.ico') : path.join(app.getAppPath(), 'resources', 'icon.png');
+export const APP_ICON = DEV
+  ? path.join(app.getAppPath(), '..', '..', 'resources', 'icon.ico')
+  : process.platform === 'win32'
+    ? path.join(app.getAppPath(), 'resources', 'icon.ico')
+    : path.join(app.getAppPath(), 'resources', 'icon.png');
 export const APP_TRAY_ICON = {
-  gray: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico') : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
-  normal: process.platform === 'win32' ? path.join(app.getAppPath(), 'resources', 'tray.ico') : path.join(app.getAppPath(), 'resources', 'tray.png'),
+  gray: DEV
+    ? path.join(app.getAppPath(), '..', '..', 'resources', 'tray_gray.ico')
+    : process.platform === 'win32'
+      ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico')
+      : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
+  normal: DEV
+    ? path.join(app.getAppPath(), '..', '..', 'resources', 'tray.ico')
+    : process.platform === 'win32'
+      ? path.join(app.getAppPath(), 'resources', 'tray.ico')
+      : path.join(app.getAppPath(), 'resources', 'tray.png'),
 };
 
 export let tray: Tray | null = null;
