@@ -134,7 +134,7 @@
   "server-alert": "<@{{userName}}-{{userPermissionLevel}}-{{userGender}}> 群廣播:",
   "server-does-not-receive-application": "該語音群不接受會員申請。",
   "server-is-blocked": "該語音群已被封鎖。",
-  "server-limit-reached": "無法創建語音群，超過可創建數量上限。",
+  "server-limit-exceeded": "無法創建語音群，超過可創建數量上限。",
   "shake-window-failed": "發送視窗震動失敗，請稍後再試。",
   "socket-error": "連線失敗，請稍後再試。",
   "stranger-failed": "成為陌生人失敗，請稍後再試。",
