@@ -73,10 +73,54 @@ export let popups: Record<string, BrowserWindow> = {};
 
 let _isLogin: boolean = false;
 
+function openAppWindow() {
+  if (_isLogin) mainWindow?.show();
+  else authWindow?.show();
+}
+
+export function setTrayDetail(isLogin?: boolean) {
+  if (!tray) return;
+
+  if (isLogin !== undefined) _isLogin = isLogin;
+
+  const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
+  const contextMenu = Menu.buildFromTemplate([
+    {
+      id: 'open-main-window',
+      label: t('open-main-window'),
+      type: 'normal',
+      click: () => openAppWindow(),
+    },
+    { type: 'separator' },
+    {
+      id: 'logout',
+      label: t('logout'),
+      type: 'normal',
+      enabled: isLogin,
+      click: () => logout(),
+    },
+    {
+      id: 'exit',
+      label: t('exit'),
+      type: 'normal',
+      click: () => app.exit(),
+    },
+  ]);
+
+  tray.setImage(nativeImage.createFromPath(trayIconPath));
+  tray.setContextMenu(contextMenu);
+}
+
 export function configureTray() {
   if (tray) tray.destroy();
+
   const trayIconPath = APP_TRAY_ICON.gray;
+
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
+
+  tray.setToolTip(VERSION_TITLE);
+  tray.on('click', openAppWindow);
+
   setTrayDetail();
 }
 
@@ -88,48 +132,6 @@ export function configureLogger() {
   log.transports.remote.url = `${Env.get().API_URL}/logs`;
   Object.assign(console, log.functions);
   log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
-}
-
-export function setTrayDetail(isLogin?: boolean) {
-  if (!tray) return;
-
-  if (isLogin !== undefined) {
-    _isLogin = isLogin;
-  }
-
-  const trayIconPath = _isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
-  const contextMenu = Menu.buildFromTemplate([
-    {
-      id: 'open-main-window',
-      label: t('open-main-window'),
-      type: 'normal',
-      click: () => {
-        if (_isLogin) mainWindow?.showInactive();
-        else authWindow?.showInactive();
-      },
-    },
-    { type: 'separator' },
-    {
-      id: 'logout',
-      label: t('logout'),
-      type: 'normal',
-      enabled: _isLogin,
-      click: () => logout(),
-    },
-    {
-      id: 'exit',
-      label: t('exit'),
-      type: 'normal',
-      click: () => app.exit(),
-    },
-  ]);
-  tray.on('click', () => {
-    if (_isLogin) mainWindow?.showInactive();
-    else authWindow?.showInactive();
-  });
-  tray.setToolTip(VERSION_TITLE);
-  tray.setImage(nativeImage.createFromPath(trayIconPath));
-  tray.setContextMenu(contextMenu);
 }
 
 export const store = new Store<Types.StoreType>({
