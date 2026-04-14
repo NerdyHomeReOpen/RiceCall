@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { app, ipcMain } from 'electron';
 
-import * as Types from '@/types';
+import type * as Types from '@/types';
 
 import Logger from '@/logger';
 

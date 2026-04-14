@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 

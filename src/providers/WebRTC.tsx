@@ -3,7 +3,7 @@ import * as mediasoupClient from 'mediasoup-client';
 
 import type * as Types from '@/types';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import Logger from '@/logger';
 
@@ -217,7 +217,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
     speaker.volume = 1;
     speaker.autoplay = true;
     speaker.style.display = 'none';
-    speaker.play().catch(() => {});
+    speaker.play().catch(() => { });
     speakerRef.current = speaker;
     document.body.appendChild(speaker);
   }, []);
@@ -273,7 +273,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
       speaker.volume = 0;
       speaker.autoplay = true;
       speaker.style.display = 'none';
-      speaker.play().catch(() => {});
+      speaker.play().catch(() => { });
       speaker.remove();
     },
     [detectSpeaking, removeSpeakerAudio, initAudioContext],
@@ -984,7 +984,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             ipc.socket.send('connectServer', { serverId: targetServer.serverId });
 
             await new Promise<void>((resolve, reject) => {
-              let unsub: () => void = () => {};
+              let unsub: () => void = () => { };
               const timeout = setTimeout(() => {
                 if (unsub) unsub();
                 reject(new Error('Timeout waiting for SFUJoined after standard join'));

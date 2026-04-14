@@ -2,7 +2,7 @@ import React from 'react';
 import Image from 'next/image';
 import { shallowEqual } from 'react-redux';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 

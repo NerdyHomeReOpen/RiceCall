@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import { io, Socket } from 'socket.io-client';
 
-import * as Types from '@/types';
+import type * as Types from '@/types';
 
 import Logger from '@/logger';
 

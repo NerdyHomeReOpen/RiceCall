@@ -9,7 +9,7 @@ import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 
 import type * as Types from '@/types';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
@@ -104,7 +104,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
             isUploadingRef.current = false;
             return;
           }

@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { FaCheckCircle, FaArrowRight, FaSpinner, FaNetworkWired, FaServer, FaCloud } from 'react-icons/fa';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 

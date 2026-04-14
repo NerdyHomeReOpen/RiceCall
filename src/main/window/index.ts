@@ -1,6 +1,6 @@
 import { modules } from '@/main/modules';
 
-export const window_ = {
+export const window = {
   minimize: (popupId?: string): void => {
     modules.default.windowMinimize(popupId);
   },

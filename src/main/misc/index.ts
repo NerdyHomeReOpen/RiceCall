@@ -29,12 +29,6 @@ export const loopbackAudio = {
   },
 };
 
-export const initialData = {
-  get: (id: string): unknown => {
-    return modules.default.getInitialData(id);
-  },
-};
-
 export const exit = (): void => {
   modules.default.exit();
 };

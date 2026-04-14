@@ -1,6 +1,6 @@
 import packageJson from '../../package.json';
 
-import * as Types from '@/types';
+import type * as Types from '@/types';
 
 import { LANGUAGES } from '@/constants';
 

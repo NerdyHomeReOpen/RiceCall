@@ -7,7 +7,7 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import WebRTCProvider from '@/providers/WebRTC';
 import ActionScannerProvider from '@/providers/ActionScanner';

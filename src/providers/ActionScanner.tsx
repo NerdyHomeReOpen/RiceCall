@@ -1,6 +1,6 @@
 import React, { useContext, createContext, ReactNode, useRef, useEffect, useCallback, useState, useMemo } from 'react';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import Logger from '@/logger';
 

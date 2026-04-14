@@ -1,7 +1,7 @@
 import { app, ipcMain } from 'electron';
 import fontList from 'font-list';
 
-import * as Types from '@/types';
+import type * as Types from '@/types';
 
 import { changeLanguage } from '@/i18n';
 

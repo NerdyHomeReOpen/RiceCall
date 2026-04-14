@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 
-import * as Types from '@/types';
+import type * as Types from '@/types';
 
 import Logger from '@/logger';
 

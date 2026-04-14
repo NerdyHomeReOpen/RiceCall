@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import { useAppSelector } from '@/hooks/Store';
 

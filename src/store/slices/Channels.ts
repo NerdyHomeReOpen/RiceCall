@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import * as Types from '@/types';
+import type * as Types from '@/types';
 
 interface ChannelsState {
   data: (Types.Channel | Types.Category)[];

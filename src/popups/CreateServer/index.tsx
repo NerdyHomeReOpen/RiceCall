@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
@@ -54,7 +54,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
       Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
           isUploadingRef.current = false;
           return;
         }

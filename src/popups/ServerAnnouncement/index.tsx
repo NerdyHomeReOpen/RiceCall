@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
@@ -32,7 +32,7 @@ const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.me
         </div>
       </div>
       <div className={styles['containers']}>
-        <AnnouncementEditor announcement={announcement} showPreview={true} onChange={() => {}} />
+        <AnnouncementEditor announcement={announcement} showPreview={true} onChange={() => { }} />
       </div>
     </div>
   );

@@ -10,7 +10,7 @@ import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 
 import { Permission } from '@/types';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 

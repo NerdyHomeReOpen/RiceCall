@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 interface ImageCropperPopupProps {
   id: string;

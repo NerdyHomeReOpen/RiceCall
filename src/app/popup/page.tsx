@@ -5,7 +5,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import { POPUP_CONFIGS } from '@/configs/popup';
 

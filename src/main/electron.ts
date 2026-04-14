@@ -7,7 +7,7 @@ import log from 'electron-log';
 import { initMain } from 'electron-audio-loopback-josh';
 initMain();
 
-import * as Types from '@/types';
+import type * as Types from '@/types';
 
 import Logger from '@/logger';
 

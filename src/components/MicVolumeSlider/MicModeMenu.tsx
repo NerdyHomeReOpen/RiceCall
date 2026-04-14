@@ -2,7 +2,7 @@ import React from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/main/ipc';
+import * as ipc from '@/main/ipc';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
