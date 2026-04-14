@@ -19,22 +19,12 @@ const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages }) 
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
     return sortedMessages.reduce<MessageGroup[]>((acc, message) => {
       const lastGroup = acc[acc.length - 1];
-      const timeDiff = lastGroup && message.timestamp - lastGroup.timestamp;
-      const nearTime = lastGroup && timeDiff <= 5 * 60 * 1000;
-      const sameType = lastGroup && message.type === lastGroup.type;
+      const isNearTime = lastGroup && message.timestamp - lastGroup.timestamp <= 5 * 60 * 1000;
+      const isSameType = lastGroup && message.type === lastGroup.type;
       const isPromptMessage = message.type === 'info' || message.type === 'warn' || message.type === 'event' || message.type === 'alert';
+      const isSameSender = lastGroup && 'userId' in message && 'userId' in lastGroup && message.userId === lastGroup.userId;
 
-      const isSameSender = () => {
-        if (message.type === 'general' && lastGroup?.type === 'general') {
-          return message.userId === lastGroup.userId;
-        }
-        if (message.type === 'dm' && lastGroup?.type === 'dm') {
-          return message.user1Id === lastGroup.user1Id && message.user2Id === lastGroup.user2Id;
-        }
-        return false;
-      };
-
-      if (isSameSender() && nearTime && sameType && !isPromptMessage) {
+      if (isSameSender && isNearTime && isSameType && !isPromptMessage) {
         lastGroup.contents.push(message.content);
       } else {
         acc.push({ ...message, contents: [message.content] });

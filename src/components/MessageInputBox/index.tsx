@@ -142,7 +142,7 @@ const MessageInputBox: React.FC = React.memo(() => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }

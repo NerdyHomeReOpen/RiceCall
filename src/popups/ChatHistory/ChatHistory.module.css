@@ -1,18 +1,17 @@
 .content {
-  padding: 0;
   gap: 0;
+  padding: 0;
   overflow: hidden;
 }
 
 .header-box {
-  gap: 0.77rem;
   display: flex;
-  justify-items: center;
-  align-items: center;
+  gap: 0.77rem;
+  place-items: center center;
   width: 100%;
-  background-color: #f7f7f7;
   height: 50px;
   padding: 10px;
+  background-color: #f7f7f7;
   border-bottom: 1px solid #d6d6d6;
 }
 
@@ -25,8 +24,7 @@
 .search-wrapper {
   display: flex;
   flex-direction: row;
-  justify-items: center;
-  align-items: center;
+  place-items: center center;
 }
 
 .search-title {
@@ -39,28 +37,28 @@
 .search-input-box {
   display: flex;
   flex-direction: row;
-  box-shadow: var(--box-shadow);
-  border: 1px solid var(--border);
-  background-color: var(--background);
   align-items: center;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  box-shadow: var(--box-shadow);
 }
 
 .search-input-box input {
-  border: unset !important;
-  background-color: unset !important;
-  box-shadow: unset !important;
   padding: 0.5rem;
+  background-color: unset !important;
+  border: unset !important;
+  box-shadow: unset !important;
 }
 
 .search-icon {
-  background-image: url('/icon_search.png');
-  background-repeat: no-repeat;
-  background-size: auto;
   width: 16px;
   height: 16px;
-  background-position: 0 0;
   margin-right: 0.5rem;
   cursor: pointer;
+  background-image: url('/icon_search.png');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
 }
 
 .search-input-box:hover .search-icon {
@@ -72,19 +70,19 @@
 }
 
 .body-box {
-  height: calc(100vh - 80px);
-  width: 100%;
-  background-color: #fcfcfc;
   display: flex;
+  width: 100%;
+  height: calc(100vh - 80px);
+  background-color: #fcfcfc;
 }
 
 .body-left {
+  flex: unset !important;
+  width: 250px;
   height: 100%;
   min-height: 467.34px;
-  width: 250px;
   overflow: auto;
   border-right: 1px solid #d6d6d6;
-  flex: unset !important;
 }
 
 .friend-group-box,
@@ -94,28 +92,27 @@
 }
 
 .friend-group {
-  border-radius: 3px;
-  align-items: center;
+  display: flex;
   gap: 2px;
+  align-items: center;
   height: 25px;
   padding: 5px;
-  display: flex;
+  border-radius: 3px;
 }
 
 .friend-info-box {
-  border-radius: 3px;
-  justify-content: flex-start;
-  align-items: center;
-  gap: 5px;
-  padding: 5 10 5 50;
-  display: flex;
   position: relative;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5 10 5 50;
+  border-radius: 3px;
 }
 
 .friend-info-box.selected {
   background-color: var(--selected);
 }
-
 
 .friend-info-box:hover {
   background-color: var(--hover);
@@ -126,41 +123,41 @@
 }
 
 .avatar-border {
-  background-image: url('/win_border.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
-  height: 30px;
-  width: 30px;
   position: absolute;
   z-index: 1;
+  width: 30px;
+  height: 30px;
+  background-image: url('/win_border.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .avatar {
-  object-fit: cover;
-  background-image: url('/im/SecretaryLogo.png');
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: cover;
+  position: relative;
   min-width: 30px;
   min-height: 30px;
-  position: relative;
+  object-fit: cover;
+  background-image: url('/im/SecretaryLogo.png');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
 }
 
 .name {
-  white-space: nowrap;
-  text-overflow: ellipsis;
   overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .main {
-  height: 33px;
-  width: 100%;
-  background-color: #fafcff;
-  border-bottom: 1px solid #d6d6d6;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  width: 100%;
+  height: 33px;
+  background-color: #fafcff;
+  border-bottom: 1px solid #d6d6d6;
 }
 
 .main-title {
@@ -168,65 +165,64 @@
 }
 
 .main-delete-button-box {
-  width: 80px;
-  height: 22px;
   display: flex;
   align-items: center;
-  border: 1px solid #b1b1b1;
-  margin-right: 0.8rem;
-  padding: 2px;
-  cursor: pointer;
-  margin-right: 0.5rem;
   justify-content: space-between;
+  width: 80px;
+  height: 22px;
+  padding: 2px;
+  margin-right: 0.5rem;
+  cursor: pointer;
+  border: 1px solid #b1b1b1;
 }
 
 .main-delete-button-box:hover {
-  background: #eeeeee;
+  background: #eee;
 }
 
 .delete-button-icon {
+  width: 16px;
+  height: 16px;
   background-image: url('/Delete_ico.png');
   background-size: auto;
-  height: 16px;
-  width: 16px;
 }
 
 .body-right-bottom {
-  flex: 1;
-  overflow-y: auto;
   display: flex;
+  flex: 1;
   flex-direction: column;
   align-items: center;
   padding-top: 0.7rem;
+  overflow-y: auto;
 }
 
 .message-date {
-  color: rgb(0, 106, 209);
-  background: linear-gradient(#fff 0%, #f4f7fc 100%);
-  border-bottom: 1px solid #b6cedc;
+  display: flex;
   align-items: end;
-  padding-bottom: 0.5rem;
   width: 95%;
   height: 40px;
+  padding-bottom: 0.5rem;
   font-weight: bold;
-  display: flex;
+  color: rgb(0 106 209);
+  background: linear-gradient(#fff 0%, #f4f7fc 100%);
+  border-bottom: 1px solid #b6cedc;
 }
 
 .body-right {
   display: flex;
   flex-direction: column;
-  height: 100%;
   width: 100%;
+  height: 100%;
 }
 
 .message-item {
+  display: flex;
   flex: 1;
-  height: auto;
+  flex-direction: column;
   width: 95%;
+  height: auto;
   padding: 6px 10px;
   border-radius: 4px;
-  display: flex;
-  flex-direction: column;
   transition: background 0.15s;
 }
 
@@ -236,13 +232,13 @@
 
 .pagination-wrapper {
   display: flex;
-  align-items: center;
-  padding: 5px 10px;
-  gap: 5px;
-  height: 40px;
   flex-shrink: 0;
+  gap: 5px;
+  align-items: center;
+  height: 40px;
+  padding: 5px 10px;
+  background: rgb(244 247 252);
   border-top: 1px solid #d6d6d6;
-  background: rgb(244, 247, 252);
 }
 
 .page-index {
@@ -256,14 +252,14 @@
 .page-btn {
   width: 11px;
   height: 11px;
+  padding: 0;
+  margin: 0.5rem;
+  cursor: pointer;
+  background-color: unset;
   background-image: url('/btn_turn_page.png');
   background-repeat: no-repeat;
   background-size: auto;
   border: none;
-  cursor: pointer;
-  padding: 0;
-  background-color: unset;
-  margin: 0.5rem;
 }
 
 .disabled {
@@ -303,17 +299,17 @@
 }
 
 .radio-wrapper {
+  display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  text-align: center;
-  margin: 0 0.2rem;
-  height: 1.9rem;
   width: 3.5rem;
-  display: flex;
+  height: 1.9rem;
+  margin: 0 0.2rem;
+  text-align: center;
+  cursor: pointer;
 }
 
-.radio-wrapper input[type="radio"] {
+.radio-wrapper input[type='radio'] {
   display: none;
 }
 
@@ -326,18 +322,18 @@
 }
 
 .body-right-message-box {
-  padding: 10px 0;
   display: flex;
   flex-direction: column;
+  gap: 0.5rem;
   align-items: center;
   width: 100%;
-  gap: 0.5rem;
+  padding: 10px 0;
 }
 
 .message-row-top {
   justify-content: space-between;
-  color: #555;
   font-size: 14px;
+  color: #555;
 }
 
 .username {
@@ -354,6 +350,6 @@
 }
 
 .message-text {
-  color: #006ad1;
   margin-top: 10px;
+  color: #006ad1;
 }

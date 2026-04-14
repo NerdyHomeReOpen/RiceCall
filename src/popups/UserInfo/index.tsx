@@ -115,7 +115,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
         Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
@@ -155,7 +155,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 
   const handleConfirmBtnClick = () => {
     if (!countries.includes(target.country)) {
-      Actions.openErrorDialog(new Error('invalid-country'), () => { });
+      Actions.openErrorDialog(new Error('invalid-country'), () => {});
       return;
     }
     Actions.editUser(objDiff(target, targetData));

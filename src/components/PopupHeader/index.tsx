@@ -42,7 +42,8 @@ const PopupHeader: React.FC<PopupHeaderProps> = React.memo(({ title, buttons, po
       </div>
       <div className={styles['buttons']}>
         {buttons.includes('minimize') && <div className={styles['minimize-button']} onClick={handleMinimizeBtnClick} />}
-        {buttons.includes('maxsize') && (isFullscreen ? <div className={styles['restore-button']} onClick={handleRestoreBtnClick} /> : <div className={styles['maxsize-button']} onClick={handleMaximizeBtnClick} />)}
+        {buttons.includes('maxsize') &&
+          (isFullscreen ? <div className={styles['restore-button']} onClick={handleRestoreBtnClick} /> : <div className={styles['maxsize-button']} onClick={handleMaximizeBtnClick} />)}
         {buttons.includes('close') && <div className={styles['close-button']} onClick={handleCloseBtnClick} />}
       </div>
     </header>

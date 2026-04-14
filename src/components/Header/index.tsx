@@ -126,7 +126,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: false,
       contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => { },
+      onClick: () => {},
     },
   ];
 

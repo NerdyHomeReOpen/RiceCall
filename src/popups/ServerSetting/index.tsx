@@ -98,18 +98,19 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     return { totalBlockMembersCount: total.length, filteredBlockMembers: filtered, sortedBlockMembers: sorted };
   }, [serverMembers, blockMemberQuery, blockMemberSortField, blockMemberSortDirection]);
 
-  const settingPages = permissionLevel >= Permission.ServerAdmin
-    ? [
-      t('server-info'),
-      t('server-announcement'),
-      t('member-management'),
-      t('access-permission'),
-      `${t('member-application-management')} (${totalApplicationsCount})`,
-      `${t('blacklist-management')} (${totalBlockMembersCount})`,
-    ]
-    : permissionLevel >= Permission.Member
-      ? [t('server-info'), t('server-announcement'), t('member-management')]
-      : [t('server-info'), t('server-announcement')];
+  const settingPages =
+    permissionLevel >= Permission.ServerAdmin
+      ? [
+          t('server-info'),
+          t('server-announcement'),
+          t('member-management'),
+          t('access-permission'),
+          `${t('member-application-management')} (${totalApplicationsCount})`,
+          `${t('blacklist-management')} (${totalBlockMembersCount})`,
+        ]
+      : permissionLevel >= Permission.Member
+        ? [t('server-info'), t('server-announcement'), t('member-management')]
+        : [t('server-info'), t('server-announcement')];
 
   const handleMemberSort = (field: keyof Types.Member) => {
     setMemberSortField(field);
@@ -190,7 +191,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => { });
+          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }

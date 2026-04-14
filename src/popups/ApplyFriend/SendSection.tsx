@@ -16,69 +16,61 @@ interface SendSectionProps {
   onCloseClick: () => void;
 }
 
-const SendSection: React.FC<SendSectionProps> = React.memo(({
-  target,
-  friendGroups,
-  applicationDesc,
-  onTargetNameClick,
-  onFriendGroupIdChange,
-  onApplicationDescChange,
-  onCreateFriendGroup,
-  onSubmitClick,
-  onCloseClick,
-}) => {
-  const { t } = useTranslation();
+const SendSection: React.FC<SendSectionProps> = React.memo(
+  ({ target, friendGroups, applicationDesc, onTargetNameClick, onFriendGroupIdChange, onApplicationDescChange, onCreateFriendGroup, onSubmitClick, onCloseClick }) => {
+    const { t } = useTranslation();
 
-  return (
-    <>
-      <div className="popup-body">
-        <div className="popup-content col">
-          <div className="label">{t('apply-friend-label')}</div>
-          <div className="row">
-            <div className="avatar-wrapper">
-              <div className="avatar-picture" style={{ backgroundImage: `url(${target.avatarUrl})` }} />
-            </div>
-            <div className="info-wrapper">
-              <div className="link-text" onClick={onTargetNameClick}>
-                {target.name}
-              </div>
-              <div className="sub-text">{target.displayId}</div>
-            </div>
-          </div>
-          <div className="split" />
-          <div className="input-box col">
-            <div className="label">{t('select-friend-group')}</div>
+    return (
+      <>
+        <div className="popup-body">
+          <div className="popup-content col">
+            <div className="label">{t('apply-friend-label')}</div>
             <div className="row">
-              <div className="select-box" style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select className="select" onChange={onFriendGroupIdChange}>
-                  <option value={''}>{t('none')}</option>
-                  {friendGroups.map((group) => (
-                    <option key={group.friendGroupId} value={group.friendGroupId}>
-                      {group.name}
-                    </option>
-                  ))}
-                </select>
+              <div className="avatar-wrapper">
+                <div className="avatar-picture" style={{ backgroundImage: `url(${target.avatarUrl})` }} />
               </div>
-              <div className="link-text" onClick={onCreateFriendGroup}>
-                {t('create-friend-group')}
+              <div className="info-wrapper">
+                <div className="link-text" onClick={onTargetNameClick}>
+                  {target.name}
+                </div>
+                <div className="sub-text">{target.displayId}</div>
               </div>
             </div>
-            <div className="label">{t('note')}</div>
-            <textarea rows={2} value={applicationDesc} onChange={onApplicationDescChange} />
+            <div className="split" />
+            <div className="input-box col">
+              <div className="label">{t('select-friend-group')}</div>
+              <div className="row">
+                <div className="select-box" style={{ maxWidth: '100px', minWidth: '0' }}>
+                  <select className="select" onChange={onFriendGroupIdChange}>
+                    <option value={''}>{t('none')}</option>
+                    {friendGroups.map((group) => (
+                      <option key={group.friendGroupId} value={group.friendGroupId}>
+                        {group.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div className="link-text" onClick={onCreateFriendGroup}>
+                  {t('create-friend-group')}
+                </div>
+              </div>
+              <div className="label">{t('note')}</div>
+              <textarea rows={2} value={applicationDesc} onChange={onApplicationDescChange} />
+            </div>
           </div>
         </div>
-      </div>
-      <div className="popup-footer">
-        <div className="button" onClick={onSubmitClick}>
-          {t('submit')}
+        <div className="popup-footer">
+          <div className="button" onClick={onSubmitClick}>
+            {t('submit')}
+          </div>
+          <div className="button" onClick={onCloseClick}>
+            {t('cancel')}
+          </div>
         </div>
-        <div className="button" onClick={onCloseClick}>
-          {t('cancel')}
-        </div>
-      </div>
-    </>
-  );
-});
+      </>
+    );
+  },
+);
 
 SendSection.displayName = 'SendSection';
 

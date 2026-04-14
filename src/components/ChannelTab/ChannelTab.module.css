@@ -82,6 +82,10 @@
   background-color: var(--selected);
 }
 
+.channel-tab-user-list {
+  padding-left: 0 !important;
+}
+
 .channel-tab-user-list > * {
   padding-left: 25px;
 }
