@@ -3,9 +3,9 @@ import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import * as Store from '@/store';
 
-import { setSelectedItemId } from '@/store/slices/UI';
+import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 
 import ChannelTab from './ChannelTab';
 
@@ -28,8 +28,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category
 
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`category-${category.channelId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`category-${category.channelId}`));
     onSelect(category);
   };
 

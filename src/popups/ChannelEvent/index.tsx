@@ -4,12 +4,12 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
+import * as Store from '@/store';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppSelector, useAppDispatch } from '@/hooks/Store';
 import { useChannelEventContextMenu } from '@/hooks/ContextMenus/ChannelEvent';
-
-import { setChannelEvents } from '@/store/slices/ChannelEvents';
 
 import { getFormatDate } from '@/utils/language';
 
@@ -57,7 +57,7 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
   };
 
   useEffect(() => {
-    dispatch(setChannelEvents(channelEventsData));
+    dispatch(Store.setChannelEvents(channelEventsData));
   }, [channelEventsData, dispatch]);
 
   return (

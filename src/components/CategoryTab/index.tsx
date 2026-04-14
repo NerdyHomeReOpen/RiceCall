@@ -6,6 +6,8 @@ import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { useChannelContextMenu } from '@/hooks/ContextMenus/Channel';
 
@@ -14,8 +16,6 @@ import { useLocateMeContext } from '@/providers/LocateMe';
 
 import ChannelTab from '@/components/ChannelTab';
 import UserTab from '@/components/UserTab';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import styles from './CategoryTab.module.css';
 
@@ -105,8 +105,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   });
 
   const handleTabClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`category-${category.channelId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`category-${category.channelId}`));
   };
 
   const handleTabDoubleClick = () => {

@@ -9,6 +9,8 @@ import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { MEMBER_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -18,8 +20,6 @@ import { useChannelSettingModeratorContextMenu } from '@/hooks/ContextMenus/Chan
 import { useChannelSettingBlockedMemberContextMenu } from '@/hooks/ContextMenus/ChannelSettingBlockedMember';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import { objDiff } from '@/utils/objDiff';
 import { sorter } from '@/utils/sorter';
@@ -596,8 +596,8 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
   const { buildContextMenu } = useChannelSettingModeratorContextMenu({ user, server, channel, moderator, permissionLevel });
 
   const handleClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`member-${moderator.userId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`member-${moderator.userId}`));
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
@@ -643,8 +643,8 @@ const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowPro
   const { buildContextMenu } = useChannelSettingBlockedMemberContextMenu({ user, server, channel, member, permissionLevel });
 
   const handleClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`blocked-${member.userId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`blocked-${member.userId}`));
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {

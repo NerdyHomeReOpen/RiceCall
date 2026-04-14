@@ -3,14 +3,14 @@ import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
 
+import * as Store from '@/store';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { useFriendGroupContextMenu } from '@/hooks/ContextMenus/FriendGroup';
 
 import FriendTab from '@/components/FriendTab';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import styles from './FriendGroupTab.module.css';
 
@@ -53,8 +53,8 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
   const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupContextMenu({ user, friendGroup });
 
   const handleTabClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`friend-group-${friendGroup.friendGroupId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`friend-group-${friendGroup.friendGroupId}`));
     setIsExpanded((prev) => !prev);
   };
 

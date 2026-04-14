@@ -7,6 +7,8 @@ import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
@@ -14,8 +16,6 @@ import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { useChannelContextMenu } from '@/hooks/ContextMenus/Channel';
 
 import UserTab from '@/components/UserTab';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import styles from './ChannelTab.module.css';
 
@@ -108,8 +108,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   });
 
   const handleTabClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`channel-${channel.channelId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`channel-${channel.channelId}`));
   };
 
   const handleTabDoubleClick = () => {

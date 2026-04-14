@@ -6,6 +6,8 @@ import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 import { useWebRTC } from '@/providers/WebRTC';
@@ -15,8 +17,6 @@ import { useMemberContextMenu } from '@/hooks/ContextMenus/Member';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import styles from './UserTab.module.css';
 
@@ -98,8 +98,8 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   };
 
   const handleTabClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`user-${member.userId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`user-${member.userId}`));
   };
 
   const handleTabDoubleClick = () => {

@@ -7,6 +7,8 @@ import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
@@ -17,8 +19,6 @@ import { useServerSettingContextMenu } from '@/hooks/ContextMenus/ServerSetting'
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
 import QueueUserTab from '@/components/QueueUserTab';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import styles from './Server.module.css';
 
@@ -79,7 +79,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
 
   const handleLocateMe = () => {
     locateMe();
-    dispatch(setSelectedItemId(`user-${user.userId}`));
+    dispatch(Store.setSelectedItemId(`user-${user.userId}`));
   };
 
   const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingContextMenu({

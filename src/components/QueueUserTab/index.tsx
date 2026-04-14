@@ -5,6 +5,8 @@ import { Permission } from '@/types';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 
 import { useQueueUserContextMenu } from '@/hooks/ContextMenus/QueueUser';
@@ -13,8 +15,6 @@ import BadgeList from '@/components/BadgeList';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useWebRTC } from '@/providers/WebRTC';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import { getDefaultQueueMember } from '@/utils/default';
 
@@ -94,8 +94,8 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   });
 
   const handleTabClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`queue-${queueMember.userId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`queue-${queueMember.userId}`));
   };
 
   const handleTabDoubleClick = () => {

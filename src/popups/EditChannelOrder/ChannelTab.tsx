@@ -3,9 +3,9 @@ import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import * as Store from '@/store';
 
-import { setSelectedItemId } from '@/store/slices/UI';
+import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 
 import styles from './EditChannelOrder.module.css';
 
@@ -23,8 +23,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect })
 
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`channel-${channel.channelId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`channel-${channel.channelId}`));
     onSelect(channel);
   };
 

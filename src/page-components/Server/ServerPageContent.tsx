@@ -9,6 +9,8 @@ import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { MESSAGE_VIERER_DEVIATION } from '@/constants';
 
 import { useWebRTC } from '@/providers/WebRTC';
@@ -18,9 +20,6 @@ import { useAppSelector, useAppDispatch } from '@/hooks/Store';
 import { useAnnouncementAreaContextMenu } from '@/hooks/ContextMenus/AnnouncementArea';
 import { useMessageAreaContextMenu } from '@/hooks/ContextMenus/MessageArea';
 import { useVoiceModeContextMenu } from '@/hooks/ContextMenus/VoiceMode';
-
-import { clearChannelMessages } from '@/store/slices/ChannelMessages';
-import { clearActionMessages } from '@/store/slices/ActionMessages';
 
 import MicButton from './MicButton';
 import MarkdownContent from '@/components/MarkdownContent';
@@ -99,8 +98,8 @@ const ServerPageContent: React.FC = React.memo(() => {
     channelEvents,
     onOpenAnnouncement: () => setCentralAreaMode('announcement'),
     onClearMessages: () => {
-      dispatch(clearChannelMessages());
-      dispatch(clearActionMessages());
+      dispatch(Store.clearChannelMessages());
+      dispatch(Store.clearActionMessages());
     },
   });
   const { buildContextMenu: buildVoiceModeContextMenu } = useVoiceModeContextMenu({

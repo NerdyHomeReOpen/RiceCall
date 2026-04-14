@@ -7,32 +7,13 @@ import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { LANGUAGES, REFRESH_REGION_INFO_INTERVAL } from '@/constants';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-
-import { addActionMessages, clearActionMessages } from '@/store/slices/ActionMessages';
-import { setAnnouncements } from '@/store/slices/Announcements';
-import { addChannelEvents, clearChannelEvents } from '@/store/slices/ChannelEvents';
-import { addChannelMessages, clearChannelMessages } from '@/store/slices/ChannelMessages';
-import { setChannels, addChannels, updateChannels, removeChannels, clearChannels } from '@/store/slices/Channels';
-import { setCurrentChannel, updateCurrentChannel, clearCurrentChannel } from '@/store/slices/CurrentChannel';
-import { setCurrentServer, updateCurrentServer, clearCurrentServer } from '@/store/slices/CurrentServer';
-import { setFriendActivities, addFriendActivities } from '@/store/slices/FriendActivities';
-import { setFriendApplications, addFriendApplications, updateFriendApplications, removeFriendApplications } from '@/store/slices/FriendApplications';
-import { setFriendGroups, addFriendGroups, updateFriendGroups, removeFriendGroups } from '@/store/slices/FriendGroups';
-import { setFriends, addFriends, updateFriends, removeFriends } from '@/store/slices/Friends';
-import { setMemberApplications, addMemberApplications, removeMemberApplications, clearMemberApplications } from '@/store/slices/MemberApplications';
-import { setMemberInvitations, addMemberInvitations, updateMemberInvitations, removeMemberInvitations } from '@/store/slices/MemberInvitations';
-import { setNotifications } from '@/store/slices/Notifications';
-import { setOnlineMembers, addOnlineMembers, updateOnlineMembers, removeOnlineMembers, clearOnlineMembers } from '@/store/slices/OnlineMembers';
-import { setQueueUsers, clearQueueUsers } from '@/store/slices/QueueUsers';
-import { setRecommendServers } from '@/store/slices/RecommendServers';
-import { setServers, addServers, updateServers, removeServers } from '@/store/slices/Servers';
-import { setLatency, setIsSocketConnected } from '@/store/slices/Socket';
-import { setUser, updateUser } from '@/store/slices/User';
 
 import { getDefaultFriendActivity } from '@/utils/default';
 
@@ -84,8 +65,8 @@ const SocketManager: React.FC = React.memo(() => {
 
     ipc.data.userHotReload({ userId }).then((user) => {
       if (user) {
-        dispatch(setUser(user));
-        dispatch(setIsSocketConnected(true));
+        dispatch(Store.setUser(user));
+        dispatch(Store.setIsSocketConnected(true));
       }
     });
   }, [user.userId, dispatch]);
@@ -101,22 +82,22 @@ const SocketManager: React.FC = React.memo(() => {
     if (!user.userId) return;
     const refresh = async () => {
       ipc.data.servers({ userId: user.userId }).then((servers) => {
-        if (servers) dispatch(setServers(servers));
+        if (servers) dispatch(Store.setServers(servers));
       });
       ipc.data.friends({ userId: user.userId }).then((friends) => {
-        if (friends) dispatch(setFriends(friends));
+        if (friends) dispatch(Store.setFriends(friends));
       });
       ipc.data.friendActivities({ userId: user.userId }).then((friendActivities) => {
-        if (friendActivities) dispatch(setFriendActivities(friendActivities));
+        if (friendActivities) dispatch(Store.setFriendActivities(friendActivities));
       });
       ipc.data.friendGroups({ userId: user.userId }).then((friendGroups) => {
-        if (friendGroups) dispatch(setFriendGroups(friendGroups));
+        if (friendGroups) dispatch(Store.setFriendGroups(friendGroups));
       });
       ipc.data.friendApplications({ receiverId: user.userId }).then((friendApplications) => {
-        if (friendApplications) dispatch(setFriendApplications(friendApplications));
+        if (friendApplications) dispatch(Store.setFriendApplications(friendApplications));
       });
       ipc.data.memberInvitations({ receiverId: user.userId }).then((memberInvitations) => {
-        if (memberInvitations) dispatch(setMemberInvitations(memberInvitations));
+        if (memberInvitations) dispatch(Store.setMemberInvitations(memberInvitations));
       });
     };
     refresh();
@@ -126,13 +107,13 @@ const SocketManager: React.FC = React.memo(() => {
     if (!user.userId) return;
     const refresh = async () => {
       ipc.data.announcements({ region }).then((announcements) => {
-        if (announcements) dispatch(setAnnouncements(announcements));
+        if (announcements) dispatch(Store.setAnnouncements(announcements));
       });
       ipc.data.notifications({ region }).then((notifications) => {
-        if (notifications) dispatch(setNotifications(notifications));
+        if (notifications) dispatch(Store.setNotifications(notifications));
       });
       ipc.data.recommendServers({ region }).then((recommendServerList) => {
-        if (recommendServerList) dispatch(setRecommendServers(recommendServerList));
+        if (recommendServerList) dispatch(Store.setRecommendServers(recommendServerList));
       });
     };
     const interval = setInterval(() => refresh(), REFRESH_REGION_INFO_INTERVAL);
@@ -143,29 +124,29 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     if (!user.userId) return;
     if (!user.currentServerId) {
-      dispatch(clearCurrentServer());
-      dispatch(clearChannels());
-      dispatch(clearOnlineMembers());
-      dispatch(clearMemberApplications());
-      dispatch(clearActionMessages());
-      dispatch(clearChannelMessages());
-      dispatch(clearQueueUsers());
-      dispatch(clearChannelEvents());
+      dispatch(Store.clearCurrentServer());
+      dispatch(Store.clearChannels());
+      dispatch(Store.clearOnlineMembers());
+      dispatch(Store.clearMemberApplications());
+      dispatch(Store.clearActionMessages());
+      dispatch(Store.clearChannelMessages());
+      dispatch(Store.clearQueueUsers());
+      dispatch(Store.clearChannelEvents());
       return;
     }
     const refresh = async () => {
       if (!user.currentServerId) return;
       ipc.data.server({ userId: user.userId, serverId: user.currentServerId }).then((server) => {
-        if (server) dispatch(setCurrentServer(server));
+        if (server) dispatch(Store.setCurrentServer(server));
       });
       ipc.data.channels({ userId: user.userId, serverId: user.currentServerId }).then((channels) => {
-        if (channels) dispatch(setChannels(channels));
+        if (channels) dispatch(Store.setChannels(channels));
       });
       ipc.data.serverOnlineMembers({ serverId: user.currentServerId }).then((serverOnlineMembers) => {
-        if (serverOnlineMembers) dispatch(setOnlineMembers(serverOnlineMembers));
+        if (serverOnlineMembers) dispatch(Store.setOnlineMembers(serverOnlineMembers));
       });
       ipc.data.memberApplications({ serverId: user.currentServerId }).then((serverMemberApplications) => {
-        if (serverMemberApplications) dispatch(setMemberApplications(serverMemberApplications));
+        if (serverMemberApplications) dispatch(Store.setMemberApplications(serverMemberApplications));
       });
     };
     refresh();
@@ -174,13 +155,13 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     if (!user.userId) return;
     if (!user.currentServerId || !user.currentChannelId) {
-      dispatch(clearCurrentChannel());
+      dispatch(Store.clearCurrentChannel());
       return;
     }
     const refresh = async () => {
       if (!user.currentServerId || !user.currentChannelId) return;
       ipc.data.channel({ userId: user.userId, serverId: user.currentServerId, channelId: user.currentChannelId }).then((channel) => {
-        if (channel) dispatch(setCurrentChannel(channel));
+        if (channel) dispatch(Store.setCurrentChannel(channel));
       });
     };
     refresh();
@@ -190,7 +171,7 @@ const SocketManager: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('connect', () => {
       ipc.popup.close('errorDialog');
       if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
-      dispatch(setIsSocketConnected(true));
+      dispatch(Store.setIsSocketConnected(true));
     });
     return () => unsub();
   }, [dispatch]);
@@ -198,14 +179,14 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('disconnect', () => {
       if (disconnectTimerRef.current) clearTimeout(disconnectTimerRef.current);
-      disconnectTimerRef.current = setTimeout(() => dispatch(setIsSocketConnected(false)), 30000);
+      disconnectTimerRef.current = setTimeout(() => dispatch(Store.setIsSocketConnected(false)), 30000);
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('heartbeat', (...args) => {
-      dispatch(setLatency(args[0].latency));
+      dispatch(Store.setLatency(args[0].latency));
     });
     return () => unsub();
   }, [dispatch]);
@@ -218,19 +199,19 @@ const SocketManager: React.FC = React.memo(() => {
         }
         return acc;
       }, []);
-      dispatch(addFriendActivities(newActives));
+      dispatch(Store.addFriendActivities(newActives));
 
       const newCurrentServerId = args[0].update.currentServerId;
       if (newCurrentServerId !== undefined && newCurrentServerId !== userRef.current.currentServerId) {
-        dispatch(clearChannels());
-        dispatch(clearOnlineMembers());
-        dispatch(clearMemberApplications());
-        dispatch(clearActionMessages());
-        dispatch(clearChannelMessages());
-        dispatch(clearQueueUsers());
-        dispatch(clearChannelEvents());
+        dispatch(Store.clearChannels());
+        dispatch(Store.clearOnlineMembers());
+        dispatch(Store.clearMemberApplications());
+        dispatch(Store.clearActionMessages());
+        dispatch(Store.clearChannelMessages());
+        dispatch(Store.clearQueueUsers());
+        dispatch(Store.clearChannelEvents());
       }
-      dispatch(updateUser(args[0].update));
+      dispatch(Store.updateUser(args[0].update));
       if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
     });
     return () => unsub();
@@ -238,7 +219,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendAdd', (...args) => {
-      dispatch(addFriends(args));
+      dispatch(Store.addFriends(args));
     });
     return () => unsub();
   }, [dispatch]);
@@ -252,64 +233,64 @@ const SocketManager: React.FC = React.memo(() => {
         }
         return acc;
       }, []);
-      dispatch(addFriendActivities(newActivities));
-      dispatch(updateFriends(args));
+      dispatch(Store.addFriendActivities(newActivities));
+      dispatch(Store.updateFriends(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendRemove', (...args) => {
-      dispatch(removeFriends(args));
+      dispatch(Store.removeFriends(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendGroupAdd', (...args) => {
-      dispatch(addFriendGroups(args));
+      dispatch(Store.addFriendGroups(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendGroupUpdate', (...args) => {
-      dispatch(updateFriendGroups(args));
+      dispatch(Store.updateFriendGroups(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendGroupRemove', (...args) => {
-      dispatch(removeFriendGroups(args));
+      dispatch(Store.removeFriendGroups(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendApplicationAdd', (...args) => {
-      dispatch(addFriendApplications(args));
+      dispatch(Store.addFriendApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendApplicationUpdate', (...args) => {
-      dispatch(updateFriendApplications(args));
+      dispatch(Store.updateFriendApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('friendApplicationRemove', (...args) => {
-      dispatch(removeFriendApplications(args));
+      dispatch(Store.removeFriendApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverAdd', (...args) => {
-      dispatch(addServers(args));
+      dispatch(Store.addServers(args));
     });
     return () => unsub();
   }, [dispatch]);
@@ -317,15 +298,15 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('serverUpdate', (...args) => {
       const currentServerUpdate = args.filter((i) => i.serverId === currentServerRef.current.serverId).reduce<Partial<Types.Server>>((acc, curr) => ({ ...acc, ...curr.update }), {});
-      dispatch(updateCurrentServer(currentServerUpdate));
-      dispatch(updateServers(args));
+      dispatch(Store.updateCurrentServer(currentServerUpdate));
+      dispatch(Store.updateServers(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverRemove', (...args) => {
-      dispatch(removeServers(args));
+      dispatch(Store.removeServers(args));
     });
     return () => unsub();
   }, [dispatch]);
@@ -339,8 +320,8 @@ const SocketManager: React.FC = React.memo(() => {
         }
         return acc;
       }, []);
-      dispatch(addChannelEvents(newChannelEvents));
-      dispatch(addOnlineMembers(args));
+      dispatch(Store.addChannelEvents(newChannelEvents));
+      dispatch(Store.addOnlineMembers(args));
     });
     return () => unsub();
   }, [dispatch]);
@@ -354,8 +335,8 @@ const SocketManager: React.FC = React.memo(() => {
         }
         return acc;
       }, []);
-      dispatch(addChannelEvents(newChannelEvents));
-      dispatch(updateOnlineMembers(args));
+      dispatch(Store.addChannelEvents(newChannelEvents));
+      dispatch(Store.updateOnlineMembers(args));
     });
     return () => unsub();
   }, [dispatch]);
@@ -369,29 +350,29 @@ const SocketManager: React.FC = React.memo(() => {
         }
         return acc;
       }, []);
-      dispatch(addChannelEvents(newChannelEvents));
-      dispatch(removeOnlineMembers(args));
+      dispatch(Store.addChannelEvents(newChannelEvents));
+      dispatch(Store.removeOnlineMembers(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args) => {
-      dispatch(addMemberApplications(args));
+      dispatch(Store.addMemberApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('serverMemberApplicationRemove', (...args) => {
-      dispatch(removeMemberApplications(args));
+      dispatch(Store.removeMemberApplications(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelAdd', (...args) => {
-      dispatch(addChannels(args));
+      dispatch(Store.addChannels(args));
     });
     return () => unsub();
   }, [dispatch]);
@@ -399,57 +380,57 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('channelUpdate', (...args) => {
       const currentChannelUpdate = args.filter((i) => i.channelId === currentChannelRef.current.channelId).reduce<Partial<Types.Channel>>((acc, curr) => ({ ...acc, ...curr.update }), {});
-      dispatch(updateCurrentChannel(currentChannelUpdate));
-      dispatch(updateChannels(args));
+      dispatch(Store.updateCurrentChannel(currentChannelUpdate));
+      dispatch(Store.updateChannels(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelRemove', (...args) => {
-      dispatch(removeChannels(args));
+      dispatch(Store.removeChannels(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('memberInvitationAdd', (...args) => {
-      dispatch(addMemberInvitations(args));
+      dispatch(Store.addMemberInvitations(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('memberInvitationUpdate', (...args) => {
-      dispatch(updateMemberInvitations(args));
+      dispatch(Store.updateMemberInvitations(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('memberInvitationRemove', (...args) => {
-      dispatch(removeMemberInvitations(args));
+      dispatch(Store.removeMemberInvitations(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('channelMessage', (...args) => {
-      dispatch(addChannelMessages(args));
+      dispatch(Store.addChannelMessages(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('actionMessage', (...args) => {
-      dispatch(addActionMessages(args));
+      dispatch(Store.addActionMessages(args));
     });
     return () => unsub();
   }, [dispatch]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('queueMembersSet', (...args) => {
-      dispatch(setQueueUsers(args));
+      dispatch(Store.setQueueUsers(args));
     });
     return () => unsub();
   }, [dispatch]);

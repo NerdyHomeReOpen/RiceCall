@@ -9,6 +9,8 @@ import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -18,8 +20,6 @@ import { useServerSettingMemberContextMenu } from '@/hooks/ContextMenus/ServerSe
 import { useServerSettingBlockedMemberContextMenu } from '@/hooks/ContextMenus/ServerSettingBlockedMember';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import { getPermissionText } from '@/utils/language';
 import { sorter } from '@/utils/sorter';
@@ -510,8 +510,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                     ];
 
                     const handleClick = () => {
-                      if (isSelected) dispatch(setSelectedItemId(null));
-                      else dispatch(setSelectedItemId(`application-${application.userId}`));
+                      if (isSelected) dispatch(Store.setSelectedItemId(null));
+                      else dispatch(Store.setSelectedItemId(`application-${application.userId}`));
                     };
 
                     const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
@@ -607,8 +607,8 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
   const { buildContextMenu } = useServerSettingMemberContextMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`member-${member.userId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`member-${member.userId}`));
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {
@@ -652,8 +652,8 @@ const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps
   const { buildContextMenu } = useServerSettingBlockedMemberContextMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`blocked-${member.userId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`blocked-${member.userId}`));
   };
 
   const handleContextMenu = (e: React.MouseEvent<HTMLTableRowElement>) => {

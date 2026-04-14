@@ -9,6 +9,8 @@ import * as ipc from '@/main/ipc';
 
 import * as Actions from '@/action';
 
+import * as Store from '@/store';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
@@ -17,8 +19,6 @@ import { useFriendTabContextMenu } from '@/hooks/ContextMenus/FriendTab';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
-
-import { setSelectedItemId } from '@/store/slices/UI';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
@@ -64,8 +64,8 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   };
 
   const handleTabClick = () => {
-    if (isSelected) dispatch(setSelectedItemId(null));
-    else dispatch(setSelectedItemId(`friend-${friend.targetId}`));
+    if (isSelected) dispatch(Store.setSelectedItemId(null));
+    else dispatch(Store.setSelectedItemId(`friend-${friend.targetId}`));
   };
 
   const handleTabDoubleClick = () => {
