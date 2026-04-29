@@ -113,7 +113,7 @@ interface DefaultAnnouncementProps {
 
 const DefaultAnnouncement: React.FC<DefaultAnnouncementProps> = React.memo(({ announcement }) => (
   <>
-    <Image loading="lazy" src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
+    <Image loading="lazy" src="/ricecall_logo.svg" alt="ricecall logo" height={80} width={-1} />
     <span>{announcement.title}</span>
   </>
 ));

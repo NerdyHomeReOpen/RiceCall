@@ -9,42 +9,42 @@
 }
 
 .vip-0 {
-  background-image: url('/channel/ucard_vip0_bg.webp');
+  background-image: url('/channel/ucard_vip0_bg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
 }
 
 .vip-1 {
-  background-image: url('/channel/ucard_vip1_bg.webp');
+  background-image: url('/channel/ucard_vip1_bg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
 }
 
 .vip-2 {
-  background-image: url('/channel/ucard_vip2_bg.webp');
+  background-image: url('/channel/ucard_vip2_bg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
 }
 
 .vip-3 {
-  background-image: url('/channel/ucard_vip3_bg.webp');
+  background-image: url('/channel/ucard_vip3_bg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
 }
 
 .vip-4 {
-  background-image: url('/channel/ucard_vip4_bg.webp');
+  background-image: url('/channel/ucard_vip4_bg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
 }
 
 .vip-5 {
-  background-image: url('/channel/ucard_vip5_bg.webp');
+  background-image: url('/channel/ucard_vip5_bg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -96,7 +96,7 @@
   margin-right: 5px;
   content: '';
   object-fit: cover;
-  background-image: url('/channel/groupcard.webp');
+  background-image: url('/channel/groupcard.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
@@ -160,7 +160,7 @@
   min-width: 2px;
   min-height: 12px;
   margin: 0 5px;
-  background-image: url('/icon_v_split.webp');
+  background-image: url('/icon_v_split.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;

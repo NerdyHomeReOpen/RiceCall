@@ -31,6 +31,7 @@
     "build:deb": "npm run next:build && npm run electron:build:deb",
     "build:dmg": "npm run next:build && npm run electron:build:dmg",
     "build:action": "npm run next:build && npm run electron:prep",
+    "svg:convert": "node scripts/webp-to-svg.mjs",
     "format": "prettier --write src/**/*.{ts,tsx,js,jsx,css}",
     "format:css": "stylelint --fix \"src/**/*.css\""
   },
@@ -96,8 +97,10 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "postcss": "^8",
+    "potrace": "^2.1.8",
     "prettier": "^3.6.2",
     "resolve-tspaths": "^0.8.23",
+    "sharp": "^0.34.5",
     "stylelint": "^16.26.1",
     "stylelint-config-recess-order": "^7.4.0",
     "stylelint-config-standard": "^39.0.1",

@@ -22,7 +22,7 @@
   line-height: 1.2;
   color: #436da1;
   text-align: center;
-  background-image: url('/card/bg_list_tips.webp');
+  background-image: url('/card/bg_list_tips.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
@@ -50,14 +50,14 @@
 .user-about-me::before {
   align-self: flex-start;
   margin-right: 10px;
-  background-image: url('/card/bg_left_quote.webp');
+  background-image: url('/card/bg_left_quote.svg');
   background-repeat: no-repeat;
 }
 
 .user-about-me::after {
   align-self: flex-end;
   margin-left: 10px;
-  background-image: url('/card/bg_right_quote.webp');
+  background-image: url('/card/bg_right_quote.svg');
   background-repeat: no-repeat;
 }
 
@@ -107,7 +107,7 @@
   padding-top: 30px;
   padding-bottom: 60px;
   color: #fff;
-  background-image: url('/im/wallpaper.webp');
+  background-image: url('/im/wallpaper.svg');
   background-size: cover;
   -webkit-app-region: drag;
 }
@@ -133,12 +133,12 @@
 }
 
 .minimize-btn {
-  background-image: url('/im/btn-min.webp');
+  background-image: url('/im/btn-min.svg');
   background-repeat: no-repeat;
 }
 
 .close-btn {
-  background-image: url('/im/btn-close.webp');
+  background-image: url('/im/btn-close.svg');
   background-repeat: no-repeat;
 }
 
@@ -158,7 +158,7 @@
   min-width: 74px;
   min-height: 74px;
   object-fit: cover;
-  background-image: url('/im/IMLogo.webp');
+  background-image: url('/im/IMLogo.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -173,7 +173,7 @@
   width: 88px;
   height: 88px;
   content: '';
-  background-image: url('/im/avatar_border.webp');
+  background-image: url('/im/avatar_border.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -203,7 +203,7 @@
   width: 17px;
   height: 16px;
   image-rendering: auto;
-  background-image: url('/official.webp');
+  background-image: url('/official.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -255,7 +255,7 @@
   height: 38px;
   padding-bottom: 6px;
   cursor: pointer;
-  background-image: url('/im/userpage_tab.webp');
+  background-image: url('/im/userpage_tab.svg');
   background-repeat: repeat;
   background-position: 0 0;
   background-size: auto;
@@ -273,7 +273,7 @@
   min-width: 13px;
   min-height: 14px;
   content: '';
-  background-image: url('/im/icon-about.webp');
+  background-image: url('/im/icon-about.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
@@ -283,7 +283,7 @@
   min-width: 18px;
   min-height: 14px;
   content: '';
-  background-image: url('/im/icon-group.webp');
+  background-image: url('/im/icon-group.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
@@ -347,7 +347,7 @@
   min-height: 12px;
   margin-right: 2px;
   content: '';
-  background-image: url('/card/icon_contribu.webp');
+  background-image: url('/card/icon_contribu.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -366,7 +366,7 @@
   height: 12px;
   margin-right: 2px;
   content: '';
-  background-image: url('/card/icon_id.webp');
+  background-image: url('/card/icon_id.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
@@ -378,7 +378,7 @@
   height: 15px;
   margin-right: 5px;
   content: '';
-  background-image: url('/icon_creator.webp');
+  background-image: url('/icon_creator.svg');
   background-position: 0 0;
   background-size: contain;
 }

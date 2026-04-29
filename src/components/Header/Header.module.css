@@ -27,7 +27,7 @@
   min-width: 18px;
   min-height: 18px;
   content: '';
-  background-image: url('/rc_logo_small.webp');
+  background-image: url('/rc_logo_small.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
@@ -49,7 +49,7 @@
   min-width: 28px;
   min-height: 28px;
   cursor: pointer;
-  background-image: url('/gift.webp');
+  background-image: url('/gift.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -68,7 +68,7 @@
   min-width: 28px;
   min-height: 28px;
   cursor: pointer;
-  background-image: url('/game.webp');
+  background-image: url('/game.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -87,7 +87,7 @@
   min-width: 24px;
   min-height: 24px;
   cursor: pointer;
-  background-image: url('/icon_notice.webp');
+  background-image: url('/icon_notice.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -107,7 +107,7 @@
   min-width: 24px;
   min-height: 24px;
   cursor: pointer;
-  background-image: url('/icon_notice_overlay.webp');
+  background-image: url('/icon_notice_overlay.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -122,7 +122,7 @@
   min-width: 2px;
   min-height: 19px;
   cursor: pointer;
-  background-image: url('/mf_spliter.webp');
+  background-image: url('/mf_spliter.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -133,7 +133,7 @@
   min-width: 20px;
   min-height: 20px;
   cursor: pointer;
-  background-image: url('/BtnMenu.webp');
+  background-image: url('/BtnMenu.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -152,7 +152,7 @@
   min-width: 20px;
   min-height: 20px;
   cursor: pointer;
-  background-image: url('/Button_Minsize.webp');
+  background-image: url('/Button_Minsize.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -171,7 +171,7 @@
   min-width: 20px;
   min-height: 20px;
   cursor: pointer;
-  background-image: url('/Button_Restore.webp');
+  background-image: url('/Button_Restore.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -190,7 +190,7 @@
   min-width: 20px;
   min-height: 20px;
   cursor: pointer;
-  background-image: url('/Button_Maxsize.webp');
+  background-image: url('/Button_Maxsize.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -209,7 +209,7 @@
   min-width: 20px;
   min-height: 20px;
   cursor: pointer;
-  background-image: url('/Button_Close.webp');
+  background-image: url('/Button_Close.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -254,7 +254,7 @@
   min-width: 10px;
   min-height: 31px;
   content: '';
-  background-image: url('/tab_item_mainframe.webp');
+  background-image: url('/tab_item_mainframe.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -267,7 +267,7 @@
   min-width: 10px;
   min-height: 31px;
   content: '';
-  background-image: url('/tab_item_mainframe.webp');
+  background-image: url('/tab_item_mainframe.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -387,7 +387,7 @@
   display: inline-block;
   min-width: 13px;
   min-height: 13px;
-  background-image: url('/user_state.webp');
+  background-image: url('/user_state.svg');
   background-repeat: no-repeat;
   background-position: 0 0 !important;
 }
@@ -413,7 +413,7 @@
   min-width: 8px;
   min-height: 13px;
   margin-left: 5px;
-  background-image: url('/state_triangle.webp');
+  background-image: url('/state_triangle.svg');
   background-repeat: no-repeat;
   background-position: 0 4px;
 }

@@ -145,11 +145,11 @@ body {
 /* Radio & Checkbox */
 
 input[type='radio'] {
-  background-image: url('/ctrl/radiobox_icon.webp');
+  background-image: url('/ctrl/radiobox_icon.svg');
 }
 
 input[type='checkbox'] {
-  background-image: url('/ctrl/checkbox_icon.webp');
+  background-image: url('/ctrl/checkbox_icon.svg');
 }
 
 input[type='radio'],
@@ -275,7 +275,7 @@ textarea {
   min-height: 18px;
   cursor: pointer;
   content: '';
-  background-image: url('/channel/FaceButton.webp');
+  background-image: url('/channel/FaceButton.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -564,7 +564,7 @@ textarea {
   height: 16px;
   min-height: 16px;
   margin-right: 2px;
-  background-image: url('/channel/UserIconsMale.webp');
+  background-image: url('/channel/UserIconsMale.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -577,7 +577,7 @@ textarea {
   height: 16px;
   min-height: 16px;
   margin-right: 2px;
-  background-image: url('/channel/UserIconsFemale.webp');
+  background-image: url('/channel/UserIconsFemale.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -621,7 +621,7 @@ textarea {
   min-width: 14px;
   min-height: 14px;
   margin-right: 2px;
-  background-image: url('/channel/vip_icons.webp');
+  background-image: url('/channel/vip_icons.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -735,7 +735,7 @@ textarea {
   display: flex;
   height: 100%;
   min-height: 0;
-  background-image: url('/setting_left_bg.webp');
+  background-image: url('/setting_left_bg.svg');
   background-repeat: no-repeat;
   background-size: cover;
   border-right: 1px solid #b4dbec;
@@ -1081,7 +1081,7 @@ textarea {
   height: 2rem;
   pointer-events: none;
   content: '';
-  background-image: url('/channel/spliter.webp');
+  background-image: url('/channel/spliter.svg');
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -1094,7 +1094,7 @@ textarea {
   height: 12px;
   pointer-events: none;
   content: '';
-  background-image: url('/login_combobox_triangle.webp');
+  background-image: url('/login_combobox_triangle.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -1119,7 +1119,7 @@ textarea {
   min-width: 17px;
   min-height: 17px;
   margin: 5px;
-  background-image: url('/channel/channel_search.webp');
+  background-image: url('/channel/channel_search.svg');
   background-position: 0 0;
   background-size: cover;
 }
@@ -1149,33 +1149,33 @@ textarea {
   height: 36px;
   margin-right: 10px;
   content: '';
-  background-image: url('/pic_alert.webp');
+  background-image: url('/pic_alert.svg');
   background-repeat: no-repeat;
   background-size: contain;
 }
 
 .dialog-icon.alert {
-  background-image: url('/pic_alert.webp');
+  background-image: url('/pic_alert.svg');
 }
 
 .dialog-icon.alert2 {
-  background-image: url('/pic_alert2.webp');
+  background-image: url('/pic_alert2.svg');
 }
 
 .dialog-icon.error {
-  background-image: url('/pic_error.webp');
+  background-image: url('/pic_error.svg');
 }
 
 .dialog-icon.warning {
-  background-image: url('/pic_warning.webp');
+  background-image: url('/pic_warning.svg');
 }
 
 .dialog-icon.info {
-  background-image: url('/pic_information.webp');
+  background-image: url('/pic_information.svg');
 }
 
 .dialog-icon.success {
-  background-image: url('/pic_ok.webp');
+  background-image: url('/pic_ok.svg');
 }
 
 .dialog-message {
@@ -1197,7 +1197,7 @@ textarea {
   min-width: 40px;
   min-height: 40px;
   object-fit: cover;
-  background-image: url('/logo_server_def.webp');
+  background-image: url('/logo_server_def.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -1211,7 +1211,7 @@ textarea {
   min-width: 42px;
   min-height: 42px;
   content: '';
-  background-image: url('/channel/server_logo_border.webp');
+  background-image: url('/channel/server_logo_border.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -1235,7 +1235,7 @@ textarea {
   min-width: 17px;
   min-height: 17px;
   cursor: pointer;
-  background-image: url('/playback.webp');
+  background-image: url('/playback.svg');
   background-repeat: no-repeat;
   background-position: 0;
   background-size: cover;

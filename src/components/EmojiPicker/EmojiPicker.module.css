@@ -58,7 +58,7 @@
   height: 12px;
   margin-right: 8px;
   margin-left: 10px;
-  background-image: url('/channel/FontButton.webp');
+  background-image: url('/channel/FontButton.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -90,7 +90,7 @@
   height: 2em;
   pointer-events: none;
   content: '';
-  background-image: url('/channel/spliter.webp');
+  background-image: url('/channel/spliter.svg');
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -103,7 +103,7 @@
   height: 12px;
   pointer-events: none;
   content: '';
-  background-image: url('/login_combobox_triangle.webp');
+  background-image: url('/login_combobox_triangle.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -239,15 +239,15 @@
 }
 
 .tab-def::before {
-  background-image: url('/im/deftab.webp');
+  background-image: url('/im/deftab.svg');
 }
 
 .tab-other::before {
-  background-image: url('/im/vipEm_Sign.webp');
+  background-image: url('/im/vipEm_Sign.svg');
 }
 
 .tab-vip::before {
-  background-image: url('/im/viptab.webp');
+  background-image: url('/im/viptab.svg');
 }
 
 .tab-def:hover::before,

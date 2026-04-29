@@ -33,7 +33,7 @@
 .search-bar .search-icon {
   min-width: 20px;
   min-height: 20px;
-  background-image: url('/channel/channel_search.webp');
+  background-image: url('/channel/channel_search.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -77,7 +77,7 @@
   min-width: 14px;
   min-height: 14px;
   content: '';
-  background-image: url('/channel/channelIcon.webp');
+  background-image: url('/channel/channelIcon.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -137,7 +137,7 @@
   min-width: 16px;
   min-height: 18px;
   content: '';
-  background-image: url('/mylocation.webp');
+  background-image: url('/mylocation.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;

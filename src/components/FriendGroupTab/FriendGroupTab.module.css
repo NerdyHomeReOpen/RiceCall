@@ -20,7 +20,7 @@
   min-width: 14px;
   min-height: 14px;
   content: '';
-  background-image: url('/channel/channelIcon.webp');
+  background-image: url('/channel/channelIcon.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;

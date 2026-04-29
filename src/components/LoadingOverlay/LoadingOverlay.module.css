@@ -49,7 +49,7 @@
   width: 18px;
   height: 18px;
   cursor: pointer;
-  background-image: url('/loading_close.webp');
+  background-image: url('/loading_close.svg');
   background-position: 0 0;
   background-size: cover;
   border: none;

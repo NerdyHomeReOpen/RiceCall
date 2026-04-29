@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="210" height="38" viewBox="0 0 210 38" shape-rendering="crispEdges">
+  <rect x="1" y="0" width="1" height="1" fill="#dddddd25"/>
+  <rect x="2" y="0" width="1" height="1" fill="#ddddddad"/>
+  <rect x="3" y="0" width="1" height="1" fill="#ddddddf1"/>
+  <rect x="4" y="0" width="202" height="1" fill="#dddddd"/>
+  <rect x="206" y="0" width="1" height="1" fill="#ddddddf1"/>
+  <rect x="207" y="0" width="1" height="1" fill="#ddddddad"/>
+  <rect x="208" y="0" width="1" height="1" fill="#dddddd25"/>
+  <rect x="0" y="1" width="1" height="1" fill="#dddddd27"/>
+  <rect x="1" y="1" width="1" height="1" fill="#ddddddef"/>
+  <rect x="2" y="1" width="206" height="1" fill="#dddddd"/>
+  <rect x="208" y="1" width="1" height="1" fill="#ddddddef"/>
+  <rect x="209" y="1" width="1" height="1" fill="#dddddd27"/>
+  <rect x="0" y="2" width="1" height="1" fill="#ddddddad"/>
+  <rect x="1" y="2" width="208" height="2" fill="#dddddd"/>
+  <rect x="209" y="2" width="1" height="1" fill="#ddddddad"/>
+  <rect x="0" y="3" width="1" height="1" fill="#ddddddf1"/>
+  <rect x="209" y="3" width="1" height="1" fill="#ddddddf3"/>
+  <rect x="0" y="4" width="210" height="30" fill="#dddddd"/>
+  <rect x="0" y="34" width="1" height="1" fill="#ddddddf1"/>
+  <rect x="1" y="34" width="208" height="2" fill="#dddddd"/>
+  <rect x="209" y="34" width="1" height="1" fill="#ddddddf3"/>
+  <rect x="0" y="35" width="1" height="1" fill="#ddddddad"/>
+  <rect x="209" y="35" width="1" height="1" fill="#ddddddad"/>
+  <rect x="0" y="36" width="1" height="1" fill="#dddddd28"/>
+  <rect x="1" y="36" width="1" height="1" fill="#ddddddef"/>
+  <rect x="2" y="36" width="206" height="1" fill="#dddddd"/>
+  <rect x="208" y="36" width="1" height="1" fill="#ddddddef"/>
+  <rect x="209" y="36" width="1" height="1" fill="#dddddd28"/>
+  <rect x="1" y="37" width="1" height="1" fill="#dddddd27"/>
+  <rect x="2" y="37" width="1" height="1" fill="#ddddddad"/>
+  <rect x="3" y="37" width="1" height="1" fill="#ddddddf2"/>
+  <rect x="4" y="37" width="202" height="1" fill="#dddddd"/>
+  <rect x="206" y="37" width="1" height="1" fill="#ddddddf2"/>
+  <rect x="207" y="37" width="1" height="1" fill="#ddddddad"/>
+  <rect x="208" y="37" width="1" height="1" fill="#dddddd27"/>
+</svg>

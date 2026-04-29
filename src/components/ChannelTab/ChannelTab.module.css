@@ -21,7 +21,7 @@
   min-width: 14px;
   min-height: 14px;
   cursor: pointer;
-  background-image: url('/channel/channelIcon.webp');
+  background-image: url('/channel/channelIcon.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -96,7 +96,7 @@
   min-width: 15px;
   min-height: 15px;
   cursor: pointer;
-  background-image: url('/mylocation.webp');
+  background-image: url('/mylocation.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }

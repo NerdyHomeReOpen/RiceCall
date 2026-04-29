@@ -13,7 +13,7 @@
   min-height: 100px;
   cursor: pointer;
   object-fit: cover;
-  background-image: url('/logo_server_def.webp');
+  background-image: url('/logo_server_def.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: cover;
@@ -34,6 +34,6 @@
   display: block;
   width: 16px;
   height: 16px;
-  background-image: url('/golden_pea.webp');
+  background-image: url('/golden_pea.svg');
   background-size: cover;
 }

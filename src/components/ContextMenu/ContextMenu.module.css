@@ -20,7 +20,7 @@
   min-width: 100%;
   min-height: 1px;
   margin: 2px 0;
-  background-image: url('/ctrl/menu_spliter.webp');
+  background-image: url('/ctrl/menu_spliter.svg');
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
@@ -49,62 +49,62 @@
 }
 
 .context-menu-option[data-type='system-setting']::before {
-  background-image: url('/set.webp');
+  background-image: url('/set.svg');
 }
 
 .context-menu-option[data-type='feedback']::before {
-  background-image: url('/message.webp');
+  background-image: url('/message.svg');
 }
 
 .context-menu-option[data-type='change-theme']::before {
-  background-image: url('/skin.webp');
+  background-image: url('/skin.svg');
 }
 
 .context-menu-option[data-type='logout']::before {
-  background-image: url('/exit.webp');
+  background-image: url('/exit.svg');
 }
 
 .context-menu-option[data-type='submenu-left']::before {
-  background-image: url('/ctrl/icon_submenu.webp');
+  background-image: url('/ctrl/icon_submenu.svg');
   transform: rotate(180deg);
 }
 
 .context-menu-option[data-type='submenu']::before {
   right: 6px;
   left: unset;
-  background-image: url('/ctrl/icon_submenu.webp');
+  background-image: url('/ctrl/icon_submenu.svg');
 }
 
 .context-menu-option[data-type='checked']::before {
-  background-image: url('/ctrl/icon_menu_checked.webp');
+  background-image: url('/ctrl/icon_menu_checked.svg');
 }
 
 .context-menu-option[data-type='member-management']::before {
-  background-image: url('/channel/icon_membermgr.webp');
+  background-image: url('/channel/icon_membermgr.svg');
 }
 
 .context-menu-option[data-type='apply-member']::before {
-  background-image: url('/channel/icon_memberapply.webp');
+  background-image: url('/channel/icon_memberapply.svg');
 }
 
 .context-menu-option[data-type='edit-nickname']::before {
-  background-image: url('/channel/icon_editGroupcard.webp');
+  background-image: url('/channel/icon_editGroupcard.svg');
 }
 
 .context-menu-option[data-type='locate-me']::before {
-  background-image: url('/channel/icon_locateme.webp');
+  background-image: url('/channel/icon_locateme.svg');
 }
 
 .context-menu-option[data-type='report']::before {
-  background-image: url('/channel/icon_report.webp');
+  background-image: url('/channel/icon_report.svg');
 }
 
 .context-menu-option[data-type='unfavorite-server']::before {
-  background-image: url('/channel/icon_uncollect.webp');
+  background-image: url('/channel/icon_uncollect.svg');
 }
 
 .context-menu-option[data-type='favorite-server']::before {
-  background-image: url('/channel/icon_collect.webp');
+  background-image: url('/channel/icon_collect.svg');
 }
 
 .context-menu-option:hover {

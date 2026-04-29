@@ -50,7 +50,7 @@
   min-width: 16px;
   min-height: 18px;
   content: '';
-  background-image: url('/mylocation.webp');
+  background-image: url('/mylocation.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
@@ -70,7 +70,7 @@
   min-width: 42px;
   min-height: 42px;
   content: '';
-  background-image: url('/win_border.webp');
+  background-image: url('/win_border.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -84,7 +84,7 @@
   min-width: 13px;
   min-height: 13px;
   content: '';
-  background-image: url('/user_state.webp');
+  background-image: url('/user_state.svg');
   background-repeat: no-repeat;
   background-position: 0 0 !important;
 }
