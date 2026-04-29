@@ -26,7 +26,7 @@ const NotificationMenuItem: React.FC<NotificationMenuItemProps> = React.memo(({ 
         <div className={styles['notification-menu-contents']}>
           {item.contents
             .slice(0, 3)
-            .map((content, index) => (item.contentType === 'image' ? <Image key={index} src={content} alt={content} width={32} height={32} loading="lazy" draggable="false" /> : content))}
+            .map((content, index) => (item.contentType === 'image' ? <Image key={index} src={content} alt="notification_image" width={32} height={32} loading="lazy" draggable="false" /> : content))}
           {item.contents.length > 3 && <span>...({item.contents.length - 3})</span>}
         </div>
       )}

@@ -108,14 +108,10 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 100px;
-  min-height: 100px;
+  width: 100px;
+  height: 100px;
   margin: 10px;
   cursor: pointer;
-  background-image: url('/im/IMLogo.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
 }
 
 .avatar-picture.offline {

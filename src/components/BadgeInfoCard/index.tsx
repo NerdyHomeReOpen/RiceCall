@@ -61,7 +61,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
     <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['badge-info-card']}`} style={display ? { top: cardY, left: cardX } : { opacity: 0 }}>
       <div className={styles['badge-info-wrapper']}>
         <div className={styles['badge-avatar-box']}>
-          <Image src={badge.iconUrl} alt={badge.name} width={64} height={64} loading="lazy" draggable="false" />
+          <Image src={badge.iconUrl} alt="badge_icon" width={64} height={64} loading="lazy" draggable="false" />
           <div className={styles['badge-rarity-text']}>{`[${t('rare')}]`}</div>
         </div>
         <div className={styles['badge-description-box']}>

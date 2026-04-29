@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 import { Permission } from '@/types';
@@ -343,7 +344,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </div>
               </div>
               <div className={styles['server-avatar-wrapper']}>
-                <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                <div className={styles['server-avatar-picture']}>
+                  <Image src={server.avatarUrl} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
+                </div>
                 <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
                 {!isReadOnly ? (
                   <label htmlFor="avatar-upload" className="button" style={{ marginTop: '10px', height: '2em' }}>

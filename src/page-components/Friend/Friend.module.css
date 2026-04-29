@@ -23,6 +23,8 @@
 
 .user-avatar-picture {
   position: relative;
+  width: 40px;
+  height: 40px;
 }
 
 .user-avatar-picture::before {
@@ -187,12 +189,12 @@
   flex: 1;
   align-items: center;
   justify-content: center;
-  min-height: 36px;
+  width: 136px;
+  height: 36px;
   text-align: center;
   cursor: pointer;
   background-image: url('/friend_tab_item_bg.svg');
   background-position: 0 0;
-  background-size: 100% 72px;
 }
 
 .friend-page-sidebar-navigate-tab.selected {

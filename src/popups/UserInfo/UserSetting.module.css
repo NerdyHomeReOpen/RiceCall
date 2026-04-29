@@ -155,13 +155,8 @@
 .avatar-picture {
   position: relative;
   display: inline-block;
-  min-width: 74px;
-  min-height: 74px;
-  object-fit: cover;
-  background-image: url('/im/IMLogo.svg');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+  width: 74px;
+  height: 74px;
   transition: all 0.3s ease-in-out;
 }
 

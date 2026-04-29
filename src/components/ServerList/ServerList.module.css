@@ -41,7 +41,8 @@
 }
 
 .server-card-avatar-picture {
-  cursor: pointer;
+  width: 70px;
+  height: 70px;
 }
 
 .server-card-info-text {

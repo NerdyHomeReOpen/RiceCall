@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
@@ -50,8 +51,8 @@ const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, serv
       <div className="popup-body">
         <div className="popup-content col">
           <div className="row">
-            <div className="avatar-wrapper">
-              <div className="avatar-picture" style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+            <div className="avatar-picture">
+              <Image src={server.avatarUrl} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
             </div>
             <div className="info-wrapper">
               <div className="link-text">{server.name}</div>

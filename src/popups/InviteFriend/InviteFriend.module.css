@@ -62,7 +62,6 @@
   align-items: center;
   height: 25px;
   padding: 5px;
-  border-radius: 3px;
 }
 
 .friend-group-tab-details {
@@ -87,8 +86,8 @@
   background-position: -14px 0;
 }
 
-.friend-group-tab-content {
-  margin-left: 20px;
+.friend-group-tab-content > div {
+  padding-left: 20px;
 }
 
 .friend-tab {
@@ -98,7 +97,6 @@
   align-items: center;
   justify-content: flex-start;
   padding: 5px;
-  border-radius: 3px;
 }
 
 .friend-tab.selected {
@@ -153,8 +151,6 @@
   position: relative;
   width: 25px;
   height: 25px;
-  background-position: center;
-  background-size: cover;
 }
 
 .checkbox {

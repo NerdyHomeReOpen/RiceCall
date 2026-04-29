@@ -91,17 +91,13 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
 
   return (
     <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>
-      <Image
+      <div
         className={styles['friend-tab-avatar-picture']}
         style={{ filter: isFriend && !isOffline && !friend.isBlocked ? '' : 'grayscale(100%)' }}
-        src={friend.avatarUrl}
-        alt={friend.name}
-        width={40}
-        height={40}
-        loading="lazy"
-        draggable="false"
         datatype={isFriend && !isOnline && !isOffline && !friend.isBlocked ? friend.status : ''}
-      />
+      >
+        <Image src={friend.avatarUrl} alt="friend_avatar" width={40} height={40} loading="lazy" draggable="false" />
+      </div>
       <div className={styles['friend-tab-base-info']}>
         <div className={styles['friend-tab-box']}>
           {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}

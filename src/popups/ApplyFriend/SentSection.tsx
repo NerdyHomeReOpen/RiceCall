@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
@@ -19,8 +20,8 @@ const SentSection: React.FC<SentSectionProps> = React.memo(({ target, onTargetNa
         <div className="popup-content col">
           <div className="label">{t('apply-friend-label')}</div>
           <div className="row">
-            <div className="avatar-wrapper">
-              <div className="avatar-picture" style={{ backgroundImage: `url(${target.avatarUrl})` }} />
+            <div className="avatar-picture">
+              <Image src={target.avatarUrl} alt="target_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className="info-wrapper">
               <div className="link-text" onClick={onTargetNameClick}>

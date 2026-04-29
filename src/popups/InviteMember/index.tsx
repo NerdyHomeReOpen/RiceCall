@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import * as ipc from '@/main/ipc';
 
@@ -48,8 +49,8 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
         <div className="content col">
           <div className="label">{t('invite-member-label')}</div>
           <div className="row">
-            <div className="avatar-wrapper">
-              <div className="avatar-picture" style={{ backgroundImage: `url(${target.avatarUrl})` }} />
+            <div className="avatar-picture">
+              <Image src={target.avatarUrl} alt="target_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className="info-wrapper">
               <div className="link-text">

@@ -82,7 +82,9 @@ const FriendPageHeader: React.FC = React.memo(() => {
 
   return (
     <>
-      <Image className={styles['user-avatar-picture']} src={user.avatarUrl} alt={user.name} width={40} height={40} loading="lazy" draggable="false" />
+      <div className={styles['user-avatar-picture']} datatype="">
+        <Image src={user.avatarUrl} alt="user_avatar" width={40} height={40} loading="lazy" draggable="false" />
+      </div>
       <div className={styles['user-base-info']}>
         <div className={styles['user-base-info-box']}>
           <div className={styles['level-icon']} />

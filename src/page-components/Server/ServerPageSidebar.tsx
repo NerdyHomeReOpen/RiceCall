@@ -151,8 +151,8 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   return (
     <>
       <div className={styles['server-page-sidebar-header']}>
-        <div className={styles['server-avatar-box']} onClick={handleServerAvatarClick}>
-          <Image className={styles['server-avatar-picture']} src={currentServer.avatarUrl} alt={currentServer.name} width={50} height={50} loading="lazy" draggable="false" />
+        <div className={styles['server-avatar-picture']} onClick={handleServerAvatarClick}>
+          <Image src={currentServer.avatarUrl} alt="server_avatar" width={50} height={50} loading="lazy" draggable="false" />
         </div>
         <div className={styles['server-base-info-wrapper']}>
           <div className={styles['server-base-info-box']}>

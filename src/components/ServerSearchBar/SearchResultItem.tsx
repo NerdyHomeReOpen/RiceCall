@@ -17,7 +17,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
 
   return (
     <div className={styles['server-search-dropdown-item']} onClick={handleClick}>
-      <Image className={styles['server-search-dropdown-item-avatar-picture']} src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
+      <div className={styles['server-search-dropdown-item-avatar-picture']}>
+        <Image src={server.avatarUrl} alt="server_avatar" width={40} height={40} loading="lazy" draggable="false" />
+      </div>
       <div className={styles['server-search-dropdown-item-info-text']}>
         <div className={styles['server-search-dropdown-item-name-text']}>{server.name}</div>
         <div className={styles['server-search-dropdown-item-id-box']}>

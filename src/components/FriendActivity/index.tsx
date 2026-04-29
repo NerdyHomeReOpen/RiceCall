@@ -35,7 +35,9 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
 
   return (
     <div className={styles['friend-activity']}>
-      <Image className={styles['friend-activity-avatar']} src={friendActivity.avatarUrl} alt={friendActivity.name} width={30} height={30} loading="lazy" draggable="false" />
+      <div className={styles['friend-activity-avatar']}>
+        <Image src={friendActivity.avatarUrl} alt="friend_avatar" width={30} height={30} loading="lazy" draggable="false" />
+      </div>
       <div className={styles['friend-activity-content']}>
         <div className={styles['friend-activity-content-top']}>
           {hasVip && <div className={`vip-icon vip-${friendActivity.vip}`} />}

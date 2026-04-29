@@ -62,14 +62,8 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 100px;
-  min-height: 100px;
-  cursor: pointer;
-  object-fit: cover;
-  background-image: url('/logo_server_def.svg');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+  width: 100px;
+  height: 100px;
 }
 
 .input-wrapper {

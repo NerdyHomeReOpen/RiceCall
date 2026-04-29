@@ -242,7 +242,9 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
             <div className={styles['minimize-btn']} onClick={handleMinimizeBtnClick} />
             <div className={styles['close-btn']} onClick={handleCloseBtnClick} />
           </div>
-          <div className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`} style={{ backgroundImage: `url(${target.avatarUrl})` }} onClick={handleAvatarClick} />
+          <div className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`} onClick={handleAvatarClick}>
+            <Image src={target.avatarUrl} alt="user_avatar" width={74} height={74} loading="lazy" draggable="false" />
+          </div>
           <div className={`row ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
             <p className={styles['user-name-text']}>{target.name}</p>
             {target.vip > 0 && <div className={`vip-icon vip-${target.vip}`} />}
@@ -487,7 +489,7 @@ const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, 
 
   return (
     <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
+      <Image src={server.avatarUrl} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
       <div className={styles['server-info-box']}>
         <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
@@ -514,7 +516,7 @@ const JoinedServerCard: React.FC<JoinedServerCardProps> = React.memo(({ target, 
 
   return (
     <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
+      <Image src={server.avatarUrl} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
       <div className={styles['server-info-box']}>
         <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
@@ -541,7 +543,7 @@ const FavoriteServerCard: React.FC<FavoriteServerCardProps> = React.memo(({ targ
 
   return (
     <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={server.avatarUrl} alt={server.name} width={35} height={35} loading="lazy" draggable="false" />
+      <Image src={server.avatarUrl} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
       <div className={styles['server-info-box']}>
         <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

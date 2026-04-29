@@ -1186,21 +1186,12 @@ textarea {
 
 /* TODO: Need to be refactored */
 
-.avatar-wrapper {
-  display: flex;
-  margin-right: 5px;
-}
-
 .avatar-picture {
   position: relative;
   align-self: center;
-  min-width: 40px;
-  min-height: 40px;
-  object-fit: cover;
-  background-image: url('/logo_server_def.svg');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+  width: 40px;
+  height: 40px;
+  margin-right: 5px;
 }
 
 .avatar-picture::before {
