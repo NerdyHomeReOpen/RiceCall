@@ -39,7 +39,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category
   };
 
   return (
-    <div key={category.channelId}>
+    <>
       <div className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
         <div
           className={`${styles['channel-tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]} ${category.isLobby ? styles['lobby'] : ''}`}
@@ -58,7 +58,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category
             <ChannelTab key={c.channelId} channel={c} onSelect={onSelect} />
           ))}
       </div>
-    </div>
+    </>
   );
 });
 

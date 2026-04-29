@@ -595,10 +595,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 4px 10px;
-  background-color: var(--background-secondary);
+  height: 55px;
+  width: 100%;
   background-image: url('/channel/chn_toolbar_bg.svg');
-  background-repeat: no-repeat;
-  background-size: 100% 105%;
 }
 
 .mic-button {
