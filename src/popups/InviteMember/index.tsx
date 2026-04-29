@@ -46,7 +46,7 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
   return (
     <div className="popup-wrapper">
       <div className="popup-body">
-        <div className="content col">
+        <div className="popup-content col">
           <div className="label">{t('invite-member-label')}</div>
           <div className="row">
             <div className="avatar-picture">
