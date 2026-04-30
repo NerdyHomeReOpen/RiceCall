@@ -1,16 +1,3 @@
-.content {
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: flex-start;
-  width: 100%;
-  overflow-y: auto;
-}
-
-.content .user-profile-content {
-  padding: 10px;
-}
-
 .user-recent-visits-private {
   display: flex;
   align-items: center;
@@ -28,55 +15,11 @@
   background-size: auto;
 }
 
-.user-about-me {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  height: 100%;
-  padding: 10px 15px;
-  color: var(--text-color-quaternary);
-  border-bottom: 1px solid var(--border);
-}
-
-.user-about-me::before,
-.user-about-me::after {
-  display: block;
-  min-width: 23px;
-  min-height: 19px;
-  content: '';
-  background-size: cover;
-}
-
-.user-about-me::before {
-  align-self: flex-start;
-  margin-right: 10px;
-  background-image: url('/card/bg_left_quote.svg');
-  background-repeat: no-repeat;
-}
-
-.user-about-me::after {
-  align-self: flex-end;
-  margin-left: 10px;
-  background-image: url('/card/bg_right_quote.svg');
-  background-repeat: no-repeat;
-}
-
-.user-about-me-text {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: flex-start;
-  word-break: break-all;
-  cursor: text;
-  user-select: text;
-}
-
 .window-action-buttons,
 .user-account-text,
 .user-info-text,
 .user-signature,
 .avatar-picture,
-.no-drag,
 .tab {
   -webkit-app-region: no-drag;
 }
@@ -88,7 +31,7 @@
   background-image: unset !important;
 }
 
-.profile-box {
+.user-profile {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -152,7 +95,7 @@
   background-position: -28px 0;
 }
 
-.avatar-picture {
+.user-avatar {
   position: relative;
   display: inline-block;
   width: 74px;
@@ -160,7 +103,7 @@
   transition: all 0.3s ease-in-out;
 }
 
-.avatar-picture::after {
+.user-avatar::after {
   position: absolute;
   top: -7px;
   left: -7px;
@@ -173,11 +116,11 @@
   background-position: 0 0;
 }
 
-.avatar-picture.editable {
+.user-avatar.editable {
   cursor: pointer;
 }
 
-.avatar-picture.editable:hover {
+.user-avatar.editable:hover {
   border-radius: 3px;
   box-shadow: 0 0 3px 6px rgb(255 255 255 / 100%);
 }
@@ -214,7 +157,7 @@
   color: #fff;
 }
 
-.user-signature {
+.user-signature-text {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
@@ -260,10 +203,6 @@
   background-position: 0 -38px;
 }
 
-.tabs .tab.editable {
-  cursor: not-allowed;
-}
-
 .tabs .tab.about::before {
   min-width: 13px;
   min-height: 14px;
@@ -282,6 +221,60 @@
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
+}
+
+.content {
+  display: flex;
+  flex: 2;
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  overflow-y: auto;
+  padding: 10px;
+}
+
+.user-about-me {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  color: var(--text-color-quaternary);
+  border-bottom: 1px solid var(--border);
+}
+
+.user-about-me::before,
+.user-about-me::after {
+  display: block;
+  min-width: 23px;
+  min-height: 19px;
+  content: '';
+  background-size: cover;
+}
+
+.user-about-me::before {
+  align-self: flex-start;
+  margin-right: 10px;
+  background-image: url('/card/bg_left_quote.svg');
+  background-repeat: no-repeat;
+}
+
+.user-about-me::after {
+  align-self: flex-end;
+  margin-left: 10px;
+  background-image: url('/card/bg_right_quote.svg');
+  background-repeat: no-repeat;
+}
+
+.user-about-me-text {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-start;
+  word-break: break-all;
+  cursor: text;
+  user-select: text;
 }
 
 .server-list {
@@ -309,7 +302,7 @@
   border: 1px solid var(--border);
 }
 
-.server-info-box {
+.server-info {  
   display: flex;
   flex: 1;
   flex-direction: column;

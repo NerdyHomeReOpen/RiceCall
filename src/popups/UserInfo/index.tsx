@@ -17,6 +17,9 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useAppSelector } from '@/hooks/Store';
 import { useCountries } from '@/hooks/Countries';
 
+import RecentServerCard from './RecentServerCard';
+import JoinedServerCard from './JoinedServerCard';
+import FavoriteServerCard from './FavoriteServerCard';
 import LevelIcon from '@/components/LevelIcon';
 import BadgeItem from '@/components/BadgeItem';
 
@@ -47,8 +50,9 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
   );
 
   const [target, setTarget] = useState(targetData);
+  const [editedTarget, setEditedTarget] = useState(targetData);
   const [serversView, setServersView] = useState<'joined' | 'favorite'>('joined');
-  const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'userSetting'>('about');
+  const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'edit'>('about');
 
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
@@ -60,7 +64,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
   const isFriend = friend?.relationStatus === 2;
   const isAboutTab = selectedTabId === 'about';
   const isGroupsTab = selectedTabId === 'groups';
-  const isUserSettingTab = selectedTabId === 'userSetting';
+  const isEditTab = selectedTabId === 'edit';
   const isJoinedServersView = serversView === 'joined';
   const isFavoriteServersView = serversView === 'favorite';
   const canSubmit = target.name.trim() && target.gender.trim() && target.country.trim() && target.birthYear && target.birthMonth && target.birthDay;
@@ -145,20 +149,22 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
   };
 
   const handleEditProfileBtnClick = () => {
-    setSelectedTabId('userSetting');
+    setEditedTarget(target);
+    setSelectedTabId('edit');
   };
 
   const handleCancelBtnClick = () => {
-    setTarget(targetData);
+    setTarget(target);
     setSelectedTabId('about');
   };
 
   const handleConfirmBtnClick = () => {
-    if (!countries.includes(target.country)) {
+    if (!countries.includes(editedTarget.country)) {
       Actions.openErrorDialog(new Error('invalid-country'), () => {});
       return;
     }
-    Actions.editUser(objDiff(target, targetData));
+    Actions.editUser(objDiff(editedTarget, target));
+    setTarget(editedTarget);
     setSelectedTabId('about');
   };
 
@@ -171,35 +177,35 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTarget((prev) => ({ ...prev, name: e.target.value }));
+    setEditedTarget((prev) => ({ ...prev, name: e.target.value }));
   };
 
   const handleGenderChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTarget((prev) => ({ ...prev, gender: e.target.value as Types.User['gender'] }));
+    setEditedTarget((prev) => ({ ...prev, gender: e.target.value as Types.User['gender'] }));
   };
 
   const handleCountryChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTarget((prev) => ({ ...prev, country: e.target.value }));
+    setEditedTarget((prev) => ({ ...prev, country: e.target.value }));
   };
 
   const handleBirthYearChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTarget((prev) => ({ ...prev, birthYear: Number(e.target.value) }));
+    setEditedTarget((prev) => ({ ...prev, birthYear: Number(e.target.value) }));
   };
 
   const handleBirthMonthChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTarget((prev) => ({ ...prev, birthMonth: Number(e.target.value) }));
+    setEditedTarget((prev) => ({ ...prev, birthMonth: Number(e.target.value) }));
   };
 
   const handleBirthDayChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    setTarget((prev) => ({ ...prev, birthDay: Number(e.target.value) }));
+    setEditedTarget((prev) => ({ ...prev, birthDay: Number(e.target.value) }));
   };
 
   const handleSignatureChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTarget((prev) => ({ ...prev, signature: e.target.value }));
+    setEditedTarget((prev) => ({ ...prev, signature: e.target.value }));
   };
 
   const handleAboutChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
-    setTarget((prev) => ({ ...prev, about: e.target.value }));
+    setEditedTarget((prev) => ({ ...prev, about: e.target.value }));
   };
 
   const handleServersViewChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -236,16 +242,16 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 
   return (
     <div className={`popup-wrapper ${styles['user-profile']}`}>
-      <div className={styles['profile-box']}>
+      <div className={styles['user-profile']}>
         <div data-draggable className={styles['header']}>
           <div className={styles['window-action-buttons']}>
             <div className={styles['minimize-btn']} onClick={handleMinimizeBtnClick} />
             <div className={styles['close-btn']} onClick={handleCloseBtnClick} />
           </div>
-          <div className={`${styles['avatar-picture']} ${isSelf ? styles['editable'] : ''}`} onClick={handleAvatarClick}>
+          <div className={`${styles['user-avatar']} ${isSelf ? styles['editable'] : ''}`} onClick={handleAvatarClick}>
             <Image src={target.avatarUrl} alt="user_avatar" width={74} height={74} loading="lazy" draggable="false" />
           </div>
-          <div className={`row ${styles['no-drag']}`} style={{ gap: '3px', marginTop: '5px' }}>
+          <div className="row" style={{ gap: '3px', marginTop: '5px' }}>
             <p className={styles['user-name-text']}>{target.name}</p>
             {target.vip > 0 && <div className={`vip-icon vip-${target.vip}`} />}
             <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={true} />
@@ -257,21 +263,18 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
           <p className={styles['user-info-text']}>
             {t(target.gender.toLowerCase())} · {getUserAge()} · {t(target.country, { ns: 'country' })}
           </p>
-          <p className={styles['user-signature']}>{target.signature}</p>
+          <p className={styles['user-signature-text']}>{target.signature}</p>
           <div className={styles['tabs']}>
-            <div
-              className={`${styles['tab']} ${styles['about']} ${isUserSettingTab ? `${styles['selected']} ${styles['editable']}` : ''} ${isAboutTab ? styles['selected'] : ''}`}
-              onClick={handleAboutTabClick}
-            >
+            <div className={`${styles['tab']} ${styles['about']} ${isEditTab ? `${styles['selected']} disabled` : ''} ${isAboutTab ? styles['selected'] : ''}`} onClick={handleAboutTabClick}>
               {t('about-me')}
             </div>
-            <div className={`${styles['tab']} ${styles['groups']} ${isUserSettingTab ? styles['editable'] : ''} ${isGroupsTab ? styles['selected'] : ''}`} onClick={handleGroupsTabClick}>
+            <div className={`${styles['tab']} ${styles['groups']} ${isEditTab ? 'disabled' : ''} ${isGroupsTab ? styles['selected'] : ''}`} onClick={handleGroupsTabClick}>
               {t('servers')}
             </div>
           </div>
         </div>
         <div className={styles['edit-tab-bar']} style={isSelf && !isGroupsTab ? {} : { display: 'none' }}>
-          {isUserSettingTab ? (
+          {isEditTab ? (
             <>
               <div className={`button button-primary ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
                 {t('confirm')}
@@ -292,152 +295,146 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
               <div className={styles['user-about-me-text']}>{target.about}</div>
             </div>
           )}
-          <div className={styles['user-profile-content']}>
-            <div className="label">{t('recent-servers')}</div>
-            <div className={styles['server-list']}>
-              {!isSelf && !target.shareRecentServers ? (
-                <div className={styles['user-recent-visits-private']}>
-                  {t('not-public-recent-servers.top')}
-                  <br />
-                  {t('not-public-recent-servers.bottom')}
-                </div>
-              ) : !recentServers.length ? (
-                <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
-              ) : (
-                recentServers.map((server) => <RecentServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
-              )}
-            </div>
-            <div className="label">{t('recent-earned')}</div>
-            <div className={styles['badge-viewer']}>
-              {badges.map((badge: Types.Badge) => (
-                <div key={badge.badgeId} className={styles['badge-item']}>
-                  <BadgeItem key={badge.badgeId} badge={badge} position="left-top" direction="right-top" />
-                </div>
-              ))}
-            </div>
+          <div className="label">{t('recent-servers')}</div>
+          <div className={styles['server-list']}>
+            {!isSelf && !target.shareRecentServers ? (
+              <div className={styles['user-recent-visits-private']}>
+                {t('not-public-recent-servers.top')}
+                <br />
+                {t('not-public-recent-servers.bottom')}
+              </div>
+            ) : !recentServers.length ? (
+              <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
+            ) : (
+              recentServers.map((server) => <RecentServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
+            )}
+          </div>
+          <div className="label">{t('recent-earned')}</div>
+          <div className={styles['badge-viewer']}>
+            {badges.map((badge: Types.Badge) => (
+              <div key={badge.badgeId} className={styles['badge-item']}>
+                <BadgeItem key={badge.badgeId} badge={badge} position="left-top" direction="right-top" />
+              </div>
+            ))}
           </div>
         </div>
         <div className={styles['content']} style={isGroupsTab ? {} : { display: 'none' }}>
-          <div className={styles['user-profile-content']}>
-            <div className="select-box">
-              <select value={serversView} onChange={handleServersViewChange}>
-                <option value="joined">{t('joined-servers')}</option>
-                <option value="favorite">{t('favorited-servers')}</option>
-              </select>
-            </div>
-            <div className={styles['server-list']} style={isJoinedServersView ? {} : { display: 'none' }}>
-              {!isSelf && !target.shareJoinedServers ? (
-                <div className={styles['user-recent-visits-private']}>
-                  {t('not-public-joined-servers.top')}
-                  <br />
-                  {t('not-public-joined-servers.bottom')}
-                </div>
-              ) : !joinedServers.length ? (
-                <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
-              ) : (
-                joinedServers.map((server) => <JoinedServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
-              )}
-            </div>
-            <div className={styles['server-list']} style={isFavoriteServersView ? {} : { display: 'none' }}>
-              {!isSelf && !target.shareFavoriteServers ? (
-                <div className={styles['user-recent-visits-private']}>
-                  {t('not-public-favorite-servers.top')}
-                  <br />
-                  {t('not-public-favorite-servers.bottom')}
-                </div>
-              ) : !favoriteServers.length ? (
-                <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
-              ) : (
-                favoriteServers.map((server) => <FavoriteServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
-              )}
-            </div>
+          <div className="select-box">
+            <select value={serversView} onChange={handleServersViewChange}>
+              <option value="joined">{t('joined-servers')}</option>
+              <option value="favorite">{t('favorited-servers')}</option>
+            </select>
+          </div>
+          <div className={styles['server-list']} style={isJoinedServersView ? {} : { display: 'none' }}>
+            {!isSelf && !target.shareJoinedServers ? (
+              <div className={styles['user-recent-visits-private']}>
+                {t('not-public-joined-servers.top')}
+                <br />
+                {t('not-public-joined-servers.bottom')}
+              </div>
+            ) : !joinedServers.length ? (
+              <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
+            ) : (
+              joinedServers.map((server) => <JoinedServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
+            )}
+          </div>
+          <div className={styles['server-list']} style={isFavoriteServersView ? {} : { display: 'none' }}>
+            {!isSelf && !target.shareFavoriteServers ? (
+              <div className={styles['user-recent-visits-private']}>
+                {t('not-public-favorite-servers.top')}
+                <br />
+                {t('not-public-favorite-servers.bottom')}
+              </div>
+            ) : !favoriteServers.length ? (
+              <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
+            ) : (
+              favoriteServers.map((server) => <FavoriteServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
+            )}
           </div>
         </div>
-        <div className={styles['content']} style={isUserSettingTab ? {} : { display: 'none' }}>
-          <div className={styles['user-profile-content']}>
-            <div className="col">
-              <div className="row">
-                <div className="input-box col">
-                  <div className="label">{t('nickname')}</div>
-                  <input name="name" type="text" value={target.name} maxLength={32} onChange={handleNameChange} />
-                </div>
-                <div className="input-box col">
-                  <div className="label">{t('gender')}</div>
-                  <div className="select-box" style={{ width: '100%' }}>
-                    <select value={target.gender} onChange={handleGenderChange}>
-                      <option value="male">{t('male')}</option>
-                      <option value="female">{t('female')}</option>
-                    </select>
-                  </div>
+        <div className={styles['content']} style={isEditTab ? {} : { display: 'none' }}>
+          <div className="col">
+            <div className="row">
+              <div className="input-box col">
+                <div className="label">{t('nickname')}</div>
+                <input name="name" type="text" value={editedTarget.name} maxLength={32} onChange={handleNameChange} />
+              </div>
+              <div className="input-box col">
+                <div className="label">{t('gender')}</div>
+                <div className="select-box" style={{ width: '100%' }}>
+                  <select value={editedTarget.gender} onChange={handleGenderChange}>
+                    <option value="male">{t('male')}</option>
+                    <option value="female">{t('female')}</option>
+                  </select>
                 </div>
               </div>
-              <div className="row">
-                <div className="input-box col">
-                  <div className="label">{t('country')}</div>
-                  <div className="select-box" style={{ width: '100%' }}>
-                    <select value={target.country} onChange={handleCountryChange}>
-                      {countries.map((country) => (
-                        <option key={country} value={country}>
-                          {t(country, { ns: 'country' })}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+            </div>
+            <div className="row">
+              <div className="input-box col">
+                <div className="label">{t('country')}</div>
+                <div className="select-box" style={{ width: '100%' }}>
+                  <select value={editedTarget.country} onChange={handleCountryChange}>
+                    {countries.map((country) => (
+                      <option key={country} value={country}>
+                        {t(country, { ns: 'country' })}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-                <div style={{ width: '100%' }}>
-                  <div className="input-box col">
-                    <div className="label">{t('birthdate')}</div>
-                    <div className="row">
-                      <div className="select-box" style={{ width: '100%' }}>
-                        <select id="birthYear" value={target.birthYear} onChange={handleBirthYearChange}>
-                          {yearOptions.map((year) => (
-                            <option key={year} value={year} disabled={year > currentYear}>
-                              {year}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="select-box" style={{ width: '100%' }}>
-                        <select id="birthMonth" value={target.birthMonth} onChange={handleBirthMonthChange}>
-                          {monthOptions.map((month) => (
-                            <option key={month} value={month} disabled={target.birthYear === currentYear && month > currentMonth}>
-                              {month.toString().padStart(2, '0')}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
-                      <div className="select-box" style={{ width: '100%' }}>
-                        <select id="birthDay" value={target.birthDay} onChange={handleBirthDayChange}>
-                          {dayOptions.map((day) => (
-                            <option key={day} value={day} disabled={target.birthYear === currentYear && target.birthMonth === currentMonth && day > currentDay}>
-                              {day.toString().padStart(2, '0')}
-                            </option>
-                          ))}
-                        </select>
-                      </div>
+              </div>
+              <div style={{ width: '100%' }}>
+                <div className="input-box col">
+                  <div className="label">{t('birthdate')}</div>
+                  <div className="row">
+                    <div className="select-box" style={{ width: '100%' }}>
+                      <select id="birthYear" value={editedTarget.birthYear} onChange={handleBirthYearChange}>
+                        {yearOptions.map((year) => (
+                          <option key={year} value={year} disabled={year > currentYear}>
+                            {year}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="select-box" style={{ width: '100%' }}>
+                      <select id="birthMonth" value={editedTarget.birthMonth} onChange={handleBirthMonthChange}>
+                        {monthOptions.map((month) => (
+                          <option key={month} value={month} disabled={editedTarget.birthYear === currentYear && month > currentMonth}>
+                            {month.toString().padStart(2, '0')}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="select-box" style={{ width: '100%' }}>
+                      <select id="birthDay" value={editedTarget.birthDay} onChange={handleBirthDayChange}>
+                        {dayOptions.map((day) => (
+                          <option key={day} value={day} disabled={editedTarget.birthYear === currentYear && editedTarget.birthMonth === currentMonth && day > currentDay}>
+                            {day.toString().padStart(2, '0')}
+                          </option>
+                        ))}
+                      </select>
                     </div>
                   </div>
                 </div>
               </div>
-              <div className="input-box col">
-                <div className="label">{t('signature')}</div>
-                <div style={{ position: 'relative', width: '100%' }}>
-                  <input
-                    ref={signatureInputRef}
-                    name="signature"
-                    type="text"
-                    value={target.signature}
-                    maxLength={100}
-                    onChange={handleSignatureChange}
-                    style={{ paddingRight: '28px', width: '100%' }}
-                  />
-                  <div className="emoji-icon emoji-in-input" onMouseDown={handleEmojiPickerClick} />
-                </div>
+            </div>
+            <div className="input-box col">
+              <div className="label">{t('signature')}</div>
+              <div className={styles['signature-input']}>
+                <input
+                  ref={signatureInputRef}
+                  name="signature"
+                  type="text"
+                  value={editedTarget.signature}
+                  maxLength={100}
+                  onChange={handleSignatureChange}
+                  style={{ paddingRight: '28px', width: '100%' }}
+                />
+                <div className={styles['emoji-btn']} onMouseDown={handleEmojiPickerClick} />
               </div>
-              <div className="input-box col">
-                <div className="label">{t('about-me')}</div>
-                <textarea name="about" value={target.about} maxLength={200} onChange={handleAboutChange} />
-              </div>
+            </div>
+            <div className="input-box col">
+              <div className="label">{t('about-me')}</div>
+              <textarea name="about" value={editedTarget.about} maxLength={200} onChange={handleAboutChange} />
             </div>
           </div>
         </div>
@@ -465,97 +462,3 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
 UserInfoPopup.displayName = 'UserInfoPopup';
 
 export default UserInfoPopup;
-
-interface RecentServerCardProps {
-  target: Types.User;
-  server: Types.Server;
-  onServerSelect: (server: Types.Server) => void;
-}
-
-const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
-  const isSelf = user.userId === target.userId;
-  const isOwned = server.ownerId === target.userId && server.owned;
-
-  const handleServerDoubleClick = () => {
-    onServerSelect(server);
-  };
-
-  return (
-    <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={server.avatarUrl} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
-      <div className={styles['server-info-box']}>
-        <div className={styles['server-name-text']}>{server.name}</div>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <div className={`${isSelf && isOwned ? styles['is-owner'] : ''}`} />
-          <div className={styles['display-id-text']}>{server.specialId || server.displayId}</div>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-RecentServerCard.displayName = 'RecentServerCard';
-
-interface JoinedServerCardProps {
-  target: Types.User;
-  server: Types.Server;
-  onServerSelect: (server: Types.Server) => void;
-}
-
-const JoinedServerCard: React.FC<JoinedServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  const handleServerDoubleClick = () => {
-    onServerSelect(server);
-  };
-
-  return (
-    <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={server.avatarUrl} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
-      <div className={styles['server-info-box']}>
-        <div className={styles['server-name-text']}>{server.name}</div>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className={`permission-${target.gender} permission-lv-${server.permissionLevel}`} />
-          <div className={styles['contribution-value-text']}>{server.contribution}</div>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-JoinedServerCard.displayName = 'JoinedServerCard';
-
-interface FavoriteServerCardProps {
-  target: Types.User;
-  server: Types.Server;
-  onServerSelect: (server: Types.Server) => void;
-}
-
-const FavoriteServerCard: React.FC<FavoriteServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  const handleServerDoubleClick = () => {
-    onServerSelect(server);
-  };
-
-  return (
-    <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={server.avatarUrl} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
-      <div className={styles['server-info-box']}>
-        <div className={styles['server-name-text']}>{server.name}</div>
-        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-          <div className={`permission-${target.gender} permission-lv-${server.permissionLevel}`} />
-          <div className={styles['contribution-box']}>
-            <div className={styles['contribution-icon']} />
-            <div className={styles['contribution-value-text']}>{server.contribution}</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-});
-
-FavoriteServerCard.displayName = 'FavoriteServerCard';
