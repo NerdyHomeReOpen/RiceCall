@@ -9,7 +9,7 @@ import * as ipc from '@/main/ipc';
 
 import { POPUP_CONFIGS } from '@/configs/popup';
 
-import SocketManager from '@/components/SocketManager';
+import PopupSocketManager from '@/components/PopupSocketManager';
 import PopupHeader from '@/components/PopupHeader';
 
 import About from '@/popups/About';
@@ -168,7 +168,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
-      <SocketManager />
+      <PopupSocketManager />
       {popup && !popup.hideHeader && (
         <PopupHeader
           title={popup.title}

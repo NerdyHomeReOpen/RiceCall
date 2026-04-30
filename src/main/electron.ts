@@ -30,6 +30,7 @@ import { registerNetworkHandlers } from '@/main/network/electron';
 import { registerPopupHandlers } from '@/main/popup/electron';
 import { registerRecordHandlers } from '@/main/record/electron';
 import { registerSocketHandlers, disconnectSocket } from '@/main/socket/electron';
+import { registerStoreStateHandlers } from '@/main/storeState/electron';
 import { registerSystemHandlers } from '@/main/systemSettings/electron';
 import { registerTrayHandlers } from '@/main/tray/electron';
 import { registerWindowHandlers } from '@/main/window/electron';
@@ -137,7 +138,7 @@ export function configureLogger() {
 export const store = new Store<Types.StoreType>({
   defaults: {
     accounts: {},
-    language: getRegion(),
+    language: getLanguage(),
     customThemes: [],
     currentTheme: null,
     autoLogin: false,
@@ -301,7 +302,7 @@ export function getSettings(): Types.SystemSettings {
   };
 }
 
-export function getRegion(): Types.LanguageKey {
+export function getLanguage(): Types.LanguageKey {
   const language = app.getLocale();
 
   const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
@@ -597,6 +598,7 @@ app.on('ready', async () => {
   registerPopupHandlers();
   registerRecordHandlers();
   registerSocketHandlers();
+  registerStoreStateHandlers();
   registerSystemHandlers();
   registerTrayHandlers();
   registerWindowHandlers();

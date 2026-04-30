@@ -43,7 +43,7 @@ class Store {
 export const store = new Store({
   defaults: {
     accounts: {},
-    language: getRegion(),
+    language: getLanguage(),
     customThemes: [],
     currentTheme: null,
     autoLogin: false,
@@ -139,10 +139,12 @@ export function getSettings(): Types.SystemSettings {
   };
 }
 
-export function getRegion(): Types.LanguageKey {
+export function getLanguage(): Types.LanguageKey {
   const language = navigator.language;
+
   const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
   if (!match) return 'en-US';
+
   return match.code;
 }
 
@@ -188,6 +190,7 @@ export * from '@/main/popup/web';
 export * from '@/main/record/web';
 export * from '@/main/socket/web';
 export * from '@/main/systemSettings/web';
+export * from '@/main/storeState/web';
 export * from '@/main/tray/web';
 export * from '@/main/window/web';
 
