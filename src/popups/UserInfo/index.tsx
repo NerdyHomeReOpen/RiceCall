@@ -29,18 +29,19 @@ import styles from './UserSetting.module.css';
 
 interface UserInfoPopupProps {
   id: string;
-  friend: Types.Friend | null;
   target: Types.User;
   targetServers: Types.Server[];
 }
 
-const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, target: targetData, targetServers }) => {
+const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: targetData, targetServers }) => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
   const { countries } = useCountries();
 
   const signatureInputRef = useRef<HTMLInputElement>(null);
   const isUploadingRef = useRef<boolean>(false);
+
+  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
 
   const user = useAppSelector(
     (state) => ({
@@ -61,7 +62,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
   const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
   const dayOptions = Array.from({ length: new Date(target.birthYear, target.birthMonth, 0).getDate() }, (_, i) => i + 1);
   const isSelf = user.userId === target.userId;
-  const isFriend = friend?.relationStatus === 2;
+  const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === 2) !== undefined;
   const isAboutTab = selectedTabId === 'about';
   const isGroupsTab = selectedTabId === 'groups';
   const isEditTab = selectedTabId === 'edit';

@@ -219,11 +219,10 @@ export async function systemSetting({ userId, systemSettings }: { userId: string
 }
 
 export async function userInfo({ userId, targetId }: { userId: string; targetId: string }) {
-  const friendPromise = Data.friend({ userId, targetId });
   const targetPromise = Data.user({ userId: targetId });
   const targetServersPromise = Data.servers({ userId: targetId });
 
-  const [friend, target, targetServers] = await Promise.all([friendPromise, targetPromise, targetServersPromise]);
+  const [target, targetServers] = await Promise.all([targetPromise, targetServersPromise]);
 
-  return { userId, targetId, friend, target, targetServers };
+  return { userId, targetId, target, targetServers };
 }
