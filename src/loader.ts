@@ -141,14 +141,6 @@ export async function editNickname({ userId, serverId }: { userId: string; serve
   return { userId, serverId, member };
 }
 
-export async function friendVerification({ userId }: { userId: string }) {
-  const friendApplicationsPromise = Data.friendApplications({ receiverId: userId });
-
-  const [friendApplications] = await Promise.all([friendApplicationsPromise]);
-
-  return { userId, friendApplications };
-}
-
 export async function inviteMember({ userId, serverId }: { userId: string; serverId: string }) {
   const targetPromise = Data.member({ userId, serverId });
   const memberInvitationPromise = Data.memberInvitation({ serverId, receiverId: userId });
@@ -183,14 +175,6 @@ export async function memberApplicationSetting({ userId, serverId }: { userId: s
   return { userId, serverId, server };
 }
 
-export async function memberInvitation({ userId }: { userId: string }) {
-  const memberInvitationsPromise = Data.memberInvitations({ receiverId: userId });
-
-  const [memberInvitations] = await Promise.all([memberInvitationsPromise]);
-
-  return { userId, memberInvitations };
-}
-
 export async function serverApplication({ userId, serverId }: { userId: string; serverId: string }) {
   const serverPromise = Data.server({ userId, serverId });
 
@@ -200,14 +184,13 @@ export async function serverApplication({ userId, serverId }: { userId: string; 
 }
 
 export async function serverSetting({ userId, serverId }: { userId: string; serverId: string }) {
-  const userPromise = Data.user({ userId });
   const serverPromise = Data.server({ userId, serverId });
   const serverMembersPromise = Data.serverMembers({ serverId });
   const memberApplicationsPromise = Data.memberApplications({ serverId });
 
-  const [user, server, serverMembers, memberApplications] = await Promise.all([userPromise, serverPromise, serverMembersPromise, memberApplicationsPromise]);
+  const [server, serverMembers, memberApplications] = await Promise.all([serverPromise, serverMembersPromise, memberApplicationsPromise]);
 
-  return { userId, serverId, user, server, serverMembers, memberApplications };
+  return { userId, serverId, server, serverMembers, memberApplications };
 }
 
 export async function systemSetting({ userId, systemSettings }: { userId: string; systemSettings: Types.SystemSettings }) {
