@@ -54,17 +54,17 @@ const FriendPageSidebar: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={styles['friend-page-sidebar-navigate-tabs']}>
-        <div className={`${styles['friend-page-sidebar-navigate-tab']} ${isFriendTab ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
+      <div className={styles['navigate-tabs']}>
+        <div className={`${styles['navigate-tab']} ${isFriendTab ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div className={`${styles['friend-page-sidebar-navigate-tab']} ${isRecentTab ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
+        <div className={`${styles['navigate-tab']} ${isRecentTab ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
-      <div className={styles['friend-page-sidebar-search-bar']}>
+      <div className={styles['search-bar']}>
         <div className={styles['search-icon']} />
-        <input name="query" type="text" className={styles['friend-page-sidebar-search-input']} placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
+        <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
         <div className={styles['prev-icon']} />
         <div className={styles['next-icon']} />
       </div>
@@ -78,11 +78,11 @@ const FriendPageSidebar: React.FC = React.memo(() => {
       <div className={styles['scroll-view']} style={isRecentTab ? {} : { display: 'none' }}>
         <div className={styles['recent-list']} />
       </div>
-      <div className={styles['friend-page-sidebar-footer']}>
-        <div className={styles['friend-page-sidebar-footer-button']} datatype="addGroup" onClick={handleCreateFriendGroupBtnClick}>
+      <div className={styles['footer']}>
+        <div className={styles['footer-button']} datatype="addGroup" onClick={handleCreateFriendGroupBtnClick}>
           {t('create-friend-group')}
         </div>
-        <div className={styles['friend-page-sidebar-footer-button']} datatype="addFriend" onClick={handleAddFriendBtnClick}>
+        <div className={styles['footer-button']} datatype="addFriend" onClick={handleAddFriendBtnClick}>
           {t('add-friend')}
         </div>
       </div>

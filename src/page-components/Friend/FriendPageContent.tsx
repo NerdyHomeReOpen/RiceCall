@@ -15,7 +15,7 @@ const FriendPageContent: React.FC = React.memo(() => {
 
   return (
     <>
-      <header className={styles['friend-page-content-header']}>{t('friend-active')}</header>
+      <header className={styles['content-header']}>{t('friend-activity')}</header>
       <div className={styles['scroll-view']}>
         <div className={styles['friend-activity-list']}>
           {friendActivities.map((friendActivity, index) => (
