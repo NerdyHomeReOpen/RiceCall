@@ -22,18 +22,45 @@
   opacity: 0.5;
 }
 
-.message-input-box .textarea {
+.emoji-btn {
+  width: 18px;
+  height: 18px;
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+}
+
+.emoji-btn::before {
+  display: block;
+  min-width: 18px;
+  min-height: 18px;
+  cursor: pointer;
+  content: '';
+  background-image: url('/channel/FaceButton.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.emoji-btn:hover::before {
+  background-position: -18px 0;
+}
+
+.emoji-btn:active::before {
+  background-position: -36px 0;
+}
+
+.input-area {
   flex: 1;
   overflow: auto;
   resize: none;
   border: none !important;
 }
 
-.message-input-box .textarea div {
+.input-area div {
   height: 100%;
 }
 
-.message-input-length-text {
+.input-length-text {
   position: absolute;
   right: 5px;
   bottom: 5px;

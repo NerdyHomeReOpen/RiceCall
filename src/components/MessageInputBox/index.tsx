@@ -194,10 +194,10 @@ const MessageInputBox: React.FC = React.memo(() => {
 
   return (
     <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
-      <div className="emoji-icon" onMouseDown={handleEmojiPickerClick} />
+      <div className={styles['emoji-btn']} onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}
-        className={`${styles['textarea']} markdown-content`}
+        className={`${styles['input-area']} markdown-content`}
         style={{ wordBreak: 'break-all', border: 'none' }}
         onPaste={handleInputPaste}
         onKeyDown={handleInputKeyDown}
@@ -206,7 +206,7 @@ const MessageInputBox: React.FC = React.memo(() => {
         maxLength={maxLength}
       />
       {isCloseToMaxLength && (
-        <div className={styles['message-input-length-text']}>
+        <div className={styles['input-length-text']}>
           {textLength}/{maxLength}
         </div>
       )}
