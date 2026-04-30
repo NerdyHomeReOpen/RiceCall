@@ -1184,30 +1184,4 @@ textarea {
   height: 100%;
 }
 
-.split {
-  width: 100%;
-  margin: 5px 0;
-  border-bottom: 1px solid var(--border);
-}
 
-.sound-effect-preview {
-  min-width: 17px;
-  min-height: 17px;
-  cursor: pointer;
-  background-image: url('/playback.svg');
-  background-repeat: no-repeat;
-  background-position: 0;
-  background-size: cover;
-}
-
-.sound-effect-preview:hover {
-  background-position: -17px;
-}
-
-.sound-effect-preview:active {
-  background-position: -34px;
-}
-
-.sound-effect-enable {
-  cursor: pointer;
-}
