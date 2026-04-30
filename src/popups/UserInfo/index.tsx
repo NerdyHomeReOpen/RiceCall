@@ -298,13 +298,13 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
           <div className="label">{t('recent-servers')}</div>
           <div className={styles['server-list']}>
             {!isSelf && !target.shareRecentServers ? (
-              <div className={styles['user-recent-visits-private']}>
+              <div className={styles['server-list-tips']}>
                 {t('not-public-recent-servers.top')}
                 <br />
                 {t('not-public-recent-servers.bottom')}
               </div>
             ) : !recentServers.length ? (
-              <div className={styles['user-recent-visits-private']}>{t('no-recent-servers')}</div>
+              <div className={styles['server-list-tips']}>{t('no-recent-servers')}</div>
             ) : (
               recentServers.map((server) => <RecentServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
             )}
@@ -327,26 +327,26 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, friend, ta
           </div>
           <div className={styles['server-list']} style={isJoinedServersView ? {} : { display: 'none' }}>
             {!isSelf && !target.shareJoinedServers ? (
-              <div className={styles['user-recent-visits-private']}>
+              <div className={styles['server-list-tips']}>
                 {t('not-public-joined-servers.top')}
                 <br />
                 {t('not-public-joined-servers.bottom')}
               </div>
             ) : !joinedServers.length ? (
-              <div className={styles['user-recent-visits-private']}>{t('no-joined-servers')}</div>
+              <div className={styles['server-list-tips']}>{t('no-joined-servers')}</div>
             ) : (
               joinedServers.map((server) => <JoinedServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
             )}
           </div>
           <div className={styles['server-list']} style={isFavoriteServersView ? {} : { display: 'none' }}>
             {!isSelf && !target.shareFavoriteServers ? (
-              <div className={styles['user-recent-visits-private']}>
+              <div className={styles['server-list-tips']}>
                 {t('not-public-favorite-servers.top')}
                 <br />
                 {t('not-public-favorite-servers.bottom')}
               </div>
             ) : !favoriteServers.length ? (
-              <div className={styles['user-recent-visits-private']}>{t('no-favorite-servers')}</div>
+              <div className={styles['server-list-tips']}>{t('no-favorite-servers')}</div>
             ) : (
               favoriteServers.map((server) => <FavoriteServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
             )}
