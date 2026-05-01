@@ -2,6 +2,10 @@ import packageJson from '../../package.json';
 
 import type * as Types from '@/types';
 
+import Env from '@/env';
+
+import { i18nReady } from '@/i18n';
+
 import { LANGUAGES } from '@/constants';
 
 import { eventEmitter } from '@/main/event';
@@ -194,7 +198,11 @@ export * from '@/main/storeState/web';
 export * from '@/main/tray/web';
 export * from '@/main/window/web';
 
-function onReady() {
+async function onReady() {
+  Env.load(store.get('env'));
+
+  await i18nReady;
+
   const token = store.get('token');
   if (!token) return;
   autoLogin(token);

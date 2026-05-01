@@ -1,7 +1,8 @@
 import net from 'net';
 import path from 'path';
 import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray, dialog } from 'electron';
-import { autoUpdater, type UpdateInfo, type ProgressInfo } from 'electron-updater';
+import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
+const { autoUpdater } = ElectronUpdater;
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import log from 'electron-log';
@@ -14,7 +15,7 @@ import Logger from '@/logger';
 
 import Env from '@/env';
 
-import { t } from '@/i18n';
+import { i18nReady, t } from '@/i18n';
 
 import { LANGUAGES } from '@/constants';
 
@@ -135,21 +136,21 @@ export function setTrayDetail(isLogin?: boolean) {
   const contextMenu = Menu.buildFromTemplate([
     {
       id: 'open-main-window',
-      label: t('open-main-window'),
+      label: t('system:open-main-window'),
       type: 'normal',
       click: () => openAppWindow(),
     },
     { type: 'separator' },
     {
       id: 'logout',
-      label: t('logout'),
+      label: t('system:logout'),
       type: 'normal',
       enabled: _isLogin,
       click: () => logout(),
     },
     {
       id: 'exit',
-      label: t('exit'),
+      label: t('system:exit'),
       type: 'normal',
       click: () => app.exit(),
     },
@@ -236,9 +237,9 @@ export async function configureAutoUpdater() {
     dialog
       .showMessageBox({
         type: 'info',
-        title: t('update-available'),
-        message: t('update-available-message', { version: info.version, releaseDate: new Date(info.releaseDate).toLocaleDateString() }),
-        buttons: [t('download-update'), t('cancel')],
+        title: t('system:update-available'),
+        message: t('system:update-available-message', { version: info.version, releaseDate: new Date(info.releaseDate).toLocaleDateString() }),
+        buttons: [t('system:download-update'), t('system:cancel')],
         cancelId: 1,
       })
       .then((buttonIndex) => {
@@ -270,9 +271,9 @@ export async function configureAutoUpdater() {
     dialog
       .showMessageBox({
         type: 'info',
-        title: t('update-downloaded'),
-        message: t('update-downloaded-message', { version: info.version }),
-        buttons: [t('install-update'), t('install-after-quit'), t('cancel')],
+        title: t('system:update-downloaded'),
+        message: t('system:update-downloaded-message', { version: info.version }),
+        buttons: [t('system:install-update'), t('system:install-after-quit'), t('system:cancel')],
         cancelId: 2,
       })
       .then((buttonIndex) => {
@@ -702,6 +703,8 @@ export function broadcast(channel: string, ...args: unknown[]) {
 
 app.on('ready', async () => {
   Env.load(store.get('env', 'prod'));
+
+  await i18nReady;
 
   configureAutoUpdater();
   configureDiscordRPC();
