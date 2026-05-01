@@ -2,11 +2,13 @@ import { useEffect, useState } from 'react';
 
 import type * as Types from '@/types';
 
+import Env from '@/env';
+
 export const useStaffList = () => {
   const [staffList, setStaffList] = useState<Types.Staff[]>([]);
 
   useEffect(() => {
-    fetch('https://nerdyhomereopen.github.io/Details/staff.json')
+    fetch(`${Env.get().DOCS_BASE_URL}/staff.json`)
       .then((res) => {
         if (!res.ok) return;
         return res.json();
