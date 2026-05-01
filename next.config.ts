@@ -12,6 +12,7 @@ const nextConfig: NextConfig = {
   env: {
     API_URL: process.env.API_URL || '',
     WS_URL: process.env.WS_URL || '',
+    DOCS_BASE_URL: process.env.DOCS_BASE_URL || '',
     I18N_BASE_URL: process.env.I18N_BASE_URL || '',
     ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
   },

@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import Env from '@/env';
 
-const getBaseUrl = () => Env.get().I18N_BASE_URL || '';
+const getBaseUrl = () => Env.get().I18N_BASE_URL;
 
 class HttpBackend {
   type = 'backend' as const;

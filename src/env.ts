@@ -16,8 +16,8 @@ type EnvType = {
 const EnvSchema = z.object({
   API_URL: z.string(),
   WS_URL: z.string(),
-  I18N_BASE_URL: z.string().optional(),
-  DOCS_BASE_URL: z.string().optional(),
+  I18N_BASE_URL: z.string(),
+  DOCS_BASE_URL: z.string(),
   REACT_DEV_TOOLS_PATH: z.string().optional(),
   ERROR_SUBMISSION_URL: z.string().optional(),
 });
