@@ -2,8 +2,7 @@ import { ipcMain } from 'electron';
 
 import { t } from '@/i18n';
 
-import { broadcast, createPopup, store } from '@/main/electron';
-import { checkForUpdates } from '@/main/auto-updater';
+import { broadcast, checkForUpdates, createPopup, store } from '@/main/electron';
 
 export function registerAppHandlers() {
   ipcMain.on('dont-show-disclaimer-next-time', () => {

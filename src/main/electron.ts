@@ -1,6 +1,7 @@
 import net from 'net';
 import path from 'path';
-import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray, dialog } from 'electron';
+import { autoUpdater, type UpdateInfo, type ProgressInfo } from 'electron-updater';
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import log from 'electron-log';
@@ -17,7 +18,6 @@ import { t } from '@/i18n';
 
 import { LANGUAGES } from '@/constants';
 
-import { configureAutoUpdater } from '@/main/auto-updater';
 import { registerAccountHandlers } from '@/main/accounts/electron';
 import { registerAppHandlers } from '@/main/app/electron';
 import { registerAuthHandlers, autoLogin, logout } from '@/main/auth/electron';
@@ -73,6 +73,53 @@ export let authWindow: BrowserWindow | null = null;
 export let popups: Record<string, BrowserWindow> = {};
 
 let _isLogin: boolean = false;
+let _isUpdateNotified: boolean = false;
+let _updateCheckInterval: NodeJS.Timeout | null = null;
+
+const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
+
+function waitForPort(port: number) {
+  return new Promise((resolve, reject) => {
+    let timeout = 30000;
+
+    function tryConnect() {
+      const client = new net.Socket();
+
+      client.once('connect', () => {
+        client.destroy();
+        resolve(null);
+      });
+      client.once('error', () => {
+        client.destroy();
+        if (timeout <= 0) {
+          reject(new Error('Timeout waiting for port'));
+          return;
+        }
+        setTimeout(tryConnect, 1000);
+        timeout -= 1000;
+      });
+
+      client.connect({ port: port, host: 'localhost' });
+    }
+    tryConnect();
+  });
+}
+
+async function openDeepLink(url: string) {
+  if (!url) return;
+  try {
+    const { hostname } = new URL(url);
+    switch (hostname) {
+      case 'join':
+        const serverId = new URL(url).searchParams.get('sid');
+        broadcast('deepLink', serverId);
+        break;
+    }
+  } catch (e) {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('System').error(`Error parsing deep link: ${error.message}`);
+  }
+}
 
 function openAppWindow() {
   if (_isLogin) mainWindow?.show();
@@ -97,7 +144,7 @@ export function setTrayDetail(isLogin?: boolean) {
       id: 'logout',
       label: t('logout'),
       type: 'normal',
-      enabled: isLogin,
+      enabled: _isLogin,
       click: () => logout(),
     },
     {
@@ -123,6 +170,126 @@ export function configureTray() {
   tray.on('click', openAppWindow);
 
   setTrayDetail();
+}
+
+export async function checkForUpdates(force = false) {
+  if (_isUpdateNotified && !force) return;
+
+  if (DEV) {
+    autoUpdater.forceDevUpdateConfig = true;
+    autoUpdater.updateConfigPath = path.join(app.getAppPath(), 'dev-app-update.yml');
+  }
+
+  const channel = store.get('updateChannel');
+  new Logger('System').info(`Checking for updates, channel: ${channel}`);
+
+  if (channel === 'dev') {
+    autoUpdater.allowPrerelease = true;
+    autoUpdater.setFeedURL({
+      provider: 'github',
+      owner: 'NerdyHomeReOpen',
+      repo: 'RiceCall',
+      channel: 'dev',
+    });
+    autoUpdater.autoDownload = false;
+    autoUpdater.autoInstallOnAppQuit = false;
+    autoUpdater.allowDowngrade = true;
+    const result = await autoUpdater.checkForUpdates().catch((e) => {
+      const error = e instanceof Error ? e : new Error('Unknown error');
+      new Logger('System').error(`Cannot check for updates in dev channel: ${error.message}`);
+    });
+    if (result?.isUpdateAvailable) return result;
+  }
+
+  autoUpdater.allowPrerelease = false;
+  autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'NerdyHomeReOpen',
+    repo: 'RiceCall',
+    channel: 'latest',
+  });
+  autoUpdater.autoDownload = false;
+  autoUpdater.autoInstallOnAppQuit = false;
+  autoUpdater.allowDowngrade = false;
+  const result = await autoUpdater.checkForUpdates().catch((e) => {
+    const error = e instanceof Error ? e : new Error('Unknown error');
+    new Logger('System').error(`Cannot check for updates in latest channel: ${error.message}`);
+  });
+  if (result?.isUpdateAvailable) return result;
+}
+
+export function startCheckForUpdates() {
+  if (_updateCheckInterval) clearInterval(_updateCheckInterval);
+  _updateCheckInterval = setInterval(checkForUpdates, store.get('updateCheckInterval'));
+  checkForUpdates();
+}
+
+export function stopCheckForUpdates() {
+  if (_updateCheckInterval) clearInterval(_updateCheckInterval);
+  _updateCheckInterval = null;
+}
+
+export async function configureAutoUpdater() {
+  autoUpdater.on('update-available', (info: UpdateInfo) => {
+    new Logger('System').info(`Update available: ${info.version}`);
+
+    dialog
+      .showMessageBox({
+        type: 'info',
+        title: t('update-available'),
+        message: t('update-available-message', { version: info.version, releaseDate: new Date(info.releaseDate).toLocaleDateString() }),
+        buttons: [t('download-update'), t('cancel')],
+        cancelId: 1,
+      })
+      .then((buttonIndex) => {
+        if (buttonIndex.response === 0) {
+          autoUpdater.downloadUpdate();
+        }
+      })
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('System').error(`Cannot show update dialog: ${error.message}`);
+      });
+    _isUpdateNotified = true;
+  });
+
+  autoUpdater.on('update-not-available', () => {
+    new Logger('System').info(`Is latest version`);
+  });
+
+  autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
+    let message = `${progressInfo.bytesPerSecond}`;
+    message = `${message} - ${progressInfo.percent}%`;
+    message = `${message} (${progressInfo.transferred}/${progressInfo.total})`;
+    new Logger('System').info(`Downloading update: ${message}`);
+  });
+
+  autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
+    new Logger('System').info(`Update downloaded: ${info.version}`);
+
+    dialog
+      .showMessageBox({
+        type: 'info',
+        title: t('update-downloaded'),
+        message: t('update-downloaded-message', { version: info.version }),
+        buttons: [t('install-update'), t('install-after-quit'), t('cancel')],
+        cancelId: 2,
+      })
+      .then((buttonIndex) => {
+        if (buttonIndex.response === 0) {
+          autoUpdater.quitAndInstall(false, true);
+        } else if (buttonIndex.response === 1) {
+          autoUpdater.autoInstallOnAppQuit = true;
+        }
+      })
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('System').error(`Cannot show update dialog: ${error.message}`);
+      });
+    _isUpdateNotified = false;
+  });
+
+  if (store.get('autoCheckForUpdates')) startCheckForUpdates();
 }
 
 export function configureLogger() {
@@ -188,35 +355,6 @@ export const store = new Store<Types.StoreType>({
   },
 });
 
-const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
-
-function waitForPort(port: number) {
-  return new Promise((resolve, reject) => {
-    let timeout = 30000;
-
-    function tryConnect() {
-      const client = new net.Socket();
-
-      client.once('connect', () => {
-        client.destroy();
-        resolve(null);
-      });
-      client.once('error', () => {
-        client.destroy();
-        if (timeout <= 0) {
-          reject(new Error('Timeout waiting for port'));
-          return;
-        }
-        setTimeout(tryConnect, 1000);
-        timeout -= 1000;
-      });
-
-      client.connect({ port: port, host: 'localhost' });
-    }
-    tryConnect();
-  });
-}
-
 export function setAutoLaunch(enable: boolean) {
   try {
     app.setLoginItemSettings({
@@ -237,22 +375,6 @@ export function isAutoLaunchEnabled(): boolean {
     const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('System').error(`Get auto launch error: ${error.message}`);
     return false;
-  }
-}
-
-async function openDeepLink(url: string) {
-  if (!url) return;
-  try {
-    const { hostname } = new URL(url);
-    switch (hostname) {
-      case 'join':
-        const serverId = new URL(url).searchParams.get('sid');
-        broadcast('deepLink', serverId);
-        break;
-    }
-  } catch (e) {
-    const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('System').error(`Error parsing deep link: ${error.message}`);
   }
 }
 

@@ -5,8 +5,7 @@ import type * as Types from '@/types';
 
 import { changeLanguage } from '@/i18n';
 
-import { store, getSettings, broadcast, isAutoLaunchEnabled, setAutoLaunch, mainWindow, getLanguage, setTrayDetail } from '@/main/electron';
-import { startCheckForUpdates, stopCheckForUpdates } from '@/main/auto-updater';
+import { store, getSettings, broadcast, isAutoLaunchEnabled, setAutoLaunch, mainWindow, getLanguage, setTrayDetail, startCheckForUpdates, stopCheckForUpdates } from '@/main/electron';
 
 export function registerSystemHandlers() {
   ipcMain.on('get-system-settings', (event) => {
