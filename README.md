@@ -105,12 +105,13 @@ RiceCall
 ### 1. Copy `.env.example` to `.env` and fill in all required options
 
 ```env
-# Server Settings (All variables must be filled)
+# Server Settings
 API_URL=http://localhost:4500 # Do not include the trailing slash
 WS_URL=http://localhost:4500 # Use the same URL if your server runs locally
 
-# i18n Settings (Required)
-I18N_BASE_URL= # Base URL of the static i18n server, e.g. https://your-host/locales — files are fetched from {I18N_BASE_URL}/{lng}/{ns}.json
+# Static Files Settings
+DOCS_BASE_URL=https://your-host/docs # Base URL of the static files server
+I18N_BASE_URL=https://your-host/locales # Base URL of the static i18n server, files are fetched from {I18N_BASE_URL}/{lng}/{ns}.json
 
 # Error Submission URL (Optional)
 ERROR_SUBMISSION_URL=https://error-submission.example.com # If not provided, errors will not be submitted
@@ -131,9 +132,7 @@ yarn dev
 ### 4. Build the application
 
 ```bash
-yarn build       # Build for all platforms
-yarn build:deb   # Build Linux .deb package
-yarn build:dmg   # Build macOS .dmg package
+yarn build
 ```
 
 ### Other Scripts
