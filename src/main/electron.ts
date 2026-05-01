@@ -1,6 +1,5 @@
-import net from 'net';
 import path from 'path';
-import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray, dialog, net as electronNet } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray, dialog, net } from 'electron';
 import { pathToFileURL } from 'url';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
@@ -99,33 +98,6 @@ let _isUpdateNotified: boolean = false;
 let _updateCheckInterval: NodeJS.Timeout | null = null;
 
 const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
-
-function waitForPort(port: number) {
-  return new Promise((resolve, reject) => {
-    let timeout = 30000;
-
-    function tryConnect() {
-      const client = new net.Socket();
-
-      client.once('connect', () => {
-        client.destroy();
-        resolve(null);
-      });
-      client.once('error', () => {
-        client.destroy();
-        if (timeout <= 0) {
-          reject(new Error('Timeout waiting for port'));
-          return;
-        }
-        setTimeout(tryConnect, 1000);
-        timeout -= 1000;
-      });
-
-      client.connect({ port: port, host: 'localhost' });
-    }
-    tryConnect();
-  });
-}
 
 async function openDeepLink(url: string) {
   if (!url) return;
@@ -463,14 +435,6 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     return mainWindow;
   }
 
-  if (DEV) {
-    waitForPort(PORT).catch((e) => {
-      const error = e instanceof Error ? e : new Error('Unknown error');
-      new Logger('System').error(`Cannot connect to Next server: ${error.message}`);
-      app.exit();
-    });
-  }
-
   mainWindow = new BrowserWindow({
     title: title || VERSION_TITLE,
     width: 1080,
@@ -544,14 +508,6 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
     return authWindow;
   }
 
-  if (DEV) {
-    waitForPort(PORT).catch((e) => {
-      const error = e instanceof Error ? e : new Error('Unknown error');
-      new Logger('System').error(`Cannot connect to Next server: ${error.message}`);
-      app.quit();
-    });
-  }
-
   authWindow = new BrowserWindow({
     title: title || VERSION_TITLE,
     width: 640,
@@ -622,14 +578,6 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
       popups[id].flashFrame(true);
       return popups[id];
     }
-  }
-
-  if (DEV) {
-    waitForPort(PORT).catch((e) => {
-      const error = e instanceof Error ? e : new Error('Unknown error');
-      new Logger('System').error(`Cannot connect to Next server: ${error.message}`);
-      app.exit();
-    });
   }
 
   popups[id] = new BrowserWindow({
@@ -730,13 +678,11 @@ app.on('ready', async () => {
   protocol.handle('local-resource', (request) => {
     const url = request.url.replace('local-resource://', '');
     const filePath = path.join(app.getPath('userData'), decodeURIComponent(url));
-    return electronNet.fetch(pathToFileURL(filePath).toString());
+    return net.fetch(pathToFileURL(filePath).toString());
   });
 
   const protocolClient = process.execPath;
-  const args = !app.isPackaged && process.platform === 'win32' && process.argv[1]
-    ? [path.resolve(process.argv[1])]
-    : undefined;
+  const args = !app.isPackaged && process.platform === 'win32' && process.argv[1] ? [path.resolve(process.argv[1])] : undefined;
   app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
 
   if (PROFILE === 'default') {
