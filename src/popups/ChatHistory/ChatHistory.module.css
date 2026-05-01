@@ -198,7 +198,7 @@
 
 .message-date {
   display: flex;
-  align-items: end;
+  align-items: flex-end;
   width: 95%;
   height: 40px;
   padding-bottom: 0.5rem;
