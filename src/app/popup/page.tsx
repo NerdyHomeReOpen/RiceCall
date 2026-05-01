@@ -9,7 +9,7 @@ import * as ipc from '@/main/ipc';
 
 import { POPUP_CONFIGS } from '@/configs/popup';
 
-import PopupSocketManager from '@/components/PopupSocketManager';
+import StoreSyncer from '@/components/StoreSyncer';
 import PopupHeader from '@/components/PopupHeader';
 
 import About from '@/popups/About';
@@ -168,7 +168,7 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
-      <PopupSocketManager />
+      <StoreSyncer.Slave />
       {popup && !popup.hideHeader && (
         <PopupHeader
           title={popup.title}

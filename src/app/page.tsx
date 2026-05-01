@@ -125,7 +125,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       <ActionScannerProvider>
         <ExpandedProvider>
           <SocketManager />
-          <StoreSyncer />
+          <StoreSyncer.Master />
           <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
           {!user.userId || !isSocketConnected ? (
             <LoadingSpinner />
