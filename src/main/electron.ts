@@ -132,7 +132,7 @@ export function setTrayDetail(isLogin?: boolean) {
 
   if (isLogin !== undefined) _isLogin = isLogin;
 
-  const trayIconPath = isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
+  const trayIconPath = _isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
   const contextMenu = Menu.buildFromTemplate([
     {
       id: 'open-main-window',
