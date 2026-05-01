@@ -1,6 +1,7 @@
 import net from 'net';
 import path from 'path';
-import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray, dialog } from 'electron';
+import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray, dialog, net as electronNet } from 'electron';
+import { pathToFileURL } from 'url';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
 const { autoUpdater } = ElectronUpdater;
 import serve from 'electron-serve';
@@ -38,14 +39,34 @@ import { registerWindowHandlers } from '@/main/window/electron';
 
 import { POPUP_SIZES, POPUP_BEHAVIORS } from '@/configs/popup';
 
+export const PROFILE = (() => {
+  const arg = process.argv.find((a) => a.startsWith('--profile='));
+  const value = arg ? arg.slice('--profile='.length).trim() : '';
+  return value || 'default';
+})();
+
+if (PROFILE !== 'default') {
+  app.setPath('userData', path.join(app.getPath('appData'), `RiceCall-${PROFILE}`));
+}
+
+if (!app.requestSingleInstanceLock()) {
+  app.quit();
+} else {
+  app.on('second-instance', (_, argv) => {
+    const url = argv.find((arg) => arg.startsWith('ricecall://'));
+    if (url) openDeepLink(url);
+  });
+}
+
 if (process.platform === 'linux') {
   app.commandLine.appendSwitch('--no-sandbox');
 }
 
 protocol.registerSchemesAsPrivileged([{ scheme: 'local-resource', privileges: { secure: true, supportFetchAPI: true, standard: true, bypassCSP: true, corsEnabled: true } }]);
 
-export const MAIN_TITLE = 'RiceCall';
-export const VERSION_TITLE = `RiceCall v${app.getVersion()}`;
+const PROFILE_SUFFIX = PROFILE === 'default' ? '' : ` (${PROFILE})`;
+export const MAIN_TITLE = `RiceCall${PROFILE_SUFFIX}`;
+export const VERSION_TITLE = `RiceCall v${app.getVersion()}${PROFILE_SUFFIX}`;
 export const DEV = process.argv.includes('--dev');
 export const PORT = 3000;
 export const PRELOAD_PATH = DEV ? path.join(app.getAppPath(), 'preload.ts') : path.join(app.getAppPath(), 'build', 'src', 'main', 'preload.js');
@@ -706,8 +727,22 @@ app.on('ready', async () => {
 
   await i18nReady;
 
-  configureAutoUpdater();
-  configureDiscordRPC();
+  protocol.handle('local-resource', (request) => {
+    const url = request.url.replace('local-resource://', '');
+    const filePath = path.join(app.getPath('userData'), decodeURIComponent(url));
+    return electronNet.fetch(pathToFileURL(filePath).toString());
+  });
+
+  const protocolClient = process.execPath;
+  const args = !app.isPackaged && process.platform === 'win32' && process.argv[1]
+    ? [path.resolve(process.argv[1])]
+    : undefined;
+  app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
+
+  if (PROFILE === 'default') {
+    configureAutoUpdater();
+    configureDiscordRPC();
+  }
   configureTray();
   configureLogger();
 
@@ -760,29 +795,6 @@ app.on('open-url', (event, url) => {
   event.preventDefault();
   openDeepLink(url);
 });
-
-app.whenReady().then(() => {
-  const protocolClient = process.execPath;
-  const args = process.platform === 'win32' ? [path.resolve(process.argv[1])] : undefined;
-
-  protocol.registerFileProtocol('local-resource', (request, callback) => {
-    const url = request.url.replace('local-resource://', '');
-    const filePath = path.join(app.getPath('userData'), decodeURIComponent(url));
-    callback({ path: filePath });
-  });
-
-  app.setAsDefaultProtocolClient('ricecall', app.isPackaged ? undefined : protocolClient, args);
-});
-
-if (!app.requestSingleInstanceLock()) {
-  const hasDeepLink = process.argv.find((arg) => arg.startsWith('ricecall://'));
-  if (hasDeepLink) app.quit();
-} else {
-  app.on('second-instance', (_, argv) => {
-    const url = argv.find((arg) => arg.startsWith('ricecall://'));
-    if (url) openDeepLink(url);
-  });
-}
 
 process.on('uncaughtException', (e) => {
   const error = e instanceof Error ? e : new Error('Unknown error');
