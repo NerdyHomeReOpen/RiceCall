@@ -109,8 +109,8 @@ RiceCall
 API_URL=http://localhost:4500 # Do not include the trailing slash
 WS_URL=http://localhost:4500 # Use the same URL if your server runs locally
 
-# Crowdin Settings (Optional)
-CROWDIN_DISTRIBUTION_HASH= # If not provided, will use local files (./src/i18n/locales/[lang]/[ns]) instead
+# i18n Settings (Required)
+I18N_BASE_URL= # Base URL of the static i18n server, e.g. https://your-host/locales — files are fetched from {I18N_BASE_URL}/{lng}/{ns}.json
 
 # Error Submission URL (Optional)
 ERROR_SUBMISSION_URL=https://error-submission.example.com # If not provided, errors will not be submitted

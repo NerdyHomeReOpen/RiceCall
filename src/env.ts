@@ -7,7 +7,8 @@ import Logger from '@/logger';
 type EnvType = {
   API_URL: string;
   WS_URL: string;
-  CROWDIN_DISTRIBUTION_HASH: string | undefined;
+  I18N_BASE_URL: string;
+  DOCS_BASE_URL: string;
   REACT_DEV_TOOLS_PATH: string | undefined;
   ERROR_SUBMISSION_URL: string | undefined;
 };
@@ -15,7 +16,8 @@ type EnvType = {
 const EnvSchema = z.object({
   API_URL: z.string(),
   WS_URL: z.string(),
-  CROWDIN_DISTRIBUTION_HASH: z.string().optional(),
+  I18N_BASE_URL: z.string().optional(),
+  DOCS_BASE_URL: z.string().optional(),
   REACT_DEV_TOOLS_PATH: z.string().optional(),
   ERROR_SUBMISSION_URL: z.string().optional(),
 });
@@ -27,7 +29,8 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
     ...process.env,
     API_URL: process.env.API_URL || '',
     WS_URL: process.env.WS_URL || '',
-    CROWDIN_DISTRIBUTION_HASH: process.env.CROWDIN_DISTRIBUTION_HASH || '',
+    I18N_BASE_URL: process.env.I18N_BASE_URL || '',
+    DOCS_BASE_URL: process.env.DOCS_BASE_URL || '',
     ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
   };
 
@@ -87,7 +90,8 @@ export default class Env {
       return {
         API_URL: '',
         WS_URL: '',
-        CROWDIN_DISTRIBUTION_HASH: undefined,
+        I18N_BASE_URL: '',
+        DOCS_BASE_URL: '',
         REACT_DEV_TOOLS_PATH: undefined,
         ERROR_SUBMISSION_URL: undefined,
       };

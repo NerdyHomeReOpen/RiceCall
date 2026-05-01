@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
   env: {
     API_URL: process.env.API_URL || '',
     WS_URL: process.env.WS_URL || '',
-    CROWDIN_DISTRIBUTION_HASH: process.env.CROWDIN_DISTRIBUTION_HASH || '',
+    I18N_BASE_URL: process.env.I18N_BASE_URL || '',
     ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
   },
   devIndicators: false,

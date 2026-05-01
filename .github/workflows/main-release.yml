@@ -60,6 +60,8 @@ jobs:
           echo "API_URL=${{ secrets.API_DEV_URL }}" >> .env.dev
           echo "WS_URL=${{ secrets.WS_URL }}" >> .env
           echo "WS_URL=${{ secrets.WS_DEV_URL }}" >> .env.dev
+          echo "DOCS_BASE_URL=${{ secrets.DOCS_BASE_URL }}" >> .env
+          echo "I18N_BASE_URL=${{ secrets.I18N_BASE_URL }}" >> .env
           echo "ERROR_SUBMISSION_URL=${{ secrets.ERROR_SUBMISSION_URL }}" >> .env
 
       - name: Build electron
