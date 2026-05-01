@@ -5,12 +5,10 @@ import type * as Types from '@/types';
 
 import Env from '@/env';
 
-const getBaseUrl = () => Env.get().I18N_BASE_URL;
-
 class HttpBackend {
   type = 'backend' as const;
   read(lng: string, ns: string, cb: (error: Error | null, data: Record<string, unknown> | null) => void) {
-    const baseUrl = getBaseUrl();
+    const baseUrl = Env.get().I18N_BASE_URL;
     if (!baseUrl) {
       cb(new Error('I18N_BASE_URL is not configured'), null);
       return;
