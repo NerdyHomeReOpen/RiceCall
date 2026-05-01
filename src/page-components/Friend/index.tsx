@@ -35,15 +35,15 @@ const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) 
 
   return (
     <main className={styles['friend-page']} style={display ? {} : { display: 'none' }}>
-      <header className={styles['friend-page-header']}>
+      <header className={styles['header']}>
         <FriendPageHeader />
       </header>
-      <main className={styles['friend-page-body']}>
-        <aside ref={sidebarRef} className={styles['friend-page-sidebar']}>
+      <main className={styles['body']}>
+        <aside ref={sidebarRef} className={styles['sidebar']}>
           <FriendPageSidebar />
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
-        <main className={styles['friend-page-content']}>
+        <main className={styles['content']}>
           <FriendPageContent />
         </main>
       </main>

@@ -73,7 +73,11 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
               <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
               <div className={styles['announcement-datail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
             </div>
-            {selectedAnn.attachmentUrl && <Image className={styles['banner']} src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />}
+            {selectedAnn.attachmentUrl && (
+              <div className={styles['banner']}>
+                <Image src={selectedAnn.attachmentUrl} alt="announcement" width={-1} height={-1} loading="lazy" draggable="false" />
+              </div>
+            )}
             <div className={styles['announcement-detail-content']}>
               <MarkdownContent markdownText={selectedAnn.content} />
             </div>

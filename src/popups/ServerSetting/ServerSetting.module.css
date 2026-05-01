@@ -8,32 +8,15 @@
 }
 
 .server-avatar-picture {
-  position: relative;
-  min-width: 100px;
-  min-height: 100px;
-  cursor: pointer;
-  object-fit: cover;
-  background-image: url('/logo_server_def.webp');
-  background-repeat: no-repeat;
-  background-position: center center;
-  background-size: cover;
+  width: 100px;
+  height: 100px;
   border: 1px solid var(--border);
-}
-
-.server-avatar-picture::before {
-  position: absolute;
-  top: -1px;
-  left: -1px;
-  z-index: 1;
-  min-width: 102px;
-  min-height: 102px;
-  content: '';
 }
 
 .wealth-coin-icon {
   display: block;
   width: 16px;
   height: 16px;
-  background-image: url('/golden_pea.webp');
+  background-image: url('/golden_pea.svg');
   background-size: cover;
 }

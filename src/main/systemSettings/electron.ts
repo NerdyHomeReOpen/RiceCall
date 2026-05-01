@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import { changeLanguage } from '@/i18n';
 
-import { store, getSettings, broadcast, isAutoLaunchEnabled, setAutoLaunch, mainWindow, getRegion, setTrayDetail } from '@/main/electron';
+import { store, getSettings, broadcast, isAutoLaunchEnabled, setAutoLaunch, mainWindow, getLanguage, setTrayDetail } from '@/main/electron';
 import { startCheckForUpdates, stopCheckForUpdates } from '@/main/auto-updater';
 
 export function registerSystemHandlers() {
@@ -385,7 +385,7 @@ export function registerSystemHandlers() {
     broadcast('update-channel', channel);
   });
 
-  ipcMain.on('set-language', (_, language: Types.LanguageKey = getRegion()) => {
+  ipcMain.on('set-language', (_, language: Types.LanguageKey = getLanguage()) => {
     store.set('language', language);
     changeLanguage(language);
     setTrayDetail();

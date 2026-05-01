@@ -56,14 +56,11 @@
 }
 
 .avatar-picture {
-  width: 45px;
-  height: 45px;
+  position: relative;
+  width: 40px;
+  height: 40px;
   margin-right: 15px;
   cursor: pointer;
-  background-image: url('/im/SecretaryLogo.webp');
-  background-position: center;
-  background-size: cover;
-  border: 1px solid var(--border);
 }
 
 .application-content-box {
@@ -127,7 +124,7 @@
 .direct-message-icon {
   width: 100%;
   height: 100%;
-  background-image: url('/icon_notice_chat.webp');
+  background-image: url('/icon_notice_chat.svg');
   background-position: center;
   background-position: 0 0;
   background-size: auto;

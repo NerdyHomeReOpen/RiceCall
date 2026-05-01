@@ -20,6 +20,8 @@ const ipcRendererHandlers = {
   socketSend: (...args) => ipcRenderer.send(...args),
   socketEmit: (...args) => ipcRenderer.invoke(...args),
   getInitialData: (id) => ipcRenderer.sendSync(`get-initial-data?id=${id}`),
+  syncStoreState: (state) => ipcRenderer.send('sync-store-state', state),
+  getStoreState: () => ipcRenderer.sendSync('get-store-state'),
   errorSubmit: (...args) => ipcRenderer.send('error-submit', ...args),
   exit: () => ipcRenderer.send('exit'),
   windowMinimize: (popupId) => ipcRenderer.send('window-control-minimize'),

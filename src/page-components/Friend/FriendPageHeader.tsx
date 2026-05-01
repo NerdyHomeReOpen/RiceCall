@@ -82,23 +82,25 @@ const FriendPageHeader: React.FC = React.memo(() => {
 
   return (
     <>
-      <Image className={styles['user-avatar-picture']} src={user.avatarUrl} alt={user.name} width={40} height={40} loading="lazy" draggable="false" />
-      <div className={styles['user-base-info']}>
-        <div className={styles['user-base-info-box']}>
+      <div className={styles['user-avatar']} datatype="">
+        <Image src={user.avatarUrl} alt="user_avatar" width={40} height={40} loading="lazy" draggable="false" />
+      </div>
+      <div className={styles['user-info']}>
+        <div className={styles['user-info-row']}>
           <div className={styles['level-icon']} />
           <LevelIcon level={user.level} xp={user.xp} requiredXp={user.requiredXp} showTooltip={true} />
           <div className={styles['wealth-icon']} />
           <div className={styles['wealth-value-text']}>{userWealth}</div>
           {userHasVip && <div className={`vip-icon vip-${user.vip}`} />}
         </div>
-        <div className={styles['user-base-info-box']}>
+        <div className={styles['user-info-row']}>
           <BadgeList badges={userBadges} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
       </div>
-      <div className={styles['user-signature-wrapper']}>
+      <div className={styles['user-signature']}>
         <textarea
           ref={signatureInputRef}
-          className={styles['user-signature-input']}
+          className={styles['signature-input']}
           defaultValue={user.signature}
           maxLength={100}
           placeholder={t('signature-placeholder')}
@@ -107,7 +109,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
           onCompositionStart={handleSignatureInputCompositionStart}
           onCompositionEnd={handleSignatureInputCompositionEnd}
         />
-        <div className="emoji-icon" onMouseDown={handleEmojiPickerClick} />
+        <div className={styles['emoji-btn']} onMouseDown={handleEmojiPickerClick} />
       </div>
     </>
   );

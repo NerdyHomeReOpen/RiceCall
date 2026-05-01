@@ -29,9 +29,13 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
 
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
-  const [section, setSection] = useState<number>(friendApplication ? 1 : 0); // 0: send, 1: sent, 2: edit
+  const [section, setSection] = useState<number>(friendApplication ? 1 : 0);
   const [friendGroupId, setFriendGroupId] = useState<Types.FriendGroup['friendGroupId']>('');
   const [applicationDesc, setApplicationDesc] = useState<Types.FriendApplication['description']>(friendApplication?.description || '');
+
+  const isSendSection = section === 0;
+  const isSentSection = section === 1;
+  const isEditSection = section === 2;
 
   const handleTargetNameClick = () => {
     Actions.openUserInfo(user.userId, target.userId);
@@ -49,7 +53,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
     setFriendGroupId(e.target.value);
   };
 
-  const handleModifyClick = () => {
+  const handleModifyBtnClick = () => {
     setSection(2);
   };
 
@@ -58,18 +62,22 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
     ipc.popup.close(id);
   };
 
-  const handleSubmitEditClick = () => {
+  const handleSubmitEditBtnClick = () => {
     Actions.editFriendApplication(target.userId, { description: applicationDesc });
     ipc.popup.close(id);
   };
 
-  const handleCloseClick = () => {
+  const handleConfirmBtnClick = () => {
+    ipc.popup.close(id);
+  };
+
+  const handleCancelBtnClick = () => {
     ipc.popup.close(id);
   };
 
   return (
     <div className="popup-wrapper">
-      {section === 0 && (
+      {isSendSection && (
         <SendSection
           target={target}
           friendGroups={friendGroups}
@@ -78,20 +86,20 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
           onTargetNameClick={handleTargetNameClick}
           onFriendGroupIdChange={handleFriendGroupIdChange}
           onApplicationDescChange={handleApplicationDescChange}
-          onCreateFriendGroup={handleCreateFriendGroupBtnClick}
-          onSubmitClick={handleSubmitClick}
-          onCloseClick={handleCloseClick}
+          onCreateFriendGroupBtnClick={handleCreateFriendGroupBtnClick}
+          onSubmitBtnClick={handleSubmitClick}
+          onCancelBtnClick={handleCancelBtnClick}
         />
       )}
-      {section === 1 && <SentSection target={target} onTargetNameClick={handleTargetNameClick} onModifyClick={handleModifyClick} onCloseClick={handleCloseClick} />}
-      {section === 2 && (
+      {isSentSection && <SentSection target={target} onTargetNameClick={handleTargetNameClick} onModifyBtnClick={handleModifyBtnClick} onConfirmBtnClick={handleConfirmBtnClick} />}
+      {isEditSection && (
         <EditSection
           target={target}
           applicationDesc={applicationDesc}
           onTargetNameClick={handleTargetNameClick}
           onApplicationDescChange={handleApplicationDescChange}
-          onSubmitClick={handleSubmitEditClick}
-          onCloseClick={handleCloseClick}
+          onSubmitBtnClick={handleSubmitEditBtnClick}
+          onCancelBtnClick={handleCancelBtnClick}
         />
       )}
     </div>

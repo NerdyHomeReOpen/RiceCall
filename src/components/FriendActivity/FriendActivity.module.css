@@ -12,6 +12,11 @@
   width: 100%;
 }
 
+.friend-activity-avatar {
+  width: 30px;
+  height: 30px;
+}
+
 .friend-activity-content {
   display: flex;
   flex: 1;

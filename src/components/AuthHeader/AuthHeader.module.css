@@ -17,7 +17,7 @@
   display: inline-block;
   min-width: 60px;
   min-height: 24px;
-  background-image: url('/login_logo_title.webp');
+  background-image: url('/login_logo_title.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -37,7 +37,7 @@
   min-width: 18px;
   min-height: 18px;
   content: '';
-  background-image: url('/rc_logo_small.webp');
+  background-image: url('/rc_logo_small.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
@@ -59,7 +59,7 @@
   min-width: 20px;
   min-height: 20px;
   cursor: pointer;
-  background-image: url('/Button_Minsize.webp');
+  background-image: url('/Button_Minsize.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -78,7 +78,7 @@
   min-width: 20px;
   min-height: 20px;
   cursor: pointer;
-  background-image: url('/Button_Close.webp');
+  background-image: url('/Button_Close.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;

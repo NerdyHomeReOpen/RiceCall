@@ -35,7 +35,7 @@
   min-width: 70px;
   min-height: 20px;
   content: '';
-  background-image: url('/channel/switch_arrow.webp');
+  background-image: url('/channel/switch_arrow.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -45,7 +45,7 @@
 .spliter {
   min-width: 2px;
   min-height: 16px;
-  background-image: url('/icon_v_split.webp');
+  background-image: url('/icon_v_split.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -78,7 +78,7 @@
   min-height: 16px;
   margin-right: 4px;
   content: '';
-  background-image: url('/mylocation.webp');
+  background-image: url('/mylocation.svg');
   background-repeat: no-repeat;
   background-size: auto;
 }

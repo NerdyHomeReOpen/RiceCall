@@ -18,6 +18,7 @@ import { useAppSelector } from '@/hooks/Store';
 
 import Header from '@/components/Header';
 import SocketManager from '@/components/SocketManager';
+import StoreSyncer from '@/components/StoreSyncer';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import NotificationToaster from '@/components/NotificationToaster';
 
@@ -124,6 +125,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       <ActionScannerProvider>
         <ExpandedProvider>
           <SocketManager />
+          <StoreSyncer />
           <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
           {!user.userId || !isSocketConnected ? (
             <LoadingSpinner />

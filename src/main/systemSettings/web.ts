@@ -2,7 +2,7 @@ import type * as Types from '@/types';
 
 import { SYSTEM_FONT_LIST } from '@/constants';
 
-import { store, eventEmitter, getSettings, getRegion } from '@/main/web';
+import { store, eventEmitter, getSettings, getLanguage as getLang } from '@/main/web';
 
 export function getSystemSettings() {
   return getSettings();
@@ -377,7 +377,7 @@ export function setUpdateChannel(channel: string = 'latest') {
   eventEmitter.emit('update-channel', channel);
 }
 
-export function setLanguage(language: string = getRegion()) {
+export function setLanguage(language: string = getLang()) {
   store.set('language', language);
   eventEmitter.emit('language', language);
 }

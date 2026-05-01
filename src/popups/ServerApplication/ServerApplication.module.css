@@ -9,7 +9,7 @@
   flex-direction: column;
   width: 320px;
   height: 150px;
-  background-image: url('/channel/BkgrdImageView.webp');
+  background-image: url('/channel/BkgrdImageView.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -23,7 +23,7 @@
   justify-content: space-evenly;
   width: 100%;
   height: 80px;
-  background-image: url('/channel/dialog_body_bg.webp');
+  background-image: url('/channel/dialog_body_bg.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -47,23 +47,23 @@
 }
 
 .button-item-box:nth-child(1) .button-item-icon {
-  background-image: url('/channel/widget_vote.webp');
+  background-image: url('/channel/widget_vote.svg');
 }
 
 .button-item-box:nth-child(2) .button-item-icon {
-  background-image: url('/channel/widget_chnEvent.webp');
+  background-image: url('/channel/widget_chnEvent.svg');
 }
 
 .button-item-box:nth-child(3) .button-item-icon {
-  background-image: url('/channel/widget_flower.webp');
+  background-image: url('/channel/widget_flower.svg');
 }
 
 .button-item-box:nth-child(4) .button-item-icon {
-  background-image: url('/channel/widget_lottery.webp');
+  background-image: url('/channel/widget_lottery.svg');
 }
 
 .button-item-box:nth-child(5) .button-item-icon {
-  background-image: url('/channel/widget_Show.webp');
+  background-image: url('/channel/widget_Show.svg');
 }
 
 .button-item-icon img {

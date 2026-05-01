@@ -174,6 +174,8 @@ export type IpcRendererHandlers = {
   webRTCSignalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: any }) => void;
   enableLoopbackAudio: () => Promise<void>;
   disableLoopbackAudio: () => Promise<void>;
+  syncStoreState: (state: Types.StoreStateSnapshot) => void;
+  getStoreState: () => Types.StoreStateSnapshot | null;
 };
 
 declare global {

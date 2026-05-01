@@ -197,6 +197,8 @@ export type RecordFormat = 'wav' | 'mp3';
 
 export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
 
+export type RegionKey = 'zh-TW' | 'zh-CN' | 'en-US';
+
 export type Popup = {
   id: string;
   type: PopupType;
@@ -536,6 +538,25 @@ export type Stage = {
 export type SFUDiagnosisInfo = {
   ip?: string;
   port?: number;
+};
+
+export type StoreStateSnapshot = {
+  user: User;
+  friends: Friend[];
+  friendActivities: FriendActivity[];
+  friendGroups: FriendGroup[];
+  friendApplications: FriendApplication[];
+  memberInvitations: MemberInvitation[];
+  servers: Server[];
+  currentServer: Server;
+  channels: (Channel | Category)[];
+  channelEvents: ChannelEvent[];
+  onlineMembers: OnlineMember[];
+  memberApplications: MemberApplication[];
+  currentChannel: Channel;
+  announcements: Announcement[];
+  notifications: Notification[];
+  recommendServers: RecommendServer[];
 };
 
 export * from './database';

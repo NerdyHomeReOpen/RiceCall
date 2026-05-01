@@ -1,6 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
@@ -173,7 +174,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserId
   return (
     <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <input type="checkbox" checked={isSelected} readOnly />
-      <div className={styles['friend-tab-avatar-picture']} style={{ backgroundImage: `url(${friend.avatarUrl})` }} />
+      <div className={styles['friend-tab-avatar-picture']}>
+        <Image src={friend.avatarUrl} alt="friend_avatar" width={25} height={25} loading="lazy" draggable="false" />
+      </div>
       <div className={styles['friend-tab-base-info-box']}>
         {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
         <div className={`${styles['friend-tab-name-text']} ${hasVip ? styles['vip'] : ''}`}>

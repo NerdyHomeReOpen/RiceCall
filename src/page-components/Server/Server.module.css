@@ -36,17 +36,14 @@
   display: flex;
   gap: 5px;
   align-items: center;
-  padding: 5px;
+  padding: 8px;
   border-bottom: 1px solid var(--border);
-}
-
-.server-avatar-box {
-  padding: 3px;
-  cursor: pointer;
 }
 
 .server-avatar-picture {
   position: relative;
+  width: 50px;
+  height: 50px;
   cursor: pointer;
   box-shadow: 0 2px 2px var(--shadow);
 }
@@ -59,7 +56,7 @@
   min-width: 52px;
   min-height: 52px;
   content: '';
-  background-image: url('/channel/server_logo_border.webp');
+  background-image: url('/channel/server_logo_border.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -84,7 +81,7 @@
 .server-verify-icon {
   min-width: 12px;
   min-height: 12px;
-  background-image: url('/icon_verify.webp');
+  background-image: url('/icon_verify.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -115,7 +112,7 @@
   min-height: 12px;
   margin-right: 2px;
   content: '';
-  background-image: url('/channel/ID.webp');
+  background-image: url('/channel/ID.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -135,7 +132,7 @@
   min-height: 12px;
   margin-right: 2px;
   content: '';
-  background-image: url('/channel/member.webp');
+  background-image: url('/channel/member.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -152,7 +149,7 @@
   min-width: 20px;
   min-height: 16px;
   cursor: pointer;
-  background-image: url('/channel/icon_invite_friend.webp');
+  background-image: url('/channel/icon_invite_friend.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -170,7 +167,7 @@
   min-width: 24px;
   min-height: 16px;
   cursor: pointer;
-  background-image: url('/channel/icon_group_option.webp');
+  background-image: url('/channel/icon_group_option.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -189,7 +186,7 @@
   min-width: 24px;
   min-height: 24px;
   cursor: pointer;
-  background-image: url('/icon_notice_overlay.webp');
+  background-image: url('/icon_notice_overlay.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: cover;
@@ -202,7 +199,7 @@
 .server-option-saperator {
   min-width: 2px;
   min-height: 16px;
-  background-image: url('/icon_v_split.webp');
+  background-image: url('/icon_v_split.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -226,7 +223,7 @@
   min-width: 20px;
   min-height: 20px;
   margin-left: 5px;
-  background-image: url('/channel/NetworkStatusRTC.webp');
+  background-image: url('/channel/NetworkStatusRTC.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -257,7 +254,7 @@
 }
 
 .rtc-latency-icon.failed {
-  background-image: url('/pic_error.webp');
+  background-image: url('/pic_error.svg');
   background-size: contain;
 }
 
@@ -270,7 +267,7 @@
   min-width: 20px;
   min-height: 20px;
   margin-left: 8px;
-  background-image: url('/channel/NetworkStatus.webp');
+  background-image: url('/channel/NetworkStatus.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -292,7 +289,7 @@
 .queue-list-saperator {
   min-height: 8px;
   cursor: ns-resize;
-  background-image: url('/channel/chn_tree_split.webp');
+  background-image: url('/channel/chn_tree_split.svg');
   background-repeat: no-repeat;
   background-position: 50% 0;
 }
@@ -304,7 +301,7 @@
 
 .channel-list-saperator {
   min-height: 1px;
-  background-image: url('/channel/spliter_SpecialMenu.webp');
+  background-image: url('/channel/spliter_SpecialMenu.svg');
   background-repeat: no-repeat;
   background-position: 50% 0;
 }
@@ -348,7 +345,7 @@
 .server-page-sidebar-navegate-tab:first-child::before {
   min-width: 18px;
   min-height: 18px;
-  background-image: url('/channel/rdb_cur_channel.webp');
+  background-image: url('/channel/rdb_cur_channel.svg');
   background-position: 0 0;
   background-size: auto;
 }
@@ -356,7 +353,7 @@
 .server-page-sidebar-navegate-tab:last-child::before {
   min-width: 18px;
   min-height: 18px;
-  background-image: url('/channel/rdb_all_channel.webp');
+  background-image: url('/channel/rdb_all_channel.svg');
   background-position: 0 0;
   background-size: auto;
 }
@@ -371,7 +368,7 @@
   min-width: 70px;
   min-height: 20px;
   content: '';
-  background-image: url('/channel/switch_arrow.webp');
+  background-image: url('/channel/switch_arrow.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -436,7 +433,7 @@
 .widget-bar-spliter {
   width: 2px;
   height: 16px;
-  background-image: url('/channel/widgetbar_spliter.webp');
+  background-image: url('/channel/widgetbar_spliter.svg');
   background-repeat: no-repeat;
   background-position: center;
 }
@@ -485,21 +482,21 @@
 }
 
 .widget-bar-item-icon.announcement-icon {
-  background-image: url('/channel/widgetbar_bullet.webp');
+  background-image: url('/channel/widgetbar_bullet.svg');
 }
 
 .widget-bar-item-icon.show-icon {
-  background-image: url('/channel/widgetbar_rcshow.webp');
+  background-image: url('/channel/widgetbar_rcshow.svg');
 }
 
 .widget-bar-item-icon.more-icon {
-  background-image: url('/channel/widgetbar_more.webp');
+  background-image: url('/channel/widgetbar_more.svg');
 }
 
 .widget-bar-item-icon.arrow-down-icon {
   width: 20px;
   height: 16px;
-  background-image: url('/channel/widgetBar_Stretch.webp');
+  background-image: url('/channel/widgetBar_Stretch.svg');
 }
 
 .widget-bar-item-text {
@@ -567,7 +564,7 @@
   height: 18px;
   min-height: 18px;
   cursor: pointer;
-  background-image: url('/loading_close.webp');
+  background-image: url('/loading_close.svg');
   background-position: 0 0;
   background-size: cover;
   border: none;
@@ -595,10 +592,9 @@
   align-items: center;
   justify-content: space-between;
   padding: 4px 10px;
-  background-color: var(--background-secondary);
-  background-image: url('/channel/chn_toolbar_bg.webp');
-  background-repeat: no-repeat;
-  background-size: 100% 105%;
+  height: 55px;
+  width: 100%;
+  background-image: url('/channel/chn_toolbar_bg.svg');
 }
 
 .mic-button {
@@ -612,22 +608,22 @@
   padding: 0 10px;
   font-family: Arial, Helvetica, sans-serif;
   cursor: pointer;
-  background-image: url('/channel/mic_state_menu.webp');
+  background-image: url('/channel/mic_state_menu.svg');
   background-repeat: no-repeat;
   background-position: 0 2px;
   background-size: auto;
 }
 
 .mic-button.normal {
-  background-image: url('/channel/mic_state_normal.webp');
+  background-image: url('/channel/mic_state_normal.svg');
 }
 
 .mic-button.queuing {
-  background-image: url('/channel/mic_state_queuing.webp');
+  background-image: url('/channel/mic_state_queuing.svg');
 }
 
 .mic-button.speaking {
-  background-image: url('/channel/mic_state_speaking.webp');
+  background-image: url('/channel/mic_state_speaking.svg');
 }
 
 .mic-button:hover {
@@ -641,7 +637,7 @@
 .mic-button .mic-button-icon {
   min-width: 24px;
   min-height: 30px;
-  background-image: url('/channel/icon_mic_state.webp');
+  background-image: url('/channel/icon_mic_state.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -655,7 +651,7 @@
 }
 
 .mic-button.speaking:not(.muted) .mic-button-icon {
-  background-image: url('/channel/icon_speaking_vol.webp');
+  background-image: url('/channel/icon_speaking_vol.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }
@@ -720,7 +716,7 @@
   min-height: 7px;
   cursor: pointer;
   content: '';
-  background-image: url('/channel/icon_mic_triangle.webp');
+  background-image: url('/channel/icon_mic_triangle.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }
@@ -747,7 +743,7 @@
 .control-button-separator {
   min-width: 2px;
   min-height: 16px;
-  background-image: url('/icon_v_split.webp');
+  background-image: url('/icon_v_split.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: auto;
@@ -771,7 +767,7 @@
     min-height: 8px;
     cursor: pointer;
     content: '';
-    background-image: url('/channel/triangle.webp');
+    background-image: url('/channel/triangle.svg');
     background-repeat: no-repeat;
     background-position: 0 0;
     transform: rotate(180deg);
@@ -796,7 +792,7 @@
     min-width: 18px;
     min-height: 18px;
     content: '';
-    background-image: url('/channel/music_bkg.webp');
+    background-image: url('/channel/music_bkg.svg');
     background-repeat: no-repeat;
     background-position: 0 0;
   }
@@ -942,7 +938,7 @@
   min-width: 18px;
   min-height: 18px;
   cursor: pointer;
-  background-image: url('/channel/recorder.webp');
+  background-image: url('/channel/recorder.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 
@@ -958,7 +954,7 @@
     min-width: 28px;
     min-height: 28px;
     content: '';
-    background-image: url('/channel/recorder_bg.webp');
+    background-image: url('/channel/recorder_bg.svg');
     background-repeat: no-repeat;
     background-position: 0 0;
   }

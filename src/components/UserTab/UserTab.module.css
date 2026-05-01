@@ -40,7 +40,7 @@
   left: 0;
   min-width: 12px;
   min-height: 12px;
-  background-image: url('/channel/audioState.webp');
+  background-image: url('/channel/audioState.svg');
   background-repeat: no-repeat;
   background-position: -36px 0;
   background-size: auto;
@@ -63,7 +63,7 @@
 .user-text-state {
   min-width: 12px;
   min-height: 12px;
-  background-image: url('/channel/audioState.webp');
+  background-image: url('/channel/audioState.svg');
   background-repeat: no-repeat;
   background-position: -36px 0;
   background-size: auto;
@@ -79,7 +79,7 @@
   min-width: 15px;
   min-height: 15px;
   cursor: pointer;
-  background-image: url('/mylocation.webp');
+  background-image: url('/mylocation.svg');
   background-repeat: no-repeat;
   background-size: cover;
 }

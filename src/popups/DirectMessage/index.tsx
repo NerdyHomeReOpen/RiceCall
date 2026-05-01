@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 import { useEditor, EditorContent } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Color from '@tiptap/extension-color';
@@ -354,11 +355,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
       <div className="popup-body">
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
-            <div
-              className={`${styles['avatar-picture']} ${isFriend && !isOffline ? '' : styles['offline']}`}
-              style={{ backgroundImage: `url(${target.avatarUrl})` }}
-              onClick={handleTargetAvatarClick}
-            />
+            <div className={`${styles['avatar-picture']} ${isFriend && !isOffline ? '' : styles['offline']}`} onClick={handleTargetAvatarClick}>
+              <Image src={target.avatarUrl} alt="target_avatar" width={100} height={100} loading="lazy" draggable="false" />
+            </div>
             {hasVip && <div className={`vip-icon-big vip-${target.vip}`} />}
             <div className={styles['user-state-box']}>
               <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={false} />
@@ -367,7 +366,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
             </div>
           </div>
           <div className={styles['user-box']}>
-            <div className={`${styles['avatar-picture']}`} style={{ backgroundImage: `url(${user.avatarUrl})` }} onClick={handleUserAvatarClick} />
+            <div className={`${styles['avatar-picture']}`} onClick={handleUserAvatarClick}>
+              <Image src={user.avatarUrl} alt="user_avatar" width={100} height={100} loading="lazy" draggable="false" />
+            </div>
           </div>
         </div>
         <div className={styles['main-content']}>

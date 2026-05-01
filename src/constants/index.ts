@@ -159,6 +159,11 @@ export const LANGUAGES: { code: Types.LanguageKey; label: string }[] = [
   { code: 'fa-IR', label: 'فارسی' },
   { code: 'tr-TR', label: 'Türkçe' },
 ];
+export const REGIONS: { code: Types.RegionKey; label: string }[] = [
+  { code: 'zh-TW', label: '繁體中文' },
+  { code: 'zh-CN', label: '简体中文' },
+  { code: 'en-US', label: 'English' },
+];
 export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds
 export const INVITATION_BASE_URL = 'https://ricecall.com/join';
 export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';

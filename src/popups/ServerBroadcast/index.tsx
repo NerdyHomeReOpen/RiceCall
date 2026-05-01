@@ -58,7 +58,7 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
   return (
     <div className="popup-wrapper">
       <div className="popup-body">
-        <div className="content col">
+        <div className="dialog-content col">
           <div className="row">
             <div className="label">{t('receive-channel')}</div>
             <div className="input-box row" style={{ width: 'fit-content' }}>

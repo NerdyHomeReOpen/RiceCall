@@ -41,42 +41,42 @@
 }
 
 .direct-option-buttons .file-share {
-  background-image: url('/im/Fileshare.webp');
+  background-image: url('/im/Fileshare.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .direct-option-buttons .apply-friend {
-  background-image: url('/im/AddContact.webp');
+  background-image: url('/im/AddContact.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .direct-option-buttons .block-user {
-  background-image: url('/im/BlockUser.webp');
+  background-image: url('/im/BlockUser.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .direct-option-buttons .un-block-user {
-  background-image: url('/im/UnblockUser.webp');
+  background-image: url('/im/UnblockUser.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .direct-option-buttons .invite-temp-group {
-  background-image: url('/im/InviteTempGroup.webp');
+  background-image: url('/im/InviteTempGroup.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
 }
 
 .direct-option-buttons .report {
-  background-image: url('/im/report.webp');
+  background-image: url('/im/report.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: contain;
@@ -108,14 +108,10 @@
 
 .avatar-picture {
   position: relative;
-  min-width: 100px;
-  min-height: 100px;
+  width: 100px;
+  height: 100px;
   margin: 10px;
   cursor: pointer;
-  background-image: url('/im/IMLogo.webp');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: cover;
 }
 
 .avatar-picture.offline {
@@ -130,7 +126,7 @@
   min-width: 120px;
   min-height: 120px;
   content: '';
-  background-image: url('/im/logoframe.webp');
+  background-image: url('/im/logoframe.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;
@@ -145,7 +141,7 @@
   width: 2px;
   height: 15px;
   margin: 0 10px;
-  background-image: url('/mf_spliter.webp');
+  background-image: url('/mf_spliter.svg');
   background-size: cover;
 }
 
@@ -181,7 +177,7 @@
   width: 100%;
   height: 22px;
   content: '';
-  background-image: url('/im/serverin_bkg.webp');
+  background-image: url('/im/serverin_bkg.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
@@ -198,7 +194,7 @@
 }
 
 .action-icon.in-server {
-  background-image: url('/im/server_in.webp');
+  background-image: url('/im/server_in.svg');
 }
 
 .action-title {
@@ -235,7 +231,7 @@
   justify-content: space-between;
   min-width: 100%;
   min-height: 30px;
-  background-image: url('/tool_bkg.webp');
+  background-image: url('/tool_bkg.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: 100%;
@@ -258,19 +254,19 @@
 }
 
 .input-area .top-bar .buttons .button.font {
-  background-image: url('/FontButton.webp');
+  background-image: url('/FontButton.svg');
 }
 
 .input-area .top-bar .buttons .button.emoji {
-  background-image: url('/FaceButton.webp');
+  background-image: url('/FaceButton.svg');
 }
 
 .input-area .top-bar .buttons .button.screen-shot {
-  background-image: url('/ScreenShot.webp');
+  background-image: url('/ScreenShot.svg');
 }
 
 .input-area .top-bar .buttons .button.nudge {
-  background-image: url('/im/Nudge.webp');
+  background-image: url('/im/Nudge.svg');
 }
 
 .input-area .top-bar .history-message {
@@ -287,7 +283,7 @@
   min-height: 18px;
   margin-right: 3px;
   content: '';
-  background-image: url('/im/history.webp');
+  background-image: url('/im/history.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
   background-size: contain;
@@ -357,7 +353,7 @@
   width: 17px;
   height: 16px;
   image-rendering: auto;
-  background-image: url('/official.webp');
+  background-image: url('/official.svg');
   background-repeat: no-repeat;
   background-position: center;
   background-size: cover;

@@ -1,6 +1,7 @@
 import React from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
@@ -79,7 +80,9 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
 
   return (
     <div className={styles['application']}>
-      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${application.avatarUrl})` }} onClick={handleSenderAvatarClick} />
+      <div className={styles['avatar-picture']} onClick={handleSenderAvatarClick}>
+        <Image src={application.avatarUrl} alt="sender_avatar" width={40} height={40} loading="lazy" draggable="false" />
+      </div>
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>
           <div className={styles['user-name-text']}>{application.name}</div>

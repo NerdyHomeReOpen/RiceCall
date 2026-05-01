@@ -53,7 +53,9 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
 
   return (
     <div className={styles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <Image className={styles['server-card-avatar-picture']} src={recommendServer.avatarUrl} alt={recommendServer.name} width={70} height={70} loading="lazy" draggable="false" />
+      <div className={styles['server-card-avatar-picture']}>
+        <Image src={recommendServer.avatarUrl} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
+      </div>
       <div className={styles['server-card-info-text']}>
         <div className={styles['server-card-name-text']}>{recommendServer.name}</div>
         <div className={styles['server-card-id-text']}>{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>

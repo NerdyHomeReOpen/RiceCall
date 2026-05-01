@@ -29,7 +29,7 @@
 .invitation-headers .icon {
   width: 15px;
   height: 15px;
-  background-image: url('/im/invitenotify.webp');
+  background-image: url('/im/invitenotify.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;

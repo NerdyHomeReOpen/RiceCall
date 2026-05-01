@@ -27,7 +27,7 @@
   width: 16px;
   height: 16px;
   background-color: var(--background);
-  background-image: url('/icon_search.webp');
+  background-image: url('/icon_search.svg');
   background-position: 0 0;
   background-size: auto;
 }
@@ -40,7 +40,7 @@
   height: 13px;
   cursor: pointer;
   background-color: var(--background);
-  background-image: url('/channel/searchCancel.webp');
+  background-image: url('/channel/searchCancel.svg');
   background-position: 0 0;
   background-size: auto;
 }
@@ -89,7 +89,7 @@
 .server-search-dropdown-spliter {
   width: 150px;
   margin-top: 3px;
-  background-image: url('/ctrl/menu_spliter.webp');
+  background-image: url('/ctrl/menu_spliter.svg');
   background-repeat: no-repeat;
   background-size: contain;
 }
@@ -113,8 +113,8 @@
 }
 
 .server-search-dropdown-item-avatar-picture {
-  min-width: 40px;
-  min-height: 40px;
+  width: 40px;
+  height: 40px;
 }
 
 .server-search-dropdown-item-info-text {
@@ -141,7 +141,7 @@
   min-height: 12px;
   margin-right: 5px;
   content: '';
-  background-image: url('/channel/ID.webp');
+  background-image: url('/channel/ID.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }

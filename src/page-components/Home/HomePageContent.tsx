@@ -65,14 +65,21 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
         <div className={styles['banner-container']}>
           <div ref={containerRef} className={styles['banner-list']}>
             {filteredAnns.length > 0 ? (
-              filteredAnns.map((ann) => (
-                <div key={ann.announcementId} className={styles['banner']} style={ann.attachmentUrl ? { backgroundImage: `url(${ann.attachmentUrl})` } : {}} onClick={() => onAnnouncementSelect(ann)}>
-                  {!ann.attachmentUrl ? <DefaultAnnouncement announcement={ann} /> : null}
-                </div>
-              ))
+              filteredAnns.map((ann) =>
+                ann.attachmentUrl ? (
+                  <div key={ann.announcementId} className={styles['banner']} onClick={() => onAnnouncementSelect(ann)}>
+                    <Image src={ann.attachmentUrl} alt="announcement_attachment" width={100} height={100} loading="lazy" draggable="false" />
+                  </div>
+                ) : (
+                  <div key={ann.announcementId} className={styles['banner']} onClick={() => onAnnouncementSelect(ann)}>
+                    <Image loading="lazy" src="/ricecall_logo.svg" alt="ricecall logo" height={80} width={-1} />
+                    <span>{ann.title}</span>
+                  </div>
+                ),
+              )
             ) : (
               <div className={styles['banner']}>
-                <DefaultAnnouncement announcement={{} as Types.Announcement} />
+                <Image loading="lazy" src="/ricecall_logo.svg" alt="ricecall logo" height={80} width={-1} />
               </div>
             )}
           </div>
@@ -106,16 +113,3 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
 HomePageContent.displayName = 'HomePageContent';
 
 export default HomePageContent;
-
-interface DefaultAnnouncementProps {
-  announcement: Types.Announcement;
-}
-
-const DefaultAnnouncement: React.FC<DefaultAnnouncementProps> = React.memo(({ announcement }) => (
-  <>
-    <Image loading="lazy" src="/ricecall_logo.webp" alt="ricecall logo" height={80} width={-1} />
-    <span>{announcement.title}</span>
-  </>
-));
-
-DefaultAnnouncement.displayName = 'DefaultAnnouncement';

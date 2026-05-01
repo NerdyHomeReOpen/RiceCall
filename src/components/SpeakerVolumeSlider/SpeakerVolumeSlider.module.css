@@ -5,7 +5,7 @@
   height: 18px;
   min-height: 18px;
   cursor: pointer;
-  background-image: url('/channel/speaker.webp');
+  background-image: url('/channel/speaker.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 
@@ -14,7 +14,7 @@
     min-width: 18px;
     min-height: 18px;
     content: '';
-    background-image: url('/channel/speaker.webp');
+    background-image: url('/channel/speaker.svg');
     background-repeat: no-repeat;
     background-position: -18px 0;
     opacity: 0;

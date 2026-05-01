@@ -1,0 +1,35 @@
+.split {
+  width: 100%;
+  margin: 5px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.server-avatar {
+  position: relative;
+  align-self: center;
+  width: 40px;
+  height: 40px;
+  margin-right: 5px;
+}
+
+.server-avatar::before {
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  z-index: 1;
+  min-width: 42px;
+  min-height: 42px;
+  content: '';
+  background-image: url('/channel/server_logo_border.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+}
+
+.server-info {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-around;
+  height: 100%;
+}

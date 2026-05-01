@@ -37,7 +37,7 @@
   min-width: 13px;
   min-height: 13px;
   content: '';
-  background-image: url('/user_state.webp');
+  background-image: url('/user_state.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
 }

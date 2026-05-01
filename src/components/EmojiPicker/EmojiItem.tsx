@@ -1,5 +1,5 @@
-/* eslint-disable @next/next/no-img-element */
 import React from 'react';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
@@ -17,7 +17,7 @@ const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }
 
   return (
     <div className={styles['emoji']}>
-      <img src={emoji.path} alt={emoji.alt} width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
+      <Image src={emoji.path} alt="emoji" width={16} height={16} loading="lazy" draggable="false" onMouseDown={(e) => e.preventDefault()} onClick={handleClick} />
     </div>
   );
 });

@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 import { Permission } from '@/types';
@@ -31,9 +32,10 @@ interface ServerSettingPopupProps {
   id: string;
   server: Types.Server;
   serverMembers: Types.Member[];
+  memberApplications: Types.MemberApplication[];
 }
 
-const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData }) => {
+const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData, memberApplications: memberApplicationsData }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
@@ -53,11 +55,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     shallowEqual,
   );
 
-  const memberApplications = useAppSelector((state) => state.memberApplications.data, shallowEqual);
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
 
   const [server, setServer] = useState<Types.Server>(serverData);
   const [serverMembers, setServerMembers] = useState<Types.Member[]>(serverMembersData);
+  const [memberApplications, setMemberApplications] = useState<Types.MemberApplication[]>(memberApplicationsData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
   const [showPreview, setShowPreview] = useState(false);
   const [memberSortDirection, setMemberSortDirection] = useState<1 | -1>(-1);
@@ -301,6 +303,29 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     return () => unsub();
   }, []);
 
+  useEffect(() => {
+    const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args: { data: Types.MemberApplication }[]) => {
+      setMemberApplications((prev) => prev.concat(args.map((i) => i.data)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('serverMemberApplicationUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.MemberApplication> }[]) => {
+      const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
+      setMemberApplications((prev) => prev.map((ma) => (update.has(`${ma.userId}#${ma.serverId}`) ? { ...ma, ...update.get(`${ma.userId}#${ma.serverId}`) } : ma)));
+    });
+    return () => unsub();
+  }, []);
+
+  useEffect(() => {
+    const unsub = ipc.socket.on('serverMemberApplicationRemove', (...args: { userId: string; serverId: string }[]) => {
+      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
+      setMemberApplications((prev) => prev.filter((ma) => !remove.has(`${ma.userId}#${ma.serverId}`)));
+    });
+    return () => unsub();
+  }, []);
+
   return (
     <div className="popup-wrapper">
       <div className="popup-body">
@@ -343,7 +368,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </div>
               </div>
               <div className={styles['server-avatar-wrapper']}>
-                <div className={styles['server-avatar-picture']} style={{ backgroundImage: `url(${server.avatarUrl})` }} />
+                <div className={styles['server-avatar-picture']}>
+                  <Image src={server.avatarUrl} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
+                </div>
                 <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
                 {!isReadOnly ? (
                   <label htmlFor="avatar-upload" className="button" style={{ marginTop: '10px', height: '2em' }}>

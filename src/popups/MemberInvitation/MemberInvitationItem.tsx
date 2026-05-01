@@ -1,5 +1,6 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
+import Image from 'next/image';
 
 import type * as Types from '@/types';
 
@@ -26,7 +27,9 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
 
   return (
     <div className={styles['application']}>
-      <div className={styles['avatar-picture']} style={{ backgroundImage: `url(${invitation.avatarUrl})` }} />
+      <div className={styles['avatar-picture']}>
+        <Image src={invitation.avatarUrl} alt="sender_avatar" width={45} height={45} loading="lazy" draggable="false" />
+      </div>
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>
           <div className={styles['user-name-text']}>{invitation.name}</div>

@@ -25,7 +25,10 @@ export function cleanMenu(items: Types.ContextMenuItem[]): Types.ContextMenuItem
 
 export * from './color';
 export * from './default';
+export * from './encodeAudio';
+export * from './language';
 export * from './objDiff';
 export * from './platform';
+export * from './region';
 export * from './sorter';
 export * from './tagConverter';
