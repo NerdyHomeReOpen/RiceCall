@@ -59,6 +59,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   const cooldownRef = useRef<number>(0);
   const messageAreaRef = useRef<HTMLDivElement>(null);
 
+  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
+
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -77,8 +79,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
 
   const textLength = editor?.getText().length || 0;
   const isWarning = textLength > MAX_INPUT_LENGTH;
-  const isFriend = friend?.relationStatus === 2;
-  const isBlocked = friend?.isBlocked;
+  const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === 2) !== undefined;
+  const isBlocked = friends.find((f) => f.targetId === target.userId && f.isBlocked) !== undefined;
   const isOffline = target.status === 'offline';
   const hasVip = target.vip > 0;
   const badges = typeof target.badges === 'string' ? JSON.parse(target.badges) : target.badges;

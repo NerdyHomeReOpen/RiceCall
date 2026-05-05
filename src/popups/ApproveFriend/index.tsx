@@ -12,10 +12,10 @@ import { useAppSelector } from '@/hooks/Store';
 
 interface ApproveFriendPopupProps {
   id: string;
-  targetId: Types.User['userId'];
+  senderId: Types.User['userId'];
 }
 
-const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, targetId }) => {
+const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, senderId }) => {
   const { t } = useTranslation();
 
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
@@ -36,7 +36,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, 
   };
 
   const handleAddBtnClick = () => {
-    Actions.approveFriendApplication(targetId, friendGroupId || null, friendNotes);
+    Actions.approveFriendApplication(senderId, friendGroupId || null, friendNotes);
     ipc.popup.close(id);
   };
 

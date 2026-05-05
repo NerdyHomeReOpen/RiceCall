@@ -1,27 +1,20 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import * as Store from '@/store';
-
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector, useAppDispatch } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/Store';
 import { useChannelEventContextMenu } from '@/hooks/ContextMenus/ChannelEvent';
 
 import { getFormatDate } from '@/utils/language';
 
 import styles from './ChannelEvent.module.css';
 
-interface ChannelEventPopupProps {
-  channelEvents: Types.ChannelEvent[];
-}
-
-const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channelEvents: channelEventsData }) => {
+const ChannelEventPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
-  const dispatch = useAppDispatch();
 
   const [selectTab, setSelectTab] = useState<'current' | 'all'>('current');
   const [query, setQuery] = useState<string>('');
@@ -55,10 +48,6 @@ const ChannelEventPopup: React.FC<ChannelEventPopupProps> = React.memo(({ channe
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setQuery(e.target.value);
   };
-
-  useEffect(() => {
-    dispatch(Store.setChannelEvents(channelEventsData));
-  }, [channelEventsData, dispatch]);
 
   return (
     <div className="popup-wrapper">

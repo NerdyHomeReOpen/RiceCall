@@ -7,14 +7,14 @@ import type * as Types from '@/types';
 import styles from './InviteMember.module.css';
 
 interface EditSectionProps {
-  target: Types.Member;
+  receiverMember: Types.Member;
   invitationDesc: string;
   onInvitationDescChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmitBtnClick: () => void;
   onCancelBtnClick: () => void;
 }
 
-const EditSection: React.FC<EditSectionProps> = React.memo(({ target, invitationDesc, onInvitationDescChange, onSubmitBtnClick, onCancelBtnClick }) => {
+const EditSection: React.FC<EditSectionProps> = React.memo(({ receiverMember, invitationDesc, onInvitationDescChange, onSubmitBtnClick, onCancelBtnClick }) => {
   const { t } = useTranslation();
 
   return (
@@ -24,14 +24,14 @@ const EditSection: React.FC<EditSectionProps> = React.memo(({ target, invitation
           <div className="label">{t('invite-member-label')}</div>
           <div className="row">
             <div className={styles['member-avatar']}>
-              <Image src={target.avatarUrl} alt="target_avatar" width={40} height={40} loading="lazy" draggable="false" />
+              <Image src={receiverMember.avatarUrl} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className={styles['member-info']}>
               <div className="link-text">
-                {target.name} ({target.displayId})
+                {receiverMember.name} ({receiverMember.displayId})
               </div>
               <div className="sub-text">
-                {t('contribution')}: {target.contribution}
+                {t('contribution')}: {receiverMember.contribution}
               </div>
             </div>
           </div>

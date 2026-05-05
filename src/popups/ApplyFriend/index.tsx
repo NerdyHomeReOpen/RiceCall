@@ -15,11 +15,11 @@ import EditSection from './EditSection';
 
 interface ApplyFriendPopupProps {
   id: string;
-  target: Types.User;
+  receiver: Types.User;
   friendApplication: Types.FriendApplication | null;
 }
 
-const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, target, friendApplication }) => {
+const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, receiver, friendApplication }) => {
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -37,8 +37,8 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
   const isSentSection = section === 1;
   const isEditSection = section === 2;
 
-  const handleTargetNameClick = () => {
-    Actions.openUserInfo(user.userId, target.userId);
+  const handleReceiverNameClick = () => {
+    Actions.openUserInfo(user.userId, receiver.userId);
   };
 
   const handleCreateFriendGroupBtnClick = () => {
@@ -58,12 +58,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
   };
 
   const handleSubmitClick = () => {
-    Actions.sendFriendApplication(target.userId, { description: applicationDesc }, friendGroupId || null);
+    Actions.sendFriendApplication(receiver.userId, { description: applicationDesc }, friendGroupId || null);
     ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
-    Actions.editFriendApplication(target.userId, { description: applicationDesc });
+    Actions.editFriendApplication(receiver.userId, { description: applicationDesc });
     ipc.popup.close(id);
   };
 
@@ -79,11 +79,11 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
     <div className="popup-wrapper">
       {isSendSection && (
         <SendSection
-          target={target}
+          receiver={receiver}
           friendGroups={friendGroups}
           friendGroupId={friendGroupId}
           applicationDesc={applicationDesc}
-          onTargetNameClick={handleTargetNameClick}
+          onReceiverNameClick={handleReceiverNameClick}
           onFriendGroupIdChange={handleFriendGroupIdChange}
           onApplicationDescChange={handleApplicationDescChange}
           onCreateFriendGroupBtnClick={handleCreateFriendGroupBtnClick}
@@ -91,12 +91,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, targ
           onCancelBtnClick={handleCancelBtnClick}
         />
       )}
-      {isSentSection && <SentSection target={target} onTargetNameClick={handleTargetNameClick} onModifyBtnClick={handleModifyBtnClick} onConfirmBtnClick={handleConfirmBtnClick} />}
+      {isSentSection && <SentSection receiver={receiver} onReceiverNameClick={handleReceiverNameClick} onModifyBtnClick={handleModifyBtnClick} onConfirmBtnClick={handleConfirmBtnClick} />}
       {isEditSection && (
         <EditSection
-          target={target}
+          receiver={receiver}
           applicationDesc={applicationDesc}
-          onTargetNameClick={handleTargetNameClick}
+          onReceiverNameClick={handleReceiverNameClick}
           onApplicationDescChange={handleApplicationDescChange}
           onSubmitBtnClick={handleSubmitEditBtnClick}
           onCancelBtnClick={handleCancelBtnClick}

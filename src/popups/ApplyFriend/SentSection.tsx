@@ -7,13 +7,13 @@ import type * as Types from '@/types';
 import styles from './ApplyFriend.module.css';
 
 interface SentSectionProps {
-  target: Types.User;
-  onTargetNameClick: () => void;
+  receiver: Types.User;
+  onReceiverNameClick: () => void;
   onModifyBtnClick: () => void;
   onConfirmBtnClick: () => void;
 }
 
-const SentSection: React.FC<SentSectionProps> = React.memo(({ target, onTargetNameClick, onModifyBtnClick, onConfirmBtnClick }) => {
+const SentSection: React.FC<SentSectionProps> = React.memo(({ receiver, onReceiverNameClick, onModifyBtnClick, onConfirmBtnClick }) => {
   const { t } = useTranslation();
 
   return (
@@ -23,13 +23,13 @@ const SentSection: React.FC<SentSectionProps> = React.memo(({ target, onTargetNa
           <div className="label">{t('apply-friend-label')}</div>
           <div className="row">
             <div className={styles['user-avatar']}>
-              <Image src={target.avatarUrl} alt="target_avatar" width={40} height={40} loading="lazy" draggable="false" />
+              <Image src={receiver.avatarUrl} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className={styles['user-info']}>
-              <div className="link-text" onClick={onTargetNameClick}>
-                {target.name}
+              <div className="link-text" onClick={onReceiverNameClick}>
+                {receiver.name}
               </div>
-              <div className="sub-text">{target.displayId}</div>
+              <div className="sub-text">{receiver.displayId}</div>
             </div>
           </div>
           <div className={styles['split']} />

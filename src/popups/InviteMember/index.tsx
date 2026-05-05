@@ -13,11 +13,11 @@ import EditSection from './EditSection';
 interface InviteMemberPopupProps {
   id: string;
   serverId: Types.Server['serverId'];
-  target: Types.Member;
+  receiverMember: Types.Member;
   memberInvitation: Types.MemberInvitation | null;
 }
 
-const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, serverId, target, memberInvitation }) => {
+const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, serverId, receiverMember, memberInvitation }) => {
   const [section, setSection] = useState<number>(memberInvitation ? 1 : 0);
   const [invitationDesc, setInvitationDesc] = useState<string>(memberInvitation?.description || '');
 
@@ -34,12 +34,12 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
   };
 
   const handleSubmitBtnClick = () => {
-    Actions.sendMemberInvitation(target.userId, serverId, { description: invitationDesc });
+    Actions.sendMemberInvitation(receiverMember.userId, serverId, { description: invitationDesc });
     ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
-    Actions.editMemberInvitation(target.userId, serverId, { description: invitationDesc });
+    Actions.editMemberInvitation(receiverMember.userId, serverId, { description: invitationDesc });
     ipc.popup.close(id);
   };
 
@@ -55,17 +55,17 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
     <div className="popup-wrapper">
       {isSendSection && (
         <SendSection
-          target={target}
+          receiverMember={receiverMember}
           invitationDesc={invitationDesc}
           onInvitationDescChange={handleInvitationDescChange}
           onSubmitBtnClick={handleSubmitBtnClick}
           onCancelBtnClick={handleCancelBtnClick}
         />
       )}
-      {isSentSection && <SentSection target={target} onModifyBtnClick={handleModifyBtnClick} onConfirmBtnClick={handleConfirmBtnClick} />}
+      {isSentSection && <SentSection receiverMember={receiverMember} onModifyBtnClick={handleModifyBtnClick} onConfirmBtnClick={handleConfirmBtnClick} />}
       {isEditSection && (
         <EditSection
-          target={target}
+          receiverMember={receiverMember}
           invitationDesc={invitationDesc}
           onInvitationDescChange={handleInvitationDescChange}
           onSubmitBtnClick={handleSubmitEditBtnClick}

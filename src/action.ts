@@ -103,18 +103,18 @@ export function openSearchUser() {
   ipc.popup.open('searchUser', 'searchUser');
 }
 
-export async function openApplyFriend(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  await ipc.data.friendApplication({ receiverId: userId, senderId: targetId }).then((receivedFriendApplication) => {
+export async function openApplyFriend(senderId: Types.User['userId'], receiverId: Types.User['userId']) {
+  await ipc.data.friendApplication({ receiverId, senderId }).then((receivedFriendApplication) => {
     if (receivedFriendApplication) {
-      ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
+      ipc.popup.open('approveFriend', 'approveFriend', { senderId, receiverId });
     } else {
-      ipc.popup.open('applyFriend', 'applyFriend', { userId, targetId });
+      ipc.popup.open('applyFriend', 'applyFriend', { senderId, receiverId });
     }
   });
 }
 
-export function openApproveFriend(userId: Types.User['userId'], targetId: Types.User['userId']) {
-  ipc.popup.open('approveFriend', 'approveFriend', { userId, targetId });
+export function openApproveFriend(receiverId: Types.User['userId'], senderId: Types.User['userId']) {
+  ipc.popup.open('approveFriend', 'approveFriend', { receiverId, senderId });
 }
 
 export function openCreateFriendGroup() {
@@ -194,7 +194,7 @@ export function kickUsersFromServer(userIds: Types.User['userId'][], serverId: T
 }
 
 export function applyMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], isReceiveApply: boolean) {
-  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => {});
+  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => { });
   else openApplyMember(userId, serverId);
 }
 

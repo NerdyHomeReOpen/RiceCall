@@ -7,15 +7,15 @@ import type * as Types from '@/types';
 import styles from './ApplyFriend.module.css';
 
 interface EditSectionProps {
-  target: Types.User;
+  receiver: Types.User;
   applicationDesc: string;
-  onTargetNameClick: () => void;
+  onReceiverNameClick: () => void;
   onApplicationDescChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
   onSubmitBtnClick: () => void;
   onCancelBtnClick: () => void;
 }
 
-const EditSection: React.FC<EditSectionProps> = React.memo(({ target, applicationDesc, onTargetNameClick, onApplicationDescChange, onSubmitBtnClick, onCancelBtnClick }) => {
+const EditSection: React.FC<EditSectionProps> = React.memo(({ receiver, applicationDesc, onReceiverNameClick, onApplicationDescChange, onSubmitBtnClick, onCancelBtnClick }) => {
   const { t } = useTranslation();
 
   return (
@@ -25,13 +25,13 @@ const EditSection: React.FC<EditSectionProps> = React.memo(({ target, applicatio
           <div className="label">{t('apply-friend-label')}</div>
           <div className="row">
             <div className={styles['user-avatar']}>
-              <Image src={target.avatarUrl} alt="target_avatar" width={40} height={40} loading="lazy" draggable="false" />
+              <Image src={receiver.avatarUrl} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className={styles['user-info']}>
-              <div className="link-text" onClick={onTargetNameClick}>
-                {target.name}
+              <div className="link-text" onClick={onReceiverNameClick}>
+                {receiver.name}
               </div>
-              <div className="sub-text">{target.displayId}</div>
+              <div className="sub-text">{receiver.displayId}</div>
             </div>
           </div>
           <div className={styles['split']} />
