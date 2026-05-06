@@ -1,14 +1,11 @@
 import dynamic from 'next/dynamic';
 import Image from 'next/image';
 import React, { useState } from 'react';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
 import * as Actions from '@/action';
-
-import { useAppSelector } from '@/hooks/Store';
 
 import HomePageHeader from './HomePageHeader';
 import HomePageContent from './HomePageContent';
@@ -27,14 +24,6 @@ interface HomePageProps {
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const { t } = useTranslation();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      currentServerId: state.user.data.currentServerId,
-    }),
-    shallowEqual,
-  );
-
   const [section, setSection] = useState<'home' | 'personal-exclusive'>('home');
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
 
@@ -42,7 +31,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const isPersonalExclusiveSection = section === 'personal-exclusive';
 
   const handleCreateServerClick = () => {
-    Actions.openCreateServer(user.userId);
+    Actions.openCreateServer();
   };
 
   const handlePersonalExclusiveSectionBtnClick = () => {

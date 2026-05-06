@@ -11,10 +11,10 @@ import styles from './ServerAnnouncement.module.css';
 
 interface ServerAnnouncementPopupProps {
   id: string;
-  announcement: Types.Server['announcement'];
+  serverAnnouncement: Types.Server['announcement'];
 }
 
-const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.memo(({ id, announcement }) => {
+const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.memo(({ id, serverAnnouncement }) => {
   const { t } = useTranslation();
 
   const handleCloseBtnClick = () => {
@@ -32,7 +32,7 @@ const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.me
         </div>
       </div>
       <div className={styles['containers']}>
-        <AnnouncementEditor announcement={announcement} showPreview={true} onChange={() => {}} />
+        <AnnouncementEditor announcement={serverAnnouncement} showPreview={true} onChange={() => {}} />
       </div>
     </div>
   );

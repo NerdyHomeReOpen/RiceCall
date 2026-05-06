@@ -227,8 +227,8 @@ export function openChangeTheme() {
   ipc.popup.open('changeTheme', 'changeTheme');
 }
 
-export function openChannelEvent(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelEvents: Types.ChannelEvent[]) {
-  ipc.popup.open('channelEvent', 'channelEvent', { userId, serverId, channelEvents });
+export function openChannelEvent() {
+  ipc.popup.open('channelEvent', 'channelEvent');
 }
 
 export function openChannelPassword(onSubmit: (password: string) => void) {
@@ -252,16 +252,16 @@ export function openCreateFriendGroup() {
   ipc.popup.open('createFriendGroup', 'createFriendGroup');
 }
 
-export function openCreateServer(userId: Types.User['userId']) {
-  ipc.popup.open('createServer', 'createServer', { userId });
+export function openCreateServer() {
+  ipc.popup.open('createServer', 'createServer');
 }
 
 export function openDirectMessage(userId: Types.User['userId'], targetId: Types.User['userId']) {
   ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
 }
 
-export function openEditChannelName(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], channelName: Types.Channel['name'] = '') {
-  ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId, channelName: channelName });
+export function openEditChannelName(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+  ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId });
 }
 
 export function openEditChannelOrder(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
@@ -285,8 +285,8 @@ export function openErrorDialog(error: Error, callback: () => void) {
   ipc.popup.onSubmit('dialogError', callback);
 }
 
-export function openFriendVerification(userId: Types.User['userId']) {
-  ipc.popup.open('friendVerification', 'friendVerification', { userId });
+export function openFriendVerification() {
+  ipc.popup.open('friendVerification', 'friendVerification');
 }
 
 export function openImageCropper(imageUnit8Array: Uint8Array, onSubmit: (imageUnit8Array: Uint8Array) => void) {
@@ -314,8 +314,8 @@ export function openMemberApplicationSetting(userId: Types.User['userId'], serve
   ipc.popup.open('memberApplicationSetting', 'memberApplicationSetting', { userId, serverId });
 }
 
-export function openMemberInvitation(userId: Types.User['userId']) {
-  ipc.popup.open('memberInvitation', 'memberInvitation', { userId });
+export function openMemberInvitation() {
+  ipc.popup.open('memberInvitation', 'memberInvitation');
 }
 
 export function openNetworkDiagnosis() {
@@ -326,8 +326,8 @@ export function openSearchUser() {
   ipc.popup.open('searchUser', 'searchUser');
 }
 
-export function openServerAnnouncement(announcement: Types.Server['announcement']) {
-  ipc.popup.open('serverAnnouncement', 'serverAnnouncement', { announcement });
+export function openServerAnnouncement(serverAnnouncement: Types.Server['announcement']) {
+  ipc.popup.open('serverAnnouncement', 'serverAnnouncement', { serverAnnouncement });
 }
 
 export function openServerApplication(userId: Types.User['userId'], serverId: Types.Server['serverId'], onSubmit: (action: string) => void) {

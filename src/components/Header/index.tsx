@@ -105,7 +105,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: true,
       contents: safeFriendApplications.map((fa) => fa.avatarUrl),
-      onClick: () => Actions.openFriendVerification(user.userId),
+      onClick: () => Actions.openFriendVerification(),
     },
     {
       id: 'member-invitation',
@@ -116,7 +116,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: true,
       contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
-      onClick: () => Actions.openMemberInvitation(user.userId),
+      onClick: () => Actions.openMemberInvitation(),
     },
     {
       id: 'system-notify',

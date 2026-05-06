@@ -72,7 +72,6 @@ const ServerPageContent: React.FC = React.memo(() => {
   const isQueueControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled), shallowEqual);
   const channelMessages = useAppSelector((state) => state.channelMessages.data, shallowEqual);
   const actionMessages = useAppSelector((state) => state.actionMessages.data, shallowEqual);
-  const channelEvents = useAppSelector((state) => state.channelEvents.data, shallowEqual);
   const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive, shallowEqual);
   const isRecording = useAppSelector((state) => state.webrtc.isRecording, shallowEqual);
   const recordTime = useAppSelector((state) => state.webrtc.recordTime, shallowEqual);
@@ -93,9 +92,6 @@ const ServerPageContent: React.FC = React.memo(() => {
     onCloseAnnouncement: () => setCentralAreaMode('none'),
   });
   const { buildContextMenu: buildMessageAreaContextMenu } = useMessageAreaContextMenu({
-    user,
-    currentServer,
-    channelEvents,
     onOpenAnnouncement: () => setCentralAreaMode('announcement'),
     onClearMessages: () => {
       dispatch(Store.clearChannelMessages());
@@ -175,7 +171,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   const handleWidgetMoreClick = () => {
     Actions.openServerApplication(user.userId, currentServer.serverId, (action) => {
       if (action === 'openShowFrame') setCentralAreaMode('show');
-      if (action === 'openChannelEvent') Actions.openChannelEvent(user.userId, currentServer.serverId, channelEvents);
+      if (action === 'openChannelEvent') Actions.openChannelEvent();
     });
     setIsWidgetExpanded(false);
   };

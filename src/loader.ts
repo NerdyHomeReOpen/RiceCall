@@ -29,14 +29,13 @@ export async function blockMember({ userId, serverId }: { userId: string; server
 }
 
 export async function channelSetting({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
-  const userPromise = Data.user({ userId });
   const serverPromise = Data.server({ userId, serverId });
   const channelPromise = Data.channel({ userId, serverId, channelId });
   const channelMembersPromise = Data.channelMembers({ serverId, channelId });
 
-  const [user, server, channel, channelMembers] = await Promise.all([userPromise, serverPromise, channelPromise, channelMembersPromise]);
+  const [server, channel, channelMembers] = await Promise.all([serverPromise, channelPromise, channelMembersPromise]);
 
-  return { userId, serverId, channelId, user, server, channel, channelMembers };
+  return { server, channel, channelMembers };
 }
 
 export async function createChannel({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
@@ -44,15 +43,15 @@ export async function createChannel({ userId, serverId, channelId }: { userId: s
 
   const [parent] = await Promise.all([parentPromise]);
 
-  return { userId, serverId, channelId, parent };
+  return { parent };
 }
 
-export async function directMessage({ userId, targetId, event, message }: { userId: string; targetId: string; event: 'directMessage' | 'shakeWindow'; message: unknown }) {
+export async function directMessage({ targetId, event, message }: { targetId: string; event: 'directMessage' | 'shakeWindow'; message: unknown }) {
   const targetPromise = Data.user({ userId: targetId });
 
   const [target] = await Promise.all([targetPromise]);
 
-  return { userId, targetId, target, event, message };
+  return { target, event, message };
 }
 
 export async function editChannelOrder({ userId, serverId }: { userId: string; serverId: string }) {
@@ -60,7 +59,7 @@ export async function editChannelOrder({ userId, serverId }: { userId: string; s
 
   const [channels] = await Promise.all([channelsPromise]);
 
-  return { userId, serverId, channels };
+  return { channels };
 }
 
 export async function editChannelName({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
@@ -68,7 +67,7 @@ export async function editChannelName({ userId, serverId, channelId }: { userId:
 
   const [channel] = await Promise.all([channelPromise]);
 
-  return { userId, serverId, channelId, channel };
+  return { channel };
 }
 
 export async function editFriendNote({ userId, targetId }: { userId: string; targetId: string }) {
@@ -76,7 +75,7 @@ export async function editFriendNote({ userId, targetId }: { userId: string; tar
 
   const [friend] = await Promise.all([friendPromise]);
 
-  return { userId, targetId, friend };
+  return { friend };
 }
 
 export async function editFriendGroupName({ userId, friendGroupId }: { userId: string; friendGroupId: string }) {
@@ -84,7 +83,7 @@ export async function editFriendGroupName({ userId, friendGroupId }: { userId: s
 
   const [friendGroup] = await Promise.all([friendGroupPromise]);
 
-  return { userId, friendGroupId, friendGroup };
+  return { friendGroup };
 }
 
 export async function editNickname({ userId, serverId }: { userId: string; serverId: string }) {
@@ -92,7 +91,7 @@ export async function editNickname({ userId, serverId }: { userId: string; serve
 
   const [member] = await Promise.all([memberPromise]);
 
-  return { userId, serverId, member };
+  return { member };
 }
 
 export async function inviteMember({ receiverId, serverId }: { receiverId: string; serverId: string }) {
@@ -101,7 +100,7 @@ export async function inviteMember({ receiverId, serverId }: { receiverId: strin
 
   const [receiverMember, memberInvitation] = await Promise.all([receiverMemberPromise, memberInvitationPromise]);
 
-  return { receiverId, serverId, receiverMember, memberInvitation };
+  return { receiverMember, memberInvitation };
 }
 
 export async function kickMemberFromServer({ userId, serverId }: { userId: string; serverId: string }) {
@@ -109,7 +108,7 @@ export async function kickMemberFromServer({ userId, serverId }: { userId: strin
 
   const [member] = await Promise.all([memberPromise]);
 
-  return { serverId, member };
+  return { member };
 }
 
 export async function kickMemberFromChannel({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) {
@@ -118,7 +117,7 @@ export async function kickMemberFromChannel({ userId, serverId, channelId }: { u
 
   const [member, channel] = await Promise.all([memberPromise, channelPromise]);
 
-  return { serverId, channel, member };
+  return { channel, member };
 }
 
 export async function memberApplicationSetting({ userId, serverId }: { userId: string; serverId: string }) {
@@ -126,7 +125,7 @@ export async function memberApplicationSetting({ userId, serverId }: { userId: s
 
   const [server] = await Promise.all([serverPromise]);
 
-  return { userId, serverId, server };
+  return { server };
 }
 
 export async function serverApplication({ userId, serverId }: { userId: string; serverId: string }) {
@@ -134,7 +133,7 @@ export async function serverApplication({ userId, serverId }: { userId: string; 
 
   const [server] = await Promise.all([serverPromise]);
 
-  return { userId, serverId, server };
+  return { server };
 }
 
 export async function serverSetting({ userId, serverId }: { userId: string; serverId: string }) {
@@ -144,7 +143,7 @@ export async function serverSetting({ userId, serverId }: { userId: string; serv
 
   const [server, serverMembers, memberApplications] = await Promise.all([serverPromise, serverMembersPromise, memberApplicationsPromise]);
 
-  return { userId, serverId, server, serverMembers, memberApplications };
+  return { server, serverMembers, memberApplications };
 }
 
 export async function systemSetting({ userId, systemSettings }: { userId: string; systemSettings: Types.SystemSettings }) {
@@ -152,14 +151,14 @@ export async function systemSetting({ userId, systemSettings }: { userId: string
 
   const [userSettings] = await Promise.all([userSettingsPromise]);
 
-  return { userId, userSettings, systemSettings };
+  return { userSettings, systemSettings };
 }
 
-export async function userInfo({ userId, targetId }: { userId: string; targetId: string }) {
+export async function userInfo({ targetId }: { targetId: string }) {
   const targetPromise = Data.user({ userId: targetId });
   const targetServersPromise = Data.servers({ userId: targetId });
 
   const [target, targetServers] = await Promise.all([targetPromise, targetServersPromise]);
 
-  return { userId, targetId, target, targetServers };
+  return { target, targetServers };
 }

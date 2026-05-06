@@ -18,11 +18,16 @@ export function registerPopupHandlers() {
     }
 
     const loader = Loader[type as keyof typeof Loader];
-    if (loader)
-      initialData = await loader({ ...initialData, systemSettings: getSettings() }).catch(() => {
+    if (loader) {
+      const loadedData = await loader({ ...initialData, systemSettings: getSettings() }).catch(() => {
         new Logger('System').error(`Cannot load ${type} data, aborting...`);
         return null;
       });
+      if (!loadedData) return;
+
+      initialData = { ...loadedData, ...initialData };
+    }
+
     if (!initialData) return;
 
     createPopup(type, id, initialData, force);
