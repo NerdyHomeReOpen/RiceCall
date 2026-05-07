@@ -68,17 +68,27 @@ async function checkCacheVersion(): Promise<void> {
 class HttpBackend {
   type = 'backend' as const;
   read(lng: string, ns: string, cb: (error: Error | null, data: Record<string, unknown> | null) => void) {
+    const cached = readCache(lng, ns);
+    if (cached) {
+      cb(null, cached);
+      return;
+    }
+
     const baseUrl = Env.get().I18N_BASE_URL;
     if (!baseUrl) {
       cb(new Error('I18N_BASE_URL is not configured'), null);
       return;
     }
+
     fetch(`${baseUrl.replace(/\/$/, '')}/${lng}/${ns}.json`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
         return res.json();
       })
-      .then((data: Record<string, unknown>) => cb(null, data))
+      .then((data: Record<string, unknown>) => {
+        writeCache(lng, ns, data);
+        cb(null, data);
+      })
       .catch((error: Error) => cb(error, null));
   }
 }
