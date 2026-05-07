@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 
-import * as Loader from '@/loader';
+import * as Loader from '@/api/loader';
 
 import { broadcast, closeAllPopups, createPopup, getSettings, popups } from '@/main/electron';
 

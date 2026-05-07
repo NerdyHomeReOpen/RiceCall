@@ -2,7 +2,7 @@ import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 
-import * as Loader from '@/loader';
+import * as Loader from '@/api/loader';
 
 import { createPopup, getSettings } from '@/main/web';
 import { eventEmitter } from '@/main/event';
