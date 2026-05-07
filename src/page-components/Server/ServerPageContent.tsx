@@ -7,9 +7,9 @@ import { Permission } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { openServerApplication, openChannelEvent, openServerAnnouncement } from '@/services';
 
 import { MESSAGE_VIERER_DEVIATION } from '@/constants';
 
@@ -169,9 +169,9 @@ const ServerPageContent: React.FC = React.memo(() => {
   };
 
   const handleWidgetMoreClick = () => {
-    Actions.openServerApplication(user.userId, currentServer.serverId, (action) => {
+    openServerApplication(user.userId, currentServer.serverId, (action) => {
       if (action === 'openShowFrame') setCentralAreaMode('show');
-      if (action === 'openChannelEvent') Actions.openChannelEvent();
+      if (action === 'openChannelEvent') openChannelEvent();
     });
     setIsWidgetExpanded(false);
   };
@@ -227,7 +227,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   }, [actionMessages]);
 
   useEffect(() => {
-    if (currentServer.serverId && currentServer.announcement) Actions.openServerAnnouncement(currentServer.announcement);
+    if (currentServer.serverId && currentServer.announcement) openServerAnnouncement(currentServer.announcement);
   }, [currentServer.serverId, currentServer.announcement]);
 
   useEffect(() => {

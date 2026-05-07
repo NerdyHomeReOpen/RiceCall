@@ -39,9 +39,12 @@ export function objDiff<T extends object>(newObj: Partial<T>, originalObj: T): P
 }
 
 export * from './color';
+export * from './contextMenu';
 export * from './default';
 export * from './encodeAudio';
+export * from './env';
 export * from './language';
+export * from './logger';
 export * from './platform';
 export * from './region';
 export * from './sorter';

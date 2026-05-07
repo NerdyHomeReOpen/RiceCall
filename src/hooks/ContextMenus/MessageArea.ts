@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import * as Actions from '@/action';
+import { openChannelEvent } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -14,7 +14,7 @@ export const useMessageAreaContextMenu = ({ onOpenAnnouncement, onClearMessages 
     () =>
       new ContextMenu()
         .addCleanUpMessageOption(onClearMessages)
-        .addOpenChannelEventOption(() => Actions.openChannelEvent())
+        .addOpenChannelEventOption(() => openChannelEvent())
         .addOpenAnnouncementOption(onOpenAnnouncement)
         .build(),
     [onClearMessages, onOpenAnnouncement],

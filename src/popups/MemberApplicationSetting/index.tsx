@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { editServer } from '@/services';
 
 interface MemberApplicationSettingPopupProps {
   id: string;
@@ -27,7 +27,7 @@ const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps
   };
 
   const handleConfirmBtnClick = () => {
-    Actions.editServer(server.serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
+    editServer(server.serverId, { receiveApply: !!serverReceiveApplication, applyNotice: serverApplyNote });
     ipc.popup.close(id);
   };
 

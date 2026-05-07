@@ -2,7 +2,7 @@ import React from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import * as Actions from '@/action';
+import { rejectAllMemberInvitation } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -16,7 +16,7 @@ const MemberInvitationPopup: React.FC = React.memo(() => {
   const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
 
   const handleRejectAllBtnClick = () => {
-    Actions.rejectAllMemberInvitation(memberInvitations);
+    rejectAllMemberInvitation(memberInvitations);
   };
 
   return (

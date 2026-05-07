@@ -7,7 +7,7 @@ import * as ipc from '@/main/ipc';
 
 import Logger from '@/utils/logger';
 
-import * as Actions from '@/action';
+import { openImageCropper } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -108,7 +108,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const image = e.target.files?.[0];
     if (!image) return;
     image.arrayBuffer().then((arrayBuffer) => {
-      Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+      openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         const buffer = imageUnit8Array.buffer;
         const imageUrl = await ipc.customThemes.saveImage(buffer as ArrayBuffer, 'custom_themes', 'theme', 'webp').catch((e) => {
           const error = e instanceof Error ? e : new Error('Unknown error');

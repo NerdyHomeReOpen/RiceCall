@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { editMember } from '@/services';
 
 interface EditNicknamePopupProps {
   id: string;
@@ -19,12 +19,12 @@ const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, se
   const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
   const handleConfirmBtnClick = () => {
-    Actions.editMember(member.userId, serverId, { nickname: memberNickname || null });
+    editMember(member.userId, serverId, { nickname: memberNickname || null });
     ipc.popup.close(id);
   };
 
   const handleApplyBtnClick = () => {
-    Actions.editMember(member.userId, serverId, { nickname: memberNickname || null });
+    editMember(member.userId, serverId, { nickname: memberNickname || null });
   };
 
   const handleCloseBtnClick = () => {

@@ -12,7 +12,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { sendMessage, openApplyFriend, blockUser, unblockUser, openUserInfo, openChatHistory, openAlertDialog } from '@/services';
 
 import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN } from '@/constants';
 
@@ -107,11 +107,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
-          ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+          ipc.api.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
               syncStyles();
@@ -130,7 +130,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInput.trim().length === 0) return;
-      Actions.sendMessage(target.userId, { type: 'dm', content: messageInput });
+      sendMessage(target.userId, { type: 'dm', content: messageInput });
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
       syncStyles();
     }
@@ -186,15 +186,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleApplyFriendBtnClick = () => {
-    Actions.openApplyFriend(user.userId, target.userId);
+    openApplyFriend(user.userId, target.userId);
   };
 
   const handleBlockUserBtnClick = () => {
-    Actions.blockUser(target.userId, target.name);
+    blockUser(target.userId, target.name);
   };
 
   const handleUnblockUserBtnClick = () => {
-    Actions.unblockUser(target.userId, target.name);
+    unblockUser(target.userId, target.name);
   };
 
   const handleReportBtnClick = () => {
@@ -202,11 +202,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleTargetAvatarClick = () => {
-    Actions.openUserInfo(user.userId, target.userId);
+    openUserInfo(user.userId, target.userId);
   };
 
   const handleUserAvatarClick = () => {
-    Actions.openUserInfo(user.userId, user.userId);
+    openUserInfo(user.userId, user.userId);
   };
 
   const handleServerNameClick = () => {
@@ -214,7 +214,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   };
 
   const handleMessageHistoryBtnClick = () => {
-    Actions.openChatHistory(user.userId, target.userId);
+    openChatHistory(user.userId, target.userId);
   };
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -243,7 +243,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
       setTargetCurrentServer(null);
       return;
     }
-    ipc.data.server({ userId: target.userId, serverId: targetCurrentServer.serverId }).then((server) => {
+    ipc.api.fetchServer({ userId: target.userId, serverId: targetCurrentServer.serverId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
   }, [target.userId, target.shareCurrentServer, targetCurrentServer, isBlocked, isFriend]);

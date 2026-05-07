@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { approveFriendApplication, openCreateFriendGroup } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -24,7 +24,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, 
   const [friendGroupId, setFriendGroupId] = useState<Types.FriendGroup['friendGroupId']>('');
 
   const handleCreateFriendGroupBtnClick = () => {
-    Actions.openCreateFriendGroup();
+    openCreateFriendGroup();
   };
 
   const handleFriendGroupIdChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -36,7 +36,7 @@ const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, 
   };
 
   const handleAddBtnClick = () => {
-    Actions.approveFriendApplication(senderId, friendGroupId || null, friendNotes);
+    approveFriendApplication(senderId, friendGroupId || null, friendNotes);
     ipc.popup.close(id);
   };
 

@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { openUserInfo, openCreateFriendGroup, sendFriendApplication, editFriendApplication } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -38,11 +38,11 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, rece
   const isEditSection = section === 2;
 
   const handleReceiverNameClick = () => {
-    Actions.openUserInfo(user.userId, receiver.userId);
+    openUserInfo(user.userId, receiver.userId);
   };
 
   const handleCreateFriendGroupBtnClick = () => {
-    Actions.openCreateFriendGroup();
+    openCreateFriendGroup();
   };
 
   const handleApplicationDescChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
@@ -58,12 +58,12 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, rece
   };
 
   const handleSubmitClick = () => {
-    Actions.sendFriendApplication(receiver.userId, { description: applicationDesc }, friendGroupId || null);
+    sendFriendApplication(receiver.userId, { description: applicationDesc }, friendGroupId || null);
     ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
-    Actions.editFriendApplication(receiver.userId, { description: applicationDesc });
+    editFriendApplication(receiver.userId, { description: applicationDesc });
     ipc.popup.close(id);
   };
 

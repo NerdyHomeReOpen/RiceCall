@@ -4,9 +4,9 @@ import { shallowEqual } from 'react-redux';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { connectChannel, moveAllUsersToChannel } from '@/services';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 import { useChannelContextMenu } from '@/hooks/ContextMenus/Channel';
@@ -110,7 +110,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   const handleTabDoubleClick = () => {
-    Actions.connectChannel(currentServer.serverId, category.channelId, canJoin, isPasswordNeeded);
+    connectChannel(currentServer.serverId, category.channelId, canJoin, isPasswordNeeded);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {
@@ -132,7 +132,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
     if (!currentChannelId || !userIds || userIds.length === 0) return;
     if (currentChannelId === category.channelId || isReadonlyChannel) return;
-    Actions.moveAllUsersToChannel(userIds, currentServer.serverId, category.channelId);
+    moveAllUsersToChannel(userIds, currentServer.serverId, category.channelId);
     e.dataTransfer.clearData();
   };
 

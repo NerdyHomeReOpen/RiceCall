@@ -1,14 +1,14 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 
 import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import { changeLanguage } from '@/i18n';
+import { changeLanguage, i18nReady } from '@/i18n';
 
 import Logger from '@/utils/logger';
 
@@ -25,6 +25,12 @@ interface ProvidersProps {
 }
 
 const ProvidersComponent = ({ children }: ProvidersProps) => {
+  const [i18nLoaded, setI18nLoaded] = useState(false);
+
+  useEffect(() => {
+    i18nReady.then(() => setI18nLoaded(true));
+  }, []);
+
   useEffect(() => {
     const changeFont = (font: string | null) => {
       new Logger('Font').info(`Font updated: ${font}`);
@@ -71,6 +77,8 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
     const unsub = ipc.systemSettings.language.onUpdate(changeLang);
     return () => unsub();
   }, []);
+
+  if (!i18nLoaded) return null;
 
   return (
     <Provider store={store}>

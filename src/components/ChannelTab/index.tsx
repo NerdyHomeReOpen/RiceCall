@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { connectChannel, moveAllUsersToChannel } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
@@ -113,7 +113,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   };
 
   const handleTabDoubleClick = () => {
-    Actions.connectChannel(currentServer.serverId, channel.channelId, canJoin, isPasswordNeeded);
+    connectChannel(currentServer.serverId, channel.channelId, canJoin, isPasswordNeeded);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {
@@ -135,7 +135,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
     const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
     if (!currentChannelId || !userIds || userIds.length === 0) return;
     if (currentChannelId === channel.channelId || isReadonlyChannel) return;
-    Actions.moveAllUsersToChannel(userIds, currentServer.serverId, channel.channelId);
+    moveAllUsersToChannel(userIds, currentServer.serverId, channel.channelId);
     e.dataTransfer.clearData();
   };
 

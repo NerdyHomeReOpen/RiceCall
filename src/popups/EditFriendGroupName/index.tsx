@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { editFriendGroup } from '@/services';
 
 interface EditFriendGroupNamePopupProps {
   id: string;
@@ -25,7 +25,7 @@ const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Actions.editFriendGroup(friendGroup.friendGroupId, { name: friendGroupName });
+    editFriendGroup(friendGroup.friendGroupId, { name: friendGroupName });
     handleCloseBtnClick();
   };
 

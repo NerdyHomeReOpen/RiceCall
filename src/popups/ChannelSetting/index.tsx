@@ -7,9 +7,9 @@ import { Permission } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { editChannel } from '@/services';
 
 import { MEMBER_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constants';
 
@@ -226,7 +226,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   };
 
   const handleConfirmBtnClick = () => {
-    Actions.editChannel(server.serverId, channel.channelId, objDiff(channel, channelData));
+    editChannel(server.serverId, channel.channelId, objDiff(channel, channelData));
     ipc.popup.close(id);
   };
 

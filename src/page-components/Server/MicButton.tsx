@@ -7,7 +7,7 @@ import { Permission } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { leaveQueue, joinQueue } from '@/services';
 
 import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
@@ -101,7 +101,7 @@ const MicButton: React.FC = React.memo(() => {
             id: 'untake-mic',
             label: t('untake-mic'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Actions.leaveQueue(currentServer.serverId, currentChannel.channelId),
+            onClick: () => leaveQueue(currentServer.serverId, currentChannel.channelId),
           },
         ]);
       } else if (permissionLevel >= Permission.ChannelMod) {
@@ -111,7 +111,7 @@ const MicButton: React.FC = React.memo(() => {
             id: 'take-mic-in-queue',
             label: t('take-mic-in-queue'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Actions.joinQueue(currentServer.serverId, currentChannel.channelId),
+            onClick: () => joinQueue(currentServer.serverId, currentChannel.channelId),
           },
           {
             id: 'separator',
@@ -121,17 +121,17 @@ const MicButton: React.FC = React.memo(() => {
             id: 'take-mic-directly',
             label: t('take-mic-directly'),
             show: isCurrentChannelQueueMode,
-            onClick: () => Actions.joinQueue(currentServer.serverId, currentChannel.channelId, -2),
+            onClick: () => joinQueue(currentServer.serverId, currentChannel.channelId, -2),
           },
         ]);
       } else {
-        Actions.joinQueue(currentServer.serverId, currentChannel.channelId);
+        joinQueue(currentServer.serverId, currentChannel.channelId);
       }
     } else {
       if (isMicTaken) {
-        Actions.leaveQueue(currentServer.serverId, currentChannel.channelId);
+        leaveQueue(currentServer.serverId, currentChannel.channelId);
       } else {
-        Actions.joinQueue(currentServer.serverId, currentChannel.channelId);
+        joinQueue(currentServer.serverId, currentChannel.channelId);
       }
     }
   };

@@ -3,9 +3,10 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { increaseUserQueueTime, moveUserQueuePositionUp, moveUserQueuePositionDown, removeUserFromQueue, clearQueue, openDirectMessage, openUserInfo, openApplyFriend, openEditNickname, forbidUserVoiceInChannel, forbidUserTextInChannel, openKickMemberFromChannel, openKickMemberFromServer, openBlockMember, terminateMember, openInviteMember } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
+
 import { useMemberManagementSubmenu } from '@/hooks/ContextMenus/MemberManagementSubmenu';
 
 interface UseQueueUserContextMenuProps {
@@ -37,37 +38,37 @@ export const useQueueUserContextMenu = ({ user, currentServer, currentChannel, q
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addIncreaseQueueTimeOption({ queuePosition: queueMember.position, permissionLevel }, () => Actions.increaseUserQueueTime(queueMember.userId, currentServer.serverId, currentChannel.channelId))
+        .addIncreaseQueueTimeOption({ queuePosition: queueMember.position, permissionLevel }, () => increaseUserQueueTime(queueMember.userId, currentServer.serverId, currentChannel.channelId))
         .addMoveUpQueueOption({ queuePosition: queueMember.position, permissionLevel }, () =>
-          Actions.moveUserQueuePositionUp(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.position - 1),
+          moveUserQueuePositionUp(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.position - 1),
         )
         .addMoveDownQueueOption({ queuePosition: queueMember.position, permissionLevel }, () =>
-          Actions.moveUserQueuePositionDown(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.position + 1),
+          moveUserQueuePositionDown(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.position + 1),
         )
-        .addRemoveFromQueueOption({ permissionLevel }, () => Actions.removeUserFromQueue(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.name))
-        .addClearQueueOption({ permissionLevel }, () => Actions.clearQueue(currentServer.serverId, currentChannel.channelId))
+        .addRemoveFromQueueOption({ permissionLevel }, () => removeUserFromQueue(queueMember.userId, currentServer.serverId, currentChannel.channelId, queueMember.name))
+        .addClearQueueOption({ permissionLevel }, () => clearQueue(currentServer.serverId, currentChannel.channelId))
         .addSeparator()
-        .addDirectMessageOption({ isSelf }, () => Actions.openDirectMessage(user.userId, queueMember.userId))
-        .addViewProfileOption(() => Actions.openUserInfo(user.userId, queueMember.userId))
-        .addAddFriendOption({ isSelf, isFriend }, () => Actions.openApplyFriend(user.userId, queueMember.userId))
+        .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, queueMember.userId))
+        .addViewProfileOption(() => openUserInfo(user.userId, queueMember.userId))
+        .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(user.userId, queueMember.userId))
         .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? onUnmuteUser(queueMember.userId) : onMuteUser(queueMember.userId)))
-        .addEditNicknameOptionWithNoIcon({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openEditNickname(queueMember.userId, currentServer.serverId))
+        .addEditNicknameOptionWithNoIcon({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(queueMember.userId, currentServer.serverId))
         .addSeparator()
         .addForbidVoiceOption({ permissionLevel, isSelf, isLowerLevel, isVoiceMuted: queueMember.isVoiceMuted }, () =>
-          Actions.forbidUserVoiceInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isVoiceMuted),
+          forbidUserVoiceInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isVoiceMuted),
         )
         .addForbidTextOption({ permissionLevel, isSelf, isLowerLevel, isTextMuted: queueMember.isTextMuted }, () =>
-          Actions.forbidUserTextInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isTextMuted),
+          forbidUserTextInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isTextMuted),
         )
         .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () =>
-          Actions.openKickMemberFromChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId),
+          openKickMemberFromChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId),
         )
-        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openKickMemberFromServer(queueMember.userId, currentServer.serverId))
-        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(queueMember.userId, currentServer.serverId))
+        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(queueMember.userId, currentServer.serverId))
+        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(queueMember.userId, currentServer.serverId))
         .addSeparator()
-        .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => Actions.terminateMember(user.userId, currentServer.serverId, t('self')))
+        .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => terminateMember(user.userId, currentServer.serverId, t('self')))
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
-          Actions.openInviteMember(queueMember.userId, currentServer.serverId),
+          openInviteMember(queueMember.userId, currentServer.serverId),
         )
         .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementSubmenu())
         .build(),

@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { editChannel } from '@/services';
 
 interface EditChannelNamePopupProps {
   id: string;
@@ -26,7 +26,7 @@ const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ 
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Actions.editChannel(serverId, channel.channelId, { name: channelName });
+    editChannel(serverId, channel.channelId, { name: channelName });
     handleCloseBtnClick();
   };
 

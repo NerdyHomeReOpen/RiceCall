@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openCreateServer } from '@/services';
 
 import HomePageHeader from './HomePageHeader';
 import HomePageContent from './HomePageContent';
@@ -31,7 +31,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const isPersonalExclusiveSection = section === 'personal-exclusive';
 
   const handleCreateServerClick = () => {
-    Actions.openCreateServer();
+    openCreateServer();
   };
 
   const handlePersonalExclusiveSectionBtnClick = () => {

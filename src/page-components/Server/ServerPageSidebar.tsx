@@ -5,9 +5,9 @@ import { useTranslation } from 'react-i18next';
 
 import { Permission } from '@/types';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { openInviteFriend, openServerSetting } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
@@ -106,7 +106,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   };
 
   const handleInviteFriendClick = () => {
-    Actions.openInviteFriend(user.userId, currentServer.serverId);
+    openInviteFriend(user.userId, currentServer.serverId);
   };
 
   const handleServerSettingClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -117,7 +117,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   };
 
   const handleServerAvatarClick = () => {
-    Actions.openServerSetting(user.userId, currentServer.serverId);
+    openServerSetting(user.userId, currentServer.serverId);
   };
 
   const handleChannelListContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

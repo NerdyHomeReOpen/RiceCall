@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { rejectAllFriendApplication, openApproveFriend, openDirectMessage, openUserInfo, rejectFriendApplication } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -19,7 +19,7 @@ const FriendVerificationPopup: React.FC = React.memo(() => {
   const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
 
   const handleRejectAllBtnClick = () => {
-    Actions.rejectAllFriendApplication(friendApplications);
+    rejectAllFriendApplication(friendApplications);
   };
 
   return (
@@ -63,19 +63,19 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
   );
 
   const handleSenderAvatarClick = () => {
-    Actions.openUserInfo(user.userId, application.senderId);
+    openUserInfo(user.userId, application.senderId);
   };
 
   const handleAcceptBtnClick = () => {
-    Actions.openApproveFriend(user.userId, application.senderId);
+    openApproveFriend(user.userId, application.senderId);
   };
 
   const handleRejectBtnClick = () => {
-    Actions.rejectFriendApplication(application.senderId, application.name);
+    rejectFriendApplication(application.senderId, application.name);
   };
 
   const handleDirectMessageBtnClick = () => {
-    Actions.openDirectMessage(user.userId, application.senderId);
+    openDirectMessage(user.userId, application.senderId);
   };
 
   return (

@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openUserInfo } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -13,7 +13,7 @@ interface UsePromptMessageContextMenuProps {
 
 export const usePromptMessageContextMenu = ({ user, contentMetadata }: UsePromptMessageContextMenuProps) => {
   const buildContextMenu = useCallback(
-    () => (contentMetadata && contentMetadata.userId ? new ContextMenu().addViewProfileOption(() => Actions.openUserInfo(user.userId, contentMetadata.userId)).build() : []),
+    () => (contentMetadata && contentMetadata.userId ? new ContextMenu().addViewProfileOption(() => openUserInfo(user.userId, contentMetadata.userId)).build() : []),
     [user, contentMetadata],
   );
 

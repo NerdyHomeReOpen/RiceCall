@@ -5,7 +5,7 @@ import { Permission } from '@/types';
 
 import ContextMenu from '@/utils/contextMenu';
 
-import * as Actions from '@/action';
+import { openDirectMessage, openUserInfo, openEditNickname, openBlockMember, terminateMember, editServerPermission } from '@/services';
 
 interface UseServerSettingMemberContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -20,19 +20,19 @@ export const useServerSettingMemberContextMenu = ({ user, server, member, permis
 
   const buildContextMenu = useCallback(() => {
     const submenuItems = new ContextMenu()
-      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => Actions.terminateMember(member.userId, server.serverId, member.name))
+      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => terminateMember(member.userId, server.serverId, member.name))
       .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
         member.permissionLevel >= Permission.ServerAdmin
-          ? Actions.editServerPermission(member.userId, server.serverId, { permissionLevel: 2 })
-          : Actions.editServerPermission(member.userId, server.serverId, { permissionLevel: 5 }),
+          ? editServerPermission(member.userId, server.serverId, { permissionLevel: 2 })
+          : editServerPermission(member.userId, server.serverId, { permissionLevel: 5 }),
       )
       .build();
 
     return new ContextMenu()
-      .addDirectMessageOption({ isSelf }, () => Actions.openDirectMessage(user.userId, member.userId))
-      .addViewProfileOption(() => Actions.openUserInfo(user.userId, member.userId))
-      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openEditNickname(member.userId, server.serverId))
-      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(member.userId, server.serverId))
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, member.userId))
+      .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(member.userId, server.serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(member.userId, server.serverId))
       .addSeparator()
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, submenuItems)
       .build();

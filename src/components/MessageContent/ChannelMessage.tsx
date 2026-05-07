@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import * as Actions from '@/action';
+import { openUserInfo } from '@/services';
 
 import { ALLOWED_MESSAGE_KEYS } from '@/constants';
 
@@ -82,7 +82,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   };
 
   const handleUsernameClick = () => {
-    Actions.openUserInfo(user.userId, messageGroup.userId);
+    openUserInfo(user.userId, messageGroup.userId);
   };
 
   return (

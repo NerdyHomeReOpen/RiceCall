@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { blockUserFromServer } from '@/services';
 
 import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constants';
 
@@ -78,7 +78,7 @@ const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = Reac
   };
 
   const handleConfirmBtnClick = () => {
-    Actions.blockUserFromServer(member.userId, serverId, Date.now() + getBlockTime());
+    blockUserFromServer(member.userId, serverId, Date.now() + getBlockTime());
     ipc.popup.close(id);
   };
 

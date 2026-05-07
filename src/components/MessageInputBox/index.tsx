@@ -12,7 +12,7 @@ import { Permission } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { openAlertDialog, sendChannelMessage } from '@/services';
 
 import { MAX_FILE_SIZE } from '@/constants';
 
@@ -142,11 +142,11 @@ const MessageInputBox: React.FC = React.memo(() => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
-          ipc.data.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+          ipc.api.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
               setStyles();
@@ -166,7 +166,7 @@ const MessageInputBox: React.FC = React.memo(() => {
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInputRef.current.trim().length === 0) return;
-      Actions.sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: messageInputRef.current });
+      sendChannelMessage(currentServer.serverId, currentChannel.channelId, { type: 'general', content: messageInputRef.current });
       setLastMessageTime(Date.now());
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
       setStyles();

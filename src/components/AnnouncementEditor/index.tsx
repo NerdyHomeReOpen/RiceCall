@@ -8,7 +8,7 @@ import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { openAlertDialog } from '@/services';
 
 import { FONT_LIST, MAX_FILE_SIZE } from '@/constants';
 
@@ -187,11 +187,11 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
-          ipc.data.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+          ipc.api.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
               syncStyles();

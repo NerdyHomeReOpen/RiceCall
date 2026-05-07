@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { editUserStatus, openUserInfo, openFriendVerification, openMemberInvitation } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useActionScanner } from '@/providers/ActionScanner';
@@ -24,7 +24,7 @@ interface HeaderProps {
 }
 
 const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) => {
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
   const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
   const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
 
@@ -78,7 +78,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
 
   const changeLanguage = (language: Types.LanguageKey) => {
     ipc.systemSettings.language.set(language);
-    i18n.changeLanguage(language);
   };
 
   const { buildContextMenu: buildHeaderContextMenu } = useHeaderContextMenu({
@@ -105,7 +104,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: true,
       contents: safeFriendApplications.map((fa) => fa.avatarUrl),
-      onClick: () => Actions.openFriendVerification(),
+      onClick: () => openFriendVerification(),
     },
     {
       id: 'member-invitation',
@@ -116,7 +115,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       showContentLength: true,
       showContent: true,
       contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
-      onClick: () => Actions.openMemberInvitation(),
+      onClick: () => openMemberInvitation(),
     },
     {
       id: 'system-notify',
@@ -156,7 +155,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
     showStatusDropdown(x, y, 'right-bottom', (status) => {
       setIsManualIdling(status !== 'online');
-      Actions.editUserStatus(status);
+      editUserStatus(status);
     });
   };
 
@@ -175,7 +174,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   };
 
   const handleNameClick = () => {
-    Actions.openUserInfo(user.userId, user.userId);
+    openUserInfo(user.userId, user.userId);
   };
 
   const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
@@ -185,7 +184,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   useEffect(() => {
     const next = isIdling ? 'idle' : 'online';
     if (user.status !== next && !isManualIdling) {
-      Actions.editUserStatus(next);
+      editUserStatus(next);
     }
   }, [isIdling, isManualIdling, user.status]);
 

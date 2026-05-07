@@ -8,9 +8,9 @@ import { Permission } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { openImageCropper, openAlertDialog, editServer, openMemberApplicationSetting, openUserInfo, approveMemberApplication, rejectMemberApplication } from '@/services';
 
 import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constants';
 
@@ -190,14 +190,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     const file = e.target.files?.[0];
     if (!file || isUploadingRef.current) return;
     file.arrayBuffer().then((arrayBuffer) => {
-      Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+      openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }
-        ipc.data.uploadImage({ folder: 'server', imageName: server.serverId, imageUnit8Array }).then((response) => {
+        ipc.api.uploadImage({ folder: 'server', imageName: server.serverId, imageUnit8Array }).then((response) => {
           if (response) {
             setServer((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
           }
@@ -256,12 +256,12 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   };
 
   const handleApplySettingBtnClick = () => {
-    Actions.openMemberApplicationSetting(user.userId, server.serverId);
+    openMemberApplicationSetting(user.userId, server.serverId);
   };
 
   const handleSaveBtnClick = () => {
     if (!canSubmit) return;
-    Actions.editServer(server.serverId, objDiff(server, serverData));
+    editServer(server.serverId, objDiff(server, serverData));
     ipc.popup.close(id);
   };
 
@@ -517,14 +517,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         id: 'view-profile',
                         label: t('view-profile'),
                         show: !isSelf,
-                        onClick: () => Actions.openUserInfo(user.userId, application.userId),
+                        onClick: () => openUserInfo(user.userId, application.userId),
                       },
                       {
                         id: 'accept-application',
                         label: t('accept-application'),
                         show: !isSelf && permissionLevel >= Permission.ServerAdmin,
                         onClick: () => {
-                          Actions.approveMemberApplication(application.userId, server.serverId);
+                          approveMemberApplication(application.userId, server.serverId);
                         },
                       },
                       {
@@ -532,7 +532,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         label: t('deny-application'),
                         show: !isSelf && permissionLevel >= Permission.ServerAdmin,
                         onClick: () => {
-                          Actions.rejectMemberApplication(application.userId, server.serverId);
+                          rejectMemberApplication(application.userId, server.serverId);
                         },
                       },
                     ];

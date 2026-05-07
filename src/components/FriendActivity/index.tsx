@@ -4,7 +4,7 @@ import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openUserInfo } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -27,7 +27,7 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
   const hasVip = friendActivity.vip > 0;
 
   const handleUserNameClick = () => {
-    Actions.openUserInfo(user.userId, friendActivity.userId);
+    openUserInfo(user.userId, friendActivity.userId);
   };
 
   return (

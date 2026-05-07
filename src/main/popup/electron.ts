@@ -4,8 +4,7 @@ import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 
-import * as Loader from '@/api/loader';
-
+import initialDataLoader from '@/main/popup/initialDataLoader';
 import { broadcast, closeAllPopups, createPopup, getSettings, popups } from '@/main/electron';
 
 export function registerPopupHandlers() {
@@ -17,15 +16,15 @@ export function registerPopupHandlers() {
       initialData = {};
     }
 
-    const loader = Loader[type as keyof typeof Loader];
+    const loader = initialDataLoader[type];
     if (loader) {
-      const loadedData = await loader({ ...initialData, systemSettings: getSettings() }).catch(() => {
+      const loadedData = await loader(initialData).catch(() => {
         new Logger('System').error(`Cannot load ${type} data, aborting...`);
         return null;
       });
       if (!loadedData) return;
 
-      initialData = { ...loadedData, ...initialData };
+      initialData = { ...loadedData, ...initialData, systemSettings: getSettings() };
     }
 
     if (!initialData) return;

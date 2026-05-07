@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openCreateChannel, kickUsersFromServer, openServerBroadcast, openEditChannelOrder } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -19,13 +19,13 @@ export const useChannelListContextMenu = ({ user, currentServer, currentChannel,
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addCreateChannelOption({ permissionLevel }, () => Actions.openCreateChannel(user.userId, currentServer.serverId, ''))
+        .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId, ''))
         .addSeparator()
-        .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => Actions.kickUsersFromServer(movableServerUserIds, currentServer.serverId))
+        .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServer.serverId))
         .addSeparator()
-        .addBroadcastOption({ permissionLevel }, () => Actions.openServerBroadcast(currentServer.serverId, currentChannel.channelId))
+        .addBroadcastOption({ permissionLevel }, () => openServerBroadcast(currentServer.serverId, currentChannel.channelId))
         .addSeparator()
-        .addEditChannelOrderOption({ permissionLevel }, () => Actions.openEditChannelOrder(user.userId, currentServer.serverId))
+        .addEditChannelOrderOption({ permissionLevel }, () => openEditChannelOrder(user.userId, currentServer.serverId))
         .build(),
     [user, currentServer, currentChannel, movableServerUserIds, permissionLevel],
   );

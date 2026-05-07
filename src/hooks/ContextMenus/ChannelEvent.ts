@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openUserInfo, openKickMemberFromServer, openBlockMember } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -20,9 +20,9 @@ export const useChannelEventContextMenu = ({ user, currentServer, event, permiss
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addViewProfileOption(() => Actions.openUserInfo(user.userId, event.userId))
-        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openKickMemberFromServer(event.userId, currentServer.serverId))
-        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(event.userId, currentServer.serverId))
+        .addViewProfileOption(() => openUserInfo(user.userId, event.userId))
+        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(event.userId, currentServer.serverId))
+        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(event.userId, currentServer.serverId))
         .build(),
     [user.userId, currentServer.serverId, event, permissionLevel, isSelf, isLowerLevel],
   );

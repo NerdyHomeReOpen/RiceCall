@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openServerSetting, favoriteServer, terminateMember } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -20,9 +20,9 @@ export const useServerCardContextMenu = ({ user, server, onJoinServer }: UseServ
     () =>
       new ContextMenu()
         .addJoinServerOption(onJoinServer)
-        .addViewServerInfoOption(() => Actions.openServerSetting(user.userId, server.serverId))
-        .addFavoriteServerOption({ isFavorite: server.favorite }, () => Actions.favoriteServer(server.serverId))
-        .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isSelf: true }, () => Actions.terminateMember(user.userId, server.serverId, t('self')))
+        .addViewServerInfoOption(() => openServerSetting(user.userId, server.serverId))
+        .addFavoriteServerOption({ isFavorite: server.favorite }, () => favoriteServer(server.serverId))
+        .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isSelf: true }, () => terminateMember(user.userId, server.serverId, t('self')))
         .build(),
     [user, server, onJoinServer, t],
   );

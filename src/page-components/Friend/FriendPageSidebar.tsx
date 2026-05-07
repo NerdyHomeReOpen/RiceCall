@@ -2,7 +2,7 @@ import React, { useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import * as Actions from '@/action';
+import { openCreateFriendGroup, openSearchUser } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -45,11 +45,11 @@ const FriendPageSidebar: React.FC = React.memo(() => {
   };
 
   const handleCreateFriendGroupBtnClick = () => {
-    Actions.openCreateFriendGroup();
+    openCreateFriendGroup();
   };
 
   const handleAddFriendBtnClick = () => {
-    Actions.openSearchUser();
+    openSearchUser();
   };
 
   return (

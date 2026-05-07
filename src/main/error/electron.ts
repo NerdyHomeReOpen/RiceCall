@@ -1,7 +1,6 @@
 import { ipcMain } from 'electron';
 
 import Logger from '@/utils/logger';
-
 import Env from '@/utils/env';
 
 import { createPopup } from '@/main/electron';

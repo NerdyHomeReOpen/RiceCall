@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openServerSetting } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -17,7 +17,7 @@ export const useRecommendServerContextMenu = ({ user, recommendServer, onJoinSer
     () =>
       new ContextMenu()
         .addJoinServerOption(onJoinServer)
-        .addViewServerInfoOption(() => Actions.openServerSetting(user.userId, recommendServer.serverId))
+        .addViewServerInfoOption(() => openServerSetting(user.userId, recommendServer.serverId))
         .build(),
     [user, recommendServer, onJoinServer],
   );

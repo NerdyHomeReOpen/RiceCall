@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { editFriend } from '@/services';
 
 interface EditFriendNotePopupProps {
   id: string;
@@ -22,7 +22,7 @@ const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ id
   };
 
   const handleSaveBtnClick = () => {
-    Actions.editFriend(friend.targetId, { note: friendNote });
+    editFriend(friend.targetId, { note: friendNote });
     handleCloseBtnClick();
   };
 

@@ -1,3 +1,4 @@
+import Logger from '@/utils/logger';
 import { isMain, isRenderer, isWebsite } from '@/utils/platform';
 
 export interface I18nStorageType {
@@ -123,7 +124,10 @@ export default class I18nStorage {
   }
 
   static get(): I18nStorageType {
-    if (!storage) throw new Error('[i18n] storage not initialized');
+    if (!storage) {
+      new Logger('I18nStorage').error('storage not initialized');
+      return new NoopStorage();
+    }
     return storage;
   }
 }

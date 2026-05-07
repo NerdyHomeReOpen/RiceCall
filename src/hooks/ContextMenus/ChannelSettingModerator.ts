@@ -5,7 +5,7 @@ import { Permission } from '@/types';
 
 import ContextMenu from '@/utils/contextMenu';
 
-import * as Actions from '@/action';
+import { openDirectMessage, openUserInfo, openEditNickname, openBlockMember, terminateMember, editChannelPermission, editServerPermission } from '@/services';
 
 interface UseChannelSettingModeratorContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -22,30 +22,30 @@ export const useChannelSettingModeratorContextMenu = ({ user, server, channel, m
   const buildContextMenu = useCallback(() => {
     const submenuItems = new ContextMenu()
       .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
-        Actions.terminateMember(moderator.userId, server.serverId, moderator.name),
+        terminateMember(moderator.userId, server.serverId, moderator.name),
       )
       .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
         moderator.permissionLevel >= Permission.ChannelMod
-          ? Actions.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
-          : Actions.editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
+          ? editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
+          : editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
       )
       .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
         moderator.permissionLevel >= Permission.ChannelAdmin
-          ? Actions.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
-          : Actions.editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
+          ? editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
+          : editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
       )
       .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
         moderator.permissionLevel >= Permission.ServerAdmin
-          ? Actions.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
-          : Actions.editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
+          ? editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
+          : editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
       )
       .build();
 
     return new ContextMenu()
-      .addDirectMessageOption({ isSelf }, () => Actions.openDirectMessage(user.userId, moderator.userId))
-      .addViewProfileOption(() => Actions.openUserInfo(user.userId, moderator.userId))
-      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openEditNickname(moderator.userId, server.serverId))
-      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(moderator.userId, server.serverId))
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, moderator.userId))
+      .addViewProfileOption(() => openUserInfo(user.userId, moderator.userId))
+      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(moderator.userId, server.serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(moderator.userId, server.serverId))
       .addSeparator()
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => { }, submenuItems)
       .build();

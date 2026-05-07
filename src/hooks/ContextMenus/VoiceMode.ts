@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { editChannel, controlQueue } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -21,16 +21,16 @@ export const useVoiceModeContextMenu = ({ currentServer, currentChannel, permiss
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
-        .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
+        .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
+        .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
         .addQueueSpeechOption(
           { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
-          () => Actions.editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),
+          () => editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),
           new ContextMenu()
             .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannel.forbidQueue }, () =>
-              Actions.editChannel(currentServer.serverId, currentChannel.channelId, { forbidQueue: !currentChannel.forbidQueue }),
+              editChannel(currentServer.serverId, currentChannel.channelId, { forbidQueue: !currentChannel.forbidQueue }),
             )
-            .addControlQueueOption({ permissionLevel, isQueueControlled }, () => Actions.controlQueue(currentServer.serverId, currentChannel.channelId))
+            .addControlQueueOption({ permissionLevel, isQueueControlled }, () => controlQueue(currentServer.serverId, currentChannel.channelId))
             .build(),
         )
         .build(),

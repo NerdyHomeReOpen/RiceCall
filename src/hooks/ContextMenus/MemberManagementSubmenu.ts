@@ -5,7 +5,7 @@ import { Permission } from '@/types';
 
 import ContextMenu from '@/utils/contextMenu';
 
-import * as Actions from '@/action';
+import { terminateMember, editChannelPermission, editServerPermission } from '@/services';
 
 interface UseMemberManagementSubmenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
@@ -23,22 +23,22 @@ export const useMemberManagementSubmenu = ({ user, currentServer, channel, membe
     () =>
       new ContextMenu()
         .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
-          Actions.terminateMember(member.userId, currentServer.serverId, member.name),
+          terminateMember(member.userId, currentServer.serverId, member.name),
         )
         .addSetChannelModOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
           member.permissionLevel >= Permission.ChannelMod
-            ? Actions.editChannelPermission(member.userId, currentServer.serverId, channel.channelId, { permissionLevel: 2 })
-            : Actions.editChannelPermission(member.userId, currentServer.serverId, channel.channelId, { permissionLevel: 3 }),
+            ? editChannelPermission(member.userId, currentServer.serverId, channel.channelId, { permissionLevel: 2 })
+            : editChannelPermission(member.userId, currentServer.serverId, channel.channelId, { permissionLevel: 3 }),
         )
         .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
           member.permissionLevel >= Permission.ChannelAdmin
-            ? Actions.editChannelPermission(member.userId, currentServer.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
-            : Actions.editChannelPermission(member.userId, currentServer.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
+            ? editChannelPermission(member.userId, currentServer.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
+            : editChannelPermission(member.userId, currentServer.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
         )
         .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
           member.permissionLevel >= Permission.ServerAdmin
-            ? Actions.editServerPermission(member.userId, currentServer.serverId, { permissionLevel: 2 })
-            : Actions.editServerPermission(member.userId, currentServer.serverId, { permissionLevel: 5 }),
+            ? editServerPermission(member.userId, currentServer.serverId, { permissionLevel: 2 })
+            : editServerPermission(member.userId, currentServer.serverId, { permissionLevel: 5 }),
         )
         .build(),
     [currentServer, channel, member, permissionLevel, isSelf, isLowerLevel],

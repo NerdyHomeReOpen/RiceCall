@@ -4,9 +4,9 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
-
 import * as ipc from '@/main/ipc';
+
+import { openCreateChannel, openEditChannelName, deleteChannel, editChannels } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -119,17 +119,17 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   const handleAddChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Actions.openCreateChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
+    openCreateChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleChangeChannelNameBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Actions.openEditChannelName(user.userId, serverId, selectedChannel?.channelId ?? '');
+    openEditChannelName(user.userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleDeleteChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    Actions.deleteChannel(serverId, selectedChannel?.channelId ?? '', selectedChannel?.name ?? '');
+    deleteChannel(serverId, selectedChannel?.channelId ?? '', selectedChannel?.name ?? '');
   };
 
   const handleMoveUpBtnClick = (e: React.MouseEvent) => {
@@ -159,7 +159,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Actions.editChannels(serverId, editedChannels);
+    editChannels(serverId, editedChannels);
     ipc.popup.close(id);
   };
 

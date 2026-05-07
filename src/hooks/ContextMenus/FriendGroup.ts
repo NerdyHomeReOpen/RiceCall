@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openEditFriendGroupName, deleteFriendGroup } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -15,8 +15,8 @@ export const useFriendGroupContextMenu = ({ user, friendGroup }: UseFriendGroupC
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addEditFriendGroupNameOption({ friendGroupId: friendGroup.friendGroupId }, () => Actions.openEditFriendGroupName(user.userId, friendGroup.friendGroupId))
-        .addDeleteFriendGroupOption({ friendGroupId: friendGroup.friendGroupId }, () => Actions.deleteFriendGroup(friendGroup.friendGroupId, friendGroup.name))
+        .addEditFriendGroupNameOption({ friendGroupId: friendGroup.friendGroupId }, () => openEditFriendGroupName(user.userId, friendGroup.friendGroupId))
+        .addDeleteFriendGroupOption({ friendGroupId: friendGroup.friendGroupId }, () => deleteFriendGroup(friendGroup.friendGroupId, friendGroup.name))
         .build(),
     [user, friendGroup],
   );

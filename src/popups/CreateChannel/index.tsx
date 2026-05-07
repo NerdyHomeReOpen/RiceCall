@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { createChannel } from '@/services';
 
 import { getDefaultChannel } from '@/utils/default';
 
@@ -28,7 +28,7 @@ const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, 
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Actions.createChannel(serverId, { name: channelName, categoryId: parent?.channelId || null });
+    createChannel(serverId, { name: channelName, categoryId: parent?.channelId || null });
     ipc.popup.close(id);
   };
 

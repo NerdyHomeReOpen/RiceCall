@@ -1,6 +1,6 @@
 import React from 'react';
 
-import * as Actions from '@/action';
+import { leaveServer } from '@/services';
 
 import styles from './Header.module.css';
 
@@ -24,7 +24,7 @@ const MainTabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect 
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
     if (!currentServerId) return;
-    Actions.leaveServer(currentServerId);
+    leaveServer(currentServerId);
   };
 
   if (tab.id === 'server' && !currentServerId) return null;

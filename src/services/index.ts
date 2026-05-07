@@ -1,6 +1,10 @@
+import packageJson from '../../package.json' with { type: 'json' };
+
 import { t } from 'i18next';
 
 import type * as Types from '@/types';
+
+import { post, get } from '@/api';
 
 import * as ipc from '@/main/ipc';
 
@@ -202,7 +206,7 @@ export function openAlertDialog(message: string, callback: () => void) {
 }
 
 export async function openApplyFriend(senderId: Types.User['userId'], receiverId: Types.User['userId']) {
-  await ipc.data.friendApplication({ receiverId, senderId }).then((receivedFriendApplication) => {
+  await ipc.api.fetchFriendApplication({ receiverId, senderId }).then((receivedFriendApplication) => {
     if (receivedFriendApplication) {
       ipc.popup.open('approveFriend', 'approveFriend', { senderId, receiverId });
     } else {
@@ -412,3 +416,272 @@ export function unblockUserFromChannel(userId: Types.User['userId'], serverId: T
 export function unblockUserFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']) {
   openAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipc.socket.send('unblockUserFromServer', { userId, serverId }));
 }
+
+type fetchUserParams = {
+  userId: string;
+};
+
+export async function fetchUser(params: fetchUserParams): Promise<Types.User | null> {
+  return await get(`/user?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchUserSettingsParams = {
+  userId: string;
+};
+
+export async function fetchUserSettings(params: fetchUserSettingsParams): Promise<Types.UserSetting | null> {
+  return await get(`/user?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchFriendParams = {
+  userId: string;
+  targetId: string;
+};
+
+export async function fetchFriend(params: fetchFriendParams): Promise<Types.Friend | null> {
+  return await get(`/friend?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchFriendsParams = {
+  userId: string;
+};
+
+export async function fetchFriends(params: fetchFriendsParams): Promise<Types.Friend[]> {
+  return (await get(`/friends?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchFriendActivitiesParams = {
+  userId: string;
+};
+
+export async function fetchFriendActivities(params: fetchFriendActivitiesParams): Promise<Types.FriendActivity[]> {
+  return (await get(`/friendActivities?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchFriendGroupParams = {
+  userId: string;
+  friendGroupId: string;
+};
+
+export async function fetchFriendGroup(params: fetchFriendGroupParams): Promise<Types.FriendGroup | null> {
+  return await get(`/friendGroup?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchFriendGroupsParams = {
+  userId: string;
+};
+
+export async function fetchFriendGroups(params: fetchFriendGroupsParams): Promise<Types.FriendGroup[]> {
+  return (await get(`/friendGroups?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchFriendApplicationParams = {
+  receiverId: string;
+  senderId: string;
+};
+
+export async function fetchFriendApplication(params: fetchFriendApplicationParams): Promise<Types.FriendApplication | null> {
+  return await get(`/friendApplication?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchFriendApplicationsParams = {
+  receiverId: string;
+};
+
+export async function fetchFriendApplications(params: fetchFriendApplicationsParams): Promise<Types.FriendApplication[]> {
+  return (await get(`/friendApplications?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchServerParams = {
+  userId: string;
+  serverId: string;
+};
+
+export async function fetchServer(params: fetchServerParams): Promise<Types.Server | null> {
+  return await get(`/server?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchServersParams = {
+  userId: string;
+};
+
+export async function fetchServers(params: fetchServersParams): Promise<Types.Server[]> {
+  return (await get(`/servers?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchServerMembersParams = {
+  serverId: string;
+};
+
+export async function fetchServerMembers(params: fetchServerMembersParams): Promise<Types.Member[]> {
+  return (await get(`/serverMembers?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchServerOnlineMembersParams = {
+  serverId: string;
+};
+
+export async function fetchServerOnlineMembers(params: fetchServerOnlineMembersParams): Promise<Types.OnlineMember[]> {
+  return (await get(`/serverOnlineMembers?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchChannelParams = {
+  userId: string;
+  serverId: string;
+  channelId: string;
+};
+
+export async function fetchChannel(params: fetchChannelParams): Promise<Types.Channel | null> {
+  return await get(`/channel?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchChannelsParams = {
+  userId: string;
+  serverId: string;
+};
+
+export async function fetchChannels(params: fetchChannelsParams): Promise<Types.Channel[]> {
+  return (await get(`/channels?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchChannelMembersParams = {
+  serverId: string;
+  channelId: string;
+};
+
+export async function fetchChannelMembers(params: fetchChannelMembersParams): Promise<Types.Member[]> {
+  return (await get(`/channelMembers?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchMemberParams = {
+  userId: string;
+  serverId: string;
+  channelId?: string;
+};
+
+export async function fetchMember(params: fetchMemberParams): Promise<Types.Member | null> {
+  return await get(`/member?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchMemberApplicationParams = {
+  userId: string;
+  serverId: string;
+};
+
+export async function fetchMemberApplication(params: fetchMemberApplicationParams): Promise<Types.MemberApplication | null> {
+  return await get(`/memberApplication?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchMemberApplicationsParams = {
+  serverId: string;
+};
+
+export async function fetchMemberApplications(params: fetchMemberApplicationsParams): Promise<Types.MemberApplication[]> {
+  return (await get(`/memberApplications?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchMemberInvitationParams = {
+  receiverId: string;
+  serverId: string;
+};
+
+export async function fetchMemberInvitation(params: fetchMemberInvitationParams): Promise<Types.MemberInvitation | null> {
+  return await get(`/memberInvitation?${new URLSearchParams(params).toString()}`);
+}
+
+type fetchMemberInvitationsParams = {
+  receiverId: string;
+};
+
+export async function fetchMemberInvitations(params: fetchMemberInvitationsParams): Promise<Types.MemberInvitation[]> {
+  return (await get(`/memberInvitations?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchNotificationsParams = {
+  region: string;
+};
+
+export async function fetchNotifications(params: fetchNotificationsParams): Promise<Types.Notification[]> {
+  return (await get(`/notifications?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchAnnouncementsParams = {
+  region: string;
+};
+
+export async function fetchAnnouncements(params: fetchAnnouncementsParams): Promise<Types.Announcement[]> {
+  return (await get(`/announcements?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type fetchRecommendServersParams = {
+  region: string;
+};
+
+export async function fetchRecommendServers(params: fetchRecommendServersParams): Promise<Types.RecommendServer[]> {
+  return (await get(`/recommendServers?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type uploadImageParams = {
+  folder: string;
+  imageName: string;
+  imageUnit8Array: Uint8Array;
+};
+
+export async function uploadImage(params: uploadImageParams): Promise<{ imageName: string; imageUrl: string } | null> {
+  const form = new FormData();
+  form.append('folder', params.folder);
+  form.append('imageName', params.imageName);
+  form.append('image', new Blob([params.imageUnit8Array], { type: 'image/webp' }), `${params.imageName}.svg`);
+  return await post('/upload/image', form);
+}
+
+type searchServerParams = {
+  query: string;
+};
+
+export async function searchServer(params: searchServerParams): Promise<Types.Server[]> {
+  return (await get(`/server/search?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type searchUserParams = {
+  query: string;
+};
+
+export async function searchUser(params: searchUserParams): Promise<Types.User[]> {
+  return (await get(`/user/search?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+type RegisterForm = {
+  account: string;
+  password: string;
+  email: string;
+  username: string;
+  locale: string;
+};
+
+export async function register(formData: RegisterForm): Promise<{ success: true; message: string } | { success: false }> {
+  const res = await post('/account/register', formData);
+  if (!res || typeof res !== 'object' || !('message' in res) || typeof res.message !== 'string') return { success: false };
+
+  return { success: true, message: res.message };
+}
+
+type LoginForm = {
+  account: string;
+  password: string;
+};
+
+export async function login(formData: LoginForm): Promise<{ success: true; token: string } | { success: false }> {
+  const res = await post('/account/login', { ...formData, version: packageJson.version });
+  if (!res || typeof res !== 'object' || !('token' in res) || typeof res.token !== 'string') return { success: false };
+
+  return { success: true, token: res.token };
+}
+
+export async function autoLogin(token: string): Promise<{ success: true; token: string } | { success: false }> {
+  const res = await post('/token/verify', { token, version: packageJson.version });
+  if (!res || typeof res !== 'object' || !('token' in res) || typeof res.token !== 'string') return { success: false };
+
+  return { success: true, token: res.token };
+}
+

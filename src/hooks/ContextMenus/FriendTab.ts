@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openDirectMessage, openUserInfo, openApplyFriend, openEditFriendNote, editFriend, unblockUser, blockUser, deleteFriend, deleteFriendApplication } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -22,10 +22,10 @@ export const useFriendTabContextMenu = ({ user, friend, friendGroups, defaultFri
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addDirectMessageOption({ isSelf }, () => Actions.openDirectMessage(user.userId, friend.targetId))
-        .addViewProfileOption(() => Actions.openUserInfo(user.userId, friend.targetId))
-        .addAddFriendOption({ isSelf, isFriend }, () => Actions.openApplyFriend(user.userId, friend.targetId))
-        .addEditNoteOption({ isSelf, isFriend }, () => Actions.openEditFriendNote(user.userId, friend.targetId))
+        .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, friend.targetId))
+        .addViewProfileOption(() => openUserInfo(user.userId, friend.targetId))
+        .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(user.userId, friend.targetId))
+        .addEditNoteOption({ isSelf, isFriend }, () => openEditFriendNote(user.userId, friend.targetId))
         .addSeparator()
         .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => { }, onNotifyFriendOnlineClick: () => { } }, () => { })
         .addEditFriendFriendGroupOption(
@@ -33,13 +33,13 @@ export const useFriendTabContextMenu = ({ user, friend, friendGroups, defaultFri
           () => { },
           new ContextMenu()
             .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) =>
-              Actions.editFriend(friend.targetId, { friendGroupId }),
+              editFriend(friend.targetId, { friendGroupId }),
             )
             .build(),
         )
-        .addBlockUserOption({ isSelf, isBlocked: friend.isBlocked }, () => (friend.isBlocked ? Actions.unblockUser(friend.targetId, friend.name) : Actions.blockUser(friend.targetId, friend.name)))
-        .addDeleteFriendOption({ isSelf, isFriend }, () => Actions.deleteFriend(friend.targetId, friend.name))
-        .addDeleteFriendApplicationOption({ isSelf, isPending }, () => Actions.deleteFriendApplication(friend.targetId))
+        .addBlockUserOption({ isSelf, isBlocked: friend.isBlocked }, () => (friend.isBlocked ? unblockUser(friend.targetId, friend.name) : blockUser(friend.targetId, friend.name)))
+        .addDeleteFriendOption({ isSelf, isFriend }, () => deleteFriend(friend.targetId, friend.name))
+        .addDeleteFriendApplicationOption({ isSelf, isPending }, () => deleteFriendApplication(friend.targetId))
         .build(),
     [user, friend, isSelf, isFriend, isStranger, isPending, friendGroups, defaultFriendGroup],
   );

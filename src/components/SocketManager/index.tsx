@@ -5,9 +5,9 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { openErrorDialog } from '@/services';
 
 import { REFRESH_REGION_INFO_INTERVAL } from '@/constants';
 
@@ -61,7 +61,7 @@ const SocketManager: React.FC = React.memo(() => {
     const userId = localStorage.getItem('userId');
     if (!userId) return;
 
-    ipc.data.userHotReload({ userId }).then((user) => {
+    ipc.api.fetchUserHotReload({ userId }).then((user) => {
       if (user) {
         dispatch(Store.setUser(user));
         dispatch(Store.setIsSocketConnected(true));
@@ -73,22 +73,22 @@ const SocketManager: React.FC = React.memo(() => {
     if (!user.userId) return;
 
     const refresh = async () => {
-      ipc.data.servers({ userId: user.userId }).then((servers) => {
+      ipc.api.fetchServers({ userId: user.userId }).then((servers) => {
         if (servers) dispatch(Store.setServers(servers));
       });
-      ipc.data.friends({ userId: user.userId }).then((friends) => {
+      ipc.api.fetchFriends({ userId: user.userId }).then((friends) => {
         if (friends) dispatch(Store.setFriends(friends));
       });
-      ipc.data.friendActivities({ userId: user.userId }).then((friendActivities) => {
+      ipc.api.fetchFriendActivities({ userId: user.userId }).then((friendActivities) => {
         if (friendActivities) dispatch(Store.setFriendActivities(friendActivities));
       });
-      ipc.data.friendGroups({ userId: user.userId }).then((friendGroups) => {
+      ipc.api.fetchFriendGroups({ userId: user.userId }).then((friendGroups) => {
         if (friendGroups) dispatch(Store.setFriendGroups(friendGroups));
       });
-      ipc.data.friendApplications({ receiverId: user.userId }).then((friendApplications) => {
+      ipc.api.fetchFriendApplications({ receiverId: user.userId }).then((friendApplications) => {
         if (friendApplications) dispatch(Store.setFriendApplications(friendApplications));
       });
-      ipc.data.memberInvitations({ receiverId: user.userId }).then((memberInvitations) => {
+      ipc.api.fetchMemberInvitations({ receiverId: user.userId }).then((memberInvitations) => {
         if (memberInvitations) dispatch(Store.setMemberInvitations(memberInvitations));
       });
     };
@@ -100,13 +100,13 @@ const SocketManager: React.FC = React.memo(() => {
 
     const refresh = async () => {
       const region = getRegion();
-      ipc.data.announcements({ region }).then((announcements) => {
+      ipc.api.fetchAnnouncements({ region }).then((announcements) => {
         if (announcements) dispatch(Store.setAnnouncements(announcements));
       });
-      ipc.data.notifications({ region }).then((notifications) => {
+      ipc.api.fetchNotifications({ region }).then((notifications) => {
         if (notifications) dispatch(Store.setNotifications(notifications));
       });
-      ipc.data.recommendServers({ region }).then((recommendServerList) => {
+      ipc.api.fetchRecommendServers({ region }).then((recommendServerList) => {
         if (recommendServerList) dispatch(Store.setRecommendServers(recommendServerList));
       });
     };
@@ -133,16 +133,16 @@ const SocketManager: React.FC = React.memo(() => {
 
     const refresh = async () => {
       if (!user.currentServerId) return;
-      ipc.data.server({ userId: user.userId, serverId: user.currentServerId }).then((server) => {
+      ipc.api.fetchServer({ userId: user.userId, serverId: user.currentServerId }).then((server) => {
         if (server) dispatch(Store.setCurrentServer(server));
       });
-      ipc.data.channels({ userId: user.userId, serverId: user.currentServerId }).then((channels) => {
+      ipc.api.fetchChannels({ userId: user.userId, serverId: user.currentServerId }).then((channels) => {
         if (channels) dispatch(Store.setChannels(channels));
       });
-      ipc.data.serverOnlineMembers({ serverId: user.currentServerId }).then((serverOnlineMembers) => {
+      ipc.api.fetchServerOnlineMembers({ serverId: user.currentServerId }).then((serverOnlineMembers) => {
         if (serverOnlineMembers) dispatch(Store.setOnlineMembers(serverOnlineMembers));
       });
-      ipc.data.memberApplications({ serverId: user.currentServerId }).then((serverMemberApplications) => {
+      ipc.api.fetchMemberApplications({ serverId: user.currentServerId }).then((serverMemberApplications) => {
         if (serverMemberApplications) dispatch(Store.setMemberApplications(serverMemberApplications));
       });
     };
@@ -158,7 +158,7 @@ const SocketManager: React.FC = React.memo(() => {
 
     const refresh = async () => {
       if (!user.currentServerId || !user.currentChannelId) return;
-      ipc.data.channel({ userId: user.userId, serverId: user.currentServerId, channelId: user.currentChannelId }).then((channel) => {
+      ipc.api.fetchChannel({ userId: user.userId, serverId: user.currentServerId, channelId: user.currentChannelId }).then((channel) => {
         if (channel) dispatch(Store.setCurrentChannel(channel));
       });
     };
@@ -457,7 +457,7 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('error', (error) => {
-      Actions.openErrorDialog(new Error(error.message), () => {});
+      openErrorDialog(new Error(error.message), () => {});
     });
     return () => unsub();
   }, []);

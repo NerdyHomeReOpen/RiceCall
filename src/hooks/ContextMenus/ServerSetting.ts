@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { applyMember, openServerSetting, openEditNickname, favoriteServer } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -18,14 +18,14 @@ export const useServerSettingContextMenu = ({ user, currentServer, onLocateMe }:
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addApplyMemberOption({ permissionLevel }, () => Actions.applyMember(user.userId, currentServer.serverId, currentServer.receiveApply))
-        .addServerSettingOption({ permissionLevel }, () => Actions.openServerSetting(user.userId, currentServer.serverId))
+        .addApplyMemberOption({ permissionLevel }, () => applyMember(user.userId, currentServer.serverId, currentServer.receiveApply))
+        .addServerSettingOption({ permissionLevel }, () => openServerSetting(user.userId, currentServer.serverId))
         .addSeparator()
-        .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => Actions.openEditNickname(user.userId, currentServer.serverId))
+        .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => openEditNickname(user.userId, currentServer.serverId))
         .addLocateMeOption(() => onLocateMe())
         .addSeparator()
         .addReportOption(() => window.open('https://ricecall.com/report-server', '_blank'))
-        .addFavoriteServerOption({ isFavorite: currentServer.favorite }, () => Actions.favoriteServer(currentServer.serverId))
+        .addFavoriteServerOption({ isFavorite: currentServer.favorite }, () => favoriteServer(currentServer.serverId))
         .build(),
     [user, currentServer, permissionLevel, onLocateMe],
   );

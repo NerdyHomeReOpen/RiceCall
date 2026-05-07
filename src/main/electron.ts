@@ -12,7 +12,6 @@ initMain();
 import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
-
 import Env from '@/utils/env';
 
 import { i18nReady, t } from '@/i18n';
@@ -20,10 +19,10 @@ import { i18nReady, t } from '@/i18n';
 import { LANGUAGES } from '@/constants';
 
 import { registerAccountHandlers } from '@/main/accounts/electron';
+import { registerApiHandlers } from '@/main/api/electron';
 import { registerAppHandlers } from '@/main/app/electron';
 import { registerAuthHandlers, autoLogin, logout } from '@/main/auth/electron';
 import { registerCustomThemesHandlers } from '@/main/customThemes/electron';
-import { registerDataHandlers } from '@/main/data/electron';
 import { registerDiscordRPCHandlers, configureDiscordRPC, clearDiscordPresence } from '@/main/discord/electron';
 import { registerEnvHandlers } from '@/main/env/electron';
 import { registerErrorHandlers } from '@/main/error/electron';
@@ -692,10 +691,10 @@ app.on('ready', async () => {
   configureLogger();
 
   registerAccountHandlers();
+  registerApiHandlers();
   registerAppHandlers();
   registerAuthHandlers();
   registerCustomThemesHandlers();
-  registerDataHandlers();
   registerDiscordRPCHandlers();
   registerEnvHandlers();
   registerErrorHandlers();

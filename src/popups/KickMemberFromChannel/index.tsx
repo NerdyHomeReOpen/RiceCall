@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { blockUserFromChannel } from '@/services';
 
 import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constants';
 
@@ -79,7 +79,7 @@ const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = Re
   };
 
   const handleConfirmBtnClick = () => {
-    Actions.blockUserFromChannel(member.userId, serverId, channel.channelId, Date.now() + getBlockTime());
+    blockUserFromChannel(member.userId, serverId, channel.channelId, Date.now() + getBlockTime());
     ipc.popup.close(id);
   };
 

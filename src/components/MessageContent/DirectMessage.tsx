@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openUserInfo } from '@/services';
 
 import { ALLOWED_MESSAGE_KEYS } from '@/constants';
 
@@ -44,7 +44,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   );
 
   const handleUsernameClick = () => {
-    Actions.openUserInfo(user.userId, messageGroup.userId);
+    openUserInfo(user.userId, messageGroup.userId);
   };
 
   return (

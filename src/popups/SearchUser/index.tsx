@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { openApplyFriend } from '@/services';
 
 import { useAppSelector } from '@/hooks/Store';
 
@@ -28,7 +28,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
   const canSubmit = query.trim();
 
   const searchUser = (query: string) => {
-    ipc.data.searchUser({ query }).then((users) => {
+    ipc.api.searchUser({ query }).then((users) => {
       const target = users[0];
 
       if (!target) {
@@ -36,11 +36,11 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
         return;
       }
 
-      ipc.data.friend({ userId: user.userId, targetId: target.userId }).then((friend) => {
+      ipc.api.fetchFriend({ userId: user.userId, targetId: target.userId }).then((friend) => {
         if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
         else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
         else {
-          Actions.openApplyFriend(user.userId, target.userId);
+          openApplyFriend(user.userId, target.userId);
           ipc.popup.close(id);
         }
       });

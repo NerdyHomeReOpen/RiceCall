@@ -182,10 +182,10 @@ export async function disableLoopbackAudio(): Promise<void> {
 }
 
 export * from '@/main/accounts/web';
+export * from '@/main/api/web';
 export * from '@/main/app/web';
 export * from '@/main/auth/web';
 export * from '@/main/customThemes/web';
-export * from '@/main/data/web';
 export * from '@/main/discord/web';
 export * from '@/main/env/web';
 export * from '@/main/error/web';

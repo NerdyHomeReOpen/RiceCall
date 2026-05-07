@@ -4,9 +4,9 @@ import { shallowEqual } from 'react-redux';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { openDirectMessage } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
@@ -104,7 +104,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
 
   const handleTabDoubleClick = () => {
     if (isSelf) return;
-    Actions.openDirectMessage(user.userId, member.userId);
+    openDirectMessage(user.userId, member.userId);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {

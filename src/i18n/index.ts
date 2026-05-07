@@ -3,11 +3,10 @@ import { initReactI18next } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import Logger from '@/utils/logger';
-
-import Env from '@/utils/env';
-
 import I18nStorage from '@/i18n/storage';
+
+import Logger from '@/utils/logger';
+import Env from '@/utils/env';
 
 const I18N_VERSION_KEY = 'i18n_version';
 const I18N_CACHE_PREFIX = 'i18n_cache:';
@@ -117,10 +116,18 @@ export const i18nReady = I18nStorage.load()
   );
 
 export function t(key: string, params?: Record<string, string>) {
+  if (!i18next.isInitialized) {
+    new Logger('i18n').error('i18next is not initialized');
+    return key;
+  }
   return i18next.t(key, params);
 }
 
 export function changeLanguage(language: Types.LanguageKey) {
+  if (!i18next.isInitialized) {
+    new Logger('i18n').error('i18next is not initialized');
+    return;
+  }
   i18next.changeLanguage(language);
 }
 

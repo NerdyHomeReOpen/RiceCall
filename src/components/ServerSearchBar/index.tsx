@@ -47,7 +47,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
       return;
     }
 
-    ipc.data.searchServer({ query }).then((serverResults) => {
+    ipc.api.searchServer({ query }).then((serverResults) => {
       const q = queryRef.current;
 
       clearSearchState();
@@ -137,7 +137,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
       if (!user.userId || !serverDisplayId) return;
-      ipc.data.searchServer({ query: serverDisplayId }).then((servers) => {
+      ipc.api.searchServer({ query: serverDisplayId }).then((servers) => {
         const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
         if (!target) return;
         selectServer(target);

@@ -27,7 +27,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
   useEffect(() => {
     if (!displayId) return;
     const refresh = async () => {
-      ipc.data.searchServer({ query: displayId }).then((server) => {
+      ipc.api.searchServer({ query: displayId }).then((server) => {
         if (server) setServer(server[0]);
       });
     };

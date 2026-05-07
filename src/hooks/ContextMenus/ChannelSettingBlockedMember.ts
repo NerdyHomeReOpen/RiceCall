@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openUserInfo, unblockUserFromChannel } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -20,8 +20,8 @@ export const useChannelSettingBlockedMemberContextMenu = ({ user, server, channe
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addViewProfileOption(() => Actions.openUserInfo(user.userId, member.userId))
-        .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => Actions.unblockUserFromChannel(member.userId, server.serverId, channel.channelId, member.name))
+        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+        .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => unblockUserFromChannel(member.userId, server.serverId, channel.channelId, member.name))
         .build(),
     [user.userId, server.serverId, channel.channelId, member, permissionLevel, isSelf],
   );

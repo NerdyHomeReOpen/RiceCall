@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openSystemSetting, openChangeTheme, openAboutUs, openNetworkDiagnosis } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -19,8 +19,8 @@ export const useHeaderContextMenu = ({ user, onChangeLanguage, onLogout, onExit 
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addSystemSettingOption(() => Actions.openSystemSetting(user.userId))
-        .addChangeThemeOption(() => Actions.openChangeTheme())
+        .addSystemSettingOption(() => openSystemSetting(user.userId))
+        .addChangeThemeOption(() => openChangeTheme())
         .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
         .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? onChangeLanguage(code) : null))
         .addHelpCenterOption(
@@ -29,11 +29,11 @@ export const useHeaderContextMenu = ({ user, onChangeLanguage, onLogout, onExit 
             onAgreementClick: () => window.open('https://ricecall.com/terms', '_blank'),
             onSpecificationClick: () => window.open('https://ricecall.com/specification', '_blank'),
             onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
-            onAboutUsClick: Actions.openAboutUs,
+            onAboutUsClick: () => openAboutUs(),
           },
           () => { },
         )
-        .addNetworkDiagnosisOption(() => Actions.openNetworkDiagnosis())
+        .addNetworkDiagnosisOption(() => openNetworkDiagnosis())
         .addLogoutOption(onLogout)
         .addExitOption(onExit)
         .build(),

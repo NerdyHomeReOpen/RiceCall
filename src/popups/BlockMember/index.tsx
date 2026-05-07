@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { blockUserFromServer } from '@/services';
 
 interface BlockMemberPopupProps {
   id: string;
@@ -28,7 +28,7 @@ const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serv
   };
 
   const handleConfirmBtnClick = () => {
-    Actions.blockUserFromServer(member.userId, serverId, -1);
+    blockUserFromServer(member.userId, serverId, -1);
     ipc.popup.close(id);
   };
 

@@ -8,7 +8,7 @@ import { Permission } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { openImageCropper, openAlertDialog, editUser, openApplyFriend, openDirectMessage, openErrorDialog } from '@/services';
 
 import { MAX_FILE_SIZE } from '@/constants';
 
@@ -117,17 +117,17 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
       const image = (e.target as HTMLInputElement).files?.[0];
       if (!image || isUploadingRef.current) return;
       image.arrayBuffer().then((arrayBuffer) => {
-        Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+        openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
           isUploadingRef.current = true;
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+            openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
-          ipc.data.uploadImage({ folder: 'user', imageName: target.userId, imageUnit8Array }).then((response) => {
+          ipc.api.uploadImage({ folder: 'user', imageName: target.userId, imageUnit8Array }).then((response) => {
             if (response) {
               setTarget((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
-              Actions.editUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
+              editUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
             }
             isUploadingRef.current = false;
           });
@@ -161,20 +161,20 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
 
   const handleConfirmBtnClick = () => {
     if (!countries.includes(editedTarget.country)) {
-      Actions.openErrorDialog(new Error('invalid-country'), () => {});
+      openErrorDialog(new Error('invalid-country'), () => {});
       return;
     }
-    Actions.editUser(objDiff(editedTarget, target));
+    editUser(objDiff(editedTarget, target));
     setTarget(editedTarget);
     setSelectedTabId('about');
   };
 
   const handleApplyFriendBtnClick = () => {
-    Actions.openApplyFriend(user.userId, target.userId);
+    openApplyFriend(user.userId, target.userId);
   };
 
   const handleChatBtnClick = () => {
-    Actions.openDirectMessage(user.userId, target.userId);
+    openDirectMessage(user.userId, target.userId);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

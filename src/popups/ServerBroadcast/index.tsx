@@ -5,7 +5,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { broadcastChannel, broadcastServer } from '@/services';
 
 import { MAX_BROADCAST_LENGTH } from '@/constants';
 
@@ -46,8 +46,8 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
 
   const handleConfirmBtnClick = () => {
     if (!canSend) return;
-    if (broadcastType === 'channel') Actions.broadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
-    else Actions.broadcastServer(serverId, { type: 'alert', content: broadcastContent });
+    if (broadcastType === 'channel') broadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
+    else broadcastServer(serverId, { type: 'alert', content: broadcastContent });
     ipc.popup.close(id);
   };
 

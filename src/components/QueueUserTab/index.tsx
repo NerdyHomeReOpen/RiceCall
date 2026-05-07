@@ -3,9 +3,9 @@ import { shallowEqual } from 'react-redux';
 
 import { Permission } from '@/types';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { openDirectMessage } from '@/services';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/Store';
 
@@ -100,7 +100,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   const handleTabDoubleClick = () => {
     if (isSelf) return;
-    Actions.openDirectMessage(user.userId, queueMember.userId);
+    openDirectMessage(user.userId, queueMember.userId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

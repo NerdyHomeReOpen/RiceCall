@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openUserInfo, unblockUserFromServer } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -19,8 +19,8 @@ export const useServerSettingBlockedMemberContextMenu = ({ user, server, member,
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addViewProfileOption(() => Actions.openUserInfo(user.userId, member.userId))
-        .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => Actions.unblockUserFromServer(member.userId, server.serverId, member.name))
+        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+        .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => unblockUserFromServer(member.userId, server.serverId, member.name))
         .build(),
     [user.userId, server.serverId, member, permissionLevel, isSelf],
   );

@@ -2,9 +2,10 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { openDirectMessage, openUserInfo, openKickMemberFromChannel, openKickMemberFromServer, openBlockMember, openInviteMember } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
+
 import { useMemberManagementSubmenu } from '@/hooks/ContextMenus/MemberManagementSubmenu';
 
 interface UseMessageContextMenuProps {
@@ -25,12 +26,12 @@ export const useMessageContextMenu = ({ user, currentServer, currentChannel, mem
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addDirectMessageOption({ isSelf }, () => Actions.openDirectMessage(user.userId, member.userId))
-        .addViewProfileOption(() => Actions.openUserInfo(user.userId, member.userId))
-        .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => Actions.openKickMemberFromChannel(member.userId, currentServer.serverId, currentChannel.channelId))
-        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openKickMemberFromServer(member.userId, currentServer.serverId))
-        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(member.userId, currentServer.serverId))
-        .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => Actions.openInviteMember(member.userId, currentServer.serverId))
+        .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, member.userId))
+        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+        .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => openKickMemberFromChannel(member.userId, currentServer.serverId, currentChannel.channelId))
+        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(member.userId, currentServer.serverId))
+        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(member.userId, currentServer.serverId))
+        .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => openInviteMember(member.userId, currentServer.serverId))
         .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementSubmenu())
         .build(),
     [user, currentServer, currentChannel, member, permissionLevel, isSelf, isLowerLevel, isInLobby, buildMemberManagementSubmenu],

@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { acceptMemberInvitation, rejectMemberInvitation } from '@/services';
 
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
@@ -18,11 +18,11 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
   const { t } = useTranslation();
 
   const handleAcceptBtnClick = () => {
-    Actions.acceptMemberInvitation(invitation.serverId);
+    acceptMemberInvitation(invitation.serverId);
   };
 
   const handleRejectBtnClick = () => {
-    Actions.rejectMemberInvitation(invitation.serverId);
+    rejectMemberInvitation(invitation.serverId);
   };
 
   return (

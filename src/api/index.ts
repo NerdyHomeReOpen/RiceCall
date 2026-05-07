@@ -1,5 +1,4 @@
 import Logger from '@/utils/logger';
-
 import Env from '@/utils/env';
 
 type RequestOptions = {

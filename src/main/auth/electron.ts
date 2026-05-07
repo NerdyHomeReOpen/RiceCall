@@ -1,7 +1,8 @@
 import { ipcMain } from 'electron';
 
 import { setToken, removeToken } from '@/api';
-import { login as _login, register as _register, autoLogin as _autoLogin } from '@/api/auth';
+
+import { login as _login, register as _register, autoLogin as _autoLogin } from '@/services';
 
 import { createPopup, closeAllPopups, mainWindow, authWindow, store, setTrayDetail } from '@/main/electron';
 import { connectSocket, disconnectSocket } from '@/main/socket/electron';

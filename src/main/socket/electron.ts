@@ -4,7 +4,6 @@ import { io, Socket } from 'socket.io-client';
 import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
-
 import Env from '@/utils/env';
 
 import { NO_LOG_ON_EVENTS, ON_EVENTS, SEND_EVENTS, EMIT_EVENTS } from '@/configs/socket';

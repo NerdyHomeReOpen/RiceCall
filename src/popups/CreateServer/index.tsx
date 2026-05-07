@@ -7,7 +7,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
+import { createServer, openImageCropper, openAlertDialog } from '@/services';
 
 import { MAX_FILE_SIZE, SERVER_TYPES } from '@/constants';
 
@@ -52,14 +52,14 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
     const image = e.target.files?.[0];
     if (!image || isUploadingRef.current) return;
     image.arrayBuffer().then((arrayBuffer) => {
-      Actions.openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
+      openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
-          Actions.openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }
-        ipc.data.uploadImage({ folder: 'server', imageName: serverAvatar, imageUnit8Array }).then((response) => {
+        ipc.api.uploadImage({ folder: 'server', imageName: serverAvatar, imageUnit8Array }).then((response) => {
           if (response) {
             setServerAvatar(response.imageName);
             setServerAvatarUrl(response.imageUrl);
@@ -84,7 +84,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
 
   const handleConfirmBtnClick = () => {
     if (!canSubmit) return;
-    Actions.createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
+    createServer({ name: serverName, avatar: serverAvatar, avatarUrl: serverAvatarUrl, slogan: serverSlogan, type: serverType });
     ipc.popup.close(id);
   };
 

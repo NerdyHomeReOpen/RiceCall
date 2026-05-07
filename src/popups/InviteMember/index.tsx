@@ -4,7 +4,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import * as Actions from '@/action';
+import { sendMemberInvitation, editMemberInvitation } from '@/services';
 
 import SendSection from './SendSection';
 import SentSection from './SentSection';
@@ -34,12 +34,12 @@ const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, se
   };
 
   const handleSubmitBtnClick = () => {
-    Actions.sendMemberInvitation(receiverMember.userId, serverId, { description: invitationDesc });
+    sendMemberInvitation(receiverMember.userId, serverId, { description: invitationDesc });
     ipc.popup.close(id);
   };
 
   const handleSubmitEditBtnClick = () => {
-    Actions.editMemberInvitation(receiverMember.userId, serverId, { description: invitationDesc });
+    editMemberInvitation(receiverMember.userId, serverId, { description: invitationDesc });
     ipc.popup.close(id);
   };
 

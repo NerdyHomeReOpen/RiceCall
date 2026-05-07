@@ -7,9 +7,9 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import * as Actions from '@/action';
-
 import * as Store from '@/store';
+
+import { openDirectMessage } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
@@ -69,7 +69,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   };
 
   const handleTabDoubleClick = () => {
-    Actions.openDirectMessage(user.userId, friend.targetId);
+    openDirectMessage(user.userId, friend.targetId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -84,7 +84,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
       setFriendCurrentServer(null);
       return;
     }
-    ipc.data.server({ userId: friend.targetId, serverId: friend.currentServerId }).then((server) => {
+    ipc.api.fetchServer({ userId: friend.targetId, serverId: friend.currentServerId }).then((server) => {
       if (server) setFriendCurrentServer(server);
     });
   }, [friend.targetId, friend.isBlocked, friend.shareCurrentServer, friend.currentServerId, isFriend]);
