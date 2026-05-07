@@ -8,7 +8,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import i18n from '@/i18n';
+import { changeLanguage } from '@/i18n';
 
 import Logger from '@/logger';
 
@@ -62,13 +62,13 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const changeLanguage = (language: Types.LanguageKey) => {
+    const changeLang = (language: Types.LanguageKey) => {
       new Logger('Language').info(`Language updated: ${language}`);
       if (!language) return;
-      i18n.changeLanguage(language);
+      changeLanguage(language);
     };
-    changeLanguage(ipc.systemSettings.language.get());
-    const unsub = ipc.systemSettings.language.onUpdate(changeLanguage);
+    changeLang(ipc.systemSettings.language.get());
+    const unsub = ipc.systemSettings.language.onUpdate(changeLang);
     return () => unsub();
   }, []);
 

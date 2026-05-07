@@ -1,4 +1,4 @@
-import { isMain } from '@/utils/platform';
+import { isMain, isRenderer, isWebsite } from '@/utils/platform';
 
 export interface I18nStorage {
   getItem(key: string): string | null;
@@ -37,7 +37,7 @@ class FsAdapter implements I18nStorage {
     private fs: any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private path: any,
-  ) {}
+  ) { }
 
   private filePath(key: string): string {
     return this.path.join(this.dir, encodeURIComponent(key) + '.dat') as string;
@@ -78,6 +78,14 @@ class FsAdapter implements I18nStorage {
   }
 }
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+class NoopStorage implements I18nStorage {
+  getItem(_key: string): string | null { return null; }
+  setItem(_key: string, _value: string): void { }
+  removeItem(_key: string): void { }
+  keys(): string[] { return []; }
+}
+
 let storage: I18nStorage | null = null;
 
 export async function loadStorage(): Promise<void> {
@@ -92,8 +100,10 @@ export async function loadStorage(): Promise<void> {
     const cacheDir = path.join(app.getPath('userData'), 'i18n-cache') as string;
     fs.mkdirSync(cacheDir, { recursive: true });
     storage = new FsAdapter(cacheDir, fs, path);
-  } else {
+  } else if (isRenderer() || isWebsite()) {
     storage = new LocalStorageAdapter();
+  } else {
+    storage = new NoopStorage();
   }
 }
 

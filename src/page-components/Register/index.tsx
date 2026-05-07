@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
-import i18n from '@/i18n';
-
 import * as Actions from '@/action';
 
 import styles from './Register.module.css';
@@ -136,7 +134,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     setIsLoading(true);
 
-    await ipc.auth.register({ account, password, email, username, locale: i18n.language ?? 'zh-TW' }).then((res) => {
+    await ipc.auth.register({ account, password, email, username, locale: ipc.systemSettings.language.get() }).then((res) => {
       if (res.success) {
         Actions.openAlertDialog(t(res.message, { '0': email }), onBackToLoginBtnClick);
       }

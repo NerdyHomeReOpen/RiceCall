@@ -2,8 +2,6 @@ import { TFunction } from 'i18next';
 
 import { Permission } from '@/types';
 
-import i18n from '@/i18n';
-
 /**
  * Get the translated text for a permission level
  * @param t - The translation function
@@ -105,7 +103,7 @@ export function getFormatTimeFromSecond(seconds: number): string {
  * @returns The formatted timestamp
  */
 export function getFormatTimestamp(t: TFunction<'translation', undefined>, timestamp: number): string {
-  const timezoneLang = i18n.language;
+  const timezoneLang = navigator.language;
   const now = new Date();
   const messageDate = new Date(timestamp);
   const messageDay = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());

@@ -43,7 +43,7 @@ function purgeCache(): void {
 }
 
 async function checkCacheVersion(): Promise<void> {
-  const baseUrl = Env.get().I18N_BASE_URL;
+  const baseUrl = Env.get().DOCS_BASE_URL;
   if (!baseUrl) return;
 
   try {
