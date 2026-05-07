@@ -93,22 +93,24 @@ class HttpBackend {
   }
 }
 
-export const i18nReady = i18next
-  .use(new HttpBackend())
-  .use(initReactI18next)
-  .init({
-    lng: 'zh-TW',
-    fallbackLng: 'zh-TW',
-    supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
+export const i18nReady = checkCacheVersion().then(() =>
+  i18next
+    .use(new HttpBackend())
+    .use(initReactI18next)
+    .init({
+      lng: 'zh-TW',
+      fallbackLng: 'zh-TW',
+      supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
 
-    ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
-    defaultNS: 'app',
-    fallbackNS: ['app'],
+      ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
+      defaultNS: 'app',
+      fallbackNS: ['app'],
 
-    interpolation: { escapeValue: false },
-    load: 'currentOnly' as const,
-    nonExplicitSupportedLngs: false,
-  });
+      interpolation: { escapeValue: false },
+      load: 'currentOnly' as const,
+      nonExplicitSupportedLngs: false,
+    }),
+);
 
 export function t(key: string, params?: Record<string, string>) {
   return i18next.t(key, params);
