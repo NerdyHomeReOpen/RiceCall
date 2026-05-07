@@ -1,7 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
 import { shallowEqual } from 'react-redux';
-import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
@@ -18,8 +17,6 @@ interface FriendActivityProps {
 }
 
 const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivity }) => {
-  const { t } = useTranslation();
-
   const user = useAppSelector(
     (state) => ({
       userId: state.user.data.userId,
@@ -44,7 +41,7 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
           <div className={styles['friend-name-text']} onClick={handleUserNameClick}>
             {friendActivity.name}
           </div>
-          <div className={styles['friend-activity-timestamp-text']}>{getFormatTimeDiff(t, friendActivity.timestamp)}</div>
+          <div className={styles['friend-activity-timestamp-text']}>{getFormatTimeDiff(friendActivity.timestamp)}</div>
         </div>
         <div className={styles['friend-activity-content-bottom']}>{friendActivity.content}</div>
       </div>

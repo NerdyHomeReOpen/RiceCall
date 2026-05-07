@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 import { useMemberManagementSubmenu } from '@/hooks/ContextMenus/MemberManagementSubmenu';
 
 interface UseQueueUserContextMenuProps {
@@ -69,7 +69,7 @@ export const useQueueUserContextMenu = ({ user, currentServer, currentChannel, q
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
           Actions.openInviteMember(queueMember.userId, currentServer.serverId),
         )
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementSubmenu())
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementSubmenu())
         .build(),
     [user, currentServer, currentChannel, queueMember, isMuted, isFriend, permissionLevel, isSelf, isLowerLevel, isInLobby, t, onMuteUser, onUnmuteUser, buildMemberManagementSubmenu],
   );

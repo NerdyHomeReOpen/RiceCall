@@ -1,6 +1,6 @@
 import { eventEmitter, store } from '@/main/web';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 export function dontShowDisclaimerNextTime(enable: boolean = false) {
   store.set('dontShowDisclaimer', enable);

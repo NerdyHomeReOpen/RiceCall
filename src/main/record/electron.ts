@@ -7,7 +7,7 @@ const binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar',
 ffmpeg.setFfmpegPath(binaryPath);
 import { app, ipcMain, dialog } from 'electron';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { t } from '@/i18n';
 

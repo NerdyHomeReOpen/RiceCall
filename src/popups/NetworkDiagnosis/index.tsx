@@ -6,7 +6,7 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 import { isElectron } from '@/utils/platform';
 
 import ndStyles from './NetworkDiagnosis.module.css';

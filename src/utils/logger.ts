@@ -9,13 +9,13 @@ type LoggerType = {
 let logger: LoggerType | null = null;
 
 async function loadLogger() {
+  logger = console;
+
   if (isMain()) {
     const createdRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
     logger = createdRequire('electron-log').default;
   } else if (isRenderer()) {
     logger = window.electronLog ?? console;
-  } else {
-    logger = console;
   }
 }
 
@@ -24,33 +24,47 @@ loadLogger();
 /**
  * Logger class
  * @param origin - The origin of the log
+ * @example
+ * const logger = new Logger('MyLogger')
+ * logger.info('Hello, world!')
+ * logger.warn('Warning!')
+ * logger.error('Error!')
+ * logger.command('Command!')
+ * logger.success('Success!')
  */
-export class Logger {
+export default class Logger {
   private origin: string;
 
   constructor(origin: string) {
     this.origin = origin;
   }
 
+  static async load() {
+    loadLogger();
+  }
+
   info(...messages: string[]) {
-    logger?.info(`[${this.origin}] ${messages.join(' ')}`);
+    if (!logger) return;
+    logger.info(`[${this.origin}] ${messages.join(' ')}`);
   }
 
   command(...messages: string[]) {
-    logger?.info(`[${this.origin}] ${messages.join(' ')}`);
+    if (!logger) return;
+    logger.info(`[${this.origin}] ${messages.join(' ')}`);
   }
 
   success(...messages: string[]) {
-    logger?.info(`[${this.origin}] ${messages.join(' ')}`);
+    if (!logger) return;
+    logger.info(`[${this.origin}] ${messages.join(' ')}`);
   }
 
   warn(...messages: string[]) {
-    logger?.warn(`[${this.origin}] ${messages.join(' ')}`);
+    if (!logger) return;
+    logger.warn(`[${this.origin}] ${messages.join(' ')}`);
   }
 
   error(...messages: string[]) {
-    logger?.error(`[${this.origin}] ${messages.join(' ')}`);
+    if (!logger) return;
+    logger.error(`[${this.origin}] ${messages.join(' ')}`);
   }
 }
-
-export default Logger;

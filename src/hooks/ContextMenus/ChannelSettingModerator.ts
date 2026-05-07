@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 
 import * as Actions from '@/action';
 
@@ -47,7 +47,7 @@ export const useChannelSettingModeratorContextMenu = ({ user, server, channel, m
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openEditNickname(moderator.userId, server.serverId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(moderator.userId, server.serverId))
       .addSeparator()
-      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => { }, submenuItems)
       .build();
   }, [user.userId, server.serverId, channel, moderator, permissionLevel, isSelf, isLowerLevel]);
 

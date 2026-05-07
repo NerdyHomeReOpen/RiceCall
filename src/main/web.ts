@@ -2,7 +2,7 @@ import packageJson from '../../package.json';
 
 import type * as Types from '@/types';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
 import { i18nReady } from '@/i18n';
 
@@ -199,8 +199,7 @@ export * from '@/main/tray/web';
 export * from '@/main/window/web';
 
 async function onReady() {
-  Env.load(store.get('env'));
-
+  await Env.load(store.get('env'));
   await i18nReady;
 
   const token = store.get('token');

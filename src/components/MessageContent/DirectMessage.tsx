@@ -31,7 +31,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   );
 
   const hasVip = messageGroup.vip > 0;
-  const formattedTimestamp = getFormatTimestamp(t, messageGroup.timestamp);
+  const formattedTimestamp = getFormatTimestamp(messageGroup.timestamp);
   const formattedMessageContents = useMemo(
     () =>
       messageGroup.contents.map((content) =>

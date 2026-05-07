@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 
 interface UseChannelEventContextMenuProps {
   user: Pick<Types.User, 'userId'>;

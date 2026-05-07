@@ -1,8 +1,6 @@
-import { z } from 'zod';
+import { isMain } from '@/utils/platform';
 
-import { isElectron, isMain } from '@/utils/platform';
-
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 type EnvType = {
   API_URL: string;
@@ -12,15 +10,6 @@ type EnvType = {
   REACT_DEV_TOOLS_PATH: string | undefined;
   ERROR_SUBMISSION_URL: string | undefined;
 };
-
-const EnvSchema = z.object({
-  API_URL: z.string(),
-  WS_URL: z.string(),
-  I18N_BASE_URL: z.string(),
-  DOCS_BASE_URL: z.string(),
-  REACT_DEV_TOOLS_PATH: z.string().optional(),
-  ERROR_SUBMISSION_URL: z.string().optional(),
-});
 
 let env: EnvType | null = null;
 
@@ -34,7 +23,7 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
     ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
   };
 
-  if (isElectron() && isMain()) {
+  if (isMain()) {
     try {
       const createRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
       const electron = createRequire('electron');
@@ -64,13 +53,6 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
     }
   }
 
-  const parsed = EnvSchema.safeParse(envLoaded);
-  if (!parsed.success) {
-    new Logger('Env').warn(`Invalid env values: ${JSON.stringify(parsed.error.flatten().fieldErrors)}`);
-  } else {
-    Object.assign(envLoaded, parsed.data);
-  }
-
   env = envLoaded as EnvType;
 }
 
@@ -78,9 +60,18 @@ loadEnv();
 
 /**
  * Env class
+ * @example
+ * Env.load('prod')
+ * const env = Env.get()
+ * console.log(env.API_URL)
+ * console.log(env.WS_URL)
+ * console.log(env.I18N_BASE_URL)
+ * console.log(env.DOCS_BASE_URL)
+ * console.log(env.REACT_DEV_TOOLS_PATH)
+ * console.log(env.ERROR_SUBMISSION_URL)
  */
 export default class Env {
-  static load(enviroment: 'prod' | 'dev' = 'prod') {
+  static async load(enviroment: 'prod' | 'dev' = 'prod') {
     loadEnv(enviroment);
   }
 

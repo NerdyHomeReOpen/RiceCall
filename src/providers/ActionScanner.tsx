@@ -2,7 +2,7 @@ import React, { useContext, createContext, ReactNode, useRef, useEffect, useCall
 
 import * as ipc from '@/main/ipc';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { useWebRTC } from '@/providers/WebRTC';
 

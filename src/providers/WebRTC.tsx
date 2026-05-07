@@ -8,7 +8,7 @@ import * as ipc from '@/main/ipc';
 import * as Store from '@/store';
 import { store } from '@/store';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 import { useLoading } from '@/providers/Loading';

@@ -10,7 +10,7 @@ import * as ipc from '@/main/ipc';
 
 import { changeLanguage } from '@/i18n';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { store } from '@/store';
 

@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 import { useMemberManagementSubmenu } from '@/hooks/ContextMenus/MemberManagementSubmenu';
 
 interface UseMessageContextMenuProps {
@@ -31,7 +31,7 @@ export const useMessageContextMenu = ({ user, currentServer, currentChannel, mem
         .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openKickMemberFromServer(member.userId, currentServer.serverId))
         .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(member.userId, currentServer.serverId))
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => Actions.openInviteMember(member.userId, currentServer.serverId))
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementSubmenu())
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementSubmenu())
         .build(),
     [user, currentServer, currentChannel, member, permissionLevel, isSelf, isLowerLevel, isInLobby, buildMemberManagementSubmenu],
   );

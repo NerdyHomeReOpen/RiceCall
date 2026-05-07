@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 import { useMemberManagementSubmenu } from '@/hooks/ContextMenus/MemberManagementSubmenu';
 
 interface UseMemberContextMenuProps {
@@ -78,7 +78,7 @@ export const useMemberContextMenu = ({
         .addSeparator()
         .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => Actions.terminateMember(user.userId, currentServer.serverId, t('self')))
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => Actions.openInviteMember(member.userId, currentServer.serverId))
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementSubmenu())
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementSubmenu())
         .build(),
     [
       member,

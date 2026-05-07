@@ -1,7 +1,7 @@
 import { ipcMain } from 'electron';
 import DiscordRPC, { Presence } from 'discord-rpc';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 const DISCORD_RPC_CLIENT_ID = '1242441392341516288';
 const START_TIMESTAMP = Date.now();

@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 
 import * as Actions from '@/action';
 

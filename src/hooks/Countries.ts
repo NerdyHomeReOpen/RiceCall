@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
 export const useCountries = () => {
   const [countries, setCountries] = useState<string[]>([]);

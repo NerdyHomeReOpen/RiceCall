@@ -1,14 +1,13 @@
-import { TFunction } from 'i18next';
+import { t } from '@/i18n';
 
 import { Permission } from '@/types';
 
 /**
  * Get the translated text for a permission level
- * @param t - The translation function
  * @param permission - The permission level
  * @returns The translated text for the permission level
  */
-export function getPermissionText(t: TFunction<'translation', undefined>, permission: Permission): string {
+export function getPermissionText(permission: Permission): string {
   const permissionMap: Record<Permission, string> = {
     [Permission.Guest]: t('guest'),
     [Permission.Member]: t('member'),
@@ -24,11 +23,10 @@ export function getPermissionText(t: TFunction<'translation', undefined>, permis
 
 /**
  * Get the formatted time difference
- * @param t - The translation function
  * @param timestamp - The timestamp
  * @returns The formatted time difference
  */
-export function getFormatTimeDiff(t: TFunction<'translation', undefined>, timestamp: number): string {
+export function getFormatTimeDiff(timestamp: number): string {
   const now = Date.now();
   const diff = Math.floor((timestamp - now) / 1000);
   const isFuture = diff > 0;
@@ -98,11 +96,10 @@ export function getFormatTimeFromSecond(seconds: number): string {
 
 /**
  * Get the formatted timestamp
- * @param t - The translation function
  * @param timestamp - The timestamp
  * @returns The formatted timestamp
  */
-export function getFormatTimestamp(t: TFunction<'translation', undefined>, timestamp: number): string {
+export function getFormatTimestamp(timestamp: number): string {
   const timezoneLang = navigator.language;
   const now = new Date();
   const messageDate = new Date(timestamp);

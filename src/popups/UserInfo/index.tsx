@@ -23,7 +23,7 @@ import FavoriteServerCard from './FavoriteServerCard';
 import LevelIcon from '@/components/LevelIcon';
 import BadgeItem from '@/components/BadgeItem';
 
-import { objDiff } from '@/utils/objDiff';
+import { objDiff } from '@/utils';
 
 import styles from './UserSetting.module.css';
 

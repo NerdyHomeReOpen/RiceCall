@@ -3,7 +3,7 @@ import { useCallback } from 'react';
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 
 import * as Actions from '@/action';
 
@@ -34,7 +34,7 @@ export const useServerSettingMemberContextMenu = ({ user, server, member, permis
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openEditNickname(member.userId, server.serverId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => Actions.openBlockMember(member.userId, server.serverId))
       .addSeparator()
-      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, submenuItems)
       .build();
   }, [user.userId, server.serverId, member, permissionLevel, isSelf, isLowerLevel]);
 

@@ -24,7 +24,7 @@ import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 import { getPermissionText } from '@/utils/language';
 import { sorter } from '@/utils/sorter';
-import { objDiff } from '@/utils/objDiff';
+import { objDiff } from '@/utils';
 
 import styles from './ServerSetting.module.css';
 
@@ -625,7 +625,6 @@ interface ServerSettingMemberRowProps {
 }
 
 const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo(({ user, server, member, permissionLevel, columnWidths }) => {
-  const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
@@ -652,7 +651,7 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
         <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
         <div className={`name ${member.nickname ? 'highlight' : ''}`}>{member.nickname || member.name}</div>
       </td>
-      <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(t, member.permissionLevel)}</td>
+      <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(member.permissionLevel)}</td>
       <td style={{ width: `${columnWidths[2]}px` }}>{member.contribution}</td>
       <td style={{ width: `${columnWidths[3]}px` }}>{new Date(member.joinAt).toLocaleDateString()}</td>
     </tr>

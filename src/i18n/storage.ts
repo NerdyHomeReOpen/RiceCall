@@ -1,13 +1,13 @@
 import { isMain, isRenderer, isWebsite } from '@/utils/platform';
 
-export interface I18nStorage {
+export interface I18nStorageType {
   getItem(key: string): string | null;
   setItem(key: string, value: string): void;
   removeItem(key: string): void;
   keys(): string[];
 }
 
-class LocalStorageAdapter implements I18nStorage {
+class LocalStorageAdapter implements I18nStorageType {
   getItem(key: string): string | null {
     return localStorage.getItem(key);
   }
@@ -30,7 +30,7 @@ class LocalStorageAdapter implements I18nStorage {
   }
 }
 
-class FsAdapter implements I18nStorage {
+class FsAdapter implements I18nStorageType {
   constructor(
     private dir: string,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -79,14 +79,14 @@ class FsAdapter implements I18nStorage {
 }
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
-class NoopStorage implements I18nStorage {
+class NoopStorage implements I18nStorageType {
   getItem(_key: string): string | null { return null; }
   setItem(_key: string, _value: string): void { }
   removeItem(_key: string): void { }
   keys(): string[] { return []; }
 }
 
-let storage: I18nStorage | null = null;
+let storage: I18nStorageType | null = null;
 
 export async function loadStorage(): Promise<void> {
   if (isMain()) {
@@ -107,7 +107,23 @@ export async function loadStorage(): Promise<void> {
   }
 }
 
-export function getStorage(): I18nStorage {
-  if (!storage) throw new Error('[i18n] storage not initialized');
-  return storage;
+/**
+ * I18nStorage class
+ * @example
+ * I18nStorage.load()
+ * const storage = I18nStorage.getStorage()
+ * storage.getItem('key')
+ * storage.setItem('key', 'value')
+ * storage.removeItem('key')
+ * storage.keys()
+ */
+export default class I18nStorage {
+  static async load() {
+    loadStorage();
+  }
+
+  static get(): I18nStorageType {
+    if (!storage) throw new Error('[i18n] storage not initialized');
+    return storage;
+  }
 }

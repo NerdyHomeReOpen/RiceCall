@@ -4,7 +4,7 @@ import { app, ipcMain } from 'electron';
 
 import type * as Types from '@/types';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { broadcast, store } from '@/main/electron';
 

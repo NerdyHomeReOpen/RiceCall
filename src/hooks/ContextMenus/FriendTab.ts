@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 
 interface UseFriendTabContextMenuProps {
   user: Pick<Types.User, 'userId'>;
@@ -27,10 +27,10 @@ export const useFriendTabContextMenu = ({ user, friend, friendGroups, defaultFri
         .addAddFriendOption({ isSelf, isFriend }, () => Actions.openApplyFriend(user.userId, friend.targetId))
         .addEditNoteOption({ isSelf, isFriend }, () => Actions.openEditFriendNote(user.userId, friend.targetId))
         .addSeparator()
-        .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => {}, onNotifyFriendOnlineClick: () => {} }, () => {})
+        .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => { }, onNotifyFriendOnlineClick: () => { } }, () => { })
         .addEditFriendFriendGroupOption(
           { isSelf, isStranger, isBlocked: friend.isBlocked },
-          () => {},
+          () => { },
           new ContextMenu()
             .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) =>
               Actions.editFriend(friend.targetId, { friendGroupId }),

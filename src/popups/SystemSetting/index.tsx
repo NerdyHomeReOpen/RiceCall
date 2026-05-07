@@ -7,7 +7,7 @@ import * as ipc from '@/main/ipc';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
-import { objDiff } from '@/utils/objDiff';
+import { objDiff } from '@/utils';
 
 import styles from './SystemSetting.module.css';
 

@@ -11,9 +11,9 @@ initMain();
 
 import type * as Types from '@/types';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
 import { i18nReady, t } from '@/i18n';
 
@@ -671,8 +671,7 @@ export function broadcast(channel: string, ...args: unknown[]) {
 }
 
 app.on('ready', async () => {
-  Env.load(store.get('env', 'prod'));
-
+  await Env.load(store.get('env', 'prod'));
   await i18nReady;
 
   protocol.handle('local-resource', (request) => {

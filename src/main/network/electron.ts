@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 
 import type * as Types from '@/types';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { broadcast } from '@/main/electron';
 
@@ -47,7 +47,7 @@ export function registerNetworkHandlers() {
       if (activeTool) {
         try {
           activeTool.cancel?.();
-        } catch {}
+        } catch { }
       }
 
       return new Promise<Types.FullReport | { error: string }>((resolve) => {

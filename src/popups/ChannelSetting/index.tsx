@@ -21,7 +21,7 @@ import { useChannelSettingBlockedMemberContextMenu } from '@/hooks/ContextMenus/
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
-import { objDiff } from '@/utils/objDiff';
+import { objDiff } from '@/utils';
 import { sorter } from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 
@@ -586,7 +586,6 @@ interface ChannelSettingModeratorRowProps {
 }
 
 const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = React.memo(({ user, server, channel, moderator, permissionLevel, columnWidths }) => {
-  const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
@@ -613,7 +612,7 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
         <div className={`permission-${moderator.gender} permission-lv-${moderator.permissionLevel}`} />
         <div className={`name ${moderator.nickname ? 'highlight' : ''}`}>{moderator.nickname || moderator.name}</div>
       </td>
-      <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(t, moderator.permissionLevel)}</td>
+      <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(moderator.permissionLevel)}</td>
       <td style={{ width: `${columnWidths[2]}px` }}>{moderator.contribution}</td>
       <td style={{ width: `${columnWidths[3]}px` }}>{new Date(moderator.joinAt).toLocaleDateString()}</td>
     </tr>

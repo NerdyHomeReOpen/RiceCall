@@ -2,7 +2,7 @@ import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'reac
 
 import type * as Types from '@/types';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { POPUP_CONFIGS } from '@/configs/popup';
 

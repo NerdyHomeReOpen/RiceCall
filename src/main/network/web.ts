@@ -1,4 +1,4 @@
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 export async function runNetworkDiagnosis(_params: { domains: string[]; duration?: number }): Promise<{ error: string }> {

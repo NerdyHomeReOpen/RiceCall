@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
 import { broadcast, store } from '@/main/electron';
 

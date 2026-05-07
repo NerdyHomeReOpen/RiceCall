@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import { broadcast } from '@/main/electron';
 
-import { objDiff } from '@/utils/objDiff';
+import { objDiff } from '@/utils';
 
 let cache: Types.StoreStateSnapshot | null = null;
 

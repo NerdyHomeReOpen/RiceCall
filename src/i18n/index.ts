@@ -3,11 +3,11 @@ import { initReactI18next } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
-import { loadStorage, getStorage } from '@/i18n/storage';
+import I18nStorage from '@/i18n/storage';
 
 const I18N_VERSION_KEY = 'i18n_version';
 const I18N_CACHE_PREFIX = 'i18n_cache:';
@@ -18,28 +18,28 @@ function cacheKey(lng: string, ns: string): string {
 
 function readCache(lng: string, ns: string): Record<string, unknown> | null {
   try {
-    const raw = getStorage().getItem(cacheKey(lng, ns));
+    const raw = I18nStorage.get().getItem(cacheKey(lng, ns));
     if (!raw) return null;
     return JSON.parse(raw) as Record<string, unknown>;
   } catch {
-    getStorage().removeItem(cacheKey(lng, ns));
+    I18nStorage.get().removeItem(cacheKey(lng, ns));
     return null;
   }
 }
 
 function writeCache(lng: string, ns: string, data: Record<string, unknown>): void {
   try {
-    getStorage().setItem(cacheKey(lng, ns), JSON.stringify(data));
+    I18nStorage.get().setItem(cacheKey(lng, ns), JSON.stringify(data));
   } catch {
     new Logger('i18n').warn('storage write failed');
   }
 }
 
 function purgeCache(): void {
-  const keysToRemove = getStorage()
+  const keysToRemove = I18nStorage.get()
     .keys()
     .filter((k) => k.startsWith(I18N_CACHE_PREFIX));
-  keysToRemove.forEach((k) => getStorage().removeItem(k));
+  keysToRemove.forEach((k) => I18nStorage.get().removeItem(k));
 }
 
 async function checkCacheVersion(): Promise<void> {
@@ -57,10 +57,10 @@ async function checkCacheVersion(): Promise<void> {
       return;
     }
 
-    const cachedVersion = getStorage().getItem(I18N_VERSION_KEY);
+    const cachedVersion = I18nStorage.get().getItem(I18N_VERSION_KEY);
     if (cachedVersion !== remoteVersion) {
       purgeCache();
-      getStorage().setItem(I18N_VERSION_KEY, remoteVersion);
+      I18nStorage.get().setItem(I18N_VERSION_KEY, remoteVersion);
     }
   } catch (e) {
     new Logger('i18n').warn(`manifest.json fetch failed, using existing cache: ${e}`);
@@ -95,7 +95,7 @@ class HttpBackend {
   }
 }
 
-export const i18nReady = loadStorage()
+export const i18nReady = I18nStorage.load()
   .then(() => checkCacheVersion())
   .then(() =>
     i18next

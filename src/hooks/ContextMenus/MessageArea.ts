@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 
 import * as Actions from '@/action';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 
 interface UseMessageAreaContextMenuProps {
   onOpenAnnouncement: () => void;

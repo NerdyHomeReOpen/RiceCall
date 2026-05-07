@@ -2,9 +2,9 @@ import { io, Socket } from 'socket.io-client';
 
 import type * as Types from '@/types';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
 import { NO_LOG_ON_EVENTS, SEND_EVENTS } from '@/configs/socket';
 

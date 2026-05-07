@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import * as Actions from '@/action';
 

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 
 import type * as Types from '@/types';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
 export const useStaffList = () => {
   const [staffList, setStaffList] = useState<Types.Staff[]>([]);

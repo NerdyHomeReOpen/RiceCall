@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import * as Actions from '@/action';
 
-import ContextMenu from '@/contextMenu';
+import ContextMenu from '@/utils/contextMenu';
 
 import { LANGUAGES } from '@/constants';
 
@@ -31,7 +31,7 @@ export const useHeaderContextMenu = ({ user, onChangeLanguage, onLogout, onExit 
             onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
             onAboutUsClick: Actions.openAboutUs,
           },
-          () => {},
+          () => { },
         )
         .addNetworkDiagnosisOption(() => Actions.openNetworkDiagnosis())
         .addLogoutOption(onLogout)

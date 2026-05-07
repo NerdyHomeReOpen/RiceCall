@@ -1,6 +1,6 @@
 import type * as Types from '@/types';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 import { store, eventEmitter } from '@/main/web';
 

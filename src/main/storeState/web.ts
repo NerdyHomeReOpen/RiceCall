@@ -2,7 +2,7 @@ import type * as Types from '@/types';
 
 import { eventEmitter } from '@/main/web';
 
-import { objDiff } from '@/utils/objDiff';
+import { objDiff } from '@/utils';
 
 let cache: Types.StoreStateSnapshot | null = null;
 

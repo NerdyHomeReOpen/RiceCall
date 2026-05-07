@@ -1,8 +1,8 @@
 import { ipcMain } from 'electron';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
-import Env from '@/env';
+import Env from '@/utils/env';
 
 import { createPopup } from '@/main/electron';
 

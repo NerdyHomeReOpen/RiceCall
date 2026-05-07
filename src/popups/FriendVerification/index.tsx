@@ -86,8 +86,8 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>
           <div className={styles['user-name-text']}>{application.name}</div>
-          <div className={styles['time-text']} title={getFormatTimestamp(t, application.createdAt)}>
-            {getFormatTimeDiff(t, application.createdAt)}
+          <div className={styles['time-text']} title={getFormatTimestamp(application.createdAt)}>
+            {getFormatTimeDiff(application.createdAt)}
           </div>
         </div>
         <div className={styles['application-content-box']}>

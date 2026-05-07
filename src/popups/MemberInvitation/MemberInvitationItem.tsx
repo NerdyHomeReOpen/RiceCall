@@ -33,8 +33,8 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>
           <div className={styles['user-name-text']}>{invitation.name}</div>
-          <div className={styles['time-text']} title={getFormatTimestamp(t, invitation.createdAt)}>
-            {getFormatTimeDiff(t, invitation.createdAt)}
+          <div className={styles['time-text']} title={getFormatTimestamp(invitation.createdAt)}>
+            {getFormatTimeDiff(invitation.createdAt)}
           </div>
         </div>
         <div className={styles['application-content-box']}>

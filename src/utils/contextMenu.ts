@@ -1,6 +1,17 @@
 import type * as Types from '@/types';
 import { Permission } from '@/types';
 
+/**
+ * ContextMenu class
+ * @example
+ * const menu = new ContextMenu()
+ * menu.addSeparator()
+ * menu.addJoinChannelOption({ canJoin: true, isInChannel: false }, () => {
+ *   console.log('join channel')
+ * })
+ * menu.build()
+ * @returns The context menu items
+ */
 export default class ContextMenu {
   private options: Types.ContextMenuItem[] = [];
 
