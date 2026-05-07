@@ -75,13 +75,13 @@ class HttpBackend {
       return;
     }
 
-    const baseUrl = Env.get().I18N_BASE_URL;
+    const baseUrl = Env.get().DOCS_BASE_URL;
     if (!baseUrl) {
-      cb(new Error('I18N_BASE_URL is not configured'), null);
+      cb(new Error('DOCS_BASE_URL is not configured'), null);
       return;
     }
 
-    fetch(`${baseUrl.replace(/\/$/, '')}/${lng}/${ns}.json`)
+    fetch(`${baseUrl.replace(/\/$/, '')}/locales/${lng}/${ns}.json`)
       .then((res) => {
         if (!res.ok) throw new Error(`HTTP ${res.status} ${res.statusText}`);
         return res.json();

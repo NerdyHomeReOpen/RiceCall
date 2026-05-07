@@ -5,7 +5,6 @@ import Logger from '@/utils/logger';
 type EnvType = {
   API_URL: string;
   WS_URL: string;
-  I18N_BASE_URL: string;
   DOCS_BASE_URL: string;
   REACT_DEV_TOOLS_PATH: string | undefined;
   ERROR_SUBMISSION_URL: string | undefined;
@@ -18,7 +17,6 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
     ...process.env,
     API_URL: process.env.API_URL || '',
     WS_URL: process.env.WS_URL || '',
-    I18N_BASE_URL: process.env.I18N_BASE_URL || '',
     DOCS_BASE_URL: process.env.DOCS_BASE_URL || '',
     ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
   };
@@ -65,7 +63,6 @@ loadEnv();
  * const env = Env.get()
  * console.log(env.API_URL)
  * console.log(env.WS_URL)
- * console.log(env.I18N_BASE_URL)
  * console.log(env.DOCS_BASE_URL)
  * console.log(env.REACT_DEV_TOOLS_PATH)
  * console.log(env.ERROR_SUBMISSION_URL)
@@ -81,7 +78,6 @@ export default class Env {
       return {
         API_URL: '',
         WS_URL: '',
-        I18N_BASE_URL: '',
         DOCS_BASE_URL: '',
         REACT_DEV_TOOLS_PATH: undefined,
         ERROR_SUBMISSION_URL: undefined,
