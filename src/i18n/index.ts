@@ -40,6 +40,31 @@ function purgeCache(): void {
   keysToRemove.forEach((k) => localStorage.removeItem(k));
 }
 
+async function checkCacheVersion(): Promise<void> {
+  const baseUrl = Env.get().I18N_BASE_URL;
+  if (!baseUrl) return;
+
+  try {
+    const res = await fetch(`${baseUrl.replace(/\/$/, '')}/manifest.json`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const manifest = (await res.json()) as Record<string, unknown>;
+    const remoteVersion = typeof manifest.version === 'string' ? manifest.version : null;
+
+    if (!remoteVersion) {
+      console.warn('[i18n] manifest.json missing version field, skipping cache invalidation');
+      return;
+    }
+
+    const cachedVersion = localStorage.getItem(I18N_VERSION_KEY);
+    if (cachedVersion !== remoteVersion) {
+      purgeCache();
+      localStorage.setItem(I18N_VERSION_KEY, remoteVersion);
+    }
+  } catch (e) {
+    console.warn('[i18n] manifest.json fetch failed, using existing cache:', e);
+  }
+}
+
 class HttpBackend {
   type = 'backend' as const;
   read(lng: string, ns: string, cb: (error: Error | null, data: Record<string, unknown> | null) => void) {
