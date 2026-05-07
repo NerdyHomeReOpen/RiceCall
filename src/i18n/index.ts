@@ -3,7 +3,11 @@ import { initReactI18next } from 'react-i18next';
 
 import type * as Types from '@/types';
 
+import Logger from '@/logger';
+
 import Env from '@/env';
+
+import { loadStorage, getStorage } from '@/i18n/storage';
 
 const I18N_VERSION_KEY = 'i18n_version';
 const I18N_CACHE_PREFIX = 'i18n_cache:';
@@ -14,30 +18,28 @@ function cacheKey(lng: string, ns: string): string {
 
 function readCache(lng: string, ns: string): Record<string, unknown> | null {
   try {
-    const raw = localStorage.getItem(cacheKey(lng, ns));
+    const raw = getStorage().getItem(cacheKey(lng, ns));
     if (!raw) return null;
     return JSON.parse(raw) as Record<string, unknown>;
   } catch {
-    localStorage.removeItem(cacheKey(lng, ns));
+    getStorage().removeItem(cacheKey(lng, ns));
     return null;
   }
 }
 
 function writeCache(lng: string, ns: string, data: Record<string, unknown>): void {
   try {
-    localStorage.setItem(cacheKey(lng, ns), JSON.stringify(data));
+    getStorage().setItem(cacheKey(lng, ns), JSON.stringify(data));
   } catch {
-    console.warn('[i18n] localStorage write failed (quota exceeded?)');
+    new Logger('i18n').warn('storage write failed');
   }
 }
 
 function purgeCache(): void {
-  const keysToRemove: string[] = [];
-  for (let i = 0; i < localStorage.length; i++) {
-    const k = localStorage.key(i);
-    if (k && k.startsWith(I18N_CACHE_PREFIX)) keysToRemove.push(k);
-  }
-  keysToRemove.forEach((k) => localStorage.removeItem(k));
+  const keysToRemove = getStorage()
+    .keys()
+    .filter((k) => k.startsWith(I18N_CACHE_PREFIX));
+  keysToRemove.forEach((k) => getStorage().removeItem(k));
 }
 
 async function checkCacheVersion(): Promise<void> {
@@ -51,17 +53,17 @@ async function checkCacheVersion(): Promise<void> {
     const remoteVersion = typeof manifest.version === 'string' ? manifest.version : null;
 
     if (!remoteVersion) {
-      console.warn('[i18n] manifest.json missing version field, skipping cache invalidation');
+      new Logger('i18n').warn('manifest.json missing version field, skipping cache invalidation');
       return;
     }
 
-    const cachedVersion = localStorage.getItem(I18N_VERSION_KEY);
+    const cachedVersion = getStorage().getItem(I18N_VERSION_KEY);
     if (cachedVersion !== remoteVersion) {
       purgeCache();
-      localStorage.setItem(I18N_VERSION_KEY, remoteVersion);
+      getStorage().setItem(I18N_VERSION_KEY, remoteVersion);
     }
   } catch (e) {
-    console.warn('[i18n] manifest.json fetch failed, using existing cache:', e);
+    new Logger('i18n').warn(`manifest.json fetch failed, using existing cache: ${e}`);
   }
 }
 
@@ -93,24 +95,26 @@ class HttpBackend {
   }
 }
 
-export const i18nReady = checkCacheVersion().then(() =>
-  i18next
-    .use(new HttpBackend())
-    .use(initReactI18next)
-    .init({
-      lng: 'zh-TW',
-      fallbackLng: 'zh-TW',
-      supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
+export const i18nReady = loadStorage()
+  .then(() => checkCacheVersion())
+  .then(() =>
+    i18next
+      .use(new HttpBackend())
+      .use(initReactI18next)
+      .init({
+        lng: 'zh-TW',
+        fallbackLng: 'zh-TW',
+        supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
 
-      ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
-      defaultNS: 'app',
-      fallbackNS: ['app'],
+        ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
+        defaultNS: 'app',
+        fallbackNS: ['app'],
 
-      interpolation: { escapeValue: false },
-      load: 'currentOnly' as const,
-      nonExplicitSupportedLngs: false,
-    }),
-);
+        interpolation: { escapeValue: false },
+        load: 'currentOnly' as const,
+        nonExplicitSupportedLngs: false,
+      }),
+  );
 
 export function t(key: string, params?: Record<string, string>) {
   return i18next.t(key, params);
