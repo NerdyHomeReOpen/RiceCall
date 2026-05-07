@@ -5,6 +5,41 @@ import type * as Types from '@/types';
 
 import Env from '@/env';
 
+const I18N_VERSION_KEY = 'i18n_version';
+const I18N_CACHE_PREFIX = 'i18n_cache:';
+
+function cacheKey(lng: string, ns: string): string {
+  return `${I18N_CACHE_PREFIX}${lng}:${ns}`;
+}
+
+function readCache(lng: string, ns: string): Record<string, unknown> | null {
+  try {
+    const raw = localStorage.getItem(cacheKey(lng, ns));
+    if (!raw) return null;
+    return JSON.parse(raw) as Record<string, unknown>;
+  } catch {
+    localStorage.removeItem(cacheKey(lng, ns));
+    return null;
+  }
+}
+
+function writeCache(lng: string, ns: string, data: Record<string, unknown>): void {
+  try {
+    localStorage.setItem(cacheKey(lng, ns), JSON.stringify(data));
+  } catch {
+    console.warn('[i18n] localStorage write failed (quota exceeded?)');
+  }
+}
+
+function purgeCache(): void {
+  const keysToRemove: string[] = [];
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(I18N_CACHE_PREFIX)) keysToRemove.push(k);
+  }
+  keysToRemove.forEach((k) => localStorage.removeItem(k));
+}
+
 class HttpBackend {
   type = 'backend' as const;
   read(lng: string, ns: string, cb: (error: Error | null, data: Record<string, unknown> | null) => void) {
