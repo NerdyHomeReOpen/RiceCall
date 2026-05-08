@@ -119,7 +119,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   const handleAddChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    openCreateChannel(user.userId, serverId, selectedChannel?.channelId ?? '');
+    openCreateChannel(user.userId, serverId, selectedChannel?.channelId);
   };
 
   const handleChangeChannelNameBtnClick = (e: React.MouseEvent) => {

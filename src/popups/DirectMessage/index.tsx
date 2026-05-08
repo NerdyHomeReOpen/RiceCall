@@ -30,19 +30,17 @@ import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 import UnreadMessageAlert from '@/components/UnreadMessageAlert';
 
-import { getDefaultFriend } from '@/utils/default';
 import { toTags } from '@/utils/tagConverter';
 
 import styles from './DirectMessage.module.css';
 
 interface DirectMessagePopupProps {
-  friend: Types.Friend | null;
   target: Types.User;
   event: 'directMessage' | 'shakeWindow';
   message: Types.DirectMessage;
 }
 
-const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ friend: friendData, target, event, message }) => {
+const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ target, event, message }) => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
   const editor = useEditor({
@@ -71,7 +69,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
 
   const [messageInput, setMessageInput] = useState<string>('');
   const [targetCurrentServer, setTargetCurrentServer] = useState<Types.Server | null>(null);
-  const [friend, setFriend] = useState<Types.Friend | null>(friendData);
   const [directMessages, setDirectMessages] = useState<(Types.DirectMessage | Types.PromptMessage)[]>([]);
   const [cooldown, setCooldown] = useState<number>(0);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
@@ -249,8 +246,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   }, [target.userId, target.shareCurrentServer, targetCurrentServer, isBlocked, isFriend]);
 
   useEffect(() => {
-    if (!friend) ipc.socket.send('stranger', { targetId: target.userId });
-  }, [friend, target.userId]);
+    if (!isFriend) ipc.socket.send('stranger', { targetId: target.userId });
+  }, [isFriend, target.userId]);
 
   useEffect(() => {
     if (!messageAreaRef.current || directMessages.length === 0) return;
@@ -278,14 +275,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ frie
   useEffect(() => {
     if (isAtBottom) setUnreadMessageCount(0);
   }, [isAtBottom]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendUpdate', (...args: { targetId: Types.User['userId']; update: Partial<Types.Friend> }[]) => {
-      const match = args.find((i) => String(i.targetId) === String(target.userId));
-      if (match) setFriend((prev) => (prev ? { ...prev, ...match.update } : getDefaultFriend(match.update)));
-    });
-    return () => unsub();
-  }, [target.userId]);
 
   useEffect(() => {
     const onDirectMessage = (...args: Types.DirectMessage[]) => {

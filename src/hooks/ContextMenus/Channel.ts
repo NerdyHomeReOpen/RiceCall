@@ -33,7 +33,7 @@ export const useChannelContextMenu = ({ channel, user, currentServer, currentCha
         .addJoinChannelOption({ canJoin, isInChannel }, () => connectChannel(currentServer.serverId, channel.channelId, canJoin, isPasswordNeeded))
         .addViewOrEditOption(() => openChannelSetting(user.userId, currentServer.serverId, channel.channelId))
         .addSeparator()
-        .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId, ''))
+        .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId))
         .addCreateSubChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId, channel.categoryId ?? channel.channelId))
         .addDeleteChannelOption({ permissionLevel, isSubChannel }, () => deleteChannel(currentServer.serverId, channel.channelId, channel.name))
         .addSeparator()

@@ -56,7 +56,9 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
     return { server, channel, channelMembers };
   },
 
-  createChannel: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) => {
+  createChannel: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId?: string }) => {
+    if (!channelId) return { parent: null };
+
     const parentPromise = fetchChannel({ userId, serverId, channelId });
 
     const [parent] = await Promise.all([parentPromise]);

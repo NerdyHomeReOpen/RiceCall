@@ -19,7 +19,7 @@ export const useChannelListContextMenu = ({ user, currentServer, currentChannel,
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId, ''))
+        .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId))
         .addSeparator()
         .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServer.serverId))
         .addSeparator()

@@ -248,7 +248,7 @@ export function openChatHistory(userId: Types.User['userId'], targetId: Types.Us
   ipc.popup.open('chatHistory', 'chatHistory', { userId, targetId });
 }
 
-export function openCreateChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function openCreateChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId?: Types.Channel['channelId']) {
   ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
 }
 
