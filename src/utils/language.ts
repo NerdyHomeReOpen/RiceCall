@@ -33,23 +33,21 @@ export function getFormatTimeDiff(timestamp: number): string {
   const absDiff = Math.abs(diff);
 
   const intervals = [
-    { label: t('year'), seconds: 31536000 },
-    { label: t('month'), seconds: 2592000 },
-    { label: t('week'), seconds: 604800 },
-    { label: t('day'), seconds: 86400 },
-    { label: t('hour'), seconds: 3600 },
-    { label: t('minute'), seconds: 60 },
-    { label: t('second'), seconds: 1 },
+    { tKey: 'years', seconds: 31536000 },
+    { tKey: 'months', seconds: 2592000 },
+    { tKey: 'weeks', seconds: 604800 },
+    { tKey: 'days', seconds: 86400 },
+    { tKey: 'hours', seconds: 3600 },
+    { tKey: 'minutes', seconds: 60 },
+    { tKey: 'seconds', seconds: 1 },
   ];
 
   if (absDiff > 10) {
     for (const interval of intervals) {
       const count = Math.floor(absDiff / interval.seconds);
       if (count >= 1) {
-        const label = interval.label;
-        const timesAgo = `${count}${label}${t('ago')}`;
-        const timesFuture = `${count}${label}${t('future')}`;
-        return isFuture ? timesFuture : timesAgo;
+        const tKey = `${interval.tKey}-${isFuture ? 'later' : 'ago'}`;
+        return `${count} ${t(tKey)}`;
       }
     }
   }
