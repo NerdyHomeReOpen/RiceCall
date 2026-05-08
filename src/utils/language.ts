@@ -47,7 +47,7 @@ export function getFormatTimeDiff(timestamp: number): string {
       const count = Math.floor(absDiff / interval.seconds);
       if (count >= 1) {
         const tKey = `${interval.tKey}-${isFuture ? 'later' : 'ago'}`;
-        return `${count} ${t(tKey)}`;
+        return t(tKey, { 0: count.toString() });
       }
     }
   }
