@@ -28,23 +28,29 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
   const canSubmit = query.trim();
 
   const searchUser = (query: string) => {
-    ipc.api.searchUser({ query }).then((users) => {
-      const target = users[0];
+    ipc.api
+      .searchUser({ query })
+      .then((users) => {
+        const target = users[0];
 
-      if (!target) {
-        setError(t('user-not-found'));
-        return;
-      }
-
-      ipc.api.fetchFriend({ userId: user.userId, targetId: target.userId }).then((friend) => {
-        if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
-        else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
-        else {
-          openApplyFriend(user.userId, target.userId);
-          ipc.popup.close(id);
+        if (!target) {
+          setError(t('user-not-found'));
+          return;
         }
+
+        ipc.api.fetchFriend({ userId: user.userId, targetId: target.userId }).then((friend) => {
+          if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
+          else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
+          else {
+            openApplyFriend(user.userId, target.userId).then(() => {
+              ipc.popup.close(id);
+            });
+          }
+        });
+      })
+      .catch(() => {
+        setError(t('user-not-found'));
       });
-    });
   };
 
   const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -72,7 +78,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
             <div className="label">{t('please-input-user-account')}</div>
             <input name="search-query" type="text" value={query} onChange={handleQueryChange} required />
             {error && (
-              <div style={{ position: 'absolute', top: '2rem', right: '0' }} className="label-error">
+              <div style={{ position: 'absolute', top: '2rem', right: '5px' }} className="error-text">
                 {`(${t(error)})`}
               </div>
             )}
