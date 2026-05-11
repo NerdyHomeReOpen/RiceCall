@@ -1,4 +1,4 @@
-.login-page {
+.page {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -9,7 +9,7 @@
   background-color: var(--background);
 }
 
-.login-page-body {
+.body {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -46,7 +46,7 @@
   background-size: auto;
 }
 
-.login-form-wrapper {
+.form-wrapper {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -250,7 +250,7 @@
   opacity: 0.6;
 }
 
-.login-page-footer {
+.footer {
   display: flex;
   align-items: center;
   justify-content: space-between;

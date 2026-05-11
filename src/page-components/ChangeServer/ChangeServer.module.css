@@ -1,4 +1,4 @@
-.change-server-page {
+.page {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -17,7 +17,7 @@
   background-size: contain;
 }
 
-.change-server-page-body {
+.body {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -27,7 +27,7 @@
   height: 100%;
 }
 
-.change-server-form-wrapper {
+.form-wrapper {
   display: grid;
   grid-template-columns: repeat(1, 1fr);
   gap: 10px;
@@ -61,7 +61,7 @@
   opacity: 0.6;
 }
 
-.change-server-page-footer {
+.footer {
   display: flex;
   align-items: center;
   justify-content: flex-start;

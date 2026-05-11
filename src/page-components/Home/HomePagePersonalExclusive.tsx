@@ -19,7 +19,7 @@ const HomePagePersonalExclusive: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={styles['home-wrapper']}>
+      <div className={styles['wrapper']}>
         <ServerList title={t('recent-servers')} servers={recentServers} />
         <ServerList title={t('my-servers')} servers={ownedServers} />
         <ServerList title={t('favorited-servers')} servers={favoriteServers} />

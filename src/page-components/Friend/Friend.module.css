@@ -139,7 +139,7 @@
   content: attr(data-placeholder-text);
 }
 
-.emoji-btn {
+.emoji-button {
   width: 18px;
   height: 18px;
   background-repeat: no-repeat;
@@ -148,7 +148,7 @@
   display: none;
 }
 
-.emoji-btn::before {
+.emoji-button::before {
   display: block;
   min-width: 18px;
   min-height: 18px;
@@ -159,15 +159,15 @@
   background-position: 0 0;
 }
 
-.emoji-btn:hover::before {
+.emoji-button:hover::before {
   background-position: -18px 0;
 }
 
-.emoji-btn:active::before {
+.emoji-button:active::before {
   background-position: -36px 0;
 }
 
-.user-signature:focus-within .emoji-btn {
+.user-signature:focus-within .emoji-button {
   display: flex;
 }
 
@@ -261,7 +261,7 @@
   background-position: 0 0;
 }
 
-.search-bar:hover:not(:has(.prev-icon:hover, .next-icon:hover)) .search-icon {
+.search-bar:hover:not(:has(.prev-button:hover, .next-button:hover)) .search-icon {
   background-position: -20px 0;
 }
 
@@ -331,7 +331,7 @@
   background-repeat: no-repeat;
 }
 
-.prev-icon {
+.prev-button {
   min-width: 29px;
   min-height: 30px;
   cursor: pointer;
@@ -340,7 +340,7 @@
   background-position: 0 0;
 }
 
-.next-icon {
+.next-button {
   min-width: 29px;
   min-height: 30px;
   cursor: pointer;
@@ -349,13 +349,13 @@
   background-position: 0 0;
 }
 
-.prev-icon:hover,
-.next-icon:hover {
+.prev-button:hover,
+.next-button:hover {
   background-position: -29px 0;
 }
 
-.prev-icon:active,
-.next-icon:active {
+.prev-button:active,
+.next-button:active {
   background-position: -58px 0;
 }
 

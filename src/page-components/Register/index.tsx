@@ -148,9 +148,9 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
   };
 
   return (
-    <main className={styles['register-page']} style={display ? {} : { display: 'none' }}>
-      <main className={styles['register-page-body']}>
-        <form className={styles['register-form-wrapper']} onSubmit={handleSubmit}>
+    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
+      <main className={styles['body']}>
+        <form className={styles['form-wrapper']} onSubmit={handleSubmit}>
           {isLoading ? (
             <>
               <div className={styles['loading-text']}>{`${t('registering')}...`}</div>
@@ -244,7 +244,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
           )}
         </form>
       </main>
-      <div className={styles['register-page-footer']}>
+      <div className={styles['footer']}>
         <div className={styles['back-to-login-button']} onClick={handleBackToLoginBtnClick}>
           {t('back-to-login')}
         </div>

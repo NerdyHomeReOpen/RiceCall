@@ -65,8 +65,8 @@ const FriendPageSidebar: React.FC = React.memo(() => {
       <div className={styles['search-bar']}>
         <div className={styles['search-icon']} />
         <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
-        <div className={styles['prev-icon']} />
-        <div className={styles['next-icon']} />
+        <div className={styles['prev-button']} />
+        <div className={styles['next-button']} />
       </div>
       <div className={styles['scroll-view']} style={isFriendTab ? {} : { display: 'none' }}>
         <div className={styles['friend-group-list']}>

@@ -110,10 +110,10 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
   }, []);
 
   return (
-    <main className={styles['login-page']} style={display ? {} : { display: 'none' }}>
-      <main className={styles['login-page-body']}>
+    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
+      <main className={styles['body']}>
         <div className={styles['app-logo']} />
-        <form className={styles['login-form-wrapper']} onSubmit={handleSubmit}>
+        <form className={styles['form-wrapper']} onSubmit={handleSubmit}>
           {isLoading ? (
             <>
               <div className={styles['loading-text']}>{`${t('logining')}...`}</div>
@@ -175,7 +175,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
           )}
         </form>
       </main>
-      <div className={styles['login-page-footer']}>
+      <div className={styles['footer']}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
           <div className={styles['create-account-button']} onClick={handleRegisterBtnClick}>
             {t('register-account')}

@@ -109,7 +109,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
           onCompositionStart={handleSignatureInputCompositionStart}
           onCompositionEnd={handleSignatureInputCompositionEnd}
         />
-        <div className={styles['emoji-btn']} onMouseDown={handleEmojiPickerClick} />
+        <div className={styles['emoji-button']} onMouseDown={handleEmojiPickerClick} />
       </div>
     </>
   );

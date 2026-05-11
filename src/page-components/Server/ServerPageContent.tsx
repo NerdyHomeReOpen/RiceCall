@@ -284,7 +284,7 @@ const ServerPageContent: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={`${styles['server-page-content-layout']} ${isChannelUIClassicMode ? styles['classic'] : ''} ${isChannelUIThreeLineMode ? styles['three-line'] : ''}`}>
+      <div className={`${styles['content-layout']} ${isChannelUIClassicMode ? styles['classic'] : ''} ${isChannelUIThreeLineMode ? styles['three-line'] : ''}`}>
         <div className={styles['widget-bar-toggle-button']}>
           <div className={styles['widget-bar-item']} onClick={handleWidgetMoreBtnClick}>
             <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`} />
@@ -295,12 +295,12 @@ const ServerPageContent: React.FC = React.memo(() => {
             <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`} />
             <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
           </div>
-          <div className={styles['widget-bar-spliter']} />
+          <div className={styles['widget-bar-splitter']} />
           <div className={`${styles['widget-bar-item']} ${isCentralAreaShowMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetShowClick}>
             <div className={`${styles['widget-bar-item-icon']} ${styles['show-icon']}`} />
             <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
           </div>
-          <div className={styles['widget-bar-spliter']} />
+          <div className={styles['widget-bar-splitter']} />
           <div className={styles['widget-bar-item']} onClick={handleWidgetMoreClick}>
             <div className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`} />
             <span className={styles['widget-bar-item-text']}>{t('more')}</span>
@@ -356,7 +356,7 @@ const ServerPageContent: React.FC = React.memo(() => {
         </div>
         <MicButton />
         <div className={styles['control-buttons']}>
-          <div className={`${styles['mixing-mode-btn']} ${isMixModeActive ? styles['active'] : ''}`} onClick={handleMixingBtnClick} title={isMixModeActive ? t('mixing-on') : t('mixing-off')}>
+          <div className={`${styles['mixing-mode-button']} ${isMixModeActive ? styles['active'] : ''}`} onClick={handleMixingBtnClick} title={isMixModeActive ? t('mixing-on') : t('mixing-off')}>
             {t('mixing')}
           </div>
           <div className={styles['control-button-separator']} />

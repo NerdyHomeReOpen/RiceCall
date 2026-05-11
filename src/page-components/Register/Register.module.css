@@ -1,4 +1,4 @@
-.register-page {
+.page {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -24,7 +24,7 @@
   background-size: cover;
 }
 
-.register-page-body {
+.body {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -34,7 +34,7 @@
   height: 60%;
 }
 
-.register-form-wrapper {
+.form-wrapper {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -110,7 +110,7 @@
   opacity: 0.6;
 }
 
-.register-page-footer {
+.footer {
   display: flex;
   align-items: center;
   justify-content: flex-start;

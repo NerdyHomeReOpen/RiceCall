@@ -51,7 +51,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   };
 
   return (
-    <main className={styles['home-page']} style={display ? {} : { display: 'none' }}>
+    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
       <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
         {selectedAnn && (
           <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
@@ -60,7 +60,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
                 {t(`${selectedAnn.category}`)}
               </div>
               <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
-              <div className={styles['announcement-datail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
+              <div className={styles['announcement-detail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
             </div>
             {selectedAnn.attachmentUrl && (
               <div className={styles['banner']}>
@@ -73,7 +73,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
           </div>
         )}
       </div>
-      <header className={styles['home-page-header']}>
+      <header className={styles['header']}>
         <HomePageHeader
           isHomeSection={isHomeSection}
           isPersonalExclusiveSection={isPersonalExclusiveSection}
@@ -83,14 +83,14 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
           onBackBtnClick={handleBackBtnClick}
         />
       </header>
-      <main className={styles['home-page-body']}>
-        <main className={styles['home-page-content']} style={isHomeSection ? {} : { display: 'none' }}>
+      <main className={styles['body']}>
+        <main className={styles['content']} style={isHomeSection ? {} : { display: 'none' }}>
           <HomePageContent onAnnouncementSelect={handleAnnouncementSelect} />
         </main>
-        <main className={styles['home-page-content']} style={isPersonalExclusiveSection ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={isPersonalExclusiveSection ? {} : { display: 'none' }}>
           <HomePagePersonalExclusive />
         </main>
-        <main className={styles['home-page-content']} style={!isHomeSection && !isPersonalExclusiveSection ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={!isHomeSection && !isPersonalExclusiveSection ? {} : { display: 'none' }}>
           <HomePageNotAvailable />
         </main>
       </main>

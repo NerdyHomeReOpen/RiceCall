@@ -90,20 +90,20 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
                   <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)} />
                 ))}
               </div>
-              <nav className={`${styles['nav']} ${styles['prev-btn']}`} onClick={handlePrevAnnBtnClick}>
+              <nav className={`${styles['nav']} ${styles['prev-button']}`} onClick={handlePrevAnnBtnClick}>
                 {'◀'}
               </nav>
-              <nav className={`${styles['nav']} ${styles['next-btn']}`} onClick={handleNextAnnBtnClick}>
+              <nav className={`${styles['nav']} ${styles['next-button']}`} onClick={handleNextAnnBtnClick}>
                 {'▶'}
               </nav>
             </>
           )}
         </div>
       </div>
-      <div className={styles['home-wrapper']}>
+      <div className={styles['wrapper']}>
         <ServerList title={t('recommend-server')} servers={filteredRecommendServers} />
       </div>
-      <div className={styles['home-wrapper']}>
+      <div className={styles['wrapper']}>
         <ServerList title={t('official-server')} servers={filteredOfficialServers} />
       </div>
     </>

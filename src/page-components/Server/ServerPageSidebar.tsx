@@ -150,21 +150,21 @@ const ServerPageSidebar: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={styles['server-page-sidebar-header']}>
-        <div className={styles['server-avatar-picture']} onClick={handleServerAvatarClick}>
+      <div className={styles['sidebar-header']}>
+        <div className={styles['server-avatar']} onClick={handleServerAvatarClick}>
           <Image src={currentServer.avatarUrl} alt="server_avatar" width={50} height={50} loading="lazy" draggable="false" />
         </div>
-        <div className={styles['server-base-info-wrapper']}>
-          <div className={styles['server-base-info-box']}>
+        <div className={styles['server-info-wrapper']}>
+          <div className={styles['server-info-box']}>
             {!!currentServer.isVerified && <div className={styles['server-verify-icon']} title={t('official-verified-server')} />}
             <div className={styles['server-name-text']}>{currentServer.name} </div>
           </div>
-          <div className={styles['server-base-info-box']}>
+          <div className={styles['server-info-box']}>
             <div className={styles['server-id-text']}>{currentServer.specialId || currentServer.displayId}</div>
             <div className={styles['server-online-count-text']}>{onlineMembers.length}</div>
             <div className={styles['server-options']}>
               <div className={styles['invitation-button']} onClick={handleInviteFriendClick} />
-              <div className={styles['server-option-saperator']} />
+              <div className={styles['options-separator']} />
               <div className={styles['setting-button']} onClick={handleServerSettingClick}>
                 <div className={`${styles['setting-overlay']} ${hasNewMemberApplications ? styles['new'] : ''}`} />
               </div>
@@ -192,7 +192,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
               ))}
             </div>
           </div>
-          <div className={styles['queue-list-saperator']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
+          <div className={styles['queue-list-separator']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
         </>
       )}
       <div className={styles['section-title-text']}>{isCurrentTab ? t('current-channel') : t('all-channel')}</div>
@@ -205,12 +205,12 @@ const ServerPageSidebar: React.FC = React.memo(() => {
           )}
         </div>
       </div>
-      <div className={styles['channel-list-saperator']} />
-      <div className={styles['server-page-sidebar-footer']}>
-        <div className={`${styles['server-page-sidebar-navegate-tab']} ${isCurrentTab ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
+      <div className={styles['channel-list-separator']} />
+      <div className={styles['sidebar-footer']}>
+        <div className={`${styles['sidebar-navigate-tab']} ${isCurrentTab ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
           {t('current-channel')}
         </div>
-        <div className={`${styles['server-page-sidebar-navegate-tab']} ${isAllTab ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
+        <div className={`${styles['sidebar-navigate-tab']} ${isAllTab ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
           {t('all-channel')}
         </div>
       </div>

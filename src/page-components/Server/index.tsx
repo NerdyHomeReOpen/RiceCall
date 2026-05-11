@@ -33,13 +33,13 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
   }, []);
 
   return (
-    <main className={styles['server-page']} style={display ? {} : { display: 'none' }}>
-      <main className={styles['server-page-body']}>
-        <aside ref={sidebarRef} className={styles['server-page-sidebar']}>
+    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
+      <main className={styles['body']}>
+        <aside ref={sidebarRef} className={styles['sidebar']}>
           <ServerPageSidebar />
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />
-        <main className={styles['server-page-content']}>
+        <main className={styles['content']}>
           <ServerPageContent />
         </main>
       </main>
