@@ -46,12 +46,12 @@ const StaffCard: React.FC<StaffCardProps> = React.memo(({ staff }) => {
       </div>
       <div className={styles['icon-wrapper']}>
         {staff.github && (
-          <div className={styles['github-icon-link']} title="GitHub" onClick={handleGitHubIconClick}>
+          <div className={styles['github-link']} title="GitHub" onClick={handleGitHubIconClick}>
             <FaGithub size={20} />
           </div>
         )}
         {staff.discord && (
-          <div className={styles['discord-icon-link']} title="Discord" onClick={handleDiscordIconClick}>
+          <div className={styles['discord-link']} title="Discord" onClick={handleDiscordIconClick}>
             <FaDiscord size={20} />
           </div>
         )}

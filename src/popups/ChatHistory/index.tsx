@@ -66,14 +66,14 @@ const ChatHistoryPopup: React.FC = React.memo(() => {
               <div className={styles['body-right']}>
                 <div className={styles['main']}>
                   <div className={styles['main-title']}>與 %d 的聊天訊息紀錄</div>
-                  <div className={styles['main-delete-button-box']}>
-                    <div className={styles['delete-button-icon']} />
+                  <div className={styles['delete-button-container']}>
+                    <div className={styles['delete-icon']} />
                     <div className={styles['delete-button-text']}>刪除紀錄</div>
                   </div>
                 </div>
                 <div className={styles['body-right-bottom']}>
                   <div className={styles['message-date']}>日期：2025/11/20</div>
-                  <div className={styles['body-right-message-box']}>
+                  <div className={styles['message-section']}>
                     {messages.map((msg) => (
                       <div key={msg.id} className={`${styles['message-item']} ${selectedMsg === msg.id ? styles['selected'] : ''}`} onClick={() => setSelectedMsg(msg.id)}>
                         <div className={styles['message-row-top']}>
@@ -90,8 +90,8 @@ const ChatHistoryPopup: React.FC = React.memo(() => {
                     {currentPage}/{totalPages}
                   </span>
                   <div className={styles['spacer']} />
-                  <button className={`${styles['page-btn']} ${styles['first']}`} onClick={goFirst} disabled={currentPage === 1} />
-                  <button className={`${styles['page-btn']} ${styles['prev']}`} onClick={goPrev} disabled={currentPage === 1} />
+                  <button className={`${styles['page-button']} ${styles['first']}`} onClick={goFirst} disabled={currentPage === 1} />
+                  <button className={`${styles['page-button']} ${styles['prev']}`} onClick={goPrev} disabled={currentPage === 1} />
                   {[...Array(totalPages)].map((_, idx) => {
                     const page = idx + 1;
                     return (
@@ -101,8 +101,8 @@ const ChatHistoryPopup: React.FC = React.memo(() => {
                       </label>
                     );
                   })}
-                  <button className={`${styles['page-btn']} ${styles['next']}`} onClick={goNext} disabled={currentPage === totalPages} />
-                  <button className={`${styles['page-btn']} ${styles['last']}`} onClick={goLast} disabled={currentPage === totalPages} />
+                  <button className={`${styles['page-button']} ${styles['next']}`} onClick={goNext} disabled={currentPage === totalPages} />
+                  <button className={`${styles['page-button']} ${styles['last']}`} onClick={goLast} disabled={currentPage === totalPages} />
                   <div className={styles['spacer']} />
                 </div>
               </div>

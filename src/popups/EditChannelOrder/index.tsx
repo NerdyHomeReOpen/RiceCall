@@ -170,7 +170,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   useEffect(() => {
     const onClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest(`.${styles['channel-tab']}`) || target.closest('[class*="Btn"]')) return;
+      if (target.closest(`.${styles['channel-item']}`) || target.closest('[class*="Btn"]')) return;
       setSelectedChannel(null);
     };
     window.addEventListener('click', onClick);

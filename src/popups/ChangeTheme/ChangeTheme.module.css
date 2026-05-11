@@ -3,7 +3,7 @@
   background-size: cover;
 }
 
-.ct-wrapper {
+.wrapper {
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -13,7 +13,7 @@
   background-size: cover;
 }
 
-.ct-contain {
+.content {
   display: flex;
   width: 100%;
   margin-right: 30px;
@@ -145,26 +145,26 @@
   margin-top: 5px;
 }
 
-.color-selected-color {
+.selected-color {
   width: 60px;
   height: 25px;
 }
 
-.color-selected-btn {
+.color-select-button {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
 
-.color-selected-save,
-.color-selected-cancel {
+.save-button,
+.cancel-button {
   width: 56px;
   height: 25px;
   cursor: pointer;
   border: 1px solid var(--border);
 }
 
-.color-selected-save {
+.save-button {
   margin-right: 3px;
   background-image: url('/palette_ok.svg');
   background-repeat: no-repeat;
@@ -172,15 +172,15 @@
   background-size: auto;
 }
 
-.color-selected-cancel {
+.cancel-button {
   background-image: url('/palette_cancel.svg');
   background-repeat: no-repeat;
   background-position: center center;
   background-size: auto;
 }
 
-.color-selected-save:hover,
-.color-selected-cancel:hover {
+.save-button:hover,
+.cancel-button:hover {
   background-color: var(--hover);
 }
 

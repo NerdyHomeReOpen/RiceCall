@@ -55,7 +55,7 @@ const ChannelEventPopup: React.FC = React.memo(() => {
         <div className={`${styles['option-tab']} ${isCurrentChannelTab ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
           {t('current-channel')}
         </div>
-        <div className={styles['spliter']} />
+        <div className={styles['splitter']} />
         <div className={`${styles['option-tab']} ${isAllChannelTab ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
           {t('all-channel')}
         </div>

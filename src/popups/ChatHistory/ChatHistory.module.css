@@ -164,7 +164,7 @@
   margin-left: 0.8rem;
 }
 
-.main-delete-button-box {
+.delete-button-container {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -176,11 +176,11 @@
   border: 1px solid #b1b1b1;
 }
 
-.main-delete-button-box:hover {
+.delete-button-container:hover {
   background: #eee;
 }
 
-.delete-button-icon {
+.delete-icon {
   width: 16px;
   height: 16px;
   background-image: url('/Delete_ico.png');
@@ -249,7 +249,7 @@
   flex: 1;
 }
 
-.page-btn {
+.page-button {
   width: 11px;
   height: 11px;
   padding: 0;
@@ -266,35 +266,35 @@
   cursor: auto;
 }
 
-.page-btn.first {
+.page-button.first {
   background-position: 0 0;
 }
 
-.page-btn.prev {
+.page-button.prev {
   background-position: -11px 0;
 }
 
-.page-btn.next {
+.page-button.next {
   background-position: -22px 0;
 }
 
-.page-btn.last {
+.page-button.last {
   background-position: -33px 0;
 }
 
-.page-btn.first.disabled {
+.page-button.first.disabled {
   background-position: -44px 0;
 }
 
-.page-btn.prev.disabled {
+.page-button.prev.disabled {
   background-position: -55px 0;
 }
 
-.page-btn.next.disabled {
+.page-button.next.disabled {
   background-position: -66px 0;
 }
 
-.page-btn.last.disabled {
+.page-button.last.disabled {
   background-position: -77px 0;
 }
 
@@ -321,7 +321,7 @@
   background: #006ad1;
 }
 
-.body-right-message-box {
+.message-section {
   display: flex;
   flex-direction: column;
   gap: 0.5rem;

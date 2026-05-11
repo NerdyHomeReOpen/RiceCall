@@ -42,7 +42,7 @@
   transition: left 0.2s ease;
 }
 
-.spliter {
+.splitter {
   min-width: 2px;
   min-height: 16px;
   background-image: url('/icon_v_split.svg');

@@ -164,8 +164,8 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   return (
     <div className="popup-wrapper">
       <div className="popup-body">
-        <div className={styles['ct-wrapper']}>
-          <div className={styles['ct-contain']}>
+        <div className={styles['wrapper']}>
+          <div className={styles['content']}>
             <div className={styles['theme-selector']}>
               <div className={styles['theme-options']}>
                 <div className={styles['theme-slots-big']}>
@@ -195,10 +195,10 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                   <div className={styles['color-selector-box']}>
                     <div ref={colorSelectorRef} className={styles['color-selector-image']} onMouseDown={handleColorSelect} onMouseMove={handleColorSelect} />
                     <div className={styles['color-selector-footer']}>
-                      <div className={styles['color-selected-color']} style={{ backgroundColor: toRGBString(pickedColor) }} />
-                      <div className={styles['color-selected-btn']}>
-                        <div className={styles['color-selected-save']} onClick={handleColorSaveBtnClick} />
-                        <div className={styles['color-selected-cancel']} onClick={handleColorCancelBtnClick} />
+                      <div className={styles['selected-color']} style={{ backgroundColor: toRGBString(pickedColor) }} />
+                      <div className={styles['color-select-button']}>
+                        <div className={styles['save-button']} onClick={handleColorSaveBtnClick} />
+                        <div className={styles['cancel-button']} onClick={handleColorCancelBtnClick} />
                       </div>
                     </div>
                   </div>

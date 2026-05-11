@@ -113,11 +113,11 @@
   user-select: text;
 }
 
-.github-icon-link:hover svg {
+.github-link:hover svg {
   color: rgb(70 70 70);
 }
 
-.discord-icon-link:hover svg {
+.discord-link:hover svg {
   color: #7289da;
 }
 

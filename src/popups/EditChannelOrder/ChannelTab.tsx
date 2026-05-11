@@ -34,14 +34,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect })
   };
 
   return (
-    <div className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
+    <div className={`${styles['channel-item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <div
-        className={`${styles['channel-tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[channel.visibility]} ${channel.isLobby ? styles['lobby'] : ''}`}
+        className={`${styles['channel-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[channel.visibility]} ${channel.isLobby ? styles['lobby'] : ''}`}
         onClick={handleTabExpandedClick}
       />
-      <div className={styles['channel-tab-label']} style={{ display: 'inline-flex' }}>
+      <div className={styles['channel-label']} style={{ display: 'inline-flex' }}>
         {channel.name}
-        <div className={styles['channel-tab-index-text']}>{`(${channel.order})`}</div>
+        <div className={styles['channel-index-text']}>{`(${channel.order})`}</div>
       </div>
     </div>
   );

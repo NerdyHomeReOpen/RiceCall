@@ -40,14 +40,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category
 
   return (
     <>
-      <div className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
+      <div className={`${styles['channel-item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
         <div
-          className={`${styles['channel-tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]} ${category.isLobby ? styles['lobby'] : ''}`}
+          className={`${styles['channel-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]} ${category.isLobby ? styles['lobby'] : ''}`}
           onClick={handleTabExpandedClick}
         />
-        <div className={styles['channel-tab-label']} style={{ display: 'inline-flex' }}>
+        <div className={styles['channel-label']} style={{ display: 'inline-flex' }}>
           {category.name}
-          <div className={styles['channel-tab-index-text']}>{`(${category.order})`}</div>
+          <div className={styles['channel-index-text']}>{`(${category.order})`}</div>
         </div>
       </div>
       <div className={styles['channel-list']} style={isExpanded ? {} : { display: 'none' }}>

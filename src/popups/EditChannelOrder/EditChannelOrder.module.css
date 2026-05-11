@@ -115,7 +115,7 @@
   background-color: var(--selected);
 }
 
-.channel-tab-box {
+.channel-box {
   display: flex;
 }
 
@@ -124,7 +124,7 @@
   flex-direction: column;
 }
 
-.channel-tab {
+.channel-item {
   position: relative;
   display: flex;
   gap: 2px;
@@ -134,15 +134,15 @@
   margin-right: 5px;
 }
 
-.channel-tab:hover {
+.channel-item:hover {
   background-color: var(--hover);
 }
 
-.channel-list .channel-list .channel-tab {
+.channel-list .channel-list .channel-item {
   padding-left: 25px;
 }
 
-.channel-tab-icon {
+.channel-icon {
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
@@ -153,54 +153,54 @@
   background-size: auto;
 }
 
-.channel-tab-icon.expanded {
+.channel-icon.expanded {
   background-position: -14px 0;
 }
 
-.channel-tab-icon.member {
+.channel-icon.member {
   background-position: 0 -14px;
 }
 
-.channel-tab-icon.member.expanded {
+.channel-icon.member.expanded {
   background-position: -14px -14px;
 }
 
-.channel-tab-icon.private {
+.channel-icon.private {
   background-position: -28px 0;
 }
 
-.channel-tab-icon.private.expanded {
+.channel-icon.private.expanded {
   background-position: -28px -14px;
 }
 
-.channel-tab-icon.readonly {
+.channel-icon.readonly {
   background-position: -42px 0;
 }
 
-.channel-tab-icon.readonly.expanded {
+.channel-icon.readonly.expanded {
   background-position: -42px -14px;
 }
 
-.channel-tab-icon.lobby {
+.channel-icon.lobby {
   background-position: -56px 0;
 }
 
-.channel-tab-icon.lobby.expanded {
+.channel-icon.lobby.expanded {
   background-position: -56px -14px;
 }
 
-.channel-tab-label {
+.channel-label {
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color-secondary);
   white-space: nowrap;
 }
 
-.channel-tab-label.is-reception-lobby {
+.channel-label.is-reception-lobby {
   color: var(--text-warning);
 }
 
-.channel-tab-index-text {
+.channel-index-text {
   margin-left: 5px;
   color: rgb(255 0 0);
 }
