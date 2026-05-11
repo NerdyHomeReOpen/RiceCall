@@ -4,8 +4,8 @@
   z-index: 1;
   display: flex;
   justify-content: space-between;
-  padding: 8px 5px;
   width: 100%;
+  padding: 8px 5px;
   background-image: url('/channel/chn_toolbar_bg.svg');
 }
 

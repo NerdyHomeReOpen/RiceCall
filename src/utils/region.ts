@@ -1,6 +1,6 @@
 import type * as Types from '@/types';
 
-import { REGIONS } from "@/constants";
+import { REGIONS } from '@/constants';
 
 /**
  * Get the region from the language
@@ -8,10 +8,10 @@ import { REGIONS } from "@/constants";
  * @returns The region
  */
 export function getRegion(): Types.RegionKey {
-    const language = navigator.language;
+  const language = navigator.language;
 
-    const match = REGIONS.find(({ code }) => code.includes(language));
-    if (!match) return 'zh-TW';
+  const match = REGIONS.find(({ code }) => code.includes(language));
+  if (!match) return 'zh-TW';
 
-    return match.code;
+  return match.code;
 }

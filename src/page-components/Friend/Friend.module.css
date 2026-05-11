@@ -140,12 +140,12 @@
 }
 
 .emoji-button {
+  display: none;
   width: 18px;
   height: 18px;
   background-repeat: no-repeat;
   background-position: center center;
   background-size: contain;
-  display: none;
 }
 
 .emoji-button::before {

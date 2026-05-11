@@ -17,7 +17,7 @@ export function addUserToQueue(userId: Types.User['userId'], serverId: Types.Ser
 }
 
 export function applyMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], isReceiveApply: boolean) {
-  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => { });
+  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => {});
   else openApplyMember(userId, serverId);
 }
 
@@ -684,4 +684,3 @@ export async function autoLogin(token: string): Promise<{ success: true; token: 
 
   return { success: true, token: res.token };
 }
-

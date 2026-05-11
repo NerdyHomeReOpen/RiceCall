@@ -38,7 +38,7 @@ class FsAdapter implements I18nStorageType {
     private fs: any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     private path: any,
-  ) { }
+  ) {}
 
   private filePath(key: string): string {
     return this.path.join(this.dir, encodeURIComponent(key) + '.dat') as string;
@@ -70,9 +70,7 @@ class FsAdapter implements I18nStorageType {
 
   keys(): string[] {
     try {
-      return (this.fs.readdirSync(this.dir) as string[])
-        .filter((f: string) => f.endsWith('.dat'))
-        .map((f: string) => decodeURIComponent(f.slice(0, -4)));
+      return (this.fs.readdirSync(this.dir) as string[]).filter((f: string) => f.endsWith('.dat')).map((f: string) => decodeURIComponent(f.slice(0, -4)));
     } catch {
       return [];
     }
@@ -81,19 +79,21 @@ class FsAdapter implements I18nStorageType {
 
 /* eslint-disable @typescript-eslint/no-unused-vars */
 class NoopStorage implements I18nStorageType {
-  getItem(_key: string): string | null { return null; }
-  setItem(_key: string, _value: string): void { }
-  removeItem(_key: string): void { }
-  keys(): string[] { return []; }
+  getItem(_key: string): string | null {
+    return null;
+  }
+  setItem(_key: string, _value: string): void {}
+  removeItem(_key: string): void {}
+  keys(): string[] {
+    return [];
+  }
 }
 
 let storage: I18nStorageType | null = null;
 
 export async function loadStorage(): Promise<void> {
   if (isMain()) {
-    const createRequire = await import(/* webpackIgnore: true */ 'module')
-      .then((module) => module.createRequire)
-      .then((cr) => cr(import.meta.url));
+    const createRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((cr) => cr(import.meta.url));
     const electron = createRequire('electron');
     const path = createRequire('path');
     const fs = createRequire('fs');

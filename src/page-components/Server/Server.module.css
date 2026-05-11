@@ -591,9 +591,9 @@
   flex: none;
   align-items: center;
   justify-content: space-between;
-  padding: 4px 10px;
-  height: 55px;
   width: 100%;
+  height: 55px;
+  padding: 4px 10px;
   background-image: url('/channel/chn_toolbar_bg.svg');
 }
 
