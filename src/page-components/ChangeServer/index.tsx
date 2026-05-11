@@ -38,7 +38,7 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
 
   return (
     <main className={styles['page']} style={display ? {} : { display: 'none' }}>
-      <main className={styles['page-body']}>
+      <main className={styles['body']}>
         <div className={styles['app-logo']} />
         <div className={styles['form-wrapper']}>
           {SERVER_OPTIONS.map((option) => (
@@ -46,7 +46,7 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
           ))}
         </div>
       </main>
-      <div className={styles['page-footer']}>
+      <div className={styles['footer']}>
         <div className={styles['back-to-login-button']} onClick={handleBackToLoginBtnClick}>
           {t('back-to-login')}
         </div>
