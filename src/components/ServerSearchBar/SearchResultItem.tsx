@@ -23,8 +23,8 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
       <div className={styles['dropdown-item-info-text']}>
         <div className={styles['dropdown-item-name-text']}>{server.name}</div>
         <div className={styles['dropdown-item-id']}>
-          <div className={styles['server-search-dropdown-item-id-icon']} />
-          <div className={styles['server-search-dropdown-item-id-text']}>{server.specialId || server.displayId}</div>
+          <div className={styles['dropdown-item-id-icon']} />
+          <div className={styles['dropdown-item-id-text']}>{server.specialId || server.displayId}</div>
         </div>
       </div>
     </div>

@@ -136,14 +136,19 @@
   color: var(--text-color-quaternary);
 }
 
-.dropdown-item-id::before {
+.dropdown-item-id-icon {
   min-width: 12px;
   min-height: 12px;
   margin-right: 5px;
-  content: '';
   background-image: url('/channel/ID.svg');
   background-repeat: no-repeat;
   background-position: 0 0;
+}
+
+.dropdown-item-id-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .dropdown-item-name-text {
