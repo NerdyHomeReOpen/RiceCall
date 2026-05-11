@@ -1,4 +1,4 @@
-.server-list-container {
+.container {
   display: flex;
   flex-direction: column;
   place-items: center;
@@ -7,7 +7,7 @@
   background-color: var(--background-secondary);
 }
 
-.server-list-title {
+.list-title {
   padding: 10px;
   margin: 10px auto;
   font-size: 1.5em;
@@ -15,7 +15,7 @@
   border-bottom: 2px solid var(--border);
 }
 
-.server-list {
+.list {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -24,12 +24,12 @@
 }
 
 @media only screen and (width <=900px) {
-  .server-list {
+  .list {
     width: 550px;
   }
 }
 
-.server-card {
+.card {
   display: flex;
   align-items: center;
   width: 270px;
@@ -40,12 +40,12 @@
   border: 1px solid var(--border);
 }
 
-.server-card-avatar-picture {
+.card-avatar {
   width: 70px;
   height: 70px;
 }
 
-.server-card-info-text {
+.card-info-text {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -58,34 +58,34 @@
   white-space: nowrap;
 }
 
-.server-card-name-text {
+.card-name-text {
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-link);
   white-space: nowrap;
 }
 
-.server-card-id-text {
+.card-id-text {
   display: flex;
   align-items: center;
   color: var(--text-color-quaternary);
 }
 
-.server-card-slogen-text {
-  display: flex;
-  align-items: center;
-  height: 1rem;
-  color: var(--text-color-quaternary);
-}
-
-.server-card-online-text {
+.card-slogan-text {
   display: flex;
   align-items: center;
   height: 1rem;
   color: var(--text-color-quaternary);
 }
 
-.server-card-id-text.is-owner::before {
+.card-online-count-text {
+  display: flex;
+  align-items: center;
+  height: 1rem;
+  color: var(--text-color-quaternary);
+}
+
+.card-id-text.is-owner::before {
   display: block;
   width: 13px;
   height: 15px;

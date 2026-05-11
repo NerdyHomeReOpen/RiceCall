@@ -35,9 +35,9 @@ const NotificationToaster: React.FC = React.memo(() => {
   }, [filteredNotifications]);
 
   return (
-    <div className={`${styles['notification-toaster']} ${show ? styles['show'] : ''}`}>
+    <div className={`${styles['toaster']} ${show ? styles['show'] : ''}`}>
       <MarkdownContent markdownText={filteredNotifications[showNotificationIndex]?.content ?? ''} selectable={false} />
-      <div className={styles['notification-toaster-close']} onClick={handleCloseBtnClick} />
+      <div className={styles['close-button']} onClick={handleCloseBtnClick} />
     </div>
   );
 });

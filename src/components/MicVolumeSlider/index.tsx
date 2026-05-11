@@ -49,7 +49,7 @@ const MicVolumeSlider = React.memo(() => {
 
   useEffect(() => {
     const onPointerDown = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest(`.${styles['mic-mode-menu']}`)) {
+      if (!(e.target as HTMLElement).closest(`.${styles['mode-menu']}`)) {
         setIsMicModeMenuVisible(false);
       }
     };
@@ -58,21 +58,21 @@ const MicVolumeSlider = React.memo(() => {
   }, []);
 
   return (
-    <div className={styles['mic-volume-container']}>
-      <div className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
-      <div className={styles['mic-volume-slider']}>
-        <div className={styles['mic-volume-slider-container']}>
+    <div className={styles['container']}>
+      <div className={`${styles['volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
+      <div className={styles['slider-track']}>
+        <div className={styles['slider-container']}>
           <input ref={sliderRef} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div
-          className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`}
+          className={`${styles['volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`}
           onClick={handleBtnClick}
           onMouseEnter={handleBtnMouseDown}
           onMouseLeave={handleBtnMouseUp}
           onWheel={handleBtnWheel}
         />
       </div>
-      <div className={styles['mic-mode-dropdown-button']} onClick={handleMicModeDropdownBtnClick}>
+      <div className={styles['mode-dropdown-button']} onClick={handleMicModeDropdownBtnClick}>
         {isMicModeMenuVisible ? <MicModeMenu /> : ''}
       </div>
     </div>

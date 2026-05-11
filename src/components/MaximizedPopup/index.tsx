@@ -24,9 +24,9 @@ const MaximizedPopup: React.FC<MaximizedPopupProps> = React.memo(({ title, butto
   };
 
   return (
-    <button key={id} type="button" onClick={handleRestoreBtnClick} title={t(title)} className={styles['maximized-popup']}>
-      <div className={styles['maximized-popup-title-text']}>{t(title)}</div>
-      {buttons.includes('close') && <div className={styles['maximized-popup-close-btn']} onClick={handleCloseBtnClick} title={t('close')} />}
+    <button key={id} type="button" onClick={handleRestoreBtnClick} title={t(title)} className={styles['popup']}>
+      <div className={styles['title-text']}>{t(title)}</div>
+      {buttons.includes('close') && <div className={styles['close-button']} onClick={handleCloseBtnClick} title={t('close')} />}
     </button>
   );
 });

@@ -40,10 +40,10 @@ const SpeakerVolumeSlider = React.memo(() => {
   };
 
   return (
-    <div className={styles['speaker-volume-container']}>
+    <div className={styles['speaker-container']}>
       <div className={`${styles['speaker-button']} ${isSpeakerMuted ? styles['muted'] : ''}`} />
-      <div className={styles['speaker-volume-slider']}>
-        <div className={styles['speaker-volume-slider-container']}>
+      <div className={styles['speaker-slider']}>
+        <div className={styles['speaker-slider-container']}>
           <input ref={sliderRef} type="range" min="0" max="100" value={speakerVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div

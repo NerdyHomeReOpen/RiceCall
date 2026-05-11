@@ -144,7 +144,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   return (
     <div
       ref={userTabRef}
-      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['item']} ${isSelected ? styles['selected'] : ''}`}
       onClick={handleTabClick}
       onDoubleClick={handleTabDoubleClick}
       onMouseEnter={handleTabMouseEnter}
@@ -153,11 +153,11 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
       onDragStart={handleTabDragStart}
       onContextMenu={handleTabContextMenu}
     >
-      <div className={`${styles['user-text-state']} ${member.isTextMuted ? styles['muted'] : ''}`} />
-      <div className={`${styles['user-audio-state']} ${styles[getStatusIcon()]}`} />
+      <div className={`${styles['text-state']} ${member.isTextMuted ? styles['muted'] : ''}`} />
+      <div className={`${styles['audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
       {hasVip && <div className={`vip-icon vip-${member.vip}`} />}
-      <div className={`${styles['user-tab-name-text']} ${member.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{member.nickname || member.name}</div>
+      <div className={`${styles['name-text']} ${member.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{member.nickname || member.name}</div>
       <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
       <BadgeList badges={JSON.parse(member.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
       {isSelf && <div className={styles['my-location-icon']} />}

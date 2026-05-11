@@ -204,7 +204,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
           <div className={styles['status-triangle']} />
         </div>
       </div>
-      <div className={styles['main-tabs']}>
+      <div className={styles['tabs']}>
         {mainTabs.map((tab) => (
           <MainTabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
         ))}
@@ -215,7 +215,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
         <div className={styles['notice-button']} onClick={handleNotificationMenuClick}>
           <div className={`${styles['notice-overlay']} ${hasNotification && styles['new']}`} />
         </div>
-        <div className={styles['spliter']} />
+        <div className={styles['splitter']} />
         <div className={styles['menu-button']} onClick={handleMenuClick} />
         <div className={styles['minimize-button']} onClick={handleMinimizeBtnClick} />
         {isFullscreen ? <div className={styles['restore-button']} onClick={handleUnmaximizeBtnClick} /> : <div className={styles['maxsize-button']} onClick={handleMaximizeBtnClick} />}

@@ -25,16 +25,16 @@
   }
 }
 
-.mic-volume-container,
-.speaker-volume-container {
+.mic-container,
+.speaker-container {
   position: relative;
   display: flex;
   gap: 5px;
   align-items: center;
 }
 
-.mic-volume-container .mic-volume-slider,
-.speaker-volume-container .speaker-volume-slider {
+.mic-container .mic-slider,
+.speaker-container .speaker-slider {
   position: absolute;
   bottom: -3px;
   left: -3px;
@@ -51,14 +51,14 @@
   box-shadow: var(--box-shadow);
 }
 
-.mic-volume-container:has(.mic-button:hover) .mic-volume-slider,
-.mic-volume-container:has(.mic-volume-slider:hover) .mic-volume-slider,
-.speaker-volume-container:has(.speaker-button:hover) .speaker-volume-slider,
-.speaker-volume-container:has(.speaker-volume-slider:hover) .speaker-volume-slider {
+.mic-container:has(.mic-button:hover) .mic-slider,
+.mic-container:has(.mic-slider:hover) .mic-slider,
+.speaker-container:has(.speaker-button:hover) .speaker-slider,
+.speaker-container:has(.speaker-slider:hover) .speaker-slider {
   display: flex;
 }
 
-.speaker-volume-slider-container {
+.speaker-slider-container {
   position: relative;
   display: flex;
   width: 4px;
@@ -67,7 +67,7 @@
   border-radius: 2px;
 }
 
-.speaker-volume-slider-container .slider {
+.speaker-slider-container .slider {
   position: absolute;
   top: calc(50% - 4px);
   left: -58px;
@@ -79,7 +79,7 @@
   transform: rotate(-90deg);
 }
 
-.speaker-volume-slider-container .slider::-webkit-slider-thumb {
+.speaker-slider-container .slider::-webkit-slider-thumb {
   width: 14px;
   height: 14px;
   appearance: none;

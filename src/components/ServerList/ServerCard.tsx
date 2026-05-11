@@ -53,14 +53,14 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   };
 
   return (
-    <div className={styles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <div className={styles['server-card-avatar-picture']}>
+    <div className={styles['card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
+      <div className={styles['card-avatar']}>
         <Image src={server.avatarUrl} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['server-card-info-text']}>
-        <div className={styles['server-card-name-text']}>{server.name}</div>
-        <div className={`${styles['server-card-id-text']} ${isOwned ? styles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
-        <div className={styles['server-card-slogen-text']}>{server.slogan}</div>
+      <div className={styles['card-info-text']}>
+        <div className={styles['card-name-text']}>{server.name}</div>
+        <div className={`${styles['card-id-text']} ${isOwned ? styles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
+        <div className={styles['card-slogan-text']}>{server.slogan}</div>
       </div>
     </div>
   );

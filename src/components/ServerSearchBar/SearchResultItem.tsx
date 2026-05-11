@@ -16,13 +16,13 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
   };
 
   return (
-    <div className={styles['server-search-dropdown-item']} onClick={handleClick}>
-      <div className={styles['server-search-dropdown-item-avatar-picture']}>
+    <div className={styles['dropdown-item']} onClick={handleClick}>
+      <div className={styles['dropdown-item-avatar']}>
         <Image src={server.avatarUrl} alt="server_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['server-search-dropdown-item-info-text']}>
-        <div className={styles['server-search-dropdown-item-name-text']}>{server.name}</div>
-        <div className={styles['server-search-dropdown-item-id-box']}>
+      <div className={styles['dropdown-item-info-text']}>
+        <div className={styles['dropdown-item-name-text']}>{server.name}</div>
+        <div className={styles['dropdown-item-id']}>
           <div className={styles['server-search-dropdown-item-id-icon']} />
           <div className={styles['server-search-dropdown-item-id-text']}>{server.specialId || server.displayId}</div>
         </div>

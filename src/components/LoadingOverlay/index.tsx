@@ -12,11 +12,11 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = React.memo(({ loadingServe
   const { t } = useTranslation();
 
   return (
-    <div className={styles['loading-overlay-wrapper']}>
+    <div className={styles['wrapper']}>
       <div className={styles['loading-overlay']}>
-        <div className={styles['loading-overlay-title-text']}>{t('connecting-server', { '0': loadingServerId })}</div>
-        <div className={styles['loading-overlay-gif']} />
-        <div className={styles['loading-overlay-close-button']} onClick={onClose} />
+        <div className={styles['title-text']}>{t('connecting-server', { '0': loadingServerId })}</div>
+        <div className={styles['loading-animation']} />
+        <div className={styles['close-button']} onClick={onClose} />
       </div>
     </div>
   );

@@ -43,7 +43,7 @@ const MicModeMenu: React.FC = React.memo(() => {
   };
 
   return (
-    <div className={styles['mic-mode-menu']}>
+    <div className={styles['mode-menu']}>
       <div className="col">
         <div className="label">{t('current-speaking-mode')}</div>
         <div className="input-box row">
@@ -56,8 +56,8 @@ const MicModeMenu: React.FC = React.memo(() => {
         <div className="input-box row">
           <input type="radio" name="visibility" checked={isAutoMode} onChange={handleAutoModeSelect} />
           <div className="label">{t('default-speaking-mode-auto-label')}</div>
-          <div style={isAutoMode ? {} : { display: 'none' }} className={styles['voice-threshold-input-wrapper']}>
-            <div className={styles['voice-threshold-input-wrapper']}>
+          <div style={isAutoMode ? {} : { display: 'none' }} className={styles['threshold-input-wrapper']}>
+            <div className={styles['threshold-input-wrapper']}>
               <input
                 className={styles['voice-threshold-input']}
                 type="range"

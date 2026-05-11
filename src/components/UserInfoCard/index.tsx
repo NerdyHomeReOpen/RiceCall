@@ -98,7 +98,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
               <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
               <div className={styles['permission-text']}>{getPermissionText(member.permissionLevel)}</div>
             </div>
-            <div className={styles['saperator']} />
+            <div className={styles['separator']} />
             <div className={styles['contribution-wrapper']}>
               <div className={styles['contribution-text']}>{t('contribution')}:</div>
               <div className={styles['contribution-value']}>{member.contribution}</div>

@@ -1,4 +1,4 @@
-.queue-user-tab {
+.item {
   position: relative;
   display: flex;
   gap: 2px;
@@ -9,34 +9,34 @@
   text-shadow: 0 1px #fff;
 }
 
-.queue-user-tab:not(.selected):hover {
+.item:not(.selected):hover {
   background-color: var(--hover);
 }
 
-.queue-user-tab.selected {
+.item.selected {
   background-color: var(--selected);
 }
 
-.queue-user-position-text {
+.position-text {
   color: var(--text-color-quaternary);
 }
 
-.queue-user-tab-name-text {
+.name-text {
   overflow: hidden;
   text-overflow: ellipsis;
   color: var(--text-color-quaternary);
   white-space: nowrap;
 }
 
-.queue-user-tab-name-text.member {
+.name-text.member {
   color: var(--text-nickname);
 }
 
-.queue-user-tab-name-text.vip {
+.name-text.vip {
   color: var(--text-vip-name);
 }
 
-.queue-user-audio-state {
+.audio-state {
   left: 0;
   min-width: 12px;
   min-height: 12px;
@@ -46,21 +46,21 @@
   background-size: auto;
 }
 
-.queue-user-audio-state.loading {
+.audio-state.loading {
   background-image: url('/loading.gif');
   background-position: 0 0;
   background-size: cover;
 }
 
-.queue-user-audio-state.play {
+.audio-state.play {
   background-position: -24px 0;
 }
 
-.queue-user-audio-state.muted {
+.audio-state.muted {
   background-position: -12px 0;
 }
 
-.queue-user-text-state {
+.text-state {
   min-width: 12px;
   min-height: 12px;
   background-image: url('/channel/audioState.svg');
@@ -69,11 +69,11 @@
   background-size: auto;
 }
 
-.queue-user-text-state.muted {
+.text-state.muted {
   background-position: 0 0;
 }
 
-.queue-user-seconds-remaining-box {
+.time-remaining {
   display: flex;
   align-items: center;
   padding-right: 3px;

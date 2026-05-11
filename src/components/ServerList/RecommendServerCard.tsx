@@ -52,15 +52,15 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   };
 
   return (
-    <div className={styles['server-card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <div className={styles['server-card-avatar-picture']}>
+    <div className={styles['card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
+      <div className={styles['card-avatar']}>
         <Image src={recommendServer.avatarUrl} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['server-card-info-text']}>
-        <div className={styles['server-card-name-text']}>{recommendServer.name}</div>
-        <div className={styles['server-card-id-text']}>{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>
-        <div className={styles['server-card-slogen-text']}>{recommendServer.slogan}</div>
-        <div className={styles['server-card-online-text']}>
+      <div className={styles['card-info-text']}>
+        <div className={styles['card-name-text']}>{recommendServer.name}</div>
+        <div className={styles['card-id-text']}>{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>
+        <div className={styles['card-slogan-text']}>{recommendServer.slogan}</div>
+        <div className={styles['card-online-count-text']}>
           {t('online')}: {recommendServer.online}
         </div>
       </div>

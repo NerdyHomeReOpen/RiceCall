@@ -1,4 +1,4 @@
-.maximized-popup {
+.popup {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -19,12 +19,12 @@
   }
 }
 
-.maximized-popup-title-text {
+.title-text {
   font-size: 14px;
   font-weight: bold;
 }
 
-.maximized-popup-close-btn {
+.close-button {
   display: inline-block;
   min-width: 20px;
   min-height: 20px;
@@ -35,10 +35,10 @@
   background-size: cover;
 }
 
-.maximized-popup-close-btn:hover {
+.close-button:hover {
   background-position: -20px 0;
 }
 
-.maximized-popup-close-btn:active {
+.close-button:active {
   background-position: -40px 0;
 }

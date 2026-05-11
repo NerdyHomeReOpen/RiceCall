@@ -22,7 +22,7 @@
   opacity: 0.5;
 }
 
-.emoji-btn {
+.emoji-button {
   width: 18px;
   height: 18px;
   background-repeat: no-repeat;
@@ -30,7 +30,7 @@
   background-size: contain;
 }
 
-.emoji-btn::before {
+.emoji-button::before {
   display: block;
   min-width: 18px;
   min-height: 18px;
@@ -41,11 +41,11 @@
   background-position: 0 0;
 }
 
-.emoji-btn:hover::before {
+.emoji-button:hover::before {
   background-position: -18px 0;
 }
 
-.emoji-btn:active::before {
+.emoji-button:active::before {
   background-position: -36px 0;
 }
 

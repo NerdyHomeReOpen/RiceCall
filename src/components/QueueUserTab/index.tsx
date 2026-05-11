@@ -125,20 +125,20 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   return (
     <div
-      className={`user-info-card-container ${styles['queue-user-tab']} ${isSelected ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['item']} ${isSelected ? styles['selected'] : ''}`}
       onClick={handleTabClick}
       onDoubleClick={handleTabDoubleClick}
       onMouseEnter={handleTabMouseEnter}
       onMouseLeave={handleTabMouseLeave}
       onContextMenu={handleTabContextMenu}
     >
-      <div className={`${styles['queue-user-audio-state']} ${styles[getStatusIcon()]}`} />
+      <div className={`${styles['audio-state']} ${styles[getStatusIcon()]}`} />
       <div className={`permission-${queueMember.gender} permission-lv-${queueMember.permissionLevel}`} />
-      <div className={`${styles['queue-user-position-text']}`}>{queueMember.position + 1}.</div>
+      <div className={`${styles['position-text']}`}>{queueMember.position + 1}.</div>
       {hasVip && <div className={`vip-icon vip-${queueMember.vip}`} />}
-      <div className={`${styles['queue-user-tab-name-text']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{queueMember.nickname || queueMember.name}</div>
+      <div className={`${styles['name-text']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{queueMember.nickname || queueMember.name}</div>
       <BadgeList badges={JSON.parse(queueMember.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
-      {isOnMic && <div className={styles['queue-user-seconds-remaining-box']}>{queueMember.leftTime}s</div>}
+      {isOnMic && <div className={styles['time-remaining']}>{queueMember.leftTime}s</div>}
     </div>
   );
 });

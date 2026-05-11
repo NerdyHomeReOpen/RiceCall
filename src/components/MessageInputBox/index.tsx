@@ -194,7 +194,7 @@ const MessageInputBox: React.FC = React.memo(() => {
 
   return (
     <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
-      <div className={styles['emoji-btn']} onMouseDown={handleEmojiPickerClick} />
+      <div className={styles['emoji-button']} onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}
         className={`${styles['input-area']} markdown-content`}

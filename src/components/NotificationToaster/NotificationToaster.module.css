@@ -1,4 +1,4 @@
-.notification-toaster {
+.toaster {
   position: absolute;
   right: 0;
   bottom: 0;
@@ -18,11 +18,11 @@
   transition: transform 1s linear;
 }
 
-.notification-toaster.show {
+.toaster.show {
   transform: translateY(0);
 }
 
-.notification-toaster-close {
+.close-button {
   width: 18px;
   min-width: 18px;
   height: 18px;
@@ -34,10 +34,10 @@
   border: none;
 }
 
-.notification-toaster-close:hover {
+.close-button:hover {
   background-position: -18px 0;
 }
 
-.notification-toaster-close:active {
+.close-button:active {
   background-position: -36px 0;
 }

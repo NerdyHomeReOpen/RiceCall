@@ -19,11 +19,11 @@ const NotificationMenuItem: React.FC<NotificationMenuItemProps> = React.memo(({ 
 
   return (
     <>
-      <div className={`${styles['notification-menu-option']} ${item.className && styles[item.className]} ${item.disabled ? 'disabled' : ''}`} data-type={item.icon || ''} onClick={handleClick}>
+      <div className={`${styles['option']} ${item.className && styles[item.className]} ${item.disabled ? 'disabled' : ''}`} data-type={item.icon || ''} onClick={handleClick}>
         {item.showContentLength ? `${item.label} (${item.contents ? item.contents.length : 0})` : item.label}
       </div>
       {item.showContent && item.contents && (
-        <div className={styles['notification-menu-contents']}>
+        <div className={styles['contents']}>
           {item.contents
             .slice(0, 3)
             .map((content, index) => (item.contentType === 'image' ? <Image key={index} src={content} alt="notification_image" width={32} height={32} loading="lazy" draggable="false" /> : content))}

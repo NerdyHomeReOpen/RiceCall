@@ -57,7 +57,7 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['notification-menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
+    <div ref={menuRef} className={`context-menu-container ${styles['menu']}`} style={display ? { top: menuY, left: menuX } : { opacity: 0 }}>
       {filteredItems.map((item) => (
         <NotificationMenuItem key={item.id} item={item} onClose={onClose} />
       ))}

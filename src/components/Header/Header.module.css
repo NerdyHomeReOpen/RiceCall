@@ -117,7 +117,7 @@
   }
 }
 
-.spliter {
+.splitter {
   display: inline-block;
   min-width: 2px;
   min-height: 19px;
@@ -223,14 +223,14 @@
   }
 }
 
-.main-tabs {
+.tabs {
   display: flex;
   align-items: flex-end;
   margin-right: auto;
   margin-left: 5%;
 }
 
-.main-tab {
+.tab {
   position: relative;
   display: flex;
   align-items: center;
@@ -246,7 +246,7 @@
   cursor: pointer;
 }
 
-.main-tab::before {
+.tab::before {
   position: absolute;
   top: 0;
   left: 0;
@@ -259,7 +259,7 @@
   background-position: 0 0;
 }
 
-.main-tab::after {
+.tab::after {
   position: absolute;
   top: 0;
   right: 0;
@@ -272,7 +272,7 @@
   background-position: 0 0;
 }
 
-.main-tab-close-button {
+.tab-close-button {
   position: relative;
   z-index: 2;
   display: flex;
@@ -286,15 +286,15 @@
   box-shadow: 0 0 2px rgb(255 255 255 / 35%);
 }
 
-.main-tab-close-button:hover {
+.tab-close-button:hover {
   background-position: -15px 0;
 }
 
-.main-tab-close-button:active {
+.tab-close-button:active {
   background-position: -30px 0;
 }
 
-.main-tab-background {
+.tab-background {
   position: absolute;
   bottom: 0;
   left: 10px;
@@ -303,7 +303,7 @@
   overflow: hidden;
 }
 
-.main-tab-label {
+.tab-label {
   z-index: 1;
   width: 100%;
   margin: 0 20px;
@@ -314,25 +314,25 @@
   white-space: nowrap;
 }
 
-.main-tab.selected::before {
+.tab.selected::before {
   content: '';
   background-position: 0 -32px;
 }
 
-.main-tab.selected::after {
+.tab.selected::after {
   content: '';
   background-position: -11px -32px;
 }
 
-.main-tab.selected .main-tab-background {
+.tab.selected .tab-background {
   background-color: var(--background);
 }
 
-.main-tab.selected .main-tab-label {
+.tab.selected .tab-label {
   color: var(--main-color);
 }
 
-.main-tab.selected .main-tab-close-button {
+.tab.selected .tab-close-button {
   color: var(--main-color);
 }
 

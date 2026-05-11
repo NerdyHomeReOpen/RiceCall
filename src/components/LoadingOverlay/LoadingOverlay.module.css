@@ -1,4 +1,4 @@
-.loading-overlay-wrapper {
+.wrapper {
   position: fixed;
   top: 0;
   z-index: 1;
@@ -23,17 +23,17 @@
   box-shadow: var(--box-shadow);
 }
 
-.loading-overlay-title-text {
+.title-text {
   display: flex;
   margin-top: 5px;
   text-align: center;
 }
 
-.loading-overlay-server-id {
+.server-id-text {
   margin-left: 5px;
 }
 
-.loading-overlay-gif {
+.loading-animation {
   width: 256px;
   height: 12px;
   margin-top: 15px;
@@ -42,7 +42,7 @@
   background-size: contain;
 }
 
-.loading-overlay-close-button {
+.close-button {
   position: absolute;
   top: 5px;
   right: 6px;
@@ -55,10 +55,10 @@
   border: none;
 }
 
-.loading-overlay-close-button:hover {
+.close-button:hover {
   background-position: -18px 0;
 }
 
-.loading-overlay-close-button:active {
+.close-button:active {
   background-position: -36px 0;
 }

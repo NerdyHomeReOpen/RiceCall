@@ -27,9 +27,9 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) =>
 
   return (
     <>
-      <div className={styles['server-list-title']}>{title}</div>
-      <div className={styles['server-list-container']}>
-        <div className={styles['server-list']}>
+      <div className={styles['list-title']}>{title}</div>
+      <div className={styles['container']}>
+        <div className={styles['list']}>
           {displayedServers.map((server) => ('online' in server ? <RecommendServerCard key={server.serverId} recommendServer={server} /> : <ServerCard key={server.serverId} server={server} />))}
         </div>
         {!canExpand ? null : expanded ? (
