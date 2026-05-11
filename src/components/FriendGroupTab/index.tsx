@@ -69,8 +69,8 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
     <>
       <div className={`${styles['group']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onContextMenu={handleTabContextMenu}>
         <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
-        <div className={styles['friend-group-tab-label']}>{friendGroup.name}</div>
-        <div className={styles['friend-group-tab-count']}>{!isStranger && !isBlacklist ? `(${onlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}</div>
+        <div className={styles['label']}>{friendGroup.name}</div>
+        <div className={styles['count']}>{!isStranger && !isBlacklist ? `(${onlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}</div>
       </div>
       <div className={styles['content']} style={isExpanded ? {} : { display: 'none' }}>
         {sortedFriendGroupFriends.map((friend) => (
