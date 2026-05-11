@@ -28,7 +28,7 @@ const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.me
           <span>{t('announcement')}</span>
         </div>
         <div className={styles['action-bars']}>
-          <div className={styles['close-btn']} onClick={handleCloseBtnClick} />
+          <div className={styles['close-button']} onClick={handleCloseBtnClick} />
         </div>
       </div>
       <div className={styles['containers']}>

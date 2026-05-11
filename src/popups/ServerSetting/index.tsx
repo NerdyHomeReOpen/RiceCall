@@ -367,8 +367,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   </div>
                 </div>
               </div>
-              <div className={styles['server-avatar-wrapper']}>
-                <div className={styles['server-avatar-picture']}>
+              <div className={styles['avatar-wrapper']}>
+                <div className={styles['avatar']}>
                   <Image src={server.avatarUrl} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
                 </div>
                 <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />

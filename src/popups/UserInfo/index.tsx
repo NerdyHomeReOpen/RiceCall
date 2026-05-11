@@ -246,8 +246,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
       <div className={styles['user-profile']}>
         <div data-draggable className={styles['header']}>
           <div className={styles['window-action-buttons']}>
-            <div className={styles['minimize-btn']} onClick={handleMinimizeBtnClick} />
-            <div className={styles['close-btn']} onClick={handleCloseBtnClick} />
+            <div className={styles['minimize-button']} onClick={handleMinimizeBtnClick} />
+            <div className={styles['close-button']} onClick={handleCloseBtnClick} />
           </div>
           <div className={`${styles['user-avatar']} ${isSelf ? styles['editable'] : ''}`} onClick={handleAvatarClick}>
             <Image src={target.avatarUrl} alt="user_avatar" width={74} height={74} loading="lazy" draggable="false" />

@@ -29,25 +29,25 @@ const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo
     <div className="popup-wrapper">
       <div className="popup-body">
         <div className={styles['middle-area']}>
-          <div className={`${styles['button-item-box']} disabled`}>
-            <div className={styles['button-item-icon']} />
-            <div className={styles['button-item-text']}>{t('vote')}</div>
+          <div className={`${styles['item-wrapper']} disabled`}>
+            <div className={styles['item-icon']} />
+            <div className={styles['item-text']}>{t('vote')}</div>
           </div>
-          <div className={styles['button-item-box']} onClick={handleChannelEventBtnClick}>
-            <div className={styles['button-item-icon']} />
-            <div className={styles['button-item-text']}>{t('channel-event')}</div>
+          <div className={styles['item-wrapper']} onClick={handleChannelEventBtnClick}>
+            <div className={styles['item-icon']} />
+            <div className={styles['item-text']}>{t('channel-event')}</div>
           </div>
-          <div className={styles['button-item-box']} onClick={handleShowFrameBtnClick}>
-            <div className={styles['button-item-icon']} />
-            <div className={styles['button-item-text']}>{t('send-flower')}</div>
+          <div className={styles['item-wrapper']} onClick={handleShowFrameBtnClick}>
+            <div className={styles['item-icon']} />
+            <div className={styles['item-text']}>{t('send-flower')}</div>
           </div>
-          <div className={`${styles['button-item-box']} disabled`}>
-            <div className={styles['button-item-icon']} />
-            <div className={styles['button-item-text']}>{t('scratch-card')}</div>
+          <div className={`${styles['item-wrapper']} disabled`}>
+            <div className={styles['item-icon']} />
+            <div className={styles['item-text']}>{t('scratch-card')}</div>
           </div>
-          <div className={`${styles['button-item-box']} ${server.isShowAvailable ? '' : 'disabled'}`}>
-            <div className={styles['button-item-icon']} />
-            <div className={styles['button-item-text']}>{t('show-room')}</div>
+          <div className={`${styles['item-wrapper']} ${server.isShowAvailable ? '' : 'disabled'}`}>
+            <div className={styles['item-icon']} />
+            <div className={styles['item-text']}>{t('show-room')}</div>
           </div>
         </div>
       </div>

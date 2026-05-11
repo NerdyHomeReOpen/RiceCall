@@ -49,8 +49,8 @@
   width: 50px;
 }
 
-.minimize-btn,
-.close-btn {
+.minimize-button,
+.close-button {
   display: inline-block;
   width: 14px;
   height: 14px;
@@ -59,23 +59,23 @@
   background-size: cover;
 }
 
-.minimize-btn {
+.minimize-button {
   background-image: url('/im/btn-min.svg');
   background-repeat: no-repeat;
 }
 
-.close-btn {
+.close-button {
   background-image: url('/im/btn-close.svg');
   background-repeat: no-repeat;
 }
 
-.minimize-btn:hover,
-.close-btn:hover {
+.minimize-button:hover,
+.close-button:hover {
   background-position: -14px 0;
 }
 
-.minimize-btn:active,
-.close-btn:active {
+.minimize-button:active,
+.close-button:active {
   background-position: -28px 0;
 }
 

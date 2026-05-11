@@ -346,11 +346,11 @@
   color: #555;
 }
 
-.btn-export {
+.export-button {
   margin-right: auto;
 }
 
-.btn-disabled {
+.disabled-button {
   pointer-events: none;
   opacity: 0.5;
 }

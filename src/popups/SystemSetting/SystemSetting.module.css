@@ -1,4 +1,4 @@
-.sound-effect-preview-btn {
+.sound-effect-preview-button {
   min-width: 17px;
   min-height: 17px;
   cursor: pointer;
@@ -8,11 +8,11 @@
   background-size: cover;
 }
 
-.sound-effect-preview-btn:hover {
+.sound-effect-preview-button:hover {
   background-position: -17px;
 }
 
-.sound-effect-preview-btn:active {
+.sound-effect-preview-button:active {
   background-position: -34px;
 }
 

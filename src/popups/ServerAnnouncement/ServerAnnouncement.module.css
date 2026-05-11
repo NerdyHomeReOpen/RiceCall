@@ -33,7 +33,7 @@
   -webkit-app-region: no-drag;
 }
 
-.close-btn {
+.close-button {
   display: block;
   width: 14px;
   height: 14px;
@@ -44,10 +44,10 @@
   background-size: cover;
 }
 
-.close-btn:hover {
+.close-button:hover {
   background-position: -14px 0;
 }
 
-.close-btn:active {
+.close-button:active {
   background-position: -28px 0;
 }

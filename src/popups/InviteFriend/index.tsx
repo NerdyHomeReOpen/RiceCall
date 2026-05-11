@@ -137,15 +137,15 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, fri
 
   return (
     <>
-      <div className={`${styles['friend-group-tab']}`}>
+      <div className={`${styles['group-item']}`}>
         <input type="checkbox" checked={isAllSelected} onChange={handleSelectAllChange} />
-        <div className={`${styles['friend-group-tab-details']} ${selectedUserIdSet.has(friendGroup.friendGroupId) ? styles['selected'] : ''}`} onClick={handleTabClick}>
-          <div className={`${styles['friend-group-tab-toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
-          <div className={styles['friend-group-tab-label']}>{friendGroup.name}</div>
-          <div className={styles['friend-group-tab-count-text']}>{`(${friendGroupFriends.length})`}</div>
+        <div className={`${styles['group-details']} ${selectedUserIdSet.has(friendGroup.friendGroupId) ? styles['selected'] : ''}`} onClick={handleTabClick}>
+          <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
+          <div className={styles['group-label']}>{friendGroup.name}</div>
+          <div className={styles['group-count-text']}>{`(${friendGroupFriends.length})`}</div>
         </div>
       </div>
-      <div className={styles['friend-group-tab-content']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className={styles['group-content']} style={isExpanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
           <FriendTab key={friend.targetId} friend={friend} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
         ))}
@@ -172,14 +172,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserId
   };
 
   return (
-    <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
+    <div className={`${styles['friend-item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <input type="checkbox" checked={isSelected} readOnly />
-      <div className={styles['friend-tab-avatar-picture']}>
+      <div className={styles['avatar']}>
         <Image src={friend.avatarUrl} alt="friend_avatar" width={25} height={25} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['friend-tab-base-info-box']}>
+      <div className={styles['base-info']}>
         {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
-        <div className={`${styles['friend-tab-name-text']} ${hasVip ? styles['vip'] : ''}`}>
+        <div className={`${styles['name-text']} ${hasVip ? styles['vip'] : ''}`}>
           {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
         </div>
       </div>

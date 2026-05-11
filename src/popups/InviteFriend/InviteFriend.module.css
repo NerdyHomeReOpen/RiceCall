@@ -56,7 +56,7 @@
   overflow-y: auto;
 }
 
-.friend-group-tab {
+.group-item {
   display: flex;
   gap: 2px;
   align-items: center;
@@ -64,14 +64,14 @@
   padding: 5px;
 }
 
-.friend-group-tab-details {
+.group-details {
   display: flex;
   flex-direction: row;
   gap: 5px;
   align-items: center;
 }
 
-.friend-group-tab-toggle-icon {
+.toggle-icon {
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
@@ -82,15 +82,15 @@
   background-size: auto;
 }
 
-.friend-group-tab-toggle-icon.expanded {
+.toggle-icon.expanded {
   background-position: -14px 0;
 }
 
-.friend-group-tab-content > div {
+.group-content > div {
   padding-left: 20px;
 }
 
-.friend-tab {
+.friend-item {
   position: relative;
   display: flex;
   gap: 5px;
@@ -99,22 +99,22 @@
   padding: 5px;
 }
 
-.friend-tab.selected {
+.friend-item.selected {
   background-color: var(--selected);
 }
 
-.friend-tab:not(.selected):hover {
+.friend-item:not(.selected):hover {
   background-color: var(--hover);
 }
 
-.friend-tab-name-text {
+.name-text {
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: bold;
   white-space: nowrap;
 }
 
-.friend-tab-signature-text {
+.signature-text {
   min-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -122,7 +122,7 @@
   white-space: nowrap;
 }
 
-.friend-tab-server-name-text {
+.server-name-text {
   min-height: 18px;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -131,7 +131,7 @@
   white-space: nowrap;
 }
 
-.friend-tab-location-icon {
+.location-icon {
   min-width: 16px;
   min-height: 18px;
   content: '';
@@ -141,13 +141,13 @@
   background-size: auto;
 }
 
-.friend-tab-base-info-box {
+.base-info {
   display: flex;
   flex-direction: row;
   align-items: center;
 }
 
-.friend-tab-avatar-picture {
+.avatar {
   position: relative;
   width: 25px;
   height: 25px;

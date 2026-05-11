@@ -774,7 +774,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     <td>{t('enter-channel-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-btn']} onClick={handlePlayEnterVoiceChannelSound} />
+                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayEnterVoiceChannelSound} />
                     </td>
                     <td className={styles['sound-effect-enable-text']} onClick={handleEnableEnterVoiceChannelSoundChange}>
                       {!systemSettings.enterVoiceChannelSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
@@ -783,7 +783,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     <td>{t('leave-channel-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-btn']} onClick={handlePlayLeaveVoiceChannelSound} />
+                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayLeaveVoiceChannelSound} />
                     </td>
                     <td className={styles['sound-effect-enable-text']} onClick={handleEnableLeaveVoiceChannelSoundChange}>
                       {!systemSettings.leaveVoiceChannelSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
@@ -792,7 +792,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     <td>{t('start-speaking-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-btn']} onClick={handlePlayStartSpeakingSound} />
+                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayStartSpeakingSound} />
                     </td>
                     <td className={styles['sound-effect-enable-text']} onClick={handleEnableStartSpeakingSoundChange}>
                       {!systemSettings.startSpeakingSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
@@ -801,7 +801,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     <td>{t('stop-speaking-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-btn']} onClick={handlePlayStopSpeakingSound} />
+                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayStopSpeakingSound} />
                     </td>
                     <td className={styles['sound-effect-enable-text']} onClick={handleEnableStopSpeakingSoundChange}>
                       {!systemSettings.stopSpeakingSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
@@ -810,7 +810,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     <td>{t('receive-direct-message-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-btn']} onClick={handlePlayReceiveDirectMessageSound} />
+                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayReceiveDirectMessageSound} />
                     </td>
                     <td className={styles['sound-effect-enable-text']} onClick={handleEnableReceiveDirectMessageSoundChange}>
                       {!systemSettings.receiveDirectMessageSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
@@ -819,7 +819,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     <td>{t('receive-channel-message-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-btn']} onClick={handlePlayReceiveChannelMessageSound} />
+                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayReceiveChannelMessageSound} />
                     </td>
                     <td className={styles['sound-effect-enable-text']} onClick={handleEnableReceiveChannelMessageSoundChange}>
                       {!systemSettings.receiveChannelMessageSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}

@@ -2,7 +2,7 @@
   min-height: 27px;
 }
 
-.button-list-box {
+.list {
   position: relative;
   box-sizing: border-box;
   display: flex;
@@ -29,7 +29,7 @@
   background-size: cover;
 }
 
-.button-item-box {
+.item-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -37,7 +37,7 @@
   cursor: pointer;
 }
 
-.button-item-icon {
+.item-icon {
   width: 44px;
   height: 44px;
   padding: 0;
@@ -46,32 +46,32 @@
   border: none;
 }
 
-.button-item-box:nth-child(1) .button-item-icon {
+.item-wrapper:nth-child(1) .item-icon {
   background-image: url('/channel/widget_vote.svg');
 }
 
-.button-item-box:nth-child(2) .button-item-icon {
+.item-wrapper:nth-child(2) .item-icon {
   background-image: url('/channel/widget_chnEvent.svg');
 }
 
-.button-item-box:nth-child(3) .button-item-icon {
+.item-wrapper:nth-child(3) .item-icon {
   background-image: url('/channel/widget_flower.svg');
 }
 
-.button-item-box:nth-child(4) .button-item-icon {
+.item-wrapper:nth-child(4) .item-icon {
   background-image: url('/channel/widget_lottery.svg');
 }
 
-.button-item-box:nth-child(5) .button-item-icon {
+.item-wrapper:nth-child(5) .item-icon {
   background-image: url('/channel/widget_Show.svg');
 }
 
-.button-item-icon img {
+.item-icon img {
   width: 44px;
   height: 44px;
 }
 
-.button-item-text {
+.item-text {
   margin-top: 4px;
   font-size: 12px;
   text-align: center;

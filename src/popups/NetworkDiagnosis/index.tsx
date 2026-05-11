@@ -400,10 +400,10 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
       </div>
 
       <div className="popup-footer">
-        <div className={`button ${ndStyles['btn-export']} ${logs.length === 0 || isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleExportReportClick}>
+        <div className={`button ${ndStyles['export-button']} ${logs.length === 0 || isTesting ? ndStyles['disabled-button'] : ''}`} onClick={handleExportReportClick}>
           {t('export-report')}
         </div>
-        <div className={`button ${isTesting ? ndStyles['btn-disabled'] : ''}`} onClick={handleStartTestClick}>
+        <div className={`button ${isTesting ? ndStyles['disabled-button'] : ''}`} onClick={handleStartTestClick}>
           {isTesting ? t('testing') : t('start-test')}
         </div>
         <div className="button" onClick={handleCloseBtnClick}>
