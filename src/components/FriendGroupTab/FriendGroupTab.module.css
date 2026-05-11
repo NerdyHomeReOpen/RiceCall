@@ -30,12 +30,17 @@
   background-position: -14px 0;
 }
 
-.content {
+.friend-list {
   margin-left: 20px;
 }
 
 .label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-secondary);
+  white-space: nowrap;
 }
 
-.count {
+.friend-count-text {
+  color: #808080;
 }
