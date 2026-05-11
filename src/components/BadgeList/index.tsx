@@ -25,7 +25,7 @@ const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'le
   );
 
   return (
-    <div className={`${styles['badge-list-wrapper']} ${grid ? styles['grid'] : ''}`}>
+    <div className={`${styles['wrapper']} ${grid ? styles['grid'] : ''}`}>
       {filteredBadges.map((badge) => (
         <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
       ))}

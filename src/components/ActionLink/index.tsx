@@ -37,11 +37,11 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
   if (!displayId) return <span>{href}</span>;
   return (
     <span className={styles['invitation-container']}>
-      <span className={styles['invitation-headers']}>
+      <span className={styles['invitation-header']}>
         <span className={styles['icon']} />
         <span className={styles['title']}>{t('join-server-invitation')}</span>
       </span>
-      <span className={styles['invitation-contents']}>
+      <span className={styles['invitation-content']}>
         {t('server-invitation-content.prefix')}
         <span className={styles['server-name']}>{server.name}</span>
         {t('server-invitation-content.suffix')}

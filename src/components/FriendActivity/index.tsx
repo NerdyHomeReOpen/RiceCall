@@ -31,19 +31,19 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
   };
 
   return (
-    <div className={styles['friend-activity']}>
-      <div className={styles['friend-activity-avatar']}>
+    <div className={styles['activity-item']}>
+      <div className={styles['avatar']}>
         <Image src={friendActivity.avatarUrl} alt="friend_avatar" width={30} height={30} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['friend-activity-content']}>
-        <div className={styles['friend-activity-content-top']}>
+      <div className={styles['content']}>
+        <div className={styles['content-top']}>
           {hasVip && <div className={`vip-icon vip-${friendActivity.vip}`} />}
-          <div className={styles['friend-name-text']} onClick={handleUserNameClick}>
+          <div className={styles['name-text']} onClick={handleUserNameClick}>
             {friendActivity.name}
           </div>
-          <div className={styles['friend-activity-timestamp-text']}>{getFormatTimeDiff(friendActivity.timestamp)}</div>
+          <div className={styles['timestamp-text']}>{getFormatTimeDiff(friendActivity.timestamp)}</div>
         </div>
-        <div className={styles['friend-activity-content-bottom']}>{friendActivity.content}</div>
+        <div className={styles['content-bottom']}>{friendActivity.content}</div>
       </div>
     </div>
   );

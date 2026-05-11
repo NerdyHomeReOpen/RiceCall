@@ -1,4 +1,4 @@
-.emoji-grid {
+.grid {
   display: grid;
   grid-template-columns: repeat(10, 1fr);
   grid-auto-rows: 24px;
@@ -27,7 +27,7 @@
   box-shadow: inset 0 0 0 1px var(--main-color);
 }
 
-.emoji-panel {
+.panel {
   position: absolute;
   z-index: 10000;
   box-sizing: border-box;
@@ -40,11 +40,11 @@
   box-shadow: var(--box-shadow);
 }
 
-.emoji-panel-compact {
+.panel-compact {
   height: 200px;
 }
 
-.emoji-fontbar {
+.font-bar {
   display: flex;
   gap: 5px;
   align-items: center;
@@ -52,7 +52,7 @@
   padding: 10px 0 0 10px;
 }
 
-.emoji-font-icon {
+.font-icon {
   flex: 0 0 12px;
   width: 12px;
   height: 12px;
@@ -146,12 +146,12 @@
   border-radius: 3px;
 }
 
-.emoji-font-select {
+.font-select {
   padding: 2px 6px;
   font-size: 14px;
 }
 
-.emoji-pages {
+.pages {
   position: relative;
   box-sizing: border-box;
   align-self: center;
@@ -161,7 +161,7 @@
   overflow: hidden;
 }
 
-.emoji-page {
+.page {
   display: none;
   width: 100%;
   height: 100%;
@@ -170,16 +170,16 @@
   scrollbar-width: none;
 }
 
-.emoji-page.active {
+.page.active {
   display: block;
 }
 
-.emoji-page::-webkit-scrollbar {
+.page::-webkit-scrollbar {
   width: 0;
   height: 0;
 }
 
-.emoji-tabs {
+.tabs {
   display: flex;
   gap: 8px;
   align-items: center;
@@ -188,7 +188,7 @@
   border-top: 1px solid var(--border);
 }
 
-.emoji-tab-btn {
+.tab-button {
   position: relative;
   width: 42px;
   height: 32px;
@@ -198,23 +198,23 @@
   border: none;
 }
 
-.emoji-tab-btn + .emoji-tab-btn {
+.tab-button + .tab-button {
   margin-left: 0;
 }
 
-.emoji-tab-label {
+.tab-label {
   position: absolute;
   inset: 0;
   opacity: 0;
 }
 
-.emoji-tab-btn .img {
+.tab-button .img {
   width: 42px;
   height: 32px;
   opacity: 0.7;
 }
 
-.emoji-tab-btn[aria-pressed='true'] .img {
+.tab-button[aria-pressed='true'] .img {
   opacity: 1;
 }
 
@@ -266,7 +266,7 @@
   background-position: 0 -32px;
 }
 
-.emoji-native {
+.native-emoji {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -278,11 +278,11 @@
   border: 1px solid transparent;
 }
 
-.emoji-native:hover {
+.native-emoji:hover {
   border-color: var(--main-color);
 }
 
-.emoji-vip-placeholder {
+.vip-placeholder {
   display: grid;
   place-items: center;
   width: 100%;

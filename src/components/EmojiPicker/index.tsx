@@ -141,13 +141,13 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     return (
       <div
         ref={emojiPickerRef}
-        className={`context-menu-container ${styles['emoji-panel']} ${!showFontbar ? styles['emoji-panel-compact'] : ''}`}
+        className={`context-menu-container ${styles['panel']} ${!showFontbar ? styles['panel-compact'] : ''}`}
         style={display ? { left: pickerX, top: pickerY, position: 'fixed' } : { opacity: 0, position: 'fixed' }}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {showFontbar && (
-          <div className={styles['emoji-fontbar']}>
-            <div className={styles['emoji-font-icon']} aria-hidden="true" />
+          <div className={styles['font-bar']}>
+            <div className={styles['font-icon']} aria-hidden="true" />
             <div className="select-box ${styles['font-select-box']}">
               <div className="select-box">
                 <select value={fontSize} onChange={handleFontSizeChange}>
@@ -164,29 +164,29 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
             </div>
           </div>
         )}
-        <div className={styles['emoji-pages']}>
-          <div className={`${styles['emoji-page']} ${activeTab === 'def' ? styles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
-            <div className={styles['emoji-grid']}>
+        <div className={styles['pages']}>
+          <div className={`${styles['page']} ${activeTab === 'def' ? styles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
+            <div className={styles['grid']}>
               {DEFAULT_EMOJIS.map((e) => (
                 <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${styles['emoji-page']} ${activeTab === 'other' ? styles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
-            <div className={styles['emoji-grid']}>
+          <div className={`${styles['page']} ${activeTab === 'other' ? styles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
+            <div className={styles['grid']}>
               {TW_EMOJIS.map((e) => (
                 <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${styles['emoji-page']} ${activeTab === 'vip' ? styles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
-            <div className={styles['emoji-vip-placeholder']}>{t('soon')}</div>
+          <div className={`${styles['page']} ${activeTab === 'vip' ? styles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
+            <div className={styles['vip-placeholder']}>{t('soon')}</div>
           </div>
         </div>
-        <div className={styles['emoji-tabs']} role="tablist">
-          <button id="btn-def" className={`${styles['emoji-tab-btn']} ${styles['tab-def']}`} role="tab" aria-selected={activeTab === 'def'} onClick={handleDefTabClick} />
-          <button id="btn-other" className={`${styles['emoji-tab-btn']} ${styles['tab-other']}`} role="tab" aria-selected={activeTab === 'other'} onClick={handleOtherTabClick} />
-          <button id="btn-vip" className={`${styles['emoji-tab-btn']} ${styles['tab-vip']}`} role="tab" aria-selected={activeTab === 'vip'} onClick={handleVipTabClick} />
+        <div className={styles['tabs']} role="tablist">
+          <button id="btn-def" className={`${styles['tab-button']} ${styles['tab-def']}`} role="tab" aria-selected={activeTab === 'def'} onClick={handleDefTabClick} />
+          <button id="btn-other" className={`${styles['tab-button']} ${styles['tab-other']}`} role="tab" aria-selected={activeTab === 'other'} onClick={handleOtherTabClick} />
+          <button id="btn-vip" className={`${styles['tab-button']} ${styles['tab-vip']}`} role="tab" aria-selected={activeTab === 'vip'} onClick={handleVipTabClick} />
         </div>
       </div>
     );

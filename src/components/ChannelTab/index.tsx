@@ -158,7 +158,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   return (
     <>
       <div
-        className={`${styles['channel-tab']} ${isSelected ? styles['selected'] : ''}`}
+        className={`${styles['channel']} ${isSelected ? styles['selected'] : ''}`}
         onClick={handleTabClick}
         onDoubleClick={handleTabDoubleClick}
         draggable={isDraggable}
@@ -167,12 +167,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
         onDrop={handleTabDrop}
         onContextMenu={handleTabContextMenu}
       >
-        <div className={`${styles['channel-tab-icon']} ${isExpanded ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channel.visibility]}`} onClick={handleTabExpandedClick} />
-        <div className={`${styles['channel-tab-label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{isLobby ? t(`lobby`) : channel.name}</div>
-        {!isReadonlyChannel && <div className={styles['channel-tab-user-count-text']}>{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
+        <div className={`${styles['channel-icon']} ${isExpanded ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channel.visibility]}`} onClick={handleTabExpandedClick} />
+        <div className={`${styles['label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{isLobby ? t(`lobby`) : channel.name}</div>
+        {!isReadonlyChannel && <div className={styles['user-count-text']}>{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
         {isInChannel && !isExpanded && <div className={styles['my-location-icon']} />}
       </div>
-      <div className={styles['channel-tab-user-list']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
         {sortedChannelMembers.map((member) => (
           <UserTab key={member.userId} member={member} channel={channel} canJoin={canJoin} isPasswordNeeded={isPasswordNeeded} />
         ))}

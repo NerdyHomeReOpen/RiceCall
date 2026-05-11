@@ -19,14 +19,14 @@
   box-shadow: 0 0 5px 1px rgb(0 0 0 / 10%);
 }
 
-.invitation-headers {
+.invitation-header {
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: flex-start;
 }
 
-.invitation-headers .icon {
+.invitation-header .icon {
   width: 15px;
   height: 15px;
   background-image: url('/im/invitenotify.svg');
@@ -35,16 +35,16 @@
   background-size: contain;
 }
 
-.invitation-headers .title {
+.invitation-header .title {
   margin-left: 5px;
   font-size: 14px;
   color: #999;
 }
 
-.invitation-contents {
+.invitation-content {
   padding: 10px 25px;
 }
 
-.invitation-contents .server-name {
+.invitation-content .server-name {
   color: var(--text-link);
 }

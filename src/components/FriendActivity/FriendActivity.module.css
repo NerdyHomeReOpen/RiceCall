@@ -1,10 +1,10 @@
-.user-activity-wrapper {
+.wrapper {
   display: flex;
   justify-content: space-between;
   width: 100%;
 }
 
-.friend-activity {
+.activity-item {
   display: flex;
   flex-direction: row;
   gap: 10px;
@@ -12,12 +12,12 @@
   width: 100%;
 }
 
-.friend-activity-avatar {
+.avatar {
   width: 30px;
   height: 30px;
 }
 
-.friend-activity-content {
+.content {
   display: flex;
   flex: 1;
   flex-direction: column;
@@ -26,7 +26,7 @@
   overflow: hidden;
 }
 
-.friend-activity-content-top {
+.content-top {
   display: flex;
   flex-direction: row;
   gap: 3px;
@@ -36,12 +36,12 @@
   min-width: 0;
 }
 
-.friend-activity-content-top > div:first-child,
-.friend-activity-content-top > div:nth-child(2) {
+.content-top > div:first-child,
+.content-top > div:nth-child(2) {
   flex-shrink: 0;
 }
 
-.friend-activity-content-top > div:last-child {
+.content-top > div:last-child {
   flex-shrink: 0;
   margin-left: auto;
 }
@@ -50,7 +50,7 @@
   width: 14px;
 }
 
-.friend-name-text {
+.name-text {
   flex-shrink: 0;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -63,7 +63,7 @@
   }
 }
 
-.friend-name-text.vip {
+.name-text.vip {
   color: var(--text-vip-name);
 
   &:hover {
@@ -71,11 +71,11 @@
   }
 }
 
-.friend-activity-timestamp-text {
+.timestamp-text {
   color: var(--text-color-quinary);
 }
 
-.friend-activity-content-bottom {
+.content-bottom {
   max-width: 100%;
   min-height: 18px;
   overflow: hidden;

@@ -1,4 +1,4 @@
-.friend-group-tab {
+.group {
   display: flex;
   gap: 2px;
   align-items: center;
@@ -7,15 +7,15 @@
   border-radius: 3px;
 }
 
-.friend-group-tab.selected {
+.group.selected {
   background-color: var(--selected);
 }
 
-.friend-group-tab:hover {
+.group:hover {
   background-color: var(--hover);
 }
 
-.friend-group-tab-toggle-icon {
+.toggle-icon {
   display: inline-block;
   min-width: 14px;
   min-height: 14px;
@@ -26,10 +26,10 @@
   background-size: auto;
 }
 
-.friend-group-tab-toggle-icon.expanded {
+.toggle-icon.expanded {
   background-position: -14px 0;
 }
 
-.friend-group-tab-content {
+.content {
   margin-left: 20px;
 }

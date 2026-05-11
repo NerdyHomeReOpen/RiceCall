@@ -90,32 +90,32 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   }, [friend.targetId, friend.isBlocked, friend.shareCurrentServer, friend.currentServerId, isFriend]);
 
   return (
-    <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>
+    <div className={`${styles['item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>
       <div
-        className={styles['friend-tab-avatar-picture']}
+        className={styles['avatar']}
         style={{ filter: isFriend && !isOffline && !friend.isBlocked ? '' : 'grayscale(100%)' }}
         datatype={isFriend && !isOnline && !isOffline && !friend.isBlocked ? friend.status : ''}
       >
         <Image src={friend.avatarUrl} alt="friend_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['friend-tab-base-info']}>
-        <div className={styles['friend-tab-box']}>
+      <div className={styles['base-info']}>
+        <div className={styles['detail-row']}>
           {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
-          <div className={`${styles['friend-tab-name-text']} ${hasVip ? styles['vip'] : ''}`}>
+          <div className={`${styles['name-text']} ${hasVip ? styles['vip'] : ''}`}>
             {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
           </div>
           <LevelIcon level={friend.level} xp={friend.xp} requiredXp={friend.requiredXp} showTooltip={false} />
           <BadgeList badges={JSON.parse(friend.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
         {isPending ? (
-          <div className={styles['friend-tab-signature-text']}>{`(${t('pending')})`}</div>
+          <div className={styles['signature-text']}>{`(${t('pending')})`}</div>
         ) : friendCurrentServer ? (
-          <div className={`${styles['friend-tab-box']} ${styles['has-server']}`} onClick={handleServerNameClick}>
-            <div className={styles['friend-tab-location-icon']} />
-            <div className={styles['friend-tab-server-name-text']}>{friendCurrentServer.name}</div>
+          <div className={`${styles['detail-row']} ${styles['has-server']}`} onClick={handleServerNameClick}>
+            <div className={styles['location-icon']} />
+            <div className={styles['server-name-text']}>{friendCurrentServer.name}</div>
           </div>
         ) : (
-          <div className={styles['friend-tab-signature-text']}>{friend.signature}</div>
+          <div className={styles['signature-text']}>{friend.signature}</div>
         )}
       </div>
     </div>

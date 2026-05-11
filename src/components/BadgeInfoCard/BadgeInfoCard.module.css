@@ -1,4 +1,4 @@
-.badge-info-card {
+.card {
   position: fixed;
   z-index: 10000;
   display: flex;
@@ -12,7 +12,7 @@
   border: 1px solid var(--border);
 }
 
-.badge-info-wrapper {
+.info-wrapper {
   display: flex;
   flex: 1;
   flex-direction: row;
@@ -21,14 +21,14 @@
   width: 100%;
 }
 
-.badge-avatar-box {
+.avatar-wrapper {
   display: flex;
   flex-direction: column;
   align-items: center;
   max-width: 75px;
 }
 
-.badge-avatar-box .badge-image {
+.avatar-wrapper .image {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -38,12 +38,12 @@
   background-size: contain;
 }
 
-.badge-avatar-box .badge-rarity-text {
+.avatar-wrapper .rarity-text {
   margin-top: 8px;
   color: var(--text-vip-name);
 }
 
-.badge-description-box {
+.description-section {
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -54,17 +54,17 @@
   margin-left: 10px;
 }
 
-.badge-description-box .badge-name {
+.description-section .name-text {
   font-size: 1.1em;
   font-weight: bold;
   color: var(--text-color-quaternary);
 }
 
-.badge-description-box .badge-description {
+.description-section .description {
   color: var(--text-color-quaternary);
 }
 
-.badge-show-time {
+.show-time {
   width: 100%;
   color: var(--text-color-quaternary);
 }
