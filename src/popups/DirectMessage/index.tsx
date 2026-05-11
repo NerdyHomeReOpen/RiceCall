@@ -54,8 +54,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   const isComposingRef = useRef<boolean>(false);
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
-  const cooldownRef = useRef<number>(0);
   const messageAreaRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
 
@@ -70,7 +71,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   const [messageInput, setMessageInput] = useState<string>('');
   const [targetCurrentServer, setTargetCurrentServer] = useState<Types.Server | null>(null);
   const [directMessages, setDirectMessages] = useState<(Types.DirectMessage | Types.PromptMessage)[]>([]);
-  const [cooldown, setCooldown] = useState<number>(0);
+  const [canShakeWindow, setCanShakeWindow] = useState<boolean>(true);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
 
@@ -161,11 +162,19 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleShakeWindowBtnClick = () => {
-    if (cooldown > 0) return;
-    if (isFriend) ipc.socket.send('shakeWindow', { targetId: target.userId });
-    else setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
-    setCooldown(SHAKE_COOLDOWN);
-    cooldownRef.current = SHAKE_COOLDOWN;
+    if (shakeTimeoutRef.current) return;
+
+    if (isFriend) {
+      ipc.socket.send('shakeWindow', { targetId: target.userId });
+    } else {
+      setDirectMessages((prev) => [...prev, { type: 'warn', content: t('non-friend-warning-message'), timestamp: Date.now(), parameter: {}, contentMetadata: {} }]);
+    }
+
+    setCanShakeWindow(false);
+    shakeTimeoutRef.current = setTimeout(() => {
+      setCanShakeWindow(true);
+      shakeTimeoutRef.current = null;
+    }, SHAKE_COOLDOWN);
   };
 
   const handleServerSelect = (server: Types.Server) => {
@@ -214,6 +223,32 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     openChatHistory(user.userId, target.userId);
   };
 
+  const handleScreenShotBtnClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || isUploadingRef.current) return;
+    e.target.value = '';
+    file.arrayBuffer().then((arrayBuffer) => {
+      const imageUnit8Array = new Uint8Array(arrayBuffer);
+      isUploadingRef.current = true;
+      if (imageUnit8Array.length > MAX_FILE_SIZE) {
+        openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+        isUploadingRef.current = false;
+        return;
+      }
+      ipc.api.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+        if (response) {
+          editor?.chain().insertImage({ src: response.imageUrl, alt: file.name }).focus().run();
+          syncStyles();
+        }
+        isUploadingRef.current = false;
+      });
+    });
+  };
+
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
@@ -224,16 +259,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   useEffect(() => {
     editor?.on('selectionUpdate', syncStyles);
   }, [editor, syncStyles]);
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (cooldownRef.current === 0) return;
-      const remaining = Math.max(0, cooldownRef.current - 1);
-      setCooldown(remaining);
-      cooldownRef.current = remaining;
-    }, 1000);
-    return () => clearInterval(interval);
-  }, []);
 
   useEffect(() => {
     if (!target.userId || !target.shareCurrentServer || isBlocked || !isFriend || !targetCurrentServer) {
@@ -328,16 +353,17 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
 
   return (
     <div className="popup-wrapper">
+      <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileInputChange} />
       <div className={styles['header']}>
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
-          <div className={`${styles['file-share']} disabled`} />
+          {/* <div className={`${styles['file-share']} disabled`} /> */}
           {!isFriend ? (
             <div className={styles['apply-friend']} onClick={handleApplyFriendBtnClick} />
           ) : (
             <>
               {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUserBtnClick} /> : <div className={styles['un-block-user']} onClick={handleUnblockUserBtnClick} />}
-              <div className={`${styles['invite-temp-group']} disabled`} />
+              {/* <div className={`${styles['invite-temp-group']} disabled`} /> */}
             </>
           )}
           <div className={styles['report']} onClick={handleReportBtnClick} />
@@ -393,10 +419,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>
               <div className={styles['buttons']}>
-                <div className={`${styles['button']} ${styles['font']} disabled`} />
+                {/* <div className={`${styles['button']} ${styles['font']} disabled`} /> */}
                 <div className={`${styles['button']} ${styles['emoji']}`} onMouseDown={handleEmojiPickerClick} />
-                <div className={`${styles['button']} ${styles['screen-shot']} disabled`} />
-                <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || cooldown > 0 ? 'disabled' : ''}`} onClick={handleShakeWindowBtnClick} />
+                <div className={`${styles['button']} ${styles['screen-shot']}`} onClick={handleScreenShotBtnClick} />
+                <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || !canShakeWindow ? 'disabled' : ''}`} onClick={handleShakeWindowBtnClick} />
               </div>
               <div className={styles['buttons']}>
                 <div className={`${styles['history-message']} disabled`} onClick={handleMessageHistoryBtnClick}>

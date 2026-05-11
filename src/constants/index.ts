@@ -85,7 +85,7 @@ export const FONT_LIST = [
   },
 ];
 export const MAX_FILE_SIZE = 5 * 1024 * 1024;
-export const SHAKE_COOLDOWN = 3;
+export const SHAKE_COOLDOWN = 3 * 1000;
 export const MAX_INPUT_LENGTH = 1000;
 export const MAX_BROADCAST_LENGTH = 300;
 export const ALLOWED_MESSAGE_KEYS = ['guest-send-an-external-link', 'message:send-shake-window', 'message:receive-shake-window'];
