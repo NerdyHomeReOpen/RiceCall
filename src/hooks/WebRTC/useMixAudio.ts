@@ -1,6 +1,7 @@
 // src/hooks/WebRTC/useMixAudio.ts
 import { useCallback } from 'react';
 import type { SharedRefs } from './useSharedRefs';
+import { detectSpeaking } from './detectSpeaking';
 import * as ipc from '@/main/ipc';
 import * as Store from '@/store';
 import Logger from '@/utils/logger';
@@ -10,9 +11,13 @@ interface UseMixAudioDeps {
 }
 
 export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioDeps) => {
-  const { audioContextRef, inputDesRef, inputAnalyserRef, mixNodesRef, recorderGainRef } = refs;
+  const { audioContextRef, inputDesRef, inputAnalyserRef, mixNodesRef, recorderGainRef, rafIdListRef, audioProducerRef } = refs;
 
   const removeMixAudio = useCallback(() => {
+    if (rafIdListRef.current['system']) {
+      cancelAnimationFrame(rafIdListRef.current['system']);
+      delete rafIdListRef.current['system'];
+    }
     if (mixNodesRef.current) {
       const { stream, source, gain } = mixNodesRef.current;
       if (source) source.disconnect();
@@ -20,7 +25,7 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
       if (stream) stream.getTracks().forEach((t) => t.stop());
       mixNodesRef.current = { stream: null, source: null, gain: null };
     }
-  }, [mixNodesRef]);
+  }, [mixNodesRef, rafIdListRef]);
 
   const initMixAudio = useCallback(
     async (systemStream: MediaStream) => {
@@ -45,8 +50,11 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
       if (Store.store.getState().webrtc.isRecording) gainNode.connect(recorderGainRef.current!);
+
+      const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
+      detectSpeaking('system', inputAnalyserRef.current, dataArray, rafIdListRef, audioProducerRef);
     },
-    [initAudioContext, removeMixAudio, audioContextRef, inputDesRef, inputAnalyserRef, mixNodesRef, recorderGainRef],
+    [initAudioContext, removeMixAudio, audioContextRef, inputDesRef, inputAnalyserRef, mixNodesRef, recorderGainRef, rafIdListRef, audioProducerRef],
   );
 
   const startMixing = useCallback(
