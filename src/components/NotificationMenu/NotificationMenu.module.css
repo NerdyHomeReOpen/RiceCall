@@ -1,0 +1,65 @@
+.menu:not(:empty) {
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  min-width: 200px;
+  overflow: hidden;
+  background-color: var(--background);
+  border-radius: 3px;
+  box-shadow: var(--box-shadow);
+}
+
+.option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 6px 30px;
+  color: var(--text-color);
+  border-radius: 3px;
+}
+
+.option::before {
+  position: absolute;
+  left: 6px;
+  align-self: center;
+  min-width: 16px;
+  min-height: 16px;
+  margin-right: 5px;
+  content: '';
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto;
+}
+
+.option:not(.readonly):hover {
+  cursor: pointer;
+  background-color: var(--hover);
+}
+
+.option[data-type='notification']::before {
+  background-image: url('/icon_notice_friend.svg');
+}
+
+.contents {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 3px 30px;
+}
+
+.image {
+  border: solid 1px var(--border);
+}
+
+.menu span {
+  margin: 5px 0;
+}

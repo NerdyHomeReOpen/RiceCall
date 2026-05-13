@@ -1,0 +1,78 @@
+.placeholder {
+  min-height: 27px;
+}
+
+.list {
+  position: relative;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  height: 150px;
+  background-image: url('/channel/BkgrdImageView.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+  border: 1px solid #777;
+}
+
+.middle-area {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-evenly;
+  width: 100%;
+  height: 80px;
+  background-image: url('/channel/dialog_body_bg.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.item-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 55px;
+  cursor: pointer;
+}
+
+.item-icon {
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  background: none;
+  background-position: -44px 0;
+  border: none;
+}
+
+.item-wrapper:nth-child(1) .item-icon {
+  background-image: url('/channel/widget_vote.svg');
+}
+
+.item-wrapper:nth-child(2) .item-icon {
+  background-image: url('/channel/widget_chnEvent.svg');
+}
+
+.item-wrapper:nth-child(3) .item-icon {
+  background-image: url('/channel/widget_flower.svg');
+}
+
+.item-wrapper:nth-child(4) .item-icon {
+  background-image: url('/channel/widget_lottery.svg');
+}
+
+.item-wrapper:nth-child(5) .item-icon {
+  background-image: url('/channel/widget_Show.svg');
+}
+
+.item-icon img {
+  width: 44px;
+  height: 44px;
+}
+
+.item-text {
+  margin-top: 4px;
+  font-size: 12px;
+  text-align: center;
+}

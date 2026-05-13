@@ -5,7 +5,7 @@ const defaultTableUser: Types.table_users = {
   name: '',
   displayId: '',
   avatar: '',
-  avatarUrl: '/default/userAvatar.webp',
+  avatarUrl: '/default/userAvatar.svg',
   signature: '',
   about: '',
   country: '',
@@ -90,7 +90,7 @@ const defaultTableServer: Types.table_servers = {
   serverId: '',
   name: '',
   avatar: `${Date.now()}`,
-  avatarUrl: `/default/serverAvatar.webp`,
+  avatarUrl: `/default/serverAvatar.svg`,
   announcement: '',
   applyNotice: '',
   description: '',
@@ -210,7 +210,12 @@ const defaultTableMemberInvitations: Types.table_member_invitations = {
   updatedAt: 0,
 };
 
-export function user(overrides: Partial<Types.User> = {}): Types.User {
+/**
+ * Get the default user
+ * @param overrides - The overrides to apply to the default user
+ * @returns The default user
+ */
+export function getDefaultUser(overrides: Partial<Types.User> = {}): Types.User {
   return {
     ...defaultTableUser,
     ...defaultTableUserSettings,
@@ -220,7 +225,12 @@ export function user(overrides: Partial<Types.User> = {}): Types.User {
   };
 }
 
-export function friend(overrides: Partial<Types.Friend> = {}): Types.Friend {
+/**
+ * Get the default friend
+ * @param overrides - The overrides to apply to the default friend
+ * @returns The default friend
+ */
+export function getDefaultFriend(overrides: Partial<Types.Friend> = {}): Types.Friend {
   return {
     ...defaultTableFriend,
     ...defaultTableUser,
@@ -230,7 +240,12 @@ export function friend(overrides: Partial<Types.Friend> = {}): Types.Friend {
   };
 }
 
-export function friendActivity(overrides: Partial<Types.FriendActivity> = {}): Types.FriendActivity {
+/**
+ * Get the default friend activity
+ * @param overrides - The overrides to apply to the default friend activity
+ * @returns The default friend activity
+ */
+export function getDefaultFriendActivity(overrides: Partial<Types.FriendActivity> = {}): Types.FriendActivity {
   return {
     ...defaultTableUser,
     ...defaultTableUserActivity,
@@ -238,14 +253,24 @@ export function friendActivity(overrides: Partial<Types.FriendActivity> = {}): T
   };
 }
 
-export function friendGroup(overrides: Partial<Types.FriendGroup> = {}): Types.FriendGroup {
+/**
+ * Get the default friend group
+ * @param overrides - The overrides to apply to the default friend group
+ * @returns The default friend group
+ */
+export function getDefaultFriendGroup(overrides: Partial<Types.FriendGroup> = {}): Types.FriendGroup {
   return {
     ...defaultTableFriendGroup,
     ...overrides,
   };
 }
 
-export function friendApplication(overrides: Partial<Types.FriendApplication> = {}): Types.FriendApplication {
+/**
+ * Get the default friend application
+ * @param overrides - The overrides to apply to the default friend application
+ * @returns The default friend application
+ */
+export function getDefaultFriendApplication(overrides: Partial<Types.FriendApplication> = {}): Types.FriendApplication {
   return {
     ...defaultTableFriendApplication,
     ...defaultTableUser,
@@ -253,7 +278,12 @@ export function friendApplication(overrides: Partial<Types.FriendApplication> = 
   };
 }
 
-export function server(overrides: Partial<Types.Server> = {}): Types.Server {
+/**
+ * Get the default server
+ * @param overrides - The overrides to apply to the default server
+ * @returns The default server
+ */
+export function getDefaultServer(overrides: Partial<Types.Server> = {}): Types.Server {
   return {
     ...defaultTableServer,
     ...defaultTableUserServer,
@@ -263,7 +293,12 @@ export function server(overrides: Partial<Types.Server> = {}): Types.Server {
   };
 }
 
-export function channel(overrides: Partial<Types.Channel> = {}): Types.Channel {
+/**
+ * Get the default channel
+ * @param overrides - The overrides to apply to the default channel
+ * @returns The default channel
+ */
+export function getDefaultChannel(overrides: Partial<Types.Channel> = {}): Types.Channel {
   return {
     ...defaultTableChannel,
     ...defaultTableChannelMute,
@@ -273,7 +308,12 @@ export function channel(overrides: Partial<Types.Channel> = {}): Types.Channel {
   };
 }
 
-export function member(overrides: Partial<Types.Member> = {}): Types.Member {
+/**
+ * Get the default member
+ * @param overrides - The overrides to apply to the default member
+ * @returns The default member
+ */
+export function getDefaultMember(overrides: Partial<Types.Member> = {}): Types.Member {
   return {
     ...defaultTableMember,
     ...defaultTableUser,
@@ -283,7 +323,12 @@ export function member(overrides: Partial<Types.Member> = {}): Types.Member {
   };
 }
 
-export function memberApplication(overrides: Partial<Types.MemberApplication> = {}): Types.MemberApplication {
+/**
+ * Get the default member application
+ * @param overrides - The overrides to apply to the default member application
+ * @returns The default member application
+ */
+export function getDefaultMemberApplication(overrides: Partial<Types.MemberApplication> = {}): Types.MemberApplication {
   return {
     ...defaultTableMemberApplications,
     ...defaultTableUser,
@@ -291,7 +336,12 @@ export function memberApplication(overrides: Partial<Types.MemberApplication> = 
   };
 }
 
-export function memberInvitation(overrides: Partial<Types.MemberInvitation> = {}): Types.MemberInvitation {
+/**
+ * Get the default member invitation
+ * @param overrides - The overrides to apply to the default member invitation
+ * @returns The default member invitation
+ */
+export function getDefaultMemberInvitation(overrides: Partial<Types.MemberInvitation> = {}): Types.MemberInvitation {
   return {
     ...defaultTableMemberInvitations,
     ...defaultTableServer,
@@ -299,7 +349,12 @@ export function memberInvitation(overrides: Partial<Types.MemberInvitation> = {}
   };
 }
 
-export function queueMember(overrides: Partial<Types.QueueMember> = {}): Types.QueueMember {
+/**
+ * Get the default queue member
+ * @param overrides - The overrides to apply to the default queue member
+ * @returns The default queue member
+ */
+export function getDefaultQueueMember(overrides: Partial<Types.QueueMember> = {}): Types.QueueMember {
   return {
     ...defaultTableMember,
     ...defaultTableUser,

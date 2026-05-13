@@ -1,0 +1,138 @@
+.header {
+  z-index: 10;
+  display: flex;
+  justify-content: space-between;
+  min-height: 30px;
+  color: var(--secondary-color);
+  background-color: var(--main-color);
+  background-image: var(--header-image);
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+  border: none;
+  -webkit-app-region: drag;
+}
+
+.app-icon {
+  display: inline-block;
+  min-width: 60px;
+  min-height: 24px;
+  background-image: url('/login_logo_title.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.title-box {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+}
+
+.title-box::before {
+  display: inline-block;
+  min-width: 18px;
+  min-height: 18px;
+  content: '';
+  background-image: url('/rc_logo_small.svg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto;
+}
+
+.title-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.buttons {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-end;
+  min-width: fit-content;
+  margin-right: 10px;
+  -webkit-app-region: no-drag;
+  cursor: pointer;
+}
+
+.minimize-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Minsize.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}
+
+.restore-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Restore.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}
+
+.maxsize-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Maxsize.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}
+
+.close-button {
+  display: inline-block;
+  min-width: 20px;
+  min-height: 20px;
+  cursor: pointer;
+  background-image: url('/Button_Close.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: cover;
+
+  &:hover {
+    background-position: -20px 0;
+  }
+
+  &:active {
+    background-position: -40px 0;
+  }
+}

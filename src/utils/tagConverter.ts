@@ -1,7 +1,4 @@
-import { EMOJIS } from '@/emojis';
-
-import markdownStyles from '@/styles/markdown.module.css';
-import permissionStyles from '@/styles/permission.module.css';
+import { EMOJIS } from '@/constants';
 
 /* ---------- forward  ---------- */
 const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g; // :code:
@@ -19,6 +16,11 @@ const twitchBackRegex = /<iframe[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const kickBackRegex = /<iframe[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const pTagRegex = /<p><\/p>/g;
 
+/**
+ * Escape HTML characters
+ * @param str - The string to escape
+ * @returns The escaped string
+ */
 export function escapeHtml(str: unknown): string {
   if (typeof str !== 'string') return str as string;
   return str
@@ -28,31 +30,41 @@ export function escapeHtml(str: unknown): string {
     .replace(/(^|\n)&gt;\s/g, '$1> ');
 }
 
+/**
+ * Convert tags to HTML
+ * @param raw - The raw string
+ * @returns The HTML string
+ */
 export function fromTags(raw: string) {
   return raw
     .replace(emojiRegex, (_, code) => {
       const emoji = EMOJIS.find((e) => e.code === code);
       if (!emoji) return code;
-      return `<img data-emoji='${code}' loading='lazy' class='${markdownStyles['emoji']}' alt=':${code}:' src='${emoji.path}'/>`;
+      return `<img data-emoji='${code}' loading='lazy' class='markdown-emoji' alt=':${code}:' src='${emoji.path}'/>`;
     })
     .replace(discordTimestampRegex, (_, timestamp) => {
       const date = new Date(parseInt(timestamp) * 1000);
       return date.toLocaleString();
     })
     .replace(userTagRegex, (_, name, _level, level = '2', _gender, gender = 'male') => {
-      return `<span data-name='${name}'><span class='${markdownStyles['user-icon']} ${permissionStyles[gender]} ${permissionStyles[`lv-${level}`]}'></span><span class='${markdownStyles['user-name']}'>${name}</span></span>`;
+      return `<span data-name='${name}'><span class='markdown-user-icon permission-${gender} permission-lv-${level}'></span><span class='markdown-user-name'>${name}</span></span>`;
     })
     .replace(ytRegex, (_, videoId) => {
-      return `<iframe data-yt='${videoId}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
+      return `<iframe data-yt='${videoId}' class='markdown-embed-video' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://www.youtube.com/embed/${videoId}?autoplay=1"></iframe>`;
     })
     .replace(twitchRegex, (_, channel) => {
-      return `<iframe data-tw='${channel}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.twitch.tv/?channel=${channel}&autoplay=true&parent=localhost"></iframe>`;
+      return `<iframe data-tw='${channel}' class='markdown-embed-video' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.twitch.tv/?channel=${channel}&autoplay=true&parent=localhost"></iframe>`;
     })
     .replace(kickRegex, (_, username) => {
-      return `<iframe data-kick='${username}' class='${markdownStyles['embed-video']}' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
+      return `<iframe data-kick='${username}' class='markdown-embed-video' allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" src="https://player.kick.com/${username}"></iframe>`;
     });
 }
 
+/**
+ * Convert HTML to tags
+ * @param raw - The HTML string
+ * @returns The tags string
+ */
 export function toTags(raw: string) {
   return raw
     .replace(emojiBackRegex, (_: string, code: string) => {

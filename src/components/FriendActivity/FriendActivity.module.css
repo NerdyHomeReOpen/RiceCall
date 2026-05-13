@@ -1,0 +1,86 @@
+.wrapper {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.activity-item {
+  display: flex;
+  flex-direction: row;
+  gap: 10px;
+  align-items: center;
+  width: 100%;
+}
+
+.avatar {
+  width: 30px;
+  height: 30px;
+}
+
+.content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  width: 100%;
+  overflow: hidden;
+}
+
+.content-top {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  min-width: 0;
+}
+
+.content-top > div:first-child,
+.content-top > div:nth-child(2) {
+  flex-shrink: 0;
+}
+
+.content-top > div:last-child {
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.vip-icon {
+  width: 14px;
+}
+
+.name-text {
+  flex-shrink: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-username);
+  white-space: nowrap;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.name-text.vip {
+  color: var(--text-vip-name);
+
+  &:hover {
+    color: var(--text-vip-name-hover);
+  }
+}
+
+.timestamp-text {
+  color: var(--text-color-quinary);
+}
+
+.content-bottom {
+  max-width: 100%;
+  min-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-quaternary);
+  white-space: nowrap;
+  user-select: text;
+}

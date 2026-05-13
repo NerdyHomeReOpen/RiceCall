@@ -1,0 +1,70 @@
+.card {
+  position: fixed;
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  width: 300px;
+  min-height: 145px;
+  padding: 10px;
+  background-color: var(--background-secondary);
+  border: 1px solid var(--border);
+}
+
+.info-wrapper {
+  display: flex;
+  flex: 1;
+  flex-direction: row;
+  gap: 10px;
+  align-items: flex-start;
+  width: 100%;
+}
+
+.avatar-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 75px;
+}
+
+.avatar-wrapper .image {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background-repeat: no-repeat;
+  background-size: contain;
+}
+
+.avatar-wrapper .rarity-text {
+  margin-top: 8px;
+  color: var(--text-vip-name);
+}
+
+.description-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  height: 100%;
+  margin-left: 10px;
+}
+
+.description-section .name-text {
+  font-size: 1.1em;
+  font-weight: bold;
+  color: var(--text-color-quaternary);
+}
+
+.description-section .description {
+  color: var(--text-color-quaternary);
+}
+
+.show-time {
+  width: 100%;
+  color: var(--text-color-quaternary);
+}

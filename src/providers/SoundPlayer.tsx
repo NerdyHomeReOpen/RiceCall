@@ -1,8 +1,8 @@
 import { createContext, ReactNode, useContext, useEffect, useRef, useCallback, useMemo } from 'react';
 
-import ipc from '@/ipc';
+import * as ipc from '@/main/ipc';
 
-import Logger from '@/logger';
+import Logger from '@/utils/logger';
 
 interface SoundPlayerContextType {
   playSound: (sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => void;
@@ -21,7 +21,6 @@ interface SoundPlayerProviderProps {
 }
 
 const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
-  // Refs
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const disableAllSoundEffectRef = useRef(false);
   const enterVoiceChannelSoundRef = useRef(false);
@@ -86,7 +85,6 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
     }
   }, []);
 
-  // Effects
   useEffect(() => {
     const changeOutputAudioDevice = (deviceId: string) => {
       new Logger('SoundPlayer').info(`Output device updated: ${deviceId}`);

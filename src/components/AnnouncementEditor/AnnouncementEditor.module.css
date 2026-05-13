@@ -1,0 +1,39 @@
+.toolbar {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 4px;
+}
+
+.toolbar-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 2em;
+  padding: 0 4px;
+  color: var(--text-color);
+  cursor: pointer;
+  background-color: var(--background);
+  border: 1px solid var(--border);
+  border-radius: 3px;
+}
+
+.toolbar-button:hover {
+  background-color: var(--hover);
+}
+
+.toolbar-button:active {
+  background-color: var(--selected);
+}
+
+.toolbar-button.active {
+  color: #fff;
+  background-color: #a7c0e9;
+  border-color: #50a1db;
+}
+
+.toolbar-button:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px #6496fa4d;
+}

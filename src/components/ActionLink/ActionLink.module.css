@@ -1,0 +1,50 @@
+.action-link {
+  font-weight: bold;
+  color: var(--text-link);
+  cursor: pointer;
+
+  &:hover {
+    color: #013880;
+  }
+}
+
+.invitation-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  background: #fff;
+  border: solid 1px #ccc;
+  border-radius: 10px;
+  box-shadow: 0 0 5px 1px rgb(0 0 0 / 10%);
+}
+
+.invitation-header {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.invitation-header .icon {
+  width: 15px;
+  height: 15px;
+  background-image: url('/im/invitenotify.svg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: contain;
+}
+
+.invitation-header .title {
+  margin-left: 5px;
+  font-size: 14px;
+  color: #999;
+}
+
+.invitation-content {
+  padding: 10px 25px;
+}
+
+.invitation-content .server-name {
+  color: var(--text-link);
+}

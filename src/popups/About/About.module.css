@@ -1,0 +1,138 @@
+.app-logo {
+  align-self: center;
+  min-width: 226px;
+  min-height: 54px;
+  background-image: url('/login_logo.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 20px;
+  overflow: scroll;
+}
+
+.app-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  width: 100%;
+}
+
+.app-version-text {
+  width: 100%;
+  padding-bottom: 5px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.copyright-text {
+  width: 100%;
+  padding-bottom: 5px;
+  text-align: center;
+}
+
+.team-members {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: fit-content;
+  padding: 10px;
+  border: 1px solid var(--border);
+  box-shadow: inset 0 1px 5px var(--shadow);
+}
+
+.team-member-card {
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 3px;
+  margin-top: 3px;
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  backdrop-filter: blur(5px);
+  transition: background-color 0.3s ease;
+}
+
+.team-member-card:hover {
+  background-color: var(--hover);
+}
+
+.icon-wrapper {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.name-wrapper {
+  display: flex;
+  align-items: center;
+  line-height: 1.4;
+}
+
+.team-list-textarea {
+  width: 100% !important;
+  height: 100% !important;
+  resize: none;
+  border: none;
+}
+
+.staff-title {
+  display: inline-block;
+  min-width: 80px;
+  padding: 4px 8px;
+  margin-right: 8px;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  background-color: rgb(115 164 213 / 70%);
+  border-radius: 4px;
+}
+
+.icon-wrapper svg {
+  vertical-align: middle;
+  transition: color 0.3s ease;
+}
+
+.ricecall-id {
+  display: inline-block;
+  margin-right: 8px;
+  color: var(--text-link);
+  text-align: center;
+  user-select: text;
+}
+
+.github-link:hover svg {
+  color: rgb(70 70 70);
+}
+
+.discord-link:hover svg {
+  color: #7289da;
+}
+
+.color-1 {
+  background-color: rgb(216 63 63 / 80%);
+}
+
+.color-2 {
+  background-color: rgb(77 173 147 / 80%);
+}
+
+.color-3 {
+  background-color: rgb(216 166 63 / 80%);
+}
+
+.color-4 {
+  background-color: rgb(63 166 216 / 80%);
+}

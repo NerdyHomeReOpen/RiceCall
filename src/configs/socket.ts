@@ -84,7 +84,7 @@ export const SEND_EVENTS: (keyof Types.ServerToClientEvents)[] = [
   'memberInvitationAdd',
   'memberInvitationRemove',
   'memberInvitationUpdate',
-  'notification', // not used yet
+  'notification',
   'openPopup',
   'playSound',
   'queueMembersSet',

@@ -1,0 +1,46 @@
+.group {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 25px;
+  padding: 5px;
+  border-radius: 3px;
+}
+
+.group.selected {
+  background-color: var(--selected);
+}
+
+.group:hover {
+  background-color: var(--hover);
+}
+
+.toggle-icon {
+  display: inline-block;
+  min-width: 14px;
+  min-height: 14px;
+  content: '';
+  background-image: url('/channel/channelIcon.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.toggle-icon.expanded {
+  background-position: -14px 0;
+}
+
+.friend-list {
+  margin-left: 20px;
+}
+
+.label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-secondary);
+  white-space: nowrap;
+}
+
+.friend-count-text {
+  color: #808080;
+}

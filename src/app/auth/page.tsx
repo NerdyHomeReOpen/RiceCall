@@ -4,19 +4,35 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ipc from '@/ipc';
+import * as ipc from '@/main/ipc';
 
-import LoginPage from '@/pages/Login';
-import RegisterPage from '@/pages/Register';
-import ChangeServerPage from '@/pages/ChangeServer';
+import AuthHeader from '@/components/AuthHeader';
 
-import headerStyles from '@/styles/header.module.css';
+import LoginPage from '@/page-components/Login';
+import RegisterPage from '@/page-components/Register';
+import ChangeServerPage from '@/page-components/ChangeServer';
 
-const Header: React.FC = React.memo(() => {
-  // Hooks
+const AuthPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
-  // Handlers
+  const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
+
+  const isDisplayLoginPage = section === 'login';
+  const isDisplayRegisterPage = section === 'register';
+  const isDisplayChangeServerPage = section === 'change-server';
+
+  const handleBackToLoginBtnClick = () => {
+    setSection('login');
+  };
+
+  const handleRegisterBtnClick = () => {
+    setSection('register');
+  };
+
+  const handleChangeServerBtnClick = () => {
+    setSection('change-server');
+  };
+
   const handleMinimizeBtnClick = () => {
     ipc.window.minimize();
   };
@@ -25,13 +41,12 @@ const Header: React.FC = React.memo(() => {
     ipc.window.close();
   };
 
-  // Effects
   useEffect(() => {
     ipc.discord.updatePresence({
       details: t('rpc:login-page'),
       state: `${t('rpc:un-login')}`,
       largeImageKey: 'app_icon',
-      largeImageText: 'RC Voice',
+      largeImageText: 'RiceCall',
       smallImageKey: 'login_icon',
       smallImageText: t('rpc:login-page'),
       timestamp: Date.now(),
@@ -45,59 +60,8 @@ const Header: React.FC = React.memo(() => {
   }, [t]);
 
   return (
-    <header className={`${headerStyles['header']} ${headerStyles['big']}`}>
-      <div className={headerStyles['title-box']}>
-        <div className={headerStyles['app-icon']} />
-      </div>
-      <div className={headerStyles['buttons']}>
-        <div className={headerStyles['minimize']} onClick={handleMinimizeBtnClick} />
-        <div className={headerStyles['close']} onClick={handleCloseBtnClick} />
-      </div>
-    </header>
-  );
-});
-
-Header.displayName = 'Header';
-
-const AuthPageComponent: React.FC = React.memo(() => {
-  // Hooks
-  const { t } = useTranslation();
-
-  // States
-  const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
-
-  // Variables
-  const isDisplayLoginPage = section === 'login';
-  const isDisplayRegisterPage = section === 'register';
-  const isDisplayChangeServerPage = section === 'change-server';
-
-  // Handlers
-  const handleBackToLoginBtnClick = () => {
-    setSection('login');
-  };
-
-  const handleRegisterBtnClick = () => {
-    setSection('register');
-  };
-
-  const handleChangeServerBtnClick = () => {
-    setSection('change-server');
-  };
-
-  // Effects
-  useEffect(() => {
-    const autoLogin = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) return;
-
-      await ipc.auth.autoLogin(token);
-    };
-    autoLogin();
-  }, [t]);
-
-  return (
     <>
-      <Header />
+      <AuthHeader onMinimize={handleMinimizeBtnClick} onClose={handleCloseBtnClick} />
       <LoginPage display={isDisplayLoginPage} onRegisterBtnClick={handleRegisterBtnClick} onChangeServerBtnClick={handleChangeServerBtnClick} />
       <RegisterPage display={isDisplayRegisterPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
       <ChangeServerPage display={isDisplayChangeServerPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />

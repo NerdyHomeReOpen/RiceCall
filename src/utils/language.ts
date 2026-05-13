@@ -1,44 +1,53 @@
-import { TFunction } from 'i18next';
-import i18n from '@/i18n';
+import { t } from '@/i18n';
 
-export function getPermissionText(t: TFunction<'translation', undefined>, permission: number): string {
-  const permissionMap: Record<number, string> = {
-    1: t('guest'),
-    2: t('member'),
-    3: t('channel-mod'),
-    4: t('channel-admin'),
-    5: t('server-admin'),
-    6: t('server-owner'),
-    7: t('staff'),
-    8: t('super-admin'),
+import { Permission } from '@/types';
+
+/**
+ * Get the translated text for a permission level
+ * @param permission - The permission level
+ * @returns The translated text for the permission level
+ */
+export function getPermissionText(permission: Permission): string {
+  const permissionMap: Record<Permission, string> = {
+    [Permission.Guest]: t('guest'),
+    [Permission.Member]: t('member'),
+    [Permission.ChannelMod]: t('channel-mod'),
+    [Permission.ChannelAdmin]: t('channel-admin'),
+    [Permission.ServerAdmin]: t('server-admin'),
+    [Permission.ServerOwner]: t('server-owner'),
+    [Permission.Staff]: t('staff'),
+    [Permission.SuperAdmin]: t('super-admin'),
   };
   return permissionMap[permission] || t('unknown-user');
 }
 
-export function getFormatTimeDiff(t: TFunction<'translation', undefined>, timestamp: number): string {
+/**
+ * Get the formatted time difference
+ * @param timestamp - The timestamp
+ * @returns The formatted time difference
+ */
+export function getFormatTimeDiff(timestamp: number): string {
   const now = Date.now();
   const diff = Math.floor((timestamp - now) / 1000);
   const isFuture = diff > 0;
   const absDiff = Math.abs(diff);
 
   const intervals = [
-    { label: t('year'), seconds: 31536000 },
-    { label: t('month'), seconds: 2592000 },
-    { label: t('week'), seconds: 604800 },
-    { label: t('day'), seconds: 86400 },
-    { label: t('hour'), seconds: 3600 },
-    { label: t('minute'), seconds: 60 },
-    { label: t('second'), seconds: 1 },
+    { tKey: 'years', seconds: 31536000 },
+    { tKey: 'months', seconds: 2592000 },
+    { tKey: 'weeks', seconds: 604800 },
+    { tKey: 'days', seconds: 86400 },
+    { tKey: 'hours', seconds: 3600 },
+    { tKey: 'minutes', seconds: 60 },
+    { tKey: 'seconds', seconds: 1 },
   ];
 
   if (absDiff > 10) {
     for (const interval of intervals) {
       const count = Math.floor(absDiff / interval.seconds);
       if (count >= 1) {
-        const label = interval.label;
-        const timesAgo = `${count}${label}${t('ago')}`;
-        const timesFuture = `${count}${label}${t('future')}`;
-        return isFuture ? timesFuture : timesAgo;
+        const tKey = `${interval.tKey}-${isFuture ? 'later' : 'ago'}`;
+        return t(tKey, { 0: count.toString() });
       }
     }
   }
@@ -46,6 +55,12 @@ export function getFormatTimeDiff(t: TFunction<'translation', undefined>, timest
   return t('just-now');
 }
 
+/**
+ * Get the formatted date
+ * @param timestamp - The timestamp
+ * @param type - The type of date to format
+ * @returns The formatted date
+ */
 export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't' | 'all'): string {
   const date = new Date(timestamp);
   const year = date.getFullYear();
@@ -64,6 +79,11 @@ export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't'
   }
 }
 
+/**
+ * Get the formatted time from seconds
+ * @param seconds - The seconds
+ * @returns The formatted time
+ */
 export function getFormatTimeFromSecond(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -72,8 +92,13 @@ export function getFormatTimeFromSecond(seconds: number): string {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
-export function getFormatTimestamp(t: TFunction<'translation', undefined>, timestamp: number): string {
-  const timezoneLang = i18n.language;
+/**
+ * Get the formatted timestamp
+ * @param timestamp - The timestamp
+ * @returns The formatted timestamp
+ */
+export function getFormatTimestamp(timestamp: number): string {
+  const timezoneLang = navigator.language;
   const now = new Date();
   const messageDate = new Date(timestamp);
   const messageDay = new Date(messageDate.getFullYear(), messageDate.getMonth(), messageDate.getDate());

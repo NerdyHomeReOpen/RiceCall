@@ -2,11 +2,15 @@
 
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useCallback } from 'react';
-import { useTranslation } from 'react-i18next';
-
-import ipc from '@/ipc';
 
 import type * as Types from '@/types';
+
+import * as ipc from '@/main/ipc';
+
+import { POPUP_CONFIGS } from '@/configs/popup';
+
+import StoreSyncer from '@/components/StoreSyncer';
+import PopupHeader from '@/components/PopupHeader';
 
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
@@ -46,75 +50,10 @@ import ServerBroadcast from '@/popups/ServerBroadcast';
 import SystemSetting from '@/popups/SystemSetting';
 import UserInfo from '@/popups/UserInfo';
 
-import { getPopupConfigs } from '@/configs/popup';
-
-import SocketManager from '@/components/SocketManager';
-
-import headerStyle from '@/styles/header.module.css';
-
-interface HeaderProps {
-  id: string;
-  title: string;
-  buttons: ('minimize' | 'maxsize' | 'close')[];
-  titleBoxIcon?: string;
-}
-
-const Header: React.FC<HeaderProps> = React.memo(({ id, title, buttons, titleBoxIcon }) => {
-  // Hooks
-  const { t } = useTranslation();
-
-  // States
+const PopupPageComponent: React.FC = React.memo(() => {
+  const [popup, setPopup] = useState<Types.Popup | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
 
-  // Handlers
-  const handleMaximizeBtnClick = () => {
-    if (isFullscreen) return;
-    ipc.window.maximize();
-  };
-
-  const handleUnmaximizeBtnClick = () => {
-    if (!isFullscreen) return;
-    ipc.window.unmaximize();
-  };
-
-  const handleMinimizeBtnClick = () => {
-    ipc.window.minimize(id);
-  };
-
-  const handleCloseBtnClick = () => {
-    ipc.popup.close(id);
-  };
-
-  // Effects
-  useEffect(() => {
-    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, []);
-
-  return (
-    <header className={`${headerStyle['header']} ${headerStyle['popup']}`}>
-      <div className={headerStyle['title-wrapper']}>
-        <div className={`${headerStyle['title-box']} ${titleBoxIcon}`}>
-          <div className={headerStyle['title']}>{t(title)}</div>
-        </div>
-        <div className={headerStyle['buttons']}>
-          {buttons.includes('minimize') && <div className={headerStyle['minimize']} onClick={handleMinimizeBtnClick} />}
-          {buttons.includes('maxsize') &&
-            (isFullscreen ? <div className={headerStyle['restore']} onClick={handleUnmaximizeBtnClick} /> : <div className={headerStyle['maxsize']} onClick={handleMaximizeBtnClick} />)}
-          {buttons.includes('close') && <div className={headerStyle['close']} onClick={handleCloseBtnClick} />}
-        </div>
-      </div>
-    </header>
-  );
-});
-
-Header.displayName = 'Header';
-
-const PopupPageComponent: React.FC = React.memo(() => {
-  // States
-  const [popup, setPopup] = useState<Types.Popup | null>(null);
-
-  // Functions
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
     const node: Record<Types.PopupType, () => React.ReactNode> = {
@@ -163,20 +102,20 @@ const PopupPageComponent: React.FC = React.memo(() => {
       userSetting: () => <UserInfo id={id} {...initialData} />,
     };
 
-    const configs = getPopupConfigs(type);
+    const config = POPUP_CONFIGS[type];
 
     switch (type) {
       case 'channelSetting':
-        configs.title = initialData?.channel?.name ?? configs.title;
+        config.title = initialData?.channel?.name ?? config.title;
         break;
       case 'directMessage':
-        configs.title = initialData?.target?.name ?? configs.title;
+        config.title = initialData?.target?.name ?? config.title;
         break;
       case 'userInfo':
-        configs.title = initialData?.target?.name ?? configs.title;
+        config.title = initialData?.target?.name ?? config.title;
         break;
       case 'serverSetting':
-        configs.title = initialData?.server?.name ?? configs.title;
+        config.title = initialData?.server?.name ?? config.title;
         break;
     }
 
@@ -184,12 +123,36 @@ const PopupPageComponent: React.FC = React.memo(() => {
       id,
       type,
       position: { top: 0, left: 0 },
-      ...configs,
+      ...config,
       node: node[type as keyof typeof node],
     };
   }, []);
 
-  // Effects
+  const handleMaximize = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximize = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
+  };
+
+  const handleMinimize = () => {
+    if (!popup?.id) return;
+    ipc.window.minimize(popup.id);
+  };
+
+  const handleClose = () => {
+    if (!popup?.id) return;
+    ipc.popup.close(popup.id);
+  };
+
+  useEffect(() => {
+    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    return () => unsubs.forEach((unsub) => unsub());
+  }, []);
+
   useEffect(() => {
     if (window.location.search) {
       const params = new URLSearchParams(window.location.search);
@@ -205,13 +168,17 @@ const PopupPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
-      <SocketManager />
+      <StoreSyncer.Slave />
       {popup && !popup.hideHeader && (
-        <Header
-          id={popup.id}
+        <PopupHeader
           title={popup.title}
           buttons={popup.buttons}
-          titleBoxIcon={popup.type === 'changeTheme' ? headerStyle['title-box-skin-icon'] : popup.type === 'directMessage' ? headerStyle['title-box-direct-message-icon'] : undefined}
+          popupType={popup.type}
+          isFullscreen={isFullscreen}
+          onMinimize={handleMinimize}
+          onMaximize={handleMaximize}
+          onRestore={handleUnmaximize}
+          onClose={handleClose}
         />
       )}
       {popup && popup.node()}

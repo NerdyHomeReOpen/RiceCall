@@ -1,7 +1,6 @@
 import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
-import Image from 'next/image';
 
-import styles from '@/styles/imageViewer.module.css';
+import ImageViewer from '@/components/ImageViewer';
 
 type ImageViewerContextType = {
   selectImage: (image: string) => void;
@@ -20,15 +19,12 @@ interface ImageViewerProviderProps {
 }
 
 const ImageViewerProvider = ({ children }: ImageViewerProviderProps) => {
-  // States
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
-  // Functions
   const selectImage = useCallback((image: string) => {
     setSelectedImage(image);
   }, []);
 
-  // Handlers
   const handleUnselectImage = () => {
     setSelectedImage(null);
   };
@@ -38,9 +34,7 @@ const ImageViewerProvider = ({ children }: ImageViewerProviderProps) => {
   return (
     <ImageViewerContext.Provider value={contextValue}>
       {children}
-      <div className={`${styles['image-viewer']} ${selectedImage ? styles['visible'] : styles['hidden']}`} onClick={handleUnselectImage}>
-        {selectedImage && <Image loading="lazy" src={selectedImage} alt="image" onClick={(e) => e.stopPropagation()} width={-1} height={-1} />}
-      </div>
+      <ImageViewer selectedImage={selectedImage} onUnselectImage={handleUnselectImage} />
     </ImageViewerContext.Provider>
   );
 };

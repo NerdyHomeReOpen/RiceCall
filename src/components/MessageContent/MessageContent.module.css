@@ -1,0 +1,115 @@
+.message-content-wrapper {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  max-width: 100%;
+}
+
+.message-wrapper {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: first baseline;
+}
+
+.info-icon {
+  display: flex;
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_NOTIFY.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.event-icon {
+  display: flex;
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_NOTIFY.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.warn-icon {
+  display: flex;
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_WARNING.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.alert-icon {
+  display: flex;
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  min-height: 12px;
+  background-image: url('/channel/NT_ANNOUNCEMENT.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.message-box {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  align-items: flex-start;
+  justify-content: flex-start;
+  min-width: 0;
+}
+
+.message-box.event {
+  flex-direction: row;
+}
+
+.details {
+  display: flex;
+  flex-direction: row;
+  gap: 3px;
+  align-items: center;
+  overflow: hidden;
+}
+
+.details .username-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-username);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: text;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.details .username-text.vip {
+  color: var(--text-vip-name);
+
+  &:hover {
+    color: var(--text-vip-name-hover);
+  }
+}
+
+.details .timestamp-text {
+  min-width: fit-content;
+  margin-left: 5px;
+  color: var(--text-color-quinary);
+  user-select: text;
+}
+
+.content {
+  color: var(--text-color);
+  overflow-wrap: break-word;
+  user-select: text;
+}

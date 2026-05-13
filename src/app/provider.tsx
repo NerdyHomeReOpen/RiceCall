@@ -1,14 +1,18 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 
-import { store } from '@/store';
-import i18n from '@/i18n';
-import ipc from '@/ipc';
-
 import type * as Types from '@/types';
+
+import * as ipc from '@/main/ipc';
+
+import { changeLanguage, i18nReady } from '@/i18n';
+
+import Logger from '@/utils/logger';
+
+import { store } from '@/store';
 
 import ContextMenuProvider from '@/providers/ContextMenu';
 import LoadingProvider from '@/providers/Loading';
@@ -16,14 +20,17 @@ import SoundPlayerProvider from '@/providers/SoundPlayer';
 import ImageViewerProvider from '@/providers/ImageViewer';
 import InAppPopupProvider from '@/providers/InAppPopup';
 
-import Logger from '@/logger';
-
 interface ProvidersProps {
   children: React.ReactNode;
 }
 
 const ProvidersComponent = ({ children }: ProvidersProps) => {
-  // Effects
+  const [i18nLoaded, setI18nLoaded] = useState(false);
+
+  useEffect(() => {
+    i18nReady.then(() => setI18nLoaded(true));
+  }, []);
+
   useEffect(() => {
     const changeFont = (font: string | null) => {
       new Logger('Font').info(`Font updated: ${font}`);
@@ -61,15 +68,17 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const changeLanguage = (language: Types.LanguageKey) => {
+    const changeLang = (language: Types.LanguageKey) => {
       new Logger('Language').info(`Language updated: ${language}`);
       if (!language) return;
-      i18n.changeLanguage(language);
+      changeLanguage(language);
     };
-    changeLanguage(ipc.language.get());
-    const unsub = ipc.language.onUpdate(changeLanguage);
+    changeLang(ipc.systemSettings.language.get());
+    const unsub = ipc.systemSettings.language.onUpdate(changeLang);
     return () => unsub();
   }, []);
+
+  if (!i18nLoaded) return null;
 
   return (
     <Provider store={store}>

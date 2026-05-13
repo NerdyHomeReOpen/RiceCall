@@ -1,6 +1,6 @@
 {
   "name": "ricecall",
-  "version": "0.3.19",
+  "version": "0.3.20-dev.20260512",
   "private": false,
   "description": "Ricecall",
   "author": {
@@ -8,7 +8,7 @@
     "email": "support@ricecall.com",
     "url": "https://ricecall.com"
   },
-  "main": "./build/src/electron/main.js",
+  "main": "./build/src/main/electron.js",
   "engines": {
     "node": ">=20"
   },
@@ -20,8 +20,8 @@
     "next:export": "next export",
     "next:lint": "next lint",
     "electron:prep": "tsc -p tsconfig.electron.json && resolve-tspaths -p tsconfig.electron.json --src . --out build && ts-add-js-extension --dir build",
-    "electron:dev": "electron -r tsx src/electron/main.ts --dev --no-sandbox",
-    "electron:start": "electron -r tsx src/electron/main.ts",
+    "electron:dev": "electron -r tsx src/main/electron.ts --dev --no-sandbox",
+    "electron:start": "electron -r tsx src/main/electron.ts",
     "electron:build": "npm run electron:prep && electron-builder",
     "electron:build:deb": "npm run electron:prep && electron-builder --linux deb",
     "electron:build:dmg": "npm run electron:prep && electron-builder --mac dmg",
@@ -32,10 +32,9 @@
     "build:dmg": "npm run next:build && npm run electron:build:dmg",
     "build:action": "npm run next:build && npm run electron:prep",
     "format": "prettier --write src/**/*.{ts,tsx,js,jsx,css}",
-    "format:css": "stylelint --fix \"src/**/*.css\""
+    "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" && stylelint --fix \"src/**/*.css\""
   },
   "dependencies": {
-    "@crowdin/ota-client": "^2.0.1",
     "@reduxjs/toolkit": "^2.11.2",
     "@tiptap/core": "^3.2.0",
     "@tiptap/extension-color": "^3.2.0",
@@ -78,8 +77,7 @@
     "rehype-highlight": "^7.0.2",
     "rehype-raw": "^7.0.0",
     "socket.io-client": "^4.8.1",
-    "twemoji": "^14.0.2",
-    "zod": "^4.1.5"
+    "twemoji": "^14.0.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
@@ -96,8 +94,10 @@
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
     "postcss": "^8",
+    "potrace": "^2.1.8",
     "prettier": "^3.6.2",
     "resolve-tspaths": "^0.8.23",
+    "sharp": "^0.34.5",
     "stylelint": "^16.26.1",
     "stylelint-config-recess-order": "^7.4.0",
     "stylelint-config-standard": "^39.0.1",
@@ -106,5 +106,8 @@
     "tsx": "^4.19.4",
     "typescript": "5.8.3"
   },
-  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
+  "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e",
+  "resolutions": {
+    "register-scheme": "https://registry.npmjs.org/register-scheme/-/register-scheme-0.0.2.tgz"
+  }
 }

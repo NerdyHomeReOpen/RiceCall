@@ -200,14 +200,273 @@ export const POPUP_BEHAVIORS: Record<Types.PopupType, PopupBehaviorConfig> = {
   userSetting: { resizable: false, maximizable: false, fullscreenable: false },
 };
 
-/**
- * Get the full popup configuration for a given type.
- */
-export function getPopupConfigs(type: Types.PopupType) {
-  return {
-    size: POPUP_SIZES[type],
-    title: POPUP_TITLE_KEYS[type],
-    ...POPUP_HEADERS[type],
-    ...POPUP_BEHAVIORS[type],
-  };
+interface PopupConfig {
+  size: PopupSizeConfig;
+  title: string;
+  buttons: ('close' | 'minimize' | 'maxsize')[];
+  hideHeader: boolean;
+  resizable: boolean;
+  maximizable: boolean;
+  fullscreenable: boolean;
 }
+
+export const POPUP_CONFIGS: Record<Types.PopupType, PopupConfig> = {
+  aboutus: {
+    size: POPUP_SIZES.aboutus,
+    title: POPUP_TITLE_KEYS.aboutus,
+    ...POPUP_HEADERS.aboutus,
+    ...POPUP_BEHAVIORS.aboutus,
+  },
+  applyFriend: {
+    size: POPUP_SIZES.applyFriend,
+    title: POPUP_TITLE_KEYS.applyFriend,
+    ...POPUP_HEADERS.applyFriend,
+    ...POPUP_BEHAVIORS.applyFriend,
+  },
+  applyMember: {
+    size: POPUP_SIZES.applyMember,
+    title: POPUP_TITLE_KEYS.applyMember,
+    ...POPUP_HEADERS.applyMember,
+    ...POPUP_BEHAVIORS.applyMember,
+  },
+  approveFriend: {
+    size: POPUP_SIZES.approveFriend,
+    title: POPUP_TITLE_KEYS.approveFriend,
+    ...POPUP_HEADERS.approveFriend,
+    ...POPUP_BEHAVIORS.approveFriend,
+  },
+  blockMember: {
+    size: POPUP_SIZES.blockMember,
+    title: POPUP_TITLE_KEYS.blockMember,
+    ...POPUP_HEADERS.blockMember,
+    ...POPUP_BEHAVIORS.blockMember,
+  },
+  channelEvent: {
+    size: POPUP_SIZES.channelEvent,
+    title: POPUP_TITLE_KEYS.channelEvent,
+    ...POPUP_HEADERS.channelEvent,
+    ...POPUP_BEHAVIORS.channelEvent,
+  },
+  channelPassword: {
+    size: POPUP_SIZES.channelPassword,
+    title: POPUP_TITLE_KEYS.channelPassword,
+    ...POPUP_HEADERS.channelPassword,
+    ...POPUP_BEHAVIORS.channelPassword,
+  },
+  channelSetting: {
+    size: POPUP_SIZES.channelSetting,
+    title: POPUP_TITLE_KEYS.channelSetting,
+    ...POPUP_HEADERS.channelSetting,
+    ...POPUP_BEHAVIORS.channelSetting,
+  },
+  changeTheme: {
+    size: POPUP_SIZES.changeTheme,
+    title: POPUP_TITLE_KEYS.changeTheme,
+    ...POPUP_HEADERS.changeTheme,
+    ...POPUP_BEHAVIORS.changeTheme,
+  },
+  chatHistory: {
+    size: POPUP_SIZES.chatHistory,
+    title: POPUP_TITLE_KEYS.chatHistory,
+    ...POPUP_HEADERS.chatHistory,
+    ...POPUP_BEHAVIORS.chatHistory,
+  },
+  createServer: {
+    size: POPUP_SIZES.createServer,
+    title: POPUP_TITLE_KEYS.createServer,
+    ...POPUP_HEADERS.createServer,
+    ...POPUP_BEHAVIORS.createServer,
+  },
+  createChannel: {
+    size: POPUP_SIZES.createChannel,
+    title: POPUP_TITLE_KEYS.createChannel,
+    ...POPUP_HEADERS.createChannel,
+    ...POPUP_BEHAVIORS.createChannel,
+  },
+  createFriendGroup: {
+    size: POPUP_SIZES.createFriendGroup,
+    title: POPUP_TITLE_KEYS.createFriendGroup,
+    ...POPUP_HEADERS.createFriendGroup,
+    ...POPUP_BEHAVIORS.createFriendGroup,
+  },
+  dialogAlert: {
+    size: POPUP_SIZES.dialogAlert,
+    title: POPUP_TITLE_KEYS.dialogAlert,
+    ...POPUP_HEADERS.dialogAlert,
+    ...POPUP_BEHAVIORS.dialogAlert,
+  },
+  dialogAlert2: {
+    size: POPUP_SIZES.dialogAlert2,
+    title: POPUP_TITLE_KEYS.dialogAlert2,
+    ...POPUP_HEADERS.dialogAlert2,
+    ...POPUP_BEHAVIORS.dialogAlert2,
+  },
+  dialogError: {
+    size: POPUP_SIZES.dialogError,
+    title: POPUP_TITLE_KEYS.dialogError,
+    ...POPUP_HEADERS.dialogError,
+    ...POPUP_BEHAVIORS.dialogError,
+  },
+  dialogInfo: {
+    size: POPUP_SIZES.dialogInfo,
+    title: POPUP_TITLE_KEYS.dialogInfo,
+    ...POPUP_HEADERS.dialogInfo,
+    ...POPUP_BEHAVIORS.dialogInfo,
+  },
+  dialogSuccess: {
+    size: POPUP_SIZES.dialogSuccess,
+    title: POPUP_TITLE_KEYS.dialogSuccess,
+    ...POPUP_HEADERS.dialogSuccess,
+    ...POPUP_BEHAVIORS.dialogSuccess,
+  },
+  dialogWarning: {
+    size: POPUP_SIZES.dialogWarning,
+    title: POPUP_TITLE_KEYS.dialogWarning,
+    ...POPUP_HEADERS.dialogWarning,
+    ...POPUP_BEHAVIORS.dialogWarning,
+  },
+  directMessage: {
+    size: POPUP_SIZES.directMessage,
+    title: POPUP_TITLE_KEYS.directMessage,
+    ...POPUP_HEADERS.directMessage,
+    ...POPUP_BEHAVIORS.directMessage,
+  },
+  editChannelOrder: {
+    size: POPUP_SIZES.editChannelOrder,
+    title: POPUP_TITLE_KEYS.editChannelOrder,
+    ...POPUP_HEADERS.editChannelOrder,
+    ...POPUP_BEHAVIORS.editChannelOrder,
+  },
+  editChannelName: {
+    size: POPUP_SIZES.editChannelName,
+    title: POPUP_TITLE_KEYS.editChannelName,
+    ...POPUP_HEADERS.editChannelName,
+    ...POPUP_BEHAVIORS.editChannelName,
+  },
+  editFriendNote: {
+    size: POPUP_SIZES.editFriendNote,
+    title: POPUP_TITLE_KEYS.editFriendNote,
+    ...POPUP_HEADERS.editFriendNote,
+    ...POPUP_BEHAVIORS.editFriendNote,
+  },
+  editFriendGroupName: {
+    size: POPUP_SIZES.editFriendGroupName,
+    title: POPUP_TITLE_KEYS.editFriendGroupName,
+    ...POPUP_HEADERS.editFriendGroupName,
+    ...POPUP_BEHAVIORS.editFriendGroupName,
+  },
+  editNickname: {
+    size: POPUP_SIZES.editNickname,
+    title: POPUP_TITLE_KEYS.editNickname,
+    ...POPUP_HEADERS.editNickname,
+    ...POPUP_BEHAVIORS.editNickname,
+  },
+  friendVerification: {
+    size: POPUP_SIZES.friendVerification,
+    title: POPUP_TITLE_KEYS.friendVerification,
+    ...POPUP_HEADERS.friendVerification,
+    ...POPUP_BEHAVIORS.friendVerification,
+  },
+  imageCropper: {
+    size: POPUP_SIZES.imageCropper,
+    title: POPUP_TITLE_KEYS.imageCropper,
+    ...POPUP_HEADERS.imageCropper,
+    ...POPUP_BEHAVIORS.imageCropper,
+  },
+  inviteFriend: {
+    size: POPUP_SIZES.inviteFriend,
+    title: POPUP_TITLE_KEYS.inviteFriend,
+    ...POPUP_HEADERS.inviteFriend,
+    ...POPUP_BEHAVIORS.inviteFriend,
+  },
+  inviteMember: {
+    size: POPUP_SIZES.inviteMember,
+    title: POPUP_TITLE_KEYS.inviteMember,
+    ...POPUP_HEADERS.inviteMember,
+    ...POPUP_BEHAVIORS.inviteMember,
+  },
+  kickMemberFromChannel: {
+    size: POPUP_SIZES.kickMemberFromChannel,
+    title: POPUP_TITLE_KEYS.kickMemberFromChannel,
+    ...POPUP_HEADERS.kickMemberFromChannel,
+    ...POPUP_BEHAVIORS.kickMemberFromChannel,
+  },
+  kickMemberFromServer: {
+    size: POPUP_SIZES.kickMemberFromServer,
+    title: POPUP_TITLE_KEYS.kickMemberFromServer,
+    ...POPUP_HEADERS.kickMemberFromServer,
+    ...POPUP_BEHAVIORS.kickMemberFromServer,
+  },
+  memberApplicationSetting: {
+    size: POPUP_SIZES.memberApplicationSetting,
+    title: POPUP_TITLE_KEYS.memberApplicationSetting,
+    ...POPUP_HEADERS.memberApplicationSetting,
+    ...POPUP_BEHAVIORS.memberApplicationSetting,
+  },
+  memberInvitation: {
+    size: POPUP_SIZES.memberInvitation,
+    title: POPUP_TITLE_KEYS.memberInvitation,
+    ...POPUP_HEADERS.memberInvitation,
+    ...POPUP_BEHAVIORS.memberInvitation,
+  },
+  networkDiagnosis: {
+    size: POPUP_SIZES.networkDiagnosis,
+    title: POPUP_TITLE_KEYS.networkDiagnosis,
+    ...POPUP_HEADERS.networkDiagnosis,
+    ...POPUP_BEHAVIORS.networkDiagnosis,
+  },
+  rtcDisconnect: {
+    size: POPUP_SIZES.rtcDisconnect,
+    title: POPUP_TITLE_KEYS.rtcDisconnect,
+    ...POPUP_HEADERS.rtcDisconnect,
+    ...POPUP_BEHAVIORS.rtcDisconnect,
+  },
+  searchUser: {
+    size: POPUP_SIZES.searchUser,
+    title: POPUP_TITLE_KEYS.searchUser,
+    ...POPUP_HEADERS.searchUser,
+    ...POPUP_BEHAVIORS.searchUser,
+  },
+  serverAnnouncement: {
+    size: POPUP_SIZES.serverAnnouncement,
+    title: POPUP_TITLE_KEYS.serverAnnouncement,
+    ...POPUP_HEADERS.serverAnnouncement,
+    ...POPUP_BEHAVIORS.serverAnnouncement,
+  },
+  serverApplication: {
+    size: POPUP_SIZES.serverApplication,
+    title: POPUP_TITLE_KEYS.serverApplication,
+    ...POPUP_HEADERS.serverApplication,
+    ...POPUP_BEHAVIORS.serverApplication,
+  },
+  serverBroadcast: {
+    size: POPUP_SIZES.serverBroadcast,
+    title: POPUP_TITLE_KEYS.serverBroadcast,
+    ...POPUP_HEADERS.serverBroadcast,
+    ...POPUP_BEHAVIORS.serverBroadcast,
+  },
+  serverSetting: {
+    size: POPUP_SIZES.serverSetting,
+    title: POPUP_TITLE_KEYS.serverSetting,
+    ...POPUP_HEADERS.serverSetting,
+    ...POPUP_BEHAVIORS.serverSetting,
+  },
+  systemSetting: {
+    size: POPUP_SIZES.systemSetting,
+    title: POPUP_TITLE_KEYS.systemSetting,
+    ...POPUP_HEADERS.systemSetting,
+    ...POPUP_BEHAVIORS.systemSetting,
+  },
+  userInfo: {
+    size: POPUP_SIZES.userInfo,
+    title: POPUP_TITLE_KEYS.userInfo,
+    ...POPUP_HEADERS.userInfo,
+    ...POPUP_BEHAVIORS.userInfo,
+  },
+  userSetting: {
+    size: POPUP_SIZES.userSetting,
+    title: POPUP_TITLE_KEYS.userSetting,
+    ...POPUP_HEADERS.userSetting,
+    ...POPUP_BEHAVIORS.userSetting,
+  },
+};

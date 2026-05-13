@@ -1,0 +1,48 @@
+import { ipcMain } from 'electron';
+
+import type * as Types from '@/types';
+
+import Logger from '@/utils/logger';
+
+import initialDataLoader from '@/main/popup/initialDataLoader';
+import { broadcast, closeAllPopups, createPopup, getSettings, popups } from '@/main/electron';
+
+export function registerPopupHandlers() {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  ipcMain.on('open-popup', async (_, type: Types.PopupType, id: string, initialData: any, force = true) => {
+    new Logger('System').info(`Opening ${type} (${id})...`);
+
+    if (typeof initialData !== 'object' || initialData === null) {
+      initialData = {};
+    }
+
+    const loader = initialDataLoader[type];
+    if (loader) {
+      const loadedData = await loader(initialData).catch(() => {
+        new Logger('System').error(`Cannot load ${type} data, aborting...`);
+        return null;
+      });
+      if (!loadedData) return;
+
+      initialData = { ...loadedData, ...initialData, systemSettings: getSettings() };
+    }
+
+    if (!initialData) return;
+
+    createPopup(type, id, initialData, force);
+  });
+
+  ipcMain.on('close-popup', (_, id: string) => {
+    if (popups[id] && !popups[id].isDestroyed()) {
+      popups[id].close();
+    }
+  });
+
+  ipcMain.on('close-all-popups', () => {
+    closeAllPopups();
+  });
+
+  ipcMain.on('popup-submit', (_, to: string, data: unknown | null = null) => {
+    broadcast(`popup-submit-${to}`, data);
+  });
+}

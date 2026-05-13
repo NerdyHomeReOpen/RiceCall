@@ -1,0 +1,21 @@
+.sound-effect-preview-button {
+  min-width: 17px;
+  min-height: 17px;
+  cursor: pointer;
+  background-image: url('/playback.svg');
+  background-repeat: no-repeat;
+  background-position: 0;
+  background-size: cover;
+}
+
+.sound-effect-preview-button:hover {
+  background-position: -17px;
+}
+
+.sound-effect-preview-button:active {
+  background-position: -34px;
+}
+
+.sound-effect-enable-text {
+  cursor: pointer;
+}

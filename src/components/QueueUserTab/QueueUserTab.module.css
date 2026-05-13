@@ -1,0 +1,86 @@
+.item {
+  position: relative;
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 25px;
+  padding: 2px 20px 2px 10px;
+  margin-right: 5px;
+  text-shadow: 0 1px #fff;
+}
+
+.item:not(.selected):hover {
+  background-color: var(--hover);
+}
+
+.item.selected {
+  background-color: var(--selected);
+}
+
+.position-text {
+  color: var(--text-color-quaternary);
+}
+
+.name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-quaternary);
+  white-space: nowrap;
+}
+
+.name-text.member {
+  color: var(--text-nickname);
+}
+
+.name-text.vip {
+  color: var(--text-vip-name);
+}
+
+.audio-state {
+  left: 0;
+  min-width: 12px;
+  min-height: 12px;
+  background-image: url('/channel/audioState.svg');
+  background-repeat: no-repeat;
+  background-position: -36px 0;
+  background-size: auto;
+}
+
+.audio-state.loading {
+  background-image: url('/loading.gif');
+  background-position: 0 0;
+  background-size: cover;
+}
+
+.audio-state.play {
+  background-position: -24px 0;
+}
+
+.audio-state.muted {
+  background-position: -12px 0;
+}
+
+.text-state {
+  min-width: 12px;
+  min-height: 12px;
+  background-image: url('/channel/audioState.svg');
+  background-repeat: no-repeat;
+  background-position: -36px 0;
+  background-size: auto;
+}
+
+.text-state.muted {
+  background-position: 0 0;
+}
+
+.time-remaining {
+  display: flex;
+  align-items: center;
+  padding-right: 3px;
+  padding-left: 3px;
+  margin-left: auto;
+  color: var(--text-color-quaternary);
+  background-color: var(--notification-toaster-background);
+  border: 1px solid var(--notification-toaster-border);
+  border-radius: 3px;
+}

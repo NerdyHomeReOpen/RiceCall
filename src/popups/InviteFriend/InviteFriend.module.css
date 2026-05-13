@@ -1,0 +1,162 @@
+.header {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-height: 45px;
+  border-bottom: 1px solid var(--border);
+}
+
+.options-content {
+  min-width: 80%;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  padding-top: 0;
+  padding-right: 0;
+  padding-bottom: 0;
+  margin-right: 10px;
+  border: 1px solid var(--border);
+  border-radius: 5px;
+}
+
+.search-bar .search-input {
+  flex: 1;
+  width: 125px;
+  padding: 5px;
+}
+
+.search-bar .search-icon {
+  min-width: 20px;
+  min-height: 20px;
+  background-image: url('/channel/channel_search.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
+
+.search-bar:hover:not(:has(.prev-icon:hover, .next-icon:hover)) .search-icon {
+  background-position: -20px 0;
+}
+
+.friend-group-list {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  padding: 10px;
+}
+
+.scroll-view {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.group-item {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 25px;
+  padding: 5px;
+}
+
+.group-details {
+  display: flex;
+  flex-direction: row;
+  gap: 5px;
+  align-items: center;
+}
+
+.toggle-icon {
+  display: inline-block;
+  min-width: 14px;
+  min-height: 14px;
+  content: '';
+  background-image: url('/channel/channelIcon.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.toggle-icon.expanded {
+  background-position: -14px 0;
+}
+
+.group-content > div {
+  padding-left: 20px;
+}
+
+.friend-item {
+  position: relative;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 5px;
+}
+
+.friend-item.selected {
+  background-color: var(--selected);
+}
+
+.friend-item:not(.selected):hover {
+  background-color: var(--hover);
+}
+
+.name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.signature-text {
+  min-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--text-color-quaternary);
+  white-space: nowrap;
+}
+
+.server-name-text {
+  min-height: 18px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 18px;
+  color: #3a9abe;
+  white-space: nowrap;
+}
+
+.location-icon {
+  min-width: 16px;
+  min-height: 18px;
+  content: '';
+  background-image: url('/mylocation.svg');
+  background-repeat: no-repeat;
+  background-position: center center;
+  background-size: auto;
+}
+
+.base-info {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.avatar {
+  position: relative;
+  width: 25px;
+  height: 25px;
+}
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  padding: 5px;
+  font-size: 14px;
+  color: var(--text-secondary);
+}

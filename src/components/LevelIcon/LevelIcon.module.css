@@ -1,0 +1,230 @@
+.grade {
+  width: 15px;
+  min-width: 15px;
+  height: 15px;
+  min-height: 15px;
+  background-image: url('/usergrade.svg');
+  background-repeat: no-repeat;
+  background-position: 0 0;
+  background-size: auto;
+}
+
+.lv-2 {
+  background-position: -15px 0 !important;
+}
+
+.lv-3 {
+  background-position: -30px 0 !important;
+}
+
+.lv-4 {
+  background-position: -45px 0 !important;
+}
+
+.lv-5 {
+  background-position: -60px 0 !important;
+}
+
+.lv-6 {
+  background-position: 0 -15px !important;
+}
+
+.lv-7 {
+  background-position: -15px -15px !important;
+}
+
+.lv-8 {
+  background-position: -30px -15px !important;
+}
+
+.lv-9 {
+  background-position: -45px -15px !important;
+}
+
+.lv-10 {
+  background-position: -60px -15px !important;
+}
+
+.lv-11 {
+  background-position: 0 -30px !important;
+}
+
+.lv-12 {
+  background-position: -15px -30px !important;
+}
+
+.lv-13 {
+  background-position: -30px -30px !important;
+}
+
+.lv-14 {
+  background-position: -45px -30px !important;
+}
+
+.lv-15 {
+  background-position: -60px -30px !important;
+}
+
+.lv-16 {
+  background-position: 0 -45px !important;
+}
+
+.lv-17 {
+  background-position: -15px -45px !important;
+}
+
+.lv-18 {
+  background-position: -30px -45px !important;
+}
+
+.lv-19 {
+  background-position: -45px -45px !important;
+}
+
+.lv-20 {
+  background-position: -60px -45px !important;
+}
+
+.lv-21 {
+  background-position: 0 -60px !important;
+}
+
+.lv-22 {
+  background-position: -15px -60px !important;
+}
+
+.lv-23 {
+  background-position: -30px -60px !important;
+}
+
+.lv-24 {
+  background-position: -45px -60px !important;
+}
+
+.lv-25 {
+  background-position: -60px -60px !important;
+}
+
+.lv-26 {
+  background-position: 0 -75px !important;
+}
+
+.lv-27 {
+  background-position: -15px -75px !important;
+}
+
+.lv-28 {
+  background-position: -30px -75px !important;
+}
+
+.lv-29 {
+  background-position: -45px -75px !important;
+}
+
+.lv-30 {
+  background-position: -60px -75px !important;
+}
+
+.lv-31 {
+  background-position: 0 -90px !important;
+}
+
+.lv-32 {
+  background-position: -15px -90px !important;
+}
+
+.lv-33 {
+  background-position: -30px -90px !important;
+}
+
+.lv-34 {
+  background-position: -45px -90px !important;
+}
+
+.lv-35 {
+  background-position: -60px -90px !important;
+}
+
+.lv-36 {
+  background-position: 0 -105px !important;
+}
+
+.lv-37 {
+  background-position: -15px -105px !important;
+}
+
+.lv-38 {
+  background-position: -30px -105px !important;
+}
+
+.lv-39 {
+  background-position: -45px -105px !important;
+}
+
+.lv-40 {
+  background-position: -60px -105px !important;
+}
+
+.lv-41 {
+  background-position: 0 -120px !important;
+}
+
+.lv-42 {
+  background-position: -15px -120px !important;
+}
+
+.lv-43 {
+  background-position: -30px -120px !important;
+}
+
+.lv-44 {
+  background-position: -45px -120px !important;
+}
+
+.lv-45 {
+  background-position: -60px -120px !important;
+}
+
+.lv-46 {
+  background-position: 0 -135px !important;
+}
+
+.lv-47 {
+  background-position: -15px -135px !important;
+}
+
+.lv-48 {
+  background-position: -30px -135px !important;
+}
+
+.lv-49 {
+  background-position: -45px -135px !important;
+}
+
+.lv-50 {
+  background-position: -60px -135px !important;
+}
+
+.lv-51 {
+  background-position: 0 -150px !important;
+}
+
+.lv-52 {
+  background-position: -15px -150px !important;
+}
+
+.lv-53 {
+  background-position: -30px -150px !important;
+}
+
+.lv-54 {
+  background-position: -45px -150px !important;
+}
+
+.lv-55 {
+  background-position: -60px -150px !important;
+}
+
+.lv-56 {
+  background-position: 0 -165px !important;
+}

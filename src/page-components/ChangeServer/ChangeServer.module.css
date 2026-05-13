@@ -1,0 +1,96 @@
+.page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background-secondary);
+}
+
+.app-logo {
+  display: block;
+  min-width: 226px;
+  min-height: 54px;
+  background-image: url('/login_logo.svg');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: contain;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 226px;
+  height: 100%;
+}
+
+.form-wrapper {
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+  gap: 10px;
+  justify-items: center;
+  width: 100%;
+  max-width: 400px;
+}
+
+.server-option {
+  width: 200px;
+  height: 42px;
+  margin-top: 10px;
+  color: #fff;
+  cursor: pointer;
+  background-color: #1680ce;
+  border: none;
+  border-radius: 4px;
+}
+
+.server-option:hover {
+  background-color: #419ddd;
+}
+
+.server-option:active {
+  background-color: #1680ce;
+}
+
+.server-option:disabled {
+  cursor: not-allowed;
+  background-color: #1680ce;
+  opacity: 0.6;
+}
+
+.footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 10px 15px;
+  margin-top: auto;
+  font-size: 0.9rem;
+  color: var(--text-color-quaternary);
+  background-color: var(--footer-background);
+  border-top: 1px solid var(--border);
+}
+
+.back-to-login-button {
+  display: flex;
+  align-items: flex-end;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.back-to-login-button:hover {
+  color: #0073c6;
+}
+
+.back-to-login-button::before {
+  min-width: 14px;
+  min-height: 14px;
+  margin-right: 5px;
+  vertical-align: middle;
+  content: '';
+  background-repeat: no-repeat;
+  background-position: 0 0;
+}
