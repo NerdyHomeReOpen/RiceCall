@@ -3,7 +3,7 @@
   <div height="20px">　</div>
   <div>
     <a title="Crowdin" target="_blank" href="https://discord.gg/adCWzv6wwS"><img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord"/></a>
-    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.19-green"/></a>
+    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.20-green"/></a>
     <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/ricecall/localized.svg"></a>
   </div>
 </div>
@@ -57,36 +57,29 @@ Please read the documentation before downloading.
 ```bash
 RiceCall
 ├── .github/                  # CI/CD workflows and issue templates
-├── build/                    # Electron build artifacts (local)
 ├── build_deb/                # Linux post-install scripts
+├── docs/                     # Project documentation
 ├── public/                   # Static assets (images, icons, fonts, etc.)
 ├── resources/                # Electron packaging resources (icons, tray)
 ├── src/
+│   ├── api/                  # API client
 │   ├── app/                  # Next.js App Router entry pages/layout
 │   ├── components/           # Reusable UI components
 │   ├── configs/              # Popup and socket configuration
-│   ├── electron/             # Electron main-process (main, preload, handlers)
+│   ├── constants/            # Shared constants (emojis, etc.)
 │   ├── extensions/           # TipTap editor extensions
+│   ├── hooks/                # Custom React hooks
 │   ├── i18n/                 # Client i18n setup and translations
-│   ├── pages/                # Renderer pages integrated with Electron
+│   ├── main/                 # Electron main-process (main, preload, IPC, handlers)
+│   ├── page-components/      # Renderer page components (Home, Server, Login, etc.)
 │   ├── popups/               # Popup view components
 │   ├── providers/            # React context providers
+│   ├── services/             # Service modules
 │   ├── store/                # Redux store and slices
-│   ├── styles/               # Global styles and CSS modules
 │   ├── types/                # Shared TypeScript types
 │   ├── utils/                # Utility functions
-│   ├── web/                  # Web platform handlers (non-Electron fallback)
-│   ├── action.ts             # Action definitions
-│   ├── api.ts                # API client
-│   ├── auth.ts               # Authentication helpers
-│   ├── constant.ts           # Shared constants
-│   ├── data.ts               # Data fetch helpers
-│   ├── emojis.ts             # Emoji definitions
-│   ├── env.ts                # Environment variable helpers
-│   ├── ipc.ts                # IPC bridge for renderer
-│   ├── loader.ts             # Loader utilities
-│   ├── logger.ts             # Logger utilities
-│   └── token.ts              # Token management
+│   ├── globals.css           # Global styles
+│   └── next-env.d.ts         # Next.js environment type declarations
 ├── dev-app-update.yml        # Electron auto-update configuration
 ├── electron-builder.json     # Electron packaging configuration
 ├── electron-builder-dev.json # Electron packaging configuration for dev builds
