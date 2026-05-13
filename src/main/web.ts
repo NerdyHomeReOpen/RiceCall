@@ -147,7 +147,7 @@ export function getLanguage(): Types.LanguageKey {
   const language = navigator.language;
 
   const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
-  if (!match) return 'en-US';
+  if (!match) return 'zh-TW';
 
   return match.code;
 }
