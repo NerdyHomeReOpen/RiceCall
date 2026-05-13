@@ -9,7 +9,7 @@ import Logger from '@/utils/logger';
 
 interface UseMicAudioDeps {
   initAudioContext: () => Promise<void>;
-  playSound: (soundName: string) => void;
+  playSound: (sound: 'startSpeaking' | 'stopSpeaking' | 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage', force?: boolean) => void;
 }
 
 export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: UseMicAudioDeps) => {
