@@ -150,7 +150,10 @@ export const useSFUTransport = (
             sendRetryCountRef.current++;
             const delay = 2000 * sendRetryCountRef.current;
             new Logger('WebRTC').info(`Retrying send transport in ${delay}ms (attempt ${sendRetryCountRef.current})`);
-            setTimeout(() => setupSend(retryChannelId), delay);
+            setTimeout(() => {
+              if (currentChannelIdRef.current === null) return;
+              setupSend(retryChannelId);
+            }, delay);
           }
         }
       });
@@ -223,7 +226,10 @@ export const useSFUTransport = (
             recvRetryCountRef.current++;
             const delay = 2000 * recvRetryCountRef.current;
             new Logger('WebRTC').info(`Retrying recv transport in ${delay}ms (attempt ${recvRetryCountRef.current})`);
-            setTimeout(() => setupRecv(retryChannelId), delay);
+            setTimeout(() => {
+              if (currentChannelIdRef.current === null) return;
+              setupRecv(retryChannelId);
+            }, delay);
           }
         }
       });
