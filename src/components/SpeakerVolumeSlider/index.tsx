@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { useWebRTC } from '@/providers/WebRTC';
 

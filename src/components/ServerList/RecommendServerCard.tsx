@@ -7,8 +7,8 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import { useAppSelector } from '@/hooks/Store';
-import { useRecommendServerContextMenu } from '@/hooks/ContextMenus/RecommendServer';
+import { useAppSelector } from '@/hooks/useStore';
+import { useRecommendServerCtxMenu } from '@/hooks/ContextMenus/useRecommendServerCtxMenu';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
@@ -38,7 +38,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
     ipc.socket.send('connectServer', { serverId: recommendServer.serverId });
   };
 
-  const { buildContextMenu: buildServerCardContextMenu } = useRecommendServerContextMenu({ user, recommendServer, onJoinServer: joinServer });
+  const { buildContextMenu: buildServerCardContextMenu } = useRecommendServerCtxMenu({ user, recommendServer, onJoinServer: joinServer });
 
   const handleServerCardClick = () => {
     joinServer();

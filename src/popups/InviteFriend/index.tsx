@@ -11,7 +11,7 @@ import { openAlertDialog } from '@/services';
 
 import { INVITATION_BASE_URL } from '@/constants';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 

@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 
 import { openUserInfo } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { getFormatTimeDiff } from '@/utils/language';
 

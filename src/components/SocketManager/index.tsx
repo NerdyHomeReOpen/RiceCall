@@ -13,7 +13,7 @@ import { REFRESH_REGION_INFO_INTERVAL } from '@/constants';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 
 import { getRegion, getDefaultFriendActivity } from '@/utils';
 

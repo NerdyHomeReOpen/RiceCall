@@ -6,14 +6,14 @@ import { openDirectMessage, openUserInfo, openApplyFriend, openEditFriendNote, e
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseFriendTabContextMenuProps {
+interface UseFriendTabCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   friend: Pick<Types.Friend, 'targetId' | 'name' | 'relationStatus' | 'isBlocked' | 'friendGroupId'>;
   friendGroups: Types.FriendGroup[];
   defaultFriendGroup: Types.FriendGroup;
 }
 
-export const useFriendTabContextMenu = ({ user, friend, friendGroups, defaultFriendGroup }: UseFriendTabContextMenuProps) => {
+export const useFriendTabCtxMenu = ({ user, friend, friendGroups, defaultFriendGroup }: UseFriendTabCtxMenuProps) => {
   const isSelf = friend.targetId === user.userId;
   const isFriend = friend.relationStatus === 2;
   const isStranger = friend.relationStatus === 0;

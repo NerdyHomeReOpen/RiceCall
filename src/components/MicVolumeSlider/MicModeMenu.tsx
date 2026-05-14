@@ -6,7 +6,7 @@ import * as ipc from '@/main/ipc';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { getLerpColor } from '@/utils/color';
 

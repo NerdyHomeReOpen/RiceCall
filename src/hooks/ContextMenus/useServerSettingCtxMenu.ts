@@ -6,13 +6,13 @@ import { applyMember, openServerSetting, openEditNickname, favoriteServer } from
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseServerSettingContextMenuProps {
+interface UseServerSettingCtxMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
   currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'favorite' | 'receiveApply'>;
   onLocateMe: () => void;
 }
 
-export const useServerSettingContextMenu = ({ user, currentServer, onLocateMe }: UseServerSettingContextMenuProps) => {
+export const useServerSettingCtxMenu = ({ user, currentServer, onLocateMe }: UseServerSettingCtxMenuProps) => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
 
   const buildContextMenu = useCallback(

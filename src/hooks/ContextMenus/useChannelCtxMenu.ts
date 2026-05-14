@@ -6,7 +6,7 @@ import { connectChannel, openChannelSetting, openCreateChannel, openEditChannelO
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseChannelContextMenuProps {
+interface UseChannelCtxMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
   currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'lobbyId' | 'receptionLobbyId'>;
   currentChannel: Pick<Types.Channel, 'channelId' | 'permissionLevel'>;
@@ -18,7 +18,7 @@ interface UseChannelContextMenuProps {
   isPasswordNeeded: boolean;
 }
 
-export const useChannelContextMenu = ({ channel, user, currentServer, currentChannel, movableChannelUserIds, movableServerUserIds, canJoin, isPasswordNeeded }: UseChannelContextMenuProps) => {
+export const useChannelCtxMenu = ({ channel, user, currentServer, currentChannel, movableChannelUserIds, movableServerUserIds, canJoin, isPasswordNeeded }: UseChannelCtxMenuProps) => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isInChannel = currentChannel.channelId === channel.channelId;

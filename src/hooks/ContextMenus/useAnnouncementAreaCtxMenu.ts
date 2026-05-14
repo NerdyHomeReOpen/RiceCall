@@ -2,11 +2,11 @@ import { useCallback } from 'react';
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseAnnouncementAreaContextMenuProps {
+interface UseAnnouncementAreaCtxMenuProps {
   onCloseAnnouncement: () => void;
 }
 
-export const useAnnouncementAreaContextMenu = ({ onCloseAnnouncement }: UseAnnouncementAreaContextMenuProps) => {
+export const useAnnouncementAreaCtxMenu = ({ onCloseAnnouncement }: UseAnnouncementAreaCtxMenuProps) => {
   const buildContextMenu = useCallback(() => new ContextMenu().addCloseAnnouncementOption(onCloseAnnouncement).build(), [onCloseAnnouncement]);
 
   return { buildContextMenu };

@@ -4,12 +4,12 @@ import { openChannelEvent } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseMessageAreaContextMenuProps {
+interface UseMessageAreaCtxMenuProps {
   onOpenAnnouncement: () => void;
   onClearMessages: () => void;
 }
 
-export const useMessageAreaContextMenu = ({ onOpenAnnouncement, onClearMessages }: UseMessageAreaContextMenuProps) => {
+export const useMessageAreaCtxMenu = ({ onOpenAnnouncement, onClearMessages }: UseMessageAreaCtxMenuProps) => {
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()

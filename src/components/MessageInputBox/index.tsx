@@ -18,7 +18,7 @@ import { MAX_FILE_SIZE } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { EmojiNode } from '@/extensions/EmojiNode';
 import { YouTubeNode, TwitchNode, KickNode } from '@/extensions/EmbedNode';

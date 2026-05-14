@@ -12,9 +12,9 @@ import { openInviteFriend, openServerSetting } from '@/services';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useChannelListContextMenu } from '@/hooks/ContextMenus/ChannelList';
-import { useServerSettingContextMenu } from '@/hooks/ContextMenus/ServerSetting';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useChannelListCtxMenu } from '@/hooks/ContextMenus/useChannelListCtxMenu';
+import { useServerSettingCtxMenu } from '@/hooks/ContextMenus/useServerSettingCtxMenu';
 
 import ChannelTab from '@/components/ChannelTab';
 import CategoryTab from '@/components/CategoryTab';
@@ -82,13 +82,13 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     dispatch(Store.setSelectedItemId(`user-${user.userId}`));
   };
 
-  const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingContextMenu({
+  const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingCtxMenu({
     user,
     currentServer,
     onLocateMe: handleLocateMe,
   });
 
-  const { buildContextMenu: buildChannelListContextMenu } = useChannelListContextMenu({
+  const { buildContextMenu: buildChannelListContextMenu } = useChannelListCtxMenu({
     user,
     currentServer,
     currentChannel,

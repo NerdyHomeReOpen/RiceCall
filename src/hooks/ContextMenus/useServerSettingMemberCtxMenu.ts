@@ -7,14 +7,14 @@ import ContextMenu from '@/utils/contextMenu';
 
 import { openDirectMessage, openUserInfo, openEditNickname, openBlockMember, terminateMember, editServerPermission } from '@/services';
 
-interface UseServerSettingMemberContextMenuProps {
+interface UseServerSettingMemberCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   server: Pick<Types.Server, 'serverId'>;
   member: Pick<Types.Member, 'userId' | 'name' | 'permissionLevel'>;
   permissionLevel: Types.Permission;
 }
 
-export const useServerSettingMemberContextMenu = ({ user, server, member, permissionLevel }: UseServerSettingMemberContextMenuProps) => {
+export const useServerSettingMemberCtxMenu = ({ user, server, member, permissionLevel }: UseServerSettingMemberCtxMenuProps) => {
   const isSelf = member.userId === user.userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;
 

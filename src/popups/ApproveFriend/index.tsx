@@ -8,7 +8,7 @@ import * as ipc from '@/main/ipc';
 
 import { approveFriendApplication, openCreateFriendGroup } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 interface ApproveFriendPopupProps {
   id: string;

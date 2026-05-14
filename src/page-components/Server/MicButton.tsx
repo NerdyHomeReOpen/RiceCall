@@ -12,7 +12,7 @@ import { leaveQueue, joinQueue } from '@/services';
 import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import styles from './Server.module.css';
 

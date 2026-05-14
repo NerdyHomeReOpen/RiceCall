@@ -8,7 +8,7 @@ import * as ipc from '@/main/ipc';
 
 import { openCreateChannel, openEditChannelName, deleteChannel, editChannels } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import CategoryTab from './CategoryTab';
 import ChannelTab from './ChannelTab';

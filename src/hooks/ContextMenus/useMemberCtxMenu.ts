@@ -7,9 +7,9 @@ import { connectChannel, addUserToQueue, openDirectMessage, openUserInfo, openAp
 
 import ContextMenu from '@/utils/contextMenu';
 
-import { useMemberManagementSubmenu } from '@/hooks/ContextMenus/MemberManagementSubmenu';
+import { useMemberManagementCtxMenu } from './useMemberManagementCtxMenu';
 
-interface UseMemberContextMenuProps {
+interface UseMemberCtxMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
   currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'lobbyId'>;
   currentChannel: Pick<Types.Channel, 'channelId' | 'permissionLevel'>;
@@ -25,7 +25,7 @@ interface UseMemberContextMenuProps {
   onUnmuteUser: (userId: string) => void;
 }
 
-export const useMemberContextMenu = ({
+export const useMemberCtxMenu = ({
   member,
   channel,
   user,
@@ -39,7 +39,7 @@ export const useMemberContextMenu = ({
   isPasswordNeeded,
   onMuteUser,
   onUnmuteUser,
-}: UseMemberContextMenuProps) => {
+}: UseMemberCtxMenuProps) => {
   const { t } = useTranslation();
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
@@ -50,7 +50,7 @@ export const useMemberContextMenu = ({
   const isInSameChannel = member.currentChannelId === currentChannel.channelId;
   const isInLobby = member.currentChannelId === currentServer.lobbyId;
 
-  const { buildMemberManagementSubmenu } = useMemberManagementSubmenu({ user, currentServer, channel, member });
+  const { buildMemberManagementCtxMenu } = useMemberManagementCtxMenu({ user, currentServer, channel, member });
 
   const buildContextMenu = useCallback(
     () =>
@@ -79,7 +79,7 @@ export const useMemberContextMenu = ({
         .addSeparator()
         .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => terminateMember(user.userId, currentServer.serverId, t('self')))
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => openInviteMember(member.userId, currentServer.serverId))
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementSubmenu())
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementCtxMenu())
         .build(),
     [
       member,
@@ -103,7 +103,7 @@ export const useMemberContextMenu = ({
       t,
       onMuteUser,
       onUnmuteUser,
-      buildMemberManagementSubmenu,
+      buildMemberManagementCtxMenu,
     ],
   );
 

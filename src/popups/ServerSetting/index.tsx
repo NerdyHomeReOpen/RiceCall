@@ -16,9 +16,9 @@ import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAG
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useServerSettingMemberContextMenu } from '@/hooks/ContextMenus/ServerSettingMember';
-import { useServerSettingBlockedMemberContextMenu } from '@/hooks/ContextMenus/ServerSettingBlockedMember';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useServerSettingMemberCtxMenu } from '@/hooks/ContextMenus/useServerSettingMemberCtxMenu';
+import { useServerSettingBlockedMemberCtxMenu } from '@/hooks/ContextMenus/useServerSettingBlockedMemberCtxMenu';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
@@ -631,7 +631,7 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
 
   const isSelected = selectedItemId === `member-${member.userId}`;
 
-  const { buildContextMenu } = useServerSettingMemberContextMenu({ user, server, member, permissionLevel });
+  const { buildContextMenu } = useServerSettingMemberCtxMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -676,7 +676,7 @@ const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps
 
   const isSelected = selectedItemId === `blocked-${member.userId}`;
 
-  const { buildContextMenu } = useServerSettingBlockedMemberContextMenu({ user, server, member, permissionLevel });
+  const { buildContextMenu } = useServerSettingBlockedMemberCtxMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));

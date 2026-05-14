@@ -6,8 +6,8 @@ import type * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector } from '@/hooks/Store';
-import { useChannelEventContextMenu } from '@/hooks/ContextMenus/ChannelEvent';
+import { useAppSelector } from '@/hooks/useStore';
+import { useChannelEventCtxMenu } from '@/hooks/ContextMenus/useChannelEventCtxMenu';
 
 import { getFormatDate } from '@/utils/language';
 
@@ -124,7 +124,7 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
 
-  const { buildContextMenu } = useChannelEventContextMenu({ user, currentServer, event, permissionLevel });
+  const { buildContextMenu } = useChannelEventCtxMenu({ user, currentServer, event, permissionLevel });
 
   const getChannelName = (channelId: string | null) => {
     const channel = channels.find((c) => c.channelId === channelId);

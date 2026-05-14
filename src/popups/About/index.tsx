@@ -4,7 +4,7 @@ import packageJson from '../../../package.json';
 
 import * as ipc from '@/main/ipc';
 
-import { useStaffList } from '@/hooks/StaffList';
+import { useStaffList } from '@/hooks/useStaffList';
 
 import StaffCard from './StaffCard';
 import MarkdownContent from '@/components/MarkdownContent';

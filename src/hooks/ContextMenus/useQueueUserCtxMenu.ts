@@ -7,9 +7,9 @@ import { increaseUserQueueTime, moveUserQueuePositionUp, moveUserQueuePositionDo
 
 import ContextMenu from '@/utils/contextMenu';
 
-import { useMemberManagementSubmenu } from '@/hooks/ContextMenus/MemberManagementSubmenu';
+import { useMemberManagementCtxMenu } from '@/hooks/ContextMenus/useMemberManagementCtxMenu';
 
-interface UseQueueUserContextMenuProps {
+interface UseQueueUserCtxMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
   currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'lobbyId'>;
   currentChannel: Pick<Types.Channel, 'channelId' | 'permissionLevel' | 'categoryId'>;
@@ -20,7 +20,7 @@ interface UseQueueUserContextMenuProps {
   onUnmuteUser: (userId: string) => void;
 }
 
-export const useQueueUserContextMenu = ({ user, currentServer, currentChannel, queueMember, isMuted, isFriend, onMuteUser, onUnmuteUser }: UseQueueUserContextMenuProps) => {
+export const useQueueUserCtxMenu = ({ user, currentServer, currentChannel, queueMember, isMuted, isFriend, onMuteUser, onUnmuteUser }: UseQueueUserCtxMenuProps) => {
   const { t } = useTranslation();
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
@@ -28,7 +28,7 @@ export const useQueueUserContextMenu = ({ user, currentServer, currentChannel, q
   const isLowerLevel = queueMember.permissionLevel < permissionLevel;
   const isInLobby = queueMember.currentChannelId === currentServer.lobbyId;
 
-  const { buildMemberManagementSubmenu } = useMemberManagementSubmenu({
+  const { buildMemberManagementCtxMenu } = useMemberManagementCtxMenu({
     user,
     currentServer,
     channel: currentChannel,
@@ -70,9 +70,9 @@ export const useQueueUserContextMenu = ({ user, currentServer, currentChannel, q
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
           openInviteMember(queueMember.userId, currentServer.serverId),
         )
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementSubmenu())
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementCtxMenu())
         .build(),
-    [user, currentServer, currentChannel, queueMember, isMuted, isFriend, permissionLevel, isSelf, isLowerLevel, isInLobby, t, onMuteUser, onUnmuteUser, buildMemberManagementSubmenu],
+    [user, currentServer, currentChannel, queueMember, isMuted, isFriend, permissionLevel, isSelf, isLowerLevel, isInLobby, t, onMuteUser, onUnmuteUser, buildMemberManagementCtxMenu],
   );
 
   return { buildContextMenu };

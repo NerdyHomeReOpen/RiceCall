@@ -7,8 +7,8 @@ import * as Store from '@/store';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useFriendGroupContextMenu } from '@/hooks/ContextMenus/FriendGroup';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useFriendGroupCtxMenu } from '@/hooks/ContextMenus/useFriendGroupCtxMenu';
 
 import FriendTab from '@/components/FriendTab';
 
@@ -50,7 +50,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
   const sortedFriendGroupFriends = useMemo(() => [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)), [friendGroupFriends]);
   const onlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
 
-  const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupContextMenu({ user, friendGroup });
+  const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupCtxMenu({ user, friendGroup });
 
   const handleTabClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));

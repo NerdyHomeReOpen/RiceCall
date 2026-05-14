@@ -6,14 +6,14 @@ import { openUserInfo, openKickMemberFromServer, openBlockMember } from '@/servi
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseChannelEventContextMenuProps {
+interface UseChannelEventCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   currentServer: Pick<Types.Server, 'serverId'>;
   event: Pick<Types.ChannelEvent, 'userId' | 'permissionLevel'>;
   permissionLevel: Types.Permission;
 }
 
-export const useChannelEventContextMenu = ({ user, currentServer, event, permissionLevel }: UseChannelEventContextMenuProps) => {
+export const useChannelEventCtxMenu = ({ user, currentServer, event, permissionLevel }: UseChannelEventCtxMenuProps) => {
   const isSelf = event.userId === user.userId;
   const isLowerLevel = event.permissionLevel < permissionLevel;
 

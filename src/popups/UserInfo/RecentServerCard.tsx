@@ -4,7 +4,7 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import styles from './UserSetting.module.css';
 

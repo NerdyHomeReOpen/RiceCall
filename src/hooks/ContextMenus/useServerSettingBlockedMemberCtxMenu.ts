@@ -6,14 +6,14 @@ import { openUserInfo, unblockUserFromServer } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseServerSettingBlockedMemberContextMenuProps {
+interface UseServerSettingBlockedMemberCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   server: Pick<Types.Server, 'serverId'>;
   member: Pick<Types.Member, 'userId' | 'name'>;
   permissionLevel: Types.Permission;
 }
 
-export const useServerSettingBlockedMemberContextMenu = ({ user, server, member, permissionLevel }: UseServerSettingBlockedMemberContextMenuProps) => {
+export const useServerSettingBlockedMemberCtxMenu = ({ user, server, member, permissionLevel }: UseServerSettingBlockedMemberCtxMenuProps) => {
   const isSelf = member.userId === user.userId;
 
   const buildContextMenu = useCallback(

@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import * as Store from '@/store';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 
 import ChannelTab from './ChannelTab';
 

@@ -6,8 +6,8 @@ import type * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector } from '@/hooks/Store';
-import { usePromptMessageContextMenu } from '@/hooks/ContextMenus/PromptMessage';
+import { useAppSelector } from '@/hooks/useStore';
+import { usePromptMessageCtxMenu } from '@/hooks/ContextMenus/usePromptMessageCtxMenu';
 
 import MarkdownContent from '@/components/MarkdownContent';
 
@@ -41,7 +41,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
     [messageGroup.contents, escapedMessageParameter, messageGroup.parameter, t],
   );
 
-  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageContextMenu({ user, contentMetadata: messageGroup.contentMetadata });
+  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageCtxMenu({ user, contentMetadata: messageGroup.contentMetadata });
 
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();

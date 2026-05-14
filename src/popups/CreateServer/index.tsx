@@ -11,7 +11,7 @@ import { createServer, openImageCropper, openAlertDialog } from '@/services';
 
 import { MAX_FILE_SIZE, SERVER_TYPES } from '@/constants';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { getDefaultServer } from '@/utils/default';
 

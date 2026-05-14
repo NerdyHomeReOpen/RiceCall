@@ -7,9 +7,9 @@ import * as Store from '@/store';
 
 import { openDirectMessage } from '@/services';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 
-import { useQueueUserContextMenu } from '@/hooks/ContextMenus/QueueUser';
+import { useQueueUserCtxMenu } from '@/hooks/ContextMenus/useQueueUserCtxMenu';
 
 import BadgeList from '@/components/BadgeList';
 
@@ -82,7 +82,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
     return '';
   };
 
-  const { buildContextMenu: buildTabContextMenu } = useQueueUserContextMenu({
+  const { buildContextMenu: buildTabContextMenu } = useQueueUserCtxMenu({
     user,
     currentServer,
     currentChannel,

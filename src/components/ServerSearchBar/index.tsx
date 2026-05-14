@@ -8,7 +8,7 @@ import * as ipc from '@/main/ipc';
 
 import { useLoading } from '@/providers/Loading';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import SearchResultItem from './SearchResultItem';
 

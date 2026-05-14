@@ -16,10 +16,10 @@ import { MESSAGE_VIERER_DEVIATION } from '@/constants';
 import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector, useAppDispatch } from '@/hooks/Store';
-import { useAnnouncementAreaContextMenu } from '@/hooks/ContextMenus/AnnouncementArea';
-import { useMessageAreaContextMenu } from '@/hooks/ContextMenus/MessageArea';
-import { useVoiceModeContextMenu } from '@/hooks/ContextMenus/VoiceMode';
+import { useAppSelector, useAppDispatch } from '@/hooks/useStore';
+import { useAnnouncementAreaCtxMenu } from '@/hooks/ContextMenus/useAnnouncementAreaCtxMenu';
+import { useMessageAreaCtxMenu } from '@/hooks/ContextMenus/useMessageAreaCtxMenu';
+import { useVoiceModeCtxMenu } from '@/hooks/ContextMenus/useVoiceModeCtxMenu';
 
 import MicButton from './MicButton';
 import MarkdownContent from '@/components/MarkdownContent';
@@ -88,17 +88,17 @@ const ServerPageContent: React.FC = React.memo(() => {
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
   const [centralAreaMode, setCentralAreaMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
-  const { buildContextMenu: buildAnnouncementAreaContextMenu } = useAnnouncementAreaContextMenu({
+  const { buildContextMenu: buildAnnouncementAreaContextMenu } = useAnnouncementAreaCtxMenu({
     onCloseAnnouncement: () => setCentralAreaMode('none'),
   });
-  const { buildContextMenu: buildMessageAreaContextMenu } = useMessageAreaContextMenu({
+  const { buildContextMenu: buildMessageAreaContextMenu } = useMessageAreaCtxMenu({
     onOpenAnnouncement: () => setCentralAreaMode('announcement'),
     onClearMessages: () => {
       dispatch(Store.clearChannelMessages());
       dispatch(Store.clearActionMessages());
     },
   });
-  const { buildContextMenu: buildVoiceModeContextMenu } = useVoiceModeContextMenu({
+  const { buildContextMenu: buildVoiceModeContextMenu } = useVoiceModeCtxMenu({
     currentServer,
     currentChannel,
     permissionLevel: Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel),

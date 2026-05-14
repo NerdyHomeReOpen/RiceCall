@@ -12,8 +12,8 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 import { useWebRTC } from '@/providers/WebRTC';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useMemberContextMenu } from '@/hooks/ContextMenus/Member';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useMemberCtxMenu } from '@/hooks/ContextMenus/useMemberCtxMenu';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
@@ -75,7 +75,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const isDraggable = !isSelf && isLowerLevel && permissionLevel >= Permission.ChannelMod;
   const hasVip = member.vip > 0;
 
-  const { buildContextMenu } = useMemberContextMenu({
+  const { buildContextMenu } = useMemberCtxMenu({
     member,
     channel,
     user,

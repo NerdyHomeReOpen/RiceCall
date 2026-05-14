@@ -7,13 +7,13 @@ import { openServerSetting, favoriteServer, terminateMember } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseServerCardContextMenuProps {
+interface UseServerCardCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   server: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'favorite'>;
   onJoinServer: () => void;
 }
 
-export const useServerCardContextMenu = ({ user, server, onJoinServer }: UseServerCardContextMenuProps) => {
+export const useServerCardCtxMenu = ({ user, server, onJoinServer }: UseServerCardCtxMenuProps) => {
   const { t } = useTranslation();
 
   const buildContextMenu = useCallback(

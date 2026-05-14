@@ -6,14 +6,14 @@ import { editChannel, controlQueue } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseVoiceModeContextMenuProps {
+interface UseVoiceModeCtxMenuProps {
   currentServer: Pick<Types.Server, 'serverId'>;
   currentChannel: Pick<Types.Channel, 'channelId' | 'voiceMode' | 'forbidQueue'>;
   permissionLevel: Types.Permission;
   isQueueControlled: boolean;
 }
 
-export const useVoiceModeContextMenu = ({ currentServer, currentChannel, permissionLevel, isQueueControlled }: UseVoiceModeContextMenuProps) => {
+export const useVoiceModeCtxMenu = ({ currentServer, currentChannel, permissionLevel, isQueueControlled }: UseVoiceModeCtxMenuProps) => {
   const isCurrentChannelFreeMode = currentChannel.voiceMode === 'free';
   const isCurrentChannelAdminMode = currentChannel.voiceMode === 'admin';
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';

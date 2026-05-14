@@ -6,12 +6,12 @@ import { openEditFriendGroupName, deleteFriendGroup } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseFriendGroupContextMenuProps {
+interface UseFriendGroupCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   friendGroup: Pick<Types.FriendGroup, 'friendGroupId' | 'name'>;
 }
 
-export const useFriendGroupContextMenu = ({ user, friendGroup }: UseFriendGroupContextMenuProps) => {
+export const useFriendGroupCtxMenu = ({ user, friendGroup }: UseFriendGroupCtxMenuProps) => {
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()

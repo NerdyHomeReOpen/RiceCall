@@ -6,7 +6,7 @@ import { openUserInfo, unblockUserFromChannel } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseChannelSettingBlockedMemberContextMenuProps {
+interface UseChannelSettingBlockedMemberCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   server: Pick<Types.Server, 'serverId'>;
   channel: Pick<Types.Channel, 'channelId'>;
@@ -14,7 +14,7 @@ interface UseChannelSettingBlockedMemberContextMenuProps {
   permissionLevel: Types.Permission;
 }
 
-export const useChannelSettingBlockedMemberContextMenu = ({ user, server, channel, member, permissionLevel }: UseChannelSettingBlockedMemberContextMenuProps) => {
+export const useChannelSettingBlockedMemberCtxMenu = ({ user, server, channel, member, permissionLevel }: UseChannelSettingBlockedMemberCtxMenuProps) => {
   const isSelf = member.userId === user.userId;
 
   const buildContextMenu = useCallback(

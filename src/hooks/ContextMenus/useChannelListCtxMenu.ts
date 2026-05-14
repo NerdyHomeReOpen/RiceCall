@@ -6,14 +6,14 @@ import { openCreateChannel, kickUsersFromServer, openServerBroadcast, openEditCh
 
 import ContextMenu from '@/utils/contextMenu';
 
-interface UseChannelListContextMenuProps {
+interface UseChannelListCtxMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
   currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel'>;
   currentChannel: Pick<Types.Channel, 'channelId' | 'permissionLevel'>;
   movableServerUserIds: string[];
 }
 
-export const useChannelListContextMenu = ({ user, currentServer, currentChannel, movableServerUserIds }: UseChannelListContextMenuProps) => {
+export const useChannelListCtxMenu = ({ user, currentServer, currentChannel, movableServerUserIds }: UseChannelListCtxMenuProps) => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
 
   const buildContextMenu = useCallback(

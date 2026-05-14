@@ -12,8 +12,8 @@ import { connectChannel, moveAllUsersToChannel } from '@/services';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useChannelContextMenu } from '@/hooks/ContextMenus/Channel';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useChannelCtxMenu } from '@/hooks/ContextMenus/useChannelCtxMenu';
 
 import UserTab from '@/components/UserTab';
 
@@ -96,7 +96,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const isPasswordNeeded = permissionLevel < Permission.ChannelMod && isPrivateChannel;
   const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && permissionLevel < Permission.Member) && (!isFull || permissionLevel >= Permission.ServerAdmin);
 
-  const { buildContextMenu } = useChannelContextMenu({
+  const { buildContextMenu } = useChannelCtxMenu({
     user,
     currentServer,
     currentChannel,

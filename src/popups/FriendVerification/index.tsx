@@ -7,7 +7,7 @@ import type * as Types from '@/types';
 
 import { rejectAllFriendApplication, openApproveFriend, openDirectMessage, openUserInfo, rejectFriendApplication } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 

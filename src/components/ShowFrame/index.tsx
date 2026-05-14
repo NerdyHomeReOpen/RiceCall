@@ -5,7 +5,7 @@ import type * as Types from '@/types';
 
 import { SHOW_FRAME_ORIGIN } from '@/constants';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 const ShowFrame: React.FC = React.memo(() => {
   const showFrameRef = useRef<HTMLIFrameElement>(null);

@@ -7,19 +7,19 @@ import ContextMenu from '@/utils/contextMenu';
 
 import { terminateMember, editChannelPermission, editServerPermission } from '@/services';
 
-interface UseMemberManagementSubmenuProps {
+interface UseMemberManagementCtxMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
   currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel'>;
   channel: Pick<Types.Channel | Types.Category, 'channelId' | 'categoryId' | 'permissionLevel'>;
   member: Pick<Types.OnlineMember | Types.ChannelMessage, 'userId' | 'permissionLevel' | 'name'>;
 }
 
-export const useMemberManagementSubmenu = ({ user, currentServer, channel, member }: UseMemberManagementSubmenuProps) => {
+export const useMemberManagementCtxMenu = ({ user, currentServer, channel, member }: UseMemberManagementCtxMenuProps) => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const isSelf = user.userId === member.userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;
 
-  const buildMemberManagementSubmenu = useCallback(
+  const buildMemberManagementCtxMenu = useCallback(
     () =>
       new ContextMenu()
         .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
@@ -44,5 +44,5 @@ export const useMemberManagementSubmenu = ({ user, currentServer, channel, membe
     [currentServer, channel, member, permissionLevel, isSelf, isLowerLevel],
   );
 
-  return { buildMemberManagementSubmenu };
+  return { buildMemberManagementCtxMenu };
 };

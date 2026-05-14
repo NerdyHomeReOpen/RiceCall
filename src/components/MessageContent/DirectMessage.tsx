@@ -8,7 +8,7 @@ import { openUserInfo } from '@/services';
 
 import { ALLOWED_MESSAGE_KEYS } from '@/constants';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import MarkdownContent from '@/components/MarkdownContent';
 

@@ -11,8 +11,8 @@ import { editUserStatus, openUserInfo, openFriendVerification, openMemberInvitat
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useActionScanner } from '@/providers/ActionScanner';
 
-import { useAppSelector } from '@/hooks/Store';
-import { useHeaderContextMenu } from '@/hooks/ContextMenus/Header';
+import { useAppSelector } from '@/hooks/useStore';
+import { useHeaderCtxMenu } from '@/hooks/ContextMenus/useHeaderCtxMenu';
 
 import MainTabItem from './MainTabItem';
 
@@ -80,7 +80,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     ipc.systemSettings.language.set(language);
   };
 
-  const { buildContextMenu: buildHeaderContextMenu } = useHeaderContextMenu({
+  const { buildContextMenu: buildHeaderContextMenu } = useHeaderCtxMenu({
     user,
     onChangeLanguage: changeLanguage,
     onLogout: logout,

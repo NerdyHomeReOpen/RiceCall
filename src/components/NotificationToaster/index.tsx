@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import MarkdownContent from '@/components/MarkdownContent';
 

@@ -7,7 +7,7 @@ import ContextMenu from '@/utils/contextMenu';
 
 import { openDirectMessage, openUserInfo, openEditNickname, openBlockMember, terminateMember, editChannelPermission, editServerPermission } from '@/services';
 
-interface UseChannelSettingModeratorContextMenuProps {
+interface UseChannelSettingModeratorCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   server: Pick<Types.Server, 'serverId'>;
   channel: Pick<Types.Channel, 'channelId' | 'categoryId'>;
@@ -15,7 +15,7 @@ interface UseChannelSettingModeratorContextMenuProps {
   permissionLevel: Types.Permission;
 }
 
-export const useChannelSettingModeratorContextMenu = ({ user, server, channel, moderator, permissionLevel }: UseChannelSettingModeratorContextMenuProps) => {
+export const useChannelSettingModeratorCtxMenu = ({ user, server, channel, moderator, permissionLevel }: UseChannelSettingModeratorCtxMenuProps) => {
   const isSelf = moderator.userId === user.userId;
   const isLowerLevel = moderator.permissionLevel < permissionLevel;
 

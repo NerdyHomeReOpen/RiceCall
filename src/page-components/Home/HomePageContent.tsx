@@ -7,7 +7,7 @@ import type * as Types from '@/types';
 
 import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constants';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import ServerList from '@/components/ServerList';
 

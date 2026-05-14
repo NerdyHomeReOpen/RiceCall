@@ -8,14 +8,14 @@ import ContextMenu from '@/utils/contextMenu';
 
 import { LANGUAGES } from '@/constants';
 
-interface UseHeaderContextMenuProps {
+interface UseHeaderCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
   onChangeLanguage: (code: Types.LanguageKey) => void;
   onLogout: () => void;
   onExit: () => void;
 }
 
-export const useHeaderContextMenu = ({ user, onChangeLanguage, onLogout, onExit }: UseHeaderContextMenuProps) => {
+export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: UseHeaderCtxMenuProps) => {
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()

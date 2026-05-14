@@ -6,9 +6,9 @@ import * as ipc from '@/main/ipc';
 
 import type * as Types from '@/types';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
-import { useServerCardContextMenu } from '@/hooks/ContextMenus/ServerCard';
+import { useServerCardCtxMenu } from '@/hooks/ContextMenus/useServerCardCtxMenu';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
@@ -39,7 +39,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
     ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
-  const { buildContextMenu: buildServerCardContextMenu } = useServerCardContextMenu({ user, server, onJoinServer: joinServer });
+  const { buildContextMenu: buildServerCardContextMenu } = useServerCardCtxMenu({ user, server, onJoinServer: joinServer });
 
   const handleServerCardClick = () => {
     joinServer();

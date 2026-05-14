@@ -14,8 +14,8 @@ import { MAX_FILE_SIZE } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector } from '@/hooks/Store';
-import { useCountries } from '@/hooks/Countries';
+import { useAppSelector } from '@/hooks/useStore';
+import { useCountries } from '@/hooks/useCountries';
 
 import RecentServerCard from './RecentServerCard';
 import JoinedServerCard from './JoinedServerCard';

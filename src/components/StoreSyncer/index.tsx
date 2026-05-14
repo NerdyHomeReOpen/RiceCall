@@ -7,7 +7,7 @@ import * as Store from '@/store';
 
 import * as ipc from '@/main/ipc';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 
 const StoreSyncerMaster: React.FC = () => {
   const user = useAppSelector((state) => state.user.data, shallowEqual);

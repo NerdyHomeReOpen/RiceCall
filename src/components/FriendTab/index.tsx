@@ -14,8 +14,8 @@ import { openDirectMessage } from '@/services';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useFriendTabContextMenu } from '@/hooks/ContextMenus/FriendTab';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useFriendTabCtxMenu } from '@/hooks/ContextMenus/useFriendTabCtxMenu';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
@@ -55,7 +55,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const hasVip = friend.vip > 0;
   const hasNote = friend.note !== '' && friend.note !== null;
 
-  const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabContextMenu({ user, friend, friendGroups, defaultFriendGroup });
+  const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabCtxMenu({ user, friend, friendGroups, defaultFriendGroup });
 
   const handleServerNameClick = () => {
     if (getIsLoading() || !friendCurrentServer || user.currentServerId === friendCurrentServer.serverId) return;

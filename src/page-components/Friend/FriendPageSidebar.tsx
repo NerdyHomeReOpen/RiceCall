@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { openCreateFriendGroup, openSearchUser } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import FriendGroupTab from '@/components/FriendGroupTab';
 
