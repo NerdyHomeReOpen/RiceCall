@@ -59,10 +59,8 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
   const refs = useSharedRefs();
   const { initAudioContext } = useAudioContext(refs);
-  const { startSpeaking, stopSpeaking, pressSpeakKey, releaseSpeakKey, changeMicVolume, toggleMicMuted } =
-    useMicAudio(refs, { initAudioContext, playSound });
-  const { initSpeakerAudio, removeSpeakerAudio, changeSpeakerVolume, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted } =
-    useSpeakerAudio(refs, { initAudioContext });
+  const { startSpeaking, stopSpeaking, pressSpeakKey, releaseSpeakKey, changeMicVolume, toggleMicMuted } = useMicAudio(refs, { initAudioContext, playSound });
+  const { initSpeakerAudio, removeSpeakerAudio, changeSpeakerVolume, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted } = useSpeakerAudio(refs, { initAudioContext });
   const { startMixing, stopMixing, toggleMixMode, changeMixVolume } = useMixAudio(refs, { initAudioContext });
   const { startRecording, stopRecording, toggleRecording } = useRecording(refs, { initAudioContext });
   const { takeMic, releaseMic, muteUser, unmuteUser, changeBitrate } = useSFUTransport(refs, {
