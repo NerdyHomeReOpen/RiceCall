@@ -1,10 +1,13 @@
-// src/hooks/WebRTC/useMixAudio.ts
 import { useCallback } from 'react';
+
+import * as ipc from '@/main/ipc';
+
+import * as Store from '@/store';
+
+import Logger from '@/utils/logger';
+
 import type { SharedRefs } from './useSharedRefs';
 import { detectSpeaking } from './detectSpeaking';
-import * as ipc from '@/main/ipc';
-import * as Store from '@/store';
-import Logger from '@/utils/logger';
 
 interface UseMixAudioDeps {
   initAudioContext: () => Promise<void>;

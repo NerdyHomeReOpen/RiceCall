@@ -1,8 +1,12 @@
 import { useCallback, useEffect, useRef } from 'react';
-import type { SharedRefs } from './useSharedRefs';
+
 import * as ipc from '@/main/ipc';
+
 import * as Store from '@/store';
+
 import Logger from '@/utils/logger';
+
+import type { SharedRefs } from './useSharedRefs';
 
 interface UseSFUTransportDeps {
   initSpeakerAudio: (userId: string, stream: MediaStream) => Promise<void>;
@@ -367,8 +371,8 @@ export const useSFUTransport = (
           sendTransport && sendTransport.connectionState === 'connected'
             ? sendTransport
             : recvTransport && recvTransport.connectionState === 'connected'
-            ? recvTransport
-            : null;
+              ? recvTransport
+              : null;
 
         if (activeTransport) {
           const stats = await activeTransport.getStats();
