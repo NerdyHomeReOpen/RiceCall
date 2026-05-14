@@ -63,12 +63,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
   const { initSpeakerAudio, removeSpeakerAudio, changeSpeakerVolume, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted } = useSpeakerAudio(refs, { initAudioContext });
   const { startMixing, stopMixing, toggleMixMode, changeMixVolume } = useMixAudio(refs, { initAudioContext });
   const { startRecording, stopRecording, toggleRecording } = useRecording(refs, { initAudioContext });
-  const { takeMic, releaseMic, muteUser, unmuteUser, changeBitrate } = useSFUTransport(refs, {
-    initSpeakerAudio,
-    removeSpeakerAudio,
-    startSpeaking,
-    stopSpeaking,
-  });
+  const { takeMic, releaseMic, muteUser, unmuteUser, changeBitrate } = useSFUTransport(refs, { initSpeakerAudio, removeSpeakerAudio, startSpeaking, stopSpeaking });
 
   const initLocalStorage = useCallback(() => {
     const localMicVolume = window.localStorage.getItem('mic-volume') ?? '100';
