@@ -1,6 +1,6 @@
-// src/hooks/WebRTC/detectSpeaking.ts
 import type { MutableRefObject } from 'react';
 import type * as mediasoupClient from 'mediasoup-client';
+
 import * as Store from '@/store';
 
 export const detectSpeaking = (

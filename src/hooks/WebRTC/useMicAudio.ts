@@ -1,11 +1,15 @@
-// src/hooks/WebRTC/useMicAudio.ts
 import { useCallback, useEffect } from 'react';
+
 import type * as Types from '@/types';
+
+import * as ipc from '@/main/ipc';
+
+import * as Store from '@/store';
+
+import Logger from '@/utils/logger';
+
 import type { SharedRefs } from './useSharedRefs';
 import { detectSpeaking } from './detectSpeaking';
-import * as ipc from '@/main/ipc';
-import * as Store from '@/store';
-import Logger from '@/utils/logger';
 
 interface UseMicAudioDeps {
   initAudioContext: () => Promise<void>;

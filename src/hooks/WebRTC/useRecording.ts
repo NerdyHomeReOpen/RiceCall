@@ -1,9 +1,12 @@
-// src/hooks/WebRTC/useRecording.ts
 import { useCallback } from 'react';
-import type { SharedRefs } from './useSharedRefs';
+
 import * as ipc from '@/main/ipc';
+
 import * as Store from '@/store';
+
 import { encodeAudio } from '@/utils/encodeAudio';
+
+import type { SharedRefs } from './useSharedRefs';
 
 interface UseRecordingDeps {
   initAudioContext: () => Promise<void>;

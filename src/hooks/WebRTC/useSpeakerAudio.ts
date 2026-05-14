@@ -1,10 +1,13 @@
-// src/hooks/WebRTC/useSpeakerAudio.ts
 import { useCallback, useEffect } from 'react';
+
+import * as ipc from '@/main/ipc';
+
+import * as Store from '@/store';
+
+import Logger from '@/utils/logger';
+
 import type { SharedRefs } from './useSharedRefs';
 import { detectSpeaking } from './detectSpeaking';
-import * as ipc from '@/main/ipc';
-import * as Store from '@/store';
-import Logger from '@/utils/logger';
 
 const BASE_VOLUME = 4;
 
@@ -75,7 +78,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
       speaker.volume = 0;
       speaker.autoplay = true;
       speaker.style.display = 'none';
-      speaker.play().catch(() => {});
+      speaker.play().catch(() => { });
       speaker.remove();
     },
     [removeSpeakerAudio, initAudioContext, audioContextRef, outputDesRef, masterGainNodeRef, speakerNodesRef, rafIdListRef, audioProducerRef],

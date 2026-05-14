@@ -1,7 +1,8 @@
-// src/hooks/WebRTC/useAudioContext.ts
 import { useCallback, useEffect } from 'react';
-import type { SharedRefs } from './useSharedRefs';
+
 import * as Store from '@/store';
+
+import type { SharedRefs } from './useSharedRefs';
 
 const workletCode = `
 class RecorderProcessor extends AudioWorkletProcessor {
@@ -78,7 +79,7 @@ export const useAudioContext = (refs: SharedRefs) => {
     speaker.volume = 1;
     speaker.autoplay = true;
     speaker.style.display = 'none';
-    speaker.play().catch(() => {});
+    speaker.play().catch(() => { });
     speakerRef.current = speaker;
     document.body.appendChild(speaker);
   }, [audioContextRef, inputDesRef, outputDesRef, recorderDesRef, inputAnalyserRef, masterGainNodeRef, speakerRef]);

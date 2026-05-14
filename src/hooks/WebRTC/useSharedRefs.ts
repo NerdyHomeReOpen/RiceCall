@@ -1,4 +1,3 @@
-// src/hooks/WebRTC/useSharedRefs.ts
 import { useRef } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 
