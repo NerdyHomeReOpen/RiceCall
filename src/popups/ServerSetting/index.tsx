@@ -80,7 +80,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const canSubmit = server.name.trim();
 
   const { totalMembersCount, sortedMembers } = useMemo(() => {
-    const total = serverMembers.filter((m) => m.permissionLevel >= Permission.Member && m.permissionLevel < Permission.ServerAdmin);
+    const total = serverMembers.filter((m) => m.permissionLevel >= Permission.Member && m.permissionLevel <= Permission.ServerOwner);
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(memberQuery.toLowerCase()) || m.name.toLowerCase().includes(memberQuery.toLowerCase()));
     const sorted = filtered.sort(sorter(memberSortField, memberSortDirection));
     return { totalMembersCount: total.length, filteredMembers: filtered, sortedMembers: sorted };
