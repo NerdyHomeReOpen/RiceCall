@@ -22,7 +22,7 @@ import LevelIcon from '@/components/LevelIcon';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
-import styles from './FriendTab.module.css';
+import styles from './Friend.module.css';
 
 interface FriendTabProps {
   friend: Types.Friend;
