@@ -3,6 +3,8 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
 import styles from './Home.module.css';
 
 interface SearchResultItemProps {
@@ -18,7 +20,7 @@ const SearchResultItem: React.FC<SearchResultItemProps> = React.memo(({ server, 
   return (
     <div className={styles['dropdown-item']} onClick={handleClick}>
       <div className={styles['dropdown-item-avatar']}>
-        <Image src={server.avatarUrl} alt="server_avatar" width={40} height={40} loading="lazy" draggable="false" />
+        <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
       <div className={styles['dropdown-item-info-text']}>
         <div className={styles['dropdown-item-name-text']}>{server.name}</div>

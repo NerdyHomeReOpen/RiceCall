@@ -10,7 +10,7 @@ import * as ipc from '@/main/ipc';
 
 import { openImageCropper, openAlertDialog, editUser, openApplyFriend, openDirectMessage, openErrorDialog } from '@/services';
 
-import { MAX_FILE_SIZE } from '@/constants';
+import { MAX_FILE_SIZE, DEFAULT_USER_AVATAR_URL } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -250,7 +250,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
             <div className={styles['close-button']} onClick={handleCloseBtnClick} />
           </div>
           <div className={`${styles['user-avatar']} ${isSelf ? styles['editable'] : ''}`} onClick={handleAvatarClick}>
-            <Image src={target.avatarUrl} alt="user_avatar" width={74} height={74} loading="lazy" draggable="false" />
+            <Image src={target.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={74} height={74} loading="lazy" draggable="false" />
           </div>
           <div className="row" style={{ gap: '3px', marginTop: '5px' }}>
             <p className={styles['user-name-text']}>{target.name}</p>

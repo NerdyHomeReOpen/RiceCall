@@ -10,6 +10,8 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { getFormatTimeDiff } from '@/utils/language';
 
+import { DEFAULT_USER_AVATAR_URL } from '@/constants';
+
 import styles from './Friend.module.css';
 
 interface FriendActivityProps {
@@ -33,7 +35,7 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
   return (
     <div className={styles['friend-activity-item']}>
       <div className={styles['friend-activity-avatar']}>
-        <Image src={friendActivity.avatarUrl} alt="friend_avatar" width={30} height={30} loading="lazy" draggable="false" />
+        <Image src={friendActivity.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="friend_avatar" width={30} height={30} loading="lazy" draggable="false" />
       </div>
       <div className={styles['friend-activity-content']}>
         <div className={styles['friend-activity-content-top']}>

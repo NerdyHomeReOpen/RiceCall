@@ -4,6 +4,8 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
+import { DEFAULT_USER_AVATAR_URL } from '@/constants';
+
 import styles from './ApplyFriend.module.css';
 
 interface EditSectionProps {
@@ -25,7 +27,7 @@ const EditSection: React.FC<EditSectionProps> = React.memo(({ receiver, applicat
           <div className="label">{t('apply-friend-label')}</div>
           <div className="row">
             <div className={styles['user-avatar']}>
-              <Image src={receiver.avatarUrl} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
+              <Image src={receiver.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className={styles['user-info']}>
               <div className="link-text" onClick={onReceiverNameClick}>

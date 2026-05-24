@@ -14,7 +14,7 @@ import * as ipc from '@/main/ipc';
 
 import { sendMessage, openApplyFriend, blockUser, unblockUser, openUserInfo, openChatHistory, openAlertDialog } from '@/services';
 
-import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN } from '@/constants';
+import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN, DEFAULT_USER_AVATAR_URL } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -373,7 +373,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
         <div className={styles['sidebar']}>
           <div className={styles['target-box']}>
             <div className={`${styles['avatar-picture']} ${isFriend && !isOffline ? '' : styles['offline']}`} onClick={handleTargetAvatarClick}>
-              <Image src={target.avatarUrl} alt="target_avatar" width={100} height={100} loading="lazy" draggable="false" />
+              <Image src={target.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="target_avatar" width={100} height={100} loading="lazy" draggable="false" />
             </div>
             {hasVip && <div className={`vip-icon-big vip-${target.vip}`} />}
             <div className={styles['user-state-box']}>
@@ -384,7 +384,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
           </div>
           <div className={styles['user-box']}>
             <div className={`${styles['avatar-picture']}`} onClick={handleUserAvatarClick}>
-              <Image src={user.avatarUrl} alt="user_avatar" width={100} height={100} loading="lazy" draggable="false" />
+              <Image src={user.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={100} height={100} loading="lazy" draggable="false" />
             </div>
           </div>
         </div>

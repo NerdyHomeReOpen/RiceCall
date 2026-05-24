@@ -26,6 +26,8 @@ import { getPermissionText } from '@/utils/language';
 import { sorter } from '@/utils/sorter';
 import { objDiff } from '@/utils';
 
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
 import styles from './ServerSetting.module.css';
 
 interface ServerSettingPopupProps {
@@ -369,7 +371,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
               </div>
               <div className={styles['avatar-wrapper']}>
                 <div className={styles['avatar']}>
-                  <Image src={server.avatarUrl} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
+                  <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
                 </div>
                 <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
                 {!isReadOnly ? (

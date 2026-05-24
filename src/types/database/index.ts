@@ -212,7 +212,7 @@ export type table_servers = {
   serverId: string;
   name: string;
   avatar: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
   announcement: string;
   applyNotice: string;
   description: string;
@@ -261,7 +261,7 @@ export type table_users = {
   name: string;
   displayId: string;
   avatar: string;
-  avatarUrl: string;
+  avatarUrl: string | null;
   signature: string;
   about: string;
   country: string;

@@ -14,6 +14,8 @@ import { useAppSelector } from '@/hooks/useStore';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
+import { DEFAULT_USER_AVATAR_URL } from '@/constants';
+
 import styles from './Friend.module.css';
 
 const FriendPageHeader: React.FC = React.memo(() => {
@@ -83,7 +85,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
   return (
     <>
       <div className={styles['user-avatar']} datatype="">
-        <Image src={user.avatarUrl} alt="user_avatar" width={40} height={40} loading="lazy" draggable="false" />
+        <Image src={user.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
       <div className={styles['user-info']}>
         <div className={styles['user-info-row']}>

@@ -9,7 +9,7 @@ import * as ipc from '@/main/ipc';
 
 import { openAlertDialog } from '@/services';
 
-import { INVITATION_BASE_URL } from '@/constants';
+import { INVITATION_BASE_URL, DEFAULT_USER_AVATAR_URL } from '@/constants';
 
 import { useAppSelector } from '@/hooks/useStore';
 
@@ -169,7 +169,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserId
     <div className={`${styles['friend-item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <input type="checkbox" checked={isSelected} readOnly />
       <div className={styles['avatar']}>
-        <Image src={friend.avatarUrl} alt="friend_avatar" width={25} height={25} loading="lazy" draggable="false" />
+        <Image src={friend.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="friend_avatar" width={25} height={25} loading="lazy" draggable="false" />
       </div>
       <div className={styles['base-info']}>
         {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}

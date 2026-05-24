@@ -22,6 +22,8 @@ import LevelIcon from '@/components/LevelIcon';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
+import { DEFAULT_USER_AVATAR_URL } from '@/constants';
+
 import styles from './Friend.module.css';
 
 interface FriendTabProps {
@@ -96,7 +98,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
         style={{ filter: isFriend && !isOffline && !friend.isBlocked ? '' : 'grayscale(100%)' }}
         datatype={isFriend && !isOnline && !isOffline && !friend.isBlocked ? friend.status : ''}
       >
-        <Image src={friend.avatarUrl} alt="friend_avatar" width={40} height={40} loading="lazy" draggable="false" />
+        <Image src={friend.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="friend_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
       <div className={styles['base-info']}>
         <div className={styles['detail-row']}>

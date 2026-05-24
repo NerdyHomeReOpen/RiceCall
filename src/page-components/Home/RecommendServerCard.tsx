@@ -13,6 +13,8 @@ import { useRecommendServerCtxMenu } from '@/hooks/ContextMenus/useRecommendServ
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
 import styles from './Home.module.css';
 
 interface RecommendServerCardProps {
@@ -54,7 +56,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   return (
     <div className={styles['card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
       <div className={styles['card-avatar']}>
-        <Image src={recommendServer.avatarUrl} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
+        <Image src={recommendServer.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
       </div>
       <div className={styles['card-info-text']}>
         <div className={styles['card-name-text']}>{recommendServer.name}</div>
