@@ -16,6 +16,8 @@ import { useHeaderCtxMenu } from '@/hooks/ContextMenus/useHeaderCtxMenu';
 
 import MainTabItem from './MainTabItem';
 
+import { DEFAULT_SERVER_AVATAR_URL, DEFAULT_USER_AVATAR_URL } from '@/constants';
+
 import styles from './Header.module.css';
 
 interface HeaderProps {
@@ -103,7 +105,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       contentType: 'image',
       showContentLength: true,
       showContent: true,
-      contents: safeFriendApplications.map((fa) => fa.avatarUrl),
+      contents: safeFriendApplications.map((fa) => fa.avatarUrl || DEFAULT_USER_AVATAR_URL),
       onClick: () => openFriendVerification(),
     },
     {
@@ -114,7 +116,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       contentType: 'image',
       showContentLength: true,
       showContent: true,
-      contents: safeMemberInvitations.map((mi) => mi.avatarUrl),
+      contents: safeMemberInvitations.map((mi) => mi.avatarUrl || DEFAULT_SERVER_AVATAR_URL),
       onClick: () => openMemberInvitation(),
     },
     {
