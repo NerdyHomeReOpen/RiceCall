@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import { useAppSelector } from '@/hooks/useStore';
@@ -14,7 +14,7 @@ const NotificationToaster: React.FC = React.memo(() => {
   const [closedNotificationIds, setClosedNotificationIds] = useState<Set<number>>(new Set());
   const [showNotificationIndex, setShowNotificationIndex] = useState<number>(0);
 
-  const filteredNotifications = useMemo(() => notifications.filter((notification) => !closedNotificationIds.has(notification.notificationId)), [notifications, closedNotificationIds]);
+  const filteredNotifications = notifications.filter((notification) => !closedNotificationIds.has(notification.notificationId));
 
   const handleCloseBtnClick = () => {
     const notificationId = filteredNotifications[showNotificationIndex]?.notificationId ?? 0;

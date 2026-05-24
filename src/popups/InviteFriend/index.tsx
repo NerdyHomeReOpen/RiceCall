@@ -25,24 +25,18 @@ interface InviteFriendPopupProps {
 const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, server }) => {
   const { t } = useTranslation();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   const [query, setQuery] = useState<string>('');
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
-  const selectedUserIdSet = useMemo(() => new Set(selectedUserIds), [selectedUserIds]);
-  const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: 0, userId: user.userId }), [t, user.userId]);
-  const filteredFriends = useMemo(() => friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.name.includes(query)), [friends, query]);
-  const sortedFriendGroups = useMemo(() => [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order), [defaultFriendGroup, friendGroups]);
-  const isAllSelected = useMemo(() => filteredFriends.every((f) => selectedUserIdSet.has(f.targetId)), [filteredFriends, selectedUserIdSet]);
+  const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: 0 }), [t]);
+
+  const selectedUserIdSet = new Set(selectedUserIds);
+  const sortedFriends = friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.name.includes(query)).sort((a, b) => a.name.localeCompare(b.name));
+  const sortedFriendGroups = [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order);
+  const isAllSelected = sortedFriends.every((f) => selectedUserIdSet.has(f.targetId));
 
   const handleSelect = (userId: Types.User['userId']) => {
     if (selectedUserIdSet.has(userId)) setSelectedUserIds((prev) => prev.filter((userId) => userId !== userId));
@@ -54,7 +48,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
   };
 
   const handleSelectAllChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (e.target.checked) setSelectedUserIds(filteredFriends.map((f) => f.targetId));
+    if (e.target.checked) setSelectedUserIds(sortedFriends.map((f) => f.targetId));
     else setSelectedUserIds([]);
   };
 
@@ -93,7 +87,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
           </div>
           <div className={styles['scroll-view']}>
             {sortedFriendGroups.map((friendGroup) => (
-              <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
+              <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={sortedFriends} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
             ))}
           </div>
         </div>

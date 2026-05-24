@@ -24,11 +24,9 @@ const FriendPageSidebar: React.FC = React.memo(() => {
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'default', name: t('my-friends'), order: -1 }), [t]);
   const strangerFriendGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000 }), [t]);
   const blacklistFriendGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001 }), [t]);
-  const sortedFriendGroups = useMemo(
-    () => [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order),
-    [defaultFriendGroup, friendGroups, strangerFriendGroup, blacklistFriendGroup],
-  );
-  const filteredFriends = useMemo(() => friends.filter((f) => f.name.toLowerCase().includes(query.toLowerCase())), [friends, query]);
+
+  const sortedFriendGroups = [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order);
+  const filteredFriends = friends.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()));
   const isFriendTab = selectedTabId === 'friend';
   const isRecentTab = selectedTabId === 'recent';
 

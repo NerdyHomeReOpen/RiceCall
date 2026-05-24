@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import type * as Types from '@/types';
 
@@ -21,7 +21,7 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
 
-  const filteredItems = useMemo(() => items.filter((item) => item?.show ?? true), [items]);
+  const filteredItems = items.filter((item) => item?.show ?? true);
 
   useLayoutEffect(() => {
     if (!menuRef.current) return;

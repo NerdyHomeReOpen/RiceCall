@@ -45,19 +45,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const [selectedChannel, setSelectedChannel] = useState<Types.Channel | Types.Category | null>(null);
   const [categoryChildren, setCategoryChildren] = useState<(Types.Channel | Types.Category)[]>([]);
 
-  const currentIndex = categoryChildren.findIndex((c) => c.channelId === selectedChannel?.channelId);
-  const firstChannel = categoryChildren[0];
-  const lastChannel = categoryChildren[categoryChildren.length - 1];
-  const isSelected = !!selectedChannel;
-  const isFirst = firstChannel?.channelId === selectedChannel?.channelId;
-  const isLast = lastChannel?.channelId === selectedChannel?.channelId;
-  const canRename = isSelected && !selectedChannel?.isLobby;
-  const canDelete = isSelected && !selectedChannel?.isLobby;
-  const canMoveUp = isSelected && !isFirst && !selectedChannel?.isLobby && currentIndex > 0;
-  const canMoveDown = isSelected && !isLast && !selectedChannel?.isLobby && currentIndex < categoryChildren.length - 1;
-  const canTop = isSelected && !isFirst && !selectedChannel?.isLobby;
-  const canBottom = isSelected && !isLast && !selectedChannel?.isLobby;
-  const canAdd = !selectedChannel?.isLobby && !selectedChannel?.categoryId;
   const editedChannels = useMemo(() => {
     return channels
       .filter((c) => !c.categoryId)
@@ -80,9 +67,21 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
         [] as { order: number; channelId: string }[],
       );
   }, [channels]);
-  const filteredChannels = useMemo(() => {
-    return channels.filter((c) => c.categoryId === null && !c.isLobby).sort((a, b) => a.order - b.order);
-  }, [channels]);
+
+  const sortedChannels = channels.filter((c) => c.categoryId === null && !c.isLobby).sort((a, b) => a.order - b.order);
+  const currentIndex = categoryChildren.findIndex((c) => c.channelId === selectedChannel?.channelId);
+  const firstChannel = categoryChildren[0];
+  const lastChannel = categoryChildren[categoryChildren.length - 1];
+  const isSelected = !!selectedChannel;
+  const isFirst = firstChannel?.channelId === selectedChannel?.channelId;
+  const isLast = lastChannel?.channelId === selectedChannel?.channelId;
+  const canRename = isSelected && !selectedChannel?.isLobby;
+  const canDelete = isSelected && !selectedChannel?.isLobby;
+  const canMoveUp = isSelected && !isFirst && !selectedChannel?.isLobby && currentIndex > 0;
+  const canMoveDown = isSelected && !isLast && !selectedChannel?.isLobby && currentIndex < categoryChildren.length - 1;
+  const canTop = isSelected && !isFirst && !selectedChannel?.isLobby;
+  const canBottom = isSelected && !isLast && !selectedChannel?.isLobby;
+  const canAdd = !selectedChannel?.isLobby && !selectedChannel?.categoryId;
   const canSubmit = editedChannels.length > 0;
 
   const changeOrder = (currentIndex: number, targetIndex: number) => {
@@ -229,7 +228,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
       <div className="popup-body">
         <div className={styles['edit-channel-order-body']}>
           <div className={styles['channel-list']} onClick={(e) => e.stopPropagation()}>
-            {filteredChannels.map((c) =>
+            {sortedChannels.map((c) =>
               c.type === 'category' ? <CategoryTab key={c.channelId} channels={channels} category={c} onSelect={handleSelect} /> : <ChannelTab key={c.channelId} channel={c} onSelect={handleSelect} />,
             )}
           </div>

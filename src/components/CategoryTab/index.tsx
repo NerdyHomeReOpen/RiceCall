@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
@@ -65,14 +65,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const categoryMembers = onlineMembers.filter((om) => om.currentChannelId === category.channelId);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
-  const filteredCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
-  const filteredCategoryMembers = useMemo(() => {
-    return [...categoryMembers].sort((a, b) => {
-      if (a.userId === user.userId && b.userId !== user.userId) return -1;
-      if (b.userId === user.userId && a.userId !== user.userId) return 1;
-      return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
-    });
-  }, [categoryMembers, user]);
+  const sortedCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
+  const sortedCategoryMembers = [...categoryMembers].sort((a, b) => {
+    if (a.userId === user.userId && b.userId !== user.userId) return -1;
+    if (b.userId === user.userId && a.userId !== user.userId) return 1;
+    return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
+  });
 
   const isInChannel = currentChannel.channelId === category.channelId;
   const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannel.channelId);
@@ -163,12 +161,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
         {!isExpanded && isInCategory && <div className={styles['my-location-icon']} />}
       </div>
       <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
-        {filteredCategoryMembers.map((member) => (
+        {sortedCategoryMembers.map((member) => (
           <UserTab key={member.userId} member={member} channel={category} canJoin={canJoin} isPasswordNeeded={isPasswordNeeded} />
         ))}
       </div>
       <div className={styles['channel-list']} style={isExpanded ? {} : { display: 'none' }}>
-        {filteredCategoryChannels.map((channel) => (
+        {sortedCategoryChannels.map((channel) => (
           <ChannelTab key={channel.channelId} channel={channel} />
         ))}
       </div>

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -61,22 +61,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const [isExpanded, setIsExpanded] = useState(true);
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
-  const channelMembers = useMemo(() => onlineMembers.filter((om) => om.currentChannelId === channel.channelId), [onlineMembers, channel.channelId]);
-  const movableServerUserIds = useMemo(
-    () => onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId),
-    [onlineMembers, user.userId, permissionLevel],
-  );
-  const movableChannelUserIds = useMemo(
-    () => channelMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId),
-    [channelMembers, user.userId, permissionLevel],
-  );
-  const sortedChannelMembers = useMemo(() => {
-    return [...channelMembers].sort((a, b) => {
-      if (a.userId === user.userId && b.userId !== user.userId) return -1;
-      if (b.userId === user.userId && a.userId !== user.userId) return 1;
-      return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
-    });
-  }, [channelMembers, user]);
+  const channelMembers = onlineMembers.filter((om) => om.currentChannelId === channel.channelId);
+  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
+  const movableChannelUserIds = channelMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
+  const sortedChannelMembers = [...channelMembers].sort((a, b) => {
+    if (a.userId === user.userId && b.userId !== user.userId) return -1;
+    if (b.userId === user.userId && a.userId !== user.userId) return 1;
+    return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
+  });
 
   const isInChannel = currentChannel.channelId === channel.channelId;
   const isLobby = currentServer.lobbyId === channel.channelId;
