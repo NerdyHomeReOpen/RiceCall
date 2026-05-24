@@ -6,7 +6,7 @@ import { useWebRTC } from '@/providers/WebRTC';
 
 import MicModeMenu from './MicModeMenu';
 
-import styles from './MicVolumeSlider.module.css';
+import styles from './Server.module.css';
 
 const MicVolumeSlider = React.memo(() => {
   const { changeMicVolume, toggleMicMuted } = useWebRTC();
@@ -58,14 +58,14 @@ const MicVolumeSlider = React.memo(() => {
   }, []);
 
   return (
-    <div className={styles['container']}>
-      <div className={`${styles['volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
+    <div className={styles['mic-volume-container']}>
+      <div className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
       <div className={styles['slider-track']}>
         <div className={styles['slider-container']}>
           <input ref={sliderRef} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div
-          className={`${styles['volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`}
+          className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`}
           onClick={handleBtnClick}
           onMouseEnter={handleBtnMouseDown}
           onMouseLeave={handleBtnMouseUp}

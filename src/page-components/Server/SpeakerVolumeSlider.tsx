@@ -4,7 +4,7 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { useWebRTC } from '@/providers/WebRTC';
 
-import styles from './SpeakerVolumeSlider.module.css';
+import styles from './Server.module.css';
 
 const SpeakerVolumeSlider = React.memo(() => {
   const { changeSpeakerVolume, toggleSpeakerMuted } = useWebRTC();
@@ -40,14 +40,14 @@ const SpeakerVolumeSlider = React.memo(() => {
   };
 
   return (
-    <div className={styles['speaker-container']}>
-      <div className={`${styles['speaker-button']} ${isSpeakerMuted ? styles['muted'] : ''}`} />
-      <div className={styles['speaker-slider']}>
-        <div className={styles['speaker-slider-container']}>
+    <div className={styles['speaker-volume-container']}>
+      <div className={`${styles['speaker-volume-button']} ${isSpeakerMuted ? styles['muted'] : ''}`} />
+      <div className={styles['slider-track']}>
+        <div className={styles['slider-container']}>
           <input ref={sliderRef} type="range" min="0" max="100" value={speakerVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div
-          className={`${styles['speaker-button']} ${isSpeakerMuted ? styles['muted'] : styles['active']}`}
+          className={`${styles['speaker-volume-button']} ${isSpeakerMuted ? styles['muted'] : styles['active']}`}
           onClick={handleBtnClick}
           onMouseEnter={handleBtnMouseDown}
           onMouseLeave={handleBtnMouseUp}

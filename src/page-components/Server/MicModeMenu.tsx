@@ -10,7 +10,7 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { getLerpColor } from '@/utils/color';
 
-import styles from './MicVolumeSlider.module.css';
+import styles from './Server.module.css';
 
 const MicModeMenu: React.FC = React.memo(() => {
   const { t } = useTranslation();

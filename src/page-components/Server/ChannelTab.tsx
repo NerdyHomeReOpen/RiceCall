@@ -15,9 +15,9 @@ import { useLocateMeContext } from '@/providers/LocateMe';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { useChannelCtxMenu } from '@/hooks/ContextMenus/useChannelCtxMenu';
 
-import UserTab from '@/components/UserTab';
+import UserTab from './UserTab';
 
-import styles from './ChannelTab.module.css';
+import styles from './Server.module.css';
 
 interface ChannelTabProps {
   channel: Types.Channel;

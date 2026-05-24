@@ -18,7 +18,7 @@ import { useMemberCtxMenu } from '@/hooks/ContextMenus/useMemberCtxMenu';
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
-import styles from './UserTab.module.css';
+import styles from './Server.module.css';
 
 interface UserTabProps {
   member: Types.OnlineMember;
@@ -144,7 +144,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   return (
     <div
       ref={userTabRef}
-      className={`user-info-card-container ${styles['item']} ${isSelected ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
       onClick={handleTabClick}
       onDoubleClick={handleTabDoubleClick}
       onMouseEnter={handleTabMouseEnter}

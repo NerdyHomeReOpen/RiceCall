@@ -18,7 +18,7 @@ import { useWebRTC } from '@/providers/WebRTC';
 
 import { getDefaultQueueMember } from '@/utils/default';
 
-import styles from './QueueUserTab.module.css';
+import styles from './Server.module.css';
 
 interface QueueUserTabProps {
   queueUserId: string;
@@ -125,7 +125,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   return (
     <div
-      className={`user-info-card-container ${styles['item']} ${isSelected ? styles['selected'] : ''}`}
+      className={`user-info-card-container ${styles['queue-user-tab']} ${isSelected ? styles['selected'] : ''}`}
       onClick={handleTabClick}
       onDoubleClick={handleTabDoubleClick}
       onMouseEnter={handleTabMouseEnter}

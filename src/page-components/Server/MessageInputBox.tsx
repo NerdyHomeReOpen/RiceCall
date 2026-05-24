@@ -27,7 +27,7 @@ import { ChatEnter } from '@/extensions/ChatEnter';
 
 import { toTags } from '@/utils/tagConverter';
 
-import styles from './MessageInputBox.module.css';
+import styles from './Server.module.css';
 
 const MessageInputBox: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -197,7 +197,7 @@ const MessageInputBox: React.FC = React.memo(() => {
       <div className={styles['emoji-button']} onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}
-        className={`${styles['input-area']} markdown-content`}
+        className={`${styles['input']} markdown-content`}
         style={{ wordBreak: 'break-all', border: 'none' }}
         onPaste={handleInputPaste}
         onKeyDown={handleInputKeyDown}

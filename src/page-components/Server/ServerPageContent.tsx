@@ -22,12 +22,12 @@ import { useMessageAreaCtxMenu } from '@/hooks/ContextMenus/useMessageAreaCtxMen
 import { useVoiceModeCtxMenu } from '@/hooks/ContextMenus/useVoiceModeCtxMenu';
 
 import MicButton from './MicButton';
+import MessageInputBox from './MessageInputBox';
+import MicVolumeSlider from './MicVolumeSlider';
+import SpeakerVolumeSlider from './SpeakerVolumeSlider';
+import ShowFrame from './ShowFrame';
 import MarkdownContent from '@/components/MarkdownContent';
 import MessageContent from '@/components/MessageContent';
-import MessageInputBox from '@/components/MessageInputBox';
-import MicVolumeSlider from '@/components/MicVolumeSlider';
-import SpeakerVolumeSlider from '@/components/SpeakerVolumeSlider';
-import ShowFrame from '@/components/ShowFrame';
 import UnreadMessageAlert from '@/components/UnreadMessageAlert';
 
 import { getFormatTimeFromSecond } from '@/utils/language';

@@ -16,9 +16,9 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { useChannelListCtxMenu } from '@/hooks/ContextMenus/useChannelListCtxMenu';
 import { useServerSettingCtxMenu } from '@/hooks/ContextMenus/useServerSettingCtxMenu';
 
-import ChannelTab from '@/components/ChannelTab';
-import CategoryTab from '@/components/CategoryTab';
-import QueueUserTab from '@/components/QueueUserTab';
+import ChannelTab from './ChannelTab';
+import CategoryTab from './CategoryTab';
+import QueueUserTab from './QueueUserTab';
 
 import styles from './Server.module.css';
 

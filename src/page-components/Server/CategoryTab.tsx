@@ -14,10 +14,10 @@ import { useChannelCtxMenu } from '@/hooks/ContextMenus/useChannelCtxMenu';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
-import ChannelTab from '@/components/ChannelTab';
-import UserTab from '@/components/UserTab';
+import ChannelTab from './ChannelTab';
+import UserTab from './UserTab';
 
-import styles from './CategoryTab.module.css';
+import styles from './Server.module.css';
 
 interface CategoryTabProps {
   category: Types.Category;
