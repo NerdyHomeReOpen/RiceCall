@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
 
 import * as Store from '@/store';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 
 import ChannelTab from './ChannelTab';
 
@@ -22,8 +22,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category
 
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
 
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
-
   const categoryChildren = channels?.filter((c) => c.categoryId === category.channelId);
 
   const handleTabClick = (e: React.MouseEvent) => {
@@ -33,24 +31,16 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category
     onSelect(category);
   };
 
-  const handleTabExpandedClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsExpanded(!isExpanded);
-  };
-
   return (
     <>
       <div className={`${styles['channel-item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
-        <div
-          className={`${styles['channel-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]} ${category.isLobby ? styles['lobby'] : ''}`}
-          onClick={handleTabExpandedClick}
-        />
+        <div className={`${styles['channel-icon']} ${styles['expanded']} ${styles[category.visibility]} ${category.isLobby ? styles['lobby'] : ''}`} />
         <div className={styles['channel-label']} style={{ display: 'inline-flex' }}>
           {category.name}
           <div className={styles['channel-index-text']}>{`(${category.order})`}</div>
         </div>
       </div>
-      <div className={styles['channel-list']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className={styles['channel-list']}>
         {categoryChildren
           .sort((a, b) => a.order - b.order)
           .filter((c) => c.type === 'channel')

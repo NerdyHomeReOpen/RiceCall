@@ -2,9 +2,9 @@ import React, { useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
-import ServerList from '@/components/ServerList';
+import ServerList from './ServerList';
 
 import styles from './Home.module.css';
 

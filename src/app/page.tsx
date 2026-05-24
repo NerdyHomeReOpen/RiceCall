@@ -14,7 +14,7 @@ import ActionScannerProvider from '@/providers/ActionScanner';
 import ExpandedProvider from '@/providers/LocateMe';
 import { useLoading } from '@/providers/Loading';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import Header from '@/components/Header';
 import SocketManager from '@/components/SocketManager';

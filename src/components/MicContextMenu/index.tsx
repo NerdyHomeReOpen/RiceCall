@@ -1,4 +1,4 @@
-import React, { useLayoutEffect, useMemo, useRef, useState } from 'react';
+import React, { useLayoutEffect, useRef, useState } from 'react';
 
 import type * as Types from '@/types';
 
@@ -23,7 +23,7 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
 
-  const filteredItems = useMemo(() => cleanMenu(items).filter((item) => item?.show ?? true), [items]);
+  const filteredItems = cleanMenu(items).filter((item) => item?.show ?? true);
 
   useLayoutEffect(() => {
     if (!menuRef.current) return;

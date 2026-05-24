@@ -11,8 +11,8 @@ import { ALLOWED_MESSAGE_KEYS } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector } from '@/hooks/Store';
-import { useMessageContextMenu } from '@/hooks/ContextMenus/Message';
+import { useAppSelector } from '@/hooks/useStore';
+import { useMessageCtxMenu } from '@/hooks/ContextMenus/useMessageCtxMenu';
 
 import MarkdownContent from '@/components/MarkdownContent';
 
@@ -67,7 +67,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     [messageGroup.contents, t],
   );
 
-  const { buildContextMenu: buildMessageContextMenu } = useMessageContextMenu({
+  const { buildContextMenu: buildMessageContextMenu } = useMessageCtxMenu({
     user,
     currentServer,
     currentChannel,

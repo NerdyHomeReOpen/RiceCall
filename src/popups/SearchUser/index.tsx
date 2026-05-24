@@ -6,7 +6,7 @@ import * as ipc from '@/main/ipc';
 
 import { openApplyFriend } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 interface SearchUserPopupProps {
   id: string;

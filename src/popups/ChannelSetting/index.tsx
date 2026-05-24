@@ -15,9 +15,9 @@ import { MEMBER_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } 
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useChannelSettingModeratorContextMenu } from '@/hooks/ContextMenus/ChannelSettingModerator';
-import { useChannelSettingBlockedMemberContextMenu } from '@/hooks/ContextMenus/ChannelSettingBlockedMember';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useChannelSettingModeratorCtxMenu } from '@/hooks/ContextMenus/useChannelSettingModeratorCtxMenu';
+import { useChannelSettingBlockedMemberCtxMenu } from '@/hooks/ContextMenus/useChannelSettingBlockedMemberCtxMenu';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
@@ -592,7 +592,7 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
 
   const isSelected = selectedItemId === `member-${moderator.userId}`;
 
-  const { buildContextMenu } = useChannelSettingModeratorContextMenu({ user, server, channel, moderator, permissionLevel });
+  const { buildContextMenu } = useChannelSettingModeratorCtxMenu({ user, server, channel, moderator, permissionLevel });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -639,7 +639,7 @@ const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowPro
   const isSelected = selectedItemId === `blocked-${member.userId}`;
   const isBlockedPermanently = member.blockedUntil === -1;
 
-  const { buildContextMenu } = useChannelSettingBlockedMemberContextMenu({ user, server, channel, member, permissionLevel });
+  const { buildContextMenu } = useChannelSettingBlockedMemberCtxMenu({ user, server, channel, member, permissionLevel });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));

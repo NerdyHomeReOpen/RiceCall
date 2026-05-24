@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { rejectAllMemberInvitation } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import MemberInvitationItem from './MemberInvitationItem';
 

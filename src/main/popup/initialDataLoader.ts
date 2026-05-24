@@ -114,6 +114,14 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
     return { member };
   },
 
+  inviteFriend: async ({ userId, serverId }: { userId: string; serverId: string }) => {
+    const serverPromise = fetchServer({ userId, serverId });
+
+    const [server] = await Promise.all([serverPromise]);
+
+    return { server };
+  },
+
   inviteMember: async ({ receiverId, serverId }: { receiverId: string; serverId: string }) => {
     const receiverMemberPromise = fetchMember({ userId: receiverId, serverId });
     const memberInvitationPromise = fetchMemberInvitation({ receiverId, serverId });
@@ -182,6 +190,6 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     return { target, targetServers };
   },
-}
+};
 
 export default initialDataLoader;

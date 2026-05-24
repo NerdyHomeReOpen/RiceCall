@@ -3,6 +3,8 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
 import styles from './UserSetting.module.css';
 
 interface FavoriteServerCardProps {
@@ -18,7 +20,7 @@ const FavoriteServerCard: React.FC<FavoriteServerCardProps> = React.memo(({ targ
 
   return (
     <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
-      <Image src={server.avatarUrl} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
+      <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
       <div className={styles['server-info']}>
         <div className={styles['server-name-text']}>{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>

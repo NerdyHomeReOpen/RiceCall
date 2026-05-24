@@ -4,6 +4,8 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
 import styles from './ApplyMember.module.css';
 
 interface SendSectionProps {
@@ -24,7 +26,7 @@ const SendSection: React.FC<SendSectionProps> = React.memo(({ server, applicatio
         <div className="popup-content col">
           <div className="row">
             <div className={styles['server-avatar']}>
-              <Image src={server.avatarUrl} alt="server_avatar" width={40} height={40} loading="lazy" draggable="false" />
+              <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className={styles['server-info']}>
               <div className="link-text" onClick={onServerNameLinkClick}>

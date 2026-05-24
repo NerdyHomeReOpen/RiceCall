@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -7,9 +7,9 @@ import type * as Types from '@/types';
 
 import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constants';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
-import ServerList from '@/components/ServerList';
+import ServerList from './ServerList';
 
 import styles from './Home.module.css';
 
@@ -28,44 +28,44 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
 
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
 
-  const filteredAnns = useMemo(() => [...announcements].sort((a, b) => b.timestamp - a.timestamp), [announcements]);
-  const filteredRecommendServers = useMemo(() => recommendServers.filter((server) => !server.tags.includes('official')), [recommendServers]);
-  const filteredOfficialServers = useMemo(() => recommendServers.filter((server) => server.tags.includes('official')), [recommendServers]);
+  const sortedAnnouncements = [...announcements].sort((a, b) => b.timestamp - a.timestamp);
+  const filteredRecommendServers = recommendServers.filter((server) => !server.tags.includes('official'));
+  const filteredOfficialServers = recommendServers.filter((server) => server.tags.includes('official'));
 
   const handleNextAnnBtnClick = () => {
-    setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length);
+    setSelectedAnnIndex((prev) => (prev + 1) % sortedAnnouncements.length);
   };
 
   const handlePrevAnnBtnClick = () => {
-    setSelectedAnnIndex((prev) => (prev === 0 ? filteredAnns.length - 1 : prev - 1));
+    setSelectedAnnIndex((prev) => (prev === 0 ? sortedAnnouncements.length - 1 : prev - 1));
   };
 
   useEffect(() => {
     if (!containerRef.current) return;
-    const number = selectedAnnIndex % filteredAnns.length;
+    const number = selectedAnnIndex % sortedAnnouncements.length;
     const width = containerRef.current.clientWidth;
     containerRef.current.scrollTo({
       left: width * number,
       behavior: 'smooth',
     });
-  }, [selectedAnnIndex, filteredAnns]);
+  }, [selectedAnnIndex, sortedAnnouncements]);
 
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
-    intervalRef.current = setInterval(() => setSelectedAnnIndex((prev) => (prev + 1) % filteredAnns.length), ANNOUNCEMENT_SLIDE_INTERVAL);
+    intervalRef.current = setInterval(() => setSelectedAnnIndex((prev) => (prev + 1) % sortedAnnouncements.length), ANNOUNCEMENT_SLIDE_INTERVAL);
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = null;
     };
-  }, [filteredAnns]);
+  }, [sortedAnnouncements]);
 
   return (
     <>
       <div className={styles['banner-wrapper']}>
         <div className={styles['banner-container']}>
           <div ref={containerRef} className={styles['banner-list']}>
-            {filteredAnns.length > 0 ? (
-              filteredAnns.map((ann) =>
+            {sortedAnnouncements.length > 0 ? (
+              sortedAnnouncements.map((ann) =>
                 ann.attachmentUrl ? (
                   <div key={ann.announcementId} className={styles['banner']} onClick={() => onAnnouncementSelect(ann)}>
                     <Image src={ann.attachmentUrl} alt="announcement_attachment" width={100} height={100} loading="lazy" draggable="false" />
@@ -83,10 +83,10 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
               </div>
             )}
           </div>
-          {filteredAnns.length > 0 && (
+          {sortedAnnouncements.length > 0 && (
             <>
               <div className={styles['number-list']}>
-                {filteredAnns.map((_, index) => (
+                {sortedAnnouncements.map((_, index) => (
                   <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)} />
                 ))}
               </div>

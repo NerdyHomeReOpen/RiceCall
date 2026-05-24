@@ -4,6 +4,8 @@ import Image from 'next/image';
 
 import type * as Types from '@/types';
 
+import { DEFAULT_USER_AVATAR_URL } from '@/constants';
+
 import styles from './InviteMember.module.css';
 
 interface EditSectionProps {
@@ -24,7 +26,7 @@ const EditSection: React.FC<EditSectionProps> = React.memo(({ receiverMember, in
           <div className="label">{t('invite-member-label')}</div>
           <div className="row">
             <div className={styles['member-avatar']}>
-              <Image src={receiverMember.avatarUrl} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
+              <Image src={receiverMember.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
             <div className={styles['member-info']}>
               <div className="link-text">
