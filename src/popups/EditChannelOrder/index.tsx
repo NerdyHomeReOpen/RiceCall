@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -18,13 +18,21 @@ import styles from './EditChannelOrder.module.css';
 interface EditChannelOrderPopupProps {
   id: string;
   serverId: Types.Server['serverId'];
-  channels: (Types.Channel | Types.Category)[];
 }
 
-const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId, channels: channelsData }) => {
+const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId }) => {
   const { t } = useTranslation();
 
-  const orderMapRef = useRef<Record<string, number>>(
+  const user = useAppSelector(
+    (state) => ({
+      userId: state.user.data.userId,
+    }),
+    shallowEqual,
+  );
+
+  const channelsData = useAppSelector((state) => state.channels.data.filter((c) => !c.isLobby));
+
+  const channelOrderMapRef = useRef<Record<string, number>>(
     channelsData.reduce(
       (acc, channel) => {
         acc[channel.channelId] = channel.order;
@@ -34,31 +42,24 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     ),
   );
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
   const [channels, setChannels] = useState<(Types.Channel | Types.Category)[]>(channelsData);
   const [selectedChannel, setSelectedChannel] = useState<Types.Channel | Types.Category | null>(null);
   const [categoryChildren, setCategoryChildren] = useState<(Types.Channel | Types.Category)[]>([]);
 
   const editedChannels = useMemo(() => {
     return channels
-      .filter((c) => !c.categoryId)
+      .filter((c) => !c.categoryId && !c.isLobby)
       .sort((a, b) => a.order - b.order)
       .reduce(
         (acc, c, index) => {
-          if (c.order !== index || c.order !== orderMapRef.current[c.channelId]) {
+          if (c.order !== index || c.order !== channelOrderMapRef.current[c.channelId]) {
             acc.push({ order: index, channelId: c.channelId });
           }
           channels
             .filter((sc) => sc.categoryId === c.channelId)
             .sort((a, b) => a.order - b.order)
             .forEach((sc, sindex) => {
-              if (sc.order !== sindex || sc.order !== orderMapRef.current[sc.channelId]) {
+              if (sc.order !== sindex || sc.order !== channelOrderMapRef.current[sc.channelId]) {
                 acc.push({ order: sindex, channelId: sc.channelId });
               }
             });
@@ -165,40 +166,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
   const handleCloseBtnClick = () => {
     ipc.popup.close(id);
   };
-
-  useEffect(() => {
-    const onClick = (e: MouseEvent) => {
-      const target = e.target as HTMLElement;
-      if (target.closest(`.${styles['channel-item']}`) || target.closest('[class*="Btn"]')) return;
-      setSelectedChannel(null);
-    };
-    window.addEventListener('click', onClick);
-    return () => window.removeEventListener('click', onClick);
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelAdd', (...args: { data: Types.Channel }[]) => {
-      const add = new Set(args.map((i) => `${i.data.channelId}`));
-      setChannels((prev) => prev.filter((c) => !add.has(`${c.channelId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelUpdate', (...args: { channelId: string; update: Partial<Types.Channel> }[]) => {
-      const update = new Map(args.map((i) => [`${i.channelId}`, i.update] as const));
-      setChannels((prev) => prev.map((c) => (update.has(`${c.channelId}`) ? { ...c, ...update.get(`${c.channelId}`) } : c)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('channelRemove', (...args: { channelId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.channelId}`));
-      setChannels((prev) => prev.filter((c) => !remove.has(`${c.channelId}`)));
-    });
-    return () => unsub();
-  }, []);
 
   return (
     <div className="popup-wrapper">
