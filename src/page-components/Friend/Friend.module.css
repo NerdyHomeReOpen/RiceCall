@@ -563,13 +563,13 @@
   background-size: auto;
 }
 
-.avatar {
+.friend-tab-avatar {
   position: relative;
   width: 40px;
   height: 40px;
 }
 
-.avatar::before {
+.friend-tab-avatar::before {
   position: absolute;
   top: -1px;
   left: -1px;
@@ -614,6 +614,17 @@
 
 .friend-tab-avatar[datatype='gn']::after {
   background-position: -39px 0 !important;
+}
+
+.friend-tab-name-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.friend-tab-name-text.vip {
+  color: var(--text-vip-name);
 }
 
 .base-info {

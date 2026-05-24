@@ -90,9 +90,9 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   }, [friend.targetId, friend.isBlocked, friend.shareCurrentServer, friend.currentServerId, isFriend]);
 
   return (
-    <div className={`${styles['item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>
+    <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>
       <div
-        className={styles['avatar']}
+        className={styles['friend-tab-avatar']}
         style={{ filter: isFriend && !isOffline && !friend.isBlocked ? '' : 'grayscale(100%)' }}
         datatype={isFriend && !isOnline && !isOffline && !friend.isBlocked ? friend.status : ''}
       >
@@ -101,7 +101,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
       <div className={styles['base-info']}>
         <div className={styles['detail-row']}>
           {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
-          <div className={`${styles['name-text']} ${hasVip ? styles['vip'] : ''}`}>
+          <div className={`${styles['friend-tab-name-text']} ${hasVip ? styles['vip'] : ''}`}>
             {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
           </div>
           <LevelIcon level={friend.level} xp={friend.xp} requiredXp={friend.requiredXp} showTooltip={false} />
