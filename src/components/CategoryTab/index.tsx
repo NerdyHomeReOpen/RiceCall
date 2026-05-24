@@ -54,7 +54,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     shallowEqual,
   );
 
-  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
@@ -68,18 +67,12 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
   const filteredCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
   const filteredCategoryMembers = useMemo(() => {
-    const friendIds = new Set(friends.filter((f) => f.relationStatus === 2).map((f) => f.targetId));
     return [...categoryMembers].sort((a, b) => {
       if (a.userId === user.userId && b.userId !== user.userId) return -1;
       if (b.userId === user.userId && a.userId !== user.userId) return 1;
-
-      const aIsFriend = friendIds.has(a.userId);
-      const bIsFriend = friendIds.has(b.userId);
-      if (aIsFriend !== bIsFriend) return aIsFriend ? -1 : 1;
-
       return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
     });
-  }, [categoryMembers, user, friends]);
+  }, [categoryMembers, user]);
 
   const isInChannel = currentChannel.channelId === category.channelId;
   const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannel.channelId);

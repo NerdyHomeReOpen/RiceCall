@@ -55,7 +55,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
     shallowEqual,
   );
 
-  const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 
@@ -72,18 +71,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
     [channelMembers, user.userId, permissionLevel],
   );
   const sortedChannelMembers = useMemo(() => {
-    const friendIds = new Set(friends.filter((f) => f.relationStatus === 2).map((f) => f.targetId));
     return [...channelMembers].sort((a, b) => {
       if (a.userId === user.userId && b.userId !== user.userId) return -1;
       if (b.userId === user.userId && a.userId !== user.userId) return 1;
-
-      const aIsFriend = friendIds.has(a.userId);
-      const bIsFriend = friendIds.has(b.userId);
-      if (aIsFriend !== bIsFriend) return aIsFriend ? -1 : 1;
-
       return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
     });
-  }, [channelMembers, user, friends]);
+  }, [channelMembers, user]);
 
   const isInChannel = currentChannel.channelId === channel.channelId;
   const isLobby = currentServer.lobbyId === channel.channelId;
