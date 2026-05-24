@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-import FriendActivity from '@/components/FriendActivity';
+import FriendActivity from './FriendActivity';
 
 import styles from './Friend.module.css';
 

@@ -10,9 +10,9 @@ import { useContextMenu } from '@/providers/ContextMenu';
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 import { useFriendGroupCtxMenu } from '@/hooks/ContextMenus/useFriendGroupCtxMenu';
 
-import FriendTab from '@/components/FriendTab';
+import FriendTab from './FriendTab';
 
-import styles from './FriendGroupTab.module.css';
+import styles from './Friend.module.css';
 
 interface FriendGroupTabProps {
   friendGroup: Types.FriendGroup;
@@ -36,6 +36,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
 
   const isStranger = friendGroup.friendGroupId === 'stranger';
   const isBlacklist = friendGroup.friendGroupId === 'blacklist';
+
   const friendGroupFriends = useMemo(() => {
     if (friendGroup.friendGroupId === 'default') {
       return friends.filter((f) => !f.isBlocked && !f.friendGroupId && f.relationStatus !== 0);
@@ -67,7 +68,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
 
   return (
     <>
-      <div className={`${styles['group']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onContextMenu={handleTabContextMenu}>
+      <div className={`${styles['friend-group-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onContextMenu={handleTabContextMenu}>
         <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
         <div className={styles['label']}>{friendGroup.name}</div>
         <div className={styles['friend-count-text']}>{!isStranger && !isBlacklist ? `(${onlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}</div>

@@ -10,7 +10,7 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { getFormatTimeDiff } from '@/utils/language';
 
-import styles from './FriendActivity.module.css';
+import styles from './Friend.module.css';
 
 interface FriendActivityProps {
   friendActivity: Types.FriendActivity;
@@ -31,19 +31,19 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
   };
 
   return (
-    <div className={styles['activity-item']}>
-      <div className={styles['avatar']}>
+    <div className={styles['friend-activity-item']}>
+      <div className={styles['friend-activity-avatar']}>
         <Image src={friendActivity.avatarUrl} alt="friend_avatar" width={30} height={30} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['content']}>
-        <div className={styles['content-top']}>
+      <div className={styles['friend-activity-content']}>
+        <div className={styles['friend-activity-content-top']}>
           {hasVip && <div className={`vip-icon vip-${friendActivity.vip}`} />}
           <div className={styles['name-text']} onClick={handleUserNameClick}>
             {friendActivity.name}
           </div>
           <div className={styles['timestamp-text']}>{getFormatTimeDiff(friendActivity.timestamp)}</div>
         </div>
-        <div className={styles['content-bottom']}>{friendActivity.content}</div>
+        <div className={styles['friend-activity-content-bottom']}>{friendActivity.content}</div>
       </div>
     </div>
   );

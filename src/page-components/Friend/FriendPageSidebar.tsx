@@ -6,7 +6,7 @@ import { openCreateFriendGroup, openSearchUser } from '@/services';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-import FriendGroupTab from '@/components/FriendGroupTab';
+import FriendGroupTab from './FriendGroupTab';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
