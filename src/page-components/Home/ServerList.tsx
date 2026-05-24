@@ -6,7 +6,7 @@ import type * as Types from '@/types';
 import ServerCard from './ServerCard';
 import RecommendServerCard from './RecommendServerCard';
 
-import styles from './ServerList.module.css';
+import styles from './Home.module.css';
 
 interface ServerListProps {
   title: string;
@@ -27,9 +27,9 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) =>
 
   return (
     <>
-      <div className={styles['list-title']}>{title}</div>
-      <div className={styles['container']}>
-        <div className={styles['list']}>
+      <div className={styles['server-list-title']}>{title}</div>
+      <div className={styles['server-list-container']}>
+        <div className={styles['server-list']}>
           {displayedServers.map((server) => ('online' in server ? <RecommendServerCard key={server.serverId} recommendServer={server} /> : <ServerCard key={server.serverId} server={server} />))}
         </div>
         {!canExpand ? null : expanded ? (

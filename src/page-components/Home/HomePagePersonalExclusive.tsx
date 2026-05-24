@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-import ServerList from '@/components/ServerList';
+import ServerList from './ServerList';
 
 import styles from './Home.module.css';
 

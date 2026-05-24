@@ -9,7 +9,7 @@ import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constants';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-import ServerList from '@/components/ServerList';
+import ServerList from './ServerList';
 
 import styles from './Home.module.css';
 
