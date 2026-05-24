@@ -32,10 +32,13 @@ const ChannelEventPopup: React.FC = React.memo(() => {
 
   const isCurrentChannelTab = selectTab === 'current';
   const isAllChannelTab = selectTab === 'all';
-  const filteredChannelEvents = channelEvents.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()));
-  const currentChannelEvents = channelEvents
+  const filteredChannelEvents = channelEvents
+    .filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()))
+    .sort((a, b) => b.timestamp - a.timestamp);
+  const filteredCurrentChannelEvents = channelEvents
     .filter((e) => e.prevChannelId === currentChannel.channelId || e.nextChannelId === currentChannel.channelId)
-    .filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()));
+    .filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()))
+    .sort((a, b) => b.timestamp - a.timestamp);
 
   const handleCurrentChannelTabClick = () => {
     setSelectTab('current');
@@ -63,7 +66,7 @@ const ChannelEventPopup: React.FC = React.memo(() => {
       <div className="popup-body">
         <div className={styles['event-list']} style={isCurrentChannelTab ? {} : { display: 'none' }}>
           <div className={styles['current-channel']}>{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
-          {currentChannelEvents.map((event, index) => (
+          {filteredCurrentChannelEvents.map((event, index) => (
             <EventTab key={index} event={event} section="current" />
           ))}
         </div>
