@@ -1328,7 +1328,7 @@
   background-color: var(--selected);
 }
 
-.channel-list > * {
+.channel-list .channel-list > * {
   padding-left: 25px;
 }
 
@@ -1416,7 +1416,7 @@
   padding-left: 0 !important;
 }
 
-.user-list > * {
+.channel-list .user-list > * {
   padding-left: 25px;
 }
 
