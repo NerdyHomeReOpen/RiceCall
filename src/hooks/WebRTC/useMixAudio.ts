@@ -60,37 +60,34 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
     [initAudioContext, removeMixAudio, audioContextRef, inputDesRef, inputAnalyserRef, mixNodesRef, recorderGainRef, rafIdListRef, audioProducerRef],
   );
 
-  const startMixing = useCallback(
-    () => {
-      if (!Store.store.getState().webrtc.isMicTaken) return;
+  const startMixing = useCallback(() => {
+    if (!Store.store.getState().webrtc.isMicTaken) return;
 
-      ipc.loopbackAudio.enable();
-      navigator.mediaDevices
-        .getDisplayMedia({
-          video: true,
-          audio: {
-            channelCount: 2,
-            echoCancellation: false,
-            noiseSuppression: false,
-            autoGainControl: false,
-          },
-        })
-        .then((stream) => {
-          for (const track of stream.getVideoTracks()) {
-            track.stop();
-            stream.removeTrack(track);
-          }
-          initMixAudio(stream);
-        })
-        .catch((e) => {
-          const error = e instanceof Error ? e : new Error('Unknown error');
-          new Logger('WebRTC').error(`Error capturing audio from system: ${error.message}`);
-        });
+    ipc.loopbackAudio.enable();
+    navigator.mediaDevices
+      .getDisplayMedia({
+        video: true,
+        audio: {
+          channelCount: 2,
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false,
+        },
+      })
+      .then((stream) => {
+        for (const track of stream.getVideoTracks()) {
+          track.stop();
+          stream.removeTrack(track);
+        }
+        initMixAudio(stream);
+      })
+      .catch((e) => {
+        const error = e instanceof Error ? e : new Error('Unknown error');
+        new Logger('WebRTC').error(`Error capturing audio from system: ${error.message}`);
+      });
 
-      Store.store.dispatch(Store.setWebRTC({ isMixModeActive: true }));
-    },
-    [initMixAudio],
-  );
+    Store.store.dispatch(Store.setWebRTC({ isMixModeActive: true }));
+  }, [initMixAudio]);
 
   const stopMixing = useCallback(() => {
     ipc.loopbackAudio.disable();

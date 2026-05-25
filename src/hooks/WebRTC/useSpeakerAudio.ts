@@ -16,15 +16,7 @@ interface UseSpeakerAudioDeps {
 }
 
 export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeakerAudioDeps) => {
-  const {
-    audioContextRef,
-    outputDesRef,
-    masterGainNodeRef,
-    speakerNodesRef,
-    rafIdListRef,
-    speakerRef,
-    audioProducerRef,
-  } = refs;
+  const { audioContextRef, outputDesRef, masterGainNodeRef, speakerNodesRef, rafIdListRef, speakerRef, audioProducerRef } = refs;
 
   const removeSpeakerAudio = useCallback(
     (userId: string) => {
@@ -78,7 +70,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
       speaker.volume = 0;
       speaker.autoplay = true;
       speaker.style.display = 'none';
-      speaker.play().catch(() => { });
+      speaker.play().catch(() => {});
       speaker.remove();
     },
     [removeSpeakerAudio, initAudioContext, audioContextRef, outputDesRef, masterGainNodeRef, speakerNodesRef, rafIdListRef, audioProducerRef],

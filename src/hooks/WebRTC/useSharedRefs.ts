@@ -39,10 +39,12 @@ export const useSharedRefs = () => {
   const inputAudioDeviceRef = useRef<string | null>(null);
   const echoCancellationRef = useRef<boolean>(false);
   const noiseCancellationRef = useRef<boolean>(false);
-  const recordBuffersRef = useRef<{
-    left: Float32Array<ArrayBufferLike>;
-    right: Float32Array<ArrayBufferLike>;
-  }[]>([]);
+  const recordBuffersRef = useRef<
+    {
+      left: Float32Array<ArrayBufferLike>;
+      right: Float32Array<ArrayBufferLike>;
+    }[]
+  >([]);
   const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   return {

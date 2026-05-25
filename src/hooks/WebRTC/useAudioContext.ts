@@ -27,15 +27,7 @@ registerProcessor('recorder-processor', RecorderProcessor);
 `;
 
 export const useAudioContext = (refs: SharedRefs) => {
-  const {
-    audioContextRef,
-    inputDesRef,
-    outputDesRef,
-    recorderDesRef,
-    inputAnalyserRef,
-    masterGainNodeRef,
-    speakerRef,
-  } = refs;
+  const { audioContextRef, inputDesRef, outputDesRef, recorderDesRef, inputAnalyserRef, masterGainNodeRef, speakerRef } = refs;
 
   const initPromiseRef = useRef<Promise<void> | null>(null);
 
@@ -61,9 +53,7 @@ export const useAudioContext = (refs: SharedRefs) => {
       //   await audioContext.resume();
       // }
 
-      await audioContext.audioWorklet.addModule(
-        URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })),
-      );
+      await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
 
       audioContextRef.current = audioContext;
       inputDesRef.current = audioContext.createMediaStreamDestination();
@@ -80,7 +70,7 @@ export const useAudioContext = (refs: SharedRefs) => {
       speakerRef.current.volume = 1;
       speakerRef.current.autoplay = true;
       speakerRef.current.style.display = 'none';
-      speakerRef.current.play().catch(() => { });
+      speakerRef.current.play().catch(() => {});
       document.body.appendChild(speakerRef.current);
 
       new Logger('WebRTC').info('Initialized audio context');
@@ -95,7 +85,7 @@ export const useAudioContext = (refs: SharedRefs) => {
 
   useEffect(() => {
     const initAudioOnInteraction = () => {
-      if (!audioContextRef.current || !speakerRef.current) initAudioContext()
+      if (!audioContextRef.current || !speakerRef.current) initAudioContext();
       else {
         if (audioContextRef.current.state === 'suspended') audioContextRef.current.resume();
         speakerRef.current.play();

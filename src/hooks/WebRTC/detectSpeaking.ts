@@ -44,7 +44,5 @@ export const detectSpeaking = (
     }
   }
 
-  rafIdListRef.current[targetId] = requestAnimationFrame(() =>
-    detectSpeaking(targetId, analyserNode, dataArray, rafIdListRef, audioProducerRef),
-  );
+  rafIdListRef.current[targetId] = requestAnimationFrame(() => detectSpeaking(targetId, analyserNode, dataArray, rafIdListRef, audioProducerRef));
 };

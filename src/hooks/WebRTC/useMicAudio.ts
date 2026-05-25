@@ -17,18 +17,8 @@ interface UseMicAudioDeps {
 }
 
 export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: UseMicAudioDeps) => {
-  const {
-    audioContextRef,
-    inputDesRef,
-    inputAnalyserRef,
-    micNodesRef,
-    rafIdListRef,
-    microphoneAmplificationRef,
-    inputAudioDeviceRef,
-    echoCancellationRef,
-    noiseCancellationRef,
-    audioProducerRef,
-  } = refs;
+  const { audioContextRef, inputDesRef, inputAnalyserRef, micNodesRef, rafIdListRef, microphoneAmplificationRef, inputAudioDeviceRef, echoCancellationRef, noiseCancellationRef, audioProducerRef } =
+    refs;
 
   const removeMicAudio = useCallback(() => {
     if (rafIdListRef.current['user']) {
@@ -63,8 +53,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
       const gainNode = audioContextRef.current.createGain();
-      gainNode.gain.value =
-        Store.store.getState().webrtc.micVolume / (microphoneAmplificationRef.current ? 20 : 100);
+      gainNode.gain.value = Store.store.getState().webrtc.micVolume / (microphoneAmplificationRef.current ? 20 : 100);
 
       micNodesRef.current = { stream, source: sourceNode, gain: gainNode };
 
