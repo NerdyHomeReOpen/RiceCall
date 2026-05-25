@@ -3,7 +3,22 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import { connectChannel, addUserToQueue, openDirectMessage, openUserInfo, openApplyFriend, openEditNickname, moveUserToChannel, forbidUserVoiceInChannel, forbidUserTextInChannel, openKickMemberFromChannel, openKickMemberFromServer, openBlockMember, terminateMember, openInviteMember } from '@/services';
+import {
+  connectChannel,
+  addUserToQueue,
+  openDirectMessage,
+  openUserInfo,
+  openApplyFriend,
+  openEditNickname,
+  moveUserToChannel,
+  forbidUserVoiceInChannel,
+  forbidUserTextInChannel,
+  openKickMemberFromChannel,
+  openKickMemberFromServer,
+  openBlockMember,
+  terminateMember,
+  openInviteMember,
+} from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -79,7 +94,7 @@ export const useMemberCtxMenu = ({
         .addSeparator()
         .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => terminateMember(user.userId, currentServer.serverId, t('self')))
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => openInviteMember(member.userId, currentServer.serverId))
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementCtxMenu())
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementCtxMenu())
         .build(),
     [
       member,

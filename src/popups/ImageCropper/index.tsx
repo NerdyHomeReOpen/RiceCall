@@ -61,7 +61,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   }, [cropBox]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    const rect = canvasRef.current!.getBoundingClientRect();
+    if (!canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     const { x: bx, y: by, size } = cropBox;
@@ -74,8 +76,9 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   const handleMouseUp = () => setDraggingBox(false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!draggingBox) return;
-    const rect = canvasRef.current!.getBoundingClientRect();
+    if (!draggingBox || !canvasRef.current) return;
+
+    const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     const dx = x - startPosRef.current.x;
@@ -118,14 +121,13 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   };
 
   const handleUploadBtnClick = async () => {
-    const canvas = previewRef.current;
-    if (!canvas) return;
+    if (!previewRef.current) return;
 
-    canvas.toBlob(async (blob) => {
+    previewRef.current.toBlob(async (blob) => {
       if (!blob) return;
       const arrayBuffer = await blob.arrayBuffer();
       const uint8Array = new Uint8Array(arrayBuffer);
-      ipc.popup.submit(id, uint8Array);
+      ipc.popup.submit(id, uint8Array.buffer);
       ipc.popup.close(id);
     }, 'image/webp');
   };
@@ -135,7 +137,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   };
 
   useEffect(() => {
-    const blob = new Blob([imageUnit8Array]);
+    const blob = new Blob([imageUnit8Array as unknown as ArrayBuffer]);
     const imageUrl = URL.createObjectURL(blob);
     imgRef.current.src = imageUrl;
     imgRef.current.onload = () => {

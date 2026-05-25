@@ -47,9 +47,7 @@ export const useChannelCtxMenu = ({ channel, user, currentServer, currentChannel
         .addKickChannelUsersFromServerOption({ permissionLevel, movableChannelUserIds }, () => kickUsersFromServer(movableChannelUserIds, currentServer.serverId))
         .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServer.serverId))
         .addSeparator()
-        .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () =>
-          editServer(currentServer.serverId, { receptionLobbyId: channel.channelId }),
-        )
+        .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => editServer(currentServer.serverId, { receptionLobbyId: channel.channelId }))
         .build(),
     [
       user,

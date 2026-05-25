@@ -3,7 +3,24 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import { increaseUserQueueTime, moveUserQueuePositionUp, moveUserQueuePositionDown, removeUserFromQueue, clearQueue, openDirectMessage, openUserInfo, openApplyFriend, openEditNickname, forbidUserVoiceInChannel, forbidUserTextInChannel, openKickMemberFromChannel, openKickMemberFromServer, openBlockMember, terminateMember, openInviteMember } from '@/services';
+import {
+  increaseUserQueueTime,
+  moveUserQueuePositionUp,
+  moveUserQueuePositionDown,
+  removeUserFromQueue,
+  clearQueue,
+  openDirectMessage,
+  openUserInfo,
+  openApplyFriend,
+  openEditNickname,
+  forbidUserVoiceInChannel,
+  forbidUserTextInChannel,
+  openKickMemberFromChannel,
+  openKickMemberFromServer,
+  openBlockMember,
+  terminateMember,
+  openInviteMember,
+} from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
@@ -60,17 +77,13 @@ export const useQueueUserCtxMenu = ({ user, currentServer, currentChannel, queue
         .addForbidTextOption({ permissionLevel, isSelf, isLowerLevel, isTextMuted: queueMember.isTextMuted }, () =>
           forbidUserTextInChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId, !queueMember.isTextMuted),
         )
-        .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () =>
-          openKickMemberFromChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId),
-        )
+        .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => openKickMemberFromChannel(queueMember.userId, currentServer.serverId, currentChannel.channelId))
         .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(queueMember.userId, currentServer.serverId))
         .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(queueMember.userId, currentServer.serverId))
         .addSeparator()
         .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => terminateMember(user.userId, currentServer.serverId, t('self')))
-        .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
-          openInviteMember(queueMember.userId, currentServer.serverId),
-        )
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => { }, buildMemberManagementCtxMenu())
+        .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => openInviteMember(queueMember.userId, currentServer.serverId))
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementCtxMenu())
         .build(),
     [user, currentServer, currentChannel, queueMember, isMuted, isFriend, permissionLevel, isSelf, isLowerLevel, isInLobby, t, onMuteUser, onUnmuteUser, buildMemberManagementCtxMenu],
   );

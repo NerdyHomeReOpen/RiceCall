@@ -104,7 +104,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     ImageInputRef.current?.click();
   };
 
-  const handleImageInput = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     if (!image) return;
     image.arrayBuffer().then((arrayBuffer) => {
@@ -189,7 +189,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                     <CustomThemeItem key={`custom-${i}`} index={i} customTheme={customTheme} onThemeSelect={handleThemeSelect} onThemeRemove={handleThemeRemove} />
                   ))}
                   <div className={styles['image-selector']} onClick={handleUploadImageBtnClick} />
-                  <input type="file" ref={ImageInputRef} style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp" onInput={handleImageInput} />
+                  <input type="file" ref={ImageInputRef} style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp" onChange={handleImageChange} />
                 </div>
                 {showColorPicker && (
                   <div className={styles['color-selector-box']}>

@@ -631,7 +631,7 @@ export async function uploadImage(params: uploadImageParams): Promise<{ imageNam
   const form = new FormData();
   form.append('folder', params.folder);
   form.append('imageName', params.imageName);
-  form.append('image', new Blob([params.imageUnit8Array], { type: 'image/webp' }), `${params.imageName}.svg`);
+  form.append('image', new Blob([params.imageUnit8Array as unknown as ArrayBuffer], { type: 'image/webp' }), `${params.imageName}.webp`);
   return await post('/upload/image', form);
 }
 

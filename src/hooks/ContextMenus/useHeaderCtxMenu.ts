@@ -31,7 +31,7 @@ export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: U
             onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
             onAboutUsClick: () => openAboutUs(),
           },
-          () => { },
+          () => {},
         )
         .addNetworkDiagnosisOption(() => openNetworkDiagnosis())
         .addLogoutOption(onLogout)

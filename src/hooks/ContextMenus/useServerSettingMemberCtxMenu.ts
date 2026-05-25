@@ -34,7 +34,7 @@ export const useServerSettingMemberCtxMenu = ({ user, server, member, permission
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(member.userId, server.serverId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(member.userId, server.serverId))
       .addSeparator()
-      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => { }, submenuItems)
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
       .build();
   }, [user.userId, server.serverId, member, permissionLevel, isSelf, isLowerLevel]);
 
