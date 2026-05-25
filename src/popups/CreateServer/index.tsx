@@ -48,7 +48,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
   }, [user.level, servers]);
   const canSubmit = remainingServers > 0 && serverName.trim();
 
-  const handleImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     if (!image || isUploadingRef.current) return;
     image.arrayBuffer().then((arrayBuffer) => {
@@ -136,7 +136,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
               <div className={styles['avatar-picture']}>
                 <Image src={serverAvatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
               </div>
-              <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
+              <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onChange={handleImageChange} />
               <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className="button">
                 {t('upload-avatar')}
               </label>
