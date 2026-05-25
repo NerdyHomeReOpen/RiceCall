@@ -1,7 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 

@@ -3,7 +3,7 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { rejectAllFriendApplication, openApproveFriend, openDirectMessage, openUserInfo, rejectFriendApplication } from '@/services';
 
@@ -57,19 +57,14 @@ interface FriendApplicationItemProps {
 const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo(({ application }) => {
   const { t } = useTranslation();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
+  const userId = useAppSelector((state) => state.user.data.userId);
 
   const handleSenderAvatarClick = () => {
-    openUserInfo(user.userId, application.senderId);
+    openUserInfo(userId, application.senderId);
   };
 
   const handleAcceptBtnClick = () => {
-    openApproveFriend(user.userId, application.senderId);
+    openApproveFriend(userId, application.senderId);
   };
 
   const handleRejectBtnClick = () => {
@@ -77,7 +72,7 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
   };
 
   const handleDirectMessageBtnClick = () => {
-    openDirectMessage(user.userId, application.senderId);
+    openDirectMessage(userId, application.senderId);
   };
 
   return (

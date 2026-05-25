@@ -2,7 +2,7 @@ import packageJson from '../../package.json' with { type: 'json' };
 
 import { t } from 'i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { post, get } from '@/api';
 

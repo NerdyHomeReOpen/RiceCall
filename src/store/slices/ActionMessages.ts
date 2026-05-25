@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 interface ActionMessagesState {
   data: (Types.ChannelMessage | Types.PromptMessage)[];

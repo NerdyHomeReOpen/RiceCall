@@ -2,8 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -40,41 +39,23 @@ const ServerPageContent: React.FC = React.memo(() => {
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      serverId: state.currentServer.data.serverId,
-      permissionLevel: state.currentServer.data.permissionLevel,
-      announcement: state.currentServer.data.announcement,
-    }),
-    shallowEqual,
-  );
-
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      permissionLevel: state.currentChannel.data.permissionLevel,
-      announcement: state.currentChannel.data.announcement,
-      voiceMode: state.currentChannel.data.voiceMode,
-      bitrate: state.currentChannel.data.bitrate,
-      forbidQueue: state.currentChannel.data.forbidQueue,
-    }),
-    shallowEqual,
-  );
-
-  const isQueueControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled), shallowEqual);
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
+  const currentServerAnnouncement = useAppSelector((state) => state.currentServer.data.announcement);
+  const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
+  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
+  const currentChannelAnnouncement = useAppSelector((state) => state.currentChannel.data.announcement);
+  const currentChannelVoiceMode = useAppSelector((state) => state.currentChannel.data.voiceMode);
+  const currentChannelBitrate = useAppSelector((state) => state.currentChannel.data.bitrate);
+  const currentChannelForbidQueue = useAppSelector((state) => state.currentChannel.data.forbidQueue);
+  const isQueueControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled));
   const channelMessages = useAppSelector((state) => state.channelMessages.data, shallowEqual);
   const actionMessages = useAppSelector((state) => state.actionMessages.data, shallowEqual);
-  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive, shallowEqual);
-  const isRecording = useAppSelector((state) => state.webrtc.isRecording, shallowEqual);
-  const recordTime = useAppSelector((state) => state.webrtc.recordTime, shallowEqual);
+  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive);
+  const isRecording = useAppSelector((state) => state.webrtc.isRecording);
+  const recordTime = useAppSelector((state) => state.webrtc.recordTime);
 
   const annAreaRef = useRef<HTMLDivElement>(null);
   const showAreaRef = useRef<HTMLIFrameElement>(null);
@@ -88,9 +69,21 @@ const ServerPageContent: React.FC = React.memo(() => {
   const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
   const [centralAreaMode, setCentralAreaMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
+  const isChannelMod = permissionLevel >= Types.Permission.ChannelMod;
+  const isCentralAreaNoneMode = centralAreaMode === 'none';
+  const isCentralAreaAnnouncementMode = centralAreaMode === 'announcement';
+  const isCentralAreaShowMode = centralAreaMode === 'show';
+  const isChannelUIClassicMode = channelUIMode === 'classic' || (channelUIMode === 'auto' && isCentralAreaAnnouncementMode);
+  const isChannelUIThreeLineMode = channelUIMode === 'three-line' || (channelUIMode === 'auto' && isCentralAreaShowMode);
+  const isCurrentChannelFreeMode = currentChannelVoiceMode === 'free';
+  const isCurrentChannelAdminMode = currentChannelVoiceMode === 'admin';
+  const isCurrentChannelQueueMode = currentChannelVoiceMode === 'queue';
+
   const { buildContextMenu: buildAnnouncementAreaContextMenu } = useAnnouncementAreaCtxMenu({
     onCloseAnnouncement: () => setCentralAreaMode('none'),
   });
+
   const { buildContextMenu: buildMessageAreaContextMenu } = useMessageAreaCtxMenu({
     onOpenAnnouncement: () => setCentralAreaMode('announcement'),
     onClearMessages: () => {
@@ -98,23 +91,15 @@ const ServerPageContent: React.FC = React.memo(() => {
       dispatch(Store.clearActionMessages());
     },
   });
+
   const { buildContextMenu: buildVoiceModeContextMenu } = useVoiceModeCtxMenu({
-    currentServer,
-    currentChannel,
-    permissionLevel: Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel),
+    currentServerId,
+    currentChannelId,
+    currentChannelVoiceMode,
+    currentChannelForbidQueue,
+    permissionLevel,
     isQueueControlled,
   });
-
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const isChannelMod = permissionLevel >= Permission.ChannelMod;
-  const isCentralAreaNoneMode = centralAreaMode === 'none';
-  const isCentralAreaAnnouncementMode = centralAreaMode === 'announcement';
-  const isCentralAreaShowMode = centralAreaMode === 'show';
-  const isChannelUIClassicMode = channelUIMode === 'classic' || (channelUIMode === 'auto' && isCentralAreaAnnouncementMode);
-  const isChannelUIThreeLineMode = channelUIMode === 'three-line' || (channelUIMode === 'auto' && isCentralAreaShowMode);
-  const isCurrentChannelFreeMode = currentChannel.voiceMode === 'free';
-  const isCurrentChannelAdminMode = currentChannel.voiceMode === 'admin';
-  const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
 
   const clearUnreadMessageNotification = () => {
     setIsAtBottom(true);
@@ -169,7 +154,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   };
 
   const handleWidgetMoreClick = () => {
-    openServerApplication(user.userId, currentServer.serverId, (action) => {
+    openServerApplication(userId, currentServerId, (action) => {
       if (action === 'openShowFrame') setCentralAreaMode('show');
       if (action === 'openChannelEvent') openChannelEvent();
     });
@@ -218,8 +203,8 @@ const ServerPageContent: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
-    changeBitrate(currentChannel.bitrate);
-  }, [currentChannel.bitrate, changeBitrate]);
+    changeBitrate(currentChannelBitrate);
+  }, [currentChannelBitrate, changeBitrate]);
 
   useEffect(() => {
     if (actionMessages.length === 0) setShowActionMessage(false);
@@ -227,8 +212,8 @@ const ServerPageContent: React.FC = React.memo(() => {
   }, [actionMessages]);
 
   useEffect(() => {
-    if (currentServer.serverId && currentServer.announcement) openServerAnnouncement(currentServer.announcement);
-  }, [currentServer.serverId, currentServer.announcement]);
+    if (currentServerId && currentServerAnnouncement) openServerAnnouncement(currentServerAnnouncement);
+  }, [currentServerId, currentServerAnnouncement]);
 
   useEffect(() => {
     if (isAtBottom) setUnreadMessageCount(0);
@@ -266,12 +251,12 @@ const ServerPageContent: React.FC = React.memo(() => {
     const lastMessage = channelMessages[channelMessages.length - 1];
     const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
 
-    if (isBottom || lastMessage.type !== 'general' || lastMessage.userId === user.userId) {
+    if (isBottom || lastMessage.type !== 'general' || lastMessage.userId === userId) {
       setTimeout(() => scrollToBottom(), 50);
     } else {
       setUnreadMessageCount((prev) => prev + 1);
     }
-  }, [channelMessages, user.userId, scrollToBottom]);
+  }, [channelMessages, userId, scrollToBottom]);
 
   useEffect(() => {
     const changeChannelUIMode = (channelUIMode: Types.ChannelUIMode) => {
@@ -314,7 +299,7 @@ const ServerPageContent: React.FC = React.memo(() => {
               style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
               onContextMenu={handleAnnAreaContextMenu}
             >
-              <MarkdownContent markdownText={currentChannel.announcement} imageSize={'big'} />
+              <MarkdownContent markdownText={currentChannelAnnouncement} imageSize={'big'} />
             </div>
           ) : isCentralAreaShowMode ? (
             <div ref={showAreaRef} className={styles['show-area']} style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>

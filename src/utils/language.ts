@@ -1,22 +1,22 @@
 import { t } from '@/i18n';
 
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 /**
  * Get the translated text for a permission level
  * @param permission - The permission level
  * @returns The translated text for the permission level
  */
-export function getPermissionText(permission: Permission): string {
-  const permissionMap: Record<Permission, string> = {
-    [Permission.Guest]: t('guest'),
-    [Permission.Member]: t('member'),
-    [Permission.ChannelMod]: t('channel-mod'),
-    [Permission.ChannelAdmin]: t('channel-admin'),
-    [Permission.ServerAdmin]: t('server-admin'),
-    [Permission.ServerOwner]: t('server-owner'),
-    [Permission.Staff]: t('staff'),
-    [Permission.SuperAdmin]: t('super-admin'),
+export function getPermissionText(permission: Types.Permission): string {
+  const permissionMap: Record<Types.Permission, string> = {
+    [Types.Permission.Guest]: t('guest'),
+    [Types.Permission.Member]: t('member'),
+    [Types.Permission.ChannelMod]: t('channel-mod'),
+    [Types.Permission.ChannelAdmin]: t('channel-admin'),
+    [Types.Permission.ServerAdmin]: t('server-admin'),
+    [Types.Permission.ServerOwner]: t('server-owner'),
+    [Types.Permission.Staff]: t('staff'),
+    [Types.Permission.SuperAdmin]: t('super-admin'),
   };
   return permissionMap[permission] || t('unknown-user');
 }

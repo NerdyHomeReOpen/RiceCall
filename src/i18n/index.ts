@@ -1,7 +1,7 @@
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import I18nStorage from '@/i18n/storage';
 

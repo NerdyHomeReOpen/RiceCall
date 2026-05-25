@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -19,24 +19,16 @@ const ChannelEventPopup: React.FC = React.memo(() => {
   const [selectTab, setSelectTab] = useState<'current' | 'all'>('current');
   const [query, setQuery] = useState<string>('');
 
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      isLobby: state.currentChannel.data.isLobby,
-      name: state.currentChannel.data.name,
-    }),
-    shallowEqual,
-  );
-
+  const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
+  const currentChannelIsLobby = useAppSelector((state) => state.currentChannel.data.isLobby);
+  const currentChannelName = useAppSelector((state) => state.currentChannel.data.name);
   const channelEvents = useAppSelector((state) => state.channelEvents.data, shallowEqual);
 
   const isCurrentChannelTab = selectTab === 'current';
   const isAllChannelTab = selectTab === 'all';
   const filteredChannelEvents = channelEvents.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()));
   const sortedChannelEvents = filteredChannelEvents.sort((a, b) => b.timestamp - a.timestamp);
-  const sortedCurrentChannelEvents = filteredChannelEvents
-    .filter((e) => e.prevChannelId === currentChannel.channelId || e.nextChannelId === currentChannel.channelId)
-    .sort((a, b) => b.timestamp - a.timestamp);
+  const sortedCurrentChannelEvents = filteredChannelEvents.filter((e) => e.prevChannelId === currentChannelId || e.nextChannelId === currentChannelId).sort((a, b) => b.timestamp - a.timestamp);
 
   const handleCurrentChannelTabClick = () => {
     setSelectTab('current');
@@ -63,7 +55,7 @@ const ChannelEventPopup: React.FC = React.memo(() => {
       </div>
       <div className="popup-body">
         <div className={styles['event-list']} style={isCurrentChannelTab ? {} : { display: 'none' }}>
-          <div className={styles['current-channel']}>{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
+          <div className={styles['current-channel']}>{currentChannelIsLobby ? t(currentChannelName) : currentChannelName}</div>
           {sortedCurrentChannelEvents.map((event, index) => (
             <EventTab key={index} event={event} section="current" />
           ))}
@@ -97,35 +89,26 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      serverId: state.currentServer.data.serverId,
-      permissionLevel: state.currentServer.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      permissionLevel: state.currentChannel.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
+  const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
+  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
 
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
+  const isSelf = event.userId === userId;
+  const isLowerLevel = event.permissionLevel < permissionLevel;
 
-  const { buildContextMenu } = useChannelEventCtxMenu({ user, currentServer, event, permissionLevel });
+  const { buildContextMenu } = useChannelEventCtxMenu({
+    userId,
+    serverId: currentServerId,
+    eventUserId: event.userId,
+    permissionLevel,
+    isSelf,
+    isLowerLevel,
+  });
 
   const getChannelName = (channelId: string | null) => {
     const channel = channels.find((c) => c.channelId === channelId);
@@ -158,13 +141,13 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
   };
 
   const getCurrentActionContent = (channelEvent: Types.ChannelEvent) => {
-    if (channelEvent.type === 'join' || (channelEvent.type === 'move' && channelEvent.nextChannelId === currentChannel.channelId)) {
+    if (channelEvent.type === 'join' || (channelEvent.type === 'move' && channelEvent.nextChannelId === currentChannelId)) {
       return (
         <div className={`${styles['action-content']} ${styles['green']}`} title={t('join-current-channel')}>
           {t('join-current-channel')}
         </div>
       );
-    } else if (channelEvent.type === 'leave' || (channelEvent.type === 'move' && channelEvent.prevChannelId === currentChannel.channelId)) {
+    } else if (channelEvent.type === 'leave' || (channelEvent.type === 'move' && channelEvent.prevChannelId === currentChannelId)) {
       return (
         <div className={`${styles['action-content']} ${styles['red']}`} title={t('leave-current-channel')}>
           {t('leave-current-channel')}

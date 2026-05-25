@@ -1,6 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import NotificationMenuItem from './NotificationMenuItem';
 

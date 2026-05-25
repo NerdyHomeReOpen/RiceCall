@@ -1,28 +1,28 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { openUserInfo, unblockUserFromServer } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
 interface UseServerSettingBlockedMemberCtxMenuProps {
-  user: Pick<Types.User, 'userId'>;
-  server: Pick<Types.Server, 'serverId'>;
-  member: Pick<Types.Member, 'userId' | 'name'>;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
+  memberUserId: Types.Member['userId'];
+  memberName: Types.Member['name'];
   permissionLevel: Types.Permission;
+  isSelf: boolean;
 }
 
-export const useServerSettingBlockedMemberCtxMenu = ({ user, server, member, permissionLevel }: UseServerSettingBlockedMemberCtxMenuProps) => {
-  const isSelf = member.userId === user.userId;
-
+export const useServerSettingBlockedMemberCtxMenu = ({ userId, serverId, memberUserId, memberName, permissionLevel, isSelf }: UseServerSettingBlockedMemberCtxMenuProps) => {
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
-        .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => unblockUserFromServer(member.userId, server.serverId, member.name))
+        .addViewProfileOption(() => openUserInfo(userId, memberUserId))
+        .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => unblockUserFromServer(memberUserId, serverId, memberName))
         .build(),
-    [user.userId, server.serverId, member, permissionLevel, isSelf],
+    [userId, serverId, memberUserId, memberName, permissionLevel, isSelf],
   );
 
   return { buildContextMenu };

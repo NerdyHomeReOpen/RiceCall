@@ -1,4 +1,4 @@
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 

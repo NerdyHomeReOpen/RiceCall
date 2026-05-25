@@ -1,4 +1,4 @@
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 export interface PopupSizeConfig {
   width: number;

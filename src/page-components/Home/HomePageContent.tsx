@@ -3,7 +3,7 @@ import Image from 'next/image';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { ANNOUNCEMENT_SLIDE_INTERVAL } from '@/constants';
 

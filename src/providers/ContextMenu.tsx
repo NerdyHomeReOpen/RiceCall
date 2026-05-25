@@ -1,6 +1,6 @@
 import React, { useEffect, useContext, createContext, ReactNode, useCallback, useMemo } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import ContextMenu from '@/components/ContextMenu';
 import MicContextMenu from '@/components/MicContextMenu';

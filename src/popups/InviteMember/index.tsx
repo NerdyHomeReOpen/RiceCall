@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 
 import * as ipc from '@/main/ipc';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { sendMemberInvitation, editMemberInvitation } from '@/services';
 

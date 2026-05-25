@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as Store from '@/store';
 
@@ -31,61 +31,48 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      serverId: state.currentServer.data.serverId,
-      permissionLevel: state.currentServer.data.permissionLevel,
-      lobbyId: state.currentServer.data.lobbyId,
-    }),
-    shallowEqual,
-  );
-
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      permissionLevel: state.currentChannel.data.permissionLevel,
-      categoryId: state.currentChannel.data.categoryId,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
+  const currentServerLobbyId = useAppSelector((state) => state.currentServer.data.lobbyId);
+  const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
+  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
+  const currentChannelCategoryId = useAppSelector((state) => state.currentChannel.data.categoryId);
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const queueUser = useAppSelector((state) => state.queueUsers.data.find((qu) => qu.userId === queueUserId), shallowEqual);
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`, shallowEqual);
-  const isSpeaking = useAppSelector((state) => (queueUserId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[queueUserId]), shallowEqual);
-  const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[queueUserId], shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`);
+  const isSpeaking = useAppSelector((state) => (queueUserId === userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[queueUserId]));
+  const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[queueUserId]);
 
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
   const queueMember = useMemo(() => {
     const onlineMember = onlineMembers.find((om) => om.userId === queueUserId);
     if (!onlineMember || !queueUser) return getDefaultQueueMember();
     return { ...queueUser, ...onlineMember };
   }, [onlineMembers, queueUser, queueUserId]);
   const isFriend = useMemo(() => friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === 2), [friends, queueMember.userId]);
-  const isSelf = queueMember.userId === user.userId;
+  const isSelf = queueMember.userId === userId;
   const hasVip = queueMember.vip > 0;
   const isOnMic = queueMember.position === 0;
-  const isControlled = isOnMic && queueMember.isQueueControlled && permissionLevel < Permission.ChannelMod;
+  const isControlled = isOnMic && queueMember.isQueueControlled && permissionLevel < Types.Permission.ChannelMod;
 
   const getStatusIcon = () => {
-    if (isMuted || queueMember.isVoiceMuted || (permissionLevel < Permission.ChannelMod && isControlled)) return 'muted';
+    if (isMuted || queueMember.isVoiceMuted || (permissionLevel < Types.Permission.ChannelMod && isControlled)) return 'muted';
     if (isSpeaking) return 'play';
     return '';
   };
 
   const { buildContextMenu: buildTabContextMenu } = useQueueUserCtxMenu({
-    user,
-    currentServer,
-    currentChannel,
+    userId,
+    userPermissionLevel,
+    currentServerId,
+    currentServerPermissionLevel,
+    currentServerLobbyId,
+    currentChannelId,
+    currentChannelPermissionLevel,
+    currentChannelCategoryId,
     queueMember,
     isMuted,
     isFriend,
@@ -100,7 +87,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   const handleTabDoubleClick = () => {
     if (isSelf) return;
-    openDirectMessage(user.userId, queueMember.userId);
+    openDirectMessage(userId, queueMember.userId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

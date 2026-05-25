@@ -1,9 +1,7 @@
-import React, { useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import { openUserInfo } from '@/services';
 
@@ -28,50 +26,37 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      serverId: state.currentServer.data.serverId,
-      permissionLevel: state.currentServer.data.permissionLevel,
-      lobbyId: state.currentServer.data.lobbyId,
-    }),
-    shallowEqual,
-  );
-
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      permissionLevel: state.currentChannel.data.permissionLevel,
-      categoryId: state.currentChannel.data.categoryId,
-    }),
-    shallowEqual,
-  );
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
+  const currentServerLobbyId = useAppSelector((state) => state.currentServer.data.lobbyId);
+  const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
+  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
+  const currentChannelCategoryId = useAppSelector((state) => state.currentChannel.data.categoryId);
 
   const hasVip = messageGroup.vip > 0;
   const formattedTimestamp = getFormatTimestamp(messageGroup.timestamp);
-  const formattedMessageContents = useMemo(
-    () =>
-      messageGroup.contents.map((content) =>
-        content
-          .split(' ')
-          .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
-          .join(' '),
-      ),
-    [messageGroup.contents, t],
+  const formattedMessageContents = messageGroup.contents.map((content) =>
+    content
+      .split(' ')
+      .map((c) => (ALLOWED_MESSAGE_KEYS.includes(c) ? t(c) : c))
+      .join(' '),
   );
 
   const { buildContextMenu: buildMessageContextMenu } = useMessageCtxMenu({
-    user,
-    currentServer,
-    currentChannel,
-    member: messageGroup,
+    userId,
+    userPermissionLevel,
+    currentServerId,
+    currentServerPermissionLevel,
+    currentServerLobbyId,
+    currentChannelId,
+    currentChannelPermissionLevel,
+    currentChannelCategoryId,
+    memberUserId: messageGroup.userId,
+    memberPermissionLevel: messageGroup.permissionLevel,
+    memberName: messageGroup.nickname || messageGroup.name,
+    memberCurrentChannelId: messageGroup.currentChannelId,
   });
 
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -82,13 +67,13 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   };
 
   const handleUsernameClick = () => {
-    openUserInfo(user.userId, messageGroup.userId);
+    openUserInfo(userId, messageGroup.userId);
   };
 
   return (
     <div className={styles['message-box']}>
       <div className={`${styles['details']}`} onContextMenu={handleMessageContextMenu}>
-        {messageGroup.permissionLevel >= Permission.ChannelMod && <div className={`permission-${messageGroup.gender} permission-lv-${messageGroup.permissionLevel}`} />}
+        {messageGroup.permissionLevel >= Types.Permission.ChannelMod && <div className={`permission-${messageGroup.gender} permission-lv-${messageGroup.permissionLevel}`} />}
         {hasVip && <div className={`vip-icon vip-${messageGroup.vip}`} />}
         <div className={`${styles['username-text']} ${hasVip ? styles['vip'] : ''}`} onClick={handleUsernameClick}>
           {messageGroup.nickname || messageGroup.name}

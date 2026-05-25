@@ -1,9 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -21,45 +19,27 @@ const MicButton: React.FC = React.memo(() => {
   const { showMicContextMenu } = useContextMenu();
   const { takeMic, releaseMic, stopMixing } = useWebRTC();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      serverId: state.currentServer.data.serverId,
-      permissionLevel: state.currentServer.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      permissionLevel: state.currentChannel.data.permissionLevel,
-      voiceMode: state.currentChannel.data.voiceMode,
-      isVoiceMuted: state.currentChannel.data.isVoiceMuted,
-    }),
-    shallowEqual,
-  );
-
-  const queuePosition = useAppSelector((state) => state.queueUsers.data.find((q) => q.userId === user.userId)?.position, shallowEqual);
-  const isQueueControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled), shallowEqual);
-  const isSpeakKeyPressed = useAppSelector((state) => state.webrtc.isSpeakKeyPressed, shallowEqual);
-  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive, shallowEqual);
-  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted, shallowEqual);
-  const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel, shallowEqual);
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
+  const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
+  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
+  const currentChannelVoiceMode = useAppSelector((state) => state.currentChannel.data.voiceMode);
+  const currentChannelIsVoiceMuted = useAppSelector((state) => state.currentChannel.data.isVoiceMuted);
+  const queuePosition = useAppSelector((state) => state.queueUsers.data.find((q) => q.userId === userId)?.position);
+  const isQueueControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled));
+  const isSpeakKeyPressed = useAppSelector((state) => state.webrtc.isSpeakKeyPressed);
+  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive);
+  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
+  const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel);
 
   const [speakingMode, setSpeakingMode] = useState<Types.SpeakingMode>('key');
   const [speakingKey, setSpeakingKey] = useState<string>('');
 
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
-  const isControlled = permissionLevel < Permission.ChannelMod && isQueueControlled;
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
+  const isCurrentChannelQueueMode = currentChannelVoiceMode === 'queue';
+  const isControlled = permissionLevel < Types.Permission.ChannelMod && isQueueControlled;
   const isQueuing = queuePosition !== undefined && queuePosition > 0;
   const isMicTaken = queuePosition !== undefined && queuePosition <= 0;
   const isIdling = !isMicTaken && !isQueuing;
@@ -73,7 +53,7 @@ const MicButton: React.FC = React.memo(() => {
   const getMicSubText = () => {
     if (isIdling) return '';
     if (isQueuing) return t('in-queue-position', { '0': queuePosition });
-    if (currentChannel.isVoiceMuted) return t('mic-forbidden');
+    if (currentChannelIsVoiceMuted) return t('mic-forbidden');
     if (isControlled) return t('mic-controlled');
     if (speakingMode === 'key' && !isSpeakKeyPressed) {
       return t('press-key-to-speak', { '0': speakingKey });
@@ -87,8 +67,8 @@ const MicButton: React.FC = React.memo(() => {
     let className = styles['mic-button'];
     if (isMicTaken) className += ` ${styles['speaking']}`;
     if (isQueuing) className += ` ${styles['queuing']}`;
-    if (currentChannel.isVoiceMuted || isControlled) className += ` ${styles['muted']}`;
-    if (!isCurrentChannelQueueMode || (permissionLevel < Permission.ChannelMod && isIdling)) className += ` ${styles['no-selection']}`;
+    if (currentChannelIsVoiceMuted || isControlled) className += ` ${styles['muted']}`;
+    if (!isCurrentChannelQueueMode || (permissionLevel < Types.Permission.ChannelMod && isIdling)) className += ` ${styles['no-selection']}`;
     return className;
   };
 
@@ -101,17 +81,17 @@ const MicButton: React.FC = React.memo(() => {
             id: 'untake-mic',
             label: t('untake-mic'),
             show: isCurrentChannelQueueMode,
-            onClick: () => leaveQueue(currentServer.serverId, currentChannel.channelId),
+            onClick: () => leaveQueue(currentServerId, currentChannelId),
           },
         ]);
-      } else if (permissionLevel >= Permission.ChannelMod) {
+      } else if (permissionLevel >= Types.Permission.ChannelMod) {
         const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
         showMicContextMenu(x, y, 'right-top', [
           {
             id: 'take-mic-in-queue',
             label: t('take-mic-in-queue'),
             show: isCurrentChannelQueueMode,
-            onClick: () => joinQueue(currentServer.serverId, currentChannel.channelId),
+            onClick: () => joinQueue(currentServerId, currentChannelId),
           },
           {
             id: 'separator',
@@ -121,26 +101,26 @@ const MicButton: React.FC = React.memo(() => {
             id: 'take-mic-directly',
             label: t('take-mic-directly'),
             show: isCurrentChannelQueueMode,
-            onClick: () => joinQueue(currentServer.serverId, currentChannel.channelId, -2),
+            onClick: () => joinQueue(currentServerId, currentChannelId, -2),
           },
         ]);
       } else {
-        joinQueue(currentServer.serverId, currentChannel.channelId);
+        joinQueue(currentServerId, currentChannelId);
       }
     } else {
       if (isMicTaken) {
-        leaveQueue(currentServer.serverId, currentChannel.channelId);
+        leaveQueue(currentServerId, currentChannelId);
       } else {
-        joinQueue(currentServer.serverId, currentChannel.channelId);
+        joinQueue(currentServerId, currentChannelId);
       }
     }
   };
 
   useEffect(() => {
-    if (isMicTaken && !isControlled) takeMic(currentChannel.channelId);
+    if (isMicTaken && !isControlled) takeMic(currentChannelId);
     else releaseMic();
     stopMixing();
-  }, [isMicTaken, isControlled, currentChannel.channelId, takeMic, releaseMic, stopMixing]);
+  }, [isMicTaken, isControlled, currentChannelId, takeMic, releaseMic, stopMixing]);
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {

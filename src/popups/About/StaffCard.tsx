@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { FaGithub, FaDiscord } from 'react-icons/fa';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import styles from './About.module.css';
 

@@ -1,9 +1,9 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as Store from '@/store';
 
@@ -30,70 +30,58 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   const { locateMe } = useLocateMeContext();
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      serverId: state.currentServer.data.serverId,
-      permissionLevel: state.currentServer.data.permissionLevel,
-      receptionLobbyId: state.currentServer.data.receptionLobbyId,
-      favorite: state.currentServer.data.favorite,
-      avatarUrl: state.currentServer.data.avatarUrl,
-      name: state.currentServer.data.name,
-      specialId: state.currentServer.data.specialId,
-      displayId: state.currentServer.data.displayId,
-      isVerified: state.currentServer.data.isVerified,
-      receiveApply: state.currentServer.data.receiveApply,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
+  const currentServerFavorite = useAppSelector((state) => state.currentServer.data.favorite);
+  const currentServerAvatarUrl = useAppSelector((state) => state.currentServer.data.avatarUrl);
+  const currentServerName = useAppSelector((state) => state.currentServer.data.name);
+  const currentServerSpecialId = useAppSelector((state) => state.currentServer.data.specialId);
+  const currentServerDisplayId = useAppSelector((state) => state.currentServer.data.displayId);
+  const currentServerIsVerified = useAppSelector((state) => state.currentServer.data.isVerified);
+  const currentServerReceiveApply = useAppSelector((state) => state.currentServer.data.receiveApply);
   const currentChannel = useAppSelector((state) => state.currentChannel.data, shallowEqual);
-  const memberApplicationsCount = useAppSelector((state) => state.memberApplications.data.length, shallowEqual);
+  const memberApplicationsCount = useAppSelector((state) => state.memberApplications.data.length);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
   const queueUserIds = useAppSelector((state) => state.queueUsers.data.filter((q) => q.position >= 0).map((q) => q.userId), shallowEqual);
-  const latency = useAppSelector((state) => state.socket.latency, shallowEqual);
-  const rtcLatency = useAppSelector((state) => state.webrtc.latency, shallowEqual);
+  const latency = useAppSelector((state) => state.socket.latency);
+  const rtcLatency = useAppSelector((state) => state.webrtc.latency);
 
   const queueListRef = useRef<HTMLDivElement>(null);
   const isResizingQueueListRef = useRef<boolean>(false);
 
   const [selectedTabId, setSelectedTabId] = useState<'all' | 'current'>('all');
 
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
-  const movableServerUserIds = useMemo(
-    () => onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId),
-    [onlineMembers, user.userId, permissionLevel],
-  );
-  const sortedChannels = useMemo(() => [...channels].filter((c) => !c.categoryId).sort((a, b) => a.order - b.order), [channels]);
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel);
+  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
+  const sortedChannels = [...channels].filter((c) => !c.categoryId).sort((a, b) => a.order - b.order);
   const isAllTab = selectedTabId === 'all';
   const isCurrentTab = selectedTabId === 'current';
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
   const connectStatus = 4 - Math.floor(Number(Math.max(latency, rtcLatency)) / 50);
-  const hasNewMemberApplications = permissionLevel >= Permission.ServerAdmin && memberApplicationsCount > 0;
+  const hasNewMemberApplications = permissionLevel >= Types.Permission.ServerAdmin && memberApplicationsCount > 0;
 
   const handleLocateMe = () => {
     locateMe();
-    dispatch(Store.setSelectedItemId(`user-${user.userId}`));
+    dispatch(Store.setSelectedItemId(`user-${userId}`));
   };
 
   const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingCtxMenu({
-    user,
-    currentServer,
+    userId,
+    serverId: currentServerId,
+    isServerReceiveApply: currentServerReceiveApply,
+    isServerFavorite: currentServerFavorite,
+    permissionLevel,
     onLocateMe: handleLocateMe,
   });
 
   const { buildContextMenu: buildChannelListContextMenu } = useChannelListCtxMenu({
-    user,
-    currentServer,
-    currentChannel,
+    userId,
+    serverId: currentServerId,
+    channelId: currentChannel.channelId,
+    permissionLevel,
     movableServerUserIds,
   });
 
@@ -108,7 +96,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   };
 
   const handleInviteFriendClick = () => {
-    openInviteFriend(user.userId, currentServer.serverId);
+    openInviteFriend(userId, currentServerId);
   };
 
   const handleServerSettingClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -119,7 +107,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   };
 
   const handleServerAvatarClick = () => {
-    openServerSetting(user.userId, currentServer.serverId);
+    openServerSetting(userId, currentServerId);
   };
 
   const handleChannelListContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -154,15 +142,15 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     <>
       <div className={styles['sidebar-header']}>
         <div className={styles['server-avatar']} onClick={handleServerAvatarClick}>
-          <Image src={currentServer.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={50} height={50} loading="lazy" draggable="false" />
+          <Image src={currentServerAvatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={50} height={50} loading="lazy" draggable="false" />
         </div>
         <div className={styles['server-info-wrapper']}>
           <div className={styles['server-info-box']}>
-            {!!currentServer.isVerified && <div className={styles['server-verify-icon']} title={t('official-verified-server')} />}
-            <div className={styles['server-name-text']}>{currentServer.name} </div>
+            {!!currentServerIsVerified && <div className={styles['server-verify-icon']} title={t('official-verified-server')} />}
+            <div className={styles['server-name-text']}>{currentServerName} </div>
           </div>
           <div className={styles['server-info-box']}>
-            <div className={styles['server-id-text']}>{currentServer.specialId || currentServer.displayId}</div>
+            <div className={styles['server-id-text']}>{currentServerSpecialId || currentServerDisplayId}</div>
             <div className={styles['server-online-count-text']}>{onlineMembers.length}</div>
             <div className={styles['server-options']}>
               <div className={styles['invitation-button']} onClick={handleInviteFriendClick} />

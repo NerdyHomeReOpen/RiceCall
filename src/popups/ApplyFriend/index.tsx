@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -20,13 +20,7 @@ interface ApplyFriendPopupProps {
 }
 
 const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, receiver, friendApplication }) => {
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   const [section, setSection] = useState<number>(friendApplication ? 1 : 0);
@@ -38,7 +32,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, rece
   const isEditSection = section === 2;
 
   const handleReceiverNameClick = () => {
-    openUserInfo(user.userId, receiver.userId);
+    openUserInfo(userId, receiver.userId);
   };
 
   const handleCreateFriendGroupBtnClick = () => {

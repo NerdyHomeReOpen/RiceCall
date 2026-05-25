@@ -8,7 +8,7 @@ import Color from '@tiptap/extension-color';
 import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -58,15 +58,9 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   const fileInputRef = useRef<HTMLInputElement>(null);
   const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userAvatarUrl = useAppSelector((state) => state.user.data.avatarUrl);
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
-
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      avatarUrl: state.user.data.avatarUrl,
-    }),
-    shallowEqual,
-  );
 
   const [messageInput, setMessageInput] = useState<string>('');
   const [targetCurrentServer, setTargetCurrentServer] = useState<Types.Server | null>(null);
@@ -192,7 +186,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleApplyFriendBtnClick = () => {
-    openApplyFriend(user.userId, target.userId);
+    openApplyFriend(userId, target.userId);
   };
 
   const handleBlockUserBtnClick = () => {
@@ -208,11 +202,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleTargetAvatarClick = () => {
-    openUserInfo(user.userId, target.userId);
+    openUserInfo(userId, target.userId);
   };
 
   const handleUserAvatarClick = () => {
-    openUserInfo(user.userId, user.userId);
+    openUserInfo(userId, userId);
   };
 
   const handleServerNameClick = () => {
@@ -220,7 +214,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleMessageHistoryBtnClick = () => {
-    openChatHistory(user.userId, target.userId);
+    openChatHistory(userId, target.userId);
   };
 
   const handleScreenShotBtnClick = () => {
@@ -280,14 +274,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     const lastMessage = directMessages[directMessages.length - 1];
     const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
 
-    if (lastMessage.type !== 'dm' || lastMessage.userId === user.userId) {
+    if (lastMessage.type !== 'dm' || lastMessage.userId === userId) {
       setTimeout(() => scrollToBottom(), 50);
     } else if (isBottom) {
       setTimeout(() => scrollToBottom(), 50);
     } else {
       setUnreadMessageCount((prev) => prev + 1);
     }
-  }, [directMessages, user.userId, scrollToBottom]);
+  }, [directMessages, userId, scrollToBottom]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -306,8 +300,8 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
-        const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
-        const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
+        const user1Id = userId.localeCompare(target.userId) < 0 ? userId : target.userId;
+        const user2Id = userId.localeCompare(target.userId) < 0 ? target.userId : userId;
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
 
         if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
@@ -316,15 +310,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     if (event === 'directMessage') onDirectMessage(message);
     const unsub = ipc.socket.on('directMessage', onDirectMessage);
     return () => unsub();
-  }, [event, message, user.userId, target.userId]);
+  }, [event, message, userId, target.userId]);
 
   useEffect(() => {
     const onShakeWindow = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
-        const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
-        const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
+        const user1Id = userId.localeCompare(target.userId) < 0 ? userId : target.userId;
+        const user2Id = userId.localeCompare(target.userId) < 0 ? target.userId : userId;
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
 
         if (isCurrentConversation) {
@@ -349,7 +343,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     if (event === 'shakeWindow') onShakeWindow(message);
     const unsub = ipc.socket.on('shakeWindow', onShakeWindow);
     return () => unsub();
-  }, [event, message, user.userId, target.userId]);
+  }, [event, message, userId, target.userId]);
 
   return (
     <div className="popup-wrapper">
@@ -384,7 +378,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
           </div>
           <div className={styles['user-box']}>
             <div className={`${styles['avatar-picture']}`} onClick={handleUserAvatarClick}>
-              <Image src={user.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={100} height={100} loading="lazy" draggable="false" />
+              <Image src={userAvatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={100} height={100} loading="lazy" draggable="false" />
             </div>
           </div>
         </div>

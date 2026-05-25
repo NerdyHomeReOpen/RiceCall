@@ -1,20 +1,22 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { openUserInfo } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
 interface UsePromptMessageCtxMenuProps {
-  user: Pick<Types.User, 'userId'>;
+  userId: Types.User['userId'];
   contentMetadata: Types.PromptMessage['contentMetadata'];
 }
 
-export const usePromptMessageCtxMenu = ({ user, contentMetadata }: UsePromptMessageCtxMenuProps) => {
+export const usePromptMessageCtxMenu = (props: UsePromptMessageCtxMenuProps) => {
+  const { userId, contentMetadata } = props;
+
   const buildContextMenu = useCallback(
-    () => (contentMetadata && contentMetadata.userId ? new ContextMenu().addViewProfileOption(() => openUserInfo(user.userId, contentMetadata.userId)).build() : []),
-    [user, contentMetadata],
+    () => (contentMetadata && contentMetadata.userId ? new ContextMenu().addViewProfileOption(() => openUserInfo(userId, contentMetadata.userId)).build() : []),
+    [userId, contentMetadata],
   );
 
   return { buildContextMenu };

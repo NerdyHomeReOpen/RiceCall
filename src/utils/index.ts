@@ -1,4 +1,4 @@
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 /**
  * Clean the menu items by removing duplicate separators and ensuring that separators are not placed at the beginning or end of the menu.

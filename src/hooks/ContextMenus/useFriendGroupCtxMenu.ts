@@ -1,24 +1,27 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { openEditFriendGroupName, deleteFriendGroup } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
 interface UseFriendGroupCtxMenuProps {
-  user: Pick<Types.User, 'userId'>;
-  friendGroup: Pick<Types.FriendGroup, 'friendGroupId' | 'name'>;
+  userId: Types.User['userId'];
+  friendGroupId: Types.FriendGroup['friendGroupId'];
+  friendGroupName: Types.FriendGroup['name'];
 }
 
-export const useFriendGroupCtxMenu = ({ user, friendGroup }: UseFriendGroupCtxMenuProps) => {
+export const useFriendGroupCtxMenu = (props: UseFriendGroupCtxMenuProps) => {
+  const { userId, friendGroupId, friendGroupName } = props;
+
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addEditFriendGroupNameOption({ friendGroupId: friendGroup.friendGroupId }, () => openEditFriendGroupName(user.userId, friendGroup.friendGroupId))
-        .addDeleteFriendGroupOption({ friendGroupId: friendGroup.friendGroupId }, () => deleteFriendGroup(friendGroup.friendGroupId, friendGroup.name))
+        .addEditFriendGroupNameOption({ friendGroupId }, () => openEditFriendGroupName(userId, friendGroupId))
+        .addDeleteFriendGroupOption({ friendGroupId }, () => deleteFriendGroup(friendGroupId, friendGroupName))
         .build(),
-    [user, friendGroup],
+    [userId, friendGroupId, friendGroupName],
   );
 
   return { buildContextMenu };

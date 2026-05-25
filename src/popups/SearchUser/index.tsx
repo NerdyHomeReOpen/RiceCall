@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
@@ -15,12 +14,7 @@ interface SearchUserPopupProps {
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
+  const userId = useAppSelector((state) => state.user.data.userId);
 
   const [query, setQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
@@ -38,11 +32,11 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
           return;
         }
 
-        ipc.api.fetchFriend({ userId: user.userId, targetId: target.userId }).then((friend) => {
+        ipc.api.fetchFriend({ userId, targetId: target.userId }).then((friend) => {
           if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
-          else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
+          else if (target.userId === userId) setError(t('cannot-add-yourself'));
           else {
-            openApplyFriend(user.userId, target.userId).then(() => {
+            openApplyFriend(userId, target.userId).then(() => {
               ipc.popup.close(id);
             });
           }

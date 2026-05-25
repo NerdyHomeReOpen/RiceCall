@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import styles from './NotificationMenu.module.css';
 

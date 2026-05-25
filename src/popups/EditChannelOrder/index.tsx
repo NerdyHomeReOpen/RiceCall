@@ -1,8 +1,7 @@
 import React, { useState, useRef, useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -23,13 +22,7 @@ interface EditChannelOrderPopupProps {
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId }) => {
   const { t } = useTranslation();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
   const channelsData = useAppSelector((state) => state.channels.data.filter((c) => !c.isLobby));
 
   const channelOrderMapRef = useRef<Record<string, number>>(
@@ -119,12 +112,12 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   const handleAddChannelBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    openCreateChannel(user.userId, serverId, selectedChannel?.channelId);
+    openCreateChannel(userId, serverId, selectedChannel?.channelId);
   };
 
   const handleChangeChannelNameBtnClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    openEditChannelName(user.userId, serverId, selectedChannel?.channelId ?? '');
+    openEditChannelName(userId, serverId, selectedChannel?.channelId ?? '');
   };
 
   const handleDeleteChannelBtnClick = (e: React.MouseEvent) => {

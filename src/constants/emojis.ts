@@ -1,7 +1,7 @@
 import emojiData from 'emoji.json' with { type: 'json' };
 import twemoji from 'twemoji';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 export const DEFAULT_EMOJIS: Types.Emoji[] = [
   { code: '1', alt: '微笑', path: '/smiles/1.gif' },

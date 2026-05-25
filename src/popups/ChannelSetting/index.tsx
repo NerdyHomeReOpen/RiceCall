@@ -2,8 +2,7 @@ import React, { useMemo, useState, useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -42,13 +41,8 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   const isResizingModeratorColumn = useRef<boolean>(false);
   const isResizingBlockMemberColumn = useRef<boolean>(false);
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
 
   const [channel, setChannel] = useState<Types.Channel>(channelData);
   const [channelMembers, setChannelMembers] = useState<Types.Member[]>(channelMembersData);
@@ -63,14 +57,14 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   const [moderatorColumnWidths, setModeratorColumnWidths] = useState<number[]>(MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
-  const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, channel.permissionLevel);
-  const isReadOnly = permissionLevel < Permission.ChannelMod;
+  const permissionLevel = Math.max(userPermissionLevel, server.permissionLevel, channel.permissionLevel);
+  const isReadOnly = permissionLevel < Types.Permission.ChannelMod;
   const isLobby = server.lobbyId === channel.channelId;
   const isReceptionLobby = server.receptionLobbyId === channel.channelId;
   const canSubmit = channel.name.trim();
 
   const { totalModeratorsCount, sortedModerators } = useMemo(() => {
-    const total = channelMembers.filter((m) => m.permissionLevel >= Permission.ChannelMod && m.permissionLevel < Permission.ServerAdmin);
+    const total = channelMembers.filter((m) => m.permissionLevel >= Types.Permission.ChannelMod && m.permissionLevel < Types.Permission.ServerAdmin);
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(moderatorQuery.toLowerCase()) || m.name.toLowerCase().includes(moderatorQuery.toLowerCase()));
     const sorted = filtered.sort(sorter(moderatorSortField, moderatorSortDirection));
     return { totalModeratorsCount: total.length, filteredModerators: filtered, sortedModerators: sorted };
@@ -85,7 +79,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
 
   const settingPages = useMemo(
     () =>
-      permissionLevel >= Permission.ChannelMod
+      permissionLevel >= Types.Permission.ChannelMod
         ? [
             t('channel-info'),
             t('channel-announcement'),
@@ -501,9 +495,10 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   {sortedModerators.map((moderator) => (
                     <ChannelSettingModeratorRow
                       key={moderator.userId}
-                      user={user}
-                      server={server}
-                      channel={channel}
+                      userId={userId}
+                      serverId={server.serverId}
+                      channelId={channel.channelId}
+                      channelCategoryId={channel.categoryId}
                       moderator={moderator}
                       permissionLevel={permissionLevel}
                       columnWidths={moderatorColumnWidths}
@@ -540,9 +535,9 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   {sortedBlockMembers.map((member) => (
                     <ChannelSettingBlockedMemberRow
                       key={member.userId}
-                      user={user}
-                      server={server}
-                      channel={channel}
+                      userId={userId}
+                      serverId={server.serverId}
+                      channelId={channel.channelId}
                       member={member}
                       permissionLevel={permissionLevel}
                       columnWidths={blockMemberColumnWidths}
@@ -577,22 +572,36 @@ ChannelSettingPopup.displayName = 'ChannelSettingPopup';
 export default ChannelSettingPopup;
 
 interface ChannelSettingModeratorRowProps {
-  user: { userId: string };
-  server: Pick<Types.Server, 'serverId'>;
-  channel: Pick<Types.Channel, 'channelId' | 'categoryId'>;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
+  channelId: Types.Channel['channelId'];
+  channelCategoryId: Types.Channel['categoryId'];
   moderator: Types.Member;
   permissionLevel: Types.Permission;
   columnWidths: number[];
 }
 
-const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = React.memo(({ user, server, channel, moderator, permissionLevel, columnWidths }) => {
+const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = React.memo(({ userId, serverId, channelId, channelCategoryId, moderator, permissionLevel, columnWidths }) => {
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
 
   const isSelected = selectedItemId === `member-${moderator.userId}`;
+  const isSelf = moderator.userId === userId;
+  const isLowerLevel = moderator.permissionLevel < permissionLevel;
 
-  const { buildContextMenu } = useChannelSettingModeratorCtxMenu({ user, server, channel, moderator, permissionLevel });
+  const { buildContextMenu } = useChannelSettingModeratorCtxMenu({
+    userId,
+    serverId,
+    channelId,
+    channelCategoryId,
+    moderatorUserId: moderator.userId,
+    moderatorName: moderator.name,
+    moderatorPermissionLevel: moderator.permissionLevel,
+    permissionLevel,
+    isSelf,
+    isLowerLevel,
+  });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -622,15 +631,15 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
 ChannelSettingModeratorRow.displayName = 'ChannelSettingModeratorRow';
 
 interface ChannelSettingBlockedMemberRowProps {
-  user: { userId: string };
-  server: Pick<Types.Server, 'serverId'>;
-  channel: Pick<Types.Channel, 'channelId'>;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
+  channelId: Types.Channel['channelId'];
   member: Types.Member;
   permissionLevel: Types.Permission;
   columnWidths: number[];
 }
 
-const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowProps> = React.memo(({ user, server, channel, member, permissionLevel, columnWidths }) => {
+const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowProps> = React.memo(({ userId, serverId, channelId, member, permissionLevel, columnWidths }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
@@ -638,8 +647,17 @@ const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowPro
 
   const isSelected = selectedItemId === `blocked-${member.userId}`;
   const isBlockedPermanently = member.blockedUntil === -1;
+  const isSelf = member.userId === userId;
 
-  const { buildContextMenu } = useChannelSettingBlockedMemberCtxMenu({ user, server, channel, member, permissionLevel });
+  const { buildContextMenu } = useChannelSettingBlockedMemberCtxMenu({
+    userId,
+    serverId,
+    channelId,
+    memberUserId: member.userId,
+    memberName: member.name,
+    permissionLevel,
+    isSelf,
+  });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));

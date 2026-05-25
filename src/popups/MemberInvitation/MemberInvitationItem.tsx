@@ -2,7 +2,7 @@ import React from 'react';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { acceptMemberInvitation, rejectMemberInvitation } from '@/services';
 

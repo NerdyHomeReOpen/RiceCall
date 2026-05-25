@@ -1,6 +1,6 @@
 import packageJson from '../../package.json';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import Env from '@/utils/env';
 

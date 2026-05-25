@@ -1,10 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
-import { shallowEqual } from 'react-redux';
 
 import * as ipc from '@/main/ipc';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { useAppSelector } from '@/hooks/useStore';
 
@@ -25,23 +24,24 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   const { showContextMenu } = useContextMenu();
   const { getIsLoading, loadServer } = useLoading();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      currentServerId: state.user.data.currentServerId,
-    }),
-    shallowEqual,
-  );
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const currentServerId = useAppSelector((state) => state.user.data.currentServerId);
 
-  const isOwned = server.ownerId === user.userId && server.owned;
+  const isOwned = server.ownerId === userId && server.owned;
 
   const joinServer = () => {
-    if (getIsLoading() || user.currentServerId === server.serverId) return;
+    if (getIsLoading() || currentServerId === server.serverId) return;
     loadServer(server.specialId || server.displayId);
     ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
-  const { buildContextMenu: buildServerCardContextMenu } = useServerCardCtxMenu({ user, server, onJoinServer: joinServer });
+  const { buildContextMenu: buildServerCardContextMenu } = useServerCardCtxMenu({
+    userId,
+    serverId: server.serverId,
+    serverPermissionLevel: server.permissionLevel,
+    serverFavorite: server.favorite,
+    onJoinServer: joinServer,
+  });
 
   const handleServerCardClick = () => {
     joinServer();

@@ -1,53 +1,56 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import ContextMenu from '@/utils/contextMenu';
 
 import { openDirectMessage, openUserInfo, openEditNickname, openBlockMember, terminateMember, editChannelPermission, editServerPermission } from '@/services';
 
 interface UseChannelSettingModeratorCtxMenuProps {
-  user: Pick<Types.User, 'userId'>;
-  server: Pick<Types.Server, 'serverId'>;
-  channel: Pick<Types.Channel, 'channelId' | 'categoryId'>;
-  moderator: Pick<Types.Member, 'userId' | 'name' | 'permissionLevel'>;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
+  channelId: Types.Channel['channelId'];
+  channelCategoryId: Types.Channel['categoryId'];
+  moderatorUserId: Types.Member['userId'];
+  moderatorName: Types.Member['name'];
+  moderatorPermissionLevel: Types.Member['permissionLevel'];
   permissionLevel: Types.Permission;
+  isSelf: boolean;
+  isLowerLevel: boolean;
 }
 
-export const useChannelSettingModeratorCtxMenu = ({ user, server, channel, moderator, permissionLevel }: UseChannelSettingModeratorCtxMenuProps) => {
-  const isSelf = moderator.userId === user.userId;
-  const isLowerLevel = moderator.permissionLevel < permissionLevel;
+export const useChannelSettingModeratorCtxMenu = (props: UseChannelSettingModeratorCtxMenuProps) => {
+  const { userId, serverId, channelId, channelCategoryId, moderatorUserId, moderatorName, moderatorPermissionLevel, permissionLevel, isSelf, isLowerLevel } = props;
 
   const buildContextMenu = useCallback(() => {
     const submenuItems = new ContextMenu()
-      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => terminateMember(moderator.userId, server.serverId, moderator.name))
-      .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-        moderator.permissionLevel >= Permission.ChannelMod
-          ? editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
-          : editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 3 }),
+      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isLowerLevel }, () => terminateMember(moderatorUserId, serverId, moderatorName))
+      .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isLowerLevel, channelCategoryId }, () =>
+        moderatorPermissionLevel >= Types.Permission.ChannelMod
+          ? editChannelPermission(moderatorUserId, serverId, channelId, { permissionLevel: 2 })
+          : editChannelPermission(moderatorUserId, serverId, channelId, { permissionLevel: 3 }),
       )
-      .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
-        moderator.permissionLevel >= Permission.ChannelAdmin
-          ? editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 2 })
-          : editChannelPermission(moderator.userId, server.serverId, channel.categoryId || channel.channelId, { permissionLevel: 4 }),
+      .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isLowerLevel, channelCategoryId }, () =>
+        moderatorPermissionLevel >= Types.Permission.ChannelAdmin
+          ? editChannelPermission(moderatorUserId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
+          : editChannelPermission(moderatorUserId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
       )
-      .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
-        moderator.permissionLevel >= Permission.ServerAdmin
-          ? editServerPermission(moderator.userId, server.serverId, { permissionLevel: 2 })
-          : editServerPermission(moderator.userId, server.serverId, { permissionLevel: 5 }),
+      .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isLowerLevel }, () =>
+        moderatorPermissionLevel >= Types.Permission.ServerAdmin
+          ? editServerPermission(moderatorUserId, serverId, { permissionLevel: 2 })
+          : editServerPermission(moderatorUserId, serverId, { permissionLevel: 5 }),
       )
       .build();
 
     return new ContextMenu()
-      .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, moderator.userId))
-      .addViewProfileOption(() => openUserInfo(user.userId, moderator.userId))
-      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(moderator.userId, server.serverId))
-      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(moderator.userId, server.serverId))
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(userId, moderatorUserId))
+      .addViewProfileOption(() => openUserInfo(userId, moderatorUserId))
+      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(moderatorUserId, serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(moderatorUserId, serverId))
       .addSeparator()
-      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderatorPermissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
       .build();
-  }, [user.userId, server.serverId, channel, moderator, permissionLevel, isSelf, isLowerLevel]);
+  }, [userId, serverId, channelId, channelCategoryId, moderatorUserId, moderatorName, moderatorPermissionLevel, permissionLevel, isSelf, isLowerLevel]);
 
   return { buildContextMenu };
 };

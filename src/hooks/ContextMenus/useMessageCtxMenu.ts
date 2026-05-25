@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { openDirectMessage, openUserInfo, openKickMemberFromChannel, openKickMemberFromServer, openBlockMember, openInviteMember } from '@/services';
 
@@ -9,32 +9,53 @@ import ContextMenu from '@/utils/contextMenu';
 import { useMemberManagementCtxMenu } from '@/hooks/ContextMenus/useMemberManagementCtxMenu';
 
 interface UseMessageCtxMenuProps {
-  user: Pick<Types.User, 'userId' | 'permissionLevel'>;
-  currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'lobbyId'>;
-  currentChannel: Pick<Types.Channel, 'channelId' | 'permissionLevel' | 'categoryId'>;
-  member: Pick<Types.ChannelMessage, 'userId' | 'permissionLevel' | 'name' | 'currentChannelId'>;
+  userId: Types.User['userId'];
+  userPermissionLevel: Types.User['permissionLevel'];
+  currentServerId: Types.Server['serverId'];
+  currentServerPermissionLevel: Types.Server['permissionLevel'];
+  currentServerLobbyId: Types.Server['lobbyId'];
+  currentChannelId: Types.Channel['channelId'];
+  currentChannelPermissionLevel: Types.Channel['permissionLevel'];
+  currentChannelCategoryId: Types.Channel['categoryId'];
+  memberUserId: Types.Member['userId'];
+  memberPermissionLevel: Types.Member['permissionLevel'];
+  memberName: Types.Member['name'];
+  memberCurrentChannelId: Types.Member['currentChannelId'];
 }
 
-export const useMessageCtxMenu = ({ user, currentServer, currentChannel, member }: UseMessageCtxMenuProps) => {
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const isSelf = member.userId === user.userId;
-  const isLowerLevel = member.permissionLevel < permissionLevel;
-  const isInLobby = member.currentChannelId === currentServer.lobbyId;
+export const useMessageCtxMenu = (props: UseMessageCtxMenuProps) => {
+  const {
+    userId,
+    userPermissionLevel,
+    currentServerId,
+    currentServerPermissionLevel,
+    currentServerLobbyId,
+    currentChannelId,
+    currentChannelPermissionLevel,
+    memberUserId,
+    memberPermissionLevel,
+    memberCurrentChannelId,
+  } = props;
 
-  const { buildMemberManagementCtxMenu } = useMemberManagementCtxMenu({ user, currentServer, channel: currentChannel, member });
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
+  const isSelf = memberUserId === userId;
+  const isLowerLevel = memberPermissionLevel < permissionLevel;
+  const isInLobby = memberCurrentChannelId === currentServerLobbyId;
+
+  const { buildMemberManagementCtxMenu } = useMemberManagementCtxMenu(props);
 
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, member.userId))
-        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
-        .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => openKickMemberFromChannel(member.userId, currentServer.serverId, currentChannel.channelId))
-        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(member.userId, currentServer.serverId))
-        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(member.userId, currentServer.serverId))
-        .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => openInviteMember(member.userId, currentServer.serverId))
-        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementCtxMenu())
+        .addDirectMessageOption({ isSelf }, () => openDirectMessage(userId, memberUserId))
+        .addViewProfileOption(() => openUserInfo(userId, memberUserId))
+        .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => openKickMemberFromChannel(memberUserId, currentServerId, currentChannelId))
+        .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(memberUserId, currentServerId))
+        .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(memberUserId, currentServerId))
+        .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: memberPermissionLevel, isSelf, isLowerLevel }, () => openInviteMember(memberUserId, currentServerId))
+        .addMemberManagementOption({ permissionLevel, targetPermissionLevel: memberPermissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementCtxMenu())
         .build(),
-    [user, currentServer, currentChannel, member, permissionLevel, isSelf, isLowerLevel, isInLobby, buildMemberManagementCtxMenu],
+    [userId, currentServerId, currentChannelId, memberUserId, memberPermissionLevel, permissionLevel, isSelf, isLowerLevel, isInLobby, buildMemberManagementCtxMenu],
   );
 
   return { buildContextMenu };

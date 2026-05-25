@@ -1,9 +1,8 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import Image from 'next/image';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -25,27 +24,19 @@ const FriendPageHeader: React.FC = React.memo(() => {
   const signatureInputRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef<boolean>(false);
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      avatarUrl: state.user.data.avatarUrl,
-      name: state.user.data.name,
-      signature: state.user.data.signature,
-      vip: state.user.data.vip,
-      badges: state.user.data.badges,
-      level: state.user.data.level,
-      xp: state.user.data.xp,
-      requiredXp: state.user.data.requiredXp,
-    }),
-    shallowEqual,
-  );
+  const userAvatarUrl = useAppSelector((state) => state.user.data.avatarUrl);
+  const userSignature = useAppSelector((state) => state.user.data.signature);
+  const userVip = useAppSelector((state) => state.user.data.vip);
+  const userBadges = useAppSelector((state) => (typeof state.user.data.badges === 'string' ? JSON.parse(state.user.data.badges) : state.user.data.badges));
+  const userLevel = useAppSelector((state) => state.user.data.level);
+  const userXp = useAppSelector((state) => state.user.data.xp);
+  const userRequiredXp = useAppSelector((state) => state.user.data.requiredXp);
 
-  const userHasVip = user.vip > 0;
-  const userBadges = useMemo(() => (typeof user.badges === 'string' ? JSON.parse(user.badges) : user.badges), [user.badges]);
+  const userHasVip = userVip > 0;
   const userWealth = 0; // TODO: get user wealth
 
   const changeSignature = (signature: Types.User['signature']) => {
-    if (signature === user.signature) return;
+    if (signature === userSignature) return;
     ipc.socket.send('editUser', { update: { signature } });
   };
 
@@ -79,21 +70,21 @@ const FriendPageHeader: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
-    signatureInputRef.current!.value = user.signature;
-  }, [user.signature]);
+    signatureInputRef.current!.value = userSignature;
+  }, [userSignature]);
 
   return (
     <>
       <div className={styles['user-avatar']} datatype="">
-        <Image src={user.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={40} height={40} loading="lazy" draggable="false" />
+        <Image src={userAvatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
       <div className={styles['user-info']}>
         <div className={styles['user-info-row']}>
           <div className={styles['level-icon']} />
-          <LevelIcon level={user.level} xp={user.xp} requiredXp={user.requiredXp} showTooltip={true} />
+          <LevelIcon level={userLevel} xp={userXp} requiredXp={userRequiredXp} showTooltip={true} />
           <div className={styles['wealth-icon']} />
           <div className={styles['wealth-value-text']}>{userWealth}</div>
-          {userHasVip && <div className={`vip-icon vip-${user.vip}`} />}
+          {userHasVip && <div className={`vip-icon vip-${userVip}`} />}
         </div>
         <div className={styles['user-info-row']}>
           <BadgeList badges={userBadges} position="left-bottom" direction="right-bottom" maxDisplay={5} />
@@ -103,7 +94,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
         <textarea
           ref={signatureInputRef}
           className={styles['signature-input']}
-          defaultValue={user.signature}
+          defaultValue={userSignature}
           maxLength={100}
           placeholder={t('signature-placeholder')}
           onBlur={handleSignatureInputBlur}

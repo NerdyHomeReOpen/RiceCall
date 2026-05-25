@@ -2,7 +2,7 @@ import React, { useState, useLayoutEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';

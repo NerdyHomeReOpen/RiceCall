@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -30,23 +30,11 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
   const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      name: state.user.data.name,
-      status: state.user.data.status,
-      currentServerId: state.currentServer.data.serverId,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      name: state.currentServer.data.name,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userName = useAppSelector((state) => state.user.data.name);
+  const userStatus = useAppSelector((state) => state.user.data.status);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerName = useAppSelector((state) => state.currentServer.data.name);
   const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
   const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
   const systemNotifications = useAppSelector((state) => state.systemNotifications.data, shallowEqual);
@@ -65,9 +53,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     () => [
       { id: 'home' as const, label: t('home') },
       { id: 'friends' as const, label: t('friends') },
-      { id: 'server' as const, label: currentServer.name },
+      { id: 'server' as const, label: currentServerName },
     ],
-    [currentServer.name, t],
+    [currentServerName, t],
   );
 
   const logout = () => {
@@ -83,7 +71,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   };
 
   const { buildContextMenu: buildHeaderContextMenu } = useHeaderCtxMenu({
-    user,
+    userId,
     onChangeLanguage: changeLanguage,
     onLogout: logout,
     onExit: exit,
@@ -176,7 +164,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   };
 
   const handleNameClick = () => {
-    openUserInfo(user.userId, user.userId);
+    openUserInfo(userId, userId);
   };
 
   const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
@@ -185,10 +173,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
 
   useEffect(() => {
     const next = isIdling ? 'idle' : 'online';
-    if (user.status !== next && !isManualIdling) {
+    if (userStatus !== next && !isManualIdling) {
       editUserStatus(next);
     }
-  }, [isIdling, isManualIdling, user.status]);
+  }, [isIdling, isManualIdling, userStatus]);
 
   useEffect(() => {
     const unsubs = [ipc.window.onMaximize(() => setIsFullscreen(true)), ipc.window.onUnmaximize(() => setIsFullscreen(false))];
@@ -199,16 +187,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     <header className={styles['header']}>
       <div className={styles['title-box']}>
         <div className={styles['name-box']} onClick={handleNameClick}>
-          {user.name}
+          {userName}
         </div>
         <div className={styles['status-box']} onClick={handleStatusDropdownClick}>
-          <div className={styles['status-display']} datatype={user.status} />
+          <div className={styles['status-display']} datatype={userStatus} />
           <div className={styles['status-triangle']} />
         </div>
       </div>
       <div className={styles['tabs']}>
         {mainTabs.map((tab) => (
-          <MainTabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
+          <MainTabItem key={tab.id} tab={tab} currentServerId={currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
         ))}
       </div>
       <div className={styles['buttons']}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 

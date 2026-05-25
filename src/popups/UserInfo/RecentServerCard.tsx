@@ -1,8 +1,7 @@
 import React from 'react';
-import { shallowEqual } from 'react-redux';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { useAppSelector } from '@/hooks/useStore';
 
@@ -17,14 +16,9 @@ interface RecentServerCardProps {
 }
 
 const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, server, onServerSelect }) => {
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
+  const userId = useAppSelector((state) => state.user.data.userId);
 
-  const isSelf = user.userId === target.userId;
+  const isSelf = userId === target.userId;
   const isOwned = server.ownerId === target.userId && server.owned;
 
   const handleServerDoubleClick = () => {

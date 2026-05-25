@@ -3,8 +3,7 @@ import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react'
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -41,14 +40,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   const signatureInputRef = useRef<HTMLInputElement>(null);
   const isUploadingRef = useRef<boolean>(false);
 
+  const userId = useAppSelector((state) => state.user.data.userId);
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
-
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
 
   const [target, setTarget] = useState(targetData);
   const [editedTarget, setEditedTarget] = useState(targetData);
@@ -61,7 +54,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   const yearOptions = Array.from({ length: currentYear - 1900 + 1 }, (_, i) => currentYear - i);
   const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
   const dayOptions = Array.from({ length: new Date(target.birthYear, target.birthMonth, 0).getDate() }, (_, i) => i + 1);
-  const isSelf = user.userId === target.userId;
+  const isSelf = userId === target.userId;
   const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === 2) !== undefined;
   const isAboutTab = selectedTabId === 'about';
   const isGroupsTab = selectedTabId === 'groups';
@@ -72,11 +65,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   const badges = typeof target.badges === 'string' ? JSON.parse(target.badges) : target.badges;
 
   const joinedServers = useMemo(() => {
-    return targetServers.filter((s) => s.permissionLevel >= Permission.Member && s.permissionLevel < Permission.ServerAdmin).sort((a, b) => b.permissionLevel - a.permissionLevel);
+    return targetServers.filter((s) => s.permissionLevel >= Types.Permission.Member && s.permissionLevel < Types.Permission.ServerAdmin).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
 
   const favoriteServers = useMemo(() => {
-    return targetServers.filter((s) => s.favorite && s.permissionLevel < Permission.ServerAdmin).sort((a, b) => b.permissionLevel - a.permissionLevel);
+    return targetServers.filter((s) => s.favorite && s.permissionLevel < Types.Permission.ServerAdmin).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
 
   const recentServers = useMemo(() => {
@@ -170,11 +163,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   };
 
   const handleApplyFriendBtnClick = () => {
-    openApplyFriend(user.userId, target.userId);
+    openApplyFriend(userId, target.userId);
   };
 
   const handleChatBtnClick = () => {
-    openDirectMessage(user.userId, target.userId);
+    openDirectMessage(userId, target.userId);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

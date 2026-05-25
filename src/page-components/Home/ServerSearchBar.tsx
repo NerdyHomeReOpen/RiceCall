@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -24,14 +24,8 @@ const ServerSearchBar: React.FC = React.memo(() => {
   const queryRef = useRef<string>('');
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      currentServerId: state.user.data.currentServerId,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const currentServerId = useAppSelector((state) => state.user.data.currentServerId);
   const servers = useAppSelector((state) => state.servers.data, shallowEqual);
 
   const [exactMatch, setExactMatch] = useState<Types.Server | null>(null);
@@ -95,12 +89,12 @@ const ServerSearchBar: React.FC = React.memo(() => {
 
   const selectServer = useCallback(
     (server: Types.Server) => {
-      if (getIsLoading() || user.currentServerId === server.serverId) return;
+      if (getIsLoading() || currentServerId === server.serverId) return;
       loadServer(server.specialId || server.displayId);
       ipc.socket.send('connectServer', { serverId: server.serverId });
       clearSearchState();
     },
-    [user.currentServerId, getIsLoading, loadServer],
+    [currentServerId, getIsLoading, loadServer],
   );
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -136,7 +130,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
-      if (!user.userId || !serverDisplayId) return;
+      if (!userId || !serverDisplayId) return;
       ipc.api.searchServer({ query: serverDisplayId }).then((servers) => {
         const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
         if (!target) return;
@@ -144,7 +138,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
       });
     });
     return () => unsub();
-  }, [user.userId, selectServer]);
+  }, [userId, selectServer]);
 
   return (
     <div className={styles['search-bar']} ref={searchRef}>

@@ -1,9 +1,9 @@
-import React, { useMemo, useRef, useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -24,13 +24,7 @@ interface CreateServerPopupProps {
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
 
-  const user = useAppSelector(
-    (state) => ({
-      level: state.user.data.level,
-    }),
-    shallowEqual,
-  );
-
+  const userLevel = useAppSelector((state) => state.user.data.level);
   const servers = useAppSelector((state) => state.servers.data, shallowEqual);
 
   const isUploadingRef = useRef<boolean>(false);
@@ -42,10 +36,8 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
   const [serverAvatar, setServerAvatar] = useState<Types.Server['avatar']>(getDefaultServer().avatar);
   const [serverAvatarUrl, setServerAvatarUrl] = useState<Types.Server['avatarUrl']>(getDefaultServer().avatarUrl);
 
-  const remainingServers = useMemo(() => {
-    const maxGroups = user.level >= 16 ? 5 : user.level >= 6 && user.level < 16 ? 4 : 3;
-    return maxGroups - servers.filter((s) => s.owned).length;
-  }, [user.level, servers]);
+  const maxServers = userLevel >= 16 ? 5 : userLevel >= 6 && userLevel < 16 ? 4 : 3;
+  const remainingServers = maxServers - servers.filter((s) => s.owned).length;
   const canSubmit = remainingServers > 0 && serverName.trim();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {

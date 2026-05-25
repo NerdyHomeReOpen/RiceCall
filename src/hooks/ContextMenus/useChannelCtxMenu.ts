@@ -1,28 +1,45 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { connectChannel, openChannelSetting, openCreateChannel, openEditChannelOrder, deleteChannel, openServerBroadcast, moveAllUsersToChannel, kickUsersFromServer, editServer } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
 interface UseChannelCtxMenuProps {
-  user: Pick<Types.User, 'userId' | 'permissionLevel'>;
-  currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'lobbyId' | 'receptionLobbyId'>;
-  currentChannel: Pick<Types.Channel, 'channelId' | 'permissionLevel'>;
-  channel: Pick<Types.Channel | Types.Category, 'channelId' | 'permissionLevel' | 'categoryId' | 'visibility' | 'name'>;
-  category?: Pick<Types.Category, 'channelId' | 'permissionLevel'>;
+  userId: Types.User['userId'];
+  userPermissionLevel: Types.User['permissionLevel'];
+  currentServerId: Types.Server['serverId'];
+  currentServerPermissionLevel: Types.Server['permissionLevel'];
+  currentServerReceptionLobbyId: Types.Server['receptionLobbyId'];
+  currentChannelId: Types.Channel['channelId'];
+  currentChannelPermissionLevel: Types.Channel['permissionLevel'];
+  channel: Types.Channel | Types.Category;
   movableChannelUserIds: string[];
   movableServerUserIds: string[];
   canJoin: boolean;
   isPasswordNeeded: boolean;
 }
 
-export const useChannelCtxMenu = ({ channel, user, currentServer, currentChannel, movableChannelUserIds, movableServerUserIds, canJoin, isPasswordNeeded }: UseChannelCtxMenuProps) => {
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
-  const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-  const isInChannel = currentChannel.channelId === channel.channelId;
-  const isReceptionLobby = currentServer.receptionLobbyId === channel.channelId;
+export const useChannelCtxMenu = (props: UseChannelCtxMenuProps) => {
+  const {
+    userId,
+    userPermissionLevel,
+    currentServerId,
+    currentServerPermissionLevel,
+    currentServerReceptionLobbyId,
+    currentChannelId,
+    currentChannelPermissionLevel,
+    channel,
+    movableChannelUserIds,
+    movableServerUserIds,
+    canJoin,
+    isPasswordNeeded,
+  } = props;
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, channel.permissionLevel);
+  const currentPermissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
+  const isInChannel = currentChannelId === channel.channelId;
+  const isReceptionLobby = currentServerReceptionLobbyId === channel.channelId;
   const isPrivateChannel = channel.visibility === 'private';
   const isReadonlyChannel = channel.visibility === 'readonly';
   const isSubChannel = !!channel.categoryId;
@@ -30,29 +47,29 @@ export const useChannelCtxMenu = ({ channel, user, currentServer, currentChannel
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addJoinChannelOption({ canJoin, isInChannel }, () => connectChannel(currentServer.serverId, channel.channelId, canJoin, isPasswordNeeded))
-        .addViewOrEditOption(() => openChannelSetting(user.userId, currentServer.serverId, channel.channelId))
+        .addJoinChannelOption({ canJoin, isInChannel }, () => connectChannel(currentServerId, channel.channelId, canJoin, isPasswordNeeded))
+        .addViewOrEditOption(() => openChannelSetting(userId, currentServerId, channel.channelId))
         .addSeparator()
-        .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId))
-        .addCreateSubChannelOption({ permissionLevel }, () => openCreateChannel(user.userId, currentServer.serverId, channel.categoryId ?? channel.channelId))
-        .addDeleteChannelOption({ permissionLevel, isSubChannel }, () => deleteChannel(currentServer.serverId, channel.channelId, channel.name))
+        .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId))
+        .addCreateSubChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId, channel.categoryId ?? channel.channelId))
+        .addDeleteChannelOption({ permissionLevel, isSubChannel }, () => deleteChannel(currentServerId, channel.channelId, channel.name))
         .addSeparator()
-        .addBroadcastOption({ permissionLevel }, () => openServerBroadcast(currentServer.serverId, channel.channelId))
+        .addBroadcastOption({ permissionLevel }, () => openServerBroadcast(currentServerId, channel.channelId))
         .addSeparator()
         .addMoveAllUserToChannelOption({ isInChannel, currentPermissionLevel, permissionLevel, movableChannelUserIds }, () =>
-          moveAllUsersToChannel(movableChannelUserIds, currentServer.serverId, currentChannel.channelId),
+          moveAllUsersToChannel(movableChannelUserIds, currentServerId, currentChannelId),
         )
-        .addEditChannelOrderOption({ permissionLevel }, () => openEditChannelOrder(user.userId, currentServer.serverId))
+        .addEditChannelOrderOption({ permissionLevel }, () => openEditChannelOrder(userId, currentServerId))
         .addSeparator()
-        .addKickChannelUsersFromServerOption({ permissionLevel, movableChannelUserIds }, () => kickUsersFromServer(movableChannelUserIds, currentServer.serverId))
-        .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServer.serverId))
+        .addKickChannelUsersFromServerOption({ permissionLevel, movableChannelUserIds }, () => kickUsersFromServer(movableChannelUserIds, currentServerId))
+        .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServerId))
         .addSeparator()
-        .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => editServer(currentServer.serverId, { receptionLobbyId: channel.channelId }))
+        .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => editServer(currentServerId, { receptionLobbyId: channel.channelId }))
         .build(),
     [
-      user,
-      currentServer,
-      currentChannel,
+      userId,
+      currentServerId,
+      currentChannelId,
       channel,
       movableChannelUserIds,
       movableServerUserIds,

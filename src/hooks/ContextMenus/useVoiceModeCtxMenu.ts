@@ -1,40 +1,41 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { editChannel, controlQueue } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
 interface UseVoiceModeCtxMenuProps {
-  currentServer: Pick<Types.Server, 'serverId'>;
-  currentChannel: Pick<Types.Channel, 'channelId' | 'voiceMode' | 'forbidQueue'>;
+  currentServerId: Types.Server['serverId'];
+  currentChannelId: Types.Channel['channelId'];
+  currentChannelVoiceMode: Types.Channel['voiceMode'];
+  currentChannelForbidQueue: Types.Channel['forbidQueue'];
   permissionLevel: Types.Permission;
   isQueueControlled: boolean;
 }
 
-export const useVoiceModeCtxMenu = ({ currentServer, currentChannel, permissionLevel, isQueueControlled }: UseVoiceModeCtxMenuProps) => {
-  const isCurrentChannelFreeMode = currentChannel.voiceMode === 'free';
-  const isCurrentChannelAdminMode = currentChannel.voiceMode === 'admin';
-  const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
+export const useVoiceModeCtxMenu = (props: UseVoiceModeCtxMenuProps) => {
+  const { currentServerId, currentChannelId, currentChannelVoiceMode, currentChannelForbidQueue, permissionLevel, isQueueControlled } = props;
+  const isCurrentChannelFreeMode = currentChannelVoiceMode === 'free';
+  const isCurrentChannelAdminMode = currentChannelVoiceMode === 'admin';
+  const isCurrentChannelQueueMode = currentChannelVoiceMode === 'queue';
 
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'free' }))
-        .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'admin' }))
+        .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => editChannel(currentServerId, currentChannelId, { voiceMode: 'free' }))
+        .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => editChannel(currentServerId, currentChannelId, { voiceMode: 'admin' }))
         .addQueueSpeechOption(
           { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
-          () => editChannel(currentServer.serverId, currentChannel.channelId, { voiceMode: 'queue' }),
+          () => editChannel(currentServerId, currentChannelId, { voiceMode: 'queue' }),
           new ContextMenu()
-            .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannel.forbidQueue }, () =>
-              editChannel(currentServer.serverId, currentChannel.channelId, { forbidQueue: !currentChannel.forbidQueue }),
-            )
-            .addControlQueueOption({ permissionLevel, isQueueControlled }, () => controlQueue(currentServer.serverId, currentChannel.channelId))
+            .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannelForbidQueue }, () => editChannel(currentServerId, currentChannelId, { forbidQueue: !currentChannelForbidQueue }))
+            .addControlQueueOption({ permissionLevel, isQueueControlled }, () => controlQueue(currentServerId, currentChannelId))
             .build(),
         )
         .build(),
-    [permissionLevel, isCurrentChannelFreeMode, isCurrentChannelAdminMode, isCurrentChannelQueueMode, currentServer.serverId, currentChannel.channelId, currentChannel.forbidQueue, isQueueControlled],
+    [permissionLevel, isCurrentChannelFreeMode, isCurrentChannelAdminMode, isCurrentChannelQueueMode, currentServerId, currentChannelId, currentChannelForbidQueue, isQueueControlled],
   );
 
   return { buildContextMenu };

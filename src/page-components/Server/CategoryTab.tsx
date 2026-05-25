@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { shallowEqual } from 'react-redux';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as Store from '@/store';
 
@@ -28,67 +26,51 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const { setExpandCategoryHandlerRef } = useLocateMeContext();
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      serverId: state.currentServer.data.serverId,
-      permissionLevel: state.currentServer.data.permissionLevel,
-      receptionLobbyId: state.currentServer.data.receptionLobbyId,
-      lobbyId: state.currentServer.data.lobbyId,
-    }),
-    shallowEqual,
-  );
-
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      permissionLevel: state.currentChannel.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
-  const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
+  const currentServerLobbyId = useAppSelector((state) => state.currentServer.data.lobbyId);
+  const currentServerReceptionLobbyId = useAppSelector((state) => state.currentServer.data.receptionLobbyId);
+  const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
+  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
+  const channels = useAppSelector((state) => state.channels.data);
+  const onlineMembers = useAppSelector((state) => state.onlineMembers.data);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`);
 
   const [isExpanded, setIsExpanded] = useState(true);
 
-  const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, category.permissionLevel);
+  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, category.permissionLevel);
   const categoryChannels = channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === category.channelId);
   const categoryMembers = onlineMembers.filter((om) => om.currentChannelId === category.channelId);
-  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
-  const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
+  const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
+  const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
   const sortedCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
   const sortedCategoryMembers = [...categoryMembers].sort((a, b) => {
-    if (a.userId === user.userId && b.userId !== user.userId) return -1;
-    if (b.userId === user.userId && a.userId !== user.userId) return 1;
+    if (a.userId === userId && b.userId !== userId) return -1;
+    if (b.userId === userId && a.userId !== userId) return 1;
     return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
   });
-
-  const isInChannel = currentChannel.channelId === category.channelId;
-  const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannel.channelId);
-  const isReceptionLobby = currentServer.receptionLobbyId === category.channelId;
+  const isInChannel = currentChannelId === category.channelId;
+  const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannelId);
+  const isReceptionLobby = currentServerLobbyId === category.channelId;
   const isMemberChannel = category.visibility === 'member';
   const isPrivateChannel = category.visibility === 'private';
   const isReadonlyChannel = category.visibility === 'readonly';
   const isFull = category.userLimit && category.userLimit <= categoryMembers.length;
-  const isDraggable = permissionLevel >= Permission.ChannelMod && movableCategoryUserIds.length > 0;
-  const isPasswordNeeded = permissionLevel < Permission.ChannelMod && isPrivateChannel;
-  const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && permissionLevel < Permission.Member) && (!isFull || permissionLevel >= Permission.ServerAdmin);
+  const isDraggable = permissionLevel >= Types.Permission.ChannelMod && movableCategoryUserIds.length > 0;
+  const isPasswordNeeded = permissionLevel < Types.Permission.ChannelMod && isPrivateChannel;
+  const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && permissionLevel < Types.Permission.Member) && (!isFull || permissionLevel >= Types.Permission.ServerAdmin);
 
   const { buildContextMenu } = useChannelCtxMenu({
-    user,
-    currentServer,
-    currentChannel,
+    userId,
+    userPermissionLevel,
+    currentServerId,
+    currentServerPermissionLevel,
+    currentServerReceptionLobbyId,
+    currentChannelId,
+    currentChannelPermissionLevel,
     channel: category,
-    category,
     movableChannelUserIds: movableCategoryUserIds,
     movableServerUserIds,
     canJoin,
@@ -101,7 +83,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   const handleTabDoubleClick = () => {
-    connectChannel(currentServer.serverId, category.channelId, canJoin, isPasswordNeeded);
+    connectChannel(currentServerId, category.channelId, canJoin, isPasswordNeeded);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {
@@ -112,7 +94,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   const handleTabDragOver = (e: React.DragEvent) => {
-    if (permissionLevel >= Permission.ChannelMod && !isReadonlyChannel) e.preventDefault();
+    if (permissionLevel >= Types.Permission.ChannelMod && !isReadonlyChannel) e.preventDefault();
     else e.dataTransfer.dropEffect = 'none';
   };
 
@@ -123,7 +105,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
     if (!currentChannelId || !userIds || userIds.length === 0) return;
     if (currentChannelId === category.channelId || isReadonlyChannel) return;
-    moveAllUsersToChannel(userIds, currentServer.serverId, category.channelId);
+    moveAllUsersToChannel(userIds, currentServerId, category.channelId);
     e.dataTransfer.clearData();
   };
 

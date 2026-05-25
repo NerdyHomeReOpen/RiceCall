@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import ChannelMessage from './ChannelMessage';
 import DirectMessage from './DirectMessage';

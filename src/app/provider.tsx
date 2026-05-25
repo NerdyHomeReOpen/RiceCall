@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 import React, { useEffect, useState } from 'react';
 import { Provider } from 'react-redux';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 

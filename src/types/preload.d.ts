@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 export type eventEmitterHandlers = {
   send: (channel: string, ...args: unknown[]) => void;

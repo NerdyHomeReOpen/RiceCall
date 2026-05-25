@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -32,23 +32,11 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const [selectedTab, setSelectedTab] = useState<'home' | 'friends' | 'server'>('home');
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      name: state.user.data.name,
-      currentServerId: state.currentServer.data.serverId,
-    }),
-    shallowEqual,
-  );
-
-  const currentServer = useAppSelector(
-    (state) => ({
-      name: state.currentServer.data.name,
-    }),
-    shallowEqual,
-  );
-
-  const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length, shallowEqual);
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userName = useAppSelector((state) => state.user.data.name);
+  const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
+  const currentServerName = useAppSelector((state) => state.currentServer.data.name);
+  const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length);
   const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   const isSelectedHomePage = selectedTab === 'home';
@@ -60,31 +48,31 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
-    ipc.tray.title.set(user.name);
-  }, [user.name]);
+    ipc.tray.title.set(userName);
+  }, [userName]);
 
   useEffect(() => {
-    if (user.currentServerId) setSelectedTab('server');
-    else if (!user.currentServerId) setSelectedTab('home');
+    if (currentServerId) setSelectedTab('server');
+    else if (!currentServerId) setSelectedTab('home');
     stopLoading();
-  }, [user.currentServerId, stopLoading]);
+  }, [currentServerId, stopLoading]);
 
   useEffect(() => {
     const onServerSelect = (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
-      if (getIsLoading() || user.currentServerId === data.serverId) return;
+      if (getIsLoading() || currentServerId === data.serverId) return;
       loadServer(data.serverDisplayId);
       ipc.socket.send('connectServer', { serverId: data.serverId });
     };
     const unsub = ipc.server.onSelect(onServerSelect);
     return () => unsub();
-  }, [user.currentServerId, getIsLoading, loadServer]);
+  }, [currentServerId, getIsLoading, loadServer]);
 
   useEffect(() => {
     switch (selectedTab) {
       case 'home':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-home-page'),
-          state: `${t('rpc:user', { '0': user.name })}`,
+          state: `${t('rpc:user', { '0': userName })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RiceCall',
           smallImageKey: 'home_icon',
@@ -96,7 +84,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       case 'friends':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-friend-page'),
-          state: `${t('rpc:user', { '0': user.name })}`,
+          state: `${t('rpc:user', { '0': userName })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RiceCall',
           smallImageKey: 'home_icon',
@@ -107,7 +95,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         break;
       case 'server':
         ipc.discord.updatePresence({
-          details: `${t('in')} ${currentServer.name}`,
+          details: `${t('in')} ${currentServerName}`,
           state: `${t('rpc:chat-with-members', { '0': onlineMembersLength.toString() })}`,
           largeImageKey: 'app_icon',
           largeImageText: 'RiceCall',
@@ -118,7 +106,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         });
         break;
     }
-  }, [selectedTab, user.name, currentServer.name, onlineMembersLength, t]);
+  }, [selectedTab, userName, currentServerName, onlineMembersLength, t]);
 
   return (
     <WebRTCProvider>
@@ -127,7 +115,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           <SocketManager />
           <StoreSyncer.Master />
           <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
-          {!user.userId || !isSocketConnected ? (
+          {!userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
             <>

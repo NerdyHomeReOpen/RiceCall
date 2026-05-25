@@ -1,6 +1,6 @@
 import React, { ReactNode, useCallback, useEffect, useRef, useState } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 

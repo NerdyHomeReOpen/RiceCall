@@ -1,9 +1,8 @@
 import React from 'react';
 import Image from 'next/image';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -26,21 +25,16 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   const { showContextMenu } = useContextMenu();
   const { getIsLoading, loadServer } = useLoading();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      currentServerId: state.user.data.currentServerId,
-    }),
-    shallowEqual,
-  );
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const currentServerId = useAppSelector((state) => state.user.data.currentServerId);
 
   const joinServer = () => {
-    if (getIsLoading() || user.currentServerId === recommendServer.serverId) return;
+    if (getIsLoading() || currentServerId === recommendServer.serverId) return;
     loadServer(recommendServer.specialId || recommendServer.displayId);
     ipc.socket.send('connectServer', { serverId: recommendServer.serverId });
   };
 
-  const { buildContextMenu: buildServerCardContextMenu } = useRecommendServerCtxMenu({ user, recommendServer, onJoinServer: joinServer });
+  const { buildContextMenu: buildServerCardContextMenu } = useRecommendServerCtxMenu({ userId, recommendServerId: recommendServer.serverId, onJoinServer: joinServer });
 
   const handleServerCardClick = () => {
     joinServer();

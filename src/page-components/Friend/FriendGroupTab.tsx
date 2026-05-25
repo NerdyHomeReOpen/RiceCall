@@ -1,7 +1,6 @@
-import React, { useState, useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
+import React, { useState } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as Store from '@/store';
 
@@ -23,35 +22,28 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-group-${friendGroup.friendGroupId}`, shallowEqual);
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-group-${friendGroup.friendGroupId}`);
 
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
+  const friendGroupFriends = friends.filter((f) => {
+    if (friendGroup.friendGroupId === 'default') {
+      return !f.isBlocked && !f.friendGroupId && f.relationStatus !== 0;
+    } else if (friendGroup.friendGroupId === 'blacklist') {
+      return f.isBlocked;
+    } else if (friendGroup.friendGroupId === 'stranger') {
+      return !f.isBlocked && f.relationStatus === 0;
+    } else {
+      return !f.isBlocked && f.friendGroupId === friendGroup.friendGroupId && f.relationStatus !== 0;
+    }
+  });
+  const sortedFriendGroupFriends = [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0));
   const isStranger = friendGroup.friendGroupId === 'stranger';
   const isBlacklist = friendGroup.friendGroupId === 'blacklist';
+  const onlineCount = friendGroupFriends.filter((f) => f.status !== 'offline').length;
 
-  const friendGroupFriends = useMemo(() => {
-    if (friendGroup.friendGroupId === 'default') {
-      return friends.filter((f) => !f.isBlocked && !f.friendGroupId && f.relationStatus !== 0);
-    } else if (friendGroup.friendGroupId === 'blacklist') {
-      return friends.filter((f) => f.isBlocked);
-    } else if (friendGroup.friendGroupId === 'stranger') {
-      return friends.filter((f) => !f.isBlocked && f.relationStatus === 0);
-    } else {
-      return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroup.friendGroupId && f.relationStatus !== 0);
-    }
-  }, [friendGroup.friendGroupId, friends]);
-  const sortedFriendGroupFriends = useMemo(() => [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)), [friendGroupFriends]);
-  const onlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
-
-  const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupCtxMenu({ user, friendGroup });
+  const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupCtxMenu({ userId, friendGroupId: friendGroup.friendGroupId, friendGroupName: friendGroup.name });
 
   const handleTabClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));

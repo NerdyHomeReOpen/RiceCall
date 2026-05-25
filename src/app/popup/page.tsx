@@ -3,7 +3,7 @@
 import dynamic from 'next/dynamic';
 import React, { useEffect, useState, useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 

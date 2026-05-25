@@ -1,8 +1,7 @@
-import React, { useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
+import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -25,23 +24,17 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  const user = useAppSelector((state) => ({ userId: state.user.data.userId }), shallowEqual);
+  const userId = useAppSelector((state) => state.user.data.userId);
 
   const escapedMessageParameter = Object.fromEntries(Object.entries(messageGroup.parameter).map(([key, value]) => [key, escapeHtml(value)]));
-  const formattedMessagesContents = useMemo(
-    () =>
-      messageGroup.contents.map((content) =>
-        content
-          .split(' ')
-          .map((c) =>
-            c.startsWith('message:') ? t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: getPermissionText(parseInt(messageGroup.parameter.userPermissionLevel)) } }) : c,
-          )
-          .join(' '),
-      ),
-    [messageGroup.contents, escapedMessageParameter, messageGroup.parameter, t],
+  const formattedMessagesContents = messageGroup.contents.map((content) =>
+    content
+      .split(' ')
+      .map((c) => (c.startsWith('message:') ? t(c, { ns: 'message', ...{ ...escapedMessageParameter, permissionText: getPermissionText(parseInt(messageGroup.parameter.userPermissionLevel)) } }) : c))
+      .join(' '),
   );
 
-  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageCtxMenu({ user, contentMetadata: messageGroup.contentMetadata });
+  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageCtxMenu({ userId, contentMetadata: messageGroup.contentMetadata });
 
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();

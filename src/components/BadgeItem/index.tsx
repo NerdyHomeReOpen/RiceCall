@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 

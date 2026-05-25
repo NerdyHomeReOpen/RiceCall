@@ -1,7 +1,6 @@
 import React from 'react';
-import { shallowEqual } from 'react-redux';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as Store from '@/store';
 
@@ -20,7 +19,7 @@ interface CategoryTabProps {
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category, onSelect }) => {
   const dispatch = useAppDispatch();
 
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`);
 
   const categoryChildren = channels?.filter((c) => c.categoryId === category.channelId);
 

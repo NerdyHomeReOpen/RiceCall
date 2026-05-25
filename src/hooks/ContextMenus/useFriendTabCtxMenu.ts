@@ -1,45 +1,50 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { openDirectMessage, openUserInfo, openApplyFriend, openEditFriendNote, editFriend, unblockUser, blockUser, deleteFriend, deleteFriendApplication } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
 interface UseFriendTabCtxMenuProps {
-  user: Pick<Types.User, 'userId'>;
-  friend: Pick<Types.Friend, 'targetId' | 'name' | 'relationStatus' | 'isBlocked' | 'friendGroupId'>;
+  userId: Types.User['userId'];
+  friendTargetId: Types.Friend['targetId'];
+  friendName: Types.Friend['name'];
+  friendRelationStatus: Types.Friend['relationStatus'];
+  friendIsBlocked: Types.Friend['isBlocked'];
+  friendFriendGroupId: Types.Friend['friendGroupId'];
   friendGroups: Types.FriendGroup[];
   defaultFriendGroup: Types.FriendGroup;
 }
 
-export const useFriendTabCtxMenu = ({ user, friend, friendGroups, defaultFriendGroup }: UseFriendTabCtxMenuProps) => {
-  const isSelf = friend.targetId === user.userId;
-  const isFriend = friend.relationStatus === 2;
-  const isStranger = friend.relationStatus === 0;
-  const isPending = friend.relationStatus === 1;
+export const useFriendTabCtxMenu = (props: UseFriendTabCtxMenuProps) => {
+  const { userId, friendTargetId, friendName, friendRelationStatus, friendIsBlocked, friendFriendGroupId, friendGroups, defaultFriendGroup } = props;
+  const isSelf = friendTargetId === userId;
+  const isFriend = friendRelationStatus === 2;
+  const isStranger = friendRelationStatus === 0;
+  const isPending = friendRelationStatus === 1;
 
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, friend.targetId))
-        .addViewProfileOption(() => openUserInfo(user.userId, friend.targetId))
-        .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(user.userId, friend.targetId))
-        .addEditNoteOption({ isSelf, isFriend }, () => openEditFriendNote(user.userId, friend.targetId))
+        .addDirectMessageOption({ isSelf }, () => openDirectMessage(userId, friendTargetId))
+        .addViewProfileOption(() => openUserInfo(userId, friendTargetId))
+        .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(userId, friendTargetId))
+        .addEditNoteOption({ isSelf, isFriend }, () => openEditFriendNote(userId, friendTargetId))
         .addSeparator()
         .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => {}, onNotifyFriendOnlineClick: () => {} }, () => {})
         .addEditFriendFriendGroupOption(
-          { isSelf, isStranger, isBlocked: friend.isBlocked },
+          { isSelf, isStranger, isBlocked: friendIsBlocked },
           () => {},
           new ContextMenu()
-            .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => editFriend(friend.targetId, { friendGroupId }))
+            .addFriendGroupOption({ friendGroupId: friendFriendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => editFriend(friendTargetId, { friendGroupId }))
             .build(),
         )
-        .addBlockUserOption({ isSelf, isBlocked: friend.isBlocked }, () => (friend.isBlocked ? unblockUser(friend.targetId, friend.name) : blockUser(friend.targetId, friend.name)))
-        .addDeleteFriendOption({ isSelf, isFriend }, () => deleteFriend(friend.targetId, friend.name))
-        .addDeleteFriendApplicationOption({ isSelf, isPending }, () => deleteFriendApplication(friend.targetId))
+        .addBlockUserOption({ isSelf, isBlocked: friendIsBlocked }, () => (friendIsBlocked ? unblockUser(friendTargetId, friendName) : blockUser(friendTargetId, friendName)))
+        .addDeleteFriendOption({ isSelf, isFriend }, () => deleteFriend(friendTargetId, friendName))
+        .addDeleteFriendApplicationOption({ isSelf, isPending }, () => deleteFriendApplication(friendTargetId))
         .build(),
-    [user, friend, isSelf, isFriend, isStranger, isPending, friendGroups, defaultFriendGroup],
+    [userId, friendTargetId, friendName, friendIsBlocked, friendFriendGroupId, friendGroups, defaultFriendGroup, isSelf, isFriend, isStranger, isPending],
   );
 
   return { buildContextMenu };

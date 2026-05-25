@@ -1,4 +1,4 @@
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { SYSTEM_FONT_LIST } from '@/constants';
 

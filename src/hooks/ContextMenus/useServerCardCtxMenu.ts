@@ -1,30 +1,34 @@
 import { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { openServerSetting, favoriteServer, terminateMember } from '@/services';
 
 import ContextMenu from '@/utils/contextMenu';
 
 interface UseServerCardCtxMenuProps {
-  user: Pick<Types.User, 'userId'>;
-  server: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'favorite'>;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
+  serverPermissionLevel: Types.Server['permissionLevel'];
+  serverFavorite: Types.Server['favorite'];
   onJoinServer: () => void;
 }
 
-export const useServerCardCtxMenu = ({ user, server, onJoinServer }: UseServerCardCtxMenuProps) => {
+export const useServerCardCtxMenu = (props: UseServerCardCtxMenuProps) => {
   const { t } = useTranslation();
+
+  const { userId, serverId, serverPermissionLevel, serverFavorite, onJoinServer } = props;
 
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
         .addJoinServerOption(onJoinServer)
-        .addViewServerInfoOption(() => openServerSetting(user.userId, server.serverId))
-        .addFavoriteServerOption({ isFavorite: server.favorite }, () => favoriteServer(server.serverId))
-        .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isSelf: true }, () => terminateMember(user.userId, server.serverId, t('self')))
+        .addViewServerInfoOption(() => openServerSetting(userId, serverId))
+        .addFavoriteServerOption({ isFavorite: serverFavorite }, () => favoriteServer(serverId))
+        .addTerminateSelfMembershipOption({ permissionLevel: serverPermissionLevel, isSelf: true }, () => terminateMember(userId, serverId, t('self')))
         .build(),
-    [user, server, onJoinServer, t],
+    [userId, serverId, serverPermissionLevel, serverFavorite, onJoinServer, t],
   );
 
   return { buildContextMenu };

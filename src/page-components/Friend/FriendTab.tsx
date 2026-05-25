@@ -3,7 +3,7 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -36,20 +36,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const { getIsLoading, loadServer } = useLoading();
   const dispatch = useAppDispatch();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      currentServerId: state.user.data.currentServerId,
-    }),
-    shallowEqual,
-  );
-
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const currentServerId = useAppSelector((state) => state.user.data.currentServerId);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-${friend.targetId}`, shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-${friend.targetId}`);
 
   const [friendCurrentServer, setFriendCurrentServer] = useState<Types.Server | null>(null);
 
-  const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: -1, userId: user.userId }), [t, user.userId]);
+  const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: -1, userId }), [t, userId]);
   const isOnline = friend.status === 'online';
   const isOffline = friend.status === 'offline';
   const isPending = friend.relationStatus === 1;
@@ -57,10 +51,19 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const hasVip = friend.vip > 0;
   const hasNote = friend.note !== '' && friend.note !== null;
 
-  const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabCtxMenu({ user, friend, friendGroups, defaultFriendGroup });
+  const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabCtxMenu({
+    userId,
+    friendTargetId: friend.targetId,
+    friendName: friend.name,
+    friendRelationStatus: friend.relationStatus,
+    friendIsBlocked: friend.isBlocked,
+    friendFriendGroupId: friend.friendGroupId,
+    friendGroups,
+    defaultFriendGroup,
+  });
 
   const handleServerNameClick = () => {
-    if (getIsLoading() || !friendCurrentServer || user.currentServerId === friendCurrentServer.serverId) return;
+    if (getIsLoading() || !friendCurrentServer || currentServerId === friendCurrentServer.serverId) return;
     loadServer(friendCurrentServer.specialId || friendCurrentServer.displayId);
     ipc.socket.send('connectServer', { serverId: friendCurrentServer.serverId });
   };
@@ -71,7 +74,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   };
 
   const handleTabDoubleClick = () => {
-    openDirectMessage(user.userId, friend.targetId);
+    openDirectMessage(userId, friend.targetId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

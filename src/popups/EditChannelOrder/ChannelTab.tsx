@@ -1,7 +1,6 @@
 import React from 'react';
-import { shallowEqual } from 'react-redux';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import * as Store from '@/store';
 
@@ -17,7 +16,7 @@ interface ChannelTabProps {
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect }) => {
   const dispatch = useAppDispatch();
 
-  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
+  const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`);
 
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();

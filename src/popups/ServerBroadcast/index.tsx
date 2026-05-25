@@ -3,7 +3,7 @@ import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { broadcastChannel, broadcastServer } from '@/services';
 

@@ -1,10 +1,8 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
-import type * as Types from '@/types';
-import { Permission } from '@/types';
+import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -49,15 +47,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const isResizingBlockMemberColumn = useRef<boolean>(false);
   const isUploadingRef = useRef<boolean>(false);
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
-
-  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+  const userId = useAppSelector((state) => state.user.data.userId);
+  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId);
 
   const [server, setServer] = useState<Types.Server>(serverData);
   const [serverMembers, setServerMembers] = useState<Types.Member[]>(serverMembersData);
@@ -77,12 +69,12 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const [applicationColumnWidths, setApplicationColumnWidths] = useState<number[]>(MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
 
-  const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel);
-  const isReadOnly = permissionLevel < Permission.ServerAdmin;
+  const permissionLevel = Math.max(userPermissionLevel, server.permissionLevel);
+  const isReadOnly = permissionLevel < Types.Permission.ServerAdmin;
   const canSubmit = server.name.trim();
 
   const { totalMembersCount, sortedMembers } = useMemo(() => {
-    const total = serverMembers.filter((m) => m.permissionLevel >= Permission.Member && m.permissionLevel <= Permission.ServerOwner);
+    const total = serverMembers.filter((m) => m.permissionLevel >= Types.Permission.Member && m.permissionLevel <= Types.Permission.ServerOwner);
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(memberQuery.toLowerCase()) || m.name.toLowerCase().includes(memberQuery.toLowerCase()));
     const sorted = filtered.sort(sorter(memberSortField, memberSortDirection));
     return { totalMembersCount: total.length, filteredMembers: filtered, sortedMembers: sorted };
@@ -103,7 +95,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   }, [serverMembers, blockMemberQuery, blockMemberSortField, blockMemberSortDirection]);
 
   const settingPages =
-    permissionLevel >= Permission.ServerAdmin
+    permissionLevel >= Types.Permission.ServerAdmin
       ? [
           t('server-info'),
           t('server-announcement'),
@@ -112,7 +104,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
           `${t('member-application-management')} (${totalApplicationsCount})`,
           `${t('blacklist-management')} (${totalBlockMembersCount})`,
         ]
-      : permissionLevel >= Permission.Member
+      : permissionLevel >= Types.Permission.Member
         ? [t('server-info'), t('server-announcement'), t('member-management')]
         : [t('server-info'), t('server-announcement')];
 
@@ -258,7 +250,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   };
 
   const handleApplySettingBtnClick = () => {
-    openMemberApplicationSetting(user.userId, server.serverId);
+    openMemberApplicationSetting(userId, server.serverId);
   };
 
   const handleSaveBtnClick = () => {
@@ -448,7 +440,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </thead>
                 <tbody className="table">
                   {sortedMembers.map((member) => (
-                    <ServerSettingMemberRow key={member.userId} user={user} server={server} member={member} permissionLevel={permissionLevel} columnWidths={memberColumnWidths} />
+                    <ServerSettingMemberRow key={member.userId} userId={userId} serverId={server.serverId} member={member} permissionLevel={permissionLevel} columnWidths={memberColumnWidths} />
                   ))}
                 </tbody>
               </table>
@@ -511,7 +503,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </thead>
                 <tbody className="table">
                   {sortedApplications.map((application) => {
-                    const isSelf = application.userId === user.userId;
+                    const isSelf = application.userId === userId;
                     const isSelected = selectedItemId === `application-${application.userId}`;
 
                     const getContextMenuItems = () => [
@@ -519,12 +511,12 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         id: 'view-profile',
                         label: t('view-profile'),
                         show: !isSelf,
-                        onClick: () => openUserInfo(user.userId, application.userId),
+                        onClick: () => openUserInfo(userId, application.userId),
                       },
                       {
                         id: 'accept-application',
                         label: t('accept-application'),
-                        show: !isSelf && permissionLevel >= Permission.ServerAdmin,
+                        show: !isSelf && permissionLevel >= Types.Permission.ServerAdmin,
                         onClick: () => {
                           approveMemberApplication(application.userId, server.serverId);
                         },
@@ -532,7 +524,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                       {
                         id: 'deny-application',
                         label: t('deny-application'),
-                        show: !isSelf && permissionLevel >= Permission.ServerAdmin,
+                        show: !isSelf && permissionLevel >= Types.Permission.ServerAdmin,
                         onClick: () => {
                           rejectMemberApplication(application.userId, server.serverId);
                         },
@@ -588,7 +580,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </thead>
                 <tbody className="table">
                   {sortedBlockMembers.map((member) => (
-                    <ServerSettingBlockedMemberRow key={member.userId} user={user} server={server} member={member} permissionLevel={permissionLevel} columnWidths={blockMemberColumnWidths} />
+                    <ServerSettingBlockedMemberRow
+                      key={member.userId}
+                      userId={userId}
+                      serverId={server.serverId}
+                      member={member}
+                      permissionLevel={permissionLevel}
+                      columnWidths={blockMemberColumnWidths}
+                    />
                   ))}
                 </tbody>
               </table>
@@ -619,21 +618,33 @@ ServerSettingPopup.displayName = 'ServerSettingPopup';
 export default ServerSettingPopup;
 
 interface ServerSettingMemberRowProps {
-  user: { userId: string };
-  server: Pick<Types.Server, 'serverId'>;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
   member: Types.Member;
   permissionLevel: Types.Permission;
   columnWidths: number[];
 }
 
-const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo(({ user, server, member, permissionLevel, columnWidths }) => {
+const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo(({ userId, serverId, member, permissionLevel, columnWidths }) => {
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
-  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId);
 
   const isSelected = selectedItemId === `member-${member.userId}`;
+  const isSelf = member.userId === userId;
+  const isLowerLevel = member.permissionLevel < permissionLevel;
 
-  const { buildContextMenu } = useServerSettingMemberCtxMenu({ user, server, member, permissionLevel });
+  const { buildContextMenu } = useServerSettingMemberCtxMenu({
+    userId,
+    serverId,
+    memberUserId: member.userId,
+    memberName: member.name,
+    memberPermissionLevel: member.permissionLevel,
+    permissionLevel,
+    isSelf,
+    isLowerLevel,
+  });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -663,22 +674,31 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
 ServerSettingMemberRow.displayName = 'ServerSettingMemberRow';
 
 interface ServerSettingBlockedMemberRowProps {
-  user: { userId: string };
-  server: Pick<Types.Server, 'serverId'>;
+  userId: Types.User['userId'];
+  serverId: Types.Server['serverId'];
   member: Types.Member;
   permissionLevel: Types.Permission;
   columnWidths: number[];
 }
 
-const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps> = React.memo(({ user, server, member, permissionLevel, columnWidths }) => {
+const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps> = React.memo(({ userId, serverId, member, permissionLevel, columnWidths }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
-  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
+
+  const selectedItemId = useAppSelector((state) => state.ui.selectedItemId);
 
   const isSelected = selectedItemId === `blocked-${member.userId}`;
+  const isSelf = member.userId === userId;
 
-  const { buildContextMenu } = useServerSettingBlockedMemberCtxMenu({ user, server, member, permissionLevel });
+  const { buildContextMenu } = useServerSettingBlockedMemberCtxMenu({
+    userId,
+    serverId,
+    memberUserId: member.userId,
+    memberName: member.name,
+    permissionLevel,
+    isSelf,
+  });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));

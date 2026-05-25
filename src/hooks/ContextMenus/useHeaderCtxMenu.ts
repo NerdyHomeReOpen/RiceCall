@@ -1,6 +1,6 @@
 import { useCallback } from 'react';
 
-import type * as Types from '@/types';
+import * as Types from '@/types';
 
 import { openSystemSetting, openChangeTheme, openAboutUs, openNetworkDiagnosis } from '@/services';
 
@@ -9,17 +9,19 @@ import ContextMenu from '@/utils/contextMenu';
 import { LANGUAGES } from '@/constants';
 
 interface UseHeaderCtxMenuProps {
-  user: Pick<Types.User, 'userId'>;
+  userId: string;
   onChangeLanguage: (code: Types.LanguageKey) => void;
   onLogout: () => void;
   onExit: () => void;
 }
 
-export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: UseHeaderCtxMenuProps) => {
+export const useHeaderCtxMenu = (props: UseHeaderCtxMenuProps) => {
+  const { userId, onChangeLanguage, onLogout, onExit } = props;
+
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addSystemSettingOption(() => openSystemSetting(user.userId))
+        .addSystemSettingOption(() => openSystemSetting(userId))
         .addChangeThemeOption(() => openChangeTheme())
         .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
         .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? onChangeLanguage(code) : null))
@@ -37,7 +39,7 @@ export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: U
         .addLogoutOption(onLogout)
         .addExitOption(onExit)
         .build(),
-    [user.userId, onChangeLanguage, onLogout, onExit],
+    [userId, onChangeLanguage, onLogout, onExit],
   );
 
   return { buildContextMenu };
