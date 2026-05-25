@@ -16,15 +16,17 @@ import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAG
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useServerSettingMemberContextMenu } from '@/hooks/ContextMenus/ServerSettingMember';
-import { useServerSettingBlockedMemberContextMenu } from '@/hooks/ContextMenus/ServerSettingBlockedMember';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useServerSettingMemberCtxMenu } from '@/hooks/ContextMenus/useServerSettingMemberCtxMenu';
+import { useServerSettingBlockedMemberCtxMenu } from '@/hooks/ContextMenus/useServerSettingBlockedMemberCtxMenu';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
 import { getPermissionText } from '@/utils/language';
 import { sorter } from '@/utils/sorter';
 import { objDiff } from '@/utils';
+
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
 import styles from './ServerSetting.module.css';
 
@@ -80,7 +82,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const canSubmit = server.name.trim();
 
   const { totalMembersCount, sortedMembers } = useMemo(() => {
-    const total = serverMembers.filter((m) => m.permissionLevel >= Permission.Member && m.permissionLevel < Permission.ServerAdmin);
+    const total = serverMembers.filter((m) => m.permissionLevel >= Permission.Member && m.permissionLevel <= Permission.ServerOwner);
     const filtered = total.filter((m) => m.nickname?.toLowerCase().includes(memberQuery.toLowerCase()) || m.name.toLowerCase().includes(memberQuery.toLowerCase()));
     const sorted = filtered.sort(sorter(memberSortField, memberSortDirection));
     return { totalMembersCount: total.length, filteredMembers: filtered, sortedMembers: sorted };
@@ -186,7 +188,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     });
   };
 
-  const handleImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || isUploadingRef.current) return;
     file.arrayBuffer().then((arrayBuffer) => {
@@ -369,9 +371,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
               </div>
               <div className={styles['avatar-wrapper']}>
                 <div className={styles['avatar']}>
-                  <Image src={server.avatarUrl} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
+                  <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
                 </div>
-                <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
+                <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onChange={handleImageChange} />
                 {!isReadOnly ? (
                   <label htmlFor="avatar-upload" className="button" style={{ marginTop: '10px', height: '2em' }}>
                     {t('change-avatar')}
@@ -631,7 +633,7 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
 
   const isSelected = selectedItemId === `member-${member.userId}`;
 
-  const { buildContextMenu } = useServerSettingMemberContextMenu({ user, server, member, permissionLevel });
+  const { buildContextMenu } = useServerSettingMemberCtxMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -676,7 +678,7 @@ const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps
 
   const isSelected = selectedItemId === `blocked-${member.userId}`;
 
-  const { buildContextMenu } = useServerSettingBlockedMemberContextMenu({ user, server, member, permissionLevel });
+  const { buildContextMenu } = useServerSettingBlockedMemberCtxMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));

@@ -349,8 +349,8 @@ export default class ContextMenu {
 
   addUnblockUserFromServerOption(params: { permissionLevel: Types.Permission; isSelf: boolean }, onClick: () => void): this {
     this.options.push({
-      id: 'unblock-user-from-server',
-      label: 'unblock-user-from-server',
+      id: 'unblock-server',
+      label: 'unblock',
       show: !params.isSelf && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
@@ -359,8 +359,8 @@ export default class ContextMenu {
 
   addUnblockUserFromChannelOption(params: { permissionLevel: Types.Permission; isSelf: boolean }, onClick: () => void): this {
     this.options.push({
-      id: 'unblock-user-from-channel',
-      label: 'unblock-user-from-channel',
+      id: 'unblock-channel',
+      label: 'unblock',
       show: !params.isSelf && params.permissionLevel >= Permission.ChannelAdmin,
       onClick: onClick,
     });

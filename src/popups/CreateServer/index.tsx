@@ -9,9 +9,9 @@ import * as ipc from '@/main/ipc';
 
 import { createServer, openImageCropper, openAlertDialog } from '@/services';
 
-import { MAX_FILE_SIZE, SERVER_TYPES } from '@/constants';
+import { MAX_FILE_SIZE, SERVER_TYPES, DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { getDefaultServer } from '@/utils/default';
 
@@ -48,7 +48,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
   }, [user.level, servers]);
   const canSubmit = remainingServers > 0 && serverName.trim();
 
-  const handleImageInput = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     if (!image || isUploadingRef.current) return;
     image.arrayBuffer().then((arrayBuffer) => {
@@ -134,9 +134,9 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
           <div className={styles['create-server-content']} style={{ justifyContent: 'space-evenly' }}>
             <div className={styles['avatar-wrapper']}>
               <div className={styles['avatar-picture']}>
-                <Image src={serverAvatarUrl} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
+                <Image src={serverAvatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
               </div>
-              <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onInput={handleImageInput} />
+              <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onChange={handleImageChange} />
               <label htmlFor="avatar-upload" style={{ marginTop: '10px' }} className="button">
                 {t('upload-avatar')}
               </label>

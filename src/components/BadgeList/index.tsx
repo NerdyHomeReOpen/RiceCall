@@ -1,4 +1,4 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 
 import type * as Types from '@/types';
 
@@ -15,18 +15,14 @@ interface BadgeListProps {
 }
 
 const BadgeList: React.FC<BadgeListProps> = React.memo(({ badges, position = 'left-top', direction = 'right-bottom', maxDisplay = 21, grid = false }) => {
-  const filteredBadges = useMemo(
-    () =>
-      badges
-        .filter((b) => b.showTo <= 0 || b.showTo >= Date.now())
-        .slice(0, maxDisplay)
-        .sort((a, b) => a.order - b.order),
-    [badges, maxDisplay],
-  );
+  const sortedBadges = badges
+    .filter((b) => b.showTo <= 0 || b.showTo >= Date.now())
+    .sort((a, b) => a.order - b.order)
+    .slice(0, maxDisplay);
 
   return (
     <div className={`${styles['wrapper']} ${grid ? styles['grid'] : ''}`}>
-      {filteredBadges.map((badge) => (
+      {sortedBadges.map((badge) => (
         <BadgeItem key={badge.badgeId} badge={badge} position={position} direction={direction} />
       ))}
     </div>

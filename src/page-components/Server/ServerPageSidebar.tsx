@@ -12,13 +12,15 @@ import { openInviteFriend, openServerSetting } from '@/services';
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
-import { useAppDispatch, useAppSelector } from '@/hooks/Store';
-import { useChannelListContextMenu } from '@/hooks/ContextMenus/ChannelList';
-import { useServerSettingContextMenu } from '@/hooks/ContextMenus/ServerSetting';
+import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
+import { useChannelListCtxMenu } from '@/hooks/ContextMenus/useChannelListCtxMenu';
+import { useServerSettingCtxMenu } from '@/hooks/ContextMenus/useServerSettingCtxMenu';
 
-import ChannelTab from '@/components/ChannelTab';
-import CategoryTab from '@/components/CategoryTab';
-import QueueUserTab from '@/components/QueueUserTab';
+import ChannelTab from './ChannelTab';
+import CategoryTab from './CategoryTab';
+import QueueUserTab from './QueueUserTab';
+
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
 import styles from './Server.module.css';
 
@@ -82,13 +84,13 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     dispatch(Store.setSelectedItemId(`user-${user.userId}`));
   };
 
-  const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingContextMenu({
+  const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingCtxMenu({
     user,
     currentServer,
     onLocateMe: handleLocateMe,
   });
 
-  const { buildContextMenu: buildChannelListContextMenu } = useChannelListContextMenu({
+  const { buildContextMenu: buildChannelListContextMenu } = useChannelListCtxMenu({
     user,
     currentServer,
     currentChannel,
@@ -152,7 +154,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     <>
       <div className={styles['sidebar-header']}>
         <div className={styles['server-avatar']} onClick={handleServerAvatarClick}>
-          <Image src={currentServer.avatarUrl} alt="server_avatar" width={50} height={50} loading="lazy" draggable="false" />
+          <Image src={currentServer.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={50} height={50} loading="lazy" draggable="false" />
         </div>
         <div className={styles['server-info-wrapper']}>
           <div className={styles['server-info-box']}>

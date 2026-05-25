@@ -194,5 +194,7 @@ export const SERVER_TYPES: { tKey: string; value: Types.Server['type'] }[] = [
   { tKey: 'entertainment', value: 'entertainment' },
   { tKey: 'other', value: 'other' },
 ];
+export const DEFAULT_USER_AVATAR_URL = '/default/userAvatar.svg';
+export const DEFAULT_SERVER_AVATAR_URL = '/default/serverAvatar.svg';
 
 export * from './emojis';

@@ -7,9 +7,11 @@ import type * as Types from '@/types';
 
 import { rejectAllFriendApplication, openApproveFriend, openDirectMessage, openUserInfo, rejectFriendApplication } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
+
+import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 
 import styles from './FriendVerification.module.css';
 
@@ -81,7 +83,7 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
   return (
     <div className={styles['application']}>
       <div className={styles['avatar-picture']} onClick={handleSenderAvatarClick}>
-        <Image src={application.avatarUrl} alt="sender_avatar" width={40} height={40} loading="lazy" draggable="false" />
+        <Image src={application.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="sender_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>

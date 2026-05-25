@@ -9,6 +9,8 @@ import LevelIcon from '@/components/LevelIcon';
 
 import { getPermissionText } from '@/utils/language';
 
+import { DEFAULT_USER_AVATAR_URL } from '@/constants';
+
 import styles from './UserInfoCard.module.css';
 
 interface UserInfoCardProps {
@@ -73,7 +75,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     >
       <div className={styles['body']}>
         <div className={styles['top']}>
-          <Image src={member.avatarUrl} alt="user_avatar" width={98} height={98} loading="lazy" draggable="false" />
+          <Image src={member.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={98} height={98} loading="lazy" draggable="false" />
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

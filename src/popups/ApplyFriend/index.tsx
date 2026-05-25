@@ -7,7 +7,7 @@ import * as ipc from '@/main/ipc';
 
 import { openUserInfo, openCreateFriendGroup, sendFriendApplication, editFriendApplication } from '@/services';
 
-import { useAppSelector } from '@/hooks/Store';
+import { useAppSelector } from '@/hooks/useStore';
 
 import SendSection from './SendSection';
 import SentSection from './SentSection';

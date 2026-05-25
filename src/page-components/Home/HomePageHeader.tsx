@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import ServerSearchBar from '@/components/ServerSearchBar';
+import ServerSearchBar from './ServerSearchBar';
 
 import styles from './Home.module.css';
 

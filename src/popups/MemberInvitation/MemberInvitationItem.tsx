@@ -8,6 +8,8 @@ import { acceptMemberInvitation, rejectMemberInvitation } from '@/services';
 
 import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
 import styles from './MemberInvitation.module.css';
 
 interface MemberInvitationItemProps {
@@ -28,7 +30,7 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
   return (
     <div className={styles['application']}>
       <div className={styles['avatar-picture']}>
-        <Image src={invitation.avatarUrl} alt="sender_avatar" width={45} height={45} loading="lazy" draggable="false" />
+        <Image src={invitation.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="sender_avatar" width={45} height={45} loading="lazy" draggable="false" />
       </div>
       <div style={{ flex: 1 }}>
         <div className={styles['user-info-box']}>
