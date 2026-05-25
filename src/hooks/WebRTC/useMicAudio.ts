@@ -35,6 +35,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       cancelAnimationFrame(rafIdListRef.current['user']);
       delete rafIdListRef.current['user'];
     }
+
     if (micNodesRef.current) {
       const { stream, source, gain } = micNodesRef.current;
       if (source) source.disconnect();
@@ -42,18 +43,17 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       if (stream) stream.getTracks().forEach((t) => t.stop());
       micNodesRef.current = { stream: null, source: null, gain: null };
     }
+
     Store.store.dispatch(Store.setSpeakingId({ id: 'user', value: false }));
   }, [rafIdListRef, micNodesRef]);
 
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
       if (!audioContextRef.current || !inputDesRef.current || !inputAnalyserRef.current) {
-        new Logger('WebRTC').info('initMicAudio: AudioContext not ready, initializing...');
         await initAudioContext();
         return initMicAudio(stream);
       }
 
-      new Logger('WebRTC').info('initMicAudio: Setting up mic audio nodes');
       removeMicAudio();
 
       stream.getAudioTracks().forEach((track) => {
@@ -72,11 +72,12 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
 
-      new Logger('WebRTC').info('initMicAudio: Starting detectSpeaking for user');
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
+
       detectSpeaking('user', inputAnalyserRef.current, dataArray, rafIdListRef, audioProducerRef);
 
       const newTrack = inputDesRef.current.stream.getAudioTracks()[0];
+
       if (audioProducerRef.current && newTrack) {
         await audioProducerRef.current.replaceTrack({ track: newTrack });
         audioProducerRef.current.resume();
@@ -109,35 +110,46 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
   const stopSpeaking = useCallback(() => {
     removeMicAudio();
+
     Store.store.dispatch(Store.setWebRTC({ isMicTaken: false }));
   }, [removeMicAudio]);
 
   const pressSpeakKey = useCallback(() => {
     const { speakingMode, isMicTaken } = Store.store.getState().webrtc;
     if (speakingMode !== 'key' || !isMicTaken) return;
+
     playSound('startSpeaking');
+
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = true;
     });
+
     Store.store.dispatch(Store.setWebRTC({ isSpeakKeyPressed: true }));
   }, [playSound, micNodesRef]);
 
   const releaseSpeakKey = useCallback(() => {
     const { speakingMode, isMicTaken } = Store.store.getState().webrtc;
     if (speakingMode !== 'key' || !isMicTaken) return;
+
     playSound('stopSpeaking');
+
     micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
       track.enabled = false;
     });
+
     Store.store.dispatch(Store.setWebRTC({ isSpeakKeyPressed: false }));
   }, [playSound, micNodesRef]);
 
   const changeMicVolume = useCallback(
     (volume: number) => {
       volume = Math.min(100, Math.max(0, volume));
-      if (micNodesRef.current.gain)
+
+      if (micNodesRef.current.gain) {
         micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
+      }
+
       const isMicMuted = volume === 0;
+
       Store.store.dispatch(Store.setWebRTC({ micVolume: volume, isMicMuted }));
       window.localStorage.setItem('mic-volume', volume.toString());
       window.localStorage.setItem('is-mic-mute', isMicMuted.toString());
@@ -146,7 +158,8 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
   );
 
   const toggleMicMuted = useCallback(() => {
-    if (Store.store.getState().webrtc.isMicMuted) {
+    const { isMicMuted } = Store.store.getState().webrtc;
+    if (isMicMuted) {
       const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
       changeMicVolume(prevVolume);
     } else {

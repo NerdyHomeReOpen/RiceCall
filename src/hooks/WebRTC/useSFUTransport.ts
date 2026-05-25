@@ -53,6 +53,7 @@ export const useSFUTransport = (
       if (!userId || typeof userId !== 'string') return;
 
       const stream = new MediaStream([consumer.track]);
+
       initSpeakerAudio(userId, stream);
 
       new Logger('WebRTC').info(`Consumed producer: ${userId}`);
@@ -70,6 +71,7 @@ export const useSFUTransport = (
 
       consumer.close();
       delete consumersRef.current[producerId];
+
       removeSpeakerAudio(userId);
 
       new Logger('WebRTC').info(`Unconsumed producer: ${userId}`);
@@ -92,14 +94,16 @@ export const useSFUTransport = (
         });
       if (!transport) return;
 
-      if (!deviceRef.current.loaded)
+      if (!deviceRef.current.loaded) {
         await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
+      }
 
-      sendTransportRef.current = deviceRef.current.createSendTransport(transport);
+      const sendTransport = deviceRef.current.createSendTransport(transport);
+      sendTransportRef.current = sendTransport;
 
-      sendTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
+      sendTransport.on('connect', ({ dtlsParameters }, cb, eb) => {
         ipc.socket
-          .emit('SFUConnectTransport', { transportId: sendTransportRef.current!.id, dtlsParameters })
+          .emit('SFUConnectTransport', { transportId: sendTransport.id, dtlsParameters })
           .then(() => {
             new Logger('WebRTC').info('SendTransport connected to SFU');
             cb();
@@ -107,9 +111,9 @@ export const useSFUTransport = (
           .catch(eb);
       });
 
-      sendTransportRef.current.on('produce', ({ kind, rtpParameters }, cb, eb) => {
+      sendTransport.on('produce', ({ kind, rtpParameters }, cb, eb) => {
         ipc.socket
-          .emit('SFUCreateProducer', { transportId: sendTransportRef.current!.id, kind, rtpParameters, channelId })
+          .emit('SFUCreateProducer', { transportId: sendTransport.id, kind, rtpParameters, channelId })
           .then(({ id }) => {
             new Logger('WebRTC').info('SendTransport produced to SFU');
             cb({ id });
@@ -117,16 +121,18 @@ export const useSFUTransport = (
           .catch(eb);
       });
 
-      sendTransportRef.current.on('connectionstatechange', async (s) => {
+      sendTransport.on('connectionstatechange', async (s) => {
         new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
+
+        if (sendTransportRef.current !== sendTransport) return;
 
         if (s === 'connected') {
           sendRetryCountRef.current = 0;
         }
 
-        if (s === 'failed' || s === 'disconnected') {
+        if (s === 'failed' || s === 'disconnected' || s === 'closed') {
           let info;
-          const stats = await sendTransportRef.current?.getStats();
+          const stats = await sendTransport.getStats().catch(() => null);
           stats?.forEach((report) => {
             if (report.type === 'candidate-pair') {
               info = {
@@ -163,7 +169,8 @@ export const useSFUTransport = (
       });
 
       const track = inputDesRef.current?.stream.getAudioTracks()[0];
-      audioProducerRef.current = await sendTransportRef.current.produce({
+
+      audioProducerRef.current = await sendTransport.produce({
         track,
         encodings: [{ maxBitrate: bitrateRef.current }],
         codecOptions: {
@@ -175,10 +182,12 @@ export const useSFUTransport = (
         },
         stopTracks: false,
       });
+
       audioProducerRef.current.on('transportclose', () => {
         new Logger('WebRTC').info('Producer transport closed');
         audioProducerRef.current?.close();
       });
+
       audioProducerRef.current.on('trackended', () => {
         new Logger('WebRTC').info('Producer track ended');
         audioProducerRef.current?.close();
@@ -194,6 +203,14 @@ export const useSFUTransport = (
         recvTransportRef.current = null;
       }
 
+      for (const producerId of Object.keys(consumersRef.current)) {
+        const consumer = consumersRef.current[producerId];
+        const userId = consumer.appData.userId;
+        consumer.close();
+        if (typeof userId === 'string') removeSpeakerAudio(userId);
+      }
+      consumersRef.current = {};
+
       const transport = await ipc.socket
         .emit('SFUCreateTransport', { direction: 'recv', channelId })
         .catch((e) => {
@@ -202,14 +219,16 @@ export const useSFUTransport = (
         });
       if (!transport) return;
 
-      if (!deviceRef.current.loaded)
+      if (!deviceRef.current.loaded) {
         await deviceRef.current.load({ routerRtpCapabilities: transport.routerRtpCapabilities });
+      }
 
-      recvTransportRef.current = deviceRef.current.createRecvTransport(transport);
+      const recvTransport = deviceRef.current.createRecvTransport(transport);
+      recvTransportRef.current = recvTransport;
 
-      recvTransportRef.current.on('connect', ({ dtlsParameters }, cb, eb) => {
+      recvTransport.on('connect', ({ dtlsParameters }, cb, eb) => {
         ipc.socket
-          .emit('SFUConnectTransport', { transportId: recvTransportRef.current!.id, dtlsParameters })
+          .emit('SFUConnectTransport', { transportId: recvTransport.id, dtlsParameters })
           .then(() => {
             new Logger('WebRTC').info('RecvTransport connected to SFU');
             cb();
@@ -217,14 +236,16 @@ export const useSFUTransport = (
           .catch(eb);
       });
 
-      recvTransportRef.current.on('connectionstatechange', (s) => {
+      recvTransport.on('connectionstatechange', (s) => {
         new Logger('WebRTC').info(`RecvTransport connection state = ${s}`);
+
+        if (recvTransportRef.current !== recvTransport) return;
 
         if (s === 'connected') {
           recvRetryCountRef.current = 0;
         }
 
-        if (s === 'failed' || s === 'disconnected') {
+        if (s === 'failed' || s === 'disconnected' || s === 'closed') {
           const retryChannelId = currentChannelIdRef.current;
           if (retryChannelId && recvRetryCountRef.current < 3) {
             recvRetryCountRef.current++;
@@ -244,42 +265,59 @@ export const useSFUTransport = (
         });
       }
     },
-    [consumeOne, deviceRef, recvTransportRef],
+    [consumeOne, removeSpeakerAudio, deviceRef, recvTransportRef, consumersRef],
   );
 
   const closeSend = useCallback(
     async () => {
       currentChannelIdRef.current = null;
+      sendRetryCountRef.current = 0;
+
+      if (audioProducerRef.current) {
+        audioProducerRef.current.close();
+        audioProducerRef.current = null;
+      }
+
       if (sendTransportRef.current) {
         sendTransportRef.current.close();
         sendTransportRef.current = null;
       }
     },
-    [sendTransportRef],
+    [sendTransportRef, audioProducerRef],
   );
 
   const closeRecv = useCallback(() => {
     currentChannelIdRef.current = null;
+    recvRetryCountRef.current = 0;
+    for (const producerId of Object.keys(consumersRef.current)) {
+      const consumer = consumersRef.current[producerId];
+      const userId = consumer.appData.userId;
+      consumer.close();
+      if (typeof userId === 'string') removeSpeakerAudio(userId);
+    }
+    consumersRef.current = {};
+
     if (recvTransportRef.current) {
       recvTransportRef.current.close();
       recvTransportRef.current = null;
     }
-  }, [recvTransportRef]);
+  }, [recvTransportRef, consumersRef, removeSpeakerAudio]);
 
   const takeMic = useCallback(
     async (channelId: string) => {
       if (Store.store.getState().webrtc.isMicTaken) return;
       currentChannelIdRef.current = channelId;
+      sendRetryCountRef.current = 0;
       await setupSend(channelId);
       startSpeaking();
     },
     [setupSend, startSpeaking],
   );
 
-  const releaseMic = useCallback(() => {
+  const releaseMic = useCallback(async () => {
     if (!Store.store.getState().webrtc.isMicTaken) return;
     currentChannelIdRef.current = null;
-    closeSend();
+    await closeSend();
     stopSpeaking();
   }, [closeSend, stopSpeaking]);
 
@@ -288,6 +326,7 @@ export const useSFUTransport = (
       Object.values(consumersRef.current).forEach((consumer) => {
         if (consumer.appData.userId === userId) consumer.pause();
       });
+
       Store.store.dispatch(Store.setMutedId({ id: userId, value: true }));
       window.localStorage.setItem('muted-by-id', JSON.stringify(Store.store.getState().webrtc.mutedById));
     },
@@ -299,6 +338,7 @@ export const useSFUTransport = (
       Object.values(consumersRef.current).forEach((consumer) => {
         if (consumer.appData.userId === userId) consumer.resume();
       });
+
       Store.store.dispatch(Store.setMutedId({ id: userId, value: false }));
       window.localStorage.setItem('muted-by-id', JSON.stringify(Store.store.getState().webrtc.mutedById));
     },
@@ -314,12 +354,18 @@ export const useSFUTransport = (
   );
 
   useEffect(() => {
-    const unsub = ipc.socket.on('SFUJoined', ({ channelId }: { channelId: string }) => {
+    const unsub = ipc.socket.on('SFUJoined', async ({ channelId }: { channelId: string }) => {
       currentChannelIdRef.current = channelId;
-      setupRecv(channelId);
+      sendRetryCountRef.current = 0;
+      recvRetryCountRef.current = 0;
+
+      await setupRecv(channelId);
+      if (Store.store.getState().webrtc.isMicTaken) {
+        await setupSend(channelId);
+      }
     });
     return () => unsub();
-  }, [setupRecv]);
+  }, [setupRecv, setupSend]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('SFULeft', () => {

@@ -16,6 +16,7 @@ export const detectSpeaking = (
     const v = (dataArray[i] - 128) / 128;
     sum += v * v;
   }
+
   const volume = Math.sqrt(sum / dataArray.length);
 
   if (targetId === 'user') {

@@ -36,52 +36,45 @@ export const useAudioContext = (refs: SharedRefs) => {
   } = refs;
 
   const initAudioContext = useCallback(async () => {
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-    }
-    const audioContext = new AudioContext();
-
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume();
-    }
-    await audioContext.audioWorklet.addModule(
-      URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })),
-    );
-    audioContextRef.current = audioContext;
-
+    if (audioContextRef.current) audioContextRef.current.close();
     if (inputDesRef.current) inputDesRef.current.disconnect();
-    inputDesRef.current = audioContext.createMediaStreamDestination();
-
     if (outputDesRef.current) outputDesRef.current.disconnect();
-    outputDesRef.current = audioContext.createMediaStreamDestination();
-
     if (recorderDesRef.current) recorderDesRef.current.disconnect();
-    recorderDesRef.current = audioContext.createMediaStreamDestination();
-
     if (inputAnalyserRef.current) inputAnalyserRef.current.disconnect();
-    const inputAnalyser = audioContext.createAnalyser();
-    inputAnalyserRef.current = inputAnalyser;
-    inputAnalyser.fftSize = 2048;
-
     if (masterGainNodeRef.current) masterGainNodeRef.current.disconnect();
-    const masterGainNode = audioContext.createGain();
-    masterGainNodeRef.current = masterGainNode;
-    masterGainNode.gain.value = Store.store.getState().webrtc.speakerVolume / 100;
-    masterGainNode.connect(outputDesRef.current!);
-
     if (speakerRef.current) {
       speakerRef.current.srcObject = null;
       speakerRef.current.pause();
       speakerRef.current.remove();
     }
-    const speaker = new Audio();
-    speaker.srcObject = outputDesRef.current.stream;
-    speaker.volume = 1;
-    speaker.autoplay = true;
-    speaker.style.display = 'none';
-    speaker.play().catch(() => { });
-    speakerRef.current = speaker;
-    document.body.appendChild(speaker);
+
+    const audioContext = new AudioContext();
+
+    if (audioContext.state === 'suspended') {
+      await audioContext.resume();
+    }
+
+    await audioContext.audioWorklet.addModule(
+      URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })),
+    );
+
+    audioContextRef.current = audioContext;
+    inputDesRef.current = audioContext.createMediaStreamDestination();
+    outputDesRef.current = audioContext.createMediaStreamDestination();
+    recorderDesRef.current = audioContext.createMediaStreamDestination();
+    inputAnalyserRef.current = audioContext.createAnalyser();
+    inputAnalyserRef.current.fftSize = 2048;
+    masterGainNodeRef.current = audioContext.createGain();
+    masterGainNodeRef.current.gain.value = Store.store.getState().webrtc.speakerVolume / 100;
+    masterGainNodeRef.current.connect(outputDesRef.current!);
+
+    speakerRef.current = new Audio();
+    speakerRef.current.srcObject = outputDesRef.current.stream;
+    speakerRef.current.volume = 1;
+    speakerRef.current.autoplay = true;
+    speakerRef.current.style.display = 'none';
+    speakerRef.current.play().catch(() => { });
+    document.body.appendChild(speakerRef.current);
   }, [audioContextRef, inputDesRef, outputDesRef, recorderDesRef, inputAnalyserRef, masterGainNodeRef, speakerRef]);
 
   useEffect(() => {
