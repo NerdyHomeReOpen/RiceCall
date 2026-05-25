@@ -78,9 +78,13 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
       const newTrack = inputDesRef.current.stream.getAudioTracks()[0];
 
-      if (audioProducerRef.current && newTrack) {
-        await audioProducerRef.current.replaceTrack({ track: newTrack });
-        audioProducerRef.current.resume();
+      if (audioProducerRef.current && !audioProducerRef.current.closed && newTrack) {
+        try {
+          await audioProducerRef.current.replaceTrack({ track: newTrack });
+          audioProducerRef.current.resume();
+        } catch (e) {
+          new Logger('WebRTC').warn(`replaceTrack failed: ${e instanceof Error ? e.message : String(e)}`);
+        }
       }
     },
     [removeMicAudio, initAudioContext, audioContextRef, inputDesRef, inputAnalyserRef, micNodesRef, microphoneAmplificationRef, rafIdListRef, audioProducerRef],
