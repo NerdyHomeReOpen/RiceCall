@@ -89,7 +89,7 @@
     "@types/react-dom": "^19.2.3",
     "concurrently": "^8.2.2",
     "dotenv-cli": "^8.0.0",
-    "electron": "^36.2.0",
+    "electron": "^39.8.5",
     "electron-builder": "^25.1.8",
     "eslint": "^9",
     "eslint-config-next": "15.3.2",
