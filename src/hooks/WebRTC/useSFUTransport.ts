@@ -25,6 +25,8 @@ export const useSFUTransport = (
   const currentChannelIdRef = useRef<string | null>(null);
   const sendRetryCountRef = useRef<number>(0);
   const recvRetryCountRef = useRef<number>(0);
+  const sendRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const recvRetryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
@@ -149,6 +151,10 @@ export const useSFUTransport = (
 
         if (s === 'connected') {
           sendRetryCountRef.current = 0;
+          if (sendRetryTimerRef.current) {
+            clearTimeout(sendRetryTimerRef.current);
+            sendRetryTimerRef.current = null;
+          }
         }
 
         if (s === 'failed' || s === 'disconnected' || s === 'closed') {
@@ -180,7 +186,9 @@ export const useSFUTransport = (
             sendRetryCountRef.current++;
             const delay = 2000 * sendRetryCountRef.current;
             new Logger('WebRTC').info(`Retrying send transport in ${delay}ms (attempt ${sendRetryCountRef.current})`);
-            setTimeout(() => {
+            if (sendRetryTimerRef.current) clearTimeout(sendRetryTimerRef.current);
+            sendRetryTimerRef.current = setTimeout(() => {
+              sendRetryTimerRef.current = null;
               const channelId = currentChannelIdRef.current;
               if (!channelId) return;
               setupSend(channelId);
@@ -276,6 +284,10 @@ export const useSFUTransport = (
 
         if (s === 'connected') {
           recvRetryCountRef.current = 0;
+          if (recvRetryTimerRef.current) {
+            clearTimeout(recvRetryTimerRef.current);
+            recvRetryTimerRef.current = null;
+          }
         }
 
         if (s === 'failed' || s === 'disconnected' || s === 'closed') {
@@ -283,7 +295,9 @@ export const useSFUTransport = (
             recvRetryCountRef.current++;
             const delay = 2000 * recvRetryCountRef.current;
             new Logger('WebRTC').info(`Retrying recv transport in ${delay}ms (attempt ${recvRetryCountRef.current})`);
-            setTimeout(() => {
+            if (recvRetryTimerRef.current) clearTimeout(recvRetryTimerRef.current);
+            recvRetryTimerRef.current = setTimeout(() => {
+              recvRetryTimerRef.current = null;
               const channelId = currentChannelIdRef.current;
               if (!channelId) return;
               setupRecv(channelId);
@@ -307,6 +321,10 @@ export const useSFUTransport = (
     async () => {
       currentChannelIdRef.current = null;
       sendRetryCountRef.current = 0;
+      if (sendRetryTimerRef.current) {
+        clearTimeout(sendRetryTimerRef.current);
+        sendRetryTimerRef.current = null;
+      }
 
       if (audioProducerRef.current) {
         const oldProducer = audioProducerRef.current;
@@ -330,6 +348,10 @@ export const useSFUTransport = (
   const closeRecv = useCallback(() => {
     currentChannelIdRef.current = null;
     recvRetryCountRef.current = 0;
+    if (recvRetryTimerRef.current) {
+      clearTimeout(recvRetryTimerRef.current);
+      recvRetryTimerRef.current = null;
+    }
     for (const producerId of Object.keys(consumersRef.current)) {
       const consumer = consumersRef.current[producerId];
       const userId = consumer.appData.userId;
@@ -354,6 +376,10 @@ export const useSFUTransport = (
       if (Store.store.getState().webrtc.isMicTaken) return;
       currentChannelIdRef.current = channelId;
       sendRetryCountRef.current = 0;
+      if (sendRetryTimerRef.current) {
+        clearTimeout(sendRetryTimerRef.current);
+        sendRetryTimerRef.current = null;
+      }
       await setupSend(channelId);
       startSpeaking();
     },
@@ -401,9 +427,26 @@ export const useSFUTransport = (
 
   useEffect(() => {
     const unsub = ipc.socket.on('SFUJoined', async ({ channelId }: { channelId: string }) => {
+      const recv = recvTransportRef.current;
+      const send = sendTransportRef.current;
+      const recvHealthy = recv && !recv.closed && recv.connectionState === 'connected';
+      const sendHealthy = !Store.store.getState().webrtc.isMicTaken || (send && !send.closed && send.connectionState === 'connected');
+      if (currentChannelIdRef.current === channelId && recvHealthy && sendHealthy) {
+        new Logger('WebRTC').info(`SFUJoined dedup: already healthy on channel ${channelId}`);
+        return;
+      }
+
       currentChannelIdRef.current = channelId;
       sendRetryCountRef.current = 0;
       recvRetryCountRef.current = 0;
+      if (sendRetryTimerRef.current) {
+        clearTimeout(sendRetryTimerRef.current);
+        sendRetryTimerRef.current = null;
+      }
+      if (recvRetryTimerRef.current) {
+        clearTimeout(recvRetryTimerRef.current);
+        recvRetryTimerRef.current = null;
+      }
 
       await setupRecv(channelId);
       if (Store.store.getState().webrtc.isMicTaken) {
@@ -411,7 +454,7 @@ export const useSFUTransport = (
       }
     });
     return () => unsub();
-  }, [setupRecv, setupSend]);
+  }, [setupRecv, setupSend, recvTransportRef, sendTransportRef]);
 
   useEffect(() => {
     const unsub = ipc.socket.on('SFULeft', () => {
