@@ -21,9 +21,7 @@ export const useChannelSettingModeratorCtxMenu = ({ user, server, channel, moder
 
   const buildContextMenu = useCallback(() => {
     const submenuItems = new ContextMenu()
-      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
-        terminateMember(moderator.userId, server.serverId, moderator.name),
-      )
+      .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => terminateMember(moderator.userId, server.serverId, moderator.name))
       .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
         moderator.permissionLevel >= Permission.ChannelMod
           ? editChannelPermission(moderator.userId, server.serverId, channel.channelId, { permissionLevel: 2 })
@@ -47,7 +45,7 @@ export const useChannelSettingModeratorCtxMenu = ({ user, server, channel, moder
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(moderator.userId, server.serverId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(moderator.userId, server.serverId))
       .addSeparator()
-      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => { }, submenuItems)
+      .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
       .build();
   }, [user.userId, server.serverId, channel, moderator, permissionLevel, isSelf, isLowerLevel]);
 

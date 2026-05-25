@@ -4,7 +4,7 @@ import { modules } from '@/main/modules';
 
 export const storeState = {
   sync: (state: Types.StoreStateSnapshot): void => {
-    modules.default.syncStoreState(state)
+    modules.default.syncStoreState(state);
   },
   get: (): Types.StoreStateSnapshot | null => {
     return modules.default.getStoreState();

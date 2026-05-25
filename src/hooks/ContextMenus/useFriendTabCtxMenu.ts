@@ -27,14 +27,12 @@ export const useFriendTabCtxMenu = ({ user, friend, friendGroups, defaultFriendG
         .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(user.userId, friend.targetId))
         .addEditNoteOption({ isSelf, isFriend }, () => openEditFriendNote(user.userId, friend.targetId))
         .addSeparator()
-        .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => { }, onNotifyFriendOnlineClick: () => { } }, () => { })
+        .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => {}, onNotifyFriendOnlineClick: () => {} }, () => {})
         .addEditFriendFriendGroupOption(
           { isSelf, isStranger, isBlocked: friend.isBlocked },
-          () => { },
+          () => {},
           new ContextMenu()
-            .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) =>
-              editFriend(friend.targetId, { friendGroupId }),
-            )
+            .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => editFriend(friend.targetId, { friendGroupId }))
             .build(),
         )
         .addBlockUserOption({ isSelf, isBlocked: friend.isBlocked }, () => (friend.isBlocked ? unblockUser(friend.targetId, friend.name) : blockUser(friend.targetId, friend.name)))

@@ -22,9 +22,7 @@ export const useMemberManagementCtxMenu = ({ user, currentServer, channel, membe
   const buildMemberManagementCtxMenu = useCallback(
     () =>
       new ContextMenu()
-        .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
-          terminateMember(member.userId, currentServer.serverId, member.name),
-        )
+        .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => terminateMember(member.userId, currentServer.serverId, member.name))
         .addSetChannelModOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel, channelCategoryId: channel.categoryId }, () =>
           member.permissionLevel >= Permission.ChannelMod
             ? editChannelPermission(member.userId, currentServer.serverId, channel.channelId, { permissionLevel: 2 })
