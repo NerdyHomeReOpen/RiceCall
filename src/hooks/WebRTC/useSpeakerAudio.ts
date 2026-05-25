@@ -46,10 +46,10 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
   );
 
   const initSpeakerAudio = useCallback(
-    async (userId: string, stream: MediaStream) => {
+    (userId: string, stream: MediaStream) => {
       if (!audioContextRef.current || !outputDesRef.current || !masterGainNodeRef.current) {
-        initAudioContext();
-        return initSpeakerAudio(userId, stream);
+        initAudioContext().then(() => initSpeakerAudio(userId, stream));
+        return;
       }
 
       removeSpeakerAudio(userId);

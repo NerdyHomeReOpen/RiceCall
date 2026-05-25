@@ -25,10 +25,10 @@ export const useRecording = (refs: SharedRefs, { initAudioContext }: UseRecordin
   } = refs;
 
   const startRecording = useCallback(
-    async () => {
+    () => {
       if (!audioContextRef.current || !recorderDesRef.current) {
-        initAudioContext();
-        return startRecording();
+        initAudioContext().then(() => startRecording());
+        return;
       }
 
       Store.store.dispatch(Store.setWebRTC({ recordTime: 0 }));
@@ -59,8 +59,8 @@ export const useRecording = (refs: SharedRefs, { initAudioContext }: UseRecordin
   const stopRecording = useCallback(
     () => {
       if (!audioContextRef.current) {
-        initAudioContext();
-        return stopRecording();
+        initAudioContext().then(() => stopRecording());
+        return;
       }
 
       recorderGainRef.current?.disconnect();

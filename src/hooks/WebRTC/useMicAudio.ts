@@ -50,8 +50,8 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
   const initMicAudio = useCallback(
     async (stream: MediaStream) => {
       if (!audioContextRef.current || !inputDesRef.current || !inputAnalyserRef.current) {
-        await initAudioContext();
-        return initMicAudio(stream);
+        initAudioContext().then(() => initMicAudio(stream));
+        return;
       }
 
       removeMicAudio();

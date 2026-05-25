@@ -25,7 +25,7 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
       });
     } catch (e) {
       if (i === retries) throw e;
-      new Logger('Socket').warn(`Retrying(#${i}) socket.emit ${event}: ${JSON.stringify(payload)}`);
+      new Logger('Socket').warn(`Retrying(#${i}) socket.emit ${event}`);
     }
   }
   throw new Error('Failed to emit event with retry');
@@ -63,7 +63,7 @@ export function connectSocket(token: string) {
 
   SEND_EVENTS.forEach((event) => {
     socket!.on(event, (...args: unknown[]) => {
-      if (!NO_LOG_ON_EVENTS.includes(event)) new Logger('Socket').info(`socket.on ${event}: ${JSON.stringify(args)}`);
+      if (!NO_LOG_ON_EVENTS.includes(event)) new Logger('Socket').info(`socket.on ${event}`);
       broadcast(event, ...args);
     });
   });
@@ -112,11 +112,11 @@ export function disconnectSocket() {
 export function registerSocketHandlers() {
   EMIT_EVENTS.forEach((event) => {
     ipcMain.handle(event, (_, payload) => {
-      new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(payload)}`);
+      new Logger('Socket').info(`socket.emit ${event}`);
       return new Promise((resolve) => {
         emitWithRetry(event, payload)
           .then((ack) => {
-            new Logger('Socket').info(`socket.onAck ${event}: ${JSON.stringify(ack)}`);
+            new Logger('Socket').info(`socket.onAck ${event}`);
             resolve(ack);
           })
           .catch((e) => {
@@ -130,7 +130,7 @@ export function registerSocketHandlers() {
 
   ON_EVENTS.forEach((event) => {
     ipcMain.on(event, (_, ...args) => {
-      new Logger('Socket').info(`socket.emit ${event}: ${JSON.stringify(args)}`);
+      new Logger('Socket').info(`socket.emit ${event}`);
       socket?.emit(event, ...args);
     });
   });

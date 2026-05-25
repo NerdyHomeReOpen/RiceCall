@@ -31,10 +31,10 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
   }, [mixNodesRef, rafIdListRef]);
 
   const initMixAudio = useCallback(
-    async (systemStream: MediaStream) => {
+    (systemStream: MediaStream) => {
       if (!audioContextRef.current || !inputDesRef.current || !inputAnalyserRef.current) {
-        initAudioContext();
-        return initMixAudio(systemStream);
+        initAudioContext().then(() => initMixAudio(systemStream));
+        return;
       }
 
       removeMixAudio();
@@ -61,7 +61,7 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
   );
 
   const startMixing = useCallback(
-    async () => {
+    () => {
       if (!Store.store.getState().webrtc.isMicTaken) return;
 
       ipc.loopbackAudio.enable();

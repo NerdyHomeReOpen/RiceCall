@@ -1,8 +1,10 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useRef } from 'react';
 
 import * as Store from '@/store';
 
 import type { SharedRefs } from './useSharedRefs';
+
+import Logger from '@/utils/logger';
 
 const workletCode = `
 class RecorderProcessor extends AudioWorkletProcessor {
@@ -35,60 +37,77 @@ export const useAudioContext = (refs: SharedRefs) => {
     speakerRef,
   } = refs;
 
-  const initAudioContext = useCallback(async () => {
-    if (audioContextRef.current) audioContextRef.current.close();
-    if (inputDesRef.current) inputDesRef.current.disconnect();
-    if (outputDesRef.current) outputDesRef.current.disconnect();
-    if (recorderDesRef.current) recorderDesRef.current.disconnect();
-    if (inputAnalyserRef.current) inputAnalyserRef.current.disconnect();
-    if (masterGainNodeRef.current) masterGainNodeRef.current.disconnect();
-    if (speakerRef.current) {
-      speakerRef.current.srcObject = null;
-      speakerRef.current.pause();
-      speakerRef.current.remove();
-    }
+  const initPromiseRef = useRef<Promise<void> | null>(null);
 
-    const audioContext = new AudioContext();
+  const initAudioContext = useCallback(async (): Promise<void> => {
+    if (initPromiseRef.current) return initPromiseRef.current;
 
-    if (audioContext.state === 'suspended') {
-      await audioContext.resume();
-    }
+    const run = async () => {
+      if (audioContextRef.current) await audioContextRef.current.close();
+      if (inputDesRef.current) inputDesRef.current.disconnect();
+      if (outputDesRef.current) outputDesRef.current.disconnect();
+      if (recorderDesRef.current) recorderDesRef.current.disconnect();
+      if (inputAnalyserRef.current) inputAnalyserRef.current.disconnect();
+      if (masterGainNodeRef.current) masterGainNodeRef.current.disconnect();
+      if (speakerRef.current) {
+        speakerRef.current.srcObject = null;
+        speakerRef.current.pause();
+        speakerRef.current.remove();
+      }
 
-    await audioContext.audioWorklet.addModule(
-      URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })),
-    );
+      const audioContext = new AudioContext();
 
-    audioContextRef.current = audioContext;
-    inputDesRef.current = audioContext.createMediaStreamDestination();
-    outputDesRef.current = audioContext.createMediaStreamDestination();
-    recorderDesRef.current = audioContext.createMediaStreamDestination();
-    inputAnalyserRef.current = audioContext.createAnalyser();
-    inputAnalyserRef.current.fftSize = 2048;
-    masterGainNodeRef.current = audioContext.createGain();
-    masterGainNodeRef.current.gain.value = Store.store.getState().webrtc.speakerVolume / 100;
-    masterGainNodeRef.current.connect(outputDesRef.current!);
+      // if (audioContext.state === 'suspended') {
+      //   await audioContext.resume();
+      // }
 
-    speakerRef.current = new Audio();
-    speakerRef.current.srcObject = outputDesRef.current.stream;
-    speakerRef.current.volume = 1;
-    speakerRef.current.autoplay = true;
-    speakerRef.current.style.display = 'none';
-    speakerRef.current.play().catch(() => { });
-    document.body.appendChild(speakerRef.current);
+      await audioContext.audioWorklet.addModule(
+        URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })),
+      );
+
+      audioContextRef.current = audioContext;
+      inputDesRef.current = audioContext.createMediaStreamDestination();
+      outputDesRef.current = audioContext.createMediaStreamDestination();
+      recorderDesRef.current = audioContext.createMediaStreamDestination();
+      inputAnalyserRef.current = audioContext.createAnalyser();
+      inputAnalyserRef.current.fftSize = 2048;
+      masterGainNodeRef.current = audioContext.createGain();
+      masterGainNodeRef.current.gain.value = Store.store.getState().webrtc.speakerVolume / 100;
+      masterGainNodeRef.current.connect(outputDesRef.current!);
+
+      speakerRef.current = new Audio();
+      speakerRef.current.srcObject = outputDesRef.current.stream;
+      speakerRef.current.volume = 1;
+      speakerRef.current.autoplay = true;
+      speakerRef.current.style.display = 'none';
+      speakerRef.current.play().catch(() => { });
+      document.body.appendChild(speakerRef.current);
+
+      new Logger('WebRTC').info('Initialized audio context');
+    };
+
+    initPromiseRef.current = run().finally(() => {
+      initPromiseRef.current = null;
+    });
+
+    return initPromiseRef.current;
   }, [audioContextRef, inputDesRef, outputDesRef, recorderDesRef, inputAnalyserRef, masterGainNodeRef, speakerRef]);
 
   useEffect(() => {
-    const initAudioOnInteraction = async () => {
-      if (!audioContextRef.current) await initAudioContext();
-      else if (audioContextRef.current.state === 'suspended') await audioContextRef.current.resume();
+    const initAudioOnInteraction = () => {
+      if (!audioContextRef.current || !speakerRef.current) initAudioContext()
+      else {
+        if (audioContextRef.current.state === 'suspended') audioContextRef.current.resume();
+        speakerRef.current.play();
+      }
     };
-    document.addEventListener('click', initAudioOnInteraction, { once: true });
-    document.addEventListener('keydown', initAudioOnInteraction, { once: true });
+    document.addEventListener('click', initAudioOnInteraction, { capture: true });
+    document.addEventListener('keydown', initAudioOnInteraction, { capture: true });
     return () => {
-      document.removeEventListener('click', initAudioOnInteraction);
-      document.removeEventListener('keydown', initAudioOnInteraction);
+      document.removeEventListener('click', initAudioOnInteraction, { capture: true });
+      document.removeEventListener('keydown', initAudioOnInteraction, { capture: true });
     };
-  }, [initAudioContext, audioContextRef]);
+  }, [initAudioContext, audioContextRef, speakerRef]);
 
   return { initAudioContext };
 };

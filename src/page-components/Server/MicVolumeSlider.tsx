@@ -40,11 +40,12 @@ const MicVolumeSlider = React.memo(() => {
   };
 
   const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-    if (!isBtnHoveredRef.current) return;
-    const newValue = parseInt(sliderRef.current!.value);
-    if (e.deltaY > 0) sliderRef.current!.value = (newValue - 4).toString();
-    else sliderRef.current!.value = (newValue + 4).toString();
-    changeMicVolume(parseInt(sliderRef.current!.value));
+    if (!isBtnHoveredRef.current || !sliderRef.current) return;
+
+    const newValue = parseInt(sliderRef.current.value);
+    if (e.deltaY > 0) sliderRef.current.value = (newValue - 4).toString();
+    else sliderRef.current.value = (newValue + 4).toString();
+    changeMicVolume(parseInt(sliderRef.current.value));
   };
 
   useEffect(() => {
