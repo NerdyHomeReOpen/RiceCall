@@ -1,5 +1,5 @@
 import dynamic from 'next/dynamic';
-import React from 'react';
+import React, { useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
@@ -20,21 +20,20 @@ interface ChangeServerPageProps {
 const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({ display, onBackToLoginBtnClick }) => {
   const { t } = useTranslation();
 
-  const handleServerSelect = (value: 'prod' | 'dev') => {
-    if (value === 'dev') {
-      openAlertDialog(t('confirm-change-server-to-dev'), () => {
+  const handleServerSelect = useCallback(
+    (value: 'prod' | 'dev') => {
+      if (value === 'dev') {
+        openAlertDialog(t('confirm-change-server-to-dev'), () => {
+          ipc.env.change(value);
+          onBackToLoginBtnClick();
+        });
+      } else {
         ipc.env.change(value);
         onBackToLoginBtnClick();
-      });
-    } else {
-      ipc.env.change(value);
-      onBackToLoginBtnClick();
-    }
-  };
-
-  const handleBackToLoginBtnClick = () => {
-    onBackToLoginBtnClick();
-  };
+      }
+    },
+    [t, onBackToLoginBtnClick],
+  );
 
   return (
     <main className={styles['page']} style={display ? {} : { display: 'none' }}>
@@ -47,7 +46,7 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
         </div>
       </main>
       <div className={styles['footer']}>
-        <div className={styles['back-to-login-button']} onClick={handleBackToLoginBtnClick}>
+        <div className={styles['back-to-login-button']} onClick={onBackToLoginBtnClick}>
           {t('back-to-login')}
         </div>
       </div>

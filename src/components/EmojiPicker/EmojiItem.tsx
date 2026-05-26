@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import Image from 'next/image';
 
 import * as Types from '@/types';
@@ -11,9 +11,10 @@ interface EmojiItemProps {
 }
 
 const EmojiItem: React.FC<EmojiItemProps> = React.memo(({ emoji, onEmojiSelect }) => {
-  const handleClick = () => {
-    onEmojiSelect?.(emoji.code, `:${emoji.code}:`);
-  };
+  const handleClick = useCallback(() => {
+    if (!onEmojiSelect) return;
+    onEmojiSelect(emoji.code, `:${emoji.code}:`);
+  }, [emoji.code, onEmojiSelect]);
 
   return (
     <div className={styles['emoji']}>

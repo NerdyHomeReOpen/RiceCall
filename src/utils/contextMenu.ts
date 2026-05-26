@@ -158,22 +158,22 @@ export default class ContextMenu {
     return this;
   }
 
-  addEditNicknameOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+  addEditNicknameOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'edit-nickname',
       label: 'edit-nickname',
-      show: (params.isSelf || (params.permissionLevel >= Types.Permission.ServerAdmin && params.isLowerLevel)) && params.permissionLevel >= Types.Permission.Member,
+      show: (params.targetIsSelf || (params.permissionLevel >= Types.Permission.ServerAdmin && params.targetHasLowerLevel)) && params.permissionLevel >= Types.Permission.Member,
       icon: 'edit-nickname',
       onClick: onClick,
     });
     return this;
   }
 
-  addEditNicknameOptionWithNoIcon(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+  addEditNicknameOptionWithNoIcon(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'edit-nickname',
       label: 'edit-nickname',
-      show: (params.isSelf || (params.permissionLevel >= Types.Permission.ServerAdmin && params.isLowerLevel)) && params.permissionLevel >= Types.Permission.Member,
+      show: (params.targetIsSelf || (params.permissionLevel >= Types.Permission.ServerAdmin && params.targetHasLowerLevel)) && params.permissionLevel >= Types.Permission.Member,
       icon: 'edit-nickname-no-icon',
       onClick: onClick,
     });
@@ -200,11 +200,11 @@ export default class ContextMenu {
     return this;
   }
 
-  addFavoriteServerOption(params: { isFavorite: boolean }, onClick: () => void): this {
+  addFavoriteServerOption(params: { serverIsFavorite: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'favorite-server',
-      label: params.isFavorite ? 'unfavorite' : 'favorite',
-      icon: params.isFavorite ? 'unfavorite-server' : 'favorite-server',
+      label: params.serverIsFavorite ? 'unfavorite' : 'favorite',
+      icon: params.serverIsFavorite ? 'unfavorite-server' : 'favorite-server',
       onClick: onClick,
     });
     return this;
@@ -297,11 +297,11 @@ export default class ContextMenu {
     return this;
   }
 
-  addDirectMessageOption(params: { isSelf: boolean }, onClick: () => void): this {
+  addDirectMessageOption(params: { targetIsSelf: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'direct-message',
       label: 'direct-message',
-      show: !params.isSelf,
+      show: !params.targetIsSelf,
       onClick: onClick,
     });
     return this;
@@ -316,68 +316,68 @@ export default class ContextMenu {
     return this;
   }
 
-  addKickUserFromChannelOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; isInLobby: boolean }, onClick: () => void): this {
+  addKickUserFromChannelOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isInLobby: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'kick-channel',
       label: 'kick-channel',
-      show: !params.isSelf && params.isLowerLevel && !params.isInLobby && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: !params.targetIsSelf && params.targetHasLowerLevel && !params.isInLobby && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addKickUserFromServerOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+  addKickUserFromServerOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'kick-server',
       label: 'kick-server',
-      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Types.Permission.ServerAdmin,
+      show: !params.targetIsSelf && params.targetHasLowerLevel && params.permissionLevel >= Types.Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
   }
 
-  addBlockUserFromServerOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+  addBlockUserFromServerOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'block',
       label: 'block',
-      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Types.Permission.ServerAdmin,
+      show: !params.targetIsSelf && params.targetHasLowerLevel && params.permissionLevel >= Types.Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
   }
 
-  addUnblockUserFromServerOption(params: { permissionLevel: Types.Permission; isSelf: boolean }, onClick: () => void): this {
+  addUnblockUserFromServerOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'unblock-server',
       label: 'unblock',
-      show: !params.isSelf && params.permissionLevel >= Types.Permission.ServerAdmin,
+      show: !params.targetIsSelf && params.permissionLevel >= Types.Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
   }
 
-  addUnblockUserFromChannelOption(params: { permissionLevel: Types.Permission; isSelf: boolean }, onClick: () => void): this {
+  addUnblockUserFromChannelOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'unblock-channel',
       label: 'unblock',
-      show: !params.isSelf && params.permissionLevel >= Types.Permission.ChannelAdmin,
+      show: !params.targetIsSelf && params.permissionLevel >= Types.Permission.ChannelAdmin,
       onClick: onClick,
     });
     return this;
   }
 
-  addInviteToBeMemberOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+  addInviteToBeMemberOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'invite-to-be-member',
       label: 'invite-to-be-member',
-      show: !params.isSelf && params.targetPermissionLevel < Types.Permission.Member && params.permissionLevel >= Types.Permission.ServerAdmin,
+      show: !params.targetIsSelf && params.targetPermissionLevel < Types.Permission.Member && params.permissionLevel >= Types.Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
   }
 
   addMemberManagementOption(
-    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean },
+    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean },
     onClick: () => void,
     submenuItems: Types.ContextMenuItem[] = [],
   ): this {
@@ -386,8 +386,8 @@ export default class ContextMenu {
       label: 'member-management',
       icon: 'submenu',
       show:
-        !params.isSelf &&
-        params.isLowerLevel &&
+        !params.targetIsSelf &&
+        params.targetHasLowerLevel &&
         params.targetPermissionLevel >= Types.Permission.Guest &&
         params.permissionLevel >= Types.Permission.ChannelMod &&
         submenuItems.filter((item) => item.show).length > 0,
@@ -398,13 +398,13 @@ export default class ContextMenu {
     return this;
   }
 
-  addTerminateMemberOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+  addTerminateMemberOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'terminate-member',
       label: 'terminate-member',
       show:
-        !params.isSelf &&
-        params.isLowerLevel &&
+        !params.targetIsSelf &&
+        params.targetHasLowerLevel &&
         params.targetPermissionLevel >= Types.Permission.Guest &&
         params.targetPermissionLevel < Types.Permission.ServerOwner &&
         params.permissionLevel >= Types.Permission.ServerAdmin,
@@ -414,22 +414,19 @@ export default class ContextMenu {
   }
 
   addSetChannelModOption(
-    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; channelCategoryId: string | null },
+    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isSubChannel: boolean },
     onClick: () => void,
   ): this {
     this.options.push({
       id: 'set-channel-mod',
       label: params.targetPermissionLevel >= Types.Permission.ChannelMod ? 'unset-channel-mod' : 'set-channel-mod',
-      show: !!params.channelCategoryId && params.permissionLevel >= Types.Permission.ChannelAdmin && params.targetPermissionLevel < Types.Permission.ChannelMod,
+      show: params.isSubChannel && params.permissionLevel >= Types.Permission.ChannelAdmin && params.targetPermissionLevel < Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addSetChannelAdminOption(
-    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; channelCategoryId: string | null },
-    onClick: () => void,
-  ): this {
+  addSetChannelAdminOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'set-channel-admin',
       label: params.targetPermissionLevel >= Types.Permission.ChannelAdmin ? 'unset-channel-admin' : 'set-channel-admin',
@@ -439,7 +436,7 @@ export default class ContextMenu {
     return this;
   }
 
-  addSetServerAdminOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean }, onClick: () => void): this {
+  addSetServerAdminOption(params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'set-server-admin',
       label: params.targetPermissionLevel >= Types.Permission.ServerAdmin ? 'unset-server-admin' : 'set-server-admin',
@@ -469,48 +466,48 @@ export default class ContextMenu {
     return this;
   }
 
-  addAddFriendOption(params: { isSelf: boolean; isFriend: boolean }, onClick: () => void): this {
+  addAddFriendOption(params: { targetIsSelf: boolean; targetIsFriend: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'add-friend',
       label: 'add-friend',
-      show: !params.isSelf && !params.isFriend,
+      show: !params.targetIsSelf && !params.targetIsFriend,
       onClick: onClick,
     });
     return this;
   }
 
-  addEditNoteOption(params: { isSelf: boolean; isFriend: boolean }, onClick: () => void): this {
+  addEditNoteOption(params: { targetIsSelf: boolean; targetIsFriend: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'edit-note',
       label: 'edit-note',
-      show: !params.isSelf && params.isFriend,
+      show: !params.targetIsSelf && params.targetIsFriend,
       onClick: onClick,
     });
     return this;
   }
 
-  addPermissionSettingOption(params: { isSelf: boolean; isFriend: boolean; onHideOrShowOnlineClick: () => void; onNotifyFriendOnlineClick: () => void }, onClick: () => void): this {
+  addPermissionSettingOption(params: { targetIsSelf: boolean; targetIsFriend: boolean; onHideOrShowOnlineClick: () => void; onNotifyFriendOnlineClick: () => void }, onClick: () => void): this {
     this.options.push({
       id: 'permission-setting',
       label: 'permission-setting',
       icon: 'submenu',
-      show: !params.isSelf && params.isFriend,
+      show: !params.targetIsSelf && params.targetIsFriend,
       hasSubmenu: true,
       submenuItems: [
-        { id: 'hide-online-to-friend', label: 'hide-online-to-friend', show: !params.isSelf && params.isFriend, onClick: params.onHideOrShowOnlineClick },
-        { id: 'notify-friend-online', label: 'notify-friend-online', show: !params.isSelf && params.isFriend, onClick: params.onNotifyFriendOnlineClick },
+        { id: 'hide-online-to-friend', label: 'hide-online-to-friend', show: !params.targetIsSelf && params.targetIsFriend, onClick: params.onHideOrShowOnlineClick },
+        { id: 'notify-friend-online', label: 'notify-friend-online', show: !params.targetIsSelf && params.targetIsFriend, onClick: params.onNotifyFriendOnlineClick },
       ],
       onClick: onClick,
     });
     return this;
   }
 
-  addEditFriendFriendGroupOption(params: { isSelf: boolean; isStranger: boolean; isBlocked: boolean }, onClick: () => void, submenuItems: Types.ContextMenuItem[] = []): this {
+  addEditFriendFriendGroupOption(params: { targetIsSelf: boolean; targetIsStranger: boolean; targetIsBlocked: boolean }, onClick: () => void, submenuItems: Types.ContextMenuItem[] = []): this {
     this.options.push({
       id: 'edit-friend-friend-group',
       label: 'edit-friend-friend-group',
       icon: 'submenu',
-      show: !params.isSelf && !params.isStranger && !params.isBlocked && submenuItems.filter((item) => item.show).length > 0,
+      show: !params.targetIsSelf && !params.targetIsStranger && !params.targetIsBlocked && submenuItems.filter((item) => item.show).length > 0,
       hasSubmenu: true,
       submenuItems: submenuItems,
       onClick: onClick,
@@ -530,31 +527,31 @@ export default class ContextMenu {
     return this;
   }
 
-  addBlockUserOption(params: { isSelf: boolean; isBlocked: boolean }, onClick: () => void): this {
+  addBlockUserOption(params: { targetIsSelf: boolean; targetIsBlocked: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'block',
-      label: params.isBlocked ? 'unblock' : 'block',
-      show: !params.isSelf,
+      label: params.targetIsBlocked ? 'unblock' : 'block',
+      show: !params.targetIsSelf,
       onClick: onClick,
     });
     return this;
   }
 
-  addDeleteFriendOption(params: { isSelf: boolean; isFriend: boolean }, onClick: () => void): this {
+  addDeleteFriendOption(params: { targetIsSelf: boolean; targetIsFriend: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'delete-friend',
       label: 'delete-friend',
-      show: !params.isSelf && params.isFriend,
+      show: !params.targetIsSelf && params.targetIsFriend,
       onClick: onClick,
     });
     return this;
   }
 
-  addDeleteFriendApplicationOption(params: { isSelf: boolean; isPending: boolean }, onClick: () => void): this {
+  addDeleteFriendApplicationOption(params: { targetIsSelf: boolean; targetIsPending: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'delete-friend-application',
       label: 'delete-friend-application',
-      show: !params.isSelf && params.isPending,
+      show: !params.targetIsSelf && params.targetIsPending,
       onClick: onClick,
     });
     return this;
@@ -578,56 +575,56 @@ export default class ContextMenu {
     return this;
   }
 
-  addTerminateSelfMembershipOption(params: { permissionLevel: Types.Permission; isSelf: boolean }, onClick: () => void): this {
+  addTerminateSelfMembershipOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'terminate-self-membership',
       label: 'terminate-self-membership',
-      show: params.isSelf && params.permissionLevel >= Types.Permission.Member && params.permissionLevel < Types.Permission.ServerOwner,
+      show: params.targetIsSelf && params.permissionLevel >= Types.Permission.Member && params.permissionLevel < Types.Permission.ServerOwner,
       onClick: onClick,
     });
     return this;
   }
 
-  addJoinUserChannelOption(params: { isSelf: boolean; isInSameChannel: boolean }, onClick: () => void): this {
+  addJoinUserChannelOption(params: { targetIsSelf: boolean; isInSameChannel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'join-user-channel',
       label: 'join-user-channel',
-      show: !params.isSelf && !params.isInSameChannel,
+      show: !params.targetIsSelf && !params.isInSameChannel,
       onClick: onClick,
     });
     return this;
   }
 
-  addAddToQueueOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isEqualOrLowerLevel: boolean; isChannelQueueMode: boolean; isInQueue: boolean }, onClick: () => void): this {
+  addAddToQueueOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; isEqualOrLowerLevel: boolean; isChannelQueueMode: boolean; isInQueue: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'add-to-queue',
       label: 'add-to-queue',
-      show: !params.isSelf && params.isEqualOrLowerLevel && params.isChannelQueueMode && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: !params.targetIsSelf && params.isEqualOrLowerLevel && params.isChannelQueueMode && params.permissionLevel >= Types.Permission.ChannelMod,
       disabled: params.isInQueue,
       onClick: onClick,
     });
     return this;
   }
 
-  addSetMuteOption(params: { isSelf: boolean; isMuted: boolean }, onClick: () => void): this {
+  addSetMuteOption(params: { targetIsSelf: boolean; isMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'set-mute',
       label: params.isMuted ? 'unmute' : 'mute',
-      show: !params.isSelf,
+      show: !params.targetIsSelf,
       onClick: onClick,
     });
     return this;
   }
 
   addMoveToChannelOption(
-    params: { currentPermissionLevel: Types.Permission; permissionLevel: Types.Permission; isSelf: boolean; isInSameChannel: boolean; isEqualOrLowerLevel: boolean },
+    params: { currentPermissionLevel: Types.Permission; permissionLevel: Types.Permission; targetIsSelf: boolean; isInSameChannel: boolean; isEqualOrLowerLevel: boolean },
     onClick: () => void,
   ): this {
     this.options.push({
       id: 'move-to-channel',
       label: 'move-to-channel',
       show:
-        !params.isSelf &&
+        !params.targetIsSelf &&
         !params.isInSameChannel &&
         params.isEqualOrLowerLevel &&
         params.currentPermissionLevel >= Types.Permission.ChannelMod &&
@@ -637,21 +634,21 @@ export default class ContextMenu {
     return this;
   }
 
-  addForbidVoiceOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; isVoiceMuted: boolean }, onClick: () => void): this {
+  addForbidVoiceOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isVoiceMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-voice',
       label: params.isVoiceMuted ? 'unforbid-voice' : 'forbid-voice',
-      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: !params.targetIsSelf && params.targetHasLowerLevel && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addForbidTextOption(params: { permissionLevel: Types.Permission; isSelf: boolean; isLowerLevel: boolean; isTextMuted: boolean }, onClick: () => void): this {
+  addForbidTextOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isTextMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-text',
       label: params.isTextMuted ? 'unforbid-text' : 'forbid-text',
-      show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: !params.targetIsSelf && params.targetHasLowerLevel && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;

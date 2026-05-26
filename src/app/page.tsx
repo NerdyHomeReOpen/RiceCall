@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -26,25 +26,48 @@ import FriendPage from '@/page-components/Friend';
 import HomePage from '@/page-components/Home';
 import ServerPage from '@/page-components/Server';
 
+type Tab = 'home' | 'friends' | 'server';
+
 const RootPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { getIsLoading, loadServer, stopLoading } = useLoading();
 
-  const [selectedTab, setSelectedTab] = useState<'home' | 'friends' | 'server'>('home');
+  const [selectedTab, setSelectedTab] = useState<Tab>('home');
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   const userId = useAppSelector((state) => state.user.data.userId);
   const userName = useAppSelector((state) => state.user.data.name);
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
   const currentServerName = useAppSelector((state) => state.currentServer.data.name);
   const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length);
-  const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
+  const socketIsConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
-  const isSelectedHomePage = selectedTab === 'home';
-  const isSelectedFriendsPage = selectedTab === 'friends';
-  const isSelectedServerPage = selectedTab === 'server';
+  const homePageIsSelected = selectedTab === 'home';
+  const friendsPageIsSelected = selectedTab === 'friends';
+  const serverPageIsSelected = selectedTab === 'server';
 
-  const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
-    setSelectedTab(tabId);
+  const handleTabSelect = useCallback((tab: Tab) => {
+    setSelectedTab(tab);
+  }, []);
+
+  const handleMaximize = () => {
+    if (isFullscreen) return;
+    ipc.window.maximize();
+  };
+
+  const handleUnmaximize = () => {
+    if (!isFullscreen) return;
+    ipc.window.unmaximize();
+  };
+
+  const handleMinimize = () => {
+    ipc.window.minimize();
+  };
+
+  const handleClose = () => {
+    const isCloseToTray = ipc.systemSettings.closeToTray.get();
+    if (isCloseToTray) ipc.window.close();
+    else ipc.exit();
   };
 
   useEffect(() => {
@@ -52,18 +75,38 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [userName]);
 
   useEffect(() => {
-    if (currentServerId) setSelectedTab('server');
-    else if (!currentServerId) setSelectedTab('home');
+    if (currentServerId) {
+      setSelectedTab('server');
+    } else if (!currentServerId) {
+      setSelectedTab('home');
+    }
+
     stopLoading();
   }, [currentServerId, stopLoading]);
 
   useEffect(() => {
-    const onServerSelect = (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
+    const handleMaximize = () => {
+      setIsFullscreen(true);
+    };
+
+    const handleUnmaximize = () => {
+      setIsFullscreen(false);
+    };
+
+    const unsubs = [ipc.window.onMaximize(handleMaximize), ipc.window.onUnmaximize(handleUnmaximize)];
+
+    return () => unsubs.forEach((unsub) => unsub());
+  }, []);
+
+  useEffect(() => {
+    const handleServerSelect = (data: { serverDisplayId: Types.Server['displayId']; serverId: Types.Server['serverId']; timestamp: number }) => {
       if (getIsLoading() || currentServerId === data.serverId) return;
       loadServer(data.serverDisplayId);
       ipc.socket.send('connectServer', { serverId: data.serverId });
     };
-    const unsub = ipc.server.onSelect(onServerSelect);
+
+    const unsub = ipc.server.onSelect(handleServerSelect);
+
     return () => unsub();
   }, [currentServerId, getIsLoading, loadServer]);
 
@@ -114,14 +157,22 @@ const RootPageComponent: React.FC = React.memo(() => {
         <ExpandedProvider>
           <SocketManager />
           <StoreSyncer.Master />
-          <Header selectedTab={selectedTab} onTabSelect={handleTabSelect} />
-          {!userId || !isSocketConnected ? (
+          <Header
+            selectedTab={selectedTab}
+            isFullscreen={isFullscreen}
+            onTabSelect={handleTabSelect}
+            onMinimize={handleMinimize}
+            onMaximize={handleMaximize}
+            onUnmaximize={handleUnmaximize}
+            onClose={handleClose}
+          />
+          {!userId || !socketIsConnected ? (
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage display={isSelectedHomePage} />
-              <FriendPage display={isSelectedFriendsPage} />
-              <ServerPage display={isSelectedServerPage} />
+              <HomePage display={homePageIsSelected} />
+              <FriendPage display={friendsPageIsSelected} />
+              <ServerPage display={serverPageIsSelected} />
               <NotificationToaster />
             </>
           )}

@@ -6,8 +6,8 @@ import ServerSearchBar from './ServerSearchBar';
 import styles from './Home.module.css';
 
 interface HomePageHeaderProps {
-  isHomeSection: boolean;
-  isPersonalExclusiveSection: boolean;
+  homeSectionIsSelected: boolean;
+  personalExclusiveSectionIsSelected: boolean;
   onHomeSectionBtnClick: () => void;
   onCreateServerBtnClick: () => void;
   onPersonalExclusiveSectionBtnClick: () => void;
@@ -15,7 +15,7 @@ interface HomePageHeaderProps {
 }
 
 const HomePageHeader: React.FC<HomePageHeaderProps> = React.memo(
-  ({ isHomeSection, isPersonalExclusiveSection, onHomeSectionBtnClick, onCreateServerBtnClick, onPersonalExclusiveSectionBtnClick, onBackBtnClick }) => {
+  ({ homeSectionIsSelected, personalExclusiveSectionIsSelected, onHomeSectionBtnClick, onCreateServerBtnClick, onPersonalExclusiveSectionBtnClick, onBackBtnClick }) => {
     const { t } = useTranslation();
 
     return (
@@ -26,7 +26,7 @@ const HomePageHeader: React.FC<HomePageHeaderProps> = React.memo(
           <ServerSearchBar />
         </div>
         <div className={styles['header-mid']}>
-          <div className={`${styles['navigate-button']} ${isHomeSection ? styles['active'] : ''}`} data-key="60060" onClick={onHomeSectionBtnClick}>
+          <div className={`${styles['navigate-button']} ${homeSectionIsSelected ? styles['active'] : ''}`} data-key="60060" onClick={onHomeSectionBtnClick}>
             {t('home')}
           </div>
         </div>
@@ -34,12 +34,12 @@ const HomePageHeader: React.FC<HomePageHeaderProps> = React.memo(
           <div className={styles['navigate-button']} data-key="30014" onClick={onCreateServerBtnClick}>
             {t('create-server')}
           </div>
-          {!isPersonalExclusiveSection && (
+          {!personalExclusiveSectionIsSelected && (
             <div className={styles['navigate-button']} data-key="60004" onClick={onPersonalExclusiveSectionBtnClick}>
               {t('personal-exclusive')}
             </div>
           )}
-          {isPersonalExclusiveSection && (
+          {personalExclusiveSectionIsSelected && (
             <div className={styles['navigate-button']} data-key="60005" onClick={onBackBtnClick}>
               {t('back')}
             </div>

@@ -38,11 +38,16 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { clientX: x, clientY: y } = e;
 
     const contextMenu =
       messageGroup.contentMetadata && messageGroup.contentMetadata.userId
-        ? new ContextMenu().addViewProfileOption(() => openUserInfo(userId, messageGroup.contentMetadata.userId)).build()
+        ? new ContextMenu()
+            .addViewProfileOption(() => {
+              openUserInfo(userId, messageGroup.contentMetadata.userId);
+            })
+            .build()
         : new ContextMenu().build();
 
     showContextMenu(x, y, 'right-bottom', contextMenu);

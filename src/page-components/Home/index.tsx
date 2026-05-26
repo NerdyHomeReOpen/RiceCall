@@ -24,26 +24,26 @@ interface HomePageProps {
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const { t } = useTranslation();
 
-  const [section, setSection] = useState<'home' | 'personal-exclusive'>('home');
+  const [selectedSection, setSelectedSection] = useState<'home' | 'personal-exclusive'>('home');
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
 
-  const isHomeSection = section === 'home';
-  const isPersonalExclusiveSection = section === 'personal-exclusive';
+  const homeSectionIsSelected = selectedSection === 'home';
+  const personalExclusiveSectionIsSelected = selectedSection === 'personal-exclusive';
 
   const handleCreateServerClick = () => {
     openCreateServer();
   };
 
   const handlePersonalExclusiveSectionBtnClick = () => {
-    setSection('personal-exclusive');
+    setSelectedSection('personal-exclusive');
   };
 
   const handleHomeSectionBtnClick = () => {
-    setSection('home');
+    setSelectedSection('home');
   };
 
   const handleBackBtnClick = () => {
-    setSection('home');
+    setSelectedSection('home');
   };
 
   const handleAnnouncementSelect = (announcement: Types.Announcement) => {
@@ -75,8 +75,8 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
       </div>
       <header className={styles['header']}>
         <HomePageHeader
-          isHomeSection={isHomeSection}
-          isPersonalExclusiveSection={isPersonalExclusiveSection}
+          homeSectionIsSelected={homeSectionIsSelected}
+          personalExclusiveSectionIsSelected={personalExclusiveSectionIsSelected}
           onHomeSectionBtnClick={handleHomeSectionBtnClick}
           onCreateServerBtnClick={handleCreateServerClick}
           onPersonalExclusiveSectionBtnClick={handlePersonalExclusiveSectionBtnClick}
@@ -84,13 +84,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
         />
       </header>
       <main className={styles['body']}>
-        <main className={styles['content']} style={isHomeSection ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={homeSectionIsSelected ? {} : { display: 'none' }}>
           <HomePageContent onAnnouncementSelect={handleAnnouncementSelect} />
         </main>
-        <main className={styles['content']} style={isPersonalExclusiveSection ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={personalExclusiveSectionIsSelected ? {} : { display: 'none' }}>
           <HomePagePersonalExclusive />
         </main>
-        <main className={styles['content']} style={!isHomeSection && !isPersonalExclusiveSection ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={!homeSectionIsSelected && !personalExclusiveSectionIsSelected ? {} : { display: 'none' }}>
           <HomePageNotAvailable />
         </main>
       </main>

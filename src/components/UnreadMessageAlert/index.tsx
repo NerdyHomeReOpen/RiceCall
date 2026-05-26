@@ -5,21 +5,17 @@ import styles from './UnreadMessageAlert.module.css';
 
 interface UnreadMessageAlertProps {
   unreadMessageCount: number;
-  onAlertClick: () => void;
+  onClick: () => void;
 }
 
-const UnreadMessageAlert: React.FC<UnreadMessageAlertProps> = React.memo(({ unreadMessageCount, onAlertClick }) => {
+const UnreadMessageAlert: React.FC<UnreadMessageAlertProps> = React.memo(({ unreadMessageCount, onClick }) => {
   const { t } = useTranslation();
 
-  return (
-    <>
-      {unreadMessageCount > 0 && (
-        <div className={styles['unread-message-alert']} onClick={onAlertClick}>
-          {t('has-new-message', { 0: unreadMessageCount })}
-        </div>
-      )}
-    </>
-  );
+  return unreadMessageCount > 0 ? (
+    <div className={styles['unread-message-alert']} onClick={onClick}>
+      {t('has-new-message', { 0: unreadMessageCount })}
+    </div>
+  ) : null;
 });
 
 UnreadMessageAlert.displayName = 'UnreadMessageAlert';

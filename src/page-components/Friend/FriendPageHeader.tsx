@@ -46,7 +46,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
 
   const handleSignatureInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter') return;
-    else e.preventDefault();
+    e.preventDefault();
     if (isComposingRef.current || !signatureInputRef.current) return;
     signatureInputRef.current.blur();
   };
@@ -62,7 +62,9 @@ const FriendPageHeader: React.FC = React.memo(() => {
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, undefined, undefined, (_, full) => {
       signatureInputRef.current?.focus();
       document.execCommand('insertText', false, full);
@@ -81,7 +83,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
       <div className={styles['user-info']}>
         <div className={styles['user-info-row']}>
           <div className={styles['level-icon']} />
-          <LevelIcon level={userLevel} xp={userXp} requiredXp={userRequiredXp} showTooltip={true} />
+          <LevelIcon level={userLevel} xp={userXp} requiredXp={userRequiredXp} showTitle={true} />
           <div className={styles['wealth-icon']} />
           <div className={styles['wealth-value-text']}>{userWealth}</div>
           {userHasVip && <div className={`vip-icon vip-${userVip}`} />}

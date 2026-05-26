@@ -44,11 +44,16 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { clientX: x, clientY: y } = e;
 
     const contextMenu = new ContextMenu()
-      .addJoinServerOption(() => joinServer())
-      .addViewServerInfoOption(() => openServerSetting(userId, recommendServer.serverId))
+      .addJoinServerOption(() => {
+        joinServer();
+      })
+      .addViewServerInfoOption(() => {
+        openServerSetting(userId, recommendServer.serverId);
+      })
       .build();
 
     showContextMenu(x, y, 'right-bottom', contextMenu);

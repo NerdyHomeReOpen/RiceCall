@@ -20,7 +20,7 @@ interface FriendActivityProps {
 const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivity }) => {
   const userId = useAppSelector((state) => state.user.data.userId);
 
-  const hasVip = friendActivity.vip > 0;
+  const friendHasVip = friendActivity.vip > 0;
 
   const handleUserNameClick = () => {
     openUserInfo(userId, friendActivity.userId);
@@ -33,7 +33,7 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
       </div>
       <div className={styles['friend-activity-content']}>
         <div className={styles['friend-activity-content-top']}>
-          {hasVip && <div className={`vip-icon vip-${friendActivity.vip}`} />}
+          {friendHasVip && <div className={`vip-icon vip-${friendActivity.vip}`} />}
           <div className={styles['name-text']} onClick={handleUserNameClick}>
             {friendActivity.name}
           </div>

@@ -9,7 +9,7 @@ import { POPUP_CONFIGS } from '@/configs/popup';
 import { eventEmitter } from '@/main/event';
 
 import PopupHeader from '@/components/PopupHeader';
-import MaximizedPopup from '@/components/MaximizedPopup';
+import MinimizedPopup from '@/components/MaximizedPopup';
 
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
@@ -137,7 +137,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     };
   }, []);
 
-  const close = useCallback((id: string) => {
+  const handleClose = useCallback((id: string) => {
     setMinimizedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -146,7 +146,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     setPopups((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
-  const minimize = useCallback((id: string) => {
+  const handleMinimize = useCallback((id: string) => {
     setMinimizedIds((prev) => {
       const next = new Set(prev);
       next.add(id);
@@ -154,7 +154,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     });
   }, []);
 
-  const restore = useCallback((id: string) => {
+  const handleRestore = useCallback((id: string) => {
     setMinimizedIds((prev) => {
       const next = new Set(prev);
       next.delete(id);
@@ -162,15 +162,15 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
     });
   }, []);
 
-  const open = useCallback(
+  const handleOpen = useCallback(
     async (type: Types.PopupType, id: string, initialData: unknown = {}, force = true) => {
       new Logger('Popup').info(`Opening ${type} (${id})...`);
 
       if (force) {
-        close(id);
+        handleClose(id);
       } else {
         if (popupsRef.current.findIndex((p) => p.id === id) !== -1) {
-          restore(id);
+          handleRestore(id);
 
           const popupEl = document.querySelector(`[data-popup-id="${id}"]`) as HTMLElement;
           if (!popupEl) return;
@@ -194,36 +194,40 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
 
       setPopups((prev) => [...prev, { ...popup, position: { top: centerY, left: centerX } }]);
     },
-    [getPopup, close, restore],
+    [getPopup, handleClose, handleRestore],
   );
 
   useEffect(() => {
-    eventEmitter.on('open-popup', open);
+    eventEmitter.on('open-popup', handleOpen);
+
     return () => {
-      eventEmitter.off('open-popup', open);
+      eventEmitter.off('open-popup', handleOpen);
     };
-  }, [open]);
+  }, [handleOpen]);
 
   useEffect(() => {
-    eventEmitter.on('close-popup', close);
+    eventEmitter.on('close-popup', handleClose);
+
     return () => {
-      eventEmitter.off('close-popup', close);
+      eventEmitter.off('close-popup', handleClose);
     };
-  }, [close]);
+  }, [handleClose]);
 
   useEffect(() => {
-    eventEmitter.on('minimize-popup', minimize);
+    eventEmitter.on('minimize-popup', handleMinimize);
+
     return () => {
-      eventEmitter.off('minimize-popup', minimize);
+      eventEmitter.off('minimize-popup', handleMinimize);
     };
-  }, [minimize]);
+  }, [handleMinimize]);
 
   useEffect(() => {
-    eventEmitter.on('restore-popup', restore);
+    eventEmitter.on('restore-popup', handleRestore);
+
     return () => {
-      eventEmitter.off('restore-popup', restore);
+      eventEmitter.off('restore-popup', handleRestore);
     };
-  }, [restore]);
+  }, [handleRestore]);
 
   useEffect(() => {
     let startX = 0;
@@ -320,10 +324,10 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
               buttons={popup.buttons}
               popupType={popup.type}
               isFullscreen={false}
-              onMinimize={() => minimize(popup.id)}
-              onMaximize={() => restore(popup.id)}
-              onRestore={() => restore(popup.id)}
-              onClose={() => close(popup.id)}
+              onMinimize={() => handleMinimize(popup.id)}
+              onMaximize={() => handleRestore(popup.id)}
+              onRestore={() => handleRestore(popup.id)}
+              onClose={() => handleClose(popup.id)}
             />
           )}
           {popup.node()}
@@ -344,7 +348,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
           }}
         >
           {minimizedPopups.map((popup) => (
-            <MaximizedPopup key={popup.id} id={popup.id} title={popup.title} buttons={popup.buttons} onRestore={() => restore(popup.id)} />
+            <MinimizedPopup key={popup.id} title={popup.title} buttons={popup.buttons} onRestore={() => handleRestore(popup.id)} onClose={() => handleClose(popup.id)} />
           ))}
         </div>
       )}

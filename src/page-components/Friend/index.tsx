@@ -13,23 +13,25 @@ interface FriendPageProps {
 
 const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) => {
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const isResizingSidebarRef = useRef<boolean>(false);
+  const sidebarIsResizingRef = useRef<boolean>(false);
 
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    isResizingSidebarRef.current = true;
+    sidebarIsResizingRef.current = true;
   };
 
   const handleSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isResizingSidebarRef.current || !sidebarRef.current) return;
+    if (!sidebarIsResizingRef.current || !sidebarRef.current) return;
     sidebarRef.current.style.width = `${e.clientX}px`;
   };
 
   useEffect(() => {
     const onPointerup = () => {
-      isResizingSidebarRef.current = false;
+      sidebarIsResizingRef.current = false;
     };
+
     document.addEventListener('pointerup', onPointerup);
+
     return () => document.removeEventListener('pointerup', onPointerup);
   }, []);
 

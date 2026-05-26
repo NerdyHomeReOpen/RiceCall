@@ -18,14 +18,14 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
   const [account, setAccount] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
   const [email, setEmail] = useState<string>('');
-  const [confirmPassword, setConfirmPassword] = useState<string>('');
   const [accountError, setAccountError] = useState<string>('');
   const [passwordError, setPasswordError] = useState<string>('');
   const [confirmPasswordError, setConfirmPasswordError] = useState<string>('');
-  const [emailError, setEmailError] = useState<string>('');
   const [usernameError, setUsernameError] = useState<string>('');
+  const [emailError, setEmailError] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const canSubmit =
@@ -80,6 +80,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     if (name === 'account') {
       setAccount(value);
       setAccountError(validateAccount(value));
@@ -100,6 +101,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     if (name === 'account') {
       setAccountError(validateAccount(value));
     } else if (name === 'password') {
@@ -134,17 +136,15 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     setIsLoading(true);
 
-    await ipc.auth.register({ account, password, email, username, locale: ipc.systemSettings.language.get() }).then((res) => {
-      if (res.success) {
+    await ipc.auth
+      .register({ account, password, email, username, locale: ipc.systemSettings.language.get() })
+      .then((res) => {
+        if (!res.success) return;
         openAlertDialog(t(res.message, { '0': email }), onBackToLoginBtnClick);
-      }
-    });
-
-    setIsLoading(false);
-  };
-
-  const handleBackToLoginBtnClick = () => {
-    onBackToLoginBtnClick();
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -245,7 +245,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
         </form>
       </main>
       <div className={styles['footer']}>
-        <div className={styles['back-to-login-button']} onClick={handleBackToLoginBtnClick}>
+        <div className={styles['back-to-login-button']} onClick={onBackToLoginBtnClick}>
           {t('back-to-login')}
         </div>
       </div>

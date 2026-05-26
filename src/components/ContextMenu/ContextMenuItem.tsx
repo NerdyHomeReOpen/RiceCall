@@ -8,15 +8,15 @@ import ContextMenu from '@/components/ContextMenu';
 import styles from './ContextMenu.module.css';
 
 interface ContextMenuItemProps {
-  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   item: Types.ContextMenuItem;
+  direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   onClose: () => void;
 }
 
-const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
+const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ item, direction, onClose }) => {
   const { t } = useTranslation();
 
-  const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
+  const [subMenu, setSubMenu] = useState<React.ReactNode | null>(null);
 
   const handleClick = () => {
     if (item.disabled) return;
@@ -26,14 +26,18 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ direction,
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!item.hasSubmenu || !item.submenuItems) return;
+
     const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
     const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
     const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
+
     setSubMenu(<ContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
   };
 
   const handleMouseLeave = () => {
-    if (item.hasSubmenu) setSubMenu(null);
+    if (item.hasSubmenu) {
+      setSubMenu(null);
+    }
   };
 
   return (

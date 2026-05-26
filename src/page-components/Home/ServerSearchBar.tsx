@@ -18,10 +18,10 @@ const ServerSearchBar: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { getIsLoading, loadServer } = useLoading();
 
-  const searchRef = useRef<HTMLDivElement>(null);
+  const searchBarRef = useRef<HTMLDivElement>(null);
   const canSearchRef = useRef<boolean>(true);
-  const inputRef = useRef<HTMLInputElement>(null);
-  const queryRef = useRef<string>('');
+  const searchInputRef = useRef<HTMLInputElement>(null);
+  const lastQueryRef = useRef<string>('');
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const userId = useAppSelector((state) => state.user.data.userId);
@@ -33,7 +33,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
   const [relatedResults, setRelatedResults] = useState<Types.Server[]>([]);
 
   const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
-  const hasInput = !!inputRef.current?.value.trim();
+  const hasInput = !!searchInputRef.current?.value.trim();
 
   const searchServers = async (query: string) => {
     if (!query) {
@@ -42,21 +42,19 @@ const ServerSearchBar: React.FC = React.memo(() => {
     }
 
     ipc.api.searchServer({ query }).then((serverResults) => {
-      const q = queryRef.current;
-
       clearSearchState();
 
       if (!serverResults.length) return;
 
-      const sorted = [...serverResults].sort((a, b) => {
-        const aHasId = a.displayId.toString().includes(q);
-        const bHasId = b.displayId.toString().includes(q);
+      const sortedServerResults = [...serverResults].sort((a, b) => {
+        const aHasId = a.displayId.toString().includes(query);
+        const bHasId = b.displayId.toString().includes(query);
         return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
       });
 
-      const { exact, personal, related } = sorted.reduce<{ exact: Types.Server | null; personal: Types.Server[]; related: Types.Server[] }>(
+      const { exact, personal, related } = sortedServerResults.reduce<{ exact: Types.Server | null; personal: Types.Server[]; related: Types.Server[] }>(
         (acc, s) => {
-          if (s.specialId === q || s.displayId === q) acc.exact = s;
+          if (s.specialId === query || s.displayId === query) acc.exact = s;
           else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
           else acc.related.push(s);
           return acc;
@@ -68,20 +66,27 @@ const ServerSearchBar: React.FC = React.memo(() => {
       setPersonalResults(personal);
       setRelatedResults(related);
     });
-    queryRef.current = query;
+
+    lastQueryRef.current = query;
     canSearchRef.current = false;
 
-    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    if (searchTimerRef.current) {
+      clearTimeout(searchTimerRef.current);
+    }
+
     searchTimerRef.current = setTimeout(() => {
       canSearchRef.current = true;
-      if (queryRef.current !== inputRef.current?.value) {
-        searchServers(inputRef.current?.value || '');
+      if (lastQueryRef.current !== searchInputRef.current?.value) {
+        searchServers(searchInputRef.current?.value || '');
       }
     }, 500);
   };
 
   const clearSearchState = (clearQuery: boolean = false) => {
-    if (clearQuery && inputRef.current) inputRef.current.value = '';
+    if (clearQuery && searchInputRef.current) {
+      searchInputRef.current.value = '';
+    }
+
     setExactMatch((prev) => (prev ? null : prev));
     setPersonalResults((prev) => (prev.length ? [] : prev));
     setRelatedResults((prev) => (prev.length ? [] : prev));
@@ -92,17 +97,20 @@ const ServerSearchBar: React.FC = React.memo(() => {
       if (getIsLoading() || currentServerId === server.serverId) return;
       loadServer(server.specialId || server.displayId);
       ipc.socket.send('connectServer', { serverId: server.serverId });
+
       clearSearchState();
     },
     [currentServerId, getIsLoading, loadServer],
   );
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (canSearchRef.current) searchServers(e.target.value);
+    if (!canSearchRef.current) return;
+    searchServers(e.target.value);
   };
 
   const handleSearchInputFocus = (e: React.FocusEvent<HTMLInputElement>) => {
-    if (canSearchRef.current) searchServers(e.target.value);
+    if (!canSearchRef.current) return;
+    searchServers(e.target.value);
   };
 
   const handleSearchInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -120,30 +128,35 @@ const ServerSearchBar: React.FC = React.memo(() => {
 
   useEffect(() => {
     const onPointerDown = (event: MouseEvent) => {
-      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+      if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
         clearSearchState(true);
       }
     };
+
     document.addEventListener('pointerdown', onPointerDown);
+
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
 
   useEffect(() => {
     const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
       if (!userId || !serverDisplayId) return;
+
       ipc.api.searchServer({ query: serverDisplayId }).then((servers) => {
         const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
         if (!target) return;
+
         selectServer(target);
       });
     });
+
     return () => unsub();
   }, [userId, selectServer]);
 
   return (
-    <div className={styles['search-bar']} ref={searchRef}>
+    <div className={styles['search-bar']} ref={searchBarRef}>
       <input
-        ref={inputRef}
+        ref={searchInputRef}
         placeholder={t('search-server-placeholder')}
         className={styles['search-input']}
         onFocus={handleSearchInputFocus}
@@ -156,7 +169,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
         {exactMatch && (
           <>
             <div className={`${styles['dropdown-header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
-              {t('quick-enter-server', { '0': queryRef.current })}
+              {t('quick-enter-server', { '0': lastQueryRef.current })}
             </div>
             <SearchResultItem key={exactMatch.serverId} server={exactMatch} onServerSelect={handleServerSelect} />
           </>

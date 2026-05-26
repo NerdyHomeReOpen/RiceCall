@@ -85,14 +85,19 @@ export const useAudioContext = (refs: SharedRefs) => {
 
   useEffect(() => {
     const initAudioOnInteraction = () => {
-      if (!audioContextRef.current || !speakerRef.current) initAudioContext();
-      else {
-        if (audioContextRef.current.state === 'suspended') audioContextRef.current.resume();
+      if (!audioContextRef.current || !speakerRef.current) {
+        initAudioContext();
+      } else {
+        if (audioContextRef.current.state === 'suspended') {
+          audioContextRef.current.resume();
+        }
         speakerRef.current.play();
       }
     };
+
     document.addEventListener('click', initAudioOnInteraction, { capture: true });
     document.addEventListener('keydown', initAudioOnInteraction, { capture: true });
+
     return () => {
       document.removeEventListener('click', initAudioOnInteraction, { capture: true });
       document.removeEventListener('keydown', initAudioOnInteraction, { capture: true });

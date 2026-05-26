@@ -98,6 +98,7 @@ const StoreSyncerSlave: React.FC = React.memo(() => {
     if (snapshot) syncStoreState(snapshot);
 
     const unsub = ipc.storeState.onUpdate(syncStoreState);
+
     return () => unsub();
   }, [dispatch]);
 

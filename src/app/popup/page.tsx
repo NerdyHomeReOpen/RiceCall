@@ -52,7 +52,7 @@ import UserInfo from '@/popups/UserInfo';
 
 const PopupPageComponent: React.FC = React.memo(() => {
   const [popup, setPopup] = useState<Types.Popup | null>(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const getPopup = useCallback((type: Types.PopupType, id: string, initialData: any): Types.Popup => {
@@ -128,28 +128,29 @@ const PopupPageComponent: React.FC = React.memo(() => {
     };
   }, []);
 
-  const handleMaximize = () => {
+  const handleMaximize = useCallback(() => {
     if (isFullscreen) return;
     ipc.window.maximize();
-  };
+  }, [isFullscreen]);
 
-  const handleUnmaximize = () => {
+  const handleUnmaximize = useCallback(() => {
     if (!isFullscreen) return;
     ipc.window.unmaximize();
-  };
+  }, [isFullscreen]);
 
-  const handleMinimize = () => {
+  const handleMinimize = useCallback(() => {
     if (!popup?.id) return;
     ipc.window.minimize(popup.id);
-  };
+  }, [popup?.id]);
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     if (!popup?.id) return;
     ipc.popup.close(popup.id);
-  };
+  }, [popup?.id]);
 
   useEffect(() => {
     const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
@@ -159,7 +160,6 @@ const PopupPageComponent: React.FC = React.memo(() => {
       const type = params.get('type') as Types.PopupType;
       const id = params.get('id') as string;
       const initialData = ipc.initialData.get(id);
-
       const popup = getPopup(type, id, initialData);
 
       setPopup(popup);

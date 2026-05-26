@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect } from 'react';
+import React, { useMemo, useEffect } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -23,10 +23,15 @@ import styles from './Header.module.css';
 
 interface HeaderProps {
   selectedTab: 'home' | 'friends' | 'server';
-  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
+  isFullscreen: boolean;
+  onTabSelect: (tab: 'home' | 'friends' | 'server') => void;
+  onMinimize: () => void;
+  onMaximize: () => void;
+  onUnmaximize: () => void;
+  onClose: () => void;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, isFullscreen, onTabSelect, onMinimize, onMaximize, onUnmaximize, onClose }) => {
   const { t } = useTranslation();
   const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
   const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
@@ -40,15 +45,10 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
   const systemNotifications = useAppSelector((state) => state.systemNotifications.data, shallowEqual);
 
-  const [isFullscreen, setIsFullscreen] = useState(false);
-
-  const safeFriendApplications = friendApplications ?? [];
-  const safeMemberInvitations = memberInvitations ?? [];
-  const safeSystemNotifications = systemNotifications ?? [];
-  const hasNotification = !!safeFriendApplications.length || !!safeMemberInvitations.length || !!safeSystemNotifications.length;
-  const hasFriendApplication = !!safeFriendApplications.length;
-  const hasMemberInvitation = !!safeMemberInvitations.length;
-  const hasSystemNotification = !!safeSystemNotifications.length;
+  const hasNotification = !!friendApplications.length || !!memberInvitations.length || !!systemNotifications.length;
+  const hasFriendApplication = !!friendApplications.length;
+  const hasMemberInvitation = !!memberInvitations.length;
+  const hasSystemNotification = !!systemNotifications.length;
 
   const mainTabs = useMemo(
     () => [
@@ -71,72 +71,16 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     ipc.systemSettings.language.set(language);
   };
 
-  // TODO: Make a NotificationMenuBuilder
-  const buildNotificationMenuItems = () => [
-    {
-      id: 'no-unread-notify',
-      label: t('no-unread-notify'),
-      show: !hasNotification,
-      className: 'readonly',
-    },
-    {
-      id: 'friend-verification',
-      label: t('friend-verification'),
-      icon: 'notification',
-      show: hasFriendApplication,
-      contentType: 'image',
-      showContentLength: true,
-      showContent: true,
-      contents: safeFriendApplications.map((fa) => fa.avatarUrl || DEFAULT_USER_AVATAR_URL),
-      onClick: () => openFriendVerification(),
-    },
-    {
-      id: 'member-invitation',
-      label: t('member-invitation'),
-      icon: 'notification',
-      show: hasMemberInvitation,
-      contentType: 'image',
-      showContentLength: true,
-      showContent: true,
-      contents: safeMemberInvitations.map((mi) => mi.avatarUrl || DEFAULT_SERVER_AVATAR_URL),
-      onClick: () => openMemberInvitation(),
-    },
-    {
-      id: 'system-notify',
-      label: t('system-notify'),
-      icon: 'notification',
-      show: hasSystemNotification,
-      showContentLength: true,
-      showContent: false,
-      contents: safeSystemNotifications.map((sn) => sn),
-      onClick: () => {},
-    },
-  ];
-
-  const handleMaximizeBtnClick = () => {
-    if (isFullscreen) return;
-    ipc.window.maximize();
-  };
-
-  const handleUnmaximizeBtnClick = () => {
-    if (!isFullscreen) return;
-    ipc.window.unmaximize();
-  };
-
-  const handleMinimizeBtnClick = () => {
-    ipc.window.minimize();
-  };
-
-  const handleCloseBtnClick = () => {
-    const isCloseToTray = ipc.systemSettings.closeToTray.get();
-    if (isCloseToTray) ipc.window.close();
-    else ipc.exit();
+  const handleNameClick = () => {
+    openUserInfo(userId, userId);
   };
 
   const handleStatusDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showStatusDropdown(x, y, 'right-bottom', (status) => {
       setIsManualIdling(status !== 'online');
       editUserStatus(status);
@@ -146,26 +90,51 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const handleMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
 
     const contextMenu = new ContextMenu()
-      .addSystemSettingOption(() => openSystemSetting(userId))
-      .addChangeThemeOption(() => openChangeTheme())
-      .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
-      .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
+      .addSystemSettingOption(() => {
+        openSystemSetting(userId);
+      })
+      .addChangeThemeOption(() => {
+        openChangeTheme();
+      })
+      .addFeedbackOption(() => {
+        window.open('https://ricecall.com/feedback', '_blank');
+      })
+      .addLanguageSelectOption({ languages: LANGUAGES }, (code) => {
+        if (code) changeLanguage(code);
+      })
       .addHelpCenterOption(
         {
-          onFaqClick: () => window.open('https://ricecall.com/#faq', '_blank'),
-          onAgreementClick: () => window.open('https://ricecall.com/terms', '_blank'),
-          onSpecificationClick: () => window.open('https://ricecall.com/specification', '_blank'),
-          onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
-          onAboutUsClick: () => openAboutUs(),
+          onFaqClick: () => {
+            window.open('https://ricecall.com/#faq', '_blank');
+          },
+          onAgreementClick: () => {
+            window.open('https://ricecall.com/terms', '_blank');
+          },
+          onSpecificationClick: () => {
+            window.open('https://ricecall.com/specification', '_blank');
+          },
+          onContactUsClick: () => {
+            window.open('https://ricecall.com/contact', '_blank');
+          },
+          onAboutUsClick: () => {
+            openAboutUs();
+          },
         },
         () => {},
       )
-      .addNetworkDiagnosisOption(() => openNetworkDiagnosis())
-      .addLogoutOption(() => logout())
-      .addExitOption(() => exit())
+      .addNetworkDiagnosisOption(() => {
+        openNetworkDiagnosis();
+      })
+      .addLogoutOption(() => {
+        logout();
+      })
+      .addExitOption(() => {
+        exit();
+      })
       .build();
 
     showContextMenu(x + 50, y, 'left-bottom', contextMenu);
@@ -174,29 +143,60 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const handleNotificationMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showNotificationMenu(x, y, 'right-bottom', buildNotificationMenuItems());
-  };
 
-  const handleNameClick = () => {
-    openUserInfo(userId, userId);
-  };
+    const notificationMenu = [
+      {
+        id: 'no-unread-notify',
+        label: t('no-unread-notify'),
+        show: !hasNotification,
+        className: 'readonly',
+      },
+      {
+        id: 'friend-verification',
+        label: t('friend-verification'),
+        icon: 'notification',
+        show: hasFriendApplication,
+        contentType: 'image',
+        showContentLength: true,
+        showContent: true,
+        contents: friendApplications.map((fa) => fa.avatarUrl || DEFAULT_USER_AVATAR_URL),
+        onClick: () => openFriendVerification(),
+      },
+      {
+        id: 'member-invitation',
+        label: t('member-invitation'),
+        icon: 'notification',
+        show: hasMemberInvitation,
+        contentType: 'image',
+        showContentLength: true,
+        showContent: true,
+        contents: memberInvitations.map((mi) => mi.avatarUrl || DEFAULT_SERVER_AVATAR_URL),
+        onClick: () => openMemberInvitation(),
+      },
+      {
+        id: 'system-notify',
+        label: t('system-notify'),
+        icon: 'notification',
+        show: hasSystemNotification,
+        showContentLength: true,
+        showContent: false,
+        contents: systemNotifications.map((sn) => sn),
+        onClick: () => {},
+      },
+    ];
 
-  const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {
-    onTabSelect(tabId);
+    showNotificationMenu(x, y, 'right-bottom', notificationMenu);
   };
 
   useEffect(() => {
     const next = isIdling ? 'idle' : 'online';
+
     if (userStatus !== next && !isManualIdling) {
       editUserStatus(next);
     }
   }, [isIdling, isManualIdling, userStatus]);
-
-  useEffect(() => {
-    const unsubs = [ipc.window.onMaximize(() => setIsFullscreen(true)), ipc.window.onUnmaximize(() => setIsFullscreen(false))];
-    return () => unsubs.forEach((unsub) => unsub());
-  }, []);
 
   return (
     <header className={styles['header']}>
@@ -211,7 +211,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
       </div>
       <div className={styles['tabs']}>
         {mainTabs.map((tab) => (
-          <MainTabItem key={tab.id} tab={tab} currentServerId={currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
+          <MainTabItem key={tab.id} tab={tab} currentServerId={currentServerId} isSelected={selectedTab === tab.id} onTabSelect={onTabSelect} />
         ))}
       </div>
       <div className={styles['buttons']}>
@@ -222,9 +222,9 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
         </div>
         <div className={styles['splitter']} />
         <div className={styles['menu-button']} onClick={handleMenuClick} />
-        <div className={styles['minimize-button']} onClick={handleMinimizeBtnClick} />
-        {isFullscreen ? <div className={styles['restore-button']} onClick={handleUnmaximizeBtnClick} /> : <div className={styles['maxsize-button']} onClick={handleMaximizeBtnClick} />}
-        <div className={styles['close-button']} onClick={handleCloseBtnClick} />
+        <div className={styles['minimize-button']} onClick={onMinimize} />
+        {isFullscreen ? <div className={styles['restore-button']} onClick={onUnmaximize} /> : <div className={styles['maxsize-button']} onClick={onMaximize} />}
+        <div className={styles['close-button']} onClick={onClose} />
       </div>
     </header>
   );

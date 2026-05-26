@@ -19,15 +19,17 @@ interface StatusDropdownProps {
 const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direction, onClose, onStatusSelect }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState(false);
-  const [dropdownX, setDropdownX] = useState(x);
-  const [dropdownY, setDropdownY] = useState(y);
+  const [display, setDisplay] = useState<boolean>(false);
+  const [positionX, setPositionX] = useState<number>(x);
+  const [positionY, setPositionY] = useState<number>(y);
 
   useLayoutEffect(() => {
     if (!dropdownRef.current) return;
+
     const { offsetWidth: menuWidth, offsetHeight: menuHeight } = dropdownRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
+
     let newPosX = x;
     let newPosY = y;
 
@@ -51,13 +53,13 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
       newPosY = marginEdge;
     }
 
-    setDropdownX(newPosX);
-    setDropdownY(newPosY);
+    setPositionX(newPosX);
+    setPositionY(newPosY);
     setDisplay(true);
   }, [x, y, direction]);
 
   return (
-    <div ref={dropdownRef} className={`context-menu-container ${styles['status-dropdown']}`} style={display ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
+    <div ref={dropdownRef} className={`context-menu-container ${styles['status-dropdown']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
       {STATUS_OPTIONS.map((status) => (
         <StatusItem key={status} status={status} onStatusSelect={onStatusSelect} onClose={onClose} />
       ))}

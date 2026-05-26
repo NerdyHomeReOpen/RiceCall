@@ -7,13 +7,13 @@ interface LevelIconProps {
   level: number;
   xp: number;
   requiredXp: number;
-  showTooltip?: boolean;
+  showTitle?: boolean;
 }
 
-const LevelIcon: React.FC<LevelIconProps> = React.memo(({ level, xp, requiredXp, showTooltip = true }) => {
+const LevelIcon: React.FC<LevelIconProps> = React.memo(({ level, xp, requiredXp, showTitle = true }) => {
   const { t } = useTranslation();
 
-  const title = showTooltip ? `${t('level')}: ${level}, ${t('xp')}: ${xp}, ${t('required-xp')}: ${requiredXp - xp}` : '';
+  const title = showTitle ? `${t('level')}: ${level}, ${t('xp')}: ${xp}, ${t('required-xp')}: ${requiredXp - xp}` : '';
 
   return <div className={`${styles['grade']} ${styles[`lv-${Math.min(56, level)}`]}`} title={title} />;
 });

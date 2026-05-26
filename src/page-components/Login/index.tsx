@@ -31,6 +31,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target;
+
     if (name === 'account') {
       const match = accounts[value];
       setAccount(value);
@@ -66,26 +67,25 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
 
     setIsLoading(true);
 
-    await ipc.auth.login({ account, password }).then((res) => {
-      if (res.success) {
-        if (rememberAccount) ipc.accounts.add(account, { autoLogin, rememberAccount, password });
+    await ipc.auth
+      .login({ account, password })
+      .then((res) => {
+        if (!res.success) return;
+
+        if (rememberAccount) {
+          ipc.accounts.add(account, { autoLogin, rememberAccount, password });
+        }
+
         localStorage.setItem('login-account', account);
-      }
-    });
-
-    setIsLoading(false);
-  };
-
-  const handleChangeServerBtnClick = () => {
-    onChangeServerBtnClick();
-  };
-
-  const handleRegisterBtnClick = () => {
-    onRegisterBtnClick();
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   useEffect(() => {
     const loginAccount = localStorage.getItem('login-account') || '';
+
     setAccount(accounts[loginAccount] ? loginAccount : '');
     setPassword(accounts[loginAccount]?.password ?? '');
     setRememberAccount(!!accounts[loginAccount]?.rememberAccount);
@@ -96,8 +96,10 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     const changeAccounts = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => {
       setAccounts(accounts);
     };
+
     changeAccounts(ipc.accounts.get());
     const unsub = ipc.accounts.onUpdate(changeAccounts);
+
     return () => unsub();
   }, []);
 
@@ -105,7 +107,9 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     const onPointerDown = (e: MouseEvent) => {
       if (!comboRef.current?.contains(e.target as Node)) setShowAccountselectBox(false);
     };
+
     document.addEventListener('pointerdown', onPointerDown);
+
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
 
@@ -177,11 +181,11 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
       </main>
       <div className={styles['footer']}>
         <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-          <div className={styles['create-account-button']} onClick={handleRegisterBtnClick}>
+          <div className={styles['create-account-button']} onClick={onRegisterBtnClick}>
             {t('register-account')}
           </div>
           {'/'}
-          <div className={styles['change-server-button']} onClick={handleChangeServerBtnClick}>
+          <div className={styles['change-server-button']} onClick={onChangeServerBtnClick}>
             {t('change-server')}
           </div>
         </div>

@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
@@ -12,34 +12,36 @@ import LoginPage from '@/page-components/Login';
 import RegisterPage from '@/page-components/Register';
 import ChangeServerPage from '@/page-components/ChangeServer';
 
+type Page = 'register' | 'login' | 'change-server';
+
 const AuthPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
-  const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
+  const [selectedPage, setSelectedPage] = useState<Page>('login');
 
-  const isDisplayLoginPage = section === 'login';
-  const isDisplayRegisterPage = section === 'register';
-  const isDisplayChangeServerPage = section === 'change-server';
+  const loginPageIsSelected = selectedPage === 'login';
+  const registerPageIsSelected = selectedPage === 'register';
+  const changeServerPageIsSelected = selectedPage === 'change-server';
 
-  const handleBackToLoginBtnClick = () => {
-    setSection('login');
-  };
+  const handleBackToLoginBtnClick = useCallback(() => {
+    setSelectedPage('login');
+  }, []);
 
-  const handleRegisterBtnClick = () => {
-    setSection('register');
-  };
+  const handleRegisterBtnClick = useCallback(() => {
+    setSelectedPage('register');
+  }, []);
 
-  const handleChangeServerBtnClick = () => {
-    setSection('change-server');
-  };
+  const handleChangeServerBtnClick = useCallback(() => {
+    setSelectedPage('change-server');
+  }, []);
 
-  const handleMinimizeBtnClick = () => {
+  const handleMinimize = useCallback(() => {
     ipc.window.minimize();
-  };
+  }, []);
 
-  const handleCloseBtnClick = () => {
+  const handleClose = useCallback(() => {
     ipc.window.close();
-  };
+  }, []);
 
   useEffect(() => {
     ipc.discord.updatePresence({
@@ -61,10 +63,10 @@ const AuthPageComponent: React.FC = React.memo(() => {
 
   return (
     <>
-      <AuthHeader onMinimize={handleMinimizeBtnClick} onClose={handleCloseBtnClick} />
-      <LoginPage display={isDisplayLoginPage} onRegisterBtnClick={handleRegisterBtnClick} onChangeServerBtnClick={handleChangeServerBtnClick} />
-      <RegisterPage display={isDisplayRegisterPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
-      <ChangeServerPage display={isDisplayChangeServerPage} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
+      <AuthHeader onMinimize={handleMinimize} onClose={handleClose} />
+      <LoginPage display={loginPageIsSelected} onRegisterBtnClick={handleRegisterBtnClick} onChangeServerBtnClick={handleChangeServerBtnClick} />
+      <RegisterPage display={registerPageIsSelected} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
+      <ChangeServerPage display={changeServerPageIsSelected} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
     </>
   );
 });

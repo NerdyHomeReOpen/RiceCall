@@ -26,11 +26,11 @@ import styles from './AnnouncementEditor.module.css';
 
 interface AnnouncementEditorProps {
   announcement: string;
-  showPreview?: boolean;
+  isPreviewing?: boolean;
   onChange: (value: string) => void;
 }
 
-const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, showPreview = false, onChange }) => {
+const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, isPreviewing = false, onChange }) => {
   const { t } = useTranslation();
   const { showColorPicker, showEmojiPicker, showEmbedLinkInput } = useContextMenu();
   const editor = useEditor({
@@ -42,23 +42,23 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const isUploadingRef = useRef(false);
 
-  const [isBold, setIsBold] = useState(false);
-  const [isItalic, setIsItalic] = useState(false);
-  const [isUnderline, setIsUnderline] = useState(false);
-  const [isTextAlignLeft, setIsTextAlignLeft] = useState(false);
-  const [isTextAlignCenter, setIsTextAlignCenter] = useState(false);
-  const [isTextAlignRight, setIsTextAlignRight] = useState(false);
-  const [fontSize, setFontSize] = useState('13px');
-  const [fontFamily, setFontFamily] = useState('Arial');
-  const [textColor, setTextColor] = useState('#000000');
+  const [boldIsActive, setBoldIsActive] = useState<boolean>(false);
+  const [italicIsActive, setItalicIsActive] = useState<boolean>(false);
+  const [underlineIsActive, setUnderlineIsActive] = useState<boolean>(false);
+  const [textAlignLeftIsActive, setTextAlignLeftIsActive] = useState<boolean>(false);
+  const [textAlignCenterIsActive, setTextAlignCenterIsActive] = useState<boolean>(false);
+  const [textAlignRightIsActive, setTextAlignRightIsActive] = useState<boolean>(false);
+  const [fontSize, setFontSize] = useState<string>('13px');
+  const [fontFamily, setFontFamily] = useState<string>('Arial');
+  const [textColor, setTextColor] = useState<string>('#000000');
 
   const syncStyles = useCallback(() => {
-    setIsBold(editor?.isActive('bold') || false);
-    setIsItalic(editor?.isActive('italic') || false);
-    setIsUnderline(editor?.isActive('underline') || false);
-    setIsTextAlignLeft(editor?.isActive({ textAlign: 'left' }) || false);
-    setIsTextAlignCenter(editor?.isActive({ textAlign: 'center' }) || false);
-    setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
+    setBoldIsActive(editor?.isActive('bold') || false);
+    setItalicIsActive(editor?.isActive('italic') || false);
+    setUnderlineIsActive(editor?.isActive('underline') || false);
+    setTextAlignLeftIsActive(editor?.isActive({ textAlign: 'left' }) || false);
+    setTextAlignCenterIsActive(editor?.isActive({ textAlign: 'center' }) || false);
+    setTextAlignRightIsActive(editor?.isActive({ textAlign: 'right' }) || false);
     setFontSize(editor?.getAttributes('textStyle').fontSize || '13px');
     setFontFamily(editor?.getAttributes('textStyle').fontFamily || 'Arial');
     setTextColor(editor?.getAttributes('textStyle').color || '#000000');
@@ -66,6 +66,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleFontFamilyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const fontFamily = e.target.value;
+
     editor?.chain().setFontFamily(fontFamily).focus().run();
     setFontFamily(fontFamily);
     syncStyles();
@@ -73,6 +74,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handleFontSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const fontSize = e.target.value;
+
     editor?.chain().setFontSize(fontSize).focus().run();
     setFontSize(fontSize);
     syncStyles();
@@ -81,55 +83,63 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const handleTextAlignLeftClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     editor?.chain().setTextAlign('left').focus().run();
-    setIsTextAlignLeft(editor?.isActive({ textAlign: 'left' }) || false);
+    setTextAlignLeftIsActive(editor?.isActive({ textAlign: 'left' }) || false);
     syncStyles();
   };
 
   const handleTextAlignCenterClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     editor?.chain().setTextAlign('center').focus().run();
-    setIsTextAlignCenter(editor?.isActive({ textAlign: 'center' }) || false);
+    setTextAlignCenterIsActive(editor?.isActive({ textAlign: 'center' }) || false);
     syncStyles();
   };
 
   const handleTextAlignRightClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     editor?.chain().setTextAlign('right').focus().run();
-    setIsTextAlignRight(editor?.isActive({ textAlign: 'right' }) || false);
+    setTextAlignRightIsActive(editor?.isActive({ textAlign: 'right' }) || false);
     syncStyles();
   };
 
   const handleBoldClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     editor?.chain().toggleBold().focus().run();
-    setIsBold(editor?.isActive('bold') || false);
+    setBoldIsActive(editor?.isActive('bold') || false);
     syncStyles();
   };
 
   const handleItalicClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     editor?.chain().toggleItalic().focus().run();
-    setIsItalic(editor?.isActive('italic') || false);
+    setItalicIsActive(editor?.isActive('italic') || false);
     syncStyles();
   };
 
   const handleUnderlineClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     editor?.chain().toggleUnderline().focus().run();
-    setIsUnderline(editor?.isActive('underline') || false);
+    setUnderlineIsActive(editor?.isActive('underline') || false);
     syncStyles();
   };
 
   const handleTextColorClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showColorPicker(x, y, 'right-bottom', (color) => {
       editor?.chain().setColor(color).focus().run();
       setTextColor(color);
@@ -140,7 +150,9 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, undefined, undefined, (code) => {
       editor?.chain().insertEmoji({ code }).focus().run();
       syncStyles();
@@ -150,56 +162,64 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   const handleEmbedLinkInputClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showEmbedLinkInput(x, y, 'right-bottom', (linkUrl) => {
       const isYouTube = linkUrl.trim().includes('youtube.com/');
       const isTwitch = linkUrl.trim().includes('twitch.tv/');
       const isKick = linkUrl.trim().includes('kick.com/');
+
       if (isYouTube) {
         const videoId = linkUrl.trim().split('/watch?v=')[1].split('&')[0];
-        if (videoId && videoId.match(/^[\w-]+$/)) {
-          editor?.chain().insertYouTube(videoId).focus().run();
-          syncStyles();
-        }
+        if (!videoId || !videoId.match(/^[\w-]+$/)) return;
+        editor?.chain().insertYouTube(videoId).focus().run();
+        syncStyles();
       } else if (isTwitch) {
         const username = linkUrl.trim().split('twitch.tv/')[1].split('&')[0];
-        if (username && username.match(/^[\w-]+$/)) {
-          editor?.chain().insertTwitch(username).focus().run();
-          syncStyles();
-        }
+        if (!username || !username.match(/^[\w-]+$/)) return;
+        editor?.chain().insertTwitch(username).focus().run();
+        syncStyles();
       } else if (isKick) {
         const username = linkUrl.trim().split('kick.com/')[1].split('&')[0];
-        if (username && username.match(/^[\w-]+$/)) {
-          editor?.chain().insertKick(username).focus().run();
-          syncStyles();
-        }
+        if (!username || !username.match(/^[\w-]+$/)) return;
+        editor?.chain().insertKick(username).focus().run();
+        syncStyles();
       }
     });
   };
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
+
     for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        const image = item.getAsFile();
-        if (!image || isUploadingRef.current) return;
-        image.arrayBuffer().then((arrayBuffer) => {
-          const imageUnit8Array = new Uint8Array(arrayBuffer);
-          isUploadingRef.current = true;
-          if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-            isUploadingRef.current = false;
-            return;
-          }
-          ipc.api.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
-            if (response) {
-              editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
-              syncStyles();
-            }
+      if (!item.type.startsWith('image/')) continue;
+
+      const image = item.getAsFile();
+      if (!image || isUploadingRef.current) continue;
+
+      image.arrayBuffer().then((arrayBuffer) => {
+        const imageUnit8Array = new Uint8Array(arrayBuffer);
+
+        isUploadingRef.current = true;
+
+        if (imageUnit8Array.length > MAX_FILE_SIZE) {
+          openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          isUploadingRef.current = false;
+          return;
+        }
+
+        ipc.api
+          .uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array })
+          .then((response) => {
+            if (!response) return;
+            editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
+            syncStyles();
+          })
+          .finally(() => {
             isUploadingRef.current = false;
           });
-        });
-      }
+      });
     }
   };
 
@@ -209,7 +229,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   return (
     <div className="input-box">
-      {!showPreview ? (
+      {!isPreviewing ? (
         <div style={{ display: 'flex', flexDirection: 'column', border: '1px solid #ccc', height: '380px' }}>
           <div className={styles['toolbar']}>
             <div className="select-box">
@@ -230,7 +250,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 ))}
               </select>
             </div>
-            <div className={`${styles['toolbar-button']} ${isTextAlignLeft ? styles['active'] : ''}`} onClick={handleTextAlignLeftClick}>
+            <div className={`${styles['toolbar-button']} ${textAlignLeftIsActive ? styles['active'] : ''}`} onClick={handleTextAlignLeftClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path
                   fillRule="evenodd"
@@ -238,7 +258,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 />
               </svg>
             </div>
-            <div className={`${styles['toolbar-button']} ${isTextAlignCenter ? styles['active'] : ''}`} onClick={handleTextAlignCenterClick}>
+            <div className={`${styles['toolbar-button']} ${textAlignCenterIsActive ? styles['active'] : ''}`} onClick={handleTextAlignCenterClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path
                   fillRule="evenodd"
@@ -246,7 +266,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 />
               </svg>
             </div>
-            <div className={`${styles['toolbar-button']} ${isTextAlignRight ? styles['active'] : ''}`} onClick={handleTextAlignRightClick}>
+            <div className={`${styles['toolbar-button']} ${textAlignRightIsActive ? styles['active'] : ''}`} onClick={handleTextAlignRightClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path
                   fillRule="evenodd"
@@ -254,17 +274,17 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
                 />
               </svg>
             </div>
-            <div className={`${styles['toolbar-button']} ${isBold ? styles['active'] : ''}`} onClick={handleBoldClick}>
+            <div className={`${styles['toolbar-button']} ${boldIsActive ? styles['active'] : ''}`} onClick={handleBoldClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M8.21 13c2.106 0 3.412-1.087 3.412-2.823 0-1.306-.984-2.283-2.324-2.386v-.055a2.176 2.176 0 0 0 1.852-2.14c0-1.51-1.162-2.46-3.014-2.46H3.843V13zM5.908 4.674h1.696c.963 0 1.517.451 1.517 1.244 0 .834-.629 1.32-1.73 1.32H5.908V4.673zm0 6.788V8.598h1.73c1.217 0 1.88.492 1.88 1.415 0 .943-.643 1.449-1.832 1.449H5.907z" />
               </svg>
             </div>
-            <div className={`${styles['toolbar-button']} ${isItalic ? styles['active'] : ''}`} onClick={handleItalicClick}>
+            <div className={`${styles['toolbar-button']} ${italicIsActive ? styles['active'] : ''}`} onClick={handleItalicClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M7.991 11.674 9.53 4.455c.123-.595.246-.71 1.347-.807l.11-.52H7.211l-.11.52c1.06.096 1.128.212 1.005.807L6.57 11.674c-.123.595-.246.71-1.346.806l-.11.52h3.774l.11-.52c-1.06-.095-1.129-.211-1.006-.806z" />
               </svg>
             </div>
-            <div className={`${styles['toolbar-button']} ${isUnderline ? styles['active'] : ''}`} onClick={handleUnderlineClick}>
+            <div className={`${styles['toolbar-button']} ${underlineIsActive ? styles['active'] : ''}`} onClick={handleUnderlineClick}>
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
                 <path d="M5.313 3.136h-1.23V9.54c0 2.105 1.47 3.623 3.917 3.623s3.917-1.518 3.917-3.623V3.136h-1.23v6.323c0 1.49-.978 2.57-2.687 2.57s-2.687-1.08-2.687-2.57zM12.5 15h-9v-1h9z" />
               </svg>

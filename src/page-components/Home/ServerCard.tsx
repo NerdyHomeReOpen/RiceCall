@@ -31,7 +31,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   const userId = useAppSelector((state) => state.user.data.userId);
   const currentServerId = useAppSelector((state) => state.user.data.currentServerId);
 
-  const isOwned = server.ownerId === userId && server.owned;
+  const serverIsOwned = server.ownerId === userId && server.owned;
 
   const joinServer = () => {
     if (getIsLoading() || currentServerId === server.serverId) return;
@@ -46,13 +46,22 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { clientX: x, clientY: y } = e;
 
     const contextMenu = new ContextMenu()
-      .addJoinServerOption(() => joinServer())
-      .addViewServerInfoOption(() => openServerSetting(userId, server.serverId))
-      .addFavoriteServerOption({ isFavorite: server.favorite }, () => favoriteServer(server.serverId))
-      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isSelf: true }, () => terminateMember(userId, server.serverId, t('self')))
+      .addJoinServerOption(() => {
+        joinServer();
+      })
+      .addViewServerInfoOption(() => {
+        openServerSetting(userId, server.serverId);
+      })
+      .addFavoriteServerOption({ serverIsFavorite: server.favorite }, () => {
+        favoriteServer(server.serverId);
+      })
+      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, targetIsSelf: true }, () => {
+        terminateMember(userId, server.serverId, t('self'));
+      })
       .build();
 
     showContextMenu(x, y, 'right-bottom', contextMenu);
@@ -65,7 +74,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
       </div>
       <div className={styles['card-info-text']}>
         <div className={styles['card-name-text']}>{server.name}</div>
-        <div className={`${styles['card-id-text']} ${isOwned ? styles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
+        <div className={`${styles['card-id-text']} ${serverIsOwned ? styles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
         <div className={styles['card-slogan-text']}>{server.slogan}</div>
       </div>
     </div>

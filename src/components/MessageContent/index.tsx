@@ -15,23 +15,27 @@ interface MessageContentProps {
 }
 
 const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages }) => {
-  const messageGroups = useMemo(() => {
-    const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
-    return sortedMessages.reduce<MessageGroup[]>((acc, message) => {
-      const lastGroup = acc[acc.length - 1];
-      const isNearTime = lastGroup && message.timestamp - lastGroup.timestamp <= 5 * 60 * 1000;
-      const isSameType = lastGroup && message.type === lastGroup.type;
-      const isPromptMessage = message.type === 'info' || message.type === 'warn' || message.type === 'event' || message.type === 'alert';
-      const isSameSender = lastGroup && 'userId' in message && 'userId' in lastGroup && message.userId === lastGroup.userId;
+  const messageGroups = useMemo(
+    () =>
+      [...messages]
+        .sort((a, b) => a.timestamp - b.timestamp)
+        .reduce<MessageGroup[]>((acc, message) => {
+          const lastGroup = acc[acc.length - 1];
+          const isRecent = lastGroup && message.timestamp - lastGroup.timestamp <= 5 * 60 * 1000;
+          const isSameType = lastGroup && message.type === lastGroup.type;
+          const isSameSender = lastGroup && 'userId' in message && 'userId' in lastGroup && message.userId === lastGroup.userId;
+          const isPromptMessage = message.type === 'info' || message.type === 'warn' || message.type === 'event' || message.type === 'alert';
 
-      if (isSameSender && isNearTime && isSameType && !isPromptMessage) {
-        lastGroup.contents.push(message.content);
-      } else {
-        acc.push({ ...message, contents: [message.content] });
-      }
-      return acc;
-    }, []);
-  }, [messages]);
+          if (isSameSender && isRecent && isSameType && !isPromptMessage) {
+            lastGroup.contents.push(message.content);
+          } else {
+            acc.push({ ...message, contents: [message.content] });
+          }
+
+          return acc;
+        }, []),
+    [messages],
+  );
 
   return (
     <div className={styles['message-content-wrapper']}>

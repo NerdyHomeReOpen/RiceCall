@@ -5,8 +5,6 @@ import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import { getDefaultServer } from '@/utils/default';
-
 import styles from './ActionLink.module.css';
 
 interface ActionLinkProps {
@@ -16,25 +14,30 @@ interface ActionLinkProps {
 const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
   const { t } = useTranslation();
 
-  const [server, setServer] = useState<Types.Server>(getDefaultServer());
+  const [server, setServer] = useState<Types.Server | undefined>(undefined);
 
-  const displayId = new URL(href).searchParams.get('sid') || '';
+  const serverDisplayId = new URL(href).searchParams.get('sid') || '';
 
   const handleLinkClick = () => {
-    ipc.server.select({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() });
+    if (!server) return;
+    ipc.server.select({ serverDisplayId, serverId: server.serverId, timestamp: Date.now() });
   };
 
   useEffect(() => {
-    if (!displayId) return;
+    if (!serverDisplayId) return;
+
     const refresh = async () => {
-      ipc.api.searchServer({ query: displayId }).then((server) => {
-        if (server) setServer(server[0]);
+      ipc.api.searchServer({ query: serverDisplayId }).then((server) => {
+        if (server.length === 0) return;
+        setServer(server[0]);
       });
     };
-    refresh();
-  }, [displayId]);
 
-  if (!displayId) return <span>{href}</span>;
+    refresh();
+  }, [serverDisplayId]);
+
+  if (!serverDisplayId) return <span>{href}</span>;
+
   return (
     <span className={styles['invitation-container']}>
       <span className={styles['invitation-header']}>
@@ -43,7 +46,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
       </span>
       <span className={styles['invitation-content']}>
         {t('server-invitation-content.prefix')}
-        <span className={styles['server-name']}>{server.name}</span>
+        <span className={styles['server-name']}>{server?.name || t('loading')}</span>
         {t('server-invitation-content.suffix')}
         <span className={styles['action-link']} onClick={handleLinkClick}>
           {t('join-server')}

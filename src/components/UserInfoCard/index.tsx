@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect, useRef, useMemo } from 'react';
+import React, { useState, useLayoutEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useTranslation } from 'react-i18next';
 
@@ -25,19 +25,21 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
 
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState(false);
-  const [cardX, setCardX] = useState(x);
-  const [cardY, setCardY] = useState(y);
+  const [display, setDisplay] = useState<boolean>(false);
+  const [positionX, setPositionX] = useState<number>(x);
+  const [positionY, setPositionY] = useState<number>(y);
 
   const vipBoost = Math.min(2, 1 + member.vip * 0.2);
-  const hasVip = member.vip > 0;
-  const badges = useMemo(() => (typeof member.badges === 'string' ? JSON.parse(member.badges) : member.badges), [member.badges]);
+  const memberHasVip = member.vip > 0;
+  const memberBadges = typeof member.badges === 'string' ? JSON.parse(member.badges) : member.badges;
 
   useLayoutEffect(() => {
     if (!cardRef.current) return;
+
     const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
+
     let newPosX = x;
     let newPosY = y;
 
@@ -61,8 +63,8 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
       newPosY = marginEdge;
     }
 
-    setCardX(newPosX);
-    setCardY(newPosY);
+    setPositionX(newPosX);
+    setPositionY(newPosY);
     setDisplay(true);
   }, [x, y, direction]);
 
@@ -70,7 +72,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     <div
       ref={cardRef}
       className={`user-info-card-container ${styles['user-info-card']} ${styles[`vip-${member.vip}`]}`}
-      style={display ? { top: cardY, left: cardX } : { opacity: 0 }}
+      style={display ? { top: positionY, left: positionX } : { opacity: 0 }}
       onClick={(e) => e.stopPropagation()}
     >
       <div className={styles['body']}>
@@ -79,11 +81,11 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
           <div className={styles['user-info-wrapper']}>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                <div className={`${styles['name-text']} ${hasVip ? styles['vip'] : ''}`}>{member.name}</div>
-                <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
+                <div className={`${styles['name-text']} ${memberHasVip ? styles['vip'] : ''}`}>{member.name}</div>
+                <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} />
               </div>
               <div className={`vip-icon-big vip-${member.vip}`} />
-              {hasVip && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
+              {memberHasVip && <div className={styles['vip-boost-text']}>{t('vip-upgrade-boost-message', { '0': vipBoost.toString() })}</div>}
             </div>
             <div className={styles['xp-wrapper']}>
               <div className={styles['level-text']}>{`${t('level')} ${member.level} (${member.xp}/${member.requiredXp})`}</div>
@@ -109,7 +111,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
         </div>
       </div>
       <div className={styles['footer']}>
-        <BadgeList badges={badges} position="left-bottom" direction="right-bottom" maxDisplay={13} />
+        <BadgeList badges={memberBadges} position="left-bottom" direction="right-bottom" maxDisplay={13} />
       </div>
     </div>
   );

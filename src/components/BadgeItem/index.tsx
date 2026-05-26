@@ -20,14 +20,21 @@ const BadgeItem: React.FC<BadgeItemProps> = React.memo(({ badge, position, direc
     const { left, right, top, bottom } = e.currentTarget.getBoundingClientRect();
     const x = position === 'left-top' || position === 'left-bottom' ? left : right;
     const y = position === 'left-top' || position === 'right-top' ? top : bottom;
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+    }
+
     hoverTimerRef.current = setTimeout(() => {
       showBadgeInfoCard(x, y, direction, badge);
     }, 200);
   };
 
   const handleMouseLeave = () => {
-    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+    }
+
     hoverTimerRef.current = null;
   };
 

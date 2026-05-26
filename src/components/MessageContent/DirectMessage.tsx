@@ -24,7 +24,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
 
   const userId = useAppSelector((state) => state.user.data.userId);
 
-  const hasVip = messageGroup.vip > 0;
+  const senderHasVip = messageGroup.vip > 0;
   const formattedTimestamp = getFormatTimestamp(messageGroup.timestamp);
   const formattedMessageContents = messageGroup.contents.map((content) =>
     content
@@ -40,7 +40,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   return (
     <div className={styles['message-box']}>
       <div className={styles['details']}>
-        <div className={`${styles['username-text']} ${hasVip ? styles['vip'] : ''}`} onClick={handleUsernameClick}>
+        <div className={`${styles['username-text']} ${senderHasVip ? styles['vip'] : ''}`} onClick={handleUsernameClick}>
           {messageGroup.name}
         </div>
         <div className={styles['timestamp-text']}>{formattedTimestamp}</div>

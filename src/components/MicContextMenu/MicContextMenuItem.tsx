@@ -26,14 +26,18 @@ const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ dire
 
   const handleMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!item.hasSubmenu || !item.submenuItems) return;
+
     const { left, right, bottom, top } = e.currentTarget.getBoundingClientRect();
     const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
     const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
+
     setSubMenu(<MicContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
   };
 
   const handleMouseLeave = () => {
-    if (item.hasSubmenu) setSubMenu(null);
+    if (item.hasSubmenu) {
+      setSubMenu(null);
+    }
   };
 
   return (

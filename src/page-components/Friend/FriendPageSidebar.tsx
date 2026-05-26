@@ -18,7 +18,7 @@ const FriendPageSidebar: React.FC = React.memo(() => {
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
-  const [query, setQuery] = useState<string>('');
+  const [searchInput, setSearchInput] = useState<string>('');
   const [selectedTabId, setSelectedTabId] = useState<'friend' | 'recent'>('friend');
 
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'default', name: t('my-friends'), order: -1 }), [t]);
@@ -26,9 +26,9 @@ const FriendPageSidebar: React.FC = React.memo(() => {
   const blacklistFriendGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: 10001 }), [t]);
 
   const sortedFriendGroups = [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order);
-  const filteredFriends = friends.filter((f) => f.name.toLowerCase().includes(query.toLowerCase()));
-  const isFriendTab = selectedTabId === 'friend';
-  const isRecentTab = selectedTabId === 'recent';
+  const filteredFriends = friends.filter((f) => f.name.toLowerCase().includes(searchInput.toLowerCase()));
+  const friendTabIsSelected = selectedTabId === 'friend';
+  const recentTabIsSelected = selectedTabId === 'recent';
 
   const handleFriendTabClick = () => {
     setSelectedTabId('friend');
@@ -38,8 +38,8 @@ const FriendPageSidebar: React.FC = React.memo(() => {
     setSelectedTabId('recent');
   };
 
-  const handleQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setQuery(e.target.value);
+  const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchInput(e.target.value);
   };
 
   const handleCreateFriendGroupBtnClick = () => {
@@ -53,27 +53,27 @@ const FriendPageSidebar: React.FC = React.memo(() => {
   return (
     <>
       <div className={styles['navigate-tabs']}>
-        <div className={`${styles['navigate-tab']} ${isFriendTab ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
+        <div className={`${styles['navigate-tab']} ${friendTabIsSelected ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div className={`${styles['navigate-tab']} ${isRecentTab ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
+        <div className={`${styles['navigate-tab']} ${recentTabIsSelected ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
       <div className={styles['search-bar']}>
         <div className={styles['search-icon']} />
-        <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
+        <input name="search-input" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={searchInput} onChange={handleSearchInputChange} />
         <div className={styles['prev-button']} />
         <div className={styles['next-button']} />
       </div>
-      <div className={styles['scroll-view']} style={isFriendTab ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={friendTabIsSelected ? {} : { display: 'none' }}>
         <div className={styles['friend-group-list']}>
           {sortedFriendGroups.map((friendGroup) => (
             <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} />
           ))}
         </div>
       </div>
-      <div className={styles['scroll-view']} style={isRecentTab ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={recentTabIsSelected ? {} : { display: 'none' }}>
         <div className={styles['recent-list']} />
       </div>
       <div className={styles['footer']}>

@@ -11,6 +11,7 @@ export const detectSpeaking = (
   audioProducerRef: MutableRefObject<mediasoupClient.types.Producer | null>,
 ): void => {
   analyserNode.getByteTimeDomainData(dataArray);
+
   let sum = 0;
   for (let i = 0; i < dataArray.length; i++) {
     const v = (dataArray[i] - 128) / 128;
@@ -24,14 +25,18 @@ export const detectSpeaking = (
     const volumeLevel = Math.ceil(volumePercent / 10) - 1;
 
     if (volumePercent > Store.store.getState().webrtc.voiceThreshold) {
-      Store.store.dispatch(Store.setWebRTC({ volumePercent, volumeLevel }));
       audioProducerRef.current?.resume();
+
+      Store.store.dispatch(Store.setWebRTC({ volumePercent, volumeLevel }));
+
       if (!Store.store.getState().webrtc.speakingById[targetId]) {
         Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: true }));
       }
     } else {
-      Store.store.dispatch(Store.setWebRTC({ volumePercent: 0, volumeLevel: 0 }));
       audioProducerRef.current?.pause();
+
+      Store.store.dispatch(Store.setWebRTC({ volumePercent: 0, volumeLevel: 0 }));
+
       if (Store.store.getState().webrtc.speakingById[targetId]) {
         Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: false }));
       }

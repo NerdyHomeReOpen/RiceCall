@@ -16,9 +16,9 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
 
   const embedLinkInputRef = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState(false);
-  const [pickerX, setPickerX] = useState<number>(x);
-  const [pickerY, setPickerY] = useState<number>(y);
+  const [display, setDisplay] = useState<boolean>(false);
+  const [positionX, setPositionX] = useState<number>(x);
+  const [positionY, setPositionY] = useState<number>(y);
   const [linkUrl, setLinkUrl] = useState<string>('');
 
   const handleLinkUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,9 +36,11 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
 
   useLayoutEffect(() => {
     if (!embedLinkInputRef.current) return;
+
     const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = embedLinkInputRef.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
+
     let newPosX = x;
     let newPosY = y;
 
@@ -62,13 +64,13 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
       newPosY = marginEdge;
     }
 
-    setPickerX(newPosX);
-    setPickerY(newPosY);
+    setPositionX(newPosX);
+    setPositionY(newPosY);
     setDisplay(true);
   }, [x, y, direction]);
 
   return (
-    <div ref={embedLinkInputRef} className={`context-menu-container col ${styles['input-dropdown']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
+    <div ref={embedLinkInputRef} className={`context-menu-container col ${styles['input-dropdown']}`} style={display ? { left: positionX, top: positionY } : { opacity: 0 }}>
       <div className="input-box col">
         <div className="label">{t('link')}</div>
         <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={handleLinkUrlChange} />

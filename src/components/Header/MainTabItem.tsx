@@ -13,7 +13,7 @@ interface MainTabItemProps {
   tab: TabType;
   currentServerId: string | null;
   isSelected: boolean;
-  onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
+  onTabSelect: (tab: 'home' | 'friends' | 'server') => void;
 }
 
 const MainTabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: MainTabItemProps) => {
@@ -23,11 +23,13 @@ const MainTabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect 
 
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
     e.stopPropagation();
+
     if (!currentServerId) return;
+
     leaveServer(currentServerId);
   };
 
-  if (tab.id === 'server' && !currentServerId) return null;
+  if (!currentServerId) return null;
   return (
     <div key={`tabs-${tab.id}`} data-tab-id={tab.id} className={`${styles['tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
       <div className={styles['tab-label']}>{tab.label}</div>

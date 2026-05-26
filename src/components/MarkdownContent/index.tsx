@@ -1,5 +1,5 @@
 /* eslint-disable @next/next/no-img-element */
-import React, { useMemo } from 'react';
+import React from 'react';
 import ReactMarkdown from 'react-markdown';
 import { Components } from 'react-markdown';
 import rehypeHighlight from 'rehype-highlight';
@@ -45,6 +45,7 @@ const ALLOWED_TAGS = [
   'tag',
   'time',
 ];
+
 const ALLOWED_ATTR: string[] = [
   'id',
   'src',
@@ -68,11 +69,11 @@ const ALLOWED_ATTR: string[] = [
 
 interface MarkdownContentProps {
   markdownText: string;
-  selectable?: boolean;
+  canSelect?: boolean;
   imageSize?: 'small' | 'medium' | 'big';
 }
 
-const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, selectable = true, imageSize = 'small' }) => {
+const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, canSelect = true, imageSize = 'small' }) => {
   const { selectImage } = useImageViewer();
 
   const components: Components = {
@@ -88,8 +89,10 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     blockquote: ({ ...props }: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) => <blockquote {...props} />,
     a: ({ ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => {
       if (!props.href) return <a {...props} target="_blank" rel="noreferrer" />;
+
       const isInvitelink = /^https?:\/\/ricecall(\.com|\.com\.tw)\/join(?:\?|$)/.test(props.href);
       if (!isInvitelink) return <a {...props} target="_blank" rel="noreferrer" />;
+
       return <ActionLink href={props.href} />;
     },
     table: ({ ...props }: React.TableHTMLAttributes<HTMLTableElement>) => <table className="markdown-table-wrapper" {...props} />,
@@ -113,11 +116,11 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   };
 
   const parsed = markdownText.replace(/<@([^>]+)-([^>]+)-([^>]+)>/g, '<tag data-tag="$1-$2-$3"></tag>').replace(/<t:(\d+):(.*?)>/g, '<time data-timestamp="$1"></time>');
-  const sanitized = useMemo(() => DOMPurify.sanitize(parsed, { ALLOWED_TAGS, ALLOWED_ATTR }), [parsed]);
-  const converted = useMemo(() => fromTags(sanitized), [sanitized]);
+  const sanitized = DOMPurify.sanitize(parsed, { ALLOWED_TAGS, ALLOWED_ATTR });
+  const converted = fromTags(sanitized);
 
   return (
-    <div className={`markdown-content image-size-${imageSize}`} style={{ userSelect: selectable ? 'text' : 'none' }}>
+    <div className={`markdown-content image-size-${imageSize}`} style={{ userSelect: canSelect ? 'text' : 'none' }}>
       <ReactMarkdown remarkPlugins={[]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={components} skipHtml={false} unwrapDisallowed={false}>
         {converted}
       </ReactMarkdown>
