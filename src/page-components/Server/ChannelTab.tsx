@@ -45,11 +45,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const channelMembers = onlineMembers.filter((om) => om.currentChannelId === channel.channelId);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableChannelUserIds = channelMembers.filter((cm) => cm.userId !== userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
-  const sortedChannelMembers = [...channelMembers].sort((a, b) => {
-    if (a.userId === userId && b.userId !== userId) return -1;
-    if (b.userId === userId && a.userId !== userId) return 1;
-    return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
-  });
+  const sortedChannelMembers = [...channelMembers].sort((a, b) => b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt);
   const isInChannel = currentChannelId === channel.channelId;
   const isLobby = currentServerLobbyId === channel.channelId;
   const isReceptionLobby = currentServerReceptionLobbyId === channel.channelId;

@@ -45,11 +45,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
   const sortedCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
-  const sortedCategoryMembers = [...categoryMembers].sort((a, b) => {
-    if (a.userId === userId && b.userId !== userId) return -1;
-    if (b.userId === userId && a.userId !== userId) return 1;
-    return b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt;
-  });
+  const sortedCategoryMembers = [...categoryMembers].sort((a, b) => b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt);
   const isInChannel = currentChannelId === category.channelId;
   const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannelId);
   const isReceptionLobby = currentServerReceptionLobbyId === category.channelId;
