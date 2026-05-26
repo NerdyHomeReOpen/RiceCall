@@ -8,21 +8,18 @@ import * as ipc from '@/main/ipc';
 
 import * as Store from '@/store';
 
-import { editChannel } from '@/services';
+import { editChannel, openBlockMember, editChannelPermission, editServerPermission, openDirectMessage, openEditNickname, openUserInfo, unblockUserFromChannel, terminateMember } from '@/services';
 
 import { MEMBER_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useChannelSettingModeratorCtxMenu } from '@/hooks/ContextMenus/useChannelSettingModeratorCtxMenu';
-import { useChannelSettingBlockedMemberCtxMenu } from '@/hooks/ContextMenus/useChannelSettingBlockedMemberCtxMenu';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
-import { objDiff } from '@/utils';
-import { sorter } from '@/utils/sorter';
-import { getPermissionText } from '@/utils/language';
+import ContextMenu from '@/utils/contextMenu';
+import { objDiff, sorter, getPermissionText } from '@/utils';
 
 import styles from './ChannelSetting.module.css';
 
@@ -590,19 +587,6 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
   const isSelf = moderator.userId === userId;
   const isLowerLevel = moderator.permissionLevel < permissionLevel;
 
-  const { buildContextMenu } = useChannelSettingModeratorCtxMenu({
-    userId,
-    serverId,
-    channelId,
-    channelCategoryId,
-    moderatorUserId: moderator.userId,
-    moderatorName: moderator.name,
-    moderatorPermissionLevel: moderator.permissionLevel,
-    permissionLevel,
-    isSelf,
-    isLowerLevel,
-  });
-
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`member-${moderator.userId}`));
@@ -612,7 +596,38 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(userId, moderator.userId))
+      .addViewProfileOption(() => openUserInfo(userId, moderator.userId))
+      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(moderator.userId, serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(moderator.userId, serverId))
+      .addSeparator()
+      .addMemberManagementOption(
+        { permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel },
+        () => {},
+        new ContextMenu()
+          .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => terminateMember(moderator.userId, serverId, moderator.name))
+          .addSetChannelModOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId }, () =>
+            moderator.permissionLevel >= Types.Permission.ChannelMod
+              ? editChannelPermission(moderator.userId, serverId, channelId, { permissionLevel: 2 })
+              : editChannelPermission(moderator.userId, serverId, channelId, { permissionLevel: 3 }),
+          )
+          .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel, channelCategoryId }, () =>
+            moderator.permissionLevel >= Types.Permission.ChannelAdmin
+              ? editChannelPermission(moderator.userId, serverId, channelCategoryId || channelId, { permissionLevel: 2 })
+              : editChannelPermission(moderator.userId, serverId, channelCategoryId || channelId, { permissionLevel: 4 }),
+          )
+          .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () =>
+            moderator.permissionLevel >= Types.Permission.ServerAdmin
+              ? editServerPermission(moderator.userId, serverId, { permissionLevel: 2 })
+              : editServerPermission(moderator.userId, serverId, { permissionLevel: 5 }),
+          )
+          .build(),
+      )
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (
@@ -649,16 +664,6 @@ const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowPro
   const isBlockedPermanently = member.blockedUntil === -1;
   const isSelf = member.userId === userId;
 
-  const { buildContextMenu } = useChannelSettingBlockedMemberCtxMenu({
-    userId,
-    serverId,
-    channelId,
-    memberUserId: member.userId,
-    memberName: member.name,
-    permissionLevel,
-    isSelf,
-  });
-
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`blocked-${member.userId}`));
@@ -668,7 +673,13 @@ const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowPro
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addViewProfileOption(() => openUserInfo(userId, member.userId))
+      .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => unblockUserFromChannel(member.userId, serverId, channelId, member.name))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (

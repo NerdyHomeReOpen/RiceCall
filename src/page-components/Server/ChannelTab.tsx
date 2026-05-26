@@ -6,13 +6,14 @@ import * as Types from '@/types';
 
 import * as Store from '@/store';
 
-import { connectChannel, moveAllUsersToChannel } from '@/services';
+import { connectChannel, kickUsersFromServer, deleteChannel, moveAllUsersToChannel, openEditChannelOrder, openServerBroadcast, openChannelSetting, openCreateChannel, editServer } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useChannelCtxMenu } from '@/hooks/ContextMenus/useChannelCtxMenu';
+
+import ContextMenu from '@/utils/contextMenu';
 
 import UserTab from './UserTab';
 
@@ -35,7 +36,6 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const currentServerLobbyId = useAppSelector((state) => state.currentServer.data.lobbyId);
   const currentServerReceptionLobbyId = useAppSelector((state) => state.currentServer.data.receptionLobbyId);
   const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
-  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`);
 
@@ -59,22 +59,8 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const isFull = channel.userLimit && channel.userLimit <= channelMembers.length;
   const isDraggable = permissionLevel >= Types.Permission.ChannelMod && movableChannelUserIds.length > 0;
   const isPasswordNeeded = permissionLevel < Types.Permission.ChannelMod && isPrivateChannel;
+  const isSubChannel = !!channel.categoryId;
   const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && permissionLevel < Types.Permission.Member) && (!isFull || permissionLevel >= Types.Permission.ServerAdmin);
-
-  const { buildContextMenu } = useChannelCtxMenu({
-    userId,
-    userPermissionLevel,
-    currentServerId,
-    currentServerPermissionLevel,
-    currentServerReceptionLobbyId,
-    currentChannelId,
-    currentChannelPermissionLevel,
-    channel,
-    movableChannelUserIds,
-    movableServerUserIds,
-    canJoin,
-    isPasswordNeeded,
-  });
 
   const handleTabClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -112,7 +98,29 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addJoinChannelOption({ canJoin, isInChannel }, () => connectChannel(currentServerId, channel.channelId, canJoin, isPasswordNeeded))
+      .addViewOrEditOption(() => openChannelSetting(userId, currentServerId, channel.channelId))
+      .addSeparator()
+      .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId))
+      .addCreateSubChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId, channel.categoryId ?? channel.channelId))
+      .addDeleteChannelOption({ permissionLevel, isSubChannel }, () => deleteChannel(currentServerId, channel.channelId, channel.name))
+      .addSeparator()
+      .addBroadcastOption({ permissionLevel }, () => openServerBroadcast(currentServerId, channel.channelId))
+      .addSeparator()
+      .addMoveAllUserToChannelOption({ isInChannel, currentPermissionLevel: permissionLevel, permissionLevel, movableChannelUserIds }, () =>
+        moveAllUsersToChannel(movableChannelUserIds, currentServerId, currentChannelId),
+      )
+      .addEditChannelOrderOption({ permissionLevel }, () => openEditChannelOrder(userId, currentServerId))
+      .addSeparator()
+      .addKickChannelUsersFromServerOption({ permissionLevel, movableChannelUserIds }, () => kickUsersFromServer(movableChannelUserIds, currentServerId))
+      .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServerId))
+      .addSeparator()
+      .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => editServer(currentServerId, { receptionLobbyId: channel.channelId }))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   const handleTabExpandedClick = () => {

@@ -6,13 +6,16 @@ import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
+import { openServerSetting } from '@/services';
+
 import { useAppSelector } from '@/hooks/useStore';
-import { useRecommendServerCtxMenu } from '@/hooks/ContextMenus/useRecommendServerCtxMenu';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
+import ContextMenu from '@/utils/contextMenu';
 
 import styles from './Home.module.css';
 
@@ -34,8 +37,6 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
     ipc.socket.send('connectServer', { serverId: recommendServer.serverId });
   };
 
-  const { buildContextMenu: buildServerCardContextMenu } = useRecommendServerCtxMenu({ userId, recommendServerId: recommendServer.serverId, onJoinServer: joinServer });
-
   const handleServerCardClick = () => {
     joinServer();
   };
@@ -44,7 +45,13 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildServerCardContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addJoinServerOption(() => joinServer())
+      .addViewServerInfoOption(() => openServerSetting(userId, recommendServer.serverId))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (

@@ -1,18 +1,21 @@
 import React from 'react';
 import Image from 'next/image';
+import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
 import * as Types from '@/types';
 
-import { useAppSelector } from '@/hooks/useStore';
+import { openServerSetting, favoriteServer, terminateMember } from '@/services';
 
-import { useServerCardCtxMenu } from '@/hooks/ContextMenus/useServerCardCtxMenu';
+import { useAppSelector } from '@/hooks/useStore';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
+import ContextMenu from '@/utils/contextMenu';
 
 import styles from './Home.module.css';
 
@@ -21,6 +24,7 @@ interface ServerCardProps {
 }
 
 const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
+  const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const { getIsLoading, loadServer } = useLoading();
 
@@ -35,14 +39,6 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
     ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
-  const { buildContextMenu: buildServerCardContextMenu } = useServerCardCtxMenu({
-    userId,
-    serverId: server.serverId,
-    serverPermissionLevel: server.permissionLevel,
-    serverFavorite: server.favorite,
-    onJoinServer: joinServer,
-  });
-
   const handleServerCardClick = () => {
     joinServer();
   };
@@ -51,7 +47,15 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildServerCardContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addJoinServerOption(() => joinServer())
+      .addViewServerInfoOption(() => openServerSetting(userId, server.serverId))
+      .addFavoriteServerOption({ isFavorite: server.favorite }, () => favoriteServer(server.serverId))
+      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isSelf: true }, () => terminateMember(userId, server.serverId, t('self')))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (

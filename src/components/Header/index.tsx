@@ -6,17 +6,18 @@ import * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import { editUserStatus, openUserInfo, openFriendVerification, openMemberInvitation } from '@/services';
+import { editUserStatus, openUserInfo, openFriendVerification, openMemberInvitation, openNetworkDiagnosis, openAboutUs, openChangeTheme, openSystemSetting } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useActionScanner } from '@/providers/ActionScanner';
 
 import { useAppSelector } from '@/hooks/useStore';
-import { useHeaderCtxMenu } from '@/hooks/ContextMenus/useHeaderCtxMenu';
 
 import MainTabItem from './MainTabItem';
 
-import { DEFAULT_SERVER_AVATAR_URL, DEFAULT_USER_AVATAR_URL } from '@/constants';
+import { DEFAULT_SERVER_AVATAR_URL, DEFAULT_USER_AVATAR_URL, LANGUAGES } from '@/constants';
+
+import ContextMenu from '@/utils/contextMenu';
 
 import styles from './Header.module.css';
 
@@ -69,13 +70,6 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const changeLanguage = (language: Types.LanguageKey) => {
     ipc.systemSettings.language.set(language);
   };
-
-  const { buildContextMenu: buildHeaderContextMenu } = useHeaderCtxMenu({
-    userId,
-    onChangeLanguage: changeLanguage,
-    onLogout: logout,
-    onExit: exit,
-  });
 
   // TODO: Make a NotificationMenuBuilder
   const buildNotificationMenuItems = () => [
@@ -153,7 +147,28 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     e.preventDefault();
     e.stopPropagation();
     const { right: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showContextMenu(x + 50, y, 'left-bottom', buildHeaderContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addSystemSettingOption(() => openSystemSetting(userId))
+      .addChangeThemeOption(() => openChangeTheme())
+      .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
+      .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? changeLanguage(code) : null))
+      .addHelpCenterOption(
+        {
+          onFaqClick: () => window.open('https://ricecall.com/#faq', '_blank'),
+          onAgreementClick: () => window.open('https://ricecall.com/terms', '_blank'),
+          onSpecificationClick: () => window.open('https://ricecall.com/specification', '_blank'),
+          onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
+          onAboutUsClick: () => openAboutUs(),
+        },
+        () => {},
+      )
+      .addNetworkDiagnosisOption(() => openNetworkDiagnosis())
+      .addLogoutOption(() => logout())
+      .addExitOption(() => exit())
+      .build();
+
+    showContextMenu(x + 50, y, 'left-bottom', contextMenu);
   };
 
   const handleNotificationMenuClick = (e: React.MouseEvent<HTMLDivElement>) => {

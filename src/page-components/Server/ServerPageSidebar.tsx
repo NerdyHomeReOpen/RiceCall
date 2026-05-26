@@ -7,20 +7,20 @@ import * as Types from '@/types';
 
 import * as Store from '@/store';
 
-import { openInviteFriend, openServerSetting } from '@/services';
+import { openCreateChannel, kickUsersFromServer, openEditChannelOrder, openServerBroadcast, openInviteFriend, openServerSetting, openEditNickname, favoriteServer, applyMember } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useChannelListCtxMenu } from '@/hooks/ContextMenus/useChannelListCtxMenu';
-import { useServerSettingCtxMenu } from '@/hooks/ContextMenus/useServerSettingCtxMenu';
 
 import ChannelTab from './ChannelTab';
 import CategoryTab from './CategoryTab';
 import QueueUserTab from './QueueUserTab';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
+
+import ContextMenu from '@/utils/contextMenu';
 
 import styles from './Server.module.css';
 
@@ -68,23 +68,6 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     dispatch(Store.setSelectedItemId(`user-${userId}`));
   };
 
-  const { buildContextMenu: buildServerSettingContextMenu } = useServerSettingCtxMenu({
-    userId,
-    serverId: currentServerId,
-    isServerReceiveApply: currentServerReceiveApply,
-    isServerFavorite: currentServerFavorite,
-    permissionLevel,
-    onLocateMe: handleLocateMe,
-  });
-
-  const { buildContextMenu: buildChannelListContextMenu } = useChannelListCtxMenu({
-    userId,
-    serverId: currentServerId,
-    channelId: currentChannel.channelId,
-    permissionLevel,
-    movableServerUserIds,
-  });
-
   const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
     isResizingQueueListRef.current = true;
@@ -103,7 +86,19 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
-    showContextMenu(x, y, 'right-bottom', buildServerSettingContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addApplyMemberOption({ permissionLevel }, () => applyMember(userId, currentServerId, currentServerReceiveApply))
+      .addServerSettingOption({ permissionLevel }, () => openServerSetting(userId, currentServerId))
+      .addSeparator()
+      .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => openEditNickname(userId, currentServerId))
+      .addLocateMeOption(() => handleLocateMe())
+      .addSeparator()
+      .addReportOption(() => window.open('https://ricecall.com/report-server', '_blank'))
+      .addFavoriteServerOption({ isFavorite: currentServerFavorite }, () => favoriteServer(currentServerId))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   const handleServerAvatarClick = () => {
@@ -114,7 +109,18 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildChannelListContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId))
+      .addSeparator()
+      .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServerId))
+      .addSeparator()
+      .addBroadcastOption({ permissionLevel }, () => openServerBroadcast(currentServerId, currentChannel.channelId))
+      .addSeparator()
+      .addEditChannelOrderOption({ permissionLevel }, () => openEditChannelOrder(userId, currentServerId))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   const handleCurrentChannelTabClick = () => {

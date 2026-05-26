@@ -4,11 +4,13 @@ import { useTranslation } from 'react-i18next';
 
 import * as Types from '@/types';
 
+import { openBlockMember, openKickMemberFromServer, openUserInfo } from '@/services';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppSelector } from '@/hooks/useStore';
-import { useChannelEventCtxMenu } from '@/hooks/ContextMenus/useChannelEventCtxMenu';
 
+import ContextMenu from '@/utils/contextMenu';
 import { getFormatDate } from '@/utils/language';
 
 import styles from './ChannelEvent.module.css';
@@ -101,15 +103,6 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
   const isSelf = event.userId === userId;
   const isLowerLevel = event.permissionLevel < permissionLevel;
 
-  const { buildContextMenu } = useChannelEventCtxMenu({
-    userId,
-    serverId: currentServerId,
-    eventUserId: event.userId,
-    permissionLevel,
-    isSelf,
-    isLowerLevel,
-  });
-
   const getChannelName = (channelId: string | null) => {
     const channel = channels.find((c) => c.channelId === channelId);
     if (!channel) return '';
@@ -160,7 +153,14 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addViewProfileOption(() => openUserInfo(userId, event.userId))
+      .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(event.userId, currentServerId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(event.userId, currentServerId))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (

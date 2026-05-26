@@ -8,21 +8,32 @@ import * as ipc from '@/main/ipc';
 
 import * as Store from '@/store';
 
-import { openImageCropper, openAlertDialog, editServer, openMemberApplicationSetting, openUserInfo, approveMemberApplication, rejectMemberApplication } from '@/services';
+import {
+  openImageCropper,
+  openAlertDialog,
+  editServer,
+  openMemberApplicationSetting,
+  openUserInfo,
+  approveMemberApplication,
+  rejectMemberApplication,
+  unblockUserFromServer,
+  openEditNickname,
+  editServerPermission,
+  terminateMember,
+  openDirectMessage,
+  openBlockMember,
+} from '@/services';
 
 import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useServerSettingMemberCtxMenu } from '@/hooks/ContextMenus/useServerSettingMemberCtxMenu';
-import { useServerSettingBlockedMemberCtxMenu } from '@/hooks/ContextMenus/useServerSettingBlockedMemberCtxMenu';
 
 import AnnouncementEditor from '@/components/AnnouncementEditor';
 
-import { getPermissionText } from '@/utils/language';
-import { sorter } from '@/utils/sorter';
-import { objDiff } from '@/utils';
+import ContextMenu from '@/utils/contextMenu';
+import { objDiff, sorter, getPermissionText } from '@/utils';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
@@ -635,17 +646,6 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
   const isSelf = member.userId === userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;
 
-  const { buildContextMenu } = useServerSettingMemberCtxMenu({
-    userId,
-    serverId,
-    memberUserId: member.userId,
-    memberName: member.name,
-    memberPermissionLevel: member.permissionLevel,
-    permissionLevel,
-    isSelf,
-    isLowerLevel,
-  });
-
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`member-${member.userId}`));
@@ -655,7 +655,28 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(userId, member.userId))
+      .addViewProfileOption(() => openUserInfo(userId, member.userId))
+      .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(member.userId, serverId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(member.userId, serverId))
+      .addSeparator()
+      .addMemberManagementOption(
+        { permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel },
+        () => {},
+        new ContextMenu()
+          .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => terminateMember(member.userId, serverId, member.name))
+          .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () =>
+            member.permissionLevel >= Types.Permission.ServerAdmin
+              ? editServerPermission(member.userId, serverId, { permissionLevel: 2 })
+              : editServerPermission(member.userId, serverId, { permissionLevel: 5 }),
+          )
+          .build(),
+      )
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (
@@ -691,15 +712,6 @@ const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps
   const isSelected = selectedItemId === `blocked-${member.userId}`;
   const isSelf = member.userId === userId;
 
-  const { buildContextMenu } = useServerSettingBlockedMemberCtxMenu({
-    userId,
-    serverId,
-    memberUserId: member.userId,
-    memberName: member.name,
-    permissionLevel,
-    isSelf,
-  });
-
   const handleClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`blocked-${member.userId}`));
@@ -709,7 +721,13 @@ const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addViewProfileOption(() => openUserInfo(userId, member.userId))
+      .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => unblockUserFromServer(member.userId, serverId, member.name))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (

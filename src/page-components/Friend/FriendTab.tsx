@@ -9,17 +9,17 @@ import * as ipc from '@/main/ipc';
 
 import * as Store from '@/store';
 
-import { openDirectMessage } from '@/services';
+import { blockUser, editFriend, deleteFriend, openApplyFriend, deleteFriendApplication, openDirectMessage, openEditFriendNote, openUserInfo, unblockUser } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLoading } from '@/providers/Loading';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useFriendTabCtxMenu } from '@/hooks/ContextMenus/useFriendTabCtxMenu';
 
 import BadgeList from '@/components/BadgeList';
 import LevelIcon from '@/components/LevelIcon';
 
+import ContextMenu from '@/utils/contextMenu';
 import { getDefaultFriendGroup } from '@/utils/default';
 
 import { DEFAULT_USER_AVATAR_URL } from '@/constants';
@@ -44,23 +44,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const [friendCurrentServer, setFriendCurrentServer] = useState<Types.Server | null>(null);
 
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: -1, userId }), [t, userId]);
+  const isSelf = friend.targetId === userId;
   const isOnline = friend.status === 'online';
   const isOffline = friend.status === 'offline';
-  const isPending = friend.relationStatus === 1;
-  const isFriend = friend.relationStatus === 2;
+  const isPending = friend.relationStatus === Types.RelationStatus.Pending;
+  const isFriend = friend.relationStatus === Types.RelationStatus.Friend;
+  const isStranger = friend.relationStatus === Types.RelationStatus.Stranger;
   const hasVip = friend.vip > 0;
   const hasNote = friend.note !== '' && friend.note !== null;
-
-  const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabCtxMenu({
-    userId,
-    friendTargetId: friend.targetId,
-    friendName: friend.name,
-    friendRelationStatus: friend.relationStatus,
-    friendIsBlocked: friend.isBlocked,
-    friendFriendGroupId: friend.friendGroupId,
-    friendGroups,
-    defaultFriendGroup,
-  });
 
   const handleServerNameClick = () => {
     if (getIsLoading() || !friendCurrentServer || currentServerId === friendCurrentServer.serverId) return;
@@ -81,7 +72,27 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildFriendTabContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(userId, friend.targetId))
+      .addViewProfileOption(() => openUserInfo(userId, friend.targetId))
+      .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(userId, friend.targetId))
+      .addEditNoteOption({ isSelf, isFriend }, () => openEditFriendNote(userId, friend.targetId))
+      .addSeparator()
+      .addPermissionSettingOption({ isSelf, isFriend, onHideOrShowOnlineClick: () => {}, onNotifyFriendOnlineClick: () => {} }, () => {})
+      .addEditFriendFriendGroupOption(
+        { isSelf, isStranger, isBlocked: friend.isBlocked },
+        () => {},
+        new ContextMenu()
+          .addFriendGroupOption({ friendGroupId: friend.friendGroupId, friendGroups: [defaultFriendGroup, ...friendGroups] }, (friendGroupId) => editFriend(friend.targetId, { friendGroupId }))
+          .build(),
+      )
+      .addBlockUserOption({ isSelf, isBlocked: friend.isBlocked }, () => (friend.isBlocked ? unblockUser(friend.targetId, friend.name) : blockUser(friend.targetId, friend.name)))
+      .addDeleteFriendOption({ isSelf, isFriend }, () => deleteFriend(friend.targetId, friend.name))
+      .addDeleteFriendApplicationOption({ isSelf, isPending }, () => deleteFriendApplication(friend.targetId))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   useEffect(() => {

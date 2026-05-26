@@ -4,12 +4,15 @@ import * as Types from '@/types';
 
 import * as Store from '@/store';
 
+import { openEditFriendGroupName, deleteFriendGroup } from '@/services';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useFriendGroupCtxMenu } from '@/hooks/ContextMenus/useFriendGroupCtxMenu';
 
 import FriendTab from './FriendTab';
+
+import ContextMenu from '@/utils/contextMenu';
 
 import styles from './Friend.module.css';
 
@@ -43,8 +46,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
   const isBlacklist = friendGroup.friendGroupId === 'blacklist';
   const onlineCount = friendGroupFriends.filter((f) => f.status !== 'offline').length;
 
-  const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupCtxMenu({ userId, friendGroupId: friendGroup.friendGroupId, friendGroupName: friendGroup.name });
-
   const handleTabClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`friend-group-${friendGroup.friendGroupId}`));
@@ -55,7 +56,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildFriendGroupContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addEditFriendGroupNameOption({ friendGroupId: friendGroup.friendGroupId }, () => openEditFriendGroupName(userId, friendGroup.friendGroupId))
+      .addDeleteFriendGroupOption({ friendGroupId: friendGroup.friendGroupId }, () => deleteFriendGroup(friendGroup.friendGroupId, friendGroup.name))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (

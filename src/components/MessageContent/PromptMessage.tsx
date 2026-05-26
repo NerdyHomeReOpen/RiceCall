@@ -3,15 +3,16 @@ import { useTranslation } from 'react-i18next';
 
 import * as Types from '@/types';
 
+import { openUserInfo } from '@/services';
+
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppSelector } from '@/hooks/useStore';
-import { usePromptMessageCtxMenu } from '@/hooks/ContextMenus/usePromptMessageCtxMenu';
 
 import MarkdownContent from '@/components/MarkdownContent';
 
-import { escapeHtml } from '@/utils/tagConverter';
-import { getPermissionText } from '@/utils/language';
+import ContextMenu from '@/utils/contextMenu';
+import { escapeHtml, getPermissionText } from '@/utils';
 
 import styles from './MessageContent.module.css';
 
@@ -34,13 +35,17 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
       .join(' '),
   );
 
-  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageCtxMenu({ userId, contentMetadata: messageGroup.contentMetadata });
-
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildMessageContextMenu());
+
+    const contextMenu =
+      messageGroup.contentMetadata && messageGroup.contentMetadata.userId
+        ? new ContextMenu().addViewProfileOption(() => openUserInfo(userId, messageGroup.contentMetadata.userId)).build()
+        : new ContextMenu().build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   return (

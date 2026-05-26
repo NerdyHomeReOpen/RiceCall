@@ -4,13 +4,14 @@ import * as Types from '@/types';
 
 import * as Store from '@/store';
 
-import { connectChannel, moveAllUsersToChannel } from '@/services';
+import { connectChannel, kickUsersFromServer, deleteChannel, moveAllUsersToChannel, openChannelSetting, openCreateChannel, openEditChannelOrder, openServerBroadcast, editServer } from '@/services';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-import { useChannelCtxMenu } from '@/hooks/ContextMenus/useChannelCtxMenu';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useLocateMeContext } from '@/providers/LocateMe';
+
+import ContextMenu from '@/utils/contextMenu';
 
 import ChannelTab from './ChannelTab';
 import UserTab from './UserTab';
@@ -30,10 +31,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
   const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
-  const currentServerLobbyId = useAppSelector((state) => state.currentServer.data.lobbyId);
   const currentServerReceptionLobbyId = useAppSelector((state) => state.currentServer.data.receptionLobbyId);
   const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
-  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
   const channels = useAppSelector((state) => state.channels.data);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`);
@@ -53,7 +52,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   });
   const isInChannel = currentChannelId === category.channelId;
   const isInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannelId);
-  const isReceptionLobby = currentServerLobbyId === category.channelId;
+  const isReceptionLobby = currentServerReceptionLobbyId === category.channelId;
   const isMemberChannel = category.visibility === 'member';
   const isPrivateChannel = category.visibility === 'private';
   const isReadonlyChannel = category.visibility === 'readonly';
@@ -61,21 +60,6 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const isDraggable = permissionLevel >= Types.Permission.ChannelMod && movableCategoryUserIds.length > 0;
   const isPasswordNeeded = permissionLevel < Types.Permission.ChannelMod && isPrivateChannel;
   const canJoin = !isInChannel && !isReadonlyChannel && !(isMemberChannel && permissionLevel < Types.Permission.Member) && (!isFull || permissionLevel >= Types.Permission.ServerAdmin);
-
-  const { buildContextMenu } = useChannelCtxMenu({
-    userId,
-    userPermissionLevel,
-    currentServerId,
-    currentServerPermissionLevel,
-    currentServerReceptionLobbyId,
-    currentChannelId,
-    currentChannelPermissionLevel,
-    channel: category,
-    movableChannelUserIds: movableCategoryUserIds,
-    movableServerUserIds,
-    canJoin,
-    isPasswordNeeded,
-  });
 
   const handleTabClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -113,7 +97,29 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addJoinChannelOption({ canJoin, isInChannel }, () => connectChannel(currentServerId, category.channelId, canJoin, isPasswordNeeded))
+      .addViewOrEditOption(() => openChannelSetting(userId, currentServerId, category.channelId))
+      .addSeparator()
+      .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId))
+      .addCreateSubChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId, category.categoryId ?? category.channelId))
+      .addDeleteChannelOption({ permissionLevel, isSubChannel: false }, () => deleteChannel(currentServerId, category.channelId, category.name))
+      .addSeparator()
+      .addBroadcastOption({ permissionLevel }, () => openServerBroadcast(currentServerId, category.channelId))
+      .addSeparator()
+      .addMoveAllUserToChannelOption({ isInChannel, currentPermissionLevel: permissionLevel, permissionLevel, movableChannelUserIds: movableCategoryUserIds }, () =>
+        moveAllUsersToChannel(movableCategoryUserIds, currentServerId, currentChannelId),
+      )
+      .addEditChannelOrderOption({ permissionLevel }, () => openEditChannelOrder(userId, currentServerId))
+      .addSeparator()
+      .addKickChannelUsersFromServerOption({ permissionLevel, movableChannelUserIds: movableCategoryUserIds }, () => kickUsersFromServer(movableCategoryUserIds, currentServerId))
+      .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServerId))
+      .addSeparator()
+      .addSetReceptionLobbyOption({ permissionLevel, isPrivateChannel, isReadonlyChannel, isReceptionLobby }, () => editServer(currentServerId, { receptionLobbyId: category.channelId }))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   const handleTabExpandedClick = () => {

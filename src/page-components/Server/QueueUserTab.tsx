@@ -1,22 +1,41 @@
 import React, { useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 import * as Types from '@/types';
 
 import * as Store from '@/store';
 
-import { openDirectMessage } from '@/services';
+import {
+  clearQueue,
+  editChannelPermission,
+  editServerPermission,
+  forbidUserTextInChannel,
+  forbidUserVoiceInChannel,
+  increaseUserQueueTime,
+  moveUserQueuePositionDown,
+  moveUserQueuePositionUp,
+  openApplyFriend,
+  openBlockMember,
+  openDirectMessage,
+  openEditNickname,
+  openInviteMember,
+  openKickMemberFromChannel,
+  openKickMemberFromServer,
+  openUserInfo,
+  removeUserFromQueue,
+  terminateMember,
+} from '@/services';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-
-import { useQueueUserCtxMenu } from '@/hooks/ContextMenus/useQueueUserCtxMenu';
 
 import BadgeList from '@/components/BadgeList';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 import { useWebRTC } from '@/providers/WebRTC';
 
-import { getDefaultQueueMember } from '@/utils/default';
+import ContextMenu from '@/utils/contextMenu';
+import { getDefaultQueueMember } from '@/utils';
 
 import styles from './Server.module.css';
 
@@ -25,6 +44,7 @@ interface QueueUserTabProps {
 }
 
 const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) => {
+  const { t } = useTranslation();
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { unmuteUser, muteUser } = useWebRTC();
   const dispatch = useAppDispatch();
@@ -57,28 +77,14 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const hasVip = queueMember.vip > 0;
   const isOnMic = queueMember.position === 0;
   const isControlled = isOnMic && queueMember.isQueueControlled && permissionLevel < Types.Permission.ChannelMod;
+  const isLowerLevel = queueMember.permissionLevel < permissionLevel;
+  const isInLobby = queueMember.currentChannelId === currentServerLobbyId;
 
   const getStatusIcon = () => {
     if (isMuted || queueMember.isVoiceMuted || (permissionLevel < Types.Permission.ChannelMod && isControlled)) return 'muted';
     if (isSpeaking) return 'play';
     return '';
   };
-
-  const { buildContextMenu: buildTabContextMenu } = useQueueUserCtxMenu({
-    userId,
-    userPermissionLevel,
-    currentServerId,
-    currentServerPermissionLevel,
-    currentServerLobbyId,
-    currentChannelId,
-    currentChannelPermissionLevel,
-    currentChannelCategoryId,
-    queueMember,
-    isMuted,
-    isFriend,
-    onMuteUser: muteUser,
-    onUnmuteUser: unmuteUser,
-  });
 
   const handleTabClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
@@ -94,7 +100,61 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildTabContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addIncreaseQueueTimeOption({ queuePosition: queueMember.position, permissionLevel }, () => increaseUserQueueTime(queueMember.userId, currentServerId, currentChannelId))
+      .addMoveUpQueueOption({ queuePosition: queueMember.position, permissionLevel }, () => moveUserQueuePositionUp(queueMember.userId, currentServerId, currentChannelId, queueMember.position - 1))
+      .addMoveDownQueueOption({ queuePosition: queueMember.position, permissionLevel }, () =>
+        moveUserQueuePositionDown(queueMember.userId, currentServerId, currentChannelId, queueMember.position + 1),
+      )
+      .addRemoveFromQueueOption({ permissionLevel }, () => removeUserFromQueue(queueMember.userId, currentServerId, currentChannelId, queueMember.name))
+      .addClearQueueOption({ permissionLevel }, () => clearQueue(currentServerId, currentChannelId))
+      .addSeparator()
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(userId, queueMember.userId))
+      .addViewProfileOption(() => openUserInfo(userId, queueMember.userId))
+      .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(userId, queueMember.userId))
+      .addSetMuteOption({ isSelf, isMuted }, () => (isMuted ? unmuteUser(queueMember.userId) : muteUser(queueMember.userId)))
+      .addEditNicknameOptionWithNoIcon({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(queueMember.userId, currentServerId))
+      .addSeparator()
+      .addForbidVoiceOption({ permissionLevel, isSelf, isLowerLevel, isVoiceMuted: queueMember.isVoiceMuted }, () =>
+        forbidUserVoiceInChannel(queueMember.userId, currentServerId, currentChannelId, !queueMember.isVoiceMuted),
+      )
+      .addForbidTextOption({ permissionLevel, isSelf, isLowerLevel, isTextMuted: queueMember.isTextMuted }, () =>
+        forbidUserTextInChannel(queueMember.userId, currentServerId, currentChannelId, !queueMember.isTextMuted),
+      )
+      .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => openKickMemberFromChannel(queueMember.userId, currentServerId, currentChannelId))
+      .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(queueMember.userId, currentServerId))
+      .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(queueMember.userId, currentServerId))
+      .addSeparator()
+      .addTerminateSelfMembershipOption({ permissionLevel, isSelf }, () => terminateMember(userId, currentServerId, t('self')))
+      .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () => openInviteMember(queueMember.userId, currentServerId))
+      .addMemberManagementOption(
+        { permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel },
+        () => {},
+        new ContextMenu()
+          .addTerminateMemberOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
+            terminateMember(queueMember.userId, currentServerId, queueMember.name),
+          )
+          .addSetChannelModOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannelCategoryId }, () =>
+            queueMember.permissionLevel >= Types.Permission.ChannelMod
+              ? editChannelPermission(queueMember.userId, currentServerId, currentChannelId, { permissionLevel: 2 })
+              : editChannelPermission(queueMember.userId, currentServerId, currentChannelId, { permissionLevel: 3 }),
+          )
+          .addSetChannelAdminOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel, channelCategoryId: currentChannelCategoryId }, () =>
+            queueMember.permissionLevel >= Types.Permission.ChannelAdmin
+              ? editChannelPermission(queueMember.userId, currentServerId, currentChannelId, { permissionLevel: 2 })
+              : editChannelPermission(queueMember.userId, currentServerId, currentChannelId, { permissionLevel: 4 }),
+          )
+          .addSetServerAdminOption({ permissionLevel, targetPermissionLevel: queueMember.permissionLevel, isSelf, isLowerLevel }, () =>
+            queueMember.permissionLevel >= Types.Permission.ServerAdmin
+              ? editServerPermission(queueMember.userId, currentServerId, { permissionLevel: 2 })
+              : editServerPermission(queueMember.userId, currentServerId, { permissionLevel: 5 }),
+          )
+          .build(),
+      )
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   const handleTabMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {

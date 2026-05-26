@@ -8,7 +8,7 @@ import * as ipc from '@/main/ipc';
 
 import * as Store from '@/store';
 
-import { openServerApplication, openChannelEvent, openServerAnnouncement } from '@/services';
+import { openServerApplication, openChannelEvent, openServerAnnouncement, editChannel, controlQueue } from '@/services';
 
 import { MESSAGE_VIERER_DEVIATION } from '@/constants';
 
@@ -16,9 +16,6 @@ import { useWebRTC } from '@/providers/WebRTC';
 import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppSelector, useAppDispatch } from '@/hooks/useStore';
-import { useAnnouncementAreaCtxMenu } from '@/hooks/ContextMenus/useAnnouncementAreaCtxMenu';
-import { useMessageAreaCtxMenu } from '@/hooks/ContextMenus/useMessageAreaCtxMenu';
-import { useVoiceModeCtxMenu } from '@/hooks/ContextMenus/useVoiceModeCtxMenu';
 
 import MicButton from './MicButton';
 import MessageInputBox from './MessageInputBox';
@@ -29,6 +26,7 @@ import MarkdownContent from '@/components/MarkdownContent';
 import MessageContent from '@/components/MessageContent';
 import UnreadMessageAlert from '@/components/UnreadMessageAlert';
 
+import ContextMenu from '@/utils/contextMenu';
 import { getFormatTimeFromSecond } from '@/utils/language';
 
 import styles from './Server.module.css';
@@ -79,27 +77,6 @@ const ServerPageContent: React.FC = React.memo(() => {
   const isCurrentChannelFreeMode = currentChannelVoiceMode === 'free';
   const isCurrentChannelAdminMode = currentChannelVoiceMode === 'admin';
   const isCurrentChannelQueueMode = currentChannelVoiceMode === 'queue';
-
-  const { buildContextMenu: buildAnnouncementAreaContextMenu } = useAnnouncementAreaCtxMenu({
-    onCloseAnnouncement: () => setCentralAreaMode('none'),
-  });
-
-  const { buildContextMenu: buildMessageAreaContextMenu } = useMessageAreaCtxMenu({
-    onOpenAnnouncement: () => setCentralAreaMode('announcement'),
-    onClearMessages: () => {
-      dispatch(Store.clearChannelMessages());
-      dispatch(Store.clearActionMessages());
-    },
-  });
-
-  const { buildContextMenu: buildVoiceModeContextMenu } = useVoiceModeCtxMenu({
-    currentServerId,
-    currentChannelId,
-    currentChannelVoiceMode,
-    currentChannelForbidQueue,
-    permissionLevel,
-    isQueueControlled,
-  });
 
   const clearUnreadMessageNotification = () => {
     setIsAtBottom(true);
@@ -165,21 +142,48 @@ const ServerPageContent: React.FC = React.memo(() => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildMessageAreaContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addCleanUpMessageOption(() => {
+        dispatch(Store.clearChannelMessages());
+        dispatch(Store.clearActionMessages());
+      })
+      .addOpenChannelEventOption(() => openChannelEvent())
+      .addOpenAnnouncementOption(() => setCentralAreaMode('announcement'))
+      .build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   const handleAnnAreaContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-bottom', buildAnnouncementAreaContextMenu());
+
+    const contextMenu = new ContextMenu().addCloseAnnouncementOption(() => setCentralAreaMode('none')).build();
+
+    showContextMenu(x, y, 'right-bottom', contextMenu);
   };
 
   const handleVoiceModeDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
     const { clientX: x, clientY: y } = e;
-    showContextMenu(x, y, 'right-top', buildVoiceModeContextMenu());
+
+    const contextMenu = new ContextMenu()
+      .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => editChannel(currentServerId, currentChannelId, { voiceMode: 'free' }))
+      .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => editChannel(currentServerId, currentChannelId, { voiceMode: 'admin' }))
+      .addQueueSpeechOption(
+        { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
+        () => editChannel(currentServerId, currentChannelId, { voiceMode: 'queue' }),
+        new ContextMenu()
+          .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannelForbidQueue }, () => editChannel(currentServerId, currentChannelId, { forbidQueue: !currentChannelForbidQueue }))
+          .addControlQueueOption({ permissionLevel, isQueueControlled }, () => controlQueue(currentServerId, currentChannelId))
+          .build(),
+      )
+      .build();
+
+    showContextMenu(x, y, 'right-top', contextMenu);
   };
 
   const handleUnreadMessageAlertClick = () => {
