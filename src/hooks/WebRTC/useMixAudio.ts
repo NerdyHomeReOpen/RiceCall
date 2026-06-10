@@ -52,7 +52,7 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
       sourceNode.connect(gainNode);
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
-      if (Store.store.getState().webrtc.isRecording) gainNode.connect(recorderGainRef.current!);
+      if (Store.store.getState().webrtc.recorderIsActive) gainNode.connect(recorderGainRef.current!);
 
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('system', inputAnalyserRef.current, dataArray, rafIdListRef, audioProducerRef);
@@ -61,7 +61,7 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
   );
 
   const startMixing = useCallback(() => {
-    if (!Store.store.getState().webrtc.isMicTaken) return;
+    if (!Store.store.getState().webrtc.micIsTaken) return;
 
     ipc.loopbackAudio.enable();
     navigator.mediaDevices
@@ -86,17 +86,17 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
         new Logger('WebRTC').error(`Error capturing audio from system: ${error.message}`);
       });
 
-    Store.store.dispatch(Store.setWebRTC({ isMixModeActive: true }));
+    Store.store.dispatch(Store.setWebRTC({ mixModeIsActive: true }));
   }, [initMixAudio]);
 
   const stopMixing = useCallback(() => {
     ipc.loopbackAudio.disable();
     removeMixAudio();
-    Store.store.dispatch(Store.setWebRTC({ isMixModeActive: false }));
+    Store.store.dispatch(Store.setWebRTC({ mixModeIsActive: false }));
   }, [removeMixAudio]);
 
   const toggleMixMode = useCallback(() => {
-    if (Store.store.getState().webrtc.isMixModeActive) stopMixing();
+    if (Store.store.getState().webrtc.mixModeIsActive) stopMixing();
     else startMixing();
   }, [startMixing, stopMixing]);
 

@@ -11,10 +11,10 @@ import styles from './Server.module.css';
 const MicVolumeSlider = React.memo(() => {
   const { changeMicVolume, toggleMicMuted } = useWebRTC();
 
-  const sliderRef = useRef<HTMLInputElement>(null);
-  const isBtnHoveredRef = useRef<boolean>(false);
+  const sliderEl = useRef<HTMLInputElement>(null);
+  const isHovered = useRef<boolean>(false);
 
-  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
+  const micIsMuted = useAppSelector((state) => state.webrtc.micIsMuted);
   const micVolume = useAppSelector((state) => state.webrtc.micVolume);
 
   const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
@@ -28,11 +28,11 @@ const MicVolumeSlider = React.memo(() => {
   };
 
   const handleBtnMouseDown = () => {
-    isBtnHoveredRef.current = true;
+    isHovered.current = true;
   };
 
   const handleBtnMouseUp = () => {
-    isBtnHoveredRef.current = false;
+    isHovered.current = false;
   };
 
   const handleMicModeDropdownBtnClick = () => {
@@ -40,12 +40,17 @@ const MicVolumeSlider = React.memo(() => {
   };
 
   const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-    if (!isBtnHoveredRef.current || !sliderRef.current) return;
+    if (!isHovered.current || !sliderEl.current) return;
 
-    const newValue = parseInt(sliderRef.current.value);
-    if (e.deltaY > 0) sliderRef.current.value = (newValue - 4).toString();
-    else sliderRef.current.value = (newValue + 4).toString();
-    changeMicVolume(parseInt(sliderRef.current.value));
+    const newValue = parseInt(sliderEl.current.value);
+
+    if (e.deltaY > 0) {
+      sliderEl.current.value = (newValue - 4).toString();
+    } else {
+      sliderEl.current.value = (newValue + 4).toString();
+    }
+
+    changeMicVolume(parseInt(sliderEl.current.value));
   };
 
   useEffect(() => {
@@ -54,19 +59,23 @@ const MicVolumeSlider = React.memo(() => {
         setIsMicModeMenuVisible(false);
       }
     };
+
     document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
   }, []);
 
   return (
     <div className={styles['mic-volume-container']}>
-      <div className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
+      <div className={`${styles['mic-volume-button']} ${micIsMuted ? styles['muted'] : styles['active']}`} />
       <div className={styles['slider-track']}>
         <div className={styles['slider-container']}>
-          <input ref={sliderRef} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
+          <input ref={sliderEl} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div
-          className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`}
+          className={`${styles['mic-volume-button']} ${micIsMuted ? styles['muted'] : styles['active']}`}
           onClick={handleBtnClick}
           onMouseEnter={handleBtnMouseDown}
           onMouseLeave={handleBtnMouseUp}

@@ -38,96 +38,107 @@ const ServerPageContent: React.FC = React.memo(() => {
   const dispatch = useAppDispatch();
 
   const userId = useAppSelector((state) => state.user.data.userId);
-  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const permissionLevel = useAppSelector((state) => Math.max(state.user.data.permissionLevel, state.currentServer.data.permissionLevel, state.currentChannel.data.permissionLevel));
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
-  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
   const currentServerAnnouncement = useAppSelector((state) => state.currentServer.data.announcement);
   const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
-  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
   const currentChannelAnnouncement = useAppSelector((state) => state.currentChannel.data.announcement);
   const currentChannelVoiceMode = useAppSelector((state) => state.currentChannel.data.voiceMode);
   const currentChannelBitrate = useAppSelector((state) => state.currentChannel.data.bitrate);
   const currentChannelForbidQueue = useAppSelector((state) => state.currentChannel.data.forbidQueue);
-  const isQueueControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled));
   const channelMessages = useAppSelector((state) => state.channelMessages.data, shallowEqual);
   const actionMessages = useAppSelector((state) => state.actionMessages.data, shallowEqual);
-  const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive);
-  const isRecording = useAppSelector((state) => state.webrtc.isRecording);
+  const queueIsControlled = useAppSelector((state) => state.queueUsers.data.some((q) => q.isQueueControlled));
+  const mixModeIsActive = useAppSelector((state) => state.webrtc.mixModeIsActive);
+  const recorderIsActive = useAppSelector((state) => state.webrtc.recorderIsActive);
   const recordTime = useAppSelector((state) => state.webrtc.recordTime);
 
-  const annAreaRef = useRef<HTMLDivElement>(null);
-  const showAreaRef = useRef<HTMLIFrameElement>(null);
-  const messageAreaRef = useRef<HTMLDivElement>(null);
-  const isResizingAnnAreaRef = useRef<boolean>(false);
+  const annAreaEl = useRef<HTMLDivElement>(null);
+  const annAreaIsResizing = useRef<boolean>(false);
+  const showAreaEl = useRef<HTMLIFrameElement>(null);
+  const messageAreaEl = useRef<HTMLDivElement>(null);
 
   const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
   const [channelUIMode, setChannelUIMode] = useState<Types.ChannelUIMode>('three-line');
-  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+  const [messageAreaIsAtBottom, setMessageAreaIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
-  const [isWidgetExpanded, setIsWidgetExpanded] = useState(false);
+  const [widgetIsExpanded, setWidgetIsExpanded] = useState(false);
   const [centralAreaMode, setCentralAreaMode] = useState<'none' | 'announcement' | 'show'>('announcement');
 
-  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
   const isChannelMod = permissionLevel >= Types.Permission.ChannelMod;
-  const isCentralAreaNoneMode = centralAreaMode === 'none';
-  const isCentralAreaAnnouncementMode = centralAreaMode === 'announcement';
-  const isCentralAreaShowMode = centralAreaMode === 'show';
-  const isChannelUIClassicMode = channelUIMode === 'classic' || (channelUIMode === 'auto' && isCentralAreaAnnouncementMode);
-  const isChannelUIThreeLineMode = channelUIMode === 'three-line' || (channelUIMode === 'auto' && isCentralAreaShowMode);
-  const isCurrentChannelFreeMode = currentChannelVoiceMode === 'free';
-  const isCurrentChannelAdminMode = currentChannelVoiceMode === 'admin';
-  const isCurrentChannelQueueMode = currentChannelVoiceMode === 'queue';
+  const centralAreaIsNoneMode = centralAreaMode === 'none';
+  const centralAreaIsAnnouncementMode = centralAreaMode === 'announcement';
+  const centralAreaIsShowMode = centralAreaMode === 'show';
+  const channelUIClassicMode = channelUIMode === 'classic' || (channelUIMode === 'auto' && centralAreaIsAnnouncementMode);
+  const channelUIThreeLineMode = channelUIMode === 'three-line' || (channelUIMode === 'auto' && centralAreaIsShowMode);
+  const channelVoiceIsFreeMode = currentChannelVoiceMode === 'free';
+  const channelVoiceIsAdminMode = currentChannelVoiceMode === 'admin';
+  const channelVoiceIsQueueMode = currentChannelVoiceMode === 'queue';
 
   const clearUnreadMessageNotification = () => {
-    setIsAtBottom(true);
+    setMessageAreaIsAtBottom(true);
     setUnreadMessageCount(0);
   };
 
   const scrollToBottom = useCallback(() => {
-    if (!messageAreaRef.current) return;
-    messageAreaRef.current.scrollTo({ top: messageAreaRef.current.scrollHeight, behavior: 'smooth' });
+    if (!messageAreaEl.current) return;
+
+    messageAreaEl.current.scrollTo({ top: messageAreaEl.current.scrollHeight, behavior: 'smooth' });
+
     clearUnreadMessageNotification();
   }, []);
 
   const getResizableAreaRef = () => {
-    if (isCentralAreaAnnouncementMode) return annAreaRef;
-    if (isCentralAreaShowMode) return showAreaRef;
+    if (centralAreaIsAnnouncementMode) return annAreaEl;
+    if (centralAreaIsShowMode) return showAreaEl;
     return null;
   };
 
   const handleAnnAreaHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     const targetRef = getResizableAreaRef();
     if (!targetRef?.current) return;
+
     e.currentTarget.setPointerCapture(e.pointerId);
-    isResizingAnnAreaRef.current = true;
+
+    annAreaIsResizing.current = true;
   };
 
   const handleAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const targetRef = getResizableAreaRef();
-    if (!isResizingAnnAreaRef.current || !targetRef?.current) return;
-    if (isChannelUIClassicMode) {
+    if (!annAreaIsResizing.current || !targetRef?.current) return;
+
+    if (channelUIClassicMode) {
       targetRef.current.style.height = `${e.clientY - targetRef.current.offsetTop}px`;
-    } else if (isChannelUIThreeLineMode) {
+    } else if (channelUIThreeLineMode) {
       targetRef.current.style.width = `${e.clientX - targetRef.current.offsetLeft}px`;
     }
   };
 
   const handleScroll = () => {
-    if (!messageAreaRef.current) return;
-    const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
-    setIsAtBottom(isBottom);
+    if (!messageAreaEl.current) return;
+
+    const isBottom = messageAreaEl.current.scrollHeight - messageAreaEl.current.scrollTop - messageAreaEl.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
+    setMessageAreaIsAtBottom(isBottom);
   };
 
   const handleWidgetAnnClick = () => {
-    if (isCentralAreaAnnouncementMode) setCentralAreaMode('none');
-    else setCentralAreaMode('announcement');
-    setIsWidgetExpanded(false);
+    if (centralAreaIsAnnouncementMode) {
+      setCentralAreaMode('none');
+    } else {
+      setCentralAreaMode('announcement');
+    }
+
+    setWidgetIsExpanded(false);
   };
 
   const handleWidgetShowClick = () => {
-    if (isCentralAreaShowMode) setCentralAreaMode('none');
-    else setCentralAreaMode('show');
-    setIsWidgetExpanded(false);
+    if (centralAreaIsShowMode) {
+      setCentralAreaMode('none');
+    } else {
+      setCentralAreaMode('show');
+    }
+
+    setWidgetIsExpanded(false);
   };
 
   const handleWidgetMoreClick = () => {
@@ -135,12 +146,14 @@ const ServerPageContent: React.FC = React.memo(() => {
       if (action === 'openShowFrame') setCentralAreaMode('show');
       if (action === 'openChannelEvent') openChannelEvent();
     });
-    setIsWidgetExpanded(false);
+
+    setWidgetIsExpanded(false);
   };
 
   const handleMessageAreaContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { clientX: x, clientY: y } = e;
 
     const contextMenu = new ContextMenu()
@@ -148,8 +161,12 @@ const ServerPageContent: React.FC = React.memo(() => {
         dispatch(Store.clearChannelMessages());
         dispatch(Store.clearActionMessages());
       })
-      .addOpenChannelEventOption(() => openChannelEvent())
-      .addOpenAnnouncementOption(() => setCentralAreaMode('announcement'))
+      .addOpenChannelEventOption(() => {
+        openChannelEvent();
+      })
+      .addOpenAnnouncementOption(() => {
+        setCentralAreaMode('announcement');
+      })
       .build();
 
     showContextMenu(x, y, 'right-bottom', contextMenu);
@@ -158,9 +175,14 @@ const ServerPageContent: React.FC = React.memo(() => {
   const handleAnnAreaContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { clientX: x, clientY: y } = e;
 
-    const contextMenu = new ContextMenu().addCloseAnnouncementOption(() => setCentralAreaMode('none')).build();
+    const contextMenu = new ContextMenu()
+      .addCloseAnnouncementOption(() => {
+        setCentralAreaMode('none');
+      })
+      .build();
 
     showContextMenu(x, y, 'right-bottom', contextMenu);
   };
@@ -168,17 +190,55 @@ const ServerPageContent: React.FC = React.memo(() => {
   const handleVoiceModeDropdownClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { clientX: x, clientY: y } = e;
 
     const contextMenu = new ContextMenu()
-      .addFreeSpeechOption({ permissionLevel, isFreeMode: isCurrentChannelFreeMode }, () => editChannel(currentServerId, currentChannelId, { voiceMode: 'free' }))
-      .addAdminSpeechOption({ permissionLevel, isAdminMode: isCurrentChannelAdminMode }, () => editChannel(currentServerId, currentChannelId, { voiceMode: 'admin' }))
+      .addFreeSpeechOption(
+        {
+          permissionLevel,
+          channelVoiceIsFreeMode: channelVoiceIsFreeMode,
+        },
+        () => {
+          editChannel(currentServerId, currentChannelId, { voiceMode: 'free' });
+        },
+      )
+      .addAdminSpeechOption(
+        {
+          permissionLevel,
+          channelVoiceIsAdminMode: channelVoiceIsAdminMode,
+        },
+        () => {
+          editChannel(currentServerId, currentChannelId, { voiceMode: 'admin' });
+        },
+      )
       .addQueueSpeechOption(
-        { permissionLevel, isQueueMode: isCurrentChannelQueueMode },
-        () => editChannel(currentServerId, currentChannelId, { voiceMode: 'queue' }),
+        {
+          permissionLevel,
+          channelVoiceIsQueueMode: channelVoiceIsQueueMode,
+        },
+        () => {
+          editChannel(currentServerId, currentChannelId, { voiceMode: 'queue' });
+        },
         new ContextMenu()
-          .addForbidQueueOption({ permissionLevel, isForbidQueue: currentChannelForbidQueue }, () => editChannel(currentServerId, currentChannelId, { forbidQueue: !currentChannelForbidQueue }))
-          .addControlQueueOption({ permissionLevel, isQueueControlled }, () => controlQueue(currentServerId, currentChannelId))
+          .addForbidQueueOption(
+            {
+              permissionLevel,
+              channelForbidQueue: currentChannelForbidQueue,
+            },
+            () => {
+              editChannel(currentServerId, currentChannelId, { forbidQueue: !currentChannelForbidQueue });
+            },
+          )
+          .addControlQueueOption(
+            {
+              permissionLevel,
+              queueIsControlled,
+            },
+            () => {
+              controlQueue(currentServerId, currentChannelId);
+            },
+          )
           .build(),
       )
       .build();
@@ -191,7 +251,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   };
 
   const handleWidgetMoreBtnClick = () => {
-    setIsWidgetExpanded(true);
+    setWidgetIsExpanded(true);
   };
 
   const handleCloseActionMessageBtnClick = () => {
@@ -220,40 +280,53 @@ const ServerPageContent: React.FC = React.memo(() => {
   }, [currentServerId, currentServerAnnouncement]);
 
   useEffect(() => {
-    if (isAtBottom) setUnreadMessageCount(0);
-  }, [isAtBottom]);
+    if (!messageAreaIsAtBottom) return;
+    setUnreadMessageCount(0);
+  }, [messageAreaIsAtBottom]);
 
   useEffect(() => {
     const onPointerup = () => {
-      isResizingAnnAreaRef.current = false;
+      annAreaIsResizing.current = false;
     };
+
     document.addEventListener('pointerup', onPointerup);
-    return () => document.removeEventListener('pointerup', onPointerup);
+
+    return () => {
+      document.removeEventListener('pointerup', onPointerup);
+    };
   }, []);
 
   useEffect(() => {
     const onPointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest(`.${styles['widget-bar']}`)) {
-        setIsWidgetExpanded(false);
+        setWidgetIsExpanded(false);
       }
     };
+
     document.addEventListener('pointerdown', onPointerDown);
-    return () => document.removeEventListener('pointerdown', onPointerDown);
+
+    return () => {
+      document.removeEventListener('pointerdown', onPointerDown);
+    };
   }, []);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') scrollToBottom();
     };
+
     window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', onKeyDown);
+    };
   }, [scrollToBottom]);
 
   useEffect(() => {
-    if (!messageAreaRef.current || channelMessages.length === 0) return;
+    if (!messageAreaEl.current || channelMessages.length === 0) return;
 
     const lastMessage = channelMessages[channelMessages.length - 1];
-    const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
+    const isBottom = messageAreaEl.current.scrollHeight - messageAreaEl.current.scrollTop - messageAreaEl.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
 
     if (isBottom || lastMessage.type !== 'general' || lastMessage.userId === userId) {
       setTimeout(() => scrollToBottom(), 50);
@@ -266,26 +339,29 @@ const ServerPageContent: React.FC = React.memo(() => {
     const changeChannelUIMode = (channelUIMode: Types.ChannelUIMode) => {
       setChannelUIMode(channelUIMode);
     };
+
     changeChannelUIMode(ipc.systemSettings.channelUIMode.get());
+
     const unsub = ipc.systemSettings.channelUIMode.onUpdate(changeChannelUIMode);
+
     return () => unsub();
   }, []);
 
   return (
     <>
-      <div className={`${styles['content-layout']} ${isChannelUIClassicMode ? styles['classic'] : ''} ${isChannelUIThreeLineMode ? styles['three-line'] : ''}`}>
+      <div className={`${styles['content-layout']} ${channelUIClassicMode ? styles['classic'] : ''} ${channelUIThreeLineMode ? styles['three-line'] : ''}`}>
         <div className={styles['widget-bar-toggle-button']}>
           <div className={styles['widget-bar-item']} onClick={handleWidgetMoreBtnClick}>
             <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`} />
           </div>
         </div>
-        <div className={`${styles['widget-bar']} ${isWidgetExpanded ? styles['widget-bar-expanded'] : ''}`}>
-          <div className={`${styles['widget-bar-item']} ${isCentralAreaAnnouncementMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetAnnClick}>
+        <div className={`${styles['widget-bar']} ${widgetIsExpanded ? styles['widget-bar-expanded'] : ''}`}>
+          <div className={`${styles['widget-bar-item']} ${centralAreaIsAnnouncementMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetAnnClick}>
             <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`} />
             <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
           </div>
           <div className={styles['widget-bar-splitter']} />
-          <div className={`${styles['widget-bar-item']} ${isCentralAreaShowMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetShowClick}>
+          <div className={`${styles['widget-bar-item']} ${centralAreaIsShowMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetShowClick}>
             <div className={`${styles['widget-bar-item-icon']} ${styles['show-icon']}`} />
             <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
           </div>
@@ -295,38 +371,38 @@ const ServerPageContent: React.FC = React.memo(() => {
             <span className={styles['widget-bar-item-text']}>{t('more')}</span>
           </div>
         </div>
-        {!isCentralAreaNoneMode &&
-          (isCentralAreaAnnouncementMode ? (
+        {!centralAreaIsNoneMode &&
+          (centralAreaIsAnnouncementMode ? (
             <div
-              ref={annAreaRef}
+              ref={annAreaEl}
               className={styles['announcement-area']}
-              style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
+              style={channelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
               onContextMenu={handleAnnAreaContextMenu}
             >
               <MarkdownContent markdownText={currentChannelAnnouncement} imageSize={'big'} />
             </div>
-          ) : isCentralAreaShowMode ? (
-            <div ref={showAreaRef} className={styles['show-area']} style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
+          ) : centralAreaIsShowMode ? (
+            <div ref={showAreaEl} className={styles['show-area']} style={channelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
               <ShowFrame />
             </div>
           ) : null)}
         <div
           className="resize-handle-vertical"
-          style={isChannelUIClassicMode && !isCentralAreaNoneMode ? {} : { display: 'none' }}
+          style={channelUIClassicMode && !centralAreaIsNoneMode ? {} : { display: 'none' }}
           onPointerDown={handleAnnAreaHandleDown}
           onPointerMove={handleAnnAreaHandleMove}
         />
         <div
           className="resize-handle"
-          style={isChannelUIThreeLineMode && !isCentralAreaNoneMode ? {} : { display: 'none' }}
+          style={channelUIThreeLineMode && !centralAreaIsNoneMode ? {} : { display: 'none' }}
           onPointerDown={handleAnnAreaHandleDown}
           onPointerMove={handleAnnAreaHandleMove}
         />
         <div className={styles['chat-area']}>
-          <div ref={messageAreaRef} className={styles['message-area']} onScroll={handleScroll} onContextMenu={handleMessageAreaContextMenu}>
+          <div ref={messageAreaEl} className={styles['message-area']} onScroll={handleScroll} onContextMenu={handleMessageAreaContextMenu}>
             <MessageContent messages={channelMessages} />
             <div style={{ minHeight: '10px' }} />
-            <UnreadMessageAlert unreadMessageCount={unreadMessageCount} onAlertClick={handleUnreadMessageAlertClick} />
+            <UnreadMessageAlert unreadMessageCount={unreadMessageCount} onClick={handleUnreadMessageAlertClick} />
           </div>
           <div className={styles['input-area']}>
             <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
@@ -340,20 +416,20 @@ const ServerPageContent: React.FC = React.memo(() => {
       <div className={styles['control-area']}>
         <div className={styles['control-buttons']}>
           <div className={styles['voice-mode-dropdown']} style={isChannelMod ? {} : { display: 'none' }} onClick={handleVoiceModeDropdownClick}>
-            {isCurrentChannelQueueMode ? t('queue-speech') : isCurrentChannelFreeMode ? t('free-speech') : isCurrentChannelAdminMode ? t('admin-speech') : ''}
+            {channelVoiceIsQueueMode ? t('queue-speech') : channelVoiceIsFreeMode ? t('free-speech') : channelVoiceIsAdminMode ? t('admin-speech') : ''}
           </div>
         </div>
         <MicButton />
         <div className={styles['control-buttons']}>
-          <div className={`${styles['mixing-mode-button']} ${isMixModeActive ? styles['active'] : ''}`} onClick={handleMixingBtnClick} title={isMixModeActive ? t('mixing-on') : t('mixing-off')}>
+          <div className={`${styles['mixing-mode-button']} ${mixModeIsActive ? styles['active'] : ''}`} onClick={handleMixingBtnClick} title={mixModeIsActive ? t('mixing-on') : t('mixing-off')}>
             {t('mixing')}
           </div>
           <div className={styles['control-button-separator']} />
           <MicVolumeSlider />
           <SpeakerVolumeSlider />
-          <div className={`${styles['record-box']} ${isRecording ? styles['active'] : ''}`}>
-            <div className={`${styles['record-button']} ${isRecording ? styles['active'] : ''}`} onClick={handleRecordModeBtnClick} />
-            <div className={`${styles['record-text']} ${isRecording ? styles['active'] : ''}`}>{getFormatTimeFromSecond(recordTime)}</div>
+          <div className={`${styles['record-box']} ${recorderIsActive ? styles['active'] : ''}`}>
+            <div className={`${styles['record-button']} ${recorderIsActive ? styles['active'] : ''}`} onClick={handleRecordModeBtnClick} />
+            <div className={`${styles['record-text']} ${recorderIsActive ? styles['active'] : ''}`}>{getFormatTimeFromSecond(recordTime)}</div>
           </div>
         </div>
       </div>

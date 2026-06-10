@@ -78,7 +78,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       try {
         consumer.close();
-      } catch {}
+      } catch { }
       delete consumersRef.current[producerId];
 
       removeSpeakerAudio(userId);
@@ -106,7 +106,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         sendTransportRef.current = null;
         try {
           old.close();
-        } catch {}
+        } catch { }
       }
 
       const transport = await ipc.socket.emit('SFUCreateTransport', { direction: 'send', channelId }).catch((e) => {
@@ -221,7 +221,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         if (audioProducerRef.current === producer) audioProducerRef.current = null;
         try {
           producer.close();
-        } catch {}
+        } catch { }
       });
 
       producer.on('trackended', () => {
@@ -229,7 +229,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         if (audioProducerRef.current === producer) audioProducerRef.current = null;
         try {
           producer.close();
-        } catch {}
+        } catch { }
       });
 
       audioProducerRef.current = producer;
@@ -244,7 +244,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         recvTransportRef.current = null;
         try {
           old.close();
-        } catch {}
+        } catch { }
       }
 
       for (const producerId of Object.keys(consumersRef.current)) {
@@ -252,7 +252,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         const userId = consumer.appData.userId;
         try {
           consumer.close();
-        } catch {}
+        } catch { }
         if (typeof userId === 'string') removeSpeakerAudio(userId);
       }
       consumersRef.current = {};
@@ -340,7 +340,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       audioProducerRef.current = null;
       try {
         oldProducer.close();
-      } catch {}
+      } catch { }
     }
 
     if (sendTransportRef.current) {
@@ -348,7 +348,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       sendTransportRef.current = null;
       try {
         old.close();
-      } catch {}
+      } catch { }
     }
   }, [sendTransportRef, audioProducerRef]);
 
@@ -366,7 +366,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       const userId = consumer.appData.userId;
       try {
         consumer.close();
-      } catch {}
+      } catch { }
       if (typeof userId === 'string') removeSpeakerAudio(userId);
     }
     consumersRef.current = {};
@@ -376,13 +376,13 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       recvTransportRef.current = null;
       try {
         old.close();
-      } catch {}
+      } catch { }
     }
   }, [recvTransportRef, consumersRef, removeSpeakerAudio]);
 
   const takeMic = useCallback(
     async (channelId: string) => {
-      if (Store.store.getState().webrtc.isMicTaken) return;
+      if (Store.store.getState().webrtc.micIsTaken) return;
 
       currentChannelIdRef.current = channelId;
       sendRetryCountRef.current = 0;
@@ -399,7 +399,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
   );
 
   const releaseMic = useCallback(async () => {
-    if (!Store.store.getState().webrtc.isMicTaken) return;
+    if (!Store.store.getState().webrtc.micIsTaken) return;
 
     currentChannelIdRef.current = null;
 
@@ -414,7 +414,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       });
 
       Store.store.dispatch(Store.setMutedId({ id: userId, value: true }));
-      window.localStorage.setItem('muted-by-id', JSON.stringify(Store.store.getState().webrtc.mutedById));
+      window.localStorage.setItem('muted-by-id', JSON.stringify(Store.store.getState().webrtc.mutedUserIdList));
     },
     [consumersRef],
   );
@@ -426,7 +426,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       });
 
       Store.store.dispatch(Store.setMutedId({ id: userId, value: false }));
-      window.localStorage.setItem('muted-by-id', JSON.stringify(Store.store.getState().webrtc.mutedById));
+      window.localStorage.setItem('muted-by-id', JSON.stringify(Store.store.getState().webrtc.mutedUserIdList));
     },
     [consumersRef],
   );
@@ -444,7 +444,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       const recv = recvTransportRef.current;
       const send = sendTransportRef.current;
       const recvHealthy = recv && !recv.closed && recv.connectionState === 'connected';
-      const sendHealthy = !Store.store.getState().webrtc.isMicTaken || (send && !send.closed && send.connectionState === 'connected');
+      const sendHealthy = !Store.store.getState().webrtc.micIsTaken || (send && !send.closed && send.connectionState === 'connected');
       if (currentChannelIdRef.current === channelId && recvHealthy && sendHealthy) {
         new Logger('WebRTC').info(`SFUJoined dedup: already healthy on channel ${channelId}`);
         return;
@@ -465,7 +465,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       }
 
       await setupRecv(channelId);
-      if (Store.store.getState().webrtc.isMicTaken) {
+      if (Store.store.getState().webrtc.micIsTaken) {
         await setupSend(channelId);
       }
     });

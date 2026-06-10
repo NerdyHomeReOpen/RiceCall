@@ -44,23 +44,22 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   const currentChannel = useAppSelector((state) => state.currentChannel.data, shallowEqual);
   const memberApplicationsCount = useAppSelector((state) => state.memberApplications.data.length);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
-  const channels = useAppSelector((state) => state.channels.data, shallowEqual);
+  const channels = useAppSelector((state) => state.channels.data.filter((c) => !c.categoryId).sort((a, b) => a.order - b.order), shallowEqual);
   const queueUserIds = useAppSelector((state) => state.queueUsers.data.filter((q) => q.position >= 0).map((q) => q.userId), shallowEqual);
-  const latency = useAppSelector((state) => state.socket.latency);
-  const rtcLatency = useAppSelector((state) => state.webrtc.latency);
+  const socketLatency = useAppSelector((state) => state.socket.latency);
+  const webrtcLatency = useAppSelector((state) => state.webrtc.latency);
 
-  const queueListRef = useRef<HTMLDivElement>(null);
-  const isResizingQueueListRef = useRef<boolean>(false);
+  const queueListEl = useRef<HTMLDivElement>(null);
+  const isResizingQueueList = useRef<boolean>(false);
 
   const [selectedTabId, setSelectedTabId] = useState<'all' | 'current'>('all');
 
   const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
-  const sortedChannels = [...channels].filter((c) => !c.categoryId).sort((a, b) => a.order - b.order);
-  const isAllTab = selectedTabId === 'all';
-  const isCurrentTab = selectedTabId === 'current';
-  const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
-  const connectStatus = 4 - Math.floor(Number(Math.max(latency, rtcLatency)) / 50);
+  const allTabIsSelected = selectedTabId === 'all';
+  const currentTabIsSelected = selectedTabId === 'current';
+  const currentChannelIsQueueMode = currentChannel.voiceMode === 'queue';
+  const connectStatus = 4 - Math.floor(Number(Math.max(socketLatency, webrtcLatency)) / 50);
   const hasNewMemberApplications = permissionLevel >= Types.Permission.ServerAdmin && memberApplicationsCount > 0;
 
   const handleLocateMe = () => {
@@ -70,12 +69,14 @@ const ServerPageSidebar: React.FC = React.memo(() => {
 
   const handleQueueListHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    isResizingQueueListRef.current = true;
+
+    isResizingQueueList.current = true;
   };
 
   const handleQueueListHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isResizingQueueListRef.current || !queueListRef.current) return;
-    queueListRef.current.style.maxHeight = `${e.clientY - queueListRef.current.offsetTop}px`;
+    if (!isResizingQueueList.current || !queueListEl.current) return;
+
+    queueListEl.current.style.maxHeight = `${e.clientY - queueListEl.current.offsetTop}px`;
   };
 
   const handleInviteFriendClick = () => {
@@ -85,17 +86,18 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   const handleServerSettingClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
 
     const contextMenu = new ContextMenu()
       .addApplyMemberOption({ permissionLevel }, () => applyMember(userId, currentServerId, currentServerReceiveApply))
       .addServerSettingOption({ permissionLevel }, () => openServerSetting(userId, currentServerId))
       .addSeparator()
-      .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => openEditNickname(userId, currentServerId))
+      .addEditNicknameOption({ permissionLevel, targetIsSelf: true, targetHasLowerLevel: false }, () => openEditNickname(userId, currentServerId))
       .addLocateMeOption(() => handleLocateMe())
       .addSeparator()
       .addReportOption(() => window.open('https://ricecall.com/report-server', '_blank'))
-      .addFavoriteServerOption({ isFavorite: currentServerFavorite }, () => favoriteServer(currentServerId))
+      .addFavoriteServerOption({ serverIsFavorite: currentServerFavorite }, () => favoriteServer(currentServerId))
       .build();
 
     showContextMenu(x, y, 'right-bottom', contextMenu);
@@ -108,12 +110,13 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   const handleChannelListContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { clientX: x, clientY: y } = e;
 
     const contextMenu = new ContextMenu()
       .addCreateChannelOption({ permissionLevel }, () => openCreateChannel(userId, currentServerId))
       .addSeparator()
-      .addKickAllUsersFromServerOption({ permissionLevel, movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServerId))
+      .addKickAllUsersFromServerOption({ permissionLevel, userIdsToKick: movableServerUserIds }, () => kickUsersFromServer(movableServerUserIds, currentServerId))
       .addSeparator()
       .addBroadcastOption({ permissionLevel }, () => openServerBroadcast(currentServerId, currentChannel.channelId))
       .addSeparator()
@@ -133,16 +136,19 @@ const ServerPageSidebar: React.FC = React.memo(() => {
 
   useEffect(() => {
     const onPointerup = () => {
-      isResizingQueueListRef.current = false;
+      isResizingQueueList.current = false;
     };
+
     document.addEventListener('pointerup', onPointerup);
-    return () => document.removeEventListener('pointerup', onPointerup);
+
+    return () => {
+      document.removeEventListener('pointerup', onPointerup);
+    };
   }, []);
 
   useEffect(() => {
-    if (isCurrentTab) return;
     locateMe();
-  }, [isCurrentTab, locateMe]);
+  }, [locateMe]);
 
   return (
     <>
@@ -171,17 +177,17 @@ const ServerPageSidebar: React.FC = React.memo(() => {
       <div className={styles['current-channel-box']}>
         <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
           <div className={'hover-text'}>
-            {`${t('latency', { 0: latency || '-' })}`}
+            {`${t('latency', { 0: socketLatency || '-' })}`}
             <br />
-            {`${t('audio-latency', { 0: rtcLatency || '-' })}`}
+            {`${t('audio-latency', { 0: webrtcLatency || '-' })}`}
           </div>
         </div>
         <div className={styles['current-channel-name-text']}>{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
       </div>
-      {isCurrentChannelQueueMode && (
+      {currentChannelIsQueueMode && (
         <>
           <div className={styles['section-title-text']}>{t('mic-order')}</div>
-          <div ref={queueListRef} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
+          <div ref={queueListEl} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
             <div className={styles['queue-list']}>
               {queueUserIds.map((queueUserId) => (
                 <QueueUserTab key={queueUserId} queueUserId={queueUserId} />
@@ -191,22 +197,22 @@ const ServerPageSidebar: React.FC = React.memo(() => {
           <div className={styles['queue-list-separator']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
         </>
       )}
-      <div className={styles['section-title-text']}>{isCurrentTab ? t('current-channel') : t('all-channel')}</div>
+      <div className={styles['section-title-text']}>{currentTabIsSelected ? t('current-channel') : t('all-channel')}</div>
       <div className={styles['scroll-view']} onContextMenu={handleChannelListContextMenu}>
         <div className={styles['channel-list']}>
-          {isCurrentTab ? (
+          {currentTabIsSelected ? (
             <ChannelTab key={currentChannel.channelId} channel={currentChannel} />
           ) : (
-            sortedChannels.map((item) => (item.type === 'category' ? <CategoryTab key={item.channelId} category={item} /> : <ChannelTab key={item.channelId} channel={item} />))
+            channels.map((item) => (item.type === 'category' ? <CategoryTab key={item.channelId} category={item} /> : <ChannelTab key={item.channelId} channel={item} />))
           )}
         </div>
       </div>
       <div className={styles['channel-list-separator']} />
       <div className={styles['sidebar-footer']}>
-        <div className={`${styles['sidebar-navigate-tab']} ${isCurrentTab ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
+        <div className={`${styles['sidebar-navigate-tab']} ${currentTabIsSelected ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
           {t('current-channel')}
         </div>
-        <div className={`${styles['sidebar-navigate-tab']} ${isAllTab ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
+        <div className={`${styles['sidebar-navigate-tab']} ${allTabIsSelected ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
           {t('all-channel')}
         </div>
       </div>

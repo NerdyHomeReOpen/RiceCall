@@ -47,7 +47,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
       removeSpeakerAudio(userId);
 
       stream.getAudioTracks().forEach((track) => {
-        track.enabled = !Store.store.getState().webrtc.mutedById[userId];
+        track.enabled = !Store.store.getState().webrtc.mutedUserIdList[userId];
       });
 
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
@@ -70,7 +70,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
       speaker.volume = 0;
       speaker.autoplay = true;
       speaker.style.display = 'none';
-      speaker.play().catch(() => {});
+      speaker.play().catch(() => { });
       speaker.remove();
     },
     [removeSpeakerAudio, initAudioContext, audioContextRef, outputDesRef, masterGainNodeRef, speakerNodesRef, rafIdListRef, audioProducerRef],
@@ -80,10 +80,10 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
     (volume: number) => {
       volume = Math.min(100, Math.max(0, volume));
       if (masterGainNodeRef.current) masterGainNodeRef.current.gain.value = volume / 100;
-      const isSpeakerMuted = volume === 0;
-      Store.store.dispatch(Store.setWebRTC({ speakerVolume: volume, isSpeakerMuted }));
+      const speakerIsMuted = volume === 0;
+      Store.store.dispatch(Store.setWebRTC({ speakerVolume: volume, speakerIsMuted }));
       window.localStorage.setItem('speaker-volume', volume.toString());
-      window.localStorage.setItem('is-speaker-mute', isSpeakerMuted.toString());
+      window.localStorage.setItem('is-speaker-mute', speakerIsMuted.toString());
     },
     [masterGainNodeRef],
   );
@@ -103,7 +103,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
   );
 
   const toggleSpeakerMuted = useCallback(() => {
-    if (Store.store.getState().webrtc.isSpeakerMuted) {
+    if (Store.store.getState().webrtc.speakerIsMuted) {
       const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
       changeSpeakerVolume(prevVolume);
     } else {

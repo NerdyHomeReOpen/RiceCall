@@ -17,7 +17,7 @@ export function addUserToQueue(userId: Types.User['userId'], serverId: Types.Ser
 }
 
 export function applyMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], isReceiveApply: boolean) {
-  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => {});
+  if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => { });
   else openApplyMember(userId, serverId);
 }
 
@@ -54,10 +54,15 @@ export function clearQueue(serverId: Types.Server['serverId'], channelId: Types.
   openAlertDialog(t('confirm-clear-queue'), () => ipc.socket.send('clearQueue', { serverId, channelId }));
 }
 
-export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, isPasswordNeeded: boolean) {
-  if (!canJoin) return;
-  if (isPasswordNeeded) openChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
-  else ipc.socket.send('connectChannel', { serverId, channelId });
+export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], userCanJoinChannel: boolean, channelNeedsPassword: boolean) {
+  if (!userCanJoinChannel) return;
+
+  if (channelNeedsPassword) {
+    openChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
+  }
+  else {
+    ipc.socket.send('connectChannel', { serverId, channelId });
+  }
 }
 
 export function controlQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {

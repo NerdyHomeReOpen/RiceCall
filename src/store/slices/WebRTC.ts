@@ -3,12 +3,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as Types from '@/types';
 
 export interface WebRTCState {
-  isMicTaken: boolean;
-  isSpeakKeyPressed: boolean;
-  isMixModeActive: boolean;
-  isMicMuted: boolean;
-  isSpeakerMuted: boolean;
-  isRecording: boolean;
+  micIsTaken: boolean;
+  speakKeyIsPressed: boolean;
+  mixModeIsActive: boolean;
+  micIsMuted: boolean;
+  speakerIsMuted: boolean;
+  recorderIsActive: boolean;
   volumePercent: number;
   volumeLevel: number;
   micVolume: number;
@@ -17,19 +17,19 @@ export interface WebRTCState {
   voiceThreshold: number;
   speakingMode: Types.SpeakingMode;
   recordTime: number;
-  speakingById: Record<string, boolean>;
-  mutedById: Record<string, boolean>;
+  speakingUserIdList: Record<string, boolean>;
+  mutedUserIdList: Record<string, boolean>;
   latency: number;
   status: Types.RTCStatus;
 }
 
 const initialState: WebRTCState = {
-  isMicTaken: false,
-  isSpeakKeyPressed: false,
-  isMixModeActive: false,
-  isMicMuted: false,
-  isSpeakerMuted: false,
-  isRecording: false,
+  micIsTaken: false,
+  speakKeyIsPressed: false,
+  mixModeIsActive: false,
+  micIsMuted: false,
+  speakerIsMuted: false,
+  recorderIsActive: false,
   volumePercent: 0,
   volumeLevel: 0,
   micVolume: 100,
@@ -38,8 +38,8 @@ const initialState: WebRTCState = {
   voiceThreshold: 1,
   speakingMode: 'key',
   recordTime: 0,
-  speakingById: {},
-  mutedById: {},
+  speakingUserIdList: {},
+  mutedUserIdList: {},
   latency: 0,
   status: 'disconnected',
 };
@@ -55,18 +55,18 @@ export const webrtcSlice = createSlice({
     setSpeakingId: (state, action: PayloadAction<{ id: string; value: boolean }>) => {
       const { id, value } = action.payload;
       if (value) {
-        state.speakingById[id] = true;
+        state.speakingUserIdList[id] = true;
       } else {
-        delete state.speakingById[id];
+        delete state.speakingUserIdList[id];
       }
     },
 
     setMutedId: (state, action: PayloadAction<{ id: string; value: boolean }>) => {
       const { id, value } = action.payload;
       if (value) {
-        state.mutedById[id] = true;
+        state.mutedUserIdList[id] = true;
       } else {
-        delete state.mutedById[id];
+        delete state.mutedUserIdList[id];
       }
     },
   },

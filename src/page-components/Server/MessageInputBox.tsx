@@ -52,17 +52,15 @@ const MessageInputBox: React.FC = React.memo(() => {
     immediatelyRender: true,
   });
 
-  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const permissionLevel = useAppSelector((state) => Math.max(state.user.data.permissionLevel, state.currentServer.data.permissionLevel, state.currentChannel.data.permissionLevel));
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
-  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
   const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
-  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
+  const currentChannelTextIsMuted = useAppSelector((state) => state.currentChannel.data.isTextMuted);
+  const currentChannelForbidText = useAppSelector((state) => state.currentChannel.data.forbidText);
+  const currentChannelForbidGuestText = useAppSelector((state) => state.currentChannel.data.forbidGuestText);
   const currentChannelGuestTextMaxLength = useAppSelector((state) => state.currentChannel.data.guestTextMaxLength);
   const currentChannelGuestTextGapTime = useAppSelector((state) => state.currentChannel.data.guestTextGapTime);
   const currentChannelGuestTextWaitTime = useAppSelector((state) => state.currentChannel.data.guestTextWaitTime);
-  const currentChannelIsTextMuted = useAppSelector((state) => state.currentChannel.data.isTextMuted);
-  const currentChannelForbidText = useAppSelector((state) => state.currentChannel.data.forbidText);
-  const currentChannelForbidGuestText = useAppSelector((state) => state.currentChannel.data.forbidGuestText);
 
   const messageInputRef = useRef<string>('');
   const isUploadingRef = useRef<boolean>(false);
@@ -70,22 +68,20 @@ const MessageInputBox: React.FC = React.memo(() => {
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
 
+  // TODO: change to ref maybe?
   const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
 
-  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
   const textLength = editor?.getText().length || 0;
-  const isCloseToMaxLength = textLength >= currentChannelGuestTextMaxLength - 100;
-  const isWarning = textLength > currentChannelGuestTextMaxLength;
-  const leftGapTime = currentChannelGuestTextGapTime ? currentChannelGuestTextGapTime - (Date.now() - lastMessageTime) : 0;
-  const leftWaitTime = currentChannelGuestTextWaitTime ? currentChannelGuestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
-  const isForbidByMutedText = currentChannelIsTextMuted;
-  const isForbidByForbidText = permissionLevel < Types.Permission.ChannelMod && currentChannelForbidText;
-  const isForbidByForbidGuestText = permissionLevel < Types.Permission.Member && currentChannelForbidGuestText;
-  const isForbidByForbidGuestTextWait = permissionLevel < Types.Permission.Member && leftWaitTime > 0;
-  const isForbidByForbidGuestTextGap = permissionLevel < Types.Permission.Member && leftGapTime > 0;
-  const disabled = isForbidByMutedText || isForbidByForbidText || isForbidByForbidGuestText || isForbidByForbidGuestTextGap || isForbidByForbidGuestTextWait;
   const maxLength = permissionLevel < Types.Permission.Member ? currentChannelGuestTextMaxLength : 3000;
+  const isCloseToMaxLength = textLength >= maxLength - 100;
+  const isOverMaxLength = textLength > maxLength;
+  const remainingGapTime = currentChannelGuestTextGapTime ? currentChannelGuestTextGapTime - (Date.now() - lastMessageTime) : 0;
+  const remainingWaitTime = currentChannelGuestTextWaitTime ? currentChannelGuestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
+  const disabled =
+    currentChannelTextIsMuted ||
+    (permissionLevel < Types.Permission.ChannelMod && currentChannelForbidText) ||
+    (permissionLevel < Types.Permission.Member && (currentChannelForbidGuestText || remainingWaitTime > 0 || remainingGapTime > 0));
 
   const setStyles = useCallback(() => {
     editor?.chain().setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
@@ -109,44 +105,54 @@ const MessageInputBox: React.FC = React.memo(() => {
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
+
     const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
+
     showEmojiPicker(x, y, 'right-top', e.currentTarget as HTMLElement, true, fontSizeRef.current, textColorRef.current, handleEmojiSelect, handleFontSizeChange, handleTextColorChange);
   };
 
   const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
+
     for (const item of items) {
-      if (item.type.startsWith('image/')) {
-        const image = item.getAsFile();
-        if (!image || isUploadingRef.current) return;
-        image.arrayBuffer().then((arrayBuffer) => {
-          const imageUnit8Array = new Uint8Array(arrayBuffer);
-          isUploadingRef.current = true;
-          if (imageUnit8Array.length > MAX_FILE_SIZE) {
-            openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-            isUploadingRef.current = false;
-            return;
-          }
-          ipc.api.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
-            if (response) {
-              editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
-              setStyles();
-            }
+      if (!item.type.startsWith('image/')) continue;
+
+      const image = item.getAsFile();
+      if (!image || isUploadingRef.current) continue;
+
+      image.arrayBuffer().then((arrayBuffer) => {
+        const imageUnit8Array = new Uint8Array(arrayBuffer);
+
+        isUploadingRef.current = true;
+
+        if (imageUnit8Array.length > MAX_FILE_SIZE) {
+          openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
+          isUploadingRef.current = false;
+          return;
+        }
+
+        ipc.api
+          .uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array })
+          .then((response) => {
+            if (!response) return;
+            editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
+            setStyles();
+          })
+          .finally(() => {
             isUploadingRef.current = false;
           });
-        });
-      }
+      });
     }
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (disabled) return;
-    if (isWarning) return;
-    if (isComposingRef.current) return;
-    if (e.shiftKey || e.ctrlKey) return;
+    if (disabled || isOverMaxLength || isComposingRef.current || e.shiftKey || e.ctrlKey) return;
+
     if (e.key === 'Enter') {
       e.preventDefault();
+
       if (messageInputRef.current.trim().length === 0) return;
+
       sendChannelMessage(currentServerId, currentChannelId, { type: 'general', content: messageInputRef.current });
       setLastMessageTime(Date.now());
       editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
@@ -167,14 +173,13 @@ const MessageInputBox: React.FC = React.memo(() => {
   }, [editor, setStyles]);
 
   useEffect(() => {
-    if (currentChannelId) {
-      setLastJoinChannelTime(Date.now());
-      setLastMessageTime(0);
-    }
+    if (!currentChannelId) return;
+    setLastJoinChannelTime(Date.now());
+    setLastMessageTime(0);
   }, [currentChannelId]);
 
   return (
-    <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
+    <div className={`${styles['message-input-box']} ${isOverMaxLength ? styles['warning'] : ''}`}>
       <div className={styles['emoji-button']} onMouseDown={handleEmojiPickerClick} />
       <EditorContent
         editor={editor}

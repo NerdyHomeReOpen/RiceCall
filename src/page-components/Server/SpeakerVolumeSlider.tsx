@@ -9,10 +9,10 @@ import styles from './Server.module.css';
 const SpeakerVolumeSlider = React.memo(() => {
   const { changeSpeakerVolume, toggleSpeakerMuted } = useWebRTC();
 
-  const sliderRef = useRef<HTMLInputElement>(null);
-  const isBtnHoveredRef = useRef<boolean>(false);
+  const sliderEl = useRef<HTMLInputElement>(null);
+  const isBtnHovered = useRef<boolean>(false);
 
-  const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted);
+  const speakerIsMuted = useAppSelector((state) => state.webrtc.speakerIsMuted);
   const speakerVolume = useAppSelector((state) => state.webrtc.speakerVolume);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -24,31 +24,36 @@ const SpeakerVolumeSlider = React.memo(() => {
   };
 
   const handleBtnMouseDown = () => {
-    isBtnHoveredRef.current = true;
+    isBtnHovered.current = true;
   };
 
   const handleBtnMouseUp = () => {
-    isBtnHoveredRef.current = false;
+    isBtnHovered.current = false;
   };
 
   const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
-    if (!isBtnHoveredRef.current || !sliderRef.current) return;
+    if (!isBtnHovered.current || !sliderEl.current) return;
 
-    const newValue = parseInt(sliderRef.current.value);
-    if (e.deltaY > 0) sliderRef.current.value = (newValue - 4).toString();
-    else sliderRef.current.value = (newValue + 4).toString();
-    changeSpeakerVolume(parseInt(sliderRef.current.value));
+    const newValue = parseInt(sliderEl.current.value);
+
+    if (e.deltaY > 0) {
+      sliderEl.current.value = (newValue - 4).toString();
+    } else {
+      sliderEl.current.value = (newValue + 4).toString();
+    }
+
+    changeSpeakerVolume(parseInt(sliderEl.current.value));
   };
 
   return (
     <div className={styles['speaker-volume-container']}>
-      <div className={`${styles['speaker-volume-button']} ${isSpeakerMuted ? styles['muted'] : ''}`} />
+      <div className={`${styles['speaker-volume-button']} ${speakerIsMuted ? styles['muted'] : ''}`} />
       <div className={styles['slider-track']}>
         <div className={styles['slider-container']}>
-          <input ref={sliderRef} type="range" min="0" max="100" value={speakerVolume} onChange={handleSliderChange} className={styles['slider']} />
+          <input ref={sliderEl} type="range" min="0" max="100" value={speakerVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div
-          className={`${styles['speaker-volume-button']} ${isSpeakerMuted ? styles['muted'] : styles['active']}`}
+          className={`${styles['speaker-volume-button']} ${speakerIsMuted ? styles['muted'] : styles['active']}`}
           onClick={handleBtnClick}
           onMouseEnter={handleBtnMouseDown}
           onMouseLeave={handleBtnMouseUp}

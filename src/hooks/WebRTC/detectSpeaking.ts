@@ -29,7 +29,7 @@ export const detectSpeaking = (
 
       Store.store.dispatch(Store.setWebRTC({ volumePercent, volumeLevel }));
 
-      if (!Store.store.getState().webrtc.speakingById[targetId]) {
+      if (!Store.store.getState().webrtc.speakingUserIdList[targetId]) {
         Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: true }));
       }
     } else {
@@ -37,14 +37,14 @@ export const detectSpeaking = (
 
       Store.store.dispatch(Store.setWebRTC({ volumePercent: 0, volumeLevel: 0 }));
 
-      if (Store.store.getState().webrtc.speakingById[targetId]) {
+      if (Store.store.getState().webrtc.speakingUserIdList[targetId]) {
         Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: false }));
       }
     }
   } else {
-    if (volume > 0 && !Store.store.getState().webrtc.speakingById[targetId]) {
+    if (volume > 0 && !Store.store.getState().webrtc.speakingUserIdList[targetId]) {
       Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: true }));
-    } else if (volume === 0 && Store.store.getState().webrtc.speakingById[targetId]) {
+    } else if (volume === 0 && Store.store.getState().webrtc.speakingUserIdList[targetId]) {
       Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: false }));
     }
   }

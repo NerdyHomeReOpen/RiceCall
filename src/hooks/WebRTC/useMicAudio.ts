@@ -47,8 +47,8 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       removeMicAudio();
 
       stream.getAudioTracks().forEach((track) => {
-        const { speakingMode, isSpeakKeyPressed } = Store.store.getState().webrtc;
-        track.enabled = speakingMode === 'key' ? isSpeakKeyPressed : true;
+        const { speakingMode, speakKeyIsPressed } = Store.store.getState().webrtc;
+        track.enabled = speakingMode === 'key' ? speakKeyIsPressed : true;
       });
 
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
@@ -98,18 +98,18 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
         new Logger('WebRTC').error(`Access input device failed: ${error.message}`);
       });
 
-    Store.store.dispatch(Store.setWebRTC({ isMicTaken: true }));
+    Store.store.dispatch(Store.setWebRTC({ micIsTaken: true }));
   }, [initMicAudio, echoCancellationRef, noiseCancellationRef, inputAudioDeviceRef]);
 
   const stopSpeaking = useCallback(() => {
     removeMicAudio();
 
-    Store.store.dispatch(Store.setWebRTC({ isMicTaken: false }));
+    Store.store.dispatch(Store.setWebRTC({ micIsTaken: false }));
   }, [removeMicAudio]);
 
   const pressSpeakKey = useCallback(() => {
-    const { speakingMode, isMicTaken } = Store.store.getState().webrtc;
-    if (speakingMode !== 'key' || !isMicTaken) return;
+    const { speakingMode, micIsTaken } = Store.store.getState().webrtc;
+    if (speakingMode !== 'key' || !micIsTaken) return;
 
     playSound('startSpeaking');
 
@@ -117,12 +117,12 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       track.enabled = true;
     });
 
-    Store.store.dispatch(Store.setWebRTC({ isSpeakKeyPressed: true }));
+    Store.store.dispatch(Store.setWebRTC({ speakKeyIsPressed: true }));
   }, [playSound, micNodesRef]);
 
   const releaseSpeakKey = useCallback(() => {
-    const { speakingMode, isMicTaken } = Store.store.getState().webrtc;
-    if (speakingMode !== 'key' || !isMicTaken) return;
+    const { speakingMode, micIsTaken } = Store.store.getState().webrtc;
+    if (speakingMode !== 'key' || !micIsTaken) return;
 
     playSound('stopSpeaking');
 
@@ -130,7 +130,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       track.enabled = false;
     });
 
-    Store.store.dispatch(Store.setWebRTC({ isSpeakKeyPressed: false }));
+    Store.store.dispatch(Store.setWebRTC({ speakKeyIsPressed: false }));
   }, [playSound, micNodesRef]);
 
   const changeMicVolume = useCallback(
@@ -141,18 +141,18 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
         micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
       }
 
-      const isMicMuted = volume === 0;
+      const micIsMuted = volume === 0;
 
-      Store.store.dispatch(Store.setWebRTC({ micVolume: volume, isMicMuted }));
+      Store.store.dispatch(Store.setWebRTC({ micVolume: volume, micIsMuted }));
       window.localStorage.setItem('mic-volume', volume.toString());
-      window.localStorage.setItem('is-mic-mute', isMicMuted.toString());
+      window.localStorage.setItem('is-mic-mute', micIsMuted.toString());
     },
     [micNodesRef, microphoneAmplificationRef],
   );
 
   const toggleMicMuted = useCallback(() => {
-    const { isMicMuted } = Store.store.getState().webrtc;
-    if (isMicMuted) {
+    const { micIsMuted } = Store.store.getState().webrtc;
+    if (micIsMuted) {
       const prevVolume = parseInt(localStorage.getItem('previous-mic-volume') || '50');
       changeMicVolume(prevVolume);
     } else {
@@ -165,7 +165,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
     const changeInputAudioDevice = (inputAudioDevice: string) => {
       new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);
       inputAudioDeviceRef.current = inputAudioDevice;
-      if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
+      if (Store.store.getState().webrtc.micIsTaken) startSpeaking();
     };
     changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
     const unsub = ipc.systemSettings.inputAudioDevice.onUpdate(changeInputAudioDevice);
@@ -176,7 +176,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
     const changeEchoCancellation = (echoCancellation: boolean) => {
       new Logger('WebRTC').info(`Echo cancellation updated: ${echoCancellation}`);
       echoCancellationRef.current = echoCancellation;
-      if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
+      if (Store.store.getState().webrtc.micIsTaken) startSpeaking();
     };
     changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
     const unsub = ipc.systemSettings.echoCancellation.onUpdate(changeEchoCancellation);
@@ -187,7 +187,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
     const changeNoiseCancellation = (noiseCancellation: boolean) => {
       new Logger('WebRTC').info(`Noise cancellation updated: ${noiseCancellation}`);
       noiseCancellationRef.current = noiseCancellation;
-      if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
+      if (Store.store.getState().webrtc.micIsTaken) startSpeaking();
     };
     changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
     const unsub = ipc.systemSettings.noiseCancellation.onUpdate(changeNoiseCancellation);
@@ -209,7 +209,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
       new Logger('WebRTC').info(`Speaking mode updated: ${speakingMode}`);
       micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
-        track.enabled = speakingMode === 'key' ? Store.store.getState().webrtc.isSpeakKeyPressed : true;
+        track.enabled = speakingMode === 'key' ? Store.store.getState().webrtc.speakKeyIsPressed : true;
       });
       Store.store.dispatch(Store.setWebRTC({ speakingMode }));
     };

@@ -11,31 +11,35 @@ interface ServerPageProps {
 }
 
 const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) => {
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const isResizingSidebarRef = useRef<boolean>(false);
+  const sidebarEl = useRef<HTMLDivElement>(null);
+  const sidebarIsResizing = useRef<boolean>(false);
 
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    isResizingSidebarRef.current = true;
+    sidebarIsResizing.current = true;
   };
 
   const handleSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!isResizingSidebarRef.current || !sidebarRef.current) return;
-    sidebarRef.current.style.width = `${e.clientX}px`;
+    if (!sidebarIsResizing.current || !sidebarEl.current) return;
+    sidebarEl.current.style.width = `${e.clientX}px`;
   };
 
   useEffect(() => {
     const onPointerup = () => {
-      isResizingSidebarRef.current = false;
+      sidebarIsResizing.current = false;
     };
+
     document.addEventListener('pointerup', onPointerup);
-    return () => document.removeEventListener('pointerup', onPointerup);
+
+    return () => {
+      document.removeEventListener('pointerup', onPointerup);
+    };
   }, []);
 
   return (
     <main className={styles['page']} style={display ? {} : { display: 'none' }}>
       <main className={styles['body']}>
-        <aside ref={sidebarRef} className={styles['sidebar']}>
+        <aside ref={sidebarEl} className={styles['sidebar']}>
           <ServerPageSidebar />
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />

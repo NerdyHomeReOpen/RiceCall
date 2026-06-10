@@ -55,7 +55,7 @@ export type ChannelEvent = OnlineMember & { type: 'join' | 'move' | 'leave'; pre
 
 export type OnlineMember = table_members & table_users & table_channel_muted_users & table_server_permissions & { badges: string };
 
-export type QueueUser = { userId: string; position: number; leftTime: number; isQueueControlled: boolean };
+export type QueueUser = { userId: string; position: number; leftTime: number; isQueueControlled: boolean }; // TODO: change to queueIsControlled
 
 export type QueueMember = QueueUser & OnlineMember;
 

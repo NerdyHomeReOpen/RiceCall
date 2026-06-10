@@ -87,8 +87,8 @@ export type table_channel_blocked_users = {
 export type table_channel_muted_users = {
   userId: string;
   channelId: string;
-  isTextMuted: boolean;
-  isVoiceMuted: boolean;
+  isTextMuted: boolean; // TODO: change to textIsMuted maybe?
+  isVoiceMuted: boolean; // TODO: change to voiceIsMuted maybe?
   updatedAt: number;
   createdAt: number;
 };

@@ -1,5 +1,7 @@
 import * as Types from '@/types';
 
+// TODO: change all permissionLevel name to userPermissionLevel
+
 /**
  * ContextMenu class
  * @example
@@ -22,12 +24,12 @@ export default class ContextMenu {
     return this;
   }
 
-  addJoinChannelOption(params: { canJoin: boolean; isInChannel: boolean }, onClick: () => void): this {
+  addJoinChannelOption(params: { userCanJoinChannel: boolean; userIsInChannel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'join-channel',
       label: 'join-channel',
-      show: params.canJoin,
-      disabled: params.isInChannel,
+      show: params.userCanJoinChannel,
+      disabled: params.userIsInChannel,
       onClick: onClick,
     });
     return this;
@@ -63,11 +65,11 @@ export default class ContextMenu {
     return this;
   }
 
-  addDeleteChannelOption(params: { permissionLevel: Types.Permission; isSubChannel: boolean }, onClick: () => void): this {
+  addDeleteChannelOption(params: { permissionLevel: Types.Permission; channelIsSubChannel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'delete-channel',
       label: 'delete-channel',
-      show: params.isSubChannel ? params.permissionLevel >= Types.Permission.ChannelAdmin : params.permissionLevel >= Types.Permission.ServerAdmin,
+      show: params.channelIsSubChannel ? params.permissionLevel >= Types.Permission.ChannelAdmin : params.permissionLevel >= Types.Permission.ServerAdmin,
       onClick: onClick,
     });
     return this;
@@ -84,13 +86,13 @@ export default class ContextMenu {
   }
 
   addMoveAllUserToChannelOption(
-    params: { isInChannel: boolean; currentPermissionLevel: Types.Permission; permissionLevel: Types.Permission; movableChannelUserIds: string[] },
+    params: { permissionLevel: Types.Permission; channelPermissionLevel: Types.Permission; userIsInChannel: boolean; userIdsToMove: string[] },
     onClick: () => void,
   ): this {
     this.options.push({
       id: 'move-all-user-to-channel',
       label: 'move-all-user-to-channel',
-      show: !params.isInChannel && params.currentPermissionLevel >= Types.Permission.ChannelMod && params.permissionLevel >= Types.Permission.ChannelMod && params.movableChannelUserIds.length > 0,
+      show: !params.userIsInChannel && (params.permissionLevel >= Types.Permission.ServerAdmin || params.channelPermissionLevel >= Types.Permission.ChannelMod) && params.permissionLevel >= Types.Permission.ChannelMod && params.userIdsToMove.length > 0,
       onClick: onClick,
     });
     return this;
@@ -106,32 +108,32 @@ export default class ContextMenu {
     return this;
   }
 
-  addKickChannelUsersFromServerOption(params: { permissionLevel: Types.Permission; movableChannelUserIds: string[] }, onClick: () => void): this {
+  addKickChannelUsersFromServerOption(params: { permissionLevel: Types.Permission; userIdsToKick: string[] }, onClick: () => void): this {
     this.options.push({
       id: 'kick-channel-users-from-server',
       label: 'kick-channel-users-from-server',
-      show: params.movableChannelUserIds.length > 0 && params.permissionLevel >= Types.Permission.Staff,
+      show: params.userIdsToKick.length > 0 && params.permissionLevel >= Types.Permission.Staff,
       onClick: onClick,
     });
     return this;
   }
 
-  addKickAllUsersFromServerOption(params: { permissionLevel: Types.Permission; movableServerUserIds: string[] }, onClick: () => void): this {
+  addKickAllUsersFromServerOption(params: { permissionLevel: Types.Permission; userIdsToKick: string[] }, onClick: () => void): this {
     this.options.push({
       id: 'kick-all-users-from-server',
       label: 'kick-all-users-from-server',
-      show: params.movableServerUserIds.length > 0 && params.permissionLevel >= Types.Permission.Staff,
+      show: params.userIdsToKick.length > 0 && params.permissionLevel >= Types.Permission.Staff,
       onClick: onClick,
     });
     return this;
   }
 
-  addSetReceptionLobbyOption(params: { permissionLevel: Types.Permission; isPrivateChannel: boolean; isReadonlyChannel: boolean; isReceptionLobby: boolean }, onClick: () => void): this {
+  addSetReceptionLobbyOption(params: { permissionLevel: Types.Permission; channelIsPrivateChannel: boolean; channelIsReadonlyChannel: boolean; isReceptionLobby: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'set-reception-lobby',
       label: 'set-reception-lobby',
       show: !params.isReceptionLobby && params.permissionLevel >= Types.Permission.ServerAdmin,
-      disabled: params.isPrivateChannel || params.isReadonlyChannel,
+      disabled: params.channelIsPrivateChannel || params.channelIsReadonlyChannel,
       onClick: onClick,
     });
     return this;
@@ -316,11 +318,11 @@ export default class ContextMenu {
     return this;
   }
 
-  addKickUserFromChannelOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isInLobby: boolean }, onClick: () => void): this {
+  addKickUserFromChannelOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; targetIsInLobby: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'kick-channel',
       label: 'kick-channel',
-      show: !params.targetIsSelf && params.targetHasLowerLevel && !params.isInLobby && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: !params.targetIsSelf && params.targetHasLowerLevel && !params.targetIsInLobby && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -414,13 +416,13 @@ export default class ContextMenu {
   }
 
   addSetChannelModOption(
-    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isSubChannel: boolean },
+    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; channelIsSubChannel: boolean },
     onClick: () => void,
   ): this {
     this.options.push({
       id: 'set-channel-mod',
       label: params.targetPermissionLevel >= Types.Permission.ChannelMod ? 'unset-channel-mod' : 'set-channel-mod',
-      show: params.isSubChannel && params.permissionLevel >= Types.Permission.ChannelAdmin && params.targetPermissionLevel < Types.Permission.ChannelMod,
+      show: params.channelIsSubChannel && params.permissionLevel >= Types.Permission.ChannelAdmin && params.targetPermissionLevel < Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
@@ -585,39 +587,40 @@ export default class ContextMenu {
     return this;
   }
 
-  addJoinUserChannelOption(params: { targetIsSelf: boolean; isInSameChannel: boolean }, onClick: () => void): this {
+  addJoinUserChannelOption(params: { targetIsSelf: boolean; targetIsInSameChannel: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'join-user-channel',
       label: 'join-user-channel',
-      show: !params.targetIsSelf && !params.isInSameChannel,
+      show: !params.targetIsSelf && !params.targetIsInSameChannel,
       onClick: onClick,
     });
     return this;
   }
 
-  addAddToQueueOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; isEqualOrLowerLevel: boolean; isChannelQueueMode: boolean; isInQueue: boolean }, onClick: () => void): this {
+  addAddToQueueOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasEqualOrLowerLevel: boolean; channelIsQueueMode: boolean; targetIsInQueue: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'add-to-queue',
       label: 'add-to-queue',
-      show: !params.targetIsSelf && params.isEqualOrLowerLevel && params.isChannelQueueMode && params.permissionLevel >= Types.Permission.ChannelMod,
-      disabled: params.isInQueue,
+      show: !params.targetIsSelf && params.targetHasEqualOrLowerLevel && params.channelIsQueueMode && params.permissionLevel >= Types.Permission.ChannelMod,
+      disabled: params.targetIsInQueue,
       onClick: onClick,
     });
     return this;
   }
 
-  addSetMuteOption(params: { targetIsSelf: boolean; isMuted: boolean }, onClick: () => void): this {
+  addSetMuteOption(params: { targetIsSelf: boolean; targetIsMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'set-mute',
-      label: params.isMuted ? 'unmute' : 'mute',
+      label: params.targetIsMuted ? 'unmute' : 'mute',
       show: !params.targetIsSelf,
       onClick: onClick,
     });
     return this;
   }
 
+  // TODO: remove target permission check logic from here
   addMoveToChannelOption(
-    params: { currentPermissionLevel: Types.Permission; permissionLevel: Types.Permission; targetIsSelf: boolean; isInSameChannel: boolean; isEqualOrLowerLevel: boolean },
+    params: { permissionLevel: Types.Permission; channelPermissionLevel: Types.Permission; targetIsSelf: boolean; targetIsInSameChannel: boolean; targetHasEqualOrLowerLevel: boolean },
     onClick: () => void,
   ): this {
     this.options.push({
@@ -625,29 +628,29 @@ export default class ContextMenu {
       label: 'move-to-channel',
       show:
         !params.targetIsSelf &&
-        !params.isInSameChannel &&
-        params.isEqualOrLowerLevel &&
-        params.currentPermissionLevel >= Types.Permission.ChannelMod &&
+        !params.targetIsInSameChannel &&
+        params.targetHasEqualOrLowerLevel &&
+        params.channelPermissionLevel >= Types.Permission.ChannelMod &&
         params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addForbidVoiceOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isVoiceMuted: boolean }, onClick: () => void): this {
+  addForbidVoiceOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; targetIsVoiceMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-voice',
-      label: params.isVoiceMuted ? 'unforbid-voice' : 'forbid-voice',
+      label: params.targetIsVoiceMuted ? 'unforbid-voice' : 'forbid-voice',
       show: !params.targetIsSelf && params.targetHasLowerLevel && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addForbidTextOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; isTextMuted: boolean }, onClick: () => void): this {
+  addForbidTextOption(params: { permissionLevel: Types.Permission; targetIsSelf: boolean; targetHasLowerLevel: boolean; targetIsTextMuted: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-text',
-      label: params.isTextMuted ? 'unforbid-text' : 'forbid-text',
+      label: params.targetIsTextMuted ? 'unforbid-text' : 'forbid-text',
       show: !params.targetIsSelf && params.targetHasLowerLevel && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
@@ -690,88 +693,88 @@ export default class ContextMenu {
     return this;
   }
 
-  addFreeSpeechOption(params: { permissionLevel: Types.Permission; isFreeMode: boolean }, onClick: () => void): this {
+  addFreeSpeechOption(params: { permissionLevel: Types.Permission; channelVoiceIsFreeMode: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'free-speech',
       label: 'free-speech',
-      icon: params.isFreeMode ? 'checked' : '',
+      icon: params.channelVoiceIsFreeMode ? 'checked' : '',
       show: params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addAdminSpeechOption(params: { permissionLevel: Types.Permission; isAdminMode: boolean }, onClick: () => void): this {
+  addAdminSpeechOption(params: { permissionLevel: Types.Permission; channelVoiceIsAdminMode: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'admin-speech',
       label: 'admin-speech',
-      icon: params.isAdminMode ? 'checked' : '',
+      icon: params.channelVoiceIsAdminMode ? 'checked' : '',
       show: params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addQueueSpeechOption(params: { permissionLevel: Types.Permission; isQueueMode: boolean }, onClick: () => void, submenuItems: Types.ContextMenuItem[] = []): this {
+  addQueueSpeechOption(params: { permissionLevel: Types.Permission; channelVoiceIsQueueMode: boolean }, onClick: () => void, submenuItems: Types.ContextMenuItem[] = []): this {
     this.options.push({
       id: 'queue-speech',
       label: 'queue-speech',
-      icon: params.isQueueMode ? 'submenu' : '',
+      icon: params.channelVoiceIsQueueMode ? 'submenu' : '',
       show: params.permissionLevel >= Types.Permission.ChannelMod,
-      hasSubmenu: params.isQueueMode,
+      hasSubmenu: params.channelVoiceIsQueueMode,
       submenuItems: submenuItems,
       onClick: onClick,
     });
     return this;
   }
 
-  addForbidQueueOption(params: { permissionLevel: Types.Permission; isForbidQueue: boolean }, onClick: () => void): this {
+  addForbidQueueOption(params: { permissionLevel: Types.Permission; channelForbidQueue: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'forbid-queue',
       label: 'forbid-queue',
-      icon: params.isForbidQueue ? 'checked' : '',
+      icon: params.channelForbidQueue ? 'checked' : '',
       show: params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addControlQueueOption(params: { permissionLevel: Types.Permission; isQueueControlled: boolean }, onClick: () => void): this {
+  addControlQueueOption(params: { permissionLevel: Types.Permission; queueIsControlled: boolean }, onClick: () => void): this {
     this.options.push({
       id: 'control-queue',
       label: 'control-queue',
-      icon: params.isQueueControlled ? 'checked' : '',
+      icon: params.queueIsControlled ? 'checked' : '',
       show: params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addIncreaseQueueTimeOption(params: { queuePosition: number; permissionLevel: Types.Permission }, onClick: () => void): this {
+  addIncreaseQueueTimeOption(params: { permissionLevel: Types.Permission; targetQueuePosition: number; }, onClick: () => void): this {
     this.options.push({
       id: 'increase-queue-time',
       label: 'increase-queue-time',
-      show: params.queuePosition === 0 && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: params.targetQueuePosition === 0 && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addMoveUpQueueOption(params: { queuePosition: number; permissionLevel: Types.Permission }, onClick: () => void): this {
+  addMoveUpQueueOption(params: { permissionLevel: Types.Permission; targetQueuePosition: number; }, onClick: () => void): this {
     this.options.push({
       id: 'move-up-queue',
       label: 'move-up-queue',
-      show: params.queuePosition > 1 && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: params.targetQueuePosition > 1 && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;
   }
 
-  addMoveDownQueueOption(params: { queuePosition: number; permissionLevel: Types.Permission }, onClick: () => void): this {
+  addMoveDownQueueOption(params: { permissionLevel: Types.Permission; targetQueuePosition: number; }, onClick: () => void): this {
     this.options.push({
       id: 'move-down-queue',
       label: 'move-down-queue',
-      show: params.queuePosition > 0 && params.permissionLevel >= Types.Permission.ChannelMod,
+      show: params.targetQueuePosition > 0 && params.permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
     return this;

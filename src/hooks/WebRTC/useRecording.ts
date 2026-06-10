@@ -41,7 +41,7 @@ export const useRecording = (refs: SharedRefs, { initAudioContext }: UseRecordin
       Store.store.dispatch(Store.setWebRTC({ recordTime: Store.store.getState().webrtc.recordTime + 1 }));
     }, 1000);
 
-    Store.store.dispatch(Store.setWebRTC({ isRecording: true }));
+    Store.store.dispatch(Store.setWebRTC({ recorderIsActive: true }));
   }, [initAudioContext, audioContextRef, recorderDesRef, recorderGainRef, micNodesRef, mixNodesRef, masterGainNodeRef, recordBuffersRef, recordTimerRef]);
 
   const stopRecording = useCallback(() => {
@@ -59,11 +59,11 @@ export const useRecording = (refs: SharedRefs, { initAudioContext }: UseRecordin
     recordBuffersRef.current = [];
     recordTimerRef.current = null;
 
-    Store.store.dispatch(Store.setWebRTC({ isRecording: false }));
+    Store.store.dispatch(Store.setWebRTC({ recorderIsActive: false }));
   }, [initAudioContext, audioContextRef, recorderGainRef, recordTimerRef, recordBuffersRef]);
 
   const toggleRecording = useCallback(() => {
-    if (Store.store.getState().webrtc.isRecording) stopRecording();
+    if (Store.store.getState().webrtc.recorderIsActive) stopRecording();
     else startRecording();
   }, [startRecording, stopRecording]);
 
