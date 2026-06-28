@@ -48,9 +48,9 @@ async function checkCacheVersion(): Promise<void> {
   try {
     const res = await fetch(`${baseUrl.replace(/\/$/, '')}/manifest.json`);
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
     const manifest = (await res.json()) as Record<string, unknown>;
     const remoteVersion = typeof manifest.version === 'string' ? manifest.version : null;
-
     if (!remoteVersion) {
       new Logger('i18n').warn('manifest.json missing version field, skipping cache invalidation');
       return;
@@ -120,6 +120,7 @@ export function t(key: string, params?: Record<string, string>) {
     new Logger('i18n').error('i18next is not initialized');
     return key;
   }
+
   return i18next.t(key, params);
 }
 
@@ -128,6 +129,7 @@ export function changeLanguage(language: Types.LanguageKey) {
     new Logger('i18n').error('i18next is not initialized');
     return;
   }
+
   i18next.changeLanguage(language);
 }
 
