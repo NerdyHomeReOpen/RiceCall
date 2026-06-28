@@ -23,10 +23,10 @@ interface ProvidersProps {
 }
 
 const ProvidersComponent = ({ children }: ProvidersProps) => {
-  const [i18nIsLoaded, setI18nIsLoaded] = useState<boolean>(false);
+  const [isI18nLoaded, setIsI18nLoaded] = useState<boolean>(false);
 
   useEffect(() => {
-    i18nReady.then(() => setI18nIsLoaded(true));
+    i18nReady.then(() => setIsI18nLoaded(true));
   }, []);
 
   useEffect(() => {
@@ -80,7 +80,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
     return () => unsub();
   }, []);
 
-  if (!i18nIsLoaded) return null;
+  if (!isI18nLoaded) return null;
 
   return (
     <Provider store={store}>
