@@ -19,7 +19,7 @@ interface ContextMenuProps {
 const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
   const menuEl = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState<boolean>(false);
+  const [isDisplayed, setIsDisplayed] = useState(false);
   const [positionX, setPositionX] = useState<number>(x);
   const [positionY, setPositionY] = useState<number>(y);
 
@@ -57,11 +57,11 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
 
     setPositionX(newPosX);
     setPositionY(newPosY);
-    setDisplay(true);
+    setIsDisplayed(true);
   }, [x, y, direction]);
 
   return (
-    <div ref={menuEl} className={`context-menu-container ${styles['context-menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
+    <div ref={menuEl} className={`context-menu-container ${styles['context-menu']}`} style={isDisplayed ? { top: positionY, left: positionX } : { opacity: 0 }}>
       {displayedItems.map((item, index) =>
         item.id === 'separator' ? <div key={index} className={styles['separator']} /> : <ContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />,
       )}

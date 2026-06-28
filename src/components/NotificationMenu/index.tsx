@@ -17,7 +17,7 @@ interface NotificationMenuProps {
 const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
   const menuEl = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState<boolean>(false);
+  const [isDisplayed, setIsDisplayed] = useState(false);
   const [positionX, setPositionX] = useState<number>(x);
   const [positionY, setPositionY] = useState<number>(y);
 
@@ -55,11 +55,11 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
 
     setPositionX(newPosX);
     setPositionY(newPosY);
-    setDisplay(true);
+    setIsDisplayed(true);
   }, [x, y, direction]);
 
   return (
-    <div ref={menuEl} className={`context-menu-container ${styles['menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
+    <div ref={menuEl} className={`context-menu-container ${styles['menu']}`} style={isDisplayed ? { top: positionY, left: positionX } : { opacity: 0 }}>
       {displayedItems.map((item) => (
         <NotificationMenuItem key={item.id} item={item} onClose={onClose} />
       ))}

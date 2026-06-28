@@ -13,7 +13,7 @@ interface ColorPickerProps {
 const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, onColorSelect }) => {
   const colorPickerEl = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState<boolean>(false);
+  const [isDisplayed, setIsDisplayed] = useState(false);
   const [positionX, setPositionX] = useState<number>(x);
   const [positionY, setPositionY] = useState<number>(y);
   const [color, setColor] = useState<string>('#FFFFFF');
@@ -55,14 +55,14 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
 
     setPositionX(newPosX);
     setPositionY(newPosY);
-    setDisplay(true);
+    setIsDisplayed(true);
   }, [x, y, direction]);
 
   return (
     <div
       ref={colorPickerEl}
       className={`color-picker-container context-menu-container ${styles['color-picker']}`}
-      style={display ? { left: positionX, top: positionY } : { opacity: 0 }}
+      style={isDisplayed ? { left: positionX, top: positionY } : { opacity: 0 }}
       onMouseDown={(e) => e.stopPropagation()}
     >
       <SketchPicker disableAlpha={true} color={color} onChange={handleColorChange} />

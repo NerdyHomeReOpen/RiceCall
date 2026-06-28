@@ -25,7 +25,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
 
   const cardEl = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState<boolean>(false);
+  const [isDisplayed, setIsDisplayed] = useState(false);
   const [positionX, setPositionX] = useState<number>(x);
   const [positionY, setPositionY] = useState<number>(y);
 
@@ -65,14 +65,14 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
 
     setPositionX(newPosX);
     setPositionY(newPosY);
-    setDisplay(true);
+    setIsDisplayed(true);
   }, [x, y, direction]);
 
   return (
     <div
       ref={cardEl}
       className={`user-info-card-container ${styles['user-info-card']} ${styles[`vip-${member.vip}`]}`}
-      style={display ? { top: positionY, left: positionX } : { opacity: 0 }}
+      style={isDisplayed ? { top: positionY, left: positionX } : { opacity: 0 }}
       onClick={(e) => e.stopPropagation()}
     >
       <div className={styles['body']}>
