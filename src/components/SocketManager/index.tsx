@@ -32,8 +32,8 @@ const SocketManager: React.FC = React.memo(() => {
   const serverRef = useRef(server);
   const onlineMembersRef = useRef(onlineMembers);
   const channelRef = useRef(channel);
-  const disconnectTimerRef = useRef<NodeJS.Timeout | null>(null);
-  const popupOffSubmitRef = useRef<() => void>(() => {});
+  const disconnectTimer = useRef<NodeJS.Timeout | null>(null);
+  const popupSubmitUnsub = useRef<() => void>(() => {});
 
   useEffect(() => {
     userRef.current = user;
@@ -200,11 +200,11 @@ const SocketManager: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('connect', () => {
       ipc.popup.close('errorDialog');
 
-      if (disconnectTimerRef.current) {
-        clearTimeout(disconnectTimerRef.current);
+      if (disconnectTimer.current) {
+        clearTimeout(disconnectTimer.current);
       }
 
-      disconnectTimerRef.current = null;
+      disconnectTimer.current = null;
 
       dispatch(Store.setIsSocketConnected(true));
     });
@@ -214,11 +214,11 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('disconnect', () => {
-      if (disconnectTimerRef.current) {
-        clearTimeout(disconnectTimerRef.current);
+      if (disconnectTimer.current) {
+        clearTimeout(disconnectTimer.current);
       }
 
-      disconnectTimerRef.current = setTimeout(() => dispatch(Store.setIsSocketConnected(false)), 30000);
+      disconnectTimer.current = setTimeout(() => dispatch(Store.setIsSocketConnected(false)), 30000);
     });
     return () => unsub();
   }, [dispatch]);
@@ -520,8 +520,8 @@ const SocketManager: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('openPopup', (...args) => {
       args.forEach((p) => {
         ipc.popup.open(p.type, p.id, p.initialData, p.force);
-        popupOffSubmitRef.current?.();
-        popupOffSubmitRef.current = ipc.popup.onSubmit(p.id, () => {
+        popupSubmitUnsub.current?.();
+        popupSubmitUnsub.current = ipc.popup.onSubmit(p.id, () => {
           if (p.id === 'logout') {
             ipc.auth.logout();
           }
