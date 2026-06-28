@@ -32,7 +32,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { getIsLoading, loadServer, stopLoading } = useLoading();
 
-  const [selectedTab, setSelectedTab] = useState<Tab>('home');
+  const [activeTab, setActiveTab] = useState<Tab>('home');
   const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
 
   const userId = useAppSelector((state) => state.user.data.userId);
@@ -40,14 +40,10 @@ const RootPageComponent: React.FC = React.memo(() => {
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
   const currentServerName = useAppSelector((state) => state.currentServer.data.name);
   const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length);
-  const socketIsConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
-
-  const homePageIsSelected = selectedTab === 'home';
-  const friendsPageIsSelected = selectedTab === 'friends';
-  const serverPageIsSelected = selectedTab === 'server';
+  const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
 
   const handleTabSelect = useCallback((tab: Tab) => {
-    setSelectedTab(tab);
+    setActiveTab(tab);
   }, []);
 
   const handleMaximize = () => {
@@ -65,9 +61,13 @@ const RootPageComponent: React.FC = React.memo(() => {
   };
 
   const handleClose = () => {
-    const isCloseToTray = ipc.systemSettings.closeToTray.get();
-    if (isCloseToTray) ipc.window.close();
-    else ipc.exit();
+    const closeToTray = ipc.systemSettings.closeToTray.get();
+
+    if (closeToTray) {
+      ipc.window.close();
+    } else {
+      ipc.exit();
+    }
   };
 
   useEffect(() => {
@@ -76,9 +76,9 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   useEffect(() => {
     if (currentServerId) {
-      setSelectedTab('server');
+      setActiveTab('server');
     } else if (!currentServerId) {
-      setSelectedTab('home');
+      setActiveTab('home');
     }
 
     stopLoading();
@@ -111,7 +111,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   }, [currentServerId, getIsLoading, loadServer]);
 
   useEffect(() => {
-    switch (selectedTab) {
+    switch (activeTab) {
       case 'home':
         ipc.discord.updatePresence({
           details: t('rpc:viewing-home-page'),
@@ -149,7 +149,7 @@ const RootPageComponent: React.FC = React.memo(() => {
         });
         break;
     }
-  }, [selectedTab, userName, currentServerName, onlineMembersLength, t]);
+  }, [activeTab, userName, currentServerName, onlineMembersLength, t]);
 
   return (
     <WebRTCProvider>
@@ -158,7 +158,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           <SocketManager />
           <StoreSyncer.Master />
           <Header
-            selectedTab={selectedTab}
+            activeTab={activeTab}
             isFullscreen={isFullscreen}
             onTabSelect={handleTabSelect}
             onMinimize={handleMinimize}
@@ -166,13 +166,13 @@ const RootPageComponent: React.FC = React.memo(() => {
             onUnmaximize={handleUnmaximize}
             onClose={handleClose}
           />
-          {!userId || !socketIsConnected ? (
+          {!userId || !isSocketConnected ? (
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage display={homePageIsSelected} />
-              <FriendPage display={friendsPageIsSelected} />
-              <ServerPage display={serverPageIsSelected} />
+              <HomePage display={activeTab === 'home'} />
+              <FriendPage display={activeTab === 'friends'} />
+              <ServerPage display={activeTab === 'server'} />
               <NotificationToaster />
             </>
           )}
