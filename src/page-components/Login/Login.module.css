@@ -262,7 +262,7 @@
   border-top: 1px solid var(--border);
 }
 
-.create-account-button,
+.register-account-button,
 .forget-password-button,
 .change-server-button {
   display: flex;
@@ -271,13 +271,13 @@
   cursor: pointer;
 }
 
-.create-account-button:hover,
+.register-account-button:hover,
 .forget-password-button:hover,
 .change-server-button:hover {
   color: #0073c6;
 }
 
-.create-account-button::before,
+.register-account-button::before,
 .forget-password-button::before {
   min-width: 14px;
   min-height: 14px;
@@ -288,7 +288,7 @@
   background-size: cover;
 }
 
-.create-account-button::before {
+.register-account-button::before {
   background-image: url('/icon_createaccount.svg');
   background-repeat: no-repeat;
   background-position: 0 0;

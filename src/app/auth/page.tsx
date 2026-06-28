@@ -17,22 +17,18 @@ type Page = 'register' | 'login' | 'change-server';
 const AuthPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
-  const [selectedPage, setSelectedPage] = useState<Page>('login');
+  const [activePage, setActivePage] = useState<Page>('login');
 
-  const loginPageIsSelected = selectedPage === 'login';
-  const registerPageIsSelected = selectedPage === 'register';
-  const changeServerPageIsSelected = selectedPage === 'change-server';
-
-  const handleBackToLoginBtnClick = useCallback(() => {
-    setSelectedPage('login');
+  const handleNavigateToLoginPage = useCallback(() => {
+    setActivePage('login');
   }, []);
 
-  const handleRegisterBtnClick = useCallback(() => {
-    setSelectedPage('register');
+  const handleNavigateToRegisterPage = useCallback(() => {
+    setActivePage('register');
   }, []);
 
-  const handleChangeServerBtnClick = useCallback(() => {
-    setSelectedPage('change-server');
+  const handleNavigateToChangeServerPage = useCallback(() => {
+    setActivePage('change-server');
   }, []);
 
   const handleMinimize = useCallback(() => {
@@ -64,9 +60,9 @@ const AuthPageComponent: React.FC = React.memo(() => {
   return (
     <>
       <AuthHeader onMinimize={handleMinimize} onClose={handleClose} />
-      <LoginPage display={loginPageIsSelected} onRegisterBtnClick={handleRegisterBtnClick} onChangeServerBtnClick={handleChangeServerBtnClick} />
-      <RegisterPage display={registerPageIsSelected} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
-      <ChangeServerPage display={changeServerPageIsSelected} onBackToLoginBtnClick={handleBackToLoginBtnClick} />
+      <LoginPage display={activePage === 'login'} onNavigateToRegisterPage={handleNavigateToRegisterPage} onNavigateToChangeServerPage={handleNavigateToChangeServerPage} />
+      <RegisterPage display={activePage === 'register'} onNavigateToLoginPage={handleNavigateToLoginPage} />
+      <ChangeServerPage display={activePage === 'change-server'} onNavigateToLoginPage={handleNavigateToLoginPage} />
     </>
   );
 });

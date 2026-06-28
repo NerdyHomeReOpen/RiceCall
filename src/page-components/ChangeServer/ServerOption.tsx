@@ -5,14 +5,14 @@ import styles from './ChangeServer.module.css';
 
 interface ServerOptionProps {
   option: { tKey: string; value: 'prod' | 'dev' };
-  onServerSelect: (value: 'prod' | 'dev') => void;
+  onSelect: (value: 'prod' | 'dev') => void;
 }
 
-const ServerOption: React.FC<ServerOptionProps> = React.memo(({ option, onServerSelect }) => {
+const ServerOption: React.FC<ServerOptionProps> = React.memo(({ option, onSelect }) => {
   const { t } = useTranslation();
 
   const handleClick = () => {
-    onServerSelect(option.value);
+    onSelect(option.value);
   };
 
   return (

@@ -10,10 +10,10 @@ import styles from './Register.module.css';
 
 interface RegisterPageProps {
   display: boolean;
-  onBackToLoginBtnClick: () => void;
+  onNavigateToLoginPage: () => void;
 }
 
-const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, onBackToLoginBtnClick }) => {
+const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, onNavigateToLoginPage }) => {
   const { t } = useTranslation();
 
   const [account, setAccount] = useState<string>('');
@@ -81,37 +81,49 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if (name === 'account') {
-      setAccount(value);
-      setAccountError(validateAccount(value));
-    } else if (name === 'password') {
-      setPassword(value);
-      setPasswordError(validatePassword(value));
-    } else if (name === 'confirmPassword') {
-      setConfirmPassword(value);
-      setConfirmPasswordError(validateConfirmPassword(value, password));
-    } else if (name === 'email') {
-      setEmail(value);
-      setEmailError(validateEmail(value));
-    } else if (name === 'username') {
-      setUsername(value);
-      setUsernameError(validateUsername(value));
+    switch (name) {
+      case 'account':
+        setAccount(value);
+        setAccountError(validateAccount(value));
+        break;
+      case 'password':
+        setPassword(value);
+        setPasswordError(validatePassword(value));
+        break;
+      case 'confirmPassword':
+        setConfirmPassword(value);
+        setConfirmPasswordError(validateConfirmPassword(value, password));
+        break;
+      case 'email':
+        setEmail(value);
+        setEmailError(validateEmail(value));
+        break;
+      case 'username':
+        setUsername(value);
+        setUsernameError(validateUsername(value));
+        break;
     }
   };
 
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
 
-    if (name === 'account') {
-      setAccountError(validateAccount(value));
-    } else if (name === 'password') {
-      setPasswordError(validatePassword(value));
-    } else if (name === 'confirmPassword') {
-      setConfirmPasswordError(validateConfirmPassword(value, password));
-    } else if (name === 'username') {
-      setUsernameError(validateUsername(value));
-    } else if (name === 'email') {
-      setEmailError(validateEmail(value));
+    switch (name) {
+      case 'account':
+        setAccountError(validateAccount(value));
+        break;
+      case 'password':
+        setPasswordError(validatePassword(value));
+        break;
+      case 'confirmPassword':
+        setConfirmPasswordError(validateConfirmPassword(value, password));
+        break;
+      case 'username':
+        setUsernameError(validateUsername(value));
+        break;
+      case 'email':
+        setEmailError(validateEmail(value));
+        break;
     }
   };
 
@@ -140,11 +152,15 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
       .register({ account, password, email, username, locale: ipc.systemSettings.language.get() })
       .then((res) => {
         if (!res.success) return;
-        openAlertDialog(t(res.message, { '0': email }), onBackToLoginBtnClick);
+        openAlertDialog(t(res.message, { '0': email }), onNavigateToLoginPage);
       })
       .finally(() => {
         setIsLoading(false);
       });
+  };
+
+  const handleBackToLoginPageClick = () => {
+    onNavigateToLoginPage();
   };
 
   return (
@@ -245,7 +261,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
         </form>
       </main>
       <div className={styles['footer']}>
-        <div className={styles['back-to-login-button']} onClick={onBackToLoginBtnClick}>
+        <div className={styles['back-to-login-button']} onClick={handleBackToLoginPageClick}>
           {t('back-to-login')}
         </div>
       </div>

@@ -14,10 +14,10 @@ import styles from './ChangeServer.module.css';
 
 interface ChangeServerPageProps {
   display: boolean;
-  onBackToLoginBtnClick: () => void;
+  onNavigateToLoginPage: () => void;
 }
 
-const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({ display, onBackToLoginBtnClick }) => {
+const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({ display, onNavigateToLoginPage }) => {
   const { t } = useTranslation();
 
   const handleServerSelect = useCallback(
@@ -25,15 +25,19 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
       if (value === 'dev') {
         openAlertDialog(t('confirm-change-server-to-dev'), () => {
           ipc.env.change(value);
-          onBackToLoginBtnClick();
+          onNavigateToLoginPage();
         });
       } else {
         ipc.env.change(value);
-        onBackToLoginBtnClick();
+        onNavigateToLoginPage();
       }
     },
-    [t, onBackToLoginBtnClick],
+    [t, onNavigateToLoginPage],
   );
+
+  const handleBackToLoginPageClick = () => {
+    onNavigateToLoginPage();
+  };
 
   return (
     <main className={styles['page']} style={display ? {} : { display: 'none' }}>
@@ -41,12 +45,12 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
         <div className={styles['app-logo']} />
         <div className={styles['form-wrapper']}>
           {SERVER_OPTIONS.map((option) => (
-            <ServerOption key={option.value} option={option} onServerSelect={handleServerSelect} />
+            <ServerOption key={option.value} option={option} onSelect={handleServerSelect} />
           ))}
         </div>
       </main>
       <div className={styles['footer']}>
-        <div className={styles['back-to-login-button']} onClick={onBackToLoginBtnClick}>
+        <div className={styles['back-to-login-button']} onClick={handleBackToLoginPageClick}>
           {t('back-to-login')}
         </div>
       </div>
