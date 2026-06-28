@@ -9,7 +9,7 @@ import { POPUP_CONFIGS } from '@/configs/popup';
 import { eventEmitter } from '@/main/event';
 
 import PopupHeader from '@/components/PopupHeader';
-import MinimizedPopup from '@/components/MaximizedPopup';
+import MinimizedPopup from '@/components/MinimizedPopup';
 
 import About from '@/popups/About';
 import ApplyFriend from '@/popups/ApplyFriend';
