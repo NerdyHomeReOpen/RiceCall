@@ -16,7 +16,7 @@ interface ContextMenuItemProps {
 const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ item, direction, onClose }) => {
   const { t } = useTranslation();
 
-  const [subMenu, setSubMenu] = useState<React.ReactNode | null>(null);
+  const [submenu, setSubmenu] = useState<React.ReactNode | null>(null);
 
   const handleClick = () => {
     if (item.disabled) return;
@@ -31,12 +31,12 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ item, dire
     const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
     const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
 
-    setSubMenu(<ContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
+    setSubmenu(<ContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
   };
 
   const handleMouseLeave = () => {
     if (item.hasSubmenu) {
-      setSubMenu(null);
+      setSubmenu(null);
     }
   };
 
@@ -50,7 +50,7 @@ const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ item, dire
       onMouseLeave={handleMouseLeave}
     >
       {t(item.label)}
-      {item.hasSubmenu && subMenu}
+      {item.hasSubmenu && submenu}
     </div>
   );
 });
