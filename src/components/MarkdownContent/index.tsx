@@ -115,14 +115,14 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
     pre: ({ ...props }: React.HTMLAttributes<HTMLPreElement>) => <pre {...props} />,
   };
 
-  const parsed = markdownText.replace(/<@([^>]+)-([^>]+)-([^>]+)>/g, '<tag data-tag="$1-$2-$3"></tag>').replace(/<t:(\d+):(.*?)>/g, '<time data-timestamp="$1"></time>');
-  const sanitized = DOMPurify.sanitize(parsed, { ALLOWED_TAGS, ALLOWED_ATTR });
-  const converted = fromTags(sanitized);
+  const parsedText = markdownText.replace(/<@([^>]+)-([^>]+)-([^>]+)>/g, '<tag data-tag="$1-$2-$3"></tag>').replace(/<t:(\d+):(.*?)>/g, '<time data-timestamp="$1"></time>');
+  const sanitizedText = DOMPurify.sanitize(parsedText, { ALLOWED_TAGS, ALLOWED_ATTR });
+  const convertedText = fromTags(sanitizedText);
 
   return (
     <div className={`markdown-content image-size-${imageSize}`} style={{ userSelect: canSelect ? 'text' : 'none' }}>
       <ReactMarkdown remarkPlugins={[]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={components} skipHtml={false} unwrapDisallowed={false}>
-        {converted}
+        {convertedText}
       </ReactMarkdown>
     </div>
   );
