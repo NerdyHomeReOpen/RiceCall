@@ -11,7 +11,7 @@ interface ColorPickerProps {
 }
 
 const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, onColorSelect }) => {
-  const colorPickerRef = useRef<HTMLDivElement>(null);
+  const colorPickerEl = useRef<HTMLDivElement>(null);
 
   const [display, setDisplay] = useState<boolean>(false);
   const [positionX, setPositionX] = useState<number>(x);
@@ -24,9 +24,9 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
   };
 
   useLayoutEffect(() => {
-    if (!colorPickerRef.current) return;
+    if (!colorPickerEl.current) return;
 
-    const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = colorPickerRef.current;
+    const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = colorPickerEl.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
 
@@ -60,7 +60,7 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
 
   return (
     <div
-      ref={colorPickerRef}
+      ref={colorPickerEl}
       className={`color-picker-container context-menu-container ${styles['color-picker']}`}
       style={display ? { left: positionX, top: positionY } : { opacity: 0 }}
       onMouseDown={(e) => e.stopPropagation()}
