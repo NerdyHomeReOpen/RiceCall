@@ -16,7 +16,7 @@ interface BadgeInfoCardProps {
 const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, direction, badge }) => {
   const { t } = useTranslation();
 
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardEl = useRef<HTMLDivElement>(null);
 
   const [display, setDisplay] = useState<boolean>(false);
   const [positionX, setPositionX] = useState<number>(x);
@@ -25,9 +25,9 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   const isPermanent = badge.showTo <= 0;
 
   useLayoutEffect(() => {
-    if (!cardRef.current) return;
+    if (!cardEl.current) return;
 
-    const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;
+    const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardEl.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
 
@@ -60,7 +60,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   }, [x, y, direction]);
 
   return (
-    <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['card']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
+    <div ref={cardEl} className={`badge-info-card-container user-info-card-container ${styles['card']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
       <div className={styles['info-wrapper']}>
         <div className={styles['avatar-wrapper']}>
           <Image src={badge.iconUrl} alt="badge_icon" width={64} height={64} loading="lazy" draggable="false" />
