@@ -314,25 +314,25 @@
   white-space: nowrap;
 }
 
-.tab.selected::before {
+.tab.active::before {
   content: '';
   background-position: 0 -32px;
 }
 
-.tab.selected::after {
+.tab.active::after {
   content: '';
   background-position: -11px -32px;
 }
 
-.tab.selected .tab-background {
+.tab.active .tab-background {
   background-color: var(--background);
 }
 
-.tab.selected .tab-label {
+.tab.active .tab-label {
   color: var(--main-color);
 }
 
-.tab.selected .tab-close-button {
+.tab.active .tab-close-button {
   color: var(--main-color);
 }
 

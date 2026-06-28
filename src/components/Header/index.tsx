@@ -22,7 +22,7 @@ import ContextMenu from '@/utils/contextMenu';
 import styles from './Header.module.css';
 
 interface HeaderProps {
-  selectedTab: 'home' | 'friends' | 'server';
+  activeTab: 'home' | 'friends' | 'server';
   isFullscreen: boolean;
   onTabSelect: (tab: 'home' | 'friends' | 'server') => void;
   onMinimize: () => void;
@@ -31,7 +31,7 @@ interface HeaderProps {
   onClose: () => void;
 }
 
-const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, isFullscreen, onTabSelect, onMinimize, onMaximize, onUnmaximize, onClose }) => {
+const Header: React.FC<HeaderProps> = React.memo(({ activeTab, isFullscreen, onTabSelect, onMinimize, onMaximize, onUnmaximize, onClose }) => {
   const { t } = useTranslation();
   const { showStatusDropdown, showContextMenu, showNotificationMenu } = useContextMenu();
   const { isIdling, isManualIdling, setIsManualIdling } = useActionScanner();
@@ -211,7 +211,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, isFullscreen, o
       </div>
       <div className={styles['tabs']}>
         {mainTabs.map((tab) => (
-          <MainTabItem key={tab.id} tab={tab} currentServerId={currentServerId} isSelected={selectedTab === tab.id} onTabSelect={onTabSelect} />
+          <MainTabItem key={tab.id} tab={tab} currentServerId={currentServerId} isActive={activeTab === tab.id} onSelect={onTabSelect} />
         ))}
       </div>
       <div className={styles['buttons']}>

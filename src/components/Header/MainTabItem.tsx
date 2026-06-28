@@ -12,13 +12,13 @@ interface TabType {
 interface MainTabItemProps {
   tab: TabType;
   currentServerId: string | null;
-  isSelected: boolean;
-  onTabSelect: (tab: 'home' | 'friends' | 'server') => void;
+  isActive: boolean;
+  onSelect: (tab: 'home' | 'friends' | 'server') => void;
 }
 
-const MainTabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect }: MainTabItemProps) => {
+const MainTabItem = React.memo(({ tab, currentServerId, isActive, onSelect }: MainTabItemProps) => {
   const handleTabClick = () => {
-    onTabSelect(tab.id);
+    onSelect(tab.id);
   };
 
   const handleCloseButtonClick = (e: React.MouseEvent<SVGSVGElement>) => {
@@ -31,7 +31,7 @@ const MainTabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect 
 
   if (!currentServerId) return null;
   return (
-    <div key={`tabs-${tab.id}`} data-tab-id={tab.id} className={`${styles['tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
+    <div key={`tabs-${tab.id}`} data-tab-id={tab.id} className={`${styles['tab']} ${isActive ? styles['active'] : ''}`} onClick={handleTabClick}>
       <div className={styles['tab-label']}>{tab.label}</div>
       <div className={styles['tab-background']} />
       {tab.id === 'server' && (
