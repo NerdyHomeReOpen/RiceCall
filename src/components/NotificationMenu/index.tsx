@@ -15,18 +15,18 @@ interface NotificationMenuProps {
 }
 
 const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuEl = useRef<HTMLDivElement>(null);
 
   const [display, setDisplay] = useState<boolean>(false);
   const [positionX, setPositionX] = useState<number>(x);
   const [positionY, setPositionY] = useState<number>(y);
 
-  const filteredItems: Types.NotificationMenuItem[] = items.filter((item) => item?.show ?? true);
+  const displayedItems: Types.NotificationMenuItem[] = items.filter((item) => item?.show ?? true);
 
   useLayoutEffect(() => {
-    if (!menuRef.current) return;
+    if (!menuEl.current) return;
 
-    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
+    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuEl.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
 
@@ -59,8 +59,8 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
-      {filteredItems.map((item) => (
+    <div ref={menuEl} className={`context-menu-container ${styles['menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
+      {displayedItems.map((item) => (
         <NotificationMenuItem key={item.id} item={item} onClose={onClose} />
       ))}
     </div>
