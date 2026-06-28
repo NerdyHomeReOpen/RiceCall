@@ -18,7 +18,7 @@
   transition: transform 1s linear;
 }
 
-.toaster.show {
+.toaster.displayed {
   transform: translateY(0);
 }
 
