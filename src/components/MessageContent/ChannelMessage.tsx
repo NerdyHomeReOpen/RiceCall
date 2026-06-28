@@ -37,20 +37,16 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   const { showContextMenu } = useContextMenu();
 
   const userId = useAppSelector((state) => state.user.data.userId);
-  const userPermissionLevel = useAppSelector((state) => state.user.data.permissionLevel);
+  const permissionLevel = useAppSelector((state) => Math.max(state.user.data.permissionLevel, state.currentServer.data.permissionLevel, state.currentChannel.data.permissionLevel));
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
-  const currentServerPermissionLevel = useAppSelector((state) => state.currentServer.data.permissionLevel);
   const currentServerLobbyId = useAppSelector((state) => state.currentServer.data.lobbyId);
   const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
-  const currentChannelPermissionLevel = useAppSelector((state) => state.currentChannel.data.permissionLevel);
   const currentChannelCategoryId = useAppSelector((state) => state.currentChannel.data.categoryId);
 
-  const permissionLevel = Math.max(userPermissionLevel, currentServerPermissionLevel, currentChannelPermissionLevel);
   const currentChannelIsSubChannel = currentChannelCategoryId !== null;
   const senderHasVip = messageGroup.vip > 0;
-  const senderHasLowerPermission = messageGroup.permissionLevel < userPermissionLevel;
-  const senderIsSelf = messageGroup.userId === userId;
-  const senderIsInLobby = messageGroup.currentChannelId === currentServerLobbyId;
+  const isSenderSelf = messageGroup.userId === userId;
+  const isSenderInLobby = messageGroup.currentChannelId === currentServerLobbyId;
   const formattedTimestamp = getFormatTimestamp(messageGroup.timestamp);
   const formattedMessageContents = messageGroup.contents.map((content) =>
     content
@@ -68,7 +64,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
     const contextMenu = new ContextMenu()
       .addDirectMessageOption(
         {
-          targetIsSelf: senderIsSelf,
+          isTargetSelf: isSenderSelf,
         },
         () => {
           openDirectMessage(userId, messageGroup.userId);
@@ -80,9 +76,9 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       .addKickUserFromChannelOption(
         {
           permissionLevel,
-          targetIsSelf: senderIsSelf,
-          targetHasLowerLevel: senderHasLowerPermission,
-          isInLobby: senderIsInLobby,
+          targetPermissionLevel: messageGroup.permissionLevel,
+          isTargetSelf: isSenderSelf,
+          isTargetInLobby: isSenderInLobby,
         },
         () => {
           openKickMemberFromChannel(messageGroup.userId, currentServerId, currentChannelId);
@@ -91,8 +87,8 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       .addKickUserFromServerOption(
         {
           permissionLevel,
-          targetIsSelf: senderIsSelf,
-          targetHasLowerLevel: senderHasLowerPermission,
+          targetPermissionLevel: messageGroup.permissionLevel,
+          isTargetSelf: isSenderSelf,
         },
         () => {
           openKickMemberFromServer(messageGroup.userId, currentServerId);
@@ -101,8 +97,8 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
       .addBlockUserFromServerOption(
         {
           permissionLevel,
-          targetIsSelf: senderIsSelf,
-          targetHasLowerLevel: senderHasLowerPermission,
+          targetPermissionLevel: messageGroup.permissionLevel,
+          isTargetSelf: isSenderSelf,
         },
         () => {
           openBlockMember(messageGroup.userId, currentServerId);
@@ -112,8 +108,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
         {
           permissionLevel,
           targetPermissionLevel: messageGroup.permissionLevel,
-          targetIsSelf: senderIsSelf,
-          targetHasLowerLevel: senderHasLowerPermission,
+          isTargetSelf: isSenderSelf,
         },
         () => {
           openInviteMember(messageGroup.userId, currentServerId);
@@ -123,8 +118,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
         {
           permissionLevel,
           targetPermissionLevel: messageGroup.permissionLevel,
-          targetIsSelf: senderIsSelf,
-          targetHasLowerLevel: senderHasLowerPermission,
+          isTargetSelf: isSenderSelf,
         },
         () => {},
         new ContextMenu()
@@ -132,8 +126,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
             {
               permissionLevel,
               targetPermissionLevel: messageGroup.permissionLevel,
-              targetIsSelf: senderIsSelf,
-              targetHasLowerLevel: senderHasLowerPermission,
+              isTargetSelf: isSenderSelf,
             },
             () => {
               terminateMember(messageGroup.userId, currentServerId, messageGroup.name);
@@ -143,9 +136,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
             {
               permissionLevel,
               targetPermissionLevel: messageGroup.permissionLevel,
-              targetIsSelf: senderIsSelf,
-              targetHasLowerLevel: senderHasLowerPermission,
-              isSubChannel: currentChannelIsSubChannel,
+              isChannelSubChannel: currentChannelIsSubChannel,
             },
             () => {
               if (messageGroup.permissionLevel >= Types.Permission.ChannelMod) {
@@ -159,8 +150,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
             {
               permissionLevel,
               targetPermissionLevel: messageGroup.permissionLevel,
-              targetIsSelf: senderIsSelf,
-              targetHasLowerLevel: senderHasLowerPermission,
             },
             () => {
               if (messageGroup.permissionLevel >= Types.Permission.ChannelAdmin) {
@@ -174,8 +163,6 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
             {
               permissionLevel,
               targetPermissionLevel: messageGroup.permissionLevel,
-              targetIsSelf: senderIsSelf,
-              targetHasLowerLevel: senderHasLowerPermission,
             },
             () => () => {
               if (messageGroup.permissionLevel >= Types.Permission.ServerAdmin) {
