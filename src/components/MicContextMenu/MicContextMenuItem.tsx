@@ -16,7 +16,7 @@ interface MicContextMenuItemProps {
 const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
   const { t } = useTranslation();
 
-  const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
+  const [submenu, setSubmenu] = useState<React.ReactNode | null>(null);
 
   const handleClick = () => {
     if (item.disabled) return;
@@ -31,12 +31,12 @@ const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ dire
     const x = direction === 'left-top' || direction === 'left-bottom' ? left : right;
     const y = direction === 'left-top' || direction === 'right-top' ? bottom : top;
 
-    setSubMenu(<MicContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
+    setSubmenu(<MicContextMenu items={item.submenuItems || []} onClose={onClose} x={x} y={y} direction={direction} />);
   };
 
   const handleMouseLeave = () => {
     if (item.hasSubmenu) {
-      setSubMenu(null);
+      setSubmenu(null);
     }
   };
 
@@ -49,7 +49,7 @@ const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ dire
       onMouseLeave={handleMouseLeave}
     >
       {t(item.label)}
-      {item.hasSubmenu && subMenu}
+      {item.hasSubmenu && submenu}
     </div>
   );
 });

@@ -17,7 +17,7 @@ interface MicContextMenuProps {
 }
 
 const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuEl = useRef<HTMLDivElement>(null);
 
   const [display, setDisplay] = useState<boolean>(false);
   const [positionX, setPositionX] = useState<number>(x);
@@ -26,9 +26,9 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
   const filteredItems: Types.ContextMenuItem[] = cleanMenu(items).filter((item) => item?.show ?? true);
 
   useLayoutEffect(() => {
-    if (!menuRef.current) return;
+    if (!menuEl.current) return;
 
-    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
+    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuEl.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
 
@@ -61,7 +61,7 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['mic-context-menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
+    <div ref={menuEl} className={`context-menu-container ${styles['mic-context-menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
       {filteredItems.map((item, index) => {
         return item.id === 'separator' ? <div key={index} className={styles['separator']} /> : <MicContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />;
       })}
