@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 
-import styles from './MaximizedPopup.module.css';
+import styles from './MinimizedPopup.module.css';
 
 interface MinimizedPopupProps {
   title: string;
@@ -14,7 +14,7 @@ const MinimizedPopup: React.FC<MinimizedPopupProps> = React.memo(({ title, butto
   const { t } = useTranslation();
 
   return (
-    <button type="button" onClick={onRestore} title={t(title)} className={styles['popup']}>
+    <button type="button" onClick={onRestore} title={t(title)} className={styles['minimized-popup']}>
       <div className={styles['title-text']}>{t(title)}</div>
       {buttons.includes('close') && <div className={styles['close-button']} onClick={onClose} title={t('close')} />}
     </button>
