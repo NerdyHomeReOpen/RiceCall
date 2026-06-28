@@ -23,7 +23,7 @@ interface UserInfoCardProps {
 const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction, member }) => {
   const { t } = useTranslation();
 
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardEl = useRef<HTMLDivElement>(null);
 
   const [display, setDisplay] = useState<boolean>(false);
   const [positionX, setPositionX] = useState<number>(x);
@@ -34,9 +34,9 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
   const memberBadges = typeof member.badges === 'string' ? JSON.parse(member.badges) : member.badges;
 
   useLayoutEffect(() => {
-    if (!cardRef.current) return;
+    if (!cardEl.current) return;
 
-    const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardRef.current;
+    const { offsetWidth: cardWidth, offsetHeight: cardHeight } = cardEl.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
 
@@ -70,7 +70,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
 
   return (
     <div
-      ref={cardRef}
+      ref={cardEl}
       className={`user-info-card-container ${styles['user-info-card']} ${styles[`vip-${member.vip}`]}`}
       style={display ? { top: positionY, left: positionX } : { opacity: 0 }}
       onClick={(e) => e.stopPropagation()}
