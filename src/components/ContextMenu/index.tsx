@@ -17,18 +17,18 @@ interface ContextMenuProps {
 }
 
 const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
-  const menuRef = useRef<HTMLDivElement>(null);
+  const menuEl = useRef<HTMLDivElement>(null);
 
   const [display, setDisplay] = useState<boolean>(false);
   const [positionX, setPositionX] = useState<number>(x);
   const [positionY, setPositionY] = useState<number>(y);
 
-  const filteredItems: Types.ContextMenuItem[] = cleanMenu(items).filter((item) => item?.show ?? true);
+  const displayedItems = cleanMenu(items).filter((item) => item?.show ?? true);
 
   useLayoutEffect(() => {
-    if (!menuRef.current) return;
+    if (!menuEl.current) return;
 
-    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuRef.current;
+    const { offsetWidth: menuWidth, offsetHeight: menuHeight } = menuEl.current;
     const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
     const marginEdge = 10;
 
@@ -61,8 +61,8 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['context-menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
-      {filteredItems.map((item, index) =>
+    <div ref={menuEl} className={`context-menu-container ${styles['context-menu']}`} style={display ? { top: positionY, left: positionX } : { opacity: 0 }}>
+      {displayedItems.map((item, index) =>
         item.id === 'separator' ? <div key={index} className={styles['separator']} /> : <ContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />,
       )}
     </div>
