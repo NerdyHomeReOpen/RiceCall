@@ -218,11 +218,11 @@
   opacity: 1;
 }
 
-.tab-def {
+.tab-default {
   margin-left: 15px;
 }
 
-.tab-def::before,
+.tab-default::before,
 .tab-other::before,
 .tab-vip::before {
   display: block;
@@ -238,7 +238,7 @@
   background-position: 0 0;
 }
 
-.tab-def::before {
+.tab-default::before {
   background-image: url('/im/deftab.svg');
 }
 
@@ -250,7 +250,7 @@
   background-image: url('/im/viptab.svg');
 }
 
-.tab-def:hover::before,
+.tab-default:hover::before,
 .tab-other:hover::before,
 .tab-vip:hover::before {
   background-position: -42px -1px;
@@ -260,7 +260,7 @@
   background-position: -42px 0;
 }
 
-.tab-def[aria-selected='true']::before,
+.tab-default[aria-selected='true']::before,
 .tab-other[aria-selected='true']::before,
 .tab-vip[aria-selected='true']::before {
   background-position: 0 -32px;

@@ -29,18 +29,14 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     const { showColorPicker } = useContextMenu();
     const { t } = useTranslation();
 
-    const emojiPickerRef = useRef<HTMLDivElement>(null);
+    const emojiPickerEl = useRef<HTMLDivElement>(null);
 
     const [display, setDisplay] = useState<boolean>(false);
     const [positionX, setPositionX] = useState<number>(x);
     const [positionY, setPositionY] = useState<number>(y);
-    const [selectedTab, setSelectedTab] = useState<Tab>('default');
+    const [activeTab, setActiveTab] = useState<Tab>('default');
     const [fontSize, setFontSize] = useState<string>(_fontSize);
     const [textColor, setTextColor] = useState<string>(_textColor);
-
-    const defaultTabIsSelected = selectedTab === 'default';
-    const otherTabIsSelected = selectedTab === 'other';
-    const vipTabIsSelected = selectedTab === 'vip';
 
     const handleFontSizeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
       const size = e.target.value;
@@ -62,15 +58,15 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     };
 
     const handleDefaultTabClick = () => {
-      setSelectedTab('default');
+      setActiveTab('default');
     };
 
     const handleOtherTabClick = () => {
-      setSelectedTab('other');
+      setActiveTab('other');
     };
 
     const handleVipTabClick = () => {
-      setSelectedTab('vip');
+      setActiveTab('vip');
     };
 
     const handleEmojiSelect = (code: string, full: string) => {
@@ -87,9 +83,9 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
 
     useLayoutEffect(() => {
       const recalc = () => {
-        if (!emojiPickerRef.current) return;
+        if (!emojiPickerEl.current) return;
 
-        const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = emojiPickerRef.current;
+        const { offsetWidth: pickerWidth, offsetHeight: pickerHeight } = emojiPickerEl.current;
         const { innerWidth: windowWidth, innerHeight: windowHeight } = window;
         const marginEdge = 10;
 
@@ -154,7 +150,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
 
     return (
       <div
-        ref={emojiPickerRef}
+        ref={emojiPickerEl}
         className={`context-menu-container ${styles['panel']} ${!showFontbar ? styles['panel-compact'] : ''}`}
         style={display ? { left: positionX, top: positionY, position: 'fixed' } : { opacity: 0, position: 'fixed' }}
         onMouseDown={(e) => e.stopPropagation()}
@@ -179,28 +175,28 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
           </div>
         )}
         <div className={styles['pages']}>
-          <div className={`${styles['page']} ${defaultTabIsSelected ? styles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
+          <div className={`${styles['page']} ${activeTab === 'default' ? styles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
             <div className={styles['grid']}>
               {DEFAULT_EMOJIS.map((e) => (
                 <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${styles['page']} ${otherTabIsSelected ? styles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
+          <div className={`${styles['page']} ${activeTab === 'other' ? styles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
             <div className={styles['grid']}>
               {TW_EMOJIS.map((e) => (
                 <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${styles['page']} ${vipTabIsSelected ? styles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
+          <div className={`${styles['page']} ${activeTab === 'vip' ? styles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
             <div className={styles['vip-placeholder']}>{t('soon')}</div>
           </div>
         </div>
         <div className={styles['tabs']} role="tablist">
-          <button id="btn-def" className={`${styles['tab-button']} ${styles['tab-def']}`} role="tab" aria-selected={defaultTabIsSelected} onClick={handleDefaultTabClick} />
-          <button id="btn-other" className={`${styles['tab-button']} ${styles['tab-other']}`} role="tab" aria-selected={otherTabIsSelected} onClick={handleOtherTabClick} />
-          <button id="btn-vip" className={`${styles['tab-button']} ${styles['tab-vip']}`} role="tab" aria-selected={vipTabIsSelected} onClick={handleVipTabClick} />
+          <button id="btn-default" className={`${styles['tab-button']} ${styles['tab-default']}`} role="tab" aria-selected={activeTab === 'default'} onClick={handleDefaultTabClick} />
+          <button id="btn-other" className={`${styles['tab-button']} ${styles['tab-other']}`} role="tab" aria-selected={activeTab === 'other'} onClick={handleOtherTabClick} />
+          <button id="btn-vip" className={`${styles['tab-button']} ${styles['tab-vip']}`} role="tab" aria-selected={activeTab === 'vip'} onClick={handleVipTabClick} />
         </div>
       </div>
     );
