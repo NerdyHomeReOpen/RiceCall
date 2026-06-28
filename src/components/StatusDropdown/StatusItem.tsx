@@ -6,13 +6,13 @@ import styles from './StatusDropdown.module.css';
 
 interface StatusItemProps {
   status: Types.User['status'];
-  onStatusSelect: (status: Types.User['status']) => void;
+  onSelect: (status: Types.User['status']) => void;
   onClose: () => void;
 }
 
-const StatusItem: React.FC<StatusItemProps> = React.memo(({ status, onStatusSelect, onClose }) => {
+const StatusItem: React.FC<StatusItemProps> = React.memo(({ status, onSelect, onClose }) => {
   const handleClick = () => {
-    onStatusSelect(status);
+    onSelect(status);
     onClose();
   };
 
