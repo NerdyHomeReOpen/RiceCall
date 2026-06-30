@@ -21,8 +21,8 @@ const FriendPageHeader: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
 
-  const signatureInputRef = useRef<HTMLTextAreaElement>(null);
-  const isComposingRef = useRef<boolean>(false);
+  const signatureInput = useRef<HTMLTextAreaElement>(null);
+  const isComposing = useRef<boolean>(false);
 
   const userAvatarUrl = useAppSelector((state) => state.user.data.avatarUrl);
   const userSignature = useAppSelector((state) => state.user.data.signature);
@@ -47,16 +47,16 @@ const FriendPageHeader: React.FC = React.memo(() => {
   const handleSignatureInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter') return;
     e.preventDefault();
-    if (isComposingRef.current || !signatureInputRef.current) return;
-    signatureInputRef.current.blur();
+    if (isComposing.current || !signatureInput.current) return;
+    signatureInput.current.blur();
   };
 
   const handleSignatureInputCompositionStart = () => {
-    isComposingRef.current = true;
+    isComposing.current = true;
   };
 
   const handleSignatureInputCompositionEnd = () => {
-    isComposingRef.current = false;
+    isComposing.current = false;
   };
 
   const handleEmojiPickerClick = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -66,13 +66,13 @@ const FriendPageHeader: React.FC = React.memo(() => {
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
 
     showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, undefined, undefined, (_, full) => {
-      signatureInputRef.current?.focus();
+      signatureInput.current?.focus();
       document.execCommand('insertText', false, full);
     });
   };
 
   useEffect(() => {
-    signatureInputRef.current!.value = userSignature;
+    signatureInput.current!.value = userSignature;
   }, [userSignature]);
 
   return (
@@ -94,7 +94,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
       </div>
       <div className={styles['user-signature']}>
         <textarea
-          ref={signatureInputRef}
+          ref={signatureInput}
           className={styles['signature-input']}
           defaultValue={userSignature}
           maxLength={100}

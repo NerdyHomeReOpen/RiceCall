@@ -19,7 +19,7 @@ const FriendPageSidebar: React.FC = React.memo(() => {
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   const [searchInput, setSearchInput] = useState<string>('');
-  const [selectedTabId, setSelectedTabId] = useState<'friend' | 'recent'>('friend');
+  const [activeTabId, setActiveTabId] = useState<'friend' | 'recent'>('friend');
 
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'default', name: t('my-friends'), order: -1 }), [t]);
   const strangerFriendGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'stranger', name: t('stranger'), order: 10000 }), [t]);
@@ -27,15 +27,13 @@ const FriendPageSidebar: React.FC = React.memo(() => {
 
   const sortedFriendGroups = [defaultFriendGroup, ...friendGroups, strangerFriendGroup, blacklistFriendGroup].sort((a, b) => a.order - b.order);
   const filteredFriends = friends.filter((f) => f.name.toLowerCase().includes(searchInput.toLowerCase()));
-  const friendTabIsSelected = selectedTabId === 'friend';
-  const recentTabIsSelected = selectedTabId === 'recent';
 
   const handleFriendTabClick = () => {
-    setSelectedTabId('friend');
+    setActiveTabId('friend');
   };
 
   const handleRecentTabClick = () => {
-    setSelectedTabId('recent');
+    setActiveTabId('recent');
   };
 
   const handleSearchInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -53,10 +51,10 @@ const FriendPageSidebar: React.FC = React.memo(() => {
   return (
     <>
       <div className={styles['navigate-tabs']}>
-        <div className={`${styles['navigate-tab']} ${friendTabIsSelected ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
+        <div className={`${styles['navigate-tab']} ${activeTabId === 'friend' ? styles['selected'] : ''}`} onClick={handleFriendTabClick}>
           <div className={styles['friend-list-icon']} />
         </div>
-        <div className={`${styles['navigate-tab']} ${recentTabIsSelected ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
+        <div className={`${styles['navigate-tab']} ${activeTabId === 'recent' ? styles['selected'] : ''}`} onClick={handleRecentTabClick}>
           <div className={styles['recent-icon']} />
         </div>
       </div>
@@ -66,14 +64,14 @@ const FriendPageSidebar: React.FC = React.memo(() => {
         <div className={styles['prev-button']} />
         <div className={styles['next-button']} />
       </div>
-      <div className={styles['scroll-view']} style={friendTabIsSelected ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={activeTabId === 'friend' ? {} : { display: 'none' }}>
         <div className={styles['friend-group-list']}>
           {sortedFriendGroups.map((friendGroup) => (
             <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={filteredFriends} />
           ))}
         </div>
       </div>
-      <div className={styles['scroll-view']} style={recentTabIsSelected ? {} : { display: 'none' }}>
+      <div className={styles['scroll-view']} style={activeTabId === 'recent' ? {} : { display: 'none' }}>
         <div className={styles['recent-list']} />
       </div>
       <div className={styles['footer']}>

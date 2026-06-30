@@ -42,8 +42,6 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
     }
   });
   const sortedFriendGroupFriends = [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0));
-  const friendGroupIsStrangerTab = friendGroup.friendGroupId === 'stranger';
-  const friendGroupIsBlacklistTab = friendGroup.friendGroupId === 'blacklist';
   const onlineCount = friendGroupFriends.filter((f) => f.status !== 'offline').length;
 
   const handleTabClick = () => {
@@ -76,7 +74,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
         <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
         <div className={styles['label']}>{friendGroup.name}</div>
         <div className={styles['friend-count-text']}>
-          {!friendGroupIsStrangerTab && !friendGroupIsBlacklistTab ? `(${onlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}
+          {friendGroup.friendGroupId !== 'stranger' && friendGroup.friendGroupId !== 'blacklist' ? `(${onlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}
         </div>
       </div>
       <div className={styles['friend-list']} style={isExpanded ? {} : { display: 'none' }}>
