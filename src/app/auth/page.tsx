@@ -60,9 +60,9 @@ const AuthPageComponent: React.FC = React.memo(() => {
   return (
     <>
       <AuthHeader onMinimize={handleMinimize} onClose={handleClose} />
-      <LoginPage display={activePage === 'login'} onNavigateToRegisterPage={handleNavigateToRegisterPage} onNavigateToChangeServerPage={handleNavigateToChangeServerPage} />
-      <RegisterPage display={activePage === 'register'} onNavigateToLoginPage={handleNavigateToLoginPage} />
-      <ChangeServerPage display={activePage === 'change-server'} onNavigateToLoginPage={handleNavigateToLoginPage} />
+      <LoginPage isActive={activePage === 'login'} onNavigateToRegisterPage={handleNavigateToRegisterPage} onNavigateToChangeServerPage={handleNavigateToChangeServerPage} />
+      <RegisterPage isActive={activePage === 'register'} onNavigateToLoginPage={handleNavigateToLoginPage} />
+      <ChangeServerPage isActive={activePage === 'change-server'} onNavigateToLoginPage={handleNavigateToLoginPage} />
     </>
   );
 });

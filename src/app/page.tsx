@@ -168,9 +168,9 @@ const RootPageComponent: React.FC = React.memo(() => {
             <LoadingSpinner />
           ) : (
             <>
-              <HomePage display={activeTab === 'home'} />
-              <FriendPage display={activeTab === 'friends'} />
-              <ServerPage display={activeTab === 'server'} />
+              <HomePage isActive={activeTab === 'home'} />
+              <FriendPage isActive={activeTab === 'friends'} />
+              <ServerPage isActive={activeTab === 'server'} />
               <NotificationToaster />
             </>
           )}
