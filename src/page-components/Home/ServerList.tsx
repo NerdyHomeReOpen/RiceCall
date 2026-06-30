@@ -18,7 +18,7 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) =>
 
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const displayServers = isExpanded ? servers : servers.slice(0, 6);
+  const displayedServers = isExpanded ? servers : servers.slice(0, 6);
   const canExpand = servers.length > 6;
 
   const handleViewMoreBtnClick = () => {
@@ -34,7 +34,7 @@ const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) =>
       <div className={styles['server-list-title']}>{title}</div>
       <div className={styles['server-list-container']}>
         <div className={styles['server-list']}>
-          {displayServers.map((server) => ('online' in server ? <RecommendServerCard key={server.serverId} recommendServer={server} /> : <ServerCard key={server.serverId} server={server} />))}
+          {displayedServers.map((server) => ('online' in server ? <RecommendServerCard key={server.serverId} recommendServer={server} /> : <ServerCard key={server.serverId} server={server} />))}
         </div>
         {!canExpand ? null : isExpanded ? (
           <div className={styles['view-less-button']} onClick={handleViewLessBtnClick}>

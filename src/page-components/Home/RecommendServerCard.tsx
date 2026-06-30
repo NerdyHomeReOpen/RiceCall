@@ -37,11 +37,11 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
     ipc.socket.send('connectServer', { serverId: recommendServer.serverId });
   };
 
-  const handleServerCardClick = () => {
+  const handleClick = () => {
     joinServer();
   };
 
-  const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -60,7 +60,7 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   };
 
   return (
-    <div className={styles['card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
+    <div className={styles['card']} onClick={handleClick} onContextMenu={handleContextMenu}>
       <div className={styles['card-avatar']}>
         <Image src={recommendServer.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
       </div>

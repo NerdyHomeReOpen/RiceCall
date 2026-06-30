@@ -20,53 +20,53 @@ interface HomePageContentProps {
 const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnouncementSelect }) => {
   const { t } = useTranslation();
 
-  const bannerContainerRef = useRef<HTMLDivElement>(null);
-  const annSlideIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const bannerContainerEl = useRef<HTMLDivElement>(null);
+  const annSlideInterval = useRef<NodeJS.Timeout | null>(null);
 
   const announcements = useAppSelector((state) => state.announcements.data, shallowEqual);
   const recommendServers = useAppSelector((state) => state.recommendServers.data, shallowEqual);
 
-  const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
+  const [activeAnnIndex, setActiveAnnIndex] = useState<number>(0);
 
   const sortedAnns = [...announcements].sort((a, b) => b.timestamp - a.timestamp);
   const filteredRecommendServers = recommendServers.filter((server) => !server.tags.includes('official'));
   const filteredOfficialServers = recommendServers.filter((server) => server.tags.includes('official'));
 
   const handleNextAnnBtnClick = () => {
-    setSelectedAnnIndex((prev) => (prev + 1) % sortedAnns.length);
+    setActiveAnnIndex((prev) => (prev + 1) % sortedAnns.length);
   };
 
   const handlePrevAnnBtnClick = () => {
-    setSelectedAnnIndex((prev) => (prev === 0 ? sortedAnns.length - 1 : prev - 1));
+    setActiveAnnIndex((prev) => (prev === 0 ? sortedAnns.length - 1 : prev - 1));
   };
 
   useEffect(() => {
-    if (!bannerContainerRef.current) return;
+    if (!bannerContainerEl.current) return;
 
-    const number = selectedAnnIndex % sortedAnns.length;
-    const width = bannerContainerRef.current.clientWidth;
+    const number = activeAnnIndex % sortedAnns.length;
+    const width = bannerContainerEl.current.clientWidth;
 
-    bannerContainerRef.current.scrollTo({
+    bannerContainerEl.current.scrollTo({
       left: width * number,
       behavior: 'smooth',
     });
-  }, [selectedAnnIndex, sortedAnns]);
+  }, [activeAnnIndex, sortedAnns]);
 
   useEffect(() => {
-    if (annSlideIntervalRef.current) {
-      clearInterval(annSlideIntervalRef.current);
+    if (annSlideInterval.current) {
+      clearInterval(annSlideInterval.current);
     }
 
-    annSlideIntervalRef.current = setInterval(() => {
-      setSelectedAnnIndex((prev) => (prev + 1) % sortedAnns.length);
+    annSlideInterval.current = setInterval(() => {
+      setActiveAnnIndex((prev) => (prev + 1) % sortedAnns.length);
     }, ANNOUNCEMENT_SLIDE_INTERVAL);
 
     return () => {
-      if (annSlideIntervalRef.current) {
-        clearInterval(annSlideIntervalRef.current);
+      if (annSlideInterval.current) {
+        clearInterval(annSlideInterval.current);
       }
 
-      annSlideIntervalRef.current = null;
+      annSlideInterval.current = null;
     };
   }, [sortedAnns]);
 
@@ -74,7 +74,7 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
     <>
       <div className={styles['banner-wrapper']}>
         <div className={styles['banner-container']}>
-          <div ref={bannerContainerRef} className={styles['banner-list']}>
+          <div ref={bannerContainerEl} className={styles['banner-list']}>
             {sortedAnns.length > 0 ? (
               sortedAnns.map((ann) =>
                 ann.attachmentUrl ? (
@@ -98,7 +98,7 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
             <>
               <div className={styles['number-list']}>
                 {sortedAnns.map((_, index) => (
-                  <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)} />
+                  <nav key={index} className={`${index === activeAnnIndex ? styles['active'] : ''}`} onClick={() => setActiveAnnIndex(index)} />
                 ))}
               </div>
               <nav className={`${styles['nav']} ${styles['prev-button']}`} onClick={handlePrevAnnBtnClick}>

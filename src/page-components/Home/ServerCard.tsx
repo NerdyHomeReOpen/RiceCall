@@ -39,11 +39,11 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
     ipc.socket.send('connectServer', { serverId: server.serverId });
   };
 
-  const handleServerCardClick = () => {
+  const handleClick = () => {
     joinServer();
   };
 
-  const handleServerCardContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
     e.stopPropagation();
 
@@ -56,10 +56,10 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
       .addViewServerInfoOption(() => {
         openServerSetting(userId, server.serverId);
       })
-      .addFavoriteServerOption({ serverIsFavorite: server.favorite }, () => {
+      .addFavoriteServerOption({ isServerFavorite: server.favorite }, () => {
         favoriteServer(server.serverId);
       })
-      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, targetIsSelf: true }, () => {
+      .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isTargetSelf: true }, () => {
         terminateMember(userId, server.serverId, t('self'));
       })
       .build();
@@ -68,7 +68,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   };
 
   return (
-    <div className={styles['card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
+    <div className={styles['card']} onClick={handleClick} onContextMenu={handleContextMenu}>
       <div className={styles['card-avatar']}>
         <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
       </div>
