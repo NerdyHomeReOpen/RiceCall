@@ -80,10 +80,10 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
     (volume: number) => {
       volume = Math.min(100, Math.max(0, volume));
       if (masterGainNodeRef.current) masterGainNodeRef.current.gain.value = volume / 100;
-      const speakerIsMuted = volume === 0;
-      Store.store.dispatch(Store.setWebRTC({ speakerVolume: volume, speakerIsMuted }));
+      const isSpeakerMuted = volume === 0;
+      Store.store.dispatch(Store.setWebRTC({ speakerVolume: volume, isSpeakerMuted }));
       window.localStorage.setItem('speaker-volume', volume.toString());
-      window.localStorage.setItem('is-speaker-mute', speakerIsMuted.toString());
+      window.localStorage.setItem('is-speaker-mute', isSpeakerMuted.toString());
     },
     [masterGainNodeRef],
   );
@@ -103,7 +103,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
   );
 
   const toggleSpeakerMuted = useCallback(() => {
-    if (Store.store.getState().webrtc.speakerIsMuted) {
+    if (Store.store.getState().webrtc.isSpeakerMuted) {
       const prevVolume = parseInt(localStorage.getItem('previous-speaker-volume') || '50');
       changeSpeakerVolume(prevVolume);
     } else {

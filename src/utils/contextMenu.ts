@@ -101,15 +101,15 @@ export default class ContextMenu {
     return this;
   }
 
-  addMoveAllUserToChannelOption(params: { permissionLevel: Types.Permission; despermissionLevel: Types.Permission; isInChannel: boolean; userIdsToMove: string[] }, onClick: () => void): this {
-    const { permissionLevel, despermissionLevel, isInChannel, userIdsToMove } = params;
+  addMoveAllUserToChannelOption(params: { permissionLevel: Types.Permission; destinationPermissionLevel: Types.Permission; isInChannel: boolean; userIdsToMove: string[] }, onClick: () => void): this {
+    const { permissionLevel, destinationPermissionLevel, isInChannel, userIdsToMove } = params;
 
     this.options.push({
       id: 'move-all-user-to-channel',
       label: 'move-all-user-to-channel',
       show:
         !isInChannel &&
-        (permissionLevel >= Types.Permission.ServerAdmin || despermissionLevel >= Types.Permission.ChannelMod) &&
+        (permissionLevel >= Types.Permission.ServerAdmin || destinationPermissionLevel >= Types.Permission.ChannelMod) &&
         permissionLevel >= Types.Permission.ChannelMod &&
         userIdsToMove.length > 0,
       onClick: onClick,
@@ -730,15 +730,15 @@ export default class ContextMenu {
   }
 
   addAddToQueueOption(
-    params: { permissionLevel: Types.Permission; isTargetSelf: boolean; isTargetInQueue: boolean; targetHasEqualOrLowerLevel: boolean; isChannelQueueMode: boolean },
+    params: { permissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isTargetSelf: boolean; isTargetInQueue: boolean; isChannelQueueMode: boolean },
     onClick: () => void,
   ): this {
-    const { permissionLevel, isTargetSelf, isTargetInQueue, targetHasEqualOrLowerLevel, isChannelQueueMode } = params;
+    const { permissionLevel, targetPermissionLevel, isTargetSelf, isTargetInQueue, isChannelQueueMode } = params;
 
     this.options.push({
       id: 'add-to-queue',
       label: 'add-to-queue',
-      show: !isTargetSelf && targetHasEqualOrLowerLevel && isChannelQueueMode && permissionLevel >= Types.Permission.ChannelMod,
+      show: !isTargetSelf && permissionLevel >= targetPermissionLevel && isChannelQueueMode && permissionLevel >= Types.Permission.ChannelMod,
       disabled: isTargetInQueue,
       onClick: onClick,
     });
@@ -761,15 +761,16 @@ export default class ContextMenu {
 
   // TODO: remove target permission check logic from here
   addMoveToChannelOption(
-    params: { permissionLevel: Types.Permission; channelPermissionLevel: Types.Permission; isTargetSelf: boolean; isTargetInSameChannel: boolean; targetHasEqualOrLowerLevel: boolean },
+    params: { permissionLevel: Types.Permission; channelPermissionLevel: Types.Permission; targetPermissionLevel: Types.Permission; isTargetSelf: boolean; isTargetInSameChannel: boolean },
     onClick: () => void,
   ): this {
-    const { permissionLevel, channelPermissionLevel, isTargetSelf, isTargetInSameChannel, targetHasEqualOrLowerLevel } = params;
+    const { permissionLevel, channelPermissionLevel, targetPermissionLevel, isTargetSelf, isTargetInSameChannel } = params;
 
     this.options.push({
       id: 'move-to-channel',
       label: 'move-to-channel',
-      show: !isTargetSelf && !isTargetInSameChannel && targetHasEqualOrLowerLevel && channelPermissionLevel >= Types.Permission.ChannelMod && permissionLevel >= Types.Permission.ChannelMod,
+      show:
+        !isTargetSelf && !isTargetInSameChannel && permissionLevel >= targetPermissionLevel && channelPermissionLevel >= Types.Permission.ChannelMod && permissionLevel >= Types.Permission.ChannelMod,
       onClick: onClick,
     });
 

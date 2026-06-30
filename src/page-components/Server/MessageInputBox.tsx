@@ -48,25 +48,25 @@ const MessageInputBox: React.FC = React.memo(() => {
       ChatEnter,
     ],
     content: '',
-    onUpdate: ({ editor }) => (messageInputRef.current = toTags(editor.getHTML())),
+    onUpdate: ({ editor }) => (message.current = toTags(editor.getHTML())),
     immediatelyRender: true,
   });
 
   const permissionLevel = useAppSelector((state) => Math.max(state.user.data.permissionLevel, state.currentServer.data.permissionLevel, state.currentChannel.data.permissionLevel));
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
   const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
-  const currentChannelTextIsMuted = useAppSelector((state) => state.currentChannel.data.isTextMuted);
-  const currentChannelForbidText = useAppSelector((state) => state.currentChannel.data.forbidText);
-  const currentChannelForbidGuestText = useAppSelector((state) => state.currentChannel.data.forbidGuestText);
+  const isCurrentChannelTextMuted = useAppSelector((state) => state.currentChannel.data.isTextMuted);
+  const isCurrentChannelTextForbidden = useAppSelector((state) => state.currentChannel.data.forbidText);
+  const isCurrentChannelGuestTextForbidden = useAppSelector((state) => state.currentChannel.data.forbidGuestText);
   const currentChannelGuestTextMaxLength = useAppSelector((state) => state.currentChannel.data.guestTextMaxLength);
   const currentChannelGuestTextGapTime = useAppSelector((state) => state.currentChannel.data.guestTextGapTime);
   const currentChannelGuestTextWaitTime = useAppSelector((state) => state.currentChannel.data.guestTextWaitTime);
 
-  const messageInputRef = useRef<string>('');
-  const isUploadingRef = useRef<boolean>(false);
-  const isComposingRef = useRef<boolean>(false);
-  const fontSizeRef = useRef<string>('13px');
-  const textColorRef = useRef<string>('#000000');
+  const message = useRef<string>('');
+  const isUploading = useRef<boolean>(false);
+  const isComposing = useRef<boolean>(false);
+  const fontSize = useRef<string>('13px');
+  const textColor = useRef<string>('#000000');
 
   // TODO: change to ref maybe?
   const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
@@ -79,26 +79,26 @@ const MessageInputBox: React.FC = React.memo(() => {
   const remainingGapTime = currentChannelGuestTextGapTime ? currentChannelGuestTextGapTime - (Date.now() - lastMessageTime) : 0;
   const remainingWaitTime = currentChannelGuestTextWaitTime ? currentChannelGuestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
   const disabled =
-    currentChannelTextIsMuted ||
-    (permissionLevel < Types.Permission.ChannelMod && currentChannelForbidText) ||
-    (permissionLevel < Types.Permission.Member && (currentChannelForbidGuestText || remainingWaitTime > 0 || remainingGapTime > 0));
+    isCurrentChannelTextMuted ||
+    (permissionLevel < Types.Permission.ChannelMod && isCurrentChannelTextForbidden) ||
+    (permissionLevel < Types.Permission.Member && (isCurrentChannelGuestTextForbidden || remainingWaitTime > 0 || remainingGapTime > 0));
 
   const setStyles = useCallback(() => {
-    editor?.chain().setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+    editor?.chain().setColor(textColor.current).setFontSize(fontSize.current).focus().run();
   }, [editor]);
 
   const handleEmojiSelect = (code: string) => {
-    editor?.chain().insertEmoji({ code }).setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+    editor?.chain().insertEmoji({ code }).setColor(textColor.current).setFontSize(fontSize.current).focus().run();
     setStyles();
   };
 
   const handleFontSizeChange = (size: string) => {
-    fontSizeRef.current = size;
+    fontSize.current = size;
     editor?.chain().setFontSize(size).focus().run();
   };
 
   const handleTextColorChange = (color: string) => {
-    textColorRef.current = color;
+    textColor.current = color;
     editor?.chain().setColor(color).focus().run();
   };
 
@@ -108,7 +108,7 @@ const MessageInputBox: React.FC = React.memo(() => {
 
     const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
 
-    showEmojiPicker(x, y, 'right-top', e.currentTarget as HTMLElement, true, fontSizeRef.current, textColorRef.current, handleEmojiSelect, handleFontSizeChange, handleTextColorChange);
+    showEmojiPicker(x, y, 'right-top', e.currentTarget as HTMLElement, true, fontSize.current, textColor.current, handleEmojiSelect, handleFontSizeChange, handleTextColorChange);
   };
 
   const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
@@ -118,16 +118,16 @@ const MessageInputBox: React.FC = React.memo(() => {
       if (!item.type.startsWith('image/')) continue;
 
       const image = item.getAsFile();
-      if (!image || isUploadingRef.current) continue;
+      if (!image || isUploading.current) continue;
 
       image.arrayBuffer().then((arrayBuffer) => {
         const imageUnit8Array = new Uint8Array(arrayBuffer);
 
-        isUploadingRef.current = true;
+        isUploading.current = true;
 
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
           openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
-          isUploadingRef.current = false;
+          isUploading.current = false;
           return;
         }
 
@@ -139,33 +139,33 @@ const MessageInputBox: React.FC = React.memo(() => {
             setStyles();
           })
           .finally(() => {
-            isUploadingRef.current = false;
+            isUploading.current = false;
           });
       });
     }
   };
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    if (disabled || isOverMaxLength || isComposingRef.current || e.shiftKey || e.ctrlKey) return;
+    if (disabled || isOverMaxLength || isComposing.current || e.shiftKey || e.ctrlKey) return;
 
     if (e.key === 'Enter') {
       e.preventDefault();
 
-      if (messageInputRef.current.trim().length === 0) return;
+      if (message.current.trim().length === 0) return;
 
-      sendChannelMessage(currentServerId, currentChannelId, { type: 'general', content: messageInputRef.current });
+      sendChannelMessage(currentServerId, currentChannelId, { type: 'general', content: message.current });
       setLastMessageTime(Date.now());
-      editor?.chain().setContent('').setColor(textColorRef.current).setFontSize(fontSizeRef.current).focus().run();
+      editor?.chain().setContent('').setColor(textColor.current).setFontSize(fontSize.current).focus().run();
       setStyles();
     }
   };
 
   const handleInputCompositionStart = () => {
-    isComposingRef.current = true;
+    isComposing.current = true;
   };
 
   const handleInputCompositionEnd = () => {
-    isComposingRef.current = false;
+    isComposing.current = false;
   };
 
   useEffect(() => {

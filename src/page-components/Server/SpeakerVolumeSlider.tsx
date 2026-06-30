@@ -12,7 +12,7 @@ const SpeakerVolumeSlider = React.memo(() => {
   const sliderEl = useRef<HTMLInputElement>(null);
   const isBtnHovered = useRef<boolean>(false);
 
-  const speakerIsMuted = useAppSelector((state) => state.webrtc.speakerIsMuted);
+  const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted);
   const speakerVolume = useAppSelector((state) => state.webrtc.speakerVolume);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -47,13 +47,13 @@ const SpeakerVolumeSlider = React.memo(() => {
 
   return (
     <div className={styles['speaker-volume-container']}>
-      <div className={`${styles['speaker-volume-button']} ${speakerIsMuted ? styles['muted'] : ''}`} />
+      <div className={`${styles['speaker-volume-button']} ${isSpeakerMuted ? styles['muted'] : ''}`} />
       <div className={styles['slider-track']}>
         <div className={styles['slider-container']}>
           <input ref={sliderEl} type="range" min="0" max="100" value={speakerVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div
-          className={`${styles['speaker-volume-button']} ${speakerIsMuted ? styles['muted'] : styles['active']}`}
+          className={`${styles['speaker-volume-button']} ${isSpeakerMuted ? styles['muted'] : styles['active']}`}
           onClick={handleBtnClick}
           onMouseEnter={handleBtnMouseDown}
           onMouseLeave={handleBtnMouseUp}

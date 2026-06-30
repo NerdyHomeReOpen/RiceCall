@@ -44,21 +44,15 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const sortedCategoryMembers = [...categoryMembers].sort((a, b) => b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
-  const userIsInChannel = currentChannelId === category.channelId;
-  const userIsInCategory = categoryMembers.some((m) => m.currentChannelId === currentChannelId);
-  const categoryIsReceptionLobby = currentServerReceptionLobbyId === category.channelId;
-  const categoryIsMemberChannel = category.visibility === 'member';
-  const categoryIsPrivateChannel = category.visibility === 'private';
-  const categoryIsReadonlyChannel = category.visibility === 'readonly';
-  const categoryIsFull = category.userLimit && category.userLimit <= categoryMembers.length;
-  const categoryNeedsPassword = permissionLevel < Types.Permission.ChannelMod && categoryIsPrivateChannel;
-  const userCanJoinCategory = !(
-    userIsInChannel ||
-    categoryIsReadonlyChannel ||
-    (permissionLevel < Types.Permission.ServerAdmin && categoryIsFull) ||
-    (permissionLevel < Types.Permission.Member && categoryIsMemberChannel)
-  );
+  const isInCategory = currentChannelId === category.channelId;
+  const isCategoryReceptionLobby = currentServerReceptionLobbyId === category.channelId;
+  const isCategoryMember = category.visibility === 'member';
+  const isCategoryPrivate = category.visibility === 'private';
+  const isCategoryReadonly = category.visibility === 'readonly';
+  const isCategoryFull = category.userLimit && category.userLimit <= categoryMembers.length;
+  const isCategoryPasswordNeeded = permissionLevel < Types.Permission.ChannelMod && isCategoryPrivate;
   const isDraggable = permissionLevel >= Types.Permission.ChannelMod && movableCategoryUserIds.length > 0;
+  const canJoin = !(isInCategory || isCategoryReadonly || (permissionLevel < Types.Permission.ServerAdmin && isCategoryFull) || (permissionLevel < Types.Permission.Member && isCategoryMember));
 
   const handleTabClick = () => {
     if (isSelected) {
@@ -69,7 +63,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   const handleTabDoubleClick = () => {
-    connectChannel(currentServerId, category.channelId, userCanJoinCategory, categoryNeedsPassword);
+    connectChannel(currentServerId, category.channelId, canJoin, isCategoryPasswordNeeded);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {
@@ -81,7 +75,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   const handleTabDragOver = (e: React.DragEvent) => {
-    if (permissionLevel >= Types.Permission.ChannelMod && !categoryIsReadonlyChannel) {
+    if (permissionLevel >= Types.Permission.ChannelMod && !isCategoryReadonly) {
       e.preventDefault();
     } else {
       e.dataTransfer.dropEffect = 'none';
@@ -89,14 +83,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   const handleTabDrop = (e: React.DragEvent) => {
-    if (categoryIsReadonlyChannel) return;
+    if (isCategoryReadonly) return;
 
     e.stopPropagation();
 
     const userIds = JSON.parse(e.dataTransfer.getData('moveUserEvent/userIds')) as string[];
     const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
 
-    if (!currentChannelId || !userIds || userIds.length === 0 || currentChannelId === category.channelId || categoryIsReadonlyChannel) return;
+    if (!currentChannelId || !userIds || userIds.length === 0 || currentChannelId === category.channelId || isCategoryReadonly) return;
 
     moveAllUsersToChannel(userIds, currentServerId, category.channelId);
 
@@ -112,11 +106,11 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
     const contextMenu = new ContextMenu()
       .addJoinChannelOption(
         {
-          userCanJoinChannel: userCanJoinCategory,
-          userIsInChannel: userIsInChannel,
+          canJoin,
+          isInChannel: isInCategory,
         },
         () => {
-          connectChannel(currentServerId, category.channelId, userCanJoinCategory, categoryNeedsPassword);
+          connectChannel(currentServerId, category.channelId, canJoin, isCategoryPasswordNeeded);
         },
       )
       .addViewOrEditOption(() => {
@@ -142,7 +136,7 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
       .addDeleteChannelOption(
         {
           permissionLevel,
-          channelIsSubChannel: false,
+          isChannelSubChannel: false,
         },
         () => {
           deleteChannel(currentServerId, category.channelId, category.name);
@@ -161,8 +155,8 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
       .addMoveAllUserToChannelOption(
         {
           permissionLevel,
-          channelPermissionLevel: category.permissionLevel,
-          userIsInChannel: userIsInCategory,
+          destinationPermissionLevel: category.permissionLevel,
+          isInChannel: isInCategory,
           userIdsToMove: movableCategoryUserIds,
         },
         () => {
@@ -200,9 +194,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
       .addSetReceptionLobbyOption(
         {
           permissionLevel,
-          channelIsPrivateChannel: categoryIsPrivateChannel,
-          channelIsReadonlyChannel: categoryIsReadonlyChannel,
-          isReceptionLobby: categoryIsReceptionLobby,
+          isChannelPrivate: isCategoryPrivate,
+          isChannelReadonly: isCategoryReadonly,
+          isChannelReceptionLobby: isCategoryReceptionLobby,
         },
         () => {
           editServer(currentServerId, { receptionLobbyId: category.channelId });
@@ -218,9 +212,9 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   };
 
   useEffect(() => {
-    if (!userIsInCategory) return;
+    if (!isInCategory) return;
     setExpandCategoryHandlerRef(() => setIsExpanded(true));
-  }, [userIsInCategory, setExpandCategoryHandlerRef]);
+  }, [isInCategory, setExpandCategoryHandlerRef]);
 
   return (
     <>
@@ -235,13 +229,13 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
         onContextMenu={handleTabContextMenu}
       >
         <div className={`${styles['category-icon']} ${isExpanded ? styles['expanded'] : ''} ${styles[category.visibility]}`} onClick={handleTabExpandedClick} />
-        <div className={`${styles['label']} ${categoryIsReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{category.name}</div>
-        {!categoryIsReadonlyChannel && <div className={styles['user-count-text']}>{`(${categoryMembers.length}${category.userLimit > 0 ? `/${category.userLimit}` : ''})`}</div>}
-        {!isExpanded && userIsInCategory && <div className={styles['my-location-icon']} />}
+        <div className={`${styles['label']} ${isCategoryReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{category.name}</div>
+        {!isCategoryReadonly && <div className={styles['user-count-text']}>{`(${categoryMembers.length}${category.userLimit > 0 ? `/${category.userLimit}` : ''})`}</div>}
+        {!isExpanded && isInCategory && <div className={styles['my-location-icon']} />}
       </div>
       <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
         {sortedCategoryMembers.map((member) => (
-          <UserTab key={member.userId} member={member} channel={category} userCanJoinChannel={userCanJoinCategory} channelNeedsPassword={categoryNeedsPassword} />
+          <UserTab key={member.userId} member={member} channel={category} canJoin={canJoin} isPasswordNeeded={isCategoryPasswordNeeded} />
         ))}
       </div>
       <div className={styles['channel-list']} style={isExpanded ? {} : { display: 'none' }}>

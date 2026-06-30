@@ -44,22 +44,17 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const sortedChannelMembers = [...channelMembers].sort((a, b) => b.permissionLevel - a.permissionLevel || b.lastJoinChannelAt - a.lastJoinChannelAt);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableChannelUserIds = channelMembers.filter((cm) => cm.userId !== userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
-  const userIsInChannel = currentChannelId === channel.channelId;
-  const channelIsLobby = currentServerLobbyId === channel.channelId;
-  const channelIsReceptionLobby = currentServerReceptionLobbyId === channel.channelId;
-  const channelIsMemberChannel = channel.visibility === 'member';
-  const channelIsPrivateChannel = channel.visibility === 'private';
-  const channelIsReadonlyChannel = channel.visibility === 'readonly';
-  const channelIsFull = channel.userLimit && channel.userLimit <= channelMembers.length;
-  const channelNeedsPassword = permissionLevel < Types.Permission.ChannelMod && channelIsPrivateChannel;
-  const channelIsSubChannel = !!channel.categoryId;
-  const userCanJoinChannel = !(
-    userIsInChannel ||
-    channelIsReadonlyChannel ||
-    (permissionLevel < Types.Permission.ServerAdmin && channelIsFull) ||
-    (permissionLevel < Types.Permission.Member && channelIsMemberChannel)
-  );
+  const isInChannel = currentChannelId === channel.channelId;
+  const isChannelLobby = currentServerLobbyId === channel.channelId;
+  const isChannelReceptionLobby = currentServerReceptionLobbyId === channel.channelId;
+  const isChannelMember = channel.visibility === 'member';
+  const isChannelPrivate = channel.visibility === 'private';
+  const isChannelReadonly = channel.visibility === 'readonly';
+  const isChannelFull = channel.userLimit && channel.userLimit <= channelMembers.length;
+  const isChannelPasswordNeeded = permissionLevel < Types.Permission.ChannelMod && isChannelPrivate;
+  const isChannelSubChannel = !!channel.categoryId;
   const isDraggable = permissionLevel >= Types.Permission.ChannelMod && movableChannelUserIds.length > 0;
+  const canJoin = !(isInChannel || isChannelReadonly || (permissionLevel < Types.Permission.ServerAdmin && isChannelFull) || (permissionLevel < Types.Permission.Member && isChannelMember));
 
   const handleTabClick = () => {
     if (isSelected) {
@@ -70,7 +65,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   };
 
   const handleTabDoubleClick = () => {
-    connectChannel(currentServerId, channel.channelId, userCanJoinChannel, channelNeedsPassword);
+    connectChannel(currentServerId, channel.channelId, canJoin, isChannelPasswordNeeded);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {
@@ -82,7 +77,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   };
 
   const handleTabDragOver = (e: React.DragEvent) => {
-    if (permissionLevel >= Types.Permission.ChannelMod && !channelIsReadonlyChannel) {
+    if (permissionLevel >= Types.Permission.ChannelMod && !isChannelReadonly) {
       e.preventDefault();
     } else {
       e.dataTransfer.dropEffect = 'none';
@@ -90,14 +85,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   };
 
   const handleTabDrop = (e: React.DragEvent) => {
-    if (channelIsReadonlyChannel) return;
+    if (isChannelReadonly) return;
 
     e.stopPropagation();
 
     const userIds = JSON.parse(e.dataTransfer.getData('moveUserEvent/userIds')) as string[];
     const currentChannelId = e.dataTransfer.getData('moveUserEvent/currentChannelId');
 
-    if (!currentChannelId || !userIds || userIds.length === 0 || currentChannelId === channel.channelId || channelIsReadonlyChannel) return;
+    if (!currentChannelId || !userIds || userIds.length === 0 || currentChannelId === channel.channelId || isChannelReadonly) return;
 
     moveAllUsersToChannel(userIds, currentServerId, channel.channelId);
 
@@ -111,44 +106,104 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
     const { clientX: x, clientY: y } = e;
 
     const contextMenu = new ContextMenu()
-      .addJoinChannelOption({ userCanJoinChannel, userIsInChannel }, () => {
-        connectChannel(currentServerId, channel.channelId, userCanJoinChannel, channelNeedsPassword);
-      })
+      .addJoinChannelOption(
+        {
+          canJoin,
+          isInChannel,
+        },
+        () => {
+          connectChannel(currentServerId, channel.channelId, canJoin, isChannelPasswordNeeded);
+        },
+      )
       .addViewOrEditOption(() => {
         openChannelSetting(userId, currentServerId, channel.channelId);
       })
       .addSeparator()
-      .addCreateChannelOption({ permissionLevel }, () => {
-        openCreateChannel(userId, currentServerId);
-      })
-      .addCreateSubChannelOption({ permissionLevel }, () => {
-        openCreateChannel(userId, currentServerId, channel.categoryId ?? channel.channelId);
-      })
-      .addDeleteChannelOption({ permissionLevel, channelIsSubChannel }, () => {
-        deleteChannel(currentServerId, channel.channelId, channel.name);
-      })
+      .addCreateChannelOption(
+        {
+          permissionLevel,
+        },
+        () => {
+          openCreateChannel(userId, currentServerId);
+        },
+      )
+      .addCreateSubChannelOption(
+        {
+          permissionLevel,
+        },
+        () => {
+          openCreateChannel(userId, currentServerId, channel.categoryId ?? channel.channelId);
+        },
+      )
+      .addDeleteChannelOption(
+        {
+          permissionLevel,
+          isChannelSubChannel,
+        },
+        () => {
+          deleteChannel(currentServerId, channel.channelId, channel.name);
+        },
+      )
       .addSeparator()
-      .addBroadcastOption({ permissionLevel }, () => {
-        openServerBroadcast(currentServerId, channel.channelId);
-      })
+      .addBroadcastOption(
+        {
+          permissionLevel,
+        },
+        () => {
+          openServerBroadcast(currentServerId, channel.channelId);
+        },
+      )
       .addSeparator()
-      .addMoveAllUserToChannelOption({ permissionLevel, channelPermissionLevel: channel.permissionLevel, userIsInChannel, userIdsToMove: movableChannelUserIds }, () => {
-        moveAllUsersToChannel(movableChannelUserIds, currentServerId, currentChannelId);
-      })
-      .addEditChannelOrderOption({ permissionLevel }, () => {
-        openEditChannelOrder(userId, currentServerId);
-      })
+      .addMoveAllUserToChannelOption(
+        {
+          permissionLevel,
+          destinationPermissionLevel: channel.permissionLevel,
+          isInChannel,
+          userIdsToMove: movableChannelUserIds,
+        },
+        () => {
+          moveAllUsersToChannel(movableChannelUserIds, currentServerId, currentChannelId);
+        },
+      )
+      .addEditChannelOrderOption(
+        {
+          permissionLevel,
+        },
+        () => {
+          openEditChannelOrder(userId, currentServerId);
+        },
+      )
       .addSeparator()
-      .addKickChannelUsersFromServerOption({ permissionLevel, userIdsToKick: movableChannelUserIds }, () => {
-        kickUsersFromServer(movableChannelUserIds, currentServerId);
-      })
-      .addKickAllUsersFromServerOption({ permissionLevel, userIdsToKick: movableServerUserIds }, () => {
-        kickUsersFromServer(movableServerUserIds, currentServerId);
-      })
+      .addKickChannelUsersFromServerOption(
+        {
+          permissionLevel,
+          userIdsToKick: movableChannelUserIds,
+        },
+        () => {
+          kickUsersFromServer(movableChannelUserIds, currentServerId);
+        },
+      )
+      .addKickAllUsersFromServerOption(
+        {
+          permissionLevel,
+          userIdsToKick: movableServerUserIds,
+        },
+        () => {
+          kickUsersFromServer(movableServerUserIds, currentServerId);
+        },
+      )
       .addSeparator()
-      .addSetReceptionLobbyOption({ permissionLevel, channelIsPrivateChannel, channelIsReadonlyChannel, isReceptionLobby: channelIsReceptionLobby }, () => {
-        editServer(currentServerId, { receptionLobbyId: channel.channelId });
-      })
+      .addSetReceptionLobbyOption(
+        {
+          permissionLevel,
+          isChannelPrivate,
+          isChannelReadonly,
+          isChannelReceptionLobby,
+        },
+        () => {
+          editServer(currentServerId, { receptionLobbyId: channel.channelId });
+        },
+      )
       .build();
 
     showContextMenu(x, y, 'right-bottom', contextMenu);
@@ -159,9 +214,9 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   };
 
   useEffect(() => {
-    if (!userIsInChannel) return;
+    if (!isInChannel) return;
     setExpandChannelHandlerRef(() => setIsExpanded(true));
-  }, [userIsInChannel, setExpandChannelHandlerRef]);
+  }, [isInChannel, setExpandChannelHandlerRef]);
 
   return (
     <>
@@ -175,14 +230,14 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
         onDrop={handleTabDrop}
         onContextMenu={handleTabContextMenu}
       >
-        <div className={`${styles['channel-icon']} ${isExpanded ? styles['expanded'] : ''} ${channelIsLobby ? styles['lobby'] : styles[channel.visibility]}`} onClick={handleTabExpandedClick} />
-        <div className={`${styles['label']} ${channelIsReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{channelIsLobby ? t(`lobby`) : channel.name}</div>
-        {!channelIsReadonlyChannel && <div className={styles['user-count-text']}>{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
-        {userIsInChannel && !isExpanded && <div className={styles['my-location-icon']} />}
+        <div className={`${styles['channel-icon']} ${isExpanded ? styles['expanded'] : ''} ${isChannelLobby ? styles['lobby'] : styles[channel.visibility]}`} onClick={handleTabExpandedClick} />
+        <div className={`${styles['label']} ${isChannelReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{isChannelLobby ? t(`lobby`) : channel.name}</div>
+        {!isChannelReadonly && <div className={styles['user-count-text']}>{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
+        {isInChannel && !isExpanded && <div className={styles['my-location-icon']} />}
       </div>
       <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
         {sortedChannelMembers.map((member) => (
-          <UserTab key={member.userId} member={member} channel={channel} userCanJoinChannel={userCanJoinChannel} channelNeedsPassword={channelNeedsPassword} />
+          <UserTab key={member.userId} member={member} channel={channel} canJoin={canJoin} isPasswordNeeded={isChannelPasswordNeeded} />
         ))}
       </div>
     </>

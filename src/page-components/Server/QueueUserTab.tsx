@@ -56,12 +56,12 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const currentServerId = useAppSelector((state) => state.currentServer.data.serverId);
   const currentServerLobbyId = useAppSelector((state) => state.currentServer.data.lobbyId);
   const currentChannelId = useAppSelector((state) => state.currentChannel.data.channelId);
-  const currentChannelIsSubChannel = useAppSelector((state) => !!state.currentChannel.data.categoryId);
+  const isCurrentChannelSubChannel = useAppSelector((state) => !!state.currentChannel.data.categoryId);
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const queueUser = useAppSelector((state) => state.queueUsers.data.find((qu) => qu.userId === queueUserId), shallowEqual);
-  const memberIsSpeaking = useAppSelector((state) => (queueUserId === userId ? !!state.webrtc.speakingUserIdList['user'] : !!state.webrtc.speakingUserIdList[queueUserId]));
-  const memberIsMuted = useAppSelector((state) => !!state.webrtc.mutedUserIdList[queueUserId]);
+  const isMemberSpeaking = useAppSelector((state) => (queueUserId === userId ? !!state.webrtc.speakingUserIdList['user'] : !!state.webrtc.speakingUserIdList[queueUserId]));
+  const isMemberMuted = useAppSelector((state) => !!state.webrtc.mutedUserIdList[queueUserId]);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`);
 
   const queueMember = useMemo(() => {
@@ -70,17 +70,16 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
     return { ...queueUser, ...onlineMember };
   }, [onlineMembers, queueUser, queueUserId]);
 
-  const memberIsFriend = friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === 2);
-  const memberIsSelf = queueMember.userId === userId;
+  const isMemberFriend = friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === 2);
+  const isMemberSelf = queueMember.userId === userId;
+  const isMemberOnMic = queueMember.position === 0;
+  const isMemberControlled = isMemberOnMic && queueMember.isQueueControlled && permissionLevel < Types.Permission.ChannelMod;
+  const isMemberInLobby = queueMember.currentChannelId === currentServerLobbyId;
   const memberHasVip = queueMember.vip > 0;
-  const memberIsOnMic = queueMember.position === 0;
-  const memberIsControlled = memberIsOnMic && queueMember.isQueueControlled && permissionLevel < Types.Permission.ChannelMod;
-  const memberHasLowerLevel = queueMember.permissionLevel < permissionLevel;
-  const memberIsInLobby = queueMember.currentChannelId === currentServerLobbyId;
 
   const getStatusIcon = () => {
-    if (memberIsMuted || queueMember.isVoiceMuted || (permissionLevel < Types.Permission.ChannelMod && memberIsControlled)) return 'muted';
-    if (memberIsSpeaking) return 'play';
+    if (isMemberMuted || queueMember.isVoiceMuted || (permissionLevel < Types.Permission.ChannelMod && isMemberControlled)) return 'muted';
+    if (isMemberSpeaking) return 'play';
     return '';
   };
 
@@ -93,7 +92,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   };
 
   const handleTabDoubleClick = () => {
-    if (memberIsSelf) return;
+    if (isMemberSelf) return;
     openDirectMessage(userId, queueMember.userId);
   };
 
@@ -150,7 +149,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addSeparator()
       .addDirectMessageOption(
         {
-          targetIsSelf: memberIsSelf,
+          isTargetSelf: isMemberSelf,
         },
         () => {
           openDirectMessage(userId, queueMember.userId);
@@ -161,8 +160,8 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       })
       .addAddFriendOption(
         {
-          targetIsSelf: memberIsSelf,
-          targetIsFriend: memberIsFriend,
+          isTargetSelf: isMemberSelf,
+          isTargetFriend: isMemberFriend,
         },
         () => {
           openApplyFriend(userId, queueMember.userId);
@@ -170,19 +169,19 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       )
       .addSetMuteOption(
         {
-          targetIsSelf: memberIsSelf,
-          targetIsMuted: memberIsMuted,
+          isTargetSelf: isMemberSelf,
+          isTargetMuted: isMemberMuted,
         },
         () => {
-          if (memberIsMuted) unmuteUser(queueMember.userId);
+          if (isMemberMuted) unmuteUser(queueMember.userId);
           else muteUser(queueMember.userId);
         },
       )
       .addEditNicknameOptionWithNoIcon(
         {
           permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
+          targetPermissionLevel: queueMember.permissionLevel,
+          isTargetSelf: isMemberSelf,
         },
         () => {
           openEditNickname(queueMember.userId, currentServerId);
@@ -192,9 +191,9 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addForbidVoiceOption(
         {
           permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
-          targetIsVoiceMuted: queueMember.isVoiceMuted,
+          targetPermissionLevel: queueMember.permissionLevel,
+          isTargetSelf: isMemberSelf,
+          isTargetVoiceMuted: queueMember.isVoiceMuted,
         },
         () => {
           forbidUserVoiceInChannel(queueMember.userId, currentServerId, currentChannelId, !queueMember.isVoiceMuted);
@@ -203,9 +202,9 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addForbidTextOption(
         {
           permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
-          targetIsTextMuted: queueMember.isTextMuted,
+          targetPermissionLevel: queueMember.permissionLevel,
+          isTargetSelf: isMemberSelf,
+          isTargetTextMuted: queueMember.isTextMuted,
         },
         () => {
           forbidUserTextInChannel(queueMember.userId, currentServerId, currentChannelId, !queueMember.isTextMuted);
@@ -214,9 +213,9 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addKickUserFromChannelOption(
         {
           permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
-          targetIsInLobby: memberIsInLobby,
+          targetPermissionLevel: queueMember.permissionLevel,
+          isTargetSelf: isMemberSelf,
+          isTargetInLobby: isMemberInLobby,
         },
         () => {
           openKickMemberFromChannel(queueMember.userId, currentServerId, currentChannelId);
@@ -225,8 +224,8 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addKickUserFromServerOption(
         {
           permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
+          targetPermissionLevel: queueMember.permissionLevel,
+          isTargetSelf: isMemberSelf,
         },
         () => {
           openKickMemberFromServer(queueMember.userId, currentServerId);
@@ -235,8 +234,8 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addBlockUserFromServerOption(
         {
           permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
+          targetPermissionLevel: queueMember.permissionLevel,
+          isTargetSelf: isMemberSelf,
         },
         () => {
           openBlockMember(queueMember.userId, currentServerId);
@@ -246,7 +245,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       .addTerminateSelfMembershipOption(
         {
           permissionLevel,
-          targetIsSelf: memberIsSelf,
+          isTargetSelf: isMemberSelf,
         },
         () => {
           terminateMember(userId, currentServerId, t('self'));
@@ -256,8 +255,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
         {
           permissionLevel,
           targetPermissionLevel: queueMember.permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
+          isTargetSelf: isMemberSelf,
         },
         () => {
           openInviteMember(queueMember.userId, currentServerId);
@@ -267,8 +265,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
         {
           permissionLevel,
           targetPermissionLevel: queueMember.permissionLevel,
-          targetIsSelf: memberIsSelf,
-          targetHasLowerLevel: memberHasLowerLevel,
+          isTargetSelf: isMemberSelf,
         },
         () => {},
         new ContextMenu()
@@ -276,8 +273,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
             {
               permissionLevel,
               targetPermissionLevel: queueMember.permissionLevel,
-              targetIsSelf: memberIsSelf,
-              targetHasLowerLevel: memberHasLowerLevel,
+              isTargetSelf: isMemberSelf,
             },
             () => {
               terminateMember(queueMember.userId, currentServerId, queueMember.name);
@@ -287,9 +283,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
             {
               permissionLevel,
               targetPermissionLevel: queueMember.permissionLevel,
-              targetIsSelf: memberIsSelf,
-              targetHasLowerLevel: memberHasLowerLevel,
-              channelIsSubChannel: currentChannelIsSubChannel,
+              isChannelSubChannel: isCurrentChannelSubChannel,
             },
             () => {
               if (queueMember.permissionLevel >= Types.Permission.ChannelMod) editChannelPermission(queueMember.userId, currentServerId, currentChannelId, { permissionLevel: 2 });
@@ -300,8 +294,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
             {
               permissionLevel,
               targetPermissionLevel: queueMember.permissionLevel,
-              targetIsSelf: memberIsSelf,
-              targetHasLowerLevel: memberHasLowerLevel,
             },
             () => {
               if (queueMember.permissionLevel >= Types.Permission.ChannelAdmin) editChannelPermission(queueMember.userId, currentServerId, currentChannelId, { permissionLevel: 2 });
@@ -312,8 +304,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
             {
               permissionLevel,
               targetPermissionLevel: queueMember.permissionLevel,
-              targetIsSelf: memberIsSelf,
-              targetHasLowerLevel: memberHasLowerLevel,
             },
             () => {
               if (queueMember.permissionLevel >= Types.Permission.ServerAdmin) editServerPermission(queueMember.userId, currentServerId, { permissionLevel: 2 });
@@ -362,7 +352,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
       {memberHasVip && <div className={`vip-icon vip-${queueMember.vip}`} />}
       <div className={`${styles['name-text']} ${queueMember.nickname ? styles['member'] : ''} ${memberHasVip ? styles['vip'] : ''}`}>{queueMember.nickname || queueMember.name}</div>
       <BadgeList badges={JSON.parse(queueMember.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
-      {memberIsOnMic && <div className={styles['time-remaining']}>{queueMember.leftTime}s</div>}
+      {isMemberOnMic && <div className={styles['time-remaining']}>{queueMember.leftTime}s</div>}
     </div>
   );
 });

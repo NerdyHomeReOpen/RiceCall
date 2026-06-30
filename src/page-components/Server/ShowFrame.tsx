@@ -13,7 +13,6 @@ const ShowFrame: React.FC = React.memo(() => {
 
   const userId = useAppSelector((state) => state.user.data.userId);
   const currentChannelVoiceMode = useAppSelector((state) => state.currentChannel.data.voiceMode);
-
   const queueUsers = useAppSelector((state) => state.queueUsers.data, shallowEqual);
 
   const updateShowFrameState = useCallback(

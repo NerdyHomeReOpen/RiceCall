@@ -382,7 +382,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
   const takeMic = useCallback(
     async (channelId: string) => {
-      if (Store.store.getState().webrtc.micIsTaken) return;
+      if (Store.store.getState().webrtc.isMicTaken) return;
 
       currentChannelIdRef.current = channelId;
       sendRetryCountRef.current = 0;
@@ -399,7 +399,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
   );
 
   const releaseMic = useCallback(async () => {
-    if (!Store.store.getState().webrtc.micIsTaken) return;
+    if (!Store.store.getState().webrtc.isMicTaken) return;
 
     currentChannelIdRef.current = null;
 
@@ -444,7 +444,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       const recv = recvTransportRef.current;
       const send = sendTransportRef.current;
       const recvHealthy = recv && !recv.closed && recv.connectionState === 'connected';
-      const sendHealthy = !Store.store.getState().webrtc.micIsTaken || (send && !send.closed && send.connectionState === 'connected');
+      const sendHealthy = !Store.store.getState().webrtc.isMicTaken || (send && !send.closed && send.connectionState === 'connected');
       if (currentChannelIdRef.current === channelId && recvHealthy && sendHealthy) {
         new Logger('WebRTC').info(`SFUJoined dedup: already healthy on channel ${channelId}`);
         return;
@@ -465,7 +465,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       }
 
       await setupRecv(channelId);
-      if (Store.store.getState().webrtc.micIsTaken) {
+      if (Store.store.getState().webrtc.isMicTaken) {
         await setupSend(channelId);
       }
     });

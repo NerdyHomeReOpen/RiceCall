@@ -3,12 +3,12 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import * as Types from '@/types';
 
 export interface WebRTCState {
-  micIsTaken: boolean;
-  speakKeyIsPressed: boolean;
-  mixModeIsActive: boolean;
-  micIsMuted: boolean;
-  speakerIsMuted: boolean;
-  recorderIsActive: boolean;
+  isMicTaken: boolean;
+  isSpeakKeyPressed: boolean;
+  isMixModeActive: boolean;
+  isMicMuted: boolean;
+  isSpeakerMuted: boolean;
+  isRecorderActive: boolean;
   volumePercent: number;
   volumeLevel: number;
   micVolume: number;
@@ -24,12 +24,12 @@ export interface WebRTCState {
 }
 
 const initialState: WebRTCState = {
-  micIsTaken: false,
-  speakKeyIsPressed: false,
-  mixModeIsActive: false,
-  micIsMuted: false,
-  speakerIsMuted: false,
-  recorderIsActive: false,
+  isMicTaken: false,
+  isSpeakKeyPressed: false,
+  isMixModeActive: false,
+  isMicMuted: false,
+  isSpeakerMuted: false,
+  isRecorderActive: false,
   volumePercent: 0,
   volumeLevel: 0,
   micVolume: 100,

@@ -14,7 +14,7 @@ const MicVolumeSlider = React.memo(() => {
   const sliderEl = useRef<HTMLInputElement>(null);
   const isHovered = useRef<boolean>(false);
 
-  const micIsMuted = useAppSelector((state) => state.webrtc.micIsMuted);
+  const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
   const micVolume = useAppSelector((state) => state.webrtc.micVolume);
 
   const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
@@ -66,13 +66,13 @@ const MicVolumeSlider = React.memo(() => {
 
   return (
     <div className={styles['mic-volume-container']}>
-      <div className={`${styles['mic-volume-button']} ${micIsMuted ? styles['muted'] : styles['active']}`} />
+      <div className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`} />
       <div className={styles['slider-track']}>
         <div className={styles['slider-container']}>
           <input ref={sliderEl} type="range" min="0" max="100" value={micVolume} onChange={handleSliderChange} className={styles['slider']} />
         </div>
         <div
-          className={`${styles['mic-volume-button']} ${micIsMuted ? styles['muted'] : styles['active']}`}
+          className={`${styles['mic-volume-button']} ${isMicMuted ? styles['muted'] : styles['active']}`}
           onClick={handleBtnClick}
           onMouseEnter={handleBtnMouseDown}
           onMouseLeave={handleBtnMouseUp}
