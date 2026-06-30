@@ -54,17 +54,14 @@ const MicVolumeSlider = React.memo(() => {
   };
 
   useEffect(() => {
-    const onPointerDown = (e: MouseEvent) => {
+    const handlePointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest(`.${styles['mode-menu']}`)) {
         setIsMicModeMenuVisible(false);
       }
     };
 
-    document.addEventListener('pointerdown', onPointerDown);
-
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
   return (

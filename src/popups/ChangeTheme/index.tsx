@@ -135,30 +135,35 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
-    const changeCustomTheme = (customThemes: Types.Theme[]) => {
+    const handleCustomThemesUpdate = (customThemes: Types.Theme[]) => {
       new Logger('CustomThemes').info(`Custom themes updated: ${customThemes}`);
       setCustomThemes(customThemes);
     };
-    changeCustomTheme(ipc.customThemes.get());
-    const unsub = ipc.customThemes.onUpdate(changeCustomTheme);
+
+    handleCustomThemesUpdate(ipc.customThemes.get());
+
+    const unsub = ipc.customThemes.onUpdate(handleCustomThemesUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const onPointerDown = (e: PointerEvent) => {
+    const handlePointerDown = (e: PointerEvent) => {
       if (e.target === colorSelectorRef.current) {
         isSelectingColorRef.current = true;
       }
     };
-    const onPointerUp = () => {
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
+  }, []);
+
+  useEffect(() => {
+    const handlePointerUp = () => {
       isSelectingColorRef.current = false;
     };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('pointerup', onPointerUp);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('pointerup', onPointerUp);
-    };
+
+    document.addEventListener('pointerup', handlePointerUp);
+    return () => document.removeEventListener('pointerup', handlePointerUp);
   }, []);
 
   return (

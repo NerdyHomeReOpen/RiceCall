@@ -301,7 +301,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
       activeInputRef.current = null;
     };
 
-    const onKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       const current = activeInputRef.current;
       if (!current || e.isComposing) return;
 
@@ -357,8 +357,9 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
         closeDelection();
       }
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [
     systemSettings.defaultSpeakingKey,
     systemSettings.hotKeyOpenMainWindow,

@@ -18,32 +18,29 @@ import { getFormatDate } from '@/utils/language';
 import styles from './Home.module.css';
 
 interface HomePageProps {
-  display: boolean;
+  isActive: boolean;
 }
 
-const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
+const HomePageComponent: React.FC<HomePageProps> = React.memo(({ isActive }) => {
   const { t } = useTranslation();
 
-  const [selectedSection, setSelectedSection] = useState<'home' | 'personal-exclusive'>('home');
+  const [activeSection, setActiveSection] = useState<'home' | 'personal-exclusive'>('home');
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
-
-  const homeSectionIsSelected = selectedSection === 'home';
-  const personalExclusiveSectionIsSelected = selectedSection === 'personal-exclusive';
 
   const handleCreateServerClick = () => {
     openCreateServer();
   };
 
   const handlePersonalExclusiveSectionBtnClick = () => {
-    setSelectedSection('personal-exclusive');
+    setActiveSection('personal-exclusive');
   };
 
   const handleHomeSectionBtnClick = () => {
-    setSelectedSection('home');
+    setActiveSection('home');
   };
 
   const handleBackBtnClick = () => {
-    setSelectedSection('home');
+    setActiveSection('home');
   };
 
   const handleAnnouncementSelect = (announcement: Types.Announcement) => {
@@ -51,7 +48,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   };
 
   return (
-    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
+    <main className={styles['page']} style={isActive ? {} : { display: 'none' }}>
       <div className={styles['announcement-detail-wrapper']} style={selectedAnn ? {} : { display: 'none' }} onClick={() => setSelectedAnn(null)}>
         {selectedAnn && (
           <div className={styles['announcement-detail-container']} onClick={(e) => e.stopPropagation()}>
@@ -75,8 +72,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
       </div>
       <header className={styles['header']}>
         <HomePageHeader
-          homeSectionIsSelected={homeSectionIsSelected}
-          personalExclusiveSectionIsSelected={personalExclusiveSectionIsSelected}
+          activeSection={activeSection}
           onHomeSectionBtnClick={handleHomeSectionBtnClick}
           onCreateServerBtnClick={handleCreateServerClick}
           onPersonalExclusiveSectionBtnClick={handlePersonalExclusiveSectionBtnClick}
@@ -84,13 +80,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
         />
       </header>
       <main className={styles['body']}>
-        <main className={styles['content']} style={homeSectionIsSelected ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={activeSection === 'home' ? {} : { display: 'none' }}>
           <HomePageContent onAnnouncementSelect={handleAnnouncementSelect} />
         </main>
-        <main className={styles['content']} style={personalExclusiveSectionIsSelected ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={activeSection === 'personal-exclusive' ? {} : { display: 'none' }}>
           <HomePagePersonalExclusive />
         </main>
-        <main className={styles['content']} style={!homeSectionIsSelected && !personalExclusiveSectionIsSelected ? {} : { display: 'none' }}>
+        <main className={styles['content']} style={activeSection !== 'home' && activeSection !== 'personal-exclusive' ? {} : { display: 'none' }}>
           <HomePageNotAvailable />
         </main>
       </main>

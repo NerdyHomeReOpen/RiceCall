@@ -284,11 +284,12 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   }, [directMessages, userId, scrollToBottom]);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') scrollToBottom();
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [scrollToBottom]);
 
   useEffect(() => {
@@ -296,7 +297,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   }, [isAtBottom]);
 
   useEffect(() => {
-    const onDirectMessage = (...args: Types.DirectMessage[]) => {
+    const handleDirectMessage = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
@@ -307,13 +308,15 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
         if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
       });
     };
-    if (event === 'directMessage') onDirectMessage(message);
-    const unsub = ipc.socket.on('directMessage', onDirectMessage);
+
+    if (event === 'directMessage') handleDirectMessage(message);
+
+    const unsub = ipc.socket.on('directMessage', handleDirectMessage);
     return () => unsub();
   }, [event, message, userId, target.userId]);
 
   useEffect(() => {
-    const onShakeWindow = (...args: Types.DirectMessage[]) => {
+    const handleShakeWindow = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
         // !! THIS IS IMPORTANT !!
@@ -340,8 +343,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
         }
       });
     };
-    if (event === 'shakeWindow') onShakeWindow(message);
-    const unsub = ipc.socket.on('shakeWindow', onShakeWindow);
+
+    if (event === 'shakeWindow') handleShakeWindow(message);
+
+    const unsub = ipc.socket.on('shakeWindow', handleShakeWindow);
     return () => unsub();
   }, [event, message, userId, target.userId]);
 

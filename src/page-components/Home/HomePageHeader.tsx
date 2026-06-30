@@ -6,49 +6,46 @@ import ServerSearchBar from './ServerSearchBar';
 import styles from './Home.module.css';
 
 interface HomePageHeaderProps {
-  homeSectionIsSelected: boolean;
-  personalExclusiveSectionIsSelected: boolean;
+  activeSection: 'home' | 'personal-exclusive';
   onHomeSectionBtnClick: () => void;
   onCreateServerBtnClick: () => void;
   onPersonalExclusiveSectionBtnClick: () => void;
   onBackBtnClick: () => void;
 }
 
-const HomePageHeader: React.FC<HomePageHeaderProps> = React.memo(
-  ({ homeSectionIsSelected, personalExclusiveSectionIsSelected, onHomeSectionBtnClick, onCreateServerBtnClick, onPersonalExclusiveSectionBtnClick, onBackBtnClick }) => {
-    const { t } = useTranslation();
+const HomePageHeader: React.FC<HomePageHeaderProps> = React.memo(({ activeSection, onHomeSectionBtnClick, onCreateServerBtnClick, onPersonalExclusiveSectionBtnClick, onBackBtnClick }) => {
+  const { t } = useTranslation();
 
-    return (
-      <>
-        <div className={styles['header-left']}>
-          <div className={styles['back-button']} />
-          <div className={styles['forward-button']} />
-          <ServerSearchBar />
+  return (
+    <>
+      <div className={styles['header-left']}>
+        <div className={styles['back-button']} />
+        <div className={styles['forward-button']} />
+        <ServerSearchBar />
+      </div>
+      <div className={styles['header-mid']}>
+        <div className={`${styles['navigate-button']} ${activeSection === 'home' ? styles['active'] : ''}`} data-key="60060" onClick={onHomeSectionBtnClick}>
+          {t('home')}
         </div>
-        <div className={styles['header-mid']}>
-          <div className={`${styles['navigate-button']} ${homeSectionIsSelected ? styles['active'] : ''}`} data-key="60060" onClick={onHomeSectionBtnClick}>
-            {t('home')}
+      </div>
+      <div className={styles['header-right']}>
+        <div className={styles['navigate-button']} data-key="30014" onClick={onCreateServerBtnClick}>
+          {t('create-server')}
+        </div>
+        {activeSection === 'home' && (
+          <div className={styles['navigate-button']} data-key="60004" onClick={onPersonalExclusiveSectionBtnClick}>
+            {t('personal-exclusive')}
           </div>
-        </div>
-        <div className={styles['header-right']}>
-          <div className={styles['navigate-button']} data-key="30014" onClick={onCreateServerBtnClick}>
-            {t('create-server')}
+        )}
+        {activeSection === 'personal-exclusive' && (
+          <div className={styles['navigate-button']} data-key="60005" onClick={onBackBtnClick}>
+            {t('back')}
           </div>
-          {!personalExclusiveSectionIsSelected && (
-            <div className={styles['navigate-button']} data-key="60004" onClick={onPersonalExclusiveSectionBtnClick}>
-              {t('personal-exclusive')}
-            </div>
-          )}
-          {personalExclusiveSectionIsSelected && (
-            <div className={styles['navigate-button']} data-key="60005" onClick={onBackBtnClick}>
-              {t('back')}
-            </div>
-          )}
-        </div>
-      </>
-    );
-  },
-);
+        )}
+      </div>
+    </>
+  );
+});
 
 HomePageHeader.displayName = 'HomePageHeader';
 

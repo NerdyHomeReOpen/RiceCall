@@ -285,41 +285,32 @@ const ServerPageContent: React.FC = React.memo(() => {
   }, [messageAreaIsAtBottom]);
 
   useEffect(() => {
-    const onPointerup = () => {
+    const handlePointerUp = () => {
       annAreaIsResizing.current = false;
     };
 
-    document.addEventListener('pointerup', onPointerup);
-
-    return () => {
-      document.removeEventListener('pointerup', onPointerup);
-    };
+    document.addEventListener('pointerup', handlePointerUp);
+    return () => document.removeEventListener('pointerup', handlePointerUp);
   }, []);
 
   useEffect(() => {
-    const onPointerDown = (e: MouseEvent) => {
+    const handlePointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest(`.${styles['widget-bar']}`)) {
         setWidgetIsExpanded(false);
       }
     };
 
-    document.addEventListener('pointerdown', onPointerDown);
-
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-    };
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') scrollToBottom();
     };
 
-    window.addEventListener('keydown', onKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, [scrollToBottom]);
 
   useEffect(() => {
@@ -336,14 +327,13 @@ const ServerPageContent: React.FC = React.memo(() => {
   }, [channelMessages, userId, scrollToBottom]);
 
   useEffect(() => {
-    const changeChannelUIMode = (channelUIMode: Types.ChannelUIMode) => {
+    const handleChannelUIModeUpdate = (channelUIMode: Types.ChannelUIMode) => {
       setChannelUIMode(channelUIMode);
     };
 
-    changeChannelUIMode(ipc.systemSettings.channelUIMode.get());
+    handleChannelUIModeUpdate(ipc.systemSettings.channelUIMode.get());
 
-    const unsub = ipc.systemSettings.channelUIMode.onUpdate(changeChannelUIMode);
-
+    const unsub = ipc.systemSettings.channelUIMode.onUpdate(handleChannelUIModeUpdate);
     return () => unsub();
   }, []);
 

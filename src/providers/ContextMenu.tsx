@@ -182,15 +182,7 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
   );
 
   useEffect(() => {
-    const onMouseMove = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest('.user-info-card-container')) {
-        closeUserInfoBlock();
-      }
-      if (!(e.target as HTMLElement).closest('.badge-info-card-container')) {
-        closeBadgeInfoCard();
-      }
-    };
-    const onPointerDown = (e: MouseEvent) => {
+    const handlePointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('.context-menu-container')) {
         closeContextMenu();
         closeMicContextMenu();
@@ -203,13 +195,24 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
         closeColorPicker();
       }
     };
-    document.addEventListener('pointerdown', onPointerDown);
-    document.addEventListener('mousemove', onMouseMove);
-    return () => {
-      document.removeEventListener('pointerdown', onPointerDown);
-      document.removeEventListener('mousemove', onMouseMove);
-    };
+
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, [closeContextMenu, closeMicContextMenu, closeNotificationMenu, closeUserInfoBlock, closeBadgeInfoCard, closeEmojiPicker, closeColorPicker, closeStatusDropdown, closeEmbedLinkInput]);
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!(e.target as HTMLElement).closest('.user-info-card-container')) {
+        closeUserInfoBlock();
+      }
+      if (!(e.target as HTMLElement).closest('.badge-info-card-container')) {
+        closeBadgeInfoCard();
+      }
+    };
+
+    document.addEventListener('mousemove', handleMouseMove);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, [closeUserInfoBlock, closeBadgeInfoCard]);
 
   const contextValue = useMemo(
     () => ({

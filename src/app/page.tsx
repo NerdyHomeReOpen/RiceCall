@@ -94,7 +94,6 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
 
     const unsubs = [ipc.window.onMaximize(handleMaximize), ipc.window.onUnmaximize(handleUnmaximize)];
-
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
@@ -106,7 +105,6 @@ const RootPageComponent: React.FC = React.memo(() => {
     };
 
     const unsub = ipc.server.onSelect(handleServerSelect);
-
     return () => unsub();
   }, [currentServerId, getIsLoading, loadServer]);
 

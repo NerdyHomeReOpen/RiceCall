@@ -130,7 +130,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   }, [isIdling]);
 
   useEffect(() => {
-    const onKeyDown = (e: KeyboardEvent) => {
+    const handleKeyDown = (e: KeyboardEvent) => {
       if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
       if (e.repeat) return;
       const mk = buildKey(e);
@@ -156,7 +156,12 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       }
     };
 
-    const onKeyUp = (e: KeyboardEvent) => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [startSpeak, stopSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute]);
+
+  useEffect(() => {
+    const handleKeyUp = (e: KeyboardEvent) => {
       if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
       const mk = buildKey(e);
       switch (mk) {
@@ -166,102 +171,123 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       }
     };
 
-    // TODO: Use system event instead of window event
-    const onBlur = () => stopSpeak();
-    const onVisibility = () => {
+    window.addEventListener('keyup', handleKeyUp);
+    return () => window.removeEventListener('keyup', handleKeyUp);
+  }, [stopSpeak]);
+
+  // TODO: Use system event instead of window event
+  useEffect(() => {
+    const handleBlur = () => {
+      stopSpeak();
+    };
+
+    document.addEventListener('blur', handleBlur);
+    return () => document.removeEventListener('blur', handleBlur);
+  }, [stopSpeak]);
+
+  useEffect(() => {
+    const handleVisibilityChange = () => {
       if (document.hidden) stopSpeak();
     };
 
-    window.addEventListener('keydown', onKeyDown);
-    window.addEventListener('keyup', onKeyUp);
-    window.addEventListener('blur', onBlur);
-    document.addEventListener('visibilitychange', onVisibility);
-    return () => {
-      window.removeEventListener('keydown', onKeyDown);
-      window.removeEventListener('keyup', onKeyUp);
-      window.removeEventListener('blur', onBlur);
-      document.removeEventListener('visibilitychange', onVisibility);
-    };
-  }, [startSpeak, stopSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute]);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [stopSpeak]);
 
   useEffect(() => {
-    const changeStatusAutoIdle = (enable: boolean) => {
+    const handleStatusAutoIdleUpdate = (enable: boolean) => {
       new Logger('ActionScanner').info(`Status auto idle updated: ${enable}`);
       idleCheck.current = enable;
       lastActiveRef.current = Date.now();
     };
-    changeStatusAutoIdle(ipc.systemSettings.statusAutoIdle.get());
-    const unsub = ipc.systemSettings.statusAutoIdle.onUpdate(changeStatusAutoIdle);
+
+    handleStatusAutoIdleUpdate(ipc.systemSettings.statusAutoIdle.get());
+
+    const unsub = ipc.systemSettings.statusAutoIdle.onUpdate(handleStatusAutoIdleUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const changeStatusAutoIdleMinutes = (value: number) => {
+    const handleStatusAutoIdleMinutesUpdate = (value: number) => {
       new Logger('ActionScanner').info(`Status auto idle minutes updated: ${value}`);
       idleMinutes.current = value;
     };
-    changeStatusAutoIdleMinutes(ipc.systemSettings.statusAutoIdleMinutes.get());
-    const unsub = ipc.systemSettings.statusAutoIdleMinutes.onUpdate(changeStatusAutoIdleMinutes);
+
+    handleStatusAutoIdleMinutesUpdate(ipc.systemSettings.statusAutoIdleMinutes.get());
+
+    const unsub = ipc.systemSettings.statusAutoIdleMinutes.onUpdate(handleStatusAutoIdleMinutesUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const changeDefaultSpeakingKey = (key: string) => {
+    const handleDefaultSpeakingKeyUpdate = (key: string) => {
       new Logger('ActionScanner').info(`Default speaking key updated: ${key}`);
       speakingKeyRef.current = key;
     };
-    changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
-    const unsub = ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey);
+
+    handleDefaultSpeakingKeyUpdate(ipc.systemSettings.defaultSpeakingKey.get());
+
+    const unsub = ipc.systemSettings.defaultSpeakingKey.onUpdate(handleDefaultSpeakingKeyUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const changeHotKeyOpenMainWindow = (key: string) => {
+    const handleHotKeyOpenMainWindowUpdate = (key: string) => {
       new Logger('ActionScanner').info(`Hot key open main window updated: ${key}`);
       openMainWindowKeyRef.current = key;
     };
-    changeHotKeyOpenMainWindow(ipc.systemSettings.hotKeyOpenMainWindow.get());
-    const unsub = ipc.systemSettings.hotKeyOpenMainWindow.onUpdate(changeHotKeyOpenMainWindow);
+
+    handleHotKeyOpenMainWindowUpdate(ipc.systemSettings.hotKeyOpenMainWindow.get());
+
+    const unsub = ipc.systemSettings.hotKeyOpenMainWindow.onUpdate(handleHotKeyOpenMainWindowUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const changeHotKeyIncreaseVolume = (key: string) => {
+    const handleHotKeyIncreaseVolumeUpdate = (key: string) => {
       new Logger('ActionScanner').info(`Hot key increase volume updated: ${key}`);
       increaseVolumeKeyRef.current = key;
     };
-    changeHotKeyIncreaseVolume(ipc.systemSettings.hotKeyIncreaseVolume.get());
-    const unsub = ipc.systemSettings.hotKeyIncreaseVolume.onUpdate(changeHotKeyIncreaseVolume);
+
+    handleHotKeyIncreaseVolumeUpdate(ipc.systemSettings.hotKeyIncreaseVolume.get());
+
+    const unsub = ipc.systemSettings.hotKeyIncreaseVolume.onUpdate(handleHotKeyIncreaseVolumeUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const changeHotKeyDecreaseVolume = (key: string) => {
+    const handleHotKeyDecreaseVolumeUpdate = (key: string) => {
       new Logger('ActionScanner').info(`Hot key decrease volume updated: ${key}`);
       decreaseVolumeKeyRef.current = key;
     };
-    changeHotKeyDecreaseVolume(ipc.systemSettings.hotKeyDecreaseVolume.get());
-    const unsub = ipc.systemSettings.hotKeyDecreaseVolume.onUpdate(changeHotKeyDecreaseVolume);
+
+    handleHotKeyDecreaseVolumeUpdate(ipc.systemSettings.hotKeyDecreaseVolume.get());
+
+    const unsub = ipc.systemSettings.hotKeyDecreaseVolume.onUpdate(handleHotKeyDecreaseVolumeUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const changeHotKeyToggleSpeaker = (key: string) => {
+    const handleHotKeyToggleSpeakerUpdate = (key: string) => {
       new Logger('ActionScanner').info(`Hot key toggle speaker updated: ${key}`);
       toggleSpeakerKeyRef.current = key;
     };
-    changeHotKeyToggleSpeaker(ipc.systemSettings.hotKeyToggleSpeaker.get());
-    const unsub = ipc.systemSettings.hotKeyToggleSpeaker.onUpdate(changeHotKeyToggleSpeaker);
+
+    handleHotKeyToggleSpeakerUpdate(ipc.systemSettings.hotKeyToggleSpeaker.get());
+
+    const unsub = ipc.systemSettings.hotKeyToggleSpeaker.onUpdate(handleHotKeyToggleSpeakerUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const changeHotKeyToggleMicrophone = (key: string) => {
+    const handleHotKeyToggleMicrophoneUpdate = (key: string) => {
       new Logger('ActionScanner').info(`Hot key toggle microphone updated: ${key}`);
       toggleMicrophoneKeyRef.current = key;
     };
-    changeHotKeyToggleMicrophone(ipc.systemSettings.hotKeyToggleMicrophone.get());
-    const unsub = ipc.systemSettings.hotKeyToggleMicrophone.onUpdate(changeHotKeyToggleMicrophone);
+
+    handleHotKeyToggleMicrophoneUpdate(ipc.systemSettings.hotKeyToggleMicrophone.get());
+
+    const unsub = ipc.systemSettings.hotKeyToggleMicrophone.onUpdate(handleHotKeyToggleMicrophoneUpdate);
     return () => unsub();
   }, []);
 

@@ -137,15 +137,12 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
 
       recalc();
 
-      if (anchorEl) {
-        window.addEventListener('resize', recalc);
-        window.addEventListener('scroll', recalc, true);
-
-        return () => {
-          window.removeEventListener('resize', recalc);
-          window.removeEventListener('scroll', recalc, true);
-        };
-      }
+      window.addEventListener('resize', recalc);
+      window.addEventListener('scroll', recalc, true);
+      return () => {
+        window.removeEventListener('resize', recalc);
+        window.removeEventListener('scroll', recalc, true);
+      };
     }, [x, y, direction, anchorEl]);
 
     return (

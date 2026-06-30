@@ -127,19 +127,18 @@ const ServerSearchBar: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
-    const onPointerDown = (event: MouseEvent) => {
+    const handlePointerDown = (event: MouseEvent) => {
       if (searchBarRef.current && !searchBarRef.current.contains(event.target as Node)) {
         clearSearchState(true);
       }
     };
 
-    document.addEventListener('pointerdown', onPointerDown);
-
-    return () => document.removeEventListener('pointerdown', onPointerDown);
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
+    const handleDeepLink = (serverDisplayId: string) => {
       if (!userId || !serverDisplayId) return;
 
       ipc.api.searchServer({ query: serverDisplayId }).then((servers) => {
@@ -148,8 +147,9 @@ const ServerSearchBar: React.FC = React.memo(() => {
 
         selectServer(target);
       });
-    });
+    };
 
+    const unsub = ipc.deepLink.onDeepLink(handleDeepLink);
     return () => unsub();
   }, [userId, selectServer]);
 

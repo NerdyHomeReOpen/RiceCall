@@ -8,40 +8,39 @@ import FriendPageContent from './FriendPageContent';
 import styles from './Friend.module.css';
 
 interface FriendPageProps {
-  display: boolean;
+  isActive: boolean;
 }
 
-const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ display }) => {
-  const sidebarRef = useRef<HTMLDivElement>(null);
-  const sidebarIsResizingRef = useRef<boolean>(false);
+const FriendPageComponent: React.FC<FriendPageProps> = React.memo(({ isActive }) => {
+  const sidebarEl = useRef<HTMLDivElement>(null);
+  const isSidebarResizing = useRef<boolean>(false);
 
   const handleSidebarHandleDown = (e: React.PointerEvent<HTMLDivElement>) => {
     e.currentTarget.setPointerCapture(e.pointerId);
-    sidebarIsResizingRef.current = true;
+    isSidebarResizing.current = true;
   };
 
   const handleSidebarHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
-    if (!sidebarIsResizingRef.current || !sidebarRef.current) return;
-    sidebarRef.current.style.width = `${e.clientX}px`;
+    if (!isSidebarResizing.current || !sidebarEl.current) return;
+    sidebarEl.current.style.width = `${e.clientX}px`;
   };
 
   useEffect(() => {
-    const onPointerup = () => {
-      sidebarIsResizingRef.current = false;
+    const handlePointerUp = () => {
+      isSidebarResizing.current = false;
     };
 
-    document.addEventListener('pointerup', onPointerup);
-
-    return () => document.removeEventListener('pointerup', onPointerup);
+    document.addEventListener('pointerup', handlePointerUp);
+    return () => document.removeEventListener('pointerup', handlePointerUp);
   }, []);
 
   return (
-    <main className={styles['friend-page']} style={display ? {} : { display: 'none' }}>
+    <main className={styles['friend-page']} style={isActive ? {} : { display: 'none' }}>
       <header className={styles['header']}>
         <FriendPageHeader />
       </header>
       <main className={styles['body']}>
-        <aside ref={sidebarRef} className={styles['sidebar']}>
+        <aside ref={sidebarEl} className={styles['sidebar']}>
           <FriendPageSidebar />
         </aside>
         <div className="resize-handle" onPointerDown={handleSidebarHandleDown} onPointerMove={handleSidebarHandleMove} />

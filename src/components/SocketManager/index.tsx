@@ -220,6 +220,7 @@ const SocketManager: React.FC = React.memo(() => {
 
       disconnectTimer.current = setTimeout(() => dispatch(Store.setIsSocketConnected(false)), 30000);
     });
+
     return () => unsub();
   }, [dispatch]);
 

@@ -70,7 +70,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
       speaker.volume = 0;
       speaker.autoplay = true;
       speaker.style.display = 'none';
-      speaker.play().catch(() => { });
+      speaker.play().catch(() => {});
       speaker.remove();
     },
     [removeSpeakerAudio, initAudioContext, audioContextRef, outputDesRef, masterGainNodeRef, speakerNodesRef, rafIdListRef, audioProducerRef],
@@ -113,7 +113,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
   }, [changeSpeakerVolume]);
 
   useEffect(() => {
-    const changeOutputAudioDevice = (outputAudioDevice: string) => {
+    const handleOutputAudioDeviceUpdate = (outputAudioDevice: string) => {
       new Logger('WebRTC').info(`Output audio device updated: ${outputAudioDevice}`);
       const el = speakerRef.current;
       if (el && typeof el.setSinkId === 'function') {
@@ -123,8 +123,10 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
         });
       }
     };
-    changeOutputAudioDevice(ipc.systemSettings.outputAudioDevice.get());
-    const unsub = ipc.systemSettings.outputAudioDevice.onUpdate(changeOutputAudioDevice);
+
+    handleOutputAudioDeviceUpdate(ipc.systemSettings.outputAudioDevice.get());
+
+    const unsub = ipc.systemSettings.outputAudioDevice.onUpdate(handleOutputAudioDeviceUpdate);
     return () => unsub();
   }, [speakerRef]);
 

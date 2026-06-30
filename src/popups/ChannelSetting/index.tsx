@@ -226,12 +226,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   };
 
   useEffect(() => {
-    const onPointerup = () => {
+    const handlePointerUp = () => {
       isResizingModeratorColumn.current = false;
       isResizingBlockMemberColumn.current = false;
     };
-    window.addEventListener('pointerup', onPointerup);
-    return () => window.removeEventListener('pointerup', onPointerup);
+
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => window.removeEventListener('pointerup', handlePointerUp);
   }, []);
 
   useEffect(() => {

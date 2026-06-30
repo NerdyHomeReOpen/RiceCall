@@ -7,12 +7,12 @@ import * as ipc from '@/main/ipc';
 import styles from './Login.module.css';
 
 interface LoginPageProps {
-  display: boolean;
+  isActive: boolean;
   onNavigateToRegisterPage: () => void;
   onNavigateToChangeServerPage: () => void;
 }
 
-const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onNavigateToRegisterPage, onNavigateToChangeServerPage }) => {
+const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ isActive, onNavigateToRegisterPage, onNavigateToChangeServerPage }) => {
   const { t } = useTranslation();
 
   const comboEl = useRef<HTMLDivElement>(null);
@@ -101,33 +101,32 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onNa
 
     setAccount(accounts[loginAccount] ? loginAccount : '');
     setPassword(accounts[loginAccount]?.password ?? '');
-    setIsRememberAccChecked(!!accounts[loginAccount]?.rememberAccount);
-    setIsAutoLoginChecked(!!accounts[loginAccount]?.autoLogin);
+    setIsRememberAccChecked(accounts[loginAccount]?.rememberAccount ?? false);
+    setIsAutoLoginChecked(accounts[loginAccount]?.autoLogin ?? false);
   }, [accounts]);
 
   useEffect(() => {
-    const changeAccounts = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => {
+    const updateAccounts = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => {
       setAccounts(accounts);
     };
 
-    changeAccounts(ipc.accounts.get());
-    const unsub = ipc.accounts.onUpdate(changeAccounts);
+    updateAccounts(ipc.accounts.get());
+    const unsub = ipc.accounts.onUpdate(updateAccounts);
 
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const onPointerDown = (e: MouseEvent) => {
+    const handlePointerDown = (e: MouseEvent) => {
       if (!comboEl.current?.contains(e.target as Node)) setIsAccDropdownVisible(false);
     };
 
-    document.addEventListener('pointerdown', onPointerDown);
-
-    return () => document.removeEventListener('pointerdown', onPointerDown);
+    document.addEventListener('pointerdown', handlePointerDown);
+    return () => document.removeEventListener('pointerdown', handlePointerDown);
   }, []);
 
   return (
-    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
+    <main className={styles['page']} style={isActive ? {} : { display: 'none' }}>
       <main className={styles['body']}>
         <div className={styles['app-logo']} />
         <form className={styles['form-wrapper']} onSubmit={handleSubmit}>

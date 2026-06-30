@@ -54,12 +54,16 @@ interface PopupProviderProps {
 }
 
 const PopupProvider = ({ children }: PopupProviderProps) => {
+  const startX = useRef(0);
+  const startY = useRef(0);
+  const popupStartX = useRef(0);
+  const popupStartY = useRef(0);
+  const holdingPopupId = useRef<string | null>(null);
+  const topZIndex = useRef(201);
+  const popupsRef = useRef<Types.Popup[]>([]);
+
   const [popups, setPopups] = useState<Types.Popup[]>([]);
   const [minimizedIds, setMinimizedIds] = useState<Set<string>>(new Set());
-
-  const holdingPopupIdRef = useRef<string | null>(null);
-  const topZIndexRef = useRef(201);
-  const popupsRef = useRef<Types.Popup[]>([]);
 
   const minimizedPopups = popups.filter((p) => minimizedIds.has(p.id));
 
@@ -175,8 +179,8 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
           const popupEl = document.querySelector(`[data-popup-id="${id}"]`) as HTMLElement;
           if (!popupEl) return;
 
-          topZIndexRef.current++;
-          popupEl.style.zIndex = `${topZIndexRef.current}`;
+          topZIndex.current++;
+          popupEl.style.zIndex = `${topZIndex.current}`;
 
           return;
         }
@@ -230,45 +234,48 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
   }, [handleRestore]);
 
   useEffect(() => {
-    let startX = 0;
-    let startY = 0;
-    let popupStartX = 0;
-    let popupStartY = 0;
-
     const handleMouseDown = (e: MouseEvent) => {
       const el = e.target as HTMLElement;
 
       const popupEl = el.closest('[data-popup-id]') as HTMLElement | null;
       if (!popupEl) return;
 
-      topZIndexRef.current++;
-      popupEl.style.zIndex = `${topZIndexRef.current}`;
+      topZIndex.current++;
+      popupEl.style.zIndex = `${topZIndex.current}`;
 
       if (!el.closest('[data-draggable]')) return;
 
       const id = popupEl.getAttribute('data-popup-id');
       if (!id) return;
 
-      holdingPopupIdRef.current = id;
+      holdingPopupId.current = id;
 
-      startX = e.clientX;
-      startY = e.clientY;
-      popupStartX = popupEl.offsetLeft;
-      popupStartY = popupEl.offsetTop;
+      startX.current = e.clientX;
+      startY.current = e.clientY;
+      popupStartX.current = popupEl.offsetLeft;
+      popupStartY.current = popupEl.offsetTop;
     };
 
+    document.addEventListener('mousedown', handleMouseDown);
+
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
-      const id = holdingPopupIdRef.current;
+      const id = holdingPopupId.current;
       if (!id) return;
 
       const popupEl = document.querySelector(`[data-popup-id="${id}"]`) as HTMLElement;
       if (!popupEl) return;
 
-      const dx = e.clientX - startX;
-      const dy = e.clientY - startY;
+      const dx = e.clientX - startX.current;
+      const dy = e.clientY - startY.current;
 
-      let newLeft = popupStartX + dx;
-      let newTop = popupStartY + dy;
+      let newLeft = popupStartX.current + dx;
+      let newTop = popupStartY.current + dy;
 
       const popupWidth = popupEl.offsetWidth;
       const popupHeight = popupEl.offsetHeight;
@@ -280,19 +287,17 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
       popupEl.style.top = `${newTop}px`;
     };
 
-    const handleMouseUp = () => {
-      holdingPopupIdRef.current = null;
-    };
-
-    document.addEventListener('mousedown', handleMouseDown);
     document.addEventListener('mousemove', handleMouseMove);
-    document.addEventListener('mouseup', handleMouseUp);
+    return () => document.removeEventListener('mousemove', handleMouseMove);
+  }, []);
 
-    return () => {
-      document.removeEventListener('mousedown', handleMouseDown);
-      document.removeEventListener('mousemove', handleMouseMove);
-      document.removeEventListener('mouseup', handleMouseUp);
+  useEffect(() => {
+    const handleMouseUp = () => {
+      holdingPopupId.current = null;
     };
+
+    document.addEventListener('mouseup', handleMouseUp);
+    return () => document.removeEventListener('mouseup', handleMouseUp);
   }, []);
 
   useEffect(() => {
@@ -311,7 +316,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
             position: 'absolute',
             top: popup.position.top,
             left: popup.position.left,
-            zIndex: topZIndexRef.current,
+            zIndex: topZIndex.current,
             boxShadow: '0 0 10px 0 rgba(0, 0, 0, 0.5)',
             height: popup.size.height,
             width: popup.size.width,

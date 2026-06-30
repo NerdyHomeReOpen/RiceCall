@@ -162,59 +162,69 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
   }, [changeMicVolume]);
 
   useEffect(() => {
-    const changeInputAudioDevice = (inputAudioDevice: string) => {
+    const handleInputAudioDeviceUpdate = (inputAudioDevice: string) => {
       new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);
       inputAudioDeviceRef.current = inputAudioDevice;
       if (Store.store.getState().webrtc.micIsTaken) startSpeaking();
     };
-    changeInputAudioDevice(ipc.systemSettings.inputAudioDevice.get());
-    const unsub = ipc.systemSettings.inputAudioDevice.onUpdate(changeInputAudioDevice);
+
+    handleInputAudioDeviceUpdate(ipc.systemSettings.inputAudioDevice.get());
+
+    const unsub = ipc.systemSettings.inputAudioDevice.onUpdate(handleInputAudioDeviceUpdate);
     return () => unsub();
   }, [startSpeaking, inputAudioDeviceRef]);
 
   useEffect(() => {
-    const changeEchoCancellation = (echoCancellation: boolean) => {
+    const handleEchoCancellationUpdate = (echoCancellation: boolean) => {
       new Logger('WebRTC').info(`Echo cancellation updated: ${echoCancellation}`);
       echoCancellationRef.current = echoCancellation;
       if (Store.store.getState().webrtc.micIsTaken) startSpeaking();
     };
-    changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
-    const unsub = ipc.systemSettings.echoCancellation.onUpdate(changeEchoCancellation);
+
+    handleEchoCancellationUpdate(ipc.systemSettings.echoCancellation.get());
+
+    const unsub = ipc.systemSettings.echoCancellation.onUpdate(handleEchoCancellationUpdate);
     return () => unsub();
   }, [startSpeaking, echoCancellationRef]);
 
   useEffect(() => {
-    const changeNoiseCancellation = (noiseCancellation: boolean) => {
+    const handleNoiseCancellationUpdate = (noiseCancellation: boolean) => {
       new Logger('WebRTC').info(`Noise cancellation updated: ${noiseCancellation}`);
       noiseCancellationRef.current = noiseCancellation;
       if (Store.store.getState().webrtc.micIsTaken) startSpeaking();
     };
-    changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
-    const unsub = ipc.systemSettings.noiseCancellation.onUpdate(changeNoiseCancellation);
+
+    handleNoiseCancellationUpdate(ipc.systemSettings.noiseCancellation.get());
+
+    const unsub = ipc.systemSettings.noiseCancellation.onUpdate(handleNoiseCancellationUpdate);
     return () => unsub();
   }, [startSpeaking, noiseCancellationRef]);
 
   useEffect(() => {
-    const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
+    const handleMicrophoneAmplificationUpdate = (microphoneAmplification: boolean) => {
       new Logger('WebRTC').info(`Microphone amplification updated: ${microphoneAmplification}`);
       microphoneAmplificationRef.current = microphoneAmplification;
       changeMicVolume(Store.store.getState().webrtc.micVolume || 100);
     };
-    changeMicrophoneAmplification(ipc.systemSettings.microphoneAmplification.get());
-    const unsub = ipc.systemSettings.microphoneAmplification.onUpdate(changeMicrophoneAmplification);
+
+    handleMicrophoneAmplificationUpdate(ipc.systemSettings.microphoneAmplification.get());
+
+    const unsub = ipc.systemSettings.microphoneAmplification.onUpdate(handleMicrophoneAmplificationUpdate);
     return () => unsub();
   }, [changeMicVolume, microphoneAmplificationRef]);
 
   useEffect(() => {
-    const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
+    const handleSpeakingModeUpdate = (speakingMode: Types.SpeakingMode) => {
       new Logger('WebRTC').info(`Speaking mode updated: ${speakingMode}`);
       micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
         track.enabled = speakingMode === 'key' ? Store.store.getState().webrtc.speakKeyIsPressed : true;
       });
       Store.store.dispatch(Store.setWebRTC({ speakingMode }));
     };
-    changeSpeakingMode(ipc.systemSettings.speakingMode.get());
-    const unsub = ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode);
+
+    handleSpeakingModeUpdate(ipc.systemSettings.speakingMode.get());
+
+    const unsub = ipc.systemSettings.speakingMode.onUpdate(handleSpeakingModeUpdate);
     return () => unsub();
   }, [micNodesRef]);
 

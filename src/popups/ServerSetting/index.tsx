@@ -275,13 +275,14 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   };
 
   useEffect(() => {
-    const onPointerup = () => {
+    const handlePointerUp = () => {
       isResizingMemberColumn.current = false;
       isResizingApplicationColumn.current = false;
       isResizingBlockMemberColumn.current = false;
     };
-    window.addEventListener('pointerup', onPointerup);
-    return () => window.removeEventListener('pointerup', onPointerup);
+
+    window.addEventListener('pointerup', handlePointerUp);
+    return () => window.removeEventListener('pointerup', handlePointerUp);
   }, []);
 
   useEffect(() => {

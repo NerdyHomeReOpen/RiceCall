@@ -13,11 +13,11 @@ import ServerOption from './ServerOption';
 import styles from './ChangeServer.module.css';
 
 interface ChangeServerPageProps {
-  display: boolean;
+  isActive: boolean;
   onNavigateToLoginPage: () => void;
 }
 
-const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({ display, onNavigateToLoginPage }) => {
+const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({ isActive, onNavigateToLoginPage }) => {
   const { t } = useTranslation();
 
   const handleServerSelect = useCallback(
@@ -40,7 +40,7 @@ const ChangeServerPageComponent: React.FC<ChangeServerPageProps> = React.memo(({
   };
 
   return (
-    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
+    <main className={styles['page']} style={isActive ? {} : { display: 'none' }}>
       <main className={styles['body']}>
         <div className={styles['app-logo']} />
         <div className={styles['form-wrapper']}>

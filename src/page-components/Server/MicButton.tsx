@@ -124,18 +124,18 @@ const MicButton: React.FC = React.memo(() => {
   }, [userIsSpeaking, userIsControlled, currentChannelId, takeMic, releaseMic, stopMixing]);
 
   useEffect(() => {
-    const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
+    const handleSpeakingModeUpdate = (speakingMode: Types.SpeakingMode) => {
       setSpeakingMode(speakingMode);
     };
 
-    const changeDefaultSpeakingKey = (key: string) => {
+    const handleDefaultSpeakingKeyUpdate = (key: string) => {
       setSpeakingKey(key);
     };
 
-    changeSpeakingMode(ipc.systemSettings.speakingMode.get());
-    changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
-    const unsubs = [ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode), ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey)];
+    handleSpeakingModeUpdate(ipc.systemSettings.speakingMode.get());
+    handleDefaultSpeakingKeyUpdate(ipc.systemSettings.defaultSpeakingKey.get());
 
+    const unsubs = [ipc.systemSettings.speakingMode.onUpdate(handleSpeakingModeUpdate), ipc.systemSettings.defaultSpeakingKey.onUpdate(handleDefaultSpeakingKeyUpdate)];
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 

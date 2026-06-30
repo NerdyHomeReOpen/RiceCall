@@ -78,7 +78,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       try {
         consumer.close();
-      } catch { }
+      } catch {}
       delete consumersRef.current[producerId];
 
       removeSpeakerAudio(userId);
@@ -106,7 +106,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         sendTransportRef.current = null;
         try {
           old.close();
-        } catch { }
+        } catch {}
       }
 
       const transport = await ipc.socket.emit('SFUCreateTransport', { direction: 'send', channelId }).catch((e) => {
@@ -221,7 +221,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         if (audioProducerRef.current === producer) audioProducerRef.current = null;
         try {
           producer.close();
-        } catch { }
+        } catch {}
       });
 
       producer.on('trackended', () => {
@@ -229,7 +229,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         if (audioProducerRef.current === producer) audioProducerRef.current = null;
         try {
           producer.close();
-        } catch { }
+        } catch {}
       });
 
       audioProducerRef.current = producer;
@@ -244,7 +244,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         recvTransportRef.current = null;
         try {
           old.close();
-        } catch { }
+        } catch {}
       }
 
       for (const producerId of Object.keys(consumersRef.current)) {
@@ -252,7 +252,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         const userId = consumer.appData.userId;
         try {
           consumer.close();
-        } catch { }
+        } catch {}
         if (typeof userId === 'string') removeSpeakerAudio(userId);
       }
       consumersRef.current = {};
@@ -340,7 +340,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       audioProducerRef.current = null;
       try {
         oldProducer.close();
-      } catch { }
+      } catch {}
     }
 
     if (sendTransportRef.current) {
@@ -348,7 +348,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       sendTransportRef.current = null;
       try {
         old.close();
-      } catch { }
+      } catch {}
     }
   }, [sendTransportRef, audioProducerRef]);
 
@@ -366,7 +366,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       const userId = consumer.appData.userId;
       try {
         consumer.close();
-      } catch { }
+      } catch {}
       if (typeof userId === 'string') removeSpeakerAudio(userId);
     }
     consumersRef.current = {};
@@ -376,7 +376,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       recvTransportRef.current = null;
       try {
         old.close();
-      } catch { }
+      } catch {}
     }
   }, [recvTransportRef, consumersRef, removeSpeakerAudio]);
 
@@ -469,6 +469,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         await setupSend(channelId);
       }
     });
+
     return () => unsub();
   }, [setupRecv, setupSend, recvTransportRef, sendTransportRef]);
 
@@ -477,6 +478,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       closeSend();
       closeRecv();
     });
+
     return () => unsub();
   }, [closeSend, closeRecv]);
 
@@ -487,6 +489,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         new Logger('WebRTC').error(`Error consuming producer: ${e}`);
       });
     });
+
     return () => unsub();
   }, [consumeOne]);
 
@@ -497,6 +500,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         new Logger('WebRTC').error(`Error unconsuming producer: ${e}`);
       });
     });
+
     return () => unsub();
   }, [unconsumeOne]);
 

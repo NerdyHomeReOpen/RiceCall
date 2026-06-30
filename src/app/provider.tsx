@@ -30,53 +30,53 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
-    const handleFontChange = (font: string | null) => {
+    const handleFontUpdate = (font: string | null) => {
       if (!font) return;
       document.body.style.setProperty('font-family', font, 'important');
       document.body.style.setProperty('--font-family', font, 'important');
     };
 
-    handleFontChange(ipc.systemSettings.font.get());
-    const unsub = ipc.systemSettings.font.onUpdate(handleFontChange);
+    handleFontUpdate(ipc.systemSettings.font.get());
 
+    const unsub = ipc.systemSettings.font.onUpdate(handleFontUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const handleFontSizeChange = (fontSize: number | null) => {
+    const handleFontSizeUpdate = (fontSize: number | null) => {
       if (!fontSize) return;
       document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
     };
 
-    handleFontSizeChange(ipc.systemSettings.fontSize.get());
-    const unsub = ipc.systemSettings.fontSize.onUpdate(handleFontSizeChange);
+    handleFontSizeUpdate(ipc.systemSettings.fontSize.get());
 
+    const unsub = ipc.systemSettings.fontSize.onUpdate(handleFontSizeUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const handleThemeChange = (theme: Types.Theme | null) => {
+    const handleThemeUpdate = (theme: Types.Theme | null) => {
       if (!theme) return;
       document.body.style.setProperty('--header-image', theme.headerImage, 'important');
       document.body.style.setProperty('--main-color', theme.mainColor, 'important');
       document.body.style.setProperty('--secondary-color', theme.secondaryColor, 'important');
     };
 
-    handleThemeChange(ipc.customThemes.current.get());
-    const unsub = ipc.customThemes.current.onUpdate(handleThemeChange);
+    handleThemeUpdate(ipc.customThemes.current.get());
 
+    const unsub = ipc.customThemes.current.onUpdate(handleThemeUpdate);
     return () => unsub();
   }, []);
 
   useEffect(() => {
-    const handleLanguageChange = (language: Types.LanguageKey) => {
+    const handleLanguageUpdate = (language: Types.LanguageKey) => {
       if (!language) return;
       changeLanguage(language);
     };
 
-    handleLanguageChange(ipc.systemSettings.language.get());
-    const unsub = ipc.systemSettings.language.onUpdate(handleLanguageChange);
+    handleLanguageUpdate(ipc.systemSettings.language.get());
 
+    const unsub = ipc.systemSettings.language.onUpdate(handleLanguageUpdate);
     return () => unsub();
   }, []);
 

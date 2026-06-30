@@ -135,15 +135,12 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   };
 
   useEffect(() => {
-    const onPointerup = () => {
+    const handlePointerUp = () => {
       isResizingQueueList.current = false;
     };
 
-    document.addEventListener('pointerup', onPointerup);
-
-    return () => {
-      document.removeEventListener('pointerup', onPointerup);
-    };
+    document.addEventListener('pointerup', handlePointerUp);
+    return () => document.removeEventListener('pointerup', handlePointerUp);
   }, []);
 
   useEffect(() => {

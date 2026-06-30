@@ -9,11 +9,11 @@ import { openAlertDialog } from '@/services';
 import styles from './Register.module.css';
 
 interface RegisterPageProps {
-  display: boolean;
+  isActive: boolean;
   onNavigateToLoginPage: () => void;
 }
 
-const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, onNavigateToLoginPage }) => {
+const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ isActive, onNavigateToLoginPage }) => {
   const { t } = useTranslation();
 
   const [account, setAccount] = useState<string>('');
@@ -40,43 +40,43 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     !usernameError &&
     !emailError;
 
-  function validateAccount(value: string): string {
+  const validateAccount = (value: string): string => {
     value = value.trim();
     if (!value) return t('account-required');
     if (value.length < 4) return t('account-min-length');
     if (value.length > 16) return t('account-max-length');
     if (!/^[A-Za-z0-9_\.]+$/.test(value)) return t('account-invalid-format');
     return '';
-  }
+  };
 
-  function validatePassword(value: string): string {
+  const validatePassword = (value: string): string => {
     value = value.trim();
     if (!value) return t('password-required');
     if (value.length < 8) return t('password-min-length');
     if (value.length > 20) return t('password-max-length');
     if (!/^[A-Za-z0-9@$!%*#?&]{8,20}$/.test(value)) return t('password-invalid-format');
     return '';
-  }
+  };
 
-  function validateConfirmPassword(value: string, check: string): string {
+  const validateConfirmPassword = (value: string, check: string): string => {
     if (value !== check) return t('passwords-do-not-match');
     return '';
-  }
+  };
 
-  function validateEmail(value: string): string {
+  const validateEmail = (value: string): string => {
     if (!value) return t('email-required');
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) return t('email-invalid-format');
     return '';
-  }
+  };
 
-  function validateUsername(value: string): string {
+  const validateUsername = (value: string): string => {
     value = value.trim();
     if (!value) return t('username-required');
     if (value.length < 1) return t('username-min-length');
     if (value.length > 32) return t('username-max-length');
     if (!/^[A-Za-z0-9\u4e00-\u9fa5]+$/.test(value)) return t('username-invalid-format');
     return '';
-  }
+  };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -164,7 +164,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
   };
 
   return (
-    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
+    <main className={styles['page']} style={isActive ? {} : { display: 'none' }}>
       <main className={styles['body']}>
         <form className={styles['form-wrapper']} onSubmit={handleSubmit}>
           {isLoading ? (

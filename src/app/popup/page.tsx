@@ -149,8 +149,15 @@ const PopupPageComponent: React.FC = React.memo(() => {
   }, [popup?.id]);
 
   useEffect(() => {
-    const unsubs = [ipc.window.onUnmaximize(() => setIsFullscreen(false)), ipc.window.onMaximize(() => setIsFullscreen(true))];
+    const handleUnmaximize = () => {
+      setIsFullscreen(false);
+    };
 
+    const handleMaximize = () => {
+      setIsFullscreen(true);
+    };
+
+    const unsubs = [ipc.window.onUnmaximize(handleUnmaximize), ipc.window.onMaximize(handleMaximize)];
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
