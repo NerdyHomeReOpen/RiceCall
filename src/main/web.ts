@@ -203,7 +203,10 @@ async function onReady() {
   await i18nReady;
 
   const token = store.get('token');
-  if (!token) return;
+  if (!token) {
+    if (window.location.pathname !== '/auth') window.location.replace('/auth');
+    return;
+  }
   autoLogin(token);
 }
 

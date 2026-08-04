@@ -68,6 +68,8 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
   }, []);
 
   useEffect(() => {
+    if (!i18nLoaded) return;
+
     const changeLang = (language: Types.LanguageKey) => {
       new Logger('Language').info(`Language updated: ${language}`);
       if (!language) return;
@@ -76,7 +78,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
     changeLang(ipc.systemSettings.language.get());
     const unsub = ipc.systemSettings.language.onUpdate(changeLang);
     return () => unsub();
-  }, []);
+  }, [i18nLoaded]);
 
   if (!i18nLoaded) return null;
 
