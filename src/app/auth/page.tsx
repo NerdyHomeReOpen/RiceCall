@@ -6,11 +6,11 @@ import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
-import AuthHeader from '@/components/AuthHeader';
+import AuthHeader from '@/components/auth-header';
 
-import LoginPage from '@/page-components/Login';
-import RegisterPage from '@/page-components/Register';
-import ChangeServerPage from '@/page-components/ChangeServer';
+import LoginPage from '@/page-components/login';
+import RegisterPage from '@/page-components/register';
+import ChangeServerPage from '@/page-components/change-server';
 
 const AuthPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();

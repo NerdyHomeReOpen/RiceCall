@@ -4,7 +4,7 @@ import Env from '@/utils/env';
 import { createPopup } from '@/main/web';
 
 export function errorSubmit(errorId: string, error: Error) {
-  const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
+  const errorSubmissionUrl = Env.get().RICE_CALL_ERROR_SUBMISSION_URL;
   if (!errorSubmissionUrl) return;
 
   fetch(errorSubmissionUrl, {
@@ -48,7 +48,7 @@ export function errorSubmit(errorId: string, error: Error) {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function webRTCSignalStateChange(formData: { signalState: string; userId: string; channelId: string; info?: any }) {
   return new Promise((resolve) => {
-    const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
+    const errorSubmissionUrl = Env.get().RICE_CALL_ERROR_SUBMISSION_URL;
     if (!errorSubmissionUrl) return;
 
     if (formData.signalState === 'disconnected') {

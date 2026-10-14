@@ -520,6 +520,7 @@ textarea {
 
 /* Permission */
 /* TODO: Remove .Male and .Female */
+/* stylelint-disable selector-class-pattern -- The API still sends capitalized gender values. */
 
 .permission-male,
 .permission-Male {
@@ -546,6 +547,8 @@ textarea {
   background-position: 0 0;
   background-size: auto;
 }
+
+/* stylelint-enable selector-class-pattern */
 
 .permission-lv-1 {
   background-position: 0 0;
@@ -899,6 +902,7 @@ textarea {
   }
 }
 
+/* stylelint-disable no-descending-specificity -- Markdown and input tables are separate UI scopes. */
 .input-box table {
   display: flex;
   flex-direction: column;
@@ -999,6 +1003,7 @@ textarea {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
+/* stylelint-enable no-descending-specificity */
 
 .input-box textarea {
   position: relative;

@@ -2,15 +2,15 @@ import React, { useEffect, useContext, createContext, ReactNode, useCallback, us
 
 import type * as Types from '@/types';
 
-import ContextMenu from '@/components/ContextMenu';
-import MicContextMenu from '@/components/MicContextMenu';
-import NotificationMenu from '@/components/NotificationMenu';
-import UserInfoCard from '@/components/UserInfoCard';
-import BadgeInfoCard from '@/components/BadgeInfoCard';
-import EmojiPicker from '@/components/EmojiPicker';
-import ColorPicker from '@/components/ColorPicker';
-import StatusDropdown from '@/components/StatusDropdown';
-import EmbedLinkInput from '@/components/EmbedLinkInput';
+import ContextMenu from '@/components/context-menu';
+import MicContextMenu from '@/components/mic-context-menu';
+import NotificationMenu from '@/components/notification-menu';
+import UserInfoCard from '@/components/user-info-card';
+import BadgeInfoCard from '@/components/badge-info-card';
+import EmojiPicker from '@/components/emoji-picker';
+import ColorPicker from '@/components/color-picker';
+import StatusDropdown from '@/components/status-dropdown';
+import EmbedLinkInput from '@/components/embed-link-input';
 
 interface ContextMenuContextType {
   showContextMenu: (x: number, y: number, position: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom', items: Types.ContextMenuItem[]) => void;

@@ -4,7 +4,7 @@ import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 
-import initialDataLoader from '@/main/popup/initialDataLoader';
+import initialDataLoader from '@/main/popup/initial-data-loader';
 import { broadcast, closeAllPopups, createPopup, getSettings, popups } from '@/main/electron';
 
 export function registerPopupHandlers() {

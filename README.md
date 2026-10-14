@@ -57,7 +57,7 @@ Please read the documentation before downloading.
 ```bash
 RiceCall
 ├── .github/                  # CI/CD workflows and issue templates
-├── build_deb/                # Linux post-install scripts
+├── build-deb/                # Linux post-install scripts
 ├── docs/                     # Project documentation
 ├── public/                   # Static assets (images, icons, fonts, etc.)
 ├── resources/                # Electron packaging resources (icons, tray)
@@ -98,16 +98,18 @@ RiceCall
 ### 1. Copy `.env.example` to `.env` and fill in all required options
 
 ```env
-# Server Settings
-API_URL=http://localhost:4500 # Do not include the trailing slash
-WS_URL=http://localhost:4500 # Use the same URL if your server runs locally
+# MainService API and WebSocket endpoints
+RICE_CALL_API_URL=http://localhost:4500
+RICE_CALL_WS_URL=http://localhost:4500
 
-# Static Files Settings
-DOCS_BASE_URL=https://your-host # Base URL of the static files server
+# Published static files
+RICE_CALL_DOCS_BASE_URL=https://your-host
 
-# Error Submission URL (Optional)
-ERROR_SUBMISSION_URL=https://error-submission.example.com # If not provided, errors will not be submitted
+# Optional error reporting endpoint
+RICE_CALL_ERROR_SUBMISSION_URL=
 ```
+
+To switch the app to a development server, create `.env.dev` with the same variable names for the endpoints you want to override. Release workflows generate both environment files from the existing GitHub secrets.
 
 ### 2. Install dependencies
 
@@ -130,5 +132,9 @@ yarn build
 ### Other Scripts
 
 ```bash
-yarn format # Format all files with Prettier
+yarn lint
+yarn check-names
+yarn typecheck
+yarn build:ci # Build the web output and Electron source without packaging
+yarn format
 ```

@@ -10,10 +10,10 @@ const nextConfig: NextConfig = {
   trailingSlash: false,
   output: 'export',
   env: {
-    API_URL: process.env.API_URL || '',
-    WS_URL: process.env.WS_URL || '',
-    DOCS_BASE_URL: process.env.DOCS_BASE_URL || '',
-    ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
+    RICE_CALL_API_URL: process.env.RICE_CALL_API_URL || '',
+    RICE_CALL_WS_URL: process.env.RICE_CALL_WS_URL || '',
+    RICE_CALL_DOCS_BASE_URL: process.env.RICE_CALL_DOCS_BASE_URL || '',
+    RICE_CALL_ERROR_SUBMISSION_URL: process.env.RICE_CALL_ERROR_SUBMISSION_URL || '',
   },
   devIndicators: false,
 };

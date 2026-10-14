@@ -2,7 +2,7 @@ import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 
-import initialDataLoader from '@/main/popup/initialDataLoader';
+import initialDataLoader from '@/main/popup/initial-data-loader';
 import { createPopup, getSettings } from '@/main/web';
 import { eventEmitter } from '@/main/event';
 

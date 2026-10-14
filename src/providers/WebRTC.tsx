@@ -7,13 +7,13 @@ import Logger from '@/utils/logger';
 import { useSoundPlayer } from '@/providers/SoundPlayer';
 import { useLoading } from '@/providers/Loading';
 
-import { useSharedRefs } from '@/hooks/WebRTC/useSharedRefs';
-import { useAudioContext } from '@/hooks/WebRTC/useAudioContext';
-import { useMicAudio } from '@/hooks/WebRTC/useMicAudio';
-import { useSpeakerAudio } from '@/hooks/WebRTC/useSpeakerAudio';
-import { useMixAudio } from '@/hooks/WebRTC/useMixAudio';
-import { useRecording } from '@/hooks/WebRTC/useRecording';
-import { useSFUTransport } from '@/hooks/WebRTC/useSFUTransport';
+import { useSharedRefs } from '@/hooks/web-rtc/useSharedRefs';
+import { useAudioContext } from '@/hooks/web-rtc/useAudioContext';
+import { useMicAudio } from '@/hooks/web-rtc/useMicAudio';
+import { useSpeakerAudio } from '@/hooks/web-rtc/useSpeakerAudio';
+import { useMixAudio } from '@/hooks/web-rtc/useMixAudio';
+import { useRecording } from '@/hooks/web-rtc/useRecording';
+import { useSFUTransport } from '@/hooks/web-rtc/useSFUTransport';
 
 interface WebRTCContextType {
   startSpeaking: () => void;

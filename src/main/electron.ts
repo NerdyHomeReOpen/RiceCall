@@ -22,7 +22,7 @@ import { registerAccountHandlers } from '@/main/accounts/electron';
 import { registerApiHandlers } from '@/main/api/electron';
 import { registerAppHandlers } from '@/main/app/electron';
 import { registerAuthHandlers, autoLogin, logout } from '@/main/auth/electron';
-import { registerCustomThemesHandlers } from '@/main/customThemes/electron';
+import { registerCustomThemesHandlers } from '@/main/custom-themes/electron';
 import { registerDiscordRPCHandlers, configureDiscordRPC, clearDiscordPresence } from '@/main/discord/electron';
 import { registerEnvHandlers } from '@/main/env/electron';
 import { registerErrorHandlers } from '@/main/error/electron';
@@ -30,8 +30,8 @@ import { registerNetworkHandlers } from '@/main/network/electron';
 import { registerPopupHandlers } from '@/main/popup/electron';
 import { registerRecordHandlers } from '@/main/record/electron';
 import { registerSocketHandlers, disconnectSocket } from '@/main/socket/electron';
-import { registerStoreStateHandlers } from '@/main/storeState/electron';
-import { registerSystemHandlers } from '@/main/systemSettings/electron';
+import { registerStoreStateHandlers } from '@/main/store-state/electron';
+import { registerSystemHandlers } from '@/main/system-settings/electron';
 import { registerTrayHandlers } from '@/main/tray/electron';
 import { registerWindowHandlers } from '@/main/window/electron';
 
@@ -290,7 +290,7 @@ export function configureLogger() {
   log.transports.file.level = 'info';
   log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
   log.transports.file.maxSize = 5 * 1024 * 1024;
-  log.transports.remote.url = `${Env.get().API_URL}/logs`;
+  log.transports.remote.url = `${Env.get().RICE_CALL_API_URL}/logs`;
   Object.assign(console, log.functions);
   log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 }

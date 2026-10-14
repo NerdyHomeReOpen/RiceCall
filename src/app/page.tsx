@@ -16,15 +16,15 @@ import { useLoading } from '@/providers/Loading';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-import Header from '@/components/Header';
-import SocketManager from '@/components/SocketManager';
-import StoreSyncer from '@/components/StoreSyncer';
-import LoadingSpinner from '@/components/LoadingSpinner';
-import NotificationToaster from '@/components/NotificationToaster';
+import Header from '@/components/header';
+import SocketManager from '@/components/socket-manager';
+import StoreSyncer from '@/components/store-syncer';
+import LoadingSpinner from '@/components/loading-spinner';
+import NotificationToaster from '@/components/notification-toaster';
 
-import FriendPage from '@/page-components/Friend';
-import HomePage from '@/page-components/Home';
-import ServerPage from '@/page-components/Server';
+import FriendPage from '@/page-components/friend';
+import HomePage from '@/page-components/home';
+import ServerPage from '@/page-components/server';
 
 const RootPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();

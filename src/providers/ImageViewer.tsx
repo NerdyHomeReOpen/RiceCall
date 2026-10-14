@@ -1,6 +1,6 @@
 import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 
-import ImageViewer from '@/components/ImageViewer';
+import ImageViewer from '@/components/image-viewer';
 
 type ImageViewerContextType = {
   selectImage: (image: string) => void;

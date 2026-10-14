@@ -51,7 +51,7 @@ export function connectSocket(token: string) {
 
   seq = 0;
 
-  socket = io(Env.get().WS_URL, {
+  socket = io(Env.get().RICE_CALL_WS_URL, {
     transports: ['websocket'],
     reconnection: true,
     reconnectionDelay: 1000,

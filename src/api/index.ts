@@ -36,7 +36,7 @@ export async function handleResponse<T>(response: Response, method: 'GET' | 'POS
 
 export async function get<T>(endpoint: string, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<T | null> {
   try {
-    const response = await fetch(`${Env.get().API_URL}${endpoint}`, {
+    const response = await fetch(`${Env.get().RICE_CALL_API_URL}${endpoint}`, {
       headers: {
         ...(options?.headers || {}),
         Authorization: `Bearer ${_token}`,
@@ -62,7 +62,7 @@ export async function post<T>(endpoint: string, data: ApiRequestData | FormData,
       Authorization: `Bearer ${_token}`,
     });
 
-    const response = await fetch(`${Env.get().API_URL}${endpoint}`, {
+    const response = await fetch(`${Env.get().RICE_CALL_API_URL}${endpoint}`, {
       method: 'POST',
       headers: headers,
       credentials: options?.credentials || 'omit',
@@ -86,7 +86,7 @@ export async function patch<T>(endpoint: string, data: Record<string, unknown>, 
       'Authorization': `Bearer ${_token}`,
     });
 
-    const response = await fetch(`${Env.get().API_URL}${endpoint}`, {
+    const response = await fetch(`${Env.get().RICE_CALL_API_URL}${endpoint}`, {
       method: 'PATCH',
       headers: headers,
       body: JSON.stringify(data),

@@ -1,6 +1,6 @@
 import React, { useContext, createContext, ReactNode, useState, useMemo, useCallback } from 'react';
 
-import LoadingOverlay from '@/components/LoadingOverlay';
+import LoadingOverlay from '@/components/loading-overlay';
 
 interface LoadingContextType {
   getIsLoading: () => boolean;
