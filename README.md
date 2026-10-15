@@ -138,3 +138,18 @@ yarn typecheck
 yarn build:ci # Build the web output and Electron source without packaging
 yarn format
 ```
+
+## 模組與子系統盤點
+
+桌面客戶端同時有 React/Next.js 畫面與 Electron 主程序；`src/main/` 的 `electron.ts`／`web.ts` 是不同執行環境的 adapter。它透過遠端服務取得資料，沒有擁有主服務的 MySQL 資料庫。
+
+| 類別 | 能力與位置 | 為什麼在此專案 |
+| --- | --- | --- |
+| 入口模組 | React/Next.js 頁面、元件與彈窗：`src/app/`、`src/page-components/`、`src/components/`、`src/popups/` | 提供桌面與 Web 畫面。 |
+| 入口模組 | Electron 主程序、preload 與 IPC：`src/main/` | 接入視窗、托盤、系統設定、更新及作業系統能力。 |
+| 功能模組 | Redux store 與切片：`src/store/` | 管理使用者、伺服器、頻道、訊息及 UI 狀態。 |
+| 子系統 | HTTP／Socket 客戶端：`src/api/`、`src/main/api/`、`src/main/socket/` | 連接 Main Service，接收即時事件。 |
+| 子系統 | WebRTC／SFU 與音訊：`src/hooks/web-rtc/`、`src/providers/WebRTC.tsx` | 處理語音傳輸、混音、錄製及裝置狀態。 |
+| 子系統 | 多語系、編輯器、Discord 與更新：`src/i18n/`、`src/extensions/`、`src/main/discord/`、`src/main/app/` | 提供客戶端專有的整合能力。 |
+
+**共用候選：** Electron/web adapter 介面、API／Socket client、WebRTC hooks、Redux slice 慣例及 UI 元件。複製時要對齊 IPC 通道、遠端事件契約和媒體生命週期；Electron 模組不適合直接放入 Nuxt 或 Node 服務。
