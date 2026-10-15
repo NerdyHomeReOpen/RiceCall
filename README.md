@@ -1,155 +1,67 @@
-<div align="center">
-  <img width="1920" height="1080" alt="discord_banner" src="https://github.com/user-attachments/assets/488a1f4c-4e03-463a-85c7-a1eef22cc505" />
-  <div height="20px">　</div>
-  <div>
-    <a title="Crowdin" target="_blank" href="https://discord.gg/adCWzv6wwS"><img src="https://img.shields.io/badge/Join-Discord-blue?logo=discord"/></a>
-    <a title="Crowdin" target="_blank" href="https://ricecall.com"><img src="https://img.shields.io/badge/Latest-0.3.21-green"/></a>
-    <a title="Crowdin" target="_blank" href="https://crowdin.com"><img src="https://badges.crowdin.net/ricecall/localized.svg"></a>
-  </div>
-</div>
+# RiceCall
 
-## Terms of Use
+[English](docs/README.en.md) · [官方網站](https://ricecall.com) · [版本下載](https://github.com/NerdyHomeReOpen/RiceCall/releases/tag/latest)
 
-**[RiceCall](https://github.com/NerdyHomeReOpen/RiceCall)** (hereinafter referred to as RC Voice) is an **independently developed** project by **[NerdyHomeReOpen](https://github.com/NerdyHomeReOpen)** (hereinafter referred to as the Team).  
-**It has no connection whatsoever with the original RaidCall development team, servers, or any official organization.** Please use at your own risk.
+## 專案概述
 
-Currently, all versions of RC Voice are test builds. If you encounter issues while using the software, you are welcome to report them through the following channels:
+RiceCall 是由社群獨立開發的語音交流桌面應用程式。本 repository 包含 React／Next.js 畫面與 Electron 主程序；帳號、語音群、頻道及即時資料由 RiceCall Main Service 提供。客戶端不直接擁有主服務的 MySQL 資料庫。
 
-- In-app: Top-right menu > Feedback
-- GitHub: [Issue Report](https://github.com/NerdyHomeReOpen/RiceCall/issues)
-- Discord: Join our [Discord](https://discord.gg/s86Yra4dUb) server to report or ask an issue freely
+## 專案架構
 
-Please note that all data in RC Voice (including but not limited to accounts, levels, VIP, and voice servers) **may be reset, lost, or deleted**. The Team reserves final decision rights.
-
-RC Voice is **not a continuation, remake, or officially licensed version of RaidCall**, and it **does not provide restoration of RaidCall services, support, or account data recovery**.  
-This project is purely a community-driven initiative by enthusiasts, intended to provide a new voice communication platform, **without any commercial purpose**.
-
-All RC Voice content is provided solely for academic research and technical exchange. If there are any concerns regarding copyright, trademarks, or other rights, please contact us for resolution.
-
-While RC Voice may reference or reuse certain RaidCall-related materials, the final product is entirely an independent creation of the Team, and **does not represent the stance or intent of RaidCall.**  
-Therefore, we **do not provide any technical support, account recovery, or data retrieval services related to RaidCall.** For such issues, please contact the original RaidCall officials.
-
-### How to Contribute
-
-We welcome developers from all backgrounds to contribute to the development and maintenance of RC Voice. You can participate through the following methods:
-
-- Fill out the [Application Form](https://forms.gle/ZowwAS22dGpKkGcZ8) (if needed, we will contact you and assign a contributor role)
-- Fork the project and submit a [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls) with new features or fixes
-
-Thank you for your support and participation!
-
-## Installation Guide
-
-Please read the documentation before downloading.
-
-> [Official Website Download](https://ricecall.com)  
-> [GitHub Download](https://github.com/NerdyHomeReOpen/RiceCall/releases/tag/latest)
-
-## Technical Architecture
-
-- **Frontend (Client):** React, Electron
-- **Backend (Server):** Node.js
-- **Database:** MySQL
-- **Communication Protocols:** WebRTC / WebSocket / HTTP
-
-## Project Structure
-
-```bash
-RiceCall
-├── .github/                  # CI/CD workflows and issue templates
-├── build-deb/                # Linux post-install scripts
-├── docs/                     # Project documentation
-├── public/                   # Static assets (images, icons, fonts, etc.)
-├── resources/                # Electron packaging resources (icons, tray)
-├── src/
-│   ├── api/                  # API client
-│   ├── app/                  # Next.js App Router entry pages/layout
-│   ├── components/           # Reusable UI components
-│   ├── configs/              # Popup and socket configuration
-│   ├── constants/            # Shared constants (emojis, etc.)
-│   ├── extensions/           # TipTap editor extensions
-│   ├── hooks/                # Custom React hooks
-│   ├── i18n/                 # Client i18n setup and translations
-│   ├── main/                 # Electron main-process (main, preload, IPC, handlers)
-│   ├── page-components/      # Renderer page components (Home, Server, Login, etc.)
-│   ├── popups/               # Popup view components
-│   ├── providers/            # React context providers
-│   ├── services/             # Service modules
-│   ├── store/                # Redux store and slices
-│   ├── types/                # Shared TypeScript types
-│   ├── utils/                # Utility functions
-│   ├── globals.css           # Global styles
-│   └── next-env.d.ts         # Next.js environment type declarations
-├── dev-app-update.yml        # Electron auto-update configuration
-├── electron-builder.json     # Electron packaging configuration
-├── electron-builder-dev.json # Electron packaging configuration for dev builds
-├── eslint.config.mjs         # ESLint configuration
-├── LICENSE                   # Project license
-├── next-env.d.ts             # Next.js environment type declarations
-├── next.config.ts            # Next.js configuration
-├── package.json              # Dependencies and npm/yarn scripts
-├── tsconfig.electron.json    # TypeScript config for the Electron main process
-├── tsconfig.json             # TypeScript config for the renderer
-└── yarn.lock                 # Dependency lockfile
+```text
+Next.js 畫面（src/app、src/page-components、src/components）
+  ├─ Redux 狀態（src/store）與 API／Socket client（src/api）→ Main Service
+  ├─ WebRTC 音訊（src/hooks/web-rtc、src/providers）
+  └─ Electron preload／IPC（src/main）→ 視窗、托盤、更新與作業系統
 ```
 
-## Setting Up Local Environment
+`src/main/electron.ts` 與 `src/main/web.ts` 是不同執行環境的入口。`public/` 放靜態素材，`resources/` 放打包資源，`electron-builder.json` 定義安裝檔。
 
-### 1. Copy `.env.example` to `.env` and fill in all required options
+## 模組與子系統
 
-```env
-# MainService API and WebSocket endpoints
-RICE_CALL_API_URL=http://localhost:4500
-RICE_CALL_WS_URL=http://localhost:4500
-
-# Published static files
-RICE_CALL_DOCS_BASE_URL=https://your-host
-
-# Optional error reporting endpoint
-RICE_CALL_ERROR_SUBMISSION_URL=
-```
-
-To switch the app to a development server, create `.env.dev` with the same variable names for the endpoints you want to override. Release workflows generate both environment files from the existing GitHub secrets.
-
-### 2. Install dependencies
-
-```bash
-yarn install
-```
-
-### 3. Start the development client
-
-```bash
-yarn dev
-```
-
-### 4. Build the application
-
-```bash
-yarn build
-```
-
-### Other Scripts
-
-```bash
-yarn lint
-yarn check-names
-yarn typecheck
-yarn build:ci # Build the web output and Electron source without packaging
-yarn format
-```
-
-## 模組與子系統盤點
-
-桌面客戶端同時有 React/Next.js 畫面與 Electron 主程序；`src/main/` 的 `electron.ts`／`web.ts` 是不同執行環境的 adapter。它透過遠端服務取得資料，沒有擁有主服務的 MySQL 資料庫。
-
-| 類別 | 能力與位置 | 為什麼在此專案 |
+| 類別 | 位置 | 職責 |
 | --- | --- | --- |
-| 入口模組 | React/Next.js 頁面、元件與彈窗：`src/app/`、`src/page-components/`、`src/components/`、`src/popups/` | 提供桌面與 Web 畫面。 |
-| 入口模組 | Electron 主程序、preload 與 IPC：`src/main/` | 接入視窗、托盤、系統設定、更新及作業系統能力。 |
-| 功能模組 | Redux store 與切片：`src/store/` | 管理使用者、伺服器、頻道、訊息及 UI 狀態。 |
-| 子系統 | HTTP／Socket 客戶端：`src/api/`、`src/main/api/`、`src/main/socket/` | 連接 Main Service，接收即時事件。 |
-| 子系統 | WebRTC／SFU 與音訊：`src/hooks/web-rtc/`、`src/providers/WebRTC.tsx` | 處理語音傳輸、混音、錄製及裝置狀態。 |
-| 子系統 | 多語系、編輯器、Discord 與更新：`src/i18n/`、`src/extensions/`、`src/main/discord/`、`src/main/app/` | 提供客戶端專有的整合能力。 |
+| 畫面模組 | `src/app/`、`src/page-components/`、`src/components/`、`src/popups/` | 頁面、共用元件與彈窗。 |
+| 狀態與通訊 | `src/store/`、`src/api/`、`src/main/api/`、`src/main/socket/` | 管理 UI 狀態並連接 HTTP／Socket 服務。 |
+| 桌面子系統 | `src/main/` | Electron 主程序、preload、IPC、Discord 與更新。 |
+| 音訊子系統 | `src/hooks/web-rtc/`、`src/providers/WebRTC.tsx` | WebRTC／SFU、裝置與錄製狀態。 |
+| 共用能力 | `src/i18n/`、`src/extensions/`、`src/services/`、`src/types/` | 翻譯、編輯器、服務封裝與型別。 |
 
-**共用候選：** Electron/web adapter 介面、API／Socket client、WebRTC hooks、Redux slice 慣例及 UI 元件。複製時要對齊 IPC 通道、遠端事件契約和媒體生命週期；Electron 模組不適合直接放入 Nuxt 或 Node 服務。
+## 完整建置與執行
+
+1. 安裝 Node.js 20 以上、Yarn 1.22.22，以及目標平台的 Electron 打包工具鏈；確保 Main Service 與靜態 JSON 網址可連線。
+2. 複製 `.env.example` 為 `.env`，設定 `RICE_CALL_API_URL`、`RICE_CALL_WS_URL`、`RICE_CALL_DOCS_BASE_URL`。錯誤回報網址 `RICE_CALL_ERROR_SUBMISSION_URL` 為選用。若要切換開發端點，可建立同名鍵的 `.env.dev`。
+3. 安裝依賴並啟動開發版：
+
+   ```bash
+   yarn install --frozen-lockfile
+   yarn dev
+   ```
+
+4. 執行檢查並建置：
+
+   ```bash
+   yarn typecheck
+   yarn lint
+   yarn check-names
+   yarn build:ci
+   yarn build
+   ```
+
+`yarn build:ci` 只產生 Next.js 與 Electron 編譯產物；`yarn build` 另外呼叫 electron-builder 產生平台安裝檔。Linux `.deb` 用 `yarn build:deb`，macOS `.dmg` 用 `yarn build:dmg`。`yarn start` 使用已建置的 Web 產物啟動 Web 與 Electron 程序。
+
+## 使用聲明
+
+RiceCall（RC 語音）由 NerdyHomeReOpen 獨立開發，與原 RaidCall 開發團隊、伺服器或官方組織無關。所有版本目前皆為測試版本，請自行評估使用風險。帳號、等級、VIP、語音群等資料可能重置、遺失或刪除。
+
+RiceCall 不是 RaidCall 的延續、重製或官方授權版本，也不提供 RaidCall 服務還原、技術支援或帳號資料恢復。本專案由社群以非商業目的開發，內容供學術研究與技術交流。如有版權、商標等疑慮，請聯繫團隊協商。
+
+問題可透過應用程式右上角「意見反饋」、[GitHub Issues](https://github.com/NerdyHomeReOpen/RiceCall/issues) 或 [Discord](https://discord.gg/s86Yra4dUb) 回報。團隊保留對測試資料與服務的最終決定權。
+
+## 下載與參與
+
+一般使用者可從[官方網站](https://ricecall.com)或 [GitHub 最新版本](https://github.com/NerdyHomeReOpen/RiceCall/releases/tag/latest)下載適用平台的安裝檔；下載前請閱讀上方使用聲明。開發者可填寫[參與表單](https://forms.gle/ZowwAS22dGpKkGcZ8)或提交 [Pull Request](https://github.com/NerdyHomeReOpen/RiceCall/pulls)。
+
+## 延伸文件
+
+`docs/` 收錄專案文件；程式命名與跨專案詞彙以 RiceCall Engineering Standard 為準。
