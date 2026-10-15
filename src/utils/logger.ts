@@ -21,17 +21,6 @@ async function loadLogger() {
 
 loadLogger();
 
-/**
- * Logger class
- * @param origin - The origin of the log
- * @example
- * const logger = new Logger('MyLogger')
- * logger.info('Hello, world!')
- * logger.warn('Warning!')
- * logger.error('Error!')
- * logger.command('Command!')
- * logger.success('Success!')
- */
 export default class Logger {
   private origin: string;
 

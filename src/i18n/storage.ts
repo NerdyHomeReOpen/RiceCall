@@ -63,9 +63,7 @@ class FsAdapter implements I18nStorageType {
   removeItem(key: string): void {
     try {
       this.fs.unlinkSync(this.filePath(key));
-    } catch {
-      // ignore if file does not exist
-    }
+    } catch {}
   }
 
   keys(): string[] {
@@ -108,16 +106,6 @@ export async function loadStorage(): Promise<void> {
   }
 }
 
-/**
- * I18nStorage class
- * @example
- * I18nStorage.load()
- * const storage = I18nStorage.getStorage()
- * storage.getItem('key')
- * storage.setItem('key', 'value')
- * storage.removeItem('key')
- * storage.keys()
- */
 export default class I18nStorage {
   static async load() {
     loadStorage();

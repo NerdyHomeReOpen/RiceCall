@@ -1,10 +1,5 @@
 import type * as Types from '@/types';
 
-/**
- * Clean the menu items by removing duplicate separators and ensuring that separators are not placed at the beginning or end of the menu.
- * @param items - The menu items to clean.
- * @returns The cleaned menu items.
- */
 export function cleanMenu(items: Types.ContextMenuItem[]): Types.ContextMenuItem[] {
   const preFiltered = items.filter((item) => item.id === 'separator' || item.show !== false);
   const result: Types.ContextMenuItem[] = [];
@@ -23,12 +18,6 @@ export function cleanMenu(items: Types.ContextMenuItem[]): Types.ContextMenuItem
   return result;
 }
 
-/**
- * Compare two objects and return the difference
- * @param newObj - The new object
- * @param originalObj - The original object
- * @returns The difference between the two objects
- */
 export function objDiff<T extends object>(newObj: Partial<T>, originalObj: T): Partial<T> {
   return Object.keys(newObj).reduce((acc, key) => {
     if (newObj[key as keyof T] !== originalObj[key as keyof T]) {

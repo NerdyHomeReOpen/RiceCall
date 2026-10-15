@@ -210,11 +210,6 @@ const defaultTableMemberInvitations: Types.table_member_invitations = {
   updatedAt: 0,
 };
 
-/**
- * Get the default user
- * @param overrides - The overrides to apply to the default user
- * @returns The default user
- */
 export function getDefaultUser(overrides: Partial<Types.User> = {}): Types.User {
   return {
     ...defaultTableUser,
@@ -225,11 +220,6 @@ export function getDefaultUser(overrides: Partial<Types.User> = {}): Types.User 
   };
 }
 
-/**
- * Get the default friend
- * @param overrides - The overrides to apply to the default friend
- * @returns The default friend
- */
 export function getDefaultFriend(overrides: Partial<Types.Friend> = {}): Types.Friend {
   return {
     ...defaultTableFriend,
@@ -240,11 +230,6 @@ export function getDefaultFriend(overrides: Partial<Types.Friend> = {}): Types.F
   };
 }
 
-/**
- * Get the default friend activity
- * @param overrides - The overrides to apply to the default friend activity
- * @returns The default friend activity
- */
 export function getDefaultFriendActivity(overrides: Partial<Types.FriendActivity> = {}): Types.FriendActivity {
   return {
     ...defaultTableUser,
@@ -253,11 +238,6 @@ export function getDefaultFriendActivity(overrides: Partial<Types.FriendActivity
   };
 }
 
-/**
- * Get the default friend group
- * @param overrides - The overrides to apply to the default friend group
- * @returns The default friend group
- */
 export function getDefaultFriendGroup(overrides: Partial<Types.FriendGroup> = {}): Types.FriendGroup {
   return {
     ...defaultTableFriendGroup,
@@ -265,11 +245,6 @@ export function getDefaultFriendGroup(overrides: Partial<Types.FriendGroup> = {}
   };
 }
 
-/**
- * Get the default friend application
- * @param overrides - The overrides to apply to the default friend application
- * @returns The default friend application
- */
 export function getDefaultFriendApplication(overrides: Partial<Types.FriendApplication> = {}): Types.FriendApplication {
   return {
     ...defaultTableFriendApplication,
@@ -278,11 +253,6 @@ export function getDefaultFriendApplication(overrides: Partial<Types.FriendAppli
   };
 }
 
-/**
- * Get the default server
- * @param overrides - The overrides to apply to the default server
- * @returns The default server
- */
 export function getDefaultServer(overrides: Partial<Types.Server> = {}): Types.Server {
   return {
     ...defaultTableServer,
@@ -293,11 +263,6 @@ export function getDefaultServer(overrides: Partial<Types.Server> = {}): Types.S
   };
 }
 
-/**
- * Get the default channel
- * @param overrides - The overrides to apply to the default channel
- * @returns The default channel
- */
 export function getDefaultChannel(overrides: Partial<Types.Channel> = {}): Types.Channel {
   return {
     ...defaultTableChannel,
@@ -308,11 +273,6 @@ export function getDefaultChannel(overrides: Partial<Types.Channel> = {}): Types
   };
 }
 
-/**
- * Get the default member
- * @param overrides - The overrides to apply to the default member
- * @returns The default member
- */
 export function getDefaultMember(overrides: Partial<Types.Member> = {}): Types.Member {
   return {
     ...defaultTableMember,
@@ -323,11 +283,6 @@ export function getDefaultMember(overrides: Partial<Types.Member> = {}): Types.M
   };
 }
 
-/**
- * Get the default member application
- * @param overrides - The overrides to apply to the default member application
- * @returns The default member application
- */
 export function getDefaultMemberApplication(overrides: Partial<Types.MemberApplication> = {}): Types.MemberApplication {
   return {
     ...defaultTableMemberApplications,
@@ -336,11 +291,6 @@ export function getDefaultMemberApplication(overrides: Partial<Types.MemberAppli
   };
 }
 
-/**
- * Get the default member invitation
- * @param overrides - The overrides to apply to the default member invitation
- * @returns The default member invitation
- */
 export function getDefaultMemberInvitation(overrides: Partial<Types.MemberInvitation> = {}): Types.MemberInvitation {
   return {
     ...defaultTableMemberInvitations,
@@ -349,11 +299,6 @@ export function getDefaultMemberInvitation(overrides: Partial<Types.MemberInvita
   };
 }
 
-/**
- * Get the default queue member
- * @param overrides - The overrides to apply to the default queue member
- * @returns The default queue member
- */
 export function getDefaultQueueMember(overrides: Partial<Types.QueueMember> = {}): Types.QueueMember {
   return {
     ...defaultTableMember,

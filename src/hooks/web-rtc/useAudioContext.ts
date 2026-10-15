@@ -49,10 +49,6 @@ export const useAudioContext = (refs: SharedRefs) => {
 
       const audioContext = new AudioContext();
 
-      // if (audioContext.state === 'suspended') {
-      //   await audioContext.resume();
-      // }
-
       await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
 
       audioContextRef.current = audioContext;

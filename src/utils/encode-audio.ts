@@ -1,11 +1,5 @@
 type StereoBuffer = { left: Float32Array; right: Float32Array };
 
-/**
- * Encode audio data to WAV
- * @param buffers - Audio data
- * @param sampleRate - Sample rate
- * @returns Encoded audio data
- */
 export function encodeAudio(buffers: StereoBuffer[], sampleRate: number): ArrayBuffer {
   const left = buffers.flatMap((b) => Array.from(b.left));
   const right = buffers.flatMap((b) => Array.from(b.right));

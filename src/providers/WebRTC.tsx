@@ -166,7 +166,6 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
               }
             });
 
-            // if (info && info.ip && info.ip !== 'unknown') break;
             await new Promise((r) => setTimeout(r, 1000));
           }
         }

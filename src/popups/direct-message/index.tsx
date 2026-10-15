@@ -305,7 +305,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     const onDirectMessage = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
-        // !! THIS IS IMPORTANT !!
         const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
         const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
@@ -322,7 +321,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     const onShakeWindow = (...args: Types.DirectMessage[]) => {
       args.forEach((item) => {
         if (!item) return;
-        // !! THIS IS IMPORTANT !!
         const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
         const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
@@ -357,13 +355,13 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
       <div className={styles['header']}>
         <div className={styles['user-signature']}>{target.signature}</div>
         <div className={styles['direct-option-buttons']}>
-          {/* <div className={`${styles['file-share']} disabled`} /> */}
+          {}
           {!isFriend ? (
             <div className={styles['apply-friend']} onClick={handleApplyFriendBtnClick} />
           ) : (
             <>
               {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUserBtnClick} /> : <div className={styles['un-block-user']} onClick={handleUnblockUserBtnClick} />}
-              {/* <div className={`${styles['invite-temp-group']} disabled`} /> */}
+              {}
             </>
           )}
           <div className={styles['report']} onClick={handleReportBtnClick} />
@@ -419,7 +417,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
           <div className={styles['input-area']}>
             <div className={styles['top-bar']}>
               <div className={styles['buttons']}>
-                {/* <div className={`${styles['button']} ${styles['font']} disabled`} /> */}
+                {}
                 <div className={`${styles['button']} ${styles['emoji']}`} onMouseDown={handleEmojiPickerClick} />
                 <div className={`${styles['button']} ${styles['screen-shot']}`} onClick={handleScreenShotBtnClick} />
                 <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || !canShakeWindow ? 'disabled' : ''}`} onClick={handleShakeWindowBtnClick} />

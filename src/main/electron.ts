@@ -467,7 +467,6 @@ export async function createMainWindow(title?: string): Promise<BrowserWindow> {
     });
   } else {
     mainWindow.loadURL(`${BASE_URI}`);
-    // mainWindow.webContents.openDevTools();
   }
 
   mainWindow.on('focus', () => {
@@ -537,7 +536,6 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
     });
   } else {
     authWindow.loadURL(`${BASE_URI}/auth`);
-    // authWindow.webContents.openDevTools();
   }
 
   authWindow.on('focus', () => {
@@ -611,7 +609,6 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
     });
   } else {
     popups[id].loadURL(`${BASE_URI}/popup?type=${type}&id=${id}`);
-    // popups[id].webContents.openDevTools();
   }
 
   ipcMain.removeAllListeners(`get-initial-data?id=${id}`);

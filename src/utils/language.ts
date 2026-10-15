@@ -2,11 +2,6 @@ import { t } from '@/i18n';
 
 import { Permission } from '@/types';
 
-/**
- * Get the translated text for a permission level
- * @param permission - The permission level
- * @returns The translated text for the permission level
- */
 export function getPermissionText(permission: Permission): string {
   const permissionMap: Record<Permission, string> = {
     [Permission.Guest]: t('guest'),
@@ -21,11 +16,6 @@ export function getPermissionText(permission: Permission): string {
   return permissionMap[permission] || t('unknown-user');
 }
 
-/**
- * Get the formatted time difference
- * @param timestamp - The timestamp
- * @returns The formatted time difference
- */
 export function getFormatTimeDiff(timestamp: number): string {
   const now = Date.now();
   const diff = Math.floor((timestamp - now) / 1000);
@@ -55,12 +45,6 @@ export function getFormatTimeDiff(timestamp: number): string {
   return t('just-now');
 }
 
-/**
- * Get the formatted date
- * @param timestamp - The timestamp
- * @param type - The type of date to format
- * @returns The formatted date
- */
 export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't' | 'all'): string {
   const date = new Date(timestamp);
   const year = date.getFullYear();
@@ -79,11 +63,6 @@ export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't'
   }
 }
 
-/**
- * Get the formatted time from seconds
- * @param seconds - The seconds
- * @returns The formatted time
- */
 export function getFormatTimeFromSecond(seconds: number): string {
   const h = Math.floor(seconds / 3600);
   const m = Math.floor((seconds % 3600) / 60);
@@ -92,11 +71,6 @@ export function getFormatTimeFromSecond(seconds: number): string {
   return `${pad(h)}:${pad(m)}:${pad(s)}`;
 }
 
-/**
- * Get the formatted timestamp
- * @param timestamp - The timestamp
- * @returns The formatted timestamp
- */
 export function getFormatTimestamp(timestamp: number): string {
   const timezoneLang = navigator.language;
   const now = new Date();

@@ -56,17 +56,6 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
 
 loadEnv();
 
-/**
- * Env class
- * @example
- * Env.load('prod')
- * const env = Env.get()
- * console.log(env.RICE_CALL_API_URL)
- * console.log(env.RICE_CALL_WS_URL)
- * console.log(env.RICE_CALL_DOCS_BASE_URL)
- * console.log(env.REACT_DEV_TOOLS_PATH)
- * console.log(env.RICE_CALL_ERROR_SUBMISSION_URL)
- */
 export default class Env {
   static async load(enviroment: 'prod' | 'dev' = 'prod') {
     loadEnv(enviroment);

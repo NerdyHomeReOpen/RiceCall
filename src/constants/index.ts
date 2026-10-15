@@ -2,13 +2,11 @@ import type * as Types from '@/types';
 
 export const SYSTEM_FONT_LIST = ['-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans TC', 'Microsoft JhengHei', 'Heiti TC', 'LiHei Pro', 'sans-serif'];
 export const FONT_LIST = [
-  // Recommended Fonts
   {
     label: 'System Default',
     value: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans TC", "Microsoft JhengHei", "Heiti TC", "LiHei Pro", sans-serif',
   },
 
-  // Sans-serif Fonts - Suitable for UI and titles
   {
     label: 'Arial',
     value: 'Arial, "Helvetica Neue", Helvetica, sans-serif',
@@ -38,7 +36,6 @@ export const FONT_LIST = [
     value: 'Roboto, "Helvetica Neue", Arial, sans-serif',
   },
 
-  // Serif Fonts - Suitable for reading articles
   {
     label: 'Times New Roman',
     value: '"Times New Roman", Times, serif',
@@ -56,7 +53,6 @@ export const FONT_LIST = [
     value: '"Palatino Linotype", "Book Antiqua", Palatino, serif',
   },
 
-  // Monospace Fonts - Suitable for code
   {
     label: 'Consolas',
     value: 'Consolas, "Andale Mono", "Lucida Console", "Liberation Mono", Monaco, monospace',
@@ -70,7 +66,6 @@ export const FONT_LIST = [
     value: 'Monaco, Menlo, "Ubuntu Mono", Consolas, source-code-pro, monospace',
   },
 
-  // Traditional Chinese Fonts
   {
     label: '微軟正黑體 (Microsoft JhengHei)',
     value: '"Microsoft JhengHei", "Heiti TC", sans-serif',
@@ -164,10 +159,10 @@ export const REGIONS: { code: Types.RegionKey; label: string }[] = [
   { code: 'zh-CN', label: '简体中文' },
   { code: 'en-US', label: 'English' },
 ];
-export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000; // 8 seconds
+export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000;
 export const INVITATION_BASE_URL = 'https://ricecall.com/join';
 export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';
-export const REFRESH_REGION_INFO_INTERVAL = 1000 * 60 * 10; // 10 minutes
+export const REFRESH_REGION_INFO_INTERVAL = 1000 * 60 * 10;
 export const MESSAGE_VIERER_DEVIATION = 100;
 export const SERVER_OPTIONS: { tKey: string; value: 'prod' | 'dev' }[] = [
   { tKey: 'prod-server', value: 'prod' },

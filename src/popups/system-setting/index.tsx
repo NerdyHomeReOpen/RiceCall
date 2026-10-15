@@ -115,18 +115,6 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
     setSystemSettings((prev) => ({ ...prev, microphoneAmplification: e.target.checked }));
   };
 
-  // const handleManualMixModeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setSystemSettings((prev) => ({ ...prev, manualMixMode: e.target.checked }));
-  // };
-
-  // const handleMixAllSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setSystemSettings((prev) => ({ ...prev, mixMode: 'all' }));
-  // };
-
-  // const handleMixAppSourceChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   setSystemSettings((prev) => ({ ...prev, mixMode: 'app' }));
-  // };
-
   const handleDefaultSpeakingModeKeyChange = () => {
     setSystemSettings((prev) => ({ ...prev, speakingMode: 'key' }));
   };
@@ -541,27 +529,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
             <div className="label-header">
               <div className="label">{t('mix-setting')}</div>
             </div>
-            {/* <div className="input-box row disabled">
-              <input name="mix-effect" type="checkbox" checked={mixEffect} onChange={handleMixEffectChange} />
-              <div className="label">{t('mix-effect-label')}</div>
-              <div className="select-box" style={{ maxWidth: '100px', minWidth: '0' }}>
-                <select name="mix-mode" value={mixEffectType} onChange={handleMixEffectTypeSelect}>
-                  <option value="">{t('mix-mode-classic')}</option>
-                  <option value="">{t('mix-mode-cave')}</option>
-                  <option value="">{t('mix-mode-alley')}</option>
-                  <option value="">{t('mix-mode-airplane-hangar')}</option>
-                  <option value="">{t('mix-mode-staircase')}</option>
-                </select>
-              </div>
-            </div>
-            <div className="input-box row disabled">
-              <input name="mix-setting-auto" type="radio" checked={autoMixSetting} onChange={handleAutoMixSettingChange} />
-              <div className="label">{t('mix-setting-auto-label')}</div>
-            </div>
-            <div className="input-box row disabled">
-              <input name="mix-setting-manual" type="radio" checked={!autoMixSetting} onChange={handleManualMixSettingChange} />
-              <div className="label">{t('mix-setting-manual-label')}</div>
-            </div> */}
+            {}
             <div className="input-box row">
               <input name="echo-cancellation" type="checkbox" checked={systemSettings.echoCancellation} onChange={handleEchoCancellationChange} />
               <div className="label">{t('echo-cancellation-label')}</div>
@@ -574,23 +542,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
               <input name="microphone-amplification" type="checkbox" checked={systemSettings.microphoneAmplification} onChange={handleMicrophoneAmplificationChange} />
               <div className="label">{t('microphone-amplification-label')}</div>
             </div>
-            {/* <div className="label-header">
-              <div className="label">{t('mix-mode-setting') + ' ' + t('soon')}</div>
-            </div>
-            <div className="input-box row disabled">
-              <input name="manual-mix-mode" type="checkbox" checked={manualMixMode} onChange={handleManualMixModeChange} />
-              <div className="label">{t('manual-mix-mode-label')}</div>
-            </div>
-            <div className="col" style={{ marginLeft: '10px' }}>
-              <div className="input-box row disabled">
-                <input name="mix-all-source" type="radio" checked={mixMode === 'all'} disabled={!manualMixMode} onChange={handleMixAllSourceChange} />
-                <div className="label">{t('mix-all-source-label')}</div>
-              </div>
-              <div className="input-box row disabled">
-                <input name="mix-app-source" type="radio" checked={mixMode === 'app'} disabled={!manualMixMode} onChange={handleMixAppSourceChange} />
-                <div className="label">{t('mix-app-source-label')}</div>
-              </div>
-            </div> */}
+            {}
           </div>
         </div>
         <div className="popup-content" style={activeTabIndex === 2 ? {} : { display: 'none' }}>

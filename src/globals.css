@@ -93,8 +93,6 @@ body {
   --font-family: arial, sans-serif;
 }
 
-/* Scrollbar */
-
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
@@ -113,8 +111,6 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background-color: #6d6d6d38;
 }
-
-/* Resize Handle */
 
 .resize-handle {
   min-width: 3px;
@@ -141,8 +137,6 @@ body {
 .resize-handle-vertical:hover {
   background-color: var(--border-secondary);
 }
-
-/* Radio & Checkbox */
 
 input[type='radio'] {
   background-image: url('/ctrl/radiobox_icon.svg');
@@ -178,8 +172,6 @@ input[type='checkbox']:checked:hover {
   background-position: -18px -18px;
 }
 
-/* Input & Select & Textarea */
-
 input,
 input::placeholder,
 select,
@@ -190,8 +182,6 @@ button {
   font-family: var(--font-family);
 }
 
-/* Highlight.js */
-
 .hljs span {
   font-family: monospace;
 }
@@ -199,8 +189,6 @@ button {
 .hljs {
   line-height: 1.25rem;
 }
-
-/* Disabled */
 
 *:disabled,
 .disabled {
@@ -222,8 +210,6 @@ button {
     outline: none;
   }
 }
-
-/* Hover Text */
 
 .hover-text {
   position: absolute;
@@ -258,8 +244,6 @@ textarea {
   color: var(--text-color);
   background-color: transparent;
 }
-
-/* Markdown */
 
 .markdown-content {
   user-select: text;
@@ -518,9 +502,7 @@ textarea {
   height: 19px;
 }
 
-/* Permission */
 /* TODO: Remove .Male and .Female */
-/* stylelint-disable selector-class-pattern -- The API still sends capitalized gender values. */
 
 .permission-male,
 .permission-Male {
@@ -547,8 +529,6 @@ textarea {
   background-position: 0 0;
   background-size: auto;
 }
-
-/* stylelint-enable selector-class-pattern */
 
 .permission-lv-1 {
   background-position: 0 0;
@@ -581,8 +561,6 @@ textarea {
 .permission-lv-8 {
   background-position: -98px 0;
 }
-
-/* Vip */
 
 .vip-icon {
   min-width: 14px;
@@ -641,8 +619,6 @@ textarea {
 .vip-icon-big.vip-5 {
   background-image: url('/channel/icon_vip5.gif');
 }
-
-/* Layouts */
 
 .no-drag {
   -webkit-app-region: no-drag;
@@ -902,7 +878,6 @@ textarea {
   }
 }
 
-/* stylelint-disable no-descending-specificity -- Markdown and input tables are separate UI scopes. */
 .input-box table {
   display: flex;
   flex-direction: column;
@@ -1003,7 +978,6 @@ textarea {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* stylelint-enable no-descending-specificity */
 
 .input-box textarea {
   position: relative;
@@ -1112,8 +1086,6 @@ textarea {
 .hidden {
   display: none;
 }
-
-/* Dialog */
 
 .dialog-icon {
   display: inline-block;

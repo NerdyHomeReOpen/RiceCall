@@ -1,14 +1,12 @@
 import { EMOJIS } from '@/constants';
 
-/* ---------- forward  ---------- */
-const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g; // :code:
-const discordTimestampRegex = /<time[^>]+data-timestamp=['"]([^'"]+)['"][^>]*><\/time>/g; // <time data-timestamp='1716537600'>
-const userTagRegex = /<tag[^>]+data-tag=['"](.+?)(-(\d+))?(-(\w+))?['"][^>]*><\/tag>/g; // <tag data-tag='name-level-gender'> // level and gender are optional
-const ytRegex = /<yt[^>]+data-yt=['"]([^'"]+)['"][^>]*><\/yt>/g; // <yt data-yt='dQw4w9WgXcQ'>
-const twitchRegex = /<tw[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/tw>/g; // <tw data-tw='dQw4w9WgXcQ'>
-const kickRegex = /<kick[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/kick>/g; // <kick data-kick='dQw4w9WgXcQ'>
+const emojiRegex = /(?<![a-zA-Z0-9]):([^:]+):(?![a-zA-Z0-9])/g;
+const discordTimestampRegex = /<time[^>]+data-timestamp=['"]([^'"]+)['"][^>]*><\/time>/g;
+const userTagRegex = /<tag[^>]+data-tag=['"](.+?)(-(\d+))?(-(\w+))?['"][^>]*><\/tag>/g;
+const ytRegex = /<yt[^>]+data-yt=['"]([^'"]+)['"][^>]*><\/yt>/g;
+const twitchRegex = /<tw[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/tw>/g;
+const kickRegex = /<kick[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/kick>/g;
 
-/* ---------- reverse ---------- */
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
 const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span><\/span>/g;
 const ytBackRegex = /<iframe[^>]+data-yt=['"]([^'"]+)['"][^>]*><\/iframe>/g;
@@ -16,11 +14,6 @@ const twitchBackRegex = /<iframe[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const kickBackRegex = /<iframe[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const pTagRegex = /<p><\/p>/g;
 
-/**
- * Escape HTML characters
- * @param str - The string to escape
- * @returns The escaped string
- */
 export function escapeHtml(str: unknown): string {
   if (typeof str !== 'string') return str as string;
   return str
@@ -30,11 +23,6 @@ export function escapeHtml(str: unknown): string {
     .replace(/(^|\n)&gt;\s/g, '$1> ');
 }
 
-/**
- * Convert tags to HTML
- * @param raw - The raw string
- * @returns The HTML string
- */
 export function fromTags(raw: string) {
   return raw
     .replace(emojiRegex, (_, code) => {
@@ -60,11 +48,6 @@ export function fromTags(raw: string) {
     });
 }
 
-/**
- * Convert HTML to tags
- * @param raw - The HTML string
- * @returns The tags string
- */
 export function toTags(raw: string) {
   return raw
     .replace(emojiBackRegex, (_: string, code: string) => {
