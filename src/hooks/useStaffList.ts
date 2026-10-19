@@ -8,7 +8,7 @@ export const useStaffList = () => {
   const [staffList, setStaffList] = useState<Types.Staff[]>([]);
 
   useEffect(() => {
-    fetch(`${Env.get().RICE_CALL_DOCS_BASE_URL}/staff.json`)
+    fetch(`${Env.get().DOCS_BASE_URL}/staff.json`)
       .then((res) => {
         if (!res.ok) return;
         return res.json();

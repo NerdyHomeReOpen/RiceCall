@@ -30,7 +30,7 @@ Next.js UI (src/app, src/page-components, src/components)
 ## Complete build and run steps
 
 1. Install Node.js 20 or newer, Yarn 1.22.22, and the Electron packaging toolchain for your target platform. Make sure Main Service and the static JSON endpoint are reachable.
-2. Copy `.env.example` to `.env`. Set `RICE_CALL_API_URL`, `RICE_CALL_WS_URL`, and `RICE_CALL_DOCS_BASE_URL`. `RICE_CALL_ERROR_SUBMISSION_URL` is optional. Use `.env.dev` with the same keys to override development endpoints.
+2. Copy `.env.example` to `.env`. Set `MAIN_SERVICE_URL`, `MAIN_SERVICE_WS_URL`, and `DOCS_BASE_URL`. `ERROR_SUBMISSION_URL` is optional. Use `.env.dev` with the same keys to override development endpoints.
 3. Install dependencies and start development:
 
    ```bash

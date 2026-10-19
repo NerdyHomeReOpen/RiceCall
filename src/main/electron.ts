@@ -290,7 +290,7 @@ export function configureLogger() {
   log.transports.file.level = 'info';
   log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
   log.transports.file.maxSize = 5 * 1024 * 1024;
-  log.transports.remote.url = `${Env.get().RICE_CALL_API_URL}/logs`;
+  log.transports.remote.url = `${Env.get().MAIN_SERVICE_URL}/logs`;
   Object.assign(console, log.functions);
   log.transports.file.format = '[{level}] [{y}-{m}-{d} {h}:{i}:{s}] {text}';
 }

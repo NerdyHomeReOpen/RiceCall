@@ -81,8 +81,8 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
       }
     };
 
-    const apiDomain = getDomain(env.RICE_CALL_API_URL);
-    const wsDomain = getDomain(env.RICE_CALL_WS_URL);
+    const apiDomain = getDomain(env.MAIN_SERVICE_URL);
+    const wsDomain = getDomain(env.MAIN_SERVICE_WS_URL);
 
     updateStage('init', 'completed');
     updateStage('domain', 'active');

@@ -7,7 +7,7 @@ import { createPopup } from '@/main/electron';
 
 export function registerErrorHandlers() {
   ipcMain.on('error-submit', (_, errorId: string, error: Error) => {
-    const errorSubmissionUrl = Env.get().RICE_CALL_ERROR_SUBMISSION_URL;
+    const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
     if (!errorSubmissionUrl) return;
 
     fetch(errorSubmissionUrl, {
@@ -51,7 +51,7 @@ export function registerErrorHandlers() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ipcMain.handle('webRTC-error', async (_, formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
     return new Promise((resolve) => {
-      const errorSubmissionUrl = Env.get().RICE_CALL_ERROR_SUBMISSION_URL;
+      const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
       if (!errorSubmissionUrl) return;
 
       if (formData.signalState === 'disconnected') {

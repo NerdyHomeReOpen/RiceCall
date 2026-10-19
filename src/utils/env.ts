@@ -3,11 +3,11 @@ import { isMain } from '@/utils/platform';
 import Logger from '@/utils/logger';
 
 type EnvType = {
-  RICE_CALL_API_URL: string;
-  RICE_CALL_WS_URL: string;
-  RICE_CALL_DOCS_BASE_URL: string;
+  MAIN_SERVICE_URL: string;
+  MAIN_SERVICE_WS_URL: string;
+  DOCS_BASE_URL: string;
   REACT_DEV_TOOLS_PATH: string | undefined;
-  RICE_CALL_ERROR_SUBMISSION_URL: string | undefined;
+  ERROR_SUBMISSION_URL: string | undefined;
 };
 
 let env: EnvType | null = null;
@@ -15,10 +15,10 @@ let env: EnvType | null = null;
 async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
   let envLoaded: Record<string, string> = {
     ...process.env,
-    RICE_CALL_API_URL: process.env.RICE_CALL_API_URL || '',
-    RICE_CALL_WS_URL: process.env.RICE_CALL_WS_URL || '',
-    RICE_CALL_DOCS_BASE_URL: process.env.RICE_CALL_DOCS_BASE_URL || '',
-    RICE_CALL_ERROR_SUBMISSION_URL: process.env.RICE_CALL_ERROR_SUBMISSION_URL || '',
+    MAIN_SERVICE_URL: process.env.MAIN_SERVICE_URL || '',
+    MAIN_SERVICE_WS_URL: process.env.MAIN_SERVICE_WS_URL || '',
+    DOCS_BASE_URL: process.env.DOCS_BASE_URL || '',
+    ERROR_SUBMISSION_URL: process.env.ERROR_SUBMISSION_URL || '',
   };
 
   if (isMain()) {
@@ -65,11 +65,11 @@ export default class Env {
     if (!env) {
       new Logger('Env').error('Env is not loaded');
       return {
-        RICE_CALL_API_URL: '',
-        RICE_CALL_WS_URL: '',
-        RICE_CALL_DOCS_BASE_URL: '',
+        MAIN_SERVICE_URL: '',
+        MAIN_SERVICE_WS_URL: '',
+        DOCS_BASE_URL: '',
         REACT_DEV_TOOLS_PATH: undefined,
-        RICE_CALL_ERROR_SUBMISSION_URL: undefined,
+        ERROR_SUBMISSION_URL: undefined,
       };
     }
     return env;

@@ -42,7 +42,7 @@ function purgeCache(): void {
 }
 
 async function checkCacheVersion(): Promise<void> {
-  const baseUrl = Env.get().RICE_CALL_DOCS_BASE_URL;
+  const baseUrl = Env.get().DOCS_BASE_URL;
   if (!baseUrl) return;
 
   try {
@@ -75,9 +75,9 @@ class HttpBackend {
       return;
     }
 
-    const baseUrl = Env.get().RICE_CALL_DOCS_BASE_URL;
+    const baseUrl = Env.get().DOCS_BASE_URL;
     if (!baseUrl) {
-      cb(new Error('RICE_CALL_DOCS_BASE_URL is not configured'), null);
+      cb(new Error('DOCS_BASE_URL is not configured'), null);
       return;
     }
 

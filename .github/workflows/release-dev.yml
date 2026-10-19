@@ -56,15 +56,15 @@ jobs:
 
       - name: Create environment files
         env:
-          API_URL: ${{ secrets.API_URL }}
-          API_DEV_URL: ${{ secrets.API_DEV_URL }}
-          WS_URL: ${{ secrets.WS_URL }}
-          WS_DEV_URL: ${{ secrets.WS_DEV_URL }}
+          MAIN_SERVICE_URL: ${{ secrets.MAIN_SERVICE_URL || secrets.API_URL }}
+          MAIN_SERVICE_DEV_URL: ${{ secrets.MAIN_SERVICE_DEV_URL || secrets.API_DEV_URL }}
+          MAIN_SERVICE_WS_URL: ${{ secrets.MAIN_SERVICE_WS_URL || secrets.WS_URL }}
+          MAIN_SERVICE_WS_DEV_URL: ${{ secrets.MAIN_SERVICE_WS_DEV_URL || secrets.WS_DEV_URL }}
           DOCS_BASE_URL: ${{ secrets.DOCS_BASE_URL }}
           ERROR_SUBMISSION_URL: ${{ secrets.ERROR_SUBMISSION_URL }}
         run: |
-          printf 'RICE_CALL_API_URL=%s\nRICE_CALL_WS_URL=%s\nRICE_CALL_DOCS_BASE_URL=%s\nRICE_CALL_ERROR_SUBMISSION_URL=%s\n' "$API_URL" "$WS_URL" "$DOCS_BASE_URL" "$ERROR_SUBMISSION_URL" > .env
-          printf 'RICE_CALL_API_URL=%s\nRICE_CALL_WS_URL=%s\n' "$API_DEV_URL" "$WS_DEV_URL" > .env.dev
+          printf 'MAIN_SERVICE_URL=%s\nMAIN_SERVICE_WS_URL=%s\nDOCS_BASE_URL=%s\nERROR_SUBMISSION_URL=%s\n' "$MAIN_SERVICE_URL" "$MAIN_SERVICE_WS_URL" "$DOCS_BASE_URL" "$ERROR_SUBMISSION_URL" > .env
+          printf 'MAIN_SERVICE_URL=%s\nMAIN_SERVICE_WS_URL=%s\n' "$MAIN_SERVICE_DEV_URL" "$MAIN_SERVICE_WS_DEV_URL" > .env.dev
 
       - name: Build electron
         uses: samuelmeuli/action-electron-builder@v1

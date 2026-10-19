@@ -30,7 +30,7 @@ Next.js 畫面（src/app、src/page-components、src/components）
 ## 完整建置與執行
 
 1. 安裝 Node.js 20 以上、Yarn 1.22.22，以及目標平台的 Electron 打包工具鏈；確保 Main Service 與靜態 JSON 網址可連線。
-2. 複製 `.env.example` 為 `.env`，設定 `RICE_CALL_API_URL`、`RICE_CALL_WS_URL`、`RICE_CALL_DOCS_BASE_URL`。錯誤回報網址 `RICE_CALL_ERROR_SUBMISSION_URL` 為選用。若要切換開發端點，可建立同名鍵的 `.env.dev`。
+2. 複製 `.env.example` 為 `.env`，設定 `MAIN_SERVICE_URL`、`MAIN_SERVICE_WS_URL`、`DOCS_BASE_URL`。錯誤回報網址 `ERROR_SUBMISSION_URL` 為選用。若要切換開發端點，可建立同名鍵的 `.env.dev`。
 3. 安裝依賴並啟動開發版：
 
    ```bash

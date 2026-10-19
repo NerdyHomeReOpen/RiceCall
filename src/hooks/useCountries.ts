@@ -6,7 +6,7 @@ export const useCountries = () => {
   const [countries, setCountries] = useState<string[]>([]);
 
   useEffect(() => {
-    fetch(`${Env.get().RICE_CALL_DOCS_BASE_URL}/country.json`)
+    fetch(`${Env.get().DOCS_BASE_URL}/country.json`)
       .then((res) => {
         if (!res.ok) return;
         return res.json();
