@@ -303,7 +303,7 @@ export function openInviteFriend(userId: Types.User['userId'], serverId: Types.S
 }
 
 export function openInviteMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
-  ipc.popup.open('inviteMember', `inviteMember`, { userId, serverId });
+  ipc.popup.open('inviteMember', `inviteMember`, { receiverId: userId, serverId });
 }
 
 export function openKickMemberFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
@@ -625,12 +625,16 @@ type uploadImageParams = {
   folder: string;
   imageName: string;
   imageUnit8Array: Uint8Array;
+  targetServerId?: string;
+  targetChannelId?: string;
 };
 
 export async function uploadImage(params: uploadImageParams): Promise<{ imageName: string; imageUrl: string } | null> {
   const form = new FormData();
   form.append('folder', params.folder);
   form.append('imageName', params.imageName);
+  if (params.targetServerId) form.append('targetServerId', params.targetServerId);
+  if (params.targetChannelId) form.append('targetChannelId', params.targetChannelId);
   form.append('image', new Blob([params.imageUnit8Array as unknown as ArrayBuffer], { type: 'image/webp' }), `${params.imageName}.webp`);
   return await post('/upload/image', form);
 }

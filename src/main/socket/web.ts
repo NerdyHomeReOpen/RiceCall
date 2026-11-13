@@ -15,6 +15,7 @@ export let interval: NodeJS.Timeout | null = null;
 
 async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): Promise<Types.ACK<T>> {
   for (let i = 0; i <= retries; i++) {
+    if (!socket?.connected) throw new Error('Socket is not connected');
     try {
       return await new Promise<Types.ACK<T>>((resolve, reject) => {
         socket?.timeout(5000).emit(event, payload, (e: unknown, ack: Types.ACK<T>) => {

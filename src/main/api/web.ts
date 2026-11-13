@@ -126,7 +126,7 @@ export async function fetchRecommendServers(params: { region: string }) {
   return await _fetchRecommendServers(params);
 }
 
-export async function uploadImage(params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }) {
+export async function uploadImage(params: { folder: string; imageName: string; imageUnit8Array: Uint8Array; targetServerId?: string; targetChannelId?: string }) {
   return await _uploadImage(params);
 }
 

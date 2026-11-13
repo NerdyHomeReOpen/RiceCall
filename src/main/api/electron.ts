@@ -129,7 +129,7 @@ export function registerApiHandlers() {
     return await fetchRecommendServers(params);
   });
 
-  ipcMain.handle('upload-image', async (_, params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }) => {
+  ipcMain.handle('upload-image', async (_, params: { folder: string; imageName: string; imageUnit8Array: Uint8Array; targetServerId?: string; targetChannelId?: string }) => {
     return await uploadImage(params);
   });
 

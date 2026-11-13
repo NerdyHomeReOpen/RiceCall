@@ -28,9 +28,11 @@ interface AnnouncementEditorProps {
   announcement: string;
   showPreview?: boolean;
   onChange: (value: string) => void;
+  targetServerId?: string;
+  targetChannelId?: string;
 }
 
-const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, showPreview = false, onChange }) => {
+const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, showPreview = false, onChange, targetServerId, targetChannelId }) => {
   const { t } = useTranslation();
   const { showColorPicker, showEmojiPicker, showEmbedLinkInput } = useContextMenu();
   const editor = useEditor({
@@ -191,7 +193,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
             isUploadingRef.current = false;
             return;
           }
-          ipc.api.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
+          ipc.api.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array, targetServerId, targetChannelId }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
               syncStyles();

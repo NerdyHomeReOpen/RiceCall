@@ -349,7 +349,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                 </div>
               )}
             </div>
-            <AnnouncementEditor announcement={channel.announcement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} />
+            <AnnouncementEditor
+              announcement={channel.announcement}
+              showPreview={showPreview || isReadOnly}
+              onChange={handleAnnouncementChange}
+              targetServerId={server.serverId}
+              targetChannelId={channel.channelId}
+            />
           </div>
         </div>
         <div className="popup-content" style={activeTabIndex === 2 ? {} : { display: 'none' }}>

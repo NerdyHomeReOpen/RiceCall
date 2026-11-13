@@ -117,7 +117,13 @@ export type IpcRendererHandlers = {
   fetchNotifications: (params: { region: Types.LanguageKey }) => Promise<Types.Notification[]>;
   fetchAnnouncements: (params: { region: Types.LanguageKey }) => Promise<Types.Announcement[]>;
   fetchRecommendServers: (params: { region: Types.LanguageKey }) => Promise<Types.RecommendServer[]>;
-  uploadImage: (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }) => Promise<{ imageName: string; imageUrl: string } | null>;
+  uploadImage: (params: {
+    folder: string;
+    imageName: string;
+    imageUnit8Array: Uint8Array;
+    targetServerId?: string;
+    targetChannelId?: string;
+  }) => Promise<{ imageName: string; imageUrl: string } | null>;
   searchServer: (params: { query: string }) => Promise<Types.Server[]>;
   searchUser: (params: { query: string }) => Promise<Types.User[]>;
   saveImage: (buffer: ArrayBuffer, directory: string, filenamePrefix: string, extension: string) => Promise<string | null>;

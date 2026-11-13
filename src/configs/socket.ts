@@ -1,6 +1,6 @@
 import type * as Types from '@/types';
 
-export const EMIT_EVENTS: (keyof Types.ClientToServerEventsWithAck)[] = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave'];
+export const EMIT_EVENTS: (keyof Types.ClientToServerEventsWithAck)[] = ['SFUCreateTransport', 'SFUConnectTransport', 'SFUCreateProducer', 'SFUCreateConsumer', 'SFUJoin', 'SFULeave', 'showViewer', 'showGift'];
 
 export const ON_EVENTS: (keyof Types.ClientToServerEvents)[] = [
   'acceptMemberInvitation',

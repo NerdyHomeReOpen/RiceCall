@@ -1,56 +1,79 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import type * as Types from '@/types';
-
+import * as ipc from '@/main/ipc';
 import { SHOW_FRAME_ORIGIN } from '@/constants';
-
 import { useAppSelector } from '@/hooks/useStore';
 
+type ShowMessage = { type: 'ricecall-show:gift'; channelId: string; action: 'heart' | 'flower'; requestId: string };
+
 const ShowFrame: React.FC = React.memo(() => {
-  const showFrameRef = useRef<HTMLIFrameElement>(null);
-  const prevStateRef = useRef<{ userId: string; anchorId: string | null; channelMode: Types.Channel['voiceMode'] }>({ userId: '', anchorId: null, channelMode: 'free' });
+  const frameRef = useRef<HTMLIFrameElement>(null);
+  const channelId = useAppSelector((state) => state.currentChannel.data.channelId, shallowEqual);
+  const channelIdRef = useRef(channelId);
+  channelIdRef.current = channelId;
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-      permissionLevel: state.user.data.permissionLevel,
-    }),
-    shallowEqual,
-  );
+  const postToShow = useCallback((message: unknown) => {
+    frameRef.current?.contentWindow?.postMessage(message, SHOW_FRAME_ORIGIN);
+  }, []);
 
-  const currentChannel = useAppSelector(
-    (state) => ({
-      channelId: state.currentChannel.data.channelId,
-      permissionLevel: state.currentChannel.data.permissionLevel,
-      voiceMode: state.currentChannel.data.voiceMode,
-    }),
-    shallowEqual,
-  );
-
-  const queueUsers = useAppSelector((state) => state.queueUsers.data, shallowEqual);
-
-  const updateShowFrameState = useCallback(
-    (userId: string, anchorId: string | null, channelMode: Types.Channel['voiceMode']) => {
-      if (!showFrameRef.current?.contentWindow) return;
-      prevStateRef.current = { userId, anchorId, channelMode };
-      showFrameRef.current.contentWindow.postMessage({ uid: userId, aid: anchorId, channelMode: channelMode }, SHOW_FRAME_ORIGIN);
-    },
-    [showFrameRef],
-  );
-
-  const handleShowFrameLoad = () => {
-    const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
-    updateShowFrameState(user.userId, anchorId, currentChannel.voiceMode);
-  };
+  const sendViewer = useCallback(async () => {
+    const activeChannelId = channelIdRef.current;
+    if (!activeChannelId) return;
+    try {
+      const { viewer } = await ipc.socket.emit('showViewer', { channelId: activeChannelId });
+      if (activeChannelId === channelIdRef.current) postToShow({ type: 'ricecall-show:viewer', channelId: activeChannelId, viewer });
+    } catch {
+      // Show can keep displaying the public channel stream while the socket reconnects.
+    }
+  }, [postToShow]);
 
   useEffect(() => {
-    const anchorId = queueUsers.find((u) => u.position === 0)?.userId || null;
-    if (prevStateRef.current.userId === user.userId && prevStateRef.current.anchorId === anchorId && prevStateRef.current.channelMode === currentChannel.voiceMode) return;
-    updateShowFrameState(user.userId, anchorId, currentChannel.voiceMode);
-  }, [user.userId, queueUsers, currentChannel.voiceMode, updateShowFrameState]);
+    void sendViewer();
+    const timer = setInterval(() => void sendViewer(), 15_000);
+    return () => clearInterval(timer);
+  }, [channelId, sendViewer]);
 
-  return <iframe ref={showFrameRef} id="showFrame" src={SHOW_FRAME_ORIGIN} height="100%" width="100%" onLoad={handleShowFrameLoad} />;
+  useEffect(() => {
+    const offConnect = ipc.socket.on('connect', () => void sendViewer());
+    const offDisconnect = ipc.socket.on('disconnect', () => postToShow({ type: 'ricecall-show:viewer', channelId: channelIdRef.current, viewer: null }));
+    return () => {
+      offConnect();
+      offDisconnect();
+    };
+  }, [postToShow, sendViewer]);
+
+  useEffect(() => {
+    const handleMessage = (event: MessageEvent) => {
+      if (event.origin !== SHOW_FRAME_ORIGIN || event.source !== frameRef.current?.contentWindow) return;
+      const message = event.data as Partial<ShowMessage>;
+      if (!message || typeof message !== 'object') return;
+      if (message.type !== 'ricecall-show:gift' || (message.action !== 'heart' && message.action !== 'flower') || typeof message.requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(message.requestId))
+        return;
+      const activeChannelId = channelIdRef.current;
+      if (!activeChannelId || message.channelId !== activeChannelId) return;
+      const action = message.action;
+      const requestId = message.requestId;
+      void ipc.socket.emit('showGift', { channelId: activeChannelId, action, requestId }).then(
+        ({ viewer }) => {
+          if (activeChannelId !== channelIdRef.current) return;
+          postToShow({ type: 'ricecall-show:viewer', channelId: activeChannelId, viewer });
+          postToShow({ type: 'ricecall-show:gift-result', channelId: activeChannelId, requestId, ok: true });
+        },
+        (error: unknown) => {
+          if (activeChannelId !== channelIdRef.current) return;
+          postToShow({ type: 'ricecall-show:gift-result', channelId: activeChannelId, requestId, ok: false, error: error instanceof Error ? error.message : 'SHOW_GIFT_FAILED' });
+          void sendViewer();
+        },
+      );
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [postToShow, sendViewer]);
+
+  const src = new URL(SHOW_FRAME_ORIGIN);
+  if (channelId) src.searchParams.set('channelId', channelId);
+  return <iframe key={channelId} ref={frameRef} id="showFrame" src={src.toString()} height="100%" width="100%" onLoad={() => void sendViewer()} />;
 });
 
 ShowFrame.displayName = 'ShowFrame';

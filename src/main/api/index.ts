@@ -99,7 +99,13 @@ export const api = {
     return await modules.default.fetchRecommendServers(params);
   },
 
-  uploadImage: async (params: { folder: string; imageName: string; imageUnit8Array: Uint8Array }): Promise<{ imageName: string; imageUrl: string } | null> => {
+  uploadImage: async (params: {
+    folder: string;
+    imageName: string;
+    imageUnit8Array: Uint8Array;
+    targetServerId?: string;
+    targetChannelId?: string;
+  }): Promise<{ imageName: string; imageUrl: string } | null> => {
     return await modules.default.uploadImage(params);
   },
 

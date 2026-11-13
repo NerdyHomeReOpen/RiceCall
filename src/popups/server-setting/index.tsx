@@ -422,7 +422,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 </div>
               )}
             </div>
-            <AnnouncementEditor announcement={server.announcement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} />
+            <AnnouncementEditor announcement={server.announcement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} targetServerId={server.serverId} />
           </div>
         </div>
         <div className="popup-content" style={activeTabIndex === 2 ? {} : { display: 'none' }}>
