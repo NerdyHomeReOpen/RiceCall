@@ -34,19 +34,17 @@ class LocalStorageAdapter implements I18nStorageType {
 class FsAdapter implements I18nStorageType {
   constructor(
     private dir: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private fs: any,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    private path: any,
+    private fs: typeof import('fs'),
+    private path: typeof import('path'),
   ) {}
 
   private filePath(key: string): string {
-    return this.path.join(this.dir, encodeURIComponent(key) + '.dat') as string;
+    return this.path.join(this.dir, encodeURIComponent(key) + '.dat');
   }
 
   getItem(key: string): string | null {
     try {
-      return this.fs.readFileSync(this.filePath(key), 'utf-8') as string;
+      return this.fs.readFileSync(this.filePath(key), 'utf-8');
     } catch {
       return null;
     }
@@ -56,7 +54,7 @@ class FsAdapter implements I18nStorageType {
     try {
       this.fs.writeFileSync(this.filePath(key), value, 'utf-8');
     } catch (e) {
-      console.warn('[i18n] fs write failed:', e);
+      new Logger('I18nStorage').warn(`fs write failed: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 

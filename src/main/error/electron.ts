@@ -48,8 +48,7 @@ export function registerErrorHandlers() {
       });
   });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ipcMain.handle('webRTC-error', async (_, formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
+  ipcMain.handle('webRTC-error', async (_, formData: { signalState: string; userId: string; channelId: string; info?: unknown }) => {
     return new Promise((resolve) => {
       const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
       if (!errorSubmissionUrl) return;

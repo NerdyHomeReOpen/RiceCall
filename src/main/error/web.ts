@@ -45,8 +45,7 @@ export function errorSubmit(errorId: string, error: Error) {
     });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export function webRTCSignalStateChange(formData: { signalState: string; userId: string; channelId: string; info?: any }) {
+export function webRTCSignalStateChange(formData: { signalState: string; userId: string; channelId: string; info?: unknown }) {
   return new Promise((resolve) => {
     const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
     if (!errorSubmissionUrl) return;

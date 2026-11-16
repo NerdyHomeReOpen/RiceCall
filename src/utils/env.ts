@@ -46,8 +46,7 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
       expand(cfg);
       envLoaded = { ...envLoaded, ...(cfg.parsed ?? {}) };
     } catch (e) {
-      const error = e instanceof Error ? e : new Error('Unknown error');
-      console.error('Failed to load Electron env files:', error.message);
+      new Logger('Env').error(`Failed to load Electron env files: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 

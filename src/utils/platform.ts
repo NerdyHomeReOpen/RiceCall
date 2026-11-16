@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 export function isMain(): boolean {
-  return typeof process !== 'undefined' && !!(process.versions && process.versions.electron) && (process as any).type === 'browser';
+  return typeof process !== 'undefined' && !!(process.versions && process.versions.electron) && (process as { type?: string }).type === 'browser';
 }
 
 export function isRenderer(): boolean {
@@ -13,5 +11,5 @@ export function isElectron(): boolean {
 }
 
 export function isWebsite(): boolean {
-  return typeof window !== 'undefined' && !isRenderer() && !(window as any).electron && !(window as any).process?.versions?.electron;
+  return typeof window !== 'undefined' && !isRenderer() && !(window as { electron?: unknown }).electron && !(window as { process?: NodeJS.Process }).process?.versions?.electron;
 }

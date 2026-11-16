@@ -1,8 +1,7 @@
 import { modules } from '@/main/modules';
 
 export const webrtc = {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  signalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: any }) => {
+  signalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: unknown }) => {
     modules.default.webRTCSignalStateChange(formData);
   },
 };
