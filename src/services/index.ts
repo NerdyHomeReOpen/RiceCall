@@ -455,7 +455,7 @@ type fetchFriendActivitiesParams = {
 };
 
 export async function fetchFriendActivities(params: fetchFriendActivitiesParams): Promise<Types.FriendActivity[]> {
-  return (await get(`/friendActivities?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/friend-activities?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchFriendGroupParams = {
@@ -464,7 +464,7 @@ type fetchFriendGroupParams = {
 };
 
 export async function fetchFriendGroup(params: fetchFriendGroupParams): Promise<Types.FriendGroup | null> {
-  return await get(`/friendGroup?${new URLSearchParams(params).toString()}`);
+  return await get(`/friend-group?${new URLSearchParams(params).toString()}`);
 }
 
 type fetchFriendGroupsParams = {
@@ -472,7 +472,7 @@ type fetchFriendGroupsParams = {
 };
 
 export async function fetchFriendGroups(params: fetchFriendGroupsParams): Promise<Types.FriendGroup[]> {
-  return (await get(`/friendGroups?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/friend-groups?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchFriendApplicationParams = {
@@ -481,7 +481,7 @@ type fetchFriendApplicationParams = {
 };
 
 export async function fetchFriendApplication(params: fetchFriendApplicationParams): Promise<Types.FriendApplication | null> {
-  return await get(`/friendApplication?${new URLSearchParams(params).toString()}`);
+  return await get(`/friend-application?${new URLSearchParams(params).toString()}`);
 }
 
 type fetchFriendApplicationsParams = {
@@ -489,7 +489,7 @@ type fetchFriendApplicationsParams = {
 };
 
 export async function fetchFriendApplications(params: fetchFriendApplicationsParams): Promise<Types.FriendApplication[]> {
-  return (await get(`/friendApplications?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/friend-applications?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchServerParams = {
@@ -514,7 +514,7 @@ type fetchServerMembersParams = {
 };
 
 export async function fetchServerMembers(params: fetchServerMembersParams): Promise<Types.Member[]> {
-  return (await get(`/serverMembers?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/server-members?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchServerOnlineMembersParams = {
@@ -522,7 +522,7 @@ type fetchServerOnlineMembersParams = {
 };
 
 export async function fetchServerOnlineMembers(params: fetchServerOnlineMembersParams): Promise<Types.OnlineMember[]> {
-  return (await get(`/serverOnlineMembers?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/server-online-members?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchChannelParams = {
@@ -550,7 +550,7 @@ type fetchChannelMembersParams = {
 };
 
 export async function fetchChannelMembers(params: fetchChannelMembersParams): Promise<Types.Member[]> {
-  return (await get(`/channelMembers?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/channel-members?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchMemberParams = {
@@ -569,7 +569,7 @@ type fetchMemberApplicationParams = {
 };
 
 export async function fetchMemberApplication(params: fetchMemberApplicationParams): Promise<Types.MemberApplication | null> {
-  return await get(`/memberApplication?${new URLSearchParams(params).toString()}`);
+  return await get(`/member-application?${new URLSearchParams(params).toString()}`);
 }
 
 type fetchMemberApplicationsParams = {
@@ -577,7 +577,7 @@ type fetchMemberApplicationsParams = {
 };
 
 export async function fetchMemberApplications(params: fetchMemberApplicationsParams): Promise<Types.MemberApplication[]> {
-  return (await get(`/memberApplications?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/member-applications?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchMemberInvitationParams = {
@@ -586,7 +586,7 @@ type fetchMemberInvitationParams = {
 };
 
 export async function fetchMemberInvitation(params: fetchMemberInvitationParams): Promise<Types.MemberInvitation | null> {
-  return await get(`/memberInvitation?${new URLSearchParams(params).toString()}`);
+  return await get(`/member-invitation?${new URLSearchParams(params).toString()}`);
 }
 
 type fetchMemberInvitationsParams = {
@@ -594,7 +594,7 @@ type fetchMemberInvitationsParams = {
 };
 
 export async function fetchMemberInvitations(params: fetchMemberInvitationsParams): Promise<Types.MemberInvitation[]> {
-  return (await get(`/memberInvitations?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/member-invitations?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type fetchNotificationsParams = {
@@ -618,7 +618,7 @@ type fetchRecommendServersParams = {
 };
 
 export async function fetchRecommendServers(params: fetchRecommendServersParams): Promise<Types.RecommendServer[]> {
-  return (await get(`/recommendServers?${new URLSearchParams(params).toString()}`)) ?? [];
+  return (await get(`/recommend-servers?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
 type uploadImageParams = {

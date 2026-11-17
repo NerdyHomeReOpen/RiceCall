@@ -35,7 +35,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       }
 
       const consumerInfo = await ipc.socket
-        .emit('SFUCreateConsumer', {
+        .emit('sfuCreateConsumer', {
           transportId: recvTransportRef.current.id,
           producerId,
           rtpCapabilities: deviceRef.current.rtpCapabilities,
@@ -109,7 +109,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         } catch {}
       }
 
-      const transport = await ipc.socket.emit('SFUCreateTransport', { direction: 'send', channelId }).catch((e) => {
+      const transport = await ipc.socket.emit('sfuCreateTransport', { direction: 'send', channelId }).catch((e) => {
         new Logger('WebRTC').error(`Error creating send transport: ${e}`);
         return null;
       });
@@ -123,7 +123,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       sendTransport.on('connect', ({ dtlsParameters }, cb, eb) => {
         ipc.socket
-          .emit('SFUConnectTransport', { transportId: sendTransport.id, dtlsParameters })
+          .emit('sfuConnectTransport', { transportId: sendTransport.id, dtlsParameters })
           .then(() => {
             new Logger('WebRTC').info('SendTransport connected to SFU');
             cb();
@@ -133,7 +133,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       sendTransport.on('produce', ({ kind, rtpParameters }, cb, eb) => {
         ipc.socket
-          .emit('SFUCreateProducer', { transportId: sendTransport.id, kind, rtpParameters, channelId })
+          .emit('sfuCreateProducer', { transportId: sendTransport.id, kind, rtpParameters, channelId })
           .then(({ id }) => {
             new Logger('WebRTC').info('SendTransport produced to SFU');
             cb({ id });
@@ -257,7 +257,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       }
       consumersRef.current = {};
 
-      const transport = await ipc.socket.emit('SFUCreateTransport', { direction: 'recv', channelId }).catch((e) => {
+      const transport = await ipc.socket.emit('sfuCreateTransport', { direction: 'recv', channelId }).catch((e) => {
         new Logger('WebRTC').error(`Error creating recv transport: ${e}`);
         return null;
       });
@@ -271,7 +271,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       recvTransport.on('connect', ({ dtlsParameters }, cb, eb) => {
         ipc.socket
-          .emit('SFUConnectTransport', { transportId: recvTransport.id, dtlsParameters })
+          .emit('sfuConnectTransport', { transportId: recvTransport.id, dtlsParameters })
           .then(() => {
             new Logger('WebRTC').info('RecvTransport connected to SFU');
             cb();
@@ -440,13 +440,13 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
   );
 
   useEffect(() => {
-    const unsub = ipc.socket.on('SFUJoined', async ({ channelId }: { channelId: string }) => {
+    const unsub = ipc.socket.on('sfuJoined', async ({ channelId }: { channelId: string }) => {
       const recv = recvTransportRef.current;
       const send = sendTransportRef.current;
       const recvHealthy = recv && !recv.closed && recv.connectionState === 'connected';
       const sendHealthy = !Store.store.getState().webrtc.isMicTaken || (send && !send.closed && send.connectionState === 'connected');
       if (currentChannelIdRef.current === channelId && recvHealthy && sendHealthy) {
-        new Logger('WebRTC').info(`SFUJoined dedup: already healthy on channel ${channelId}`);
+        new Logger('WebRTC').info(`sfuJoined dedup: already healthy on channel ${channelId}`);
         return;
       }
 
@@ -473,7 +473,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
   }, [setupRecv, setupSend, recvTransportRef, sendTransportRef]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('SFULeft', () => {
+    const unsub = ipc.socket.on('sfuLeft', () => {
       closeSend();
       closeRecv();
     });
@@ -481,7 +481,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
   }, [closeSend, closeRecv]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('SFUNewProducer', ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
+    const unsub = ipc.socket.on('sfuProducerAdd', ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
       new Logger('WebRTC').info(`New producer: ${userId}`);
       consumeOne(producerId, channelId).catch((e) => {
         new Logger('WebRTC').error(`Error consuming producer: ${e}`);
@@ -491,7 +491,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
   }, [consumeOne]);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('SFUProducerClosed', ({ userId, producerId }: { userId: string; producerId: string }) => {
+    const unsub = ipc.socket.on('sfuProducerRemove', ({ userId, producerId }: { userId: string; producerId: string }) => {
       new Logger('WebRTC').info(`Producer closed: ${userId}`);
       unconsumeOne(producerId).catch((e) => {
         new Logger('WebRTC').error(`Error unconsuming producer: ${e}`);

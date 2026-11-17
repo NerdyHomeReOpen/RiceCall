@@ -25,11 +25,11 @@ export const sfuDiagnosis = {
     return modules.default.listen('request-sfu-diagnosis', callback);
   },
 
-  response: (info: Types.SFUDiagnosisInfo | null): void => {
+  response: (info: Types.SfuDiagnosisInfo | null): void => {
     modules.default.sfuDiagnosisResponse(info);
   },
 
-  onResponse: (callback: (info: Types.SFUDiagnosisInfo | null) => void): (() => void) => {
+  onResponse: (callback: (info: Types.SfuDiagnosisInfo | null) => void): (() => void) => {
     return modules.default.listen('sfu-diagnosis-response', callback);
   },
 };

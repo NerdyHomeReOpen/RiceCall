@@ -128,9 +128,9 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
               let unsub: () => void = () => {};
               const timeout = setTimeout(() => {
                 if (unsub) unsub();
-                reject(new Error('Timeout waiting for SFUJoined after standard join'));
+                reject(new Error('Timeout waiting for sfuJoined after standard join'));
               }, 10000);
-              unsub = ipc.socket.on('SFUJoined', () => {
+              unsub = ipc.socket.on('sfuJoined', () => {
                 clearTimeout(timeout);
                 if (unsub) unsub();
                 resolve();

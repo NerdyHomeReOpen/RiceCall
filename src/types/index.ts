@@ -365,10 +365,10 @@ export type ServerToClientEvents = {
   directMessage: (...args: (DirectMessage & { event?: 'directMessage'; message?: DirectMessage; initialData?: unknown })[]) => void;
   shakeWindow: (...args: (DirectMessage & { event?: 'shakeWindow'; message?: DirectMessage; initialData?: unknown })[]) => void;
   chatHistory: (...args: ChatHistory[]) => void;
-  SFUJoined: (...args: { channelId: string }[]) => void;
-  SFULeft: () => void;
-  SFUNewProducer: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
-  SFUProducerClosed: (...args: { userId: string; producerId: string }[]) => void;
+  sfuJoined: (...args: { channelId: string }[]) => void;
+  sfuLeft: () => void;
+  sfuProducerAdd: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
+  sfuProducerRemove: (...args: { userId: string; producerId: string }[]) => void;
   webrtcDisconnectCountUpdate: (count: number) => void;
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
   openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
@@ -383,12 +383,12 @@ export type ClientToServerEventsWithAck = {
     duplicate: boolean;
     viewer: { userId: string; heartUsed: boolean; availableFlowers: number; nextRestoreAt: number | null; totalSentFlowers: number; maxFlowers: number };
   };
-  SFUCreateTransport: (payload: SFUCreateTransportParams) => SFUCreateTransportReturnType;
-  SFUConnectTransport: (payload: SFUConnectTransportParams) => void;
-  SFUCreateProducer: (payload: SFUCreateProducerParams) => SFUCreateProducerReturnType;
-  SFUCreateConsumer: (payload: SFUCreateConsumerParams) => SFUCreateConsumerReturnType;
-  SFUJoin: (payload: { channelId: string }) => void;
-  SFULeave: (payload: { channelId: string }) => void;
+  sfuCreateTransport: (payload: SfuCreateTransportParams) => SfuCreateTransportReturnType;
+  sfuConnectTransport: (payload: SfuConnectTransportParams) => void;
+  sfuCreateProducer: (payload: SfuCreateProducerParams) => SfuCreateProducerReturnType;
+  sfuCreateConsumer: (payload: SfuCreateConsumerParams) => SfuCreateConsumerReturnType;
+  sfuJoin: (payload: { channelId: string }) => void;
+  sfuLeave: (payload: { channelId: string }) => void;
 };
 
 export type StoreType = {
@@ -442,46 +442,46 @@ export type StoreType = {
   token: string;
 };
 
-export type SFUCreateTransportParams = {
+export type SfuCreateTransportParams = {
   direction: 'send' | 'recv';
   channelId: string;
 };
 
-export type SFUCreateTransportReturnType = {
+export type SfuCreateTransportReturnType = {
   id: string;
   iceParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   iceCandidates: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   dtlsParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   routerRtpCapabilities: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  producers?: SFUCreateProducerReturnType[];
+  producers?: SfuCreateProducerReturnType[];
 };
 
-export type SFUConnectTransportParams = {
+export type SfuConnectTransportParams = {
   transportId: string;
   dtlsParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
 };
 
-export type SFUCreateProducerParams = {
+export type SfuCreateProducerParams = {
   kind: mediasoupClient.types.MediaKind;
   transportId: string;
   rtpParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   channelId: string;
 };
 
-export type SFUCreateProducerReturnType = {
+export type SfuCreateProducerReturnType = {
   id: string;
   userId: string;
   kind: mediasoupClient.types.MediaKind;
 };
 
-export type SFUCreateConsumerParams = {
+export type SfuCreateConsumerParams = {
   transportId: string;
   producerId: string;
   rtpCapabilities: any; // eslint-disable-line @typescript-eslint/no-explicit-any
   channelId: string;
 };
 
-export type SFUCreateConsumerReturnType = {
+export type SfuCreateConsumerReturnType = {
   id: string;
   userId: string;
   producerId: string;
@@ -542,7 +542,7 @@ export type Stage = {
   status: StepStatus;
 };
 
-export type SFUDiagnosisInfo = {
+export type SfuDiagnosisInfo = {
   ip?: string;
   port?: number;
 };

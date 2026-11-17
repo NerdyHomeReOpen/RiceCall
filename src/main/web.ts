@@ -97,11 +97,6 @@ export const store = new Store({
   },
 });
 
-if (typeof localStorage !== 'undefined' && localStorage.getItem('notSaveMessageHistory') !== null) {
-  localStorage.setItem('disableMessageHistory', localStorage.getItem('notSaveMessageHistory') as string);
-  localStorage.removeItem('notSaveMessageHistory');
-}
-
 export function getSettings(): Types.SystemSettings {
   return {
     autoLogin: store.get('autoLogin'),

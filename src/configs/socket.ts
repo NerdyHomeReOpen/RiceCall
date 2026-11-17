@@ -1,12 +1,12 @@
 import type * as Types from '@/types';
 
 export const EMIT_EVENTS: (keyof Types.ClientToServerEventsWithAck)[] = [
-  'SFUCreateTransport',
-  'SFUConnectTransport',
-  'SFUCreateProducer',
-  'SFUCreateConsumer',
-  'SFUJoin',
-  'SFULeave',
+  'sfuCreateTransport',
+  'sfuConnectTransport',
+  'sfuCreateProducer',
+  'sfuCreateConsumer',
+  'sfuJoin',
+  'sfuLeave',
   'showViewer',
   'showGift',
 ];
@@ -109,10 +109,10 @@ export const SEND_EVENTS: (keyof Types.ServerToClientEvents)[] = [
   'serverOnlineMemberUpdate',
   'serverRemove',
   'serverUpdate',
-  'SFUJoined',
-  'SFULeft',
-  'SFUNewProducer',
-  'SFUProducerClosed',
+  'sfuJoined',
+  'sfuLeft',
+  'sfuProducerAdd',
+  'sfuProducerRemove',
   'shakeWindow',
   'userUpdate',
 ];

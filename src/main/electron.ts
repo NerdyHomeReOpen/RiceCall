@@ -348,12 +348,6 @@ export const store = new Store<Types.StoreType>({
   },
 });
 
-const legacyStore = store as unknown as { has(key: string): boolean; get(key: string): unknown; delete(key: string): void };
-if (legacyStore.has('notSaveMessageHistory')) {
-  store.set('disableMessageHistory', Boolean(legacyStore.get('notSaveMessageHistory')));
-  legacyStore.delete('notSaveMessageHistory');
-}
-
 export function setAutoLaunch(enable: boolean) {
   try {
     app.setLoginItemSettings({
