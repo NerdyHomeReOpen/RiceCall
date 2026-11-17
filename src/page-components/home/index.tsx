@@ -60,7 +60,7 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
                 {t(`${selectedAnn.category}`)}
               </div>
               <div className={styles['announcement-detail-title']}>{selectedAnn.title}</div>
-              <div className={styles['announcement-detail-date']}>{getFormatDate(selectedAnn.timestamp)}</div>
+              <div className={styles['announcement-detail-date']}>{getFormatDate(selectedAnn.publishedAt)}</div>
             </div>
             {selectedAnn.attachmentUrl && (
               <div className={styles['banner']}>

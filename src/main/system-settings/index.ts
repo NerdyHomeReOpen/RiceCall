@@ -28,7 +28,7 @@ export const systemSettings = {
     if (settings.mixMode !== undefined) modules.default.setMixMode(settings.mixMode);
     if (settings.speakingMode !== undefined) modules.default.setSpeakingMode(settings.speakingMode);
     if (settings.defaultSpeakingKey !== undefined) modules.default.setDefaultSpeakingKey(settings.defaultSpeakingKey);
-    if (settings.notSaveMessageHistory !== undefined) modules.default.setNotSaveMessageHistory(settings.notSaveMessageHistory);
+    if (settings.disableMessageHistory !== undefined) modules.default.setDisableMessageHistory(settings.disableMessageHistory);
     if (settings.hotKeyOpenMainWindow !== undefined) modules.default.setHotKeyOpenMainWindow(settings.hotKeyOpenMainWindow);
     if (settings.hotKeyIncreaseVolume !== undefined) modules.default.setHotKeyIncreaseVolume(settings.hotKeyIncreaseVolume);
     if (settings.hotKeyDecreaseVolume !== undefined) modules.default.setHotKeyDecreaseVolume(settings.hotKeyDecreaseVolume);
@@ -338,15 +338,15 @@ export const systemSettings = {
     },
   },
 
-  notSaveMessageHistory: {
+  disableMessageHistory: {
     set: (enabled: boolean): void => {
-      modules.default.setNotSaveMessageHistory(enabled);
+      modules.default.setDisableMessageHistory(enabled);
     },
     get: (): boolean => {
-      return modules.default.getNotSaveMessageHistory();
+      return modules.default.getDisableMessageHistory();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('not-save-message-history', callback);
+      return modules.default.listen('disable-message-history', callback);
     },
   },
 

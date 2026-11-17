@@ -33,7 +33,7 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
     shallowEqual,
   );
 
-  const isOwned = server.ownerId === user.userId && server.owned;
+  const isOwned = server.ownerId === user.userId && server.isOwned;
 
   const joinServer = () => {
     if (getIsLoading() || user.currentServerId === server.serverId) return;

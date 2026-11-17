@@ -9,7 +9,7 @@ import ContextMenu from '@/utils/context-menu';
 
 interface UseServerCardCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
-  server: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'favorite'>;
+  server: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'isFavorite'>;
   onJoinServer: () => void;
 }
 
@@ -21,7 +21,7 @@ export const useServerCardCtxMenu = ({ user, server, onJoinServer }: UseServerCa
       new ContextMenu()
         .addJoinServerOption(onJoinServer)
         .addViewServerInfoOption(() => openServerSetting(user.userId, server.serverId))
-        .addFavoriteServerOption({ isFavorite: server.favorite }, () => favoriteServer(server.serverId))
+        .addFavoriteServerOption({ isFavorite: server.isFavorite }, () => favoriteServer(server.serverId))
         .addTerminateSelfMembershipOption({ permissionLevel: server.permissionLevel, isSelf: true }, () => terminateMember(user.userId, server.serverId, t('self')))
         .build(),
     [user, server, onJoinServer, t],

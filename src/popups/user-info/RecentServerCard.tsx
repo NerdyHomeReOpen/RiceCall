@@ -25,7 +25,7 @@ const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, 
   );
 
   const isSelf = user.userId === target.userId;
-  const isOwned = server.ownerId === target.userId && server.owned;
+  const isOwned = server.ownerId === target.userId && server.isOwned;
 
   const handleServerDoubleClick = () => {
     onServerSelect(server);

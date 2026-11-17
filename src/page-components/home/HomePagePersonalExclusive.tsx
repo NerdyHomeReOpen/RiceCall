@@ -13,8 +13,8 @@ const HomePagePersonalExclusive: React.FC = React.memo(() => {
 
   const servers = useAppSelector((state) => state.servers.data, shallowEqual);
 
-  const recentServers = useMemo(() => servers.filter((s) => s.recent).sort((a, b) => b.timestamp - a.timestamp), [servers]);
-  const favoriteServers = useMemo(() => servers.filter((s) => s.favorite), [servers]);
+  const recentServers = useMemo(() => servers.filter((s) => s.isRecent).sort((a, b) => b.lastConnectedAt - a.lastConnectedAt), [servers]);
+  const favoriteServers = useMemo(() => servers.filter((s) => s.isFavorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
 
   return (

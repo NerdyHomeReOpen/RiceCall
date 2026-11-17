@@ -74,8 +74,8 @@ const MessageInputBox: React.FC = React.memo(() => {
       channelId: state.currentChannel.data.channelId,
       permissionLevel: state.currentChannel.data.permissionLevel,
       guestTextMaxLength: state.currentChannel.data.guestTextMaxLength,
-      guestTextGapTime: state.currentChannel.data.guestTextGapTime,
-      guestTextWaitTime: state.currentChannel.data.guestTextWaitTime,
+      guestTextGapSeconds: state.currentChannel.data.guestTextGapSeconds,
+      guestTextWaitSeconds: state.currentChannel.data.guestTextWaitSeconds,
       isTextMuted: state.currentChannel.data.isTextMuted,
       forbidText: state.currentChannel.data.forbidText,
       forbidGuestText: state.currentChannel.data.forbidGuestText,
@@ -96,8 +96,8 @@ const MessageInputBox: React.FC = React.memo(() => {
   const textLength = editor?.getText().length || 0;
   const isCloseToMaxLength = textLength >= currentChannel.guestTextMaxLength - 100;
   const isWarning = textLength > currentChannel.guestTextMaxLength;
-  const leftGapTime = currentChannel.guestTextGapTime ? currentChannel.guestTextGapTime - (Date.now() - lastMessageTime) : 0;
-  const leftWaitTime = currentChannel.guestTextWaitTime ? currentChannel.guestTextWaitTime - (Date.now() - lastJoinChannelTime) : 0;
+  const leftGapTime = currentChannel.guestTextGapSeconds ? currentChannel.guestTextGapSeconds - (Date.now() - lastMessageTime) : 0;
+  const leftWaitTime = currentChannel.guestTextWaitSeconds ? currentChannel.guestTextWaitSeconds - (Date.now() - lastJoinChannelTime) : 0;
   const isForbidByMutedText = currentChannel.isTextMuted;
   const isForbidByForbidText = permissionLevel < Permission.ChannelMod && currentChannel.forbidText;
   const isForbidByForbidGuestText = permissionLevel < Permission.Member && currentChannel.forbidGuestText;

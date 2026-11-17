@@ -32,9 +32,9 @@ export type table_announcements = {
   content: string;
   region: string;
   category: string;
-  timestamp: number;
-  showFrom: number;
-  showTo: number;
+  publishedAt: number;
+  showStartsAt: number;
+  showEndsAt: number;
   updatedAt: number;
   createdAt: number;
 };
@@ -56,9 +56,9 @@ export type table_channels = {
   order: number;
   bitrate: number;
   userLimit: number;
-  queueTime: number;
-  guestTextGapTime: number;
-  guestTextWaitTime: number;
+  queueSeconds: number;
+  guestTextGapSeconds: number;
+  guestTextWaitSeconds: number;
   guestTextMaxLength: number;
   isLobby: boolean;
   forbidText: boolean;
@@ -142,7 +142,7 @@ export type table_members = {
   nickname: string | null;
   contribution: number;
   lastJoinChannelAt: number;
-  joinAt: number;
+  joinedAt: number;
   updatedAt: number;
   createdAt: number;
 };
@@ -163,8 +163,8 @@ export type table_member_invitations = {
   createdAt: number;
 };
 
-export type table_message_logs = {
-  logId: number;
+export type table_messages = {
+  messageId: number;
   roomId: string;
   senderId: string;
   content: string;
@@ -176,8 +176,8 @@ export type table_notifications = {
   notificationId: number;
   content: string;
   region: string;
-  showFrom: number;
-  showTo: number;
+  showStartsAt: number;
+  showEndsAt: number;
   updatedAt: number;
   createdAt: number;
 };
@@ -287,7 +287,7 @@ export type table_user_activities = {
   activityId: number;
   userId: string;
   content: string;
-  timestamp: number;
+  occurredAt: number;
   updatedAt: number;
   createdAt: number;
 };
@@ -297,7 +297,7 @@ export type table_user_badges = {
   badgeId: string;
   displayNickname: string | null;
   order: number;
-  showTo: number;
+  showEndsAt: number;
   obtainedAt: number;
   updatedAt: number;
   createdAt: number;
@@ -306,7 +306,7 @@ export type table_user_badges = {
 export type table_user_liked_anchors = {
   userId: string;
   anchorUserId: string;
-  sendTime: number;
+  sentAt: number;
   updatedAt: number;
   createdAt: number;
 };
@@ -314,10 +314,10 @@ export type table_user_liked_anchors = {
 export type table_user_servers = {
   userId: string;
   serverId: string;
-  owned: boolean;
-  recent: boolean;
-  favorite: boolean;
-  timestamp: number;
+  isOwned: boolean;
+  isRecent: boolean;
+  isFavorite: boolean;
+  lastConnectedAt: number;
   updatedAt: number;
   createdAt: number;
 };
@@ -332,7 +332,7 @@ export type table_user_settings = {
   shareRecentServers: boolean;
   shareJoinedServers: boolean;
   shareFavoriteServers: boolean;
-  notSaveMessageHistory: boolean;
+  disableMessageHistory: boolean;
   updatedAt: number;
   createdAt: number;
 };

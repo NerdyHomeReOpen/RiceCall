@@ -113,8 +113,8 @@ export function registerSystemHandlers() {
     event.returnValue = store.get('defaultSpeakingKey');
   });
 
-  ipcMain.on('get-not-save-message-history', (event) => {
-    event.returnValue = store.get('notSaveMessageHistory');
+  ipcMain.on('get-disable-message-history', (event) => {
+    event.returnValue = store.get('disableMessageHistory');
   });
 
   ipcMain.on('get-hot-key-open-main-window', (event) => {
@@ -302,9 +302,9 @@ export function registerSystemHandlers() {
     broadcast('default-speaking-key', key);
   });
 
-  ipcMain.on('set-not-save-message-history', (_, enable = false) => {
-    store.set('notSaveMessageHistory', enable);
-    broadcast('not-save-message-history', enable);
+  ipcMain.on('set-disable-message-history', (_, enable = false) => {
+    store.set('disableMessageHistory', enable);
+    broadcast('disable-message-history', enable);
   });
 
   ipcMain.on('set-hot-key-open-main-window', (_, key = '') => {

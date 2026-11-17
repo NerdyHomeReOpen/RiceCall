@@ -28,7 +28,7 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
 
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
 
-  const sortedAnnouncements = [...announcements].sort((a, b) => b.timestamp - a.timestamp);
+  const sortedAnnouncements = [...announcements].sort((a, b) => b.publishedAt - a.publishedAt);
   const filteredRecommendServers = recommendServers.filter((server) => !server.tags.includes('official'));
   const filteredOfficialServers = recommendServers.filter((server) => server.tags.includes('official'));
 

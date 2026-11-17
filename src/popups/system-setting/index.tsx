@@ -155,8 +155,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
     setUserSettings((prev) => ({ ...prev, shareFavoriteServers: e.target.checked }));
   };
 
-  const handleNotSaveMessageHistoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setUserSettings((prev) => ({ ...prev, notSaveMessageHistory: e.target.checked }));
+  const handleDisableMessageHistoryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setUserSettings((prev) => ({ ...prev, disableMessageHistory: e.target.checked }));
   };
 
   const handleDisableAllSoundEffectChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -621,7 +621,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
               <div className="label">{t('message-history-setting')}</div>
             </div>
             <div className="input-box row disabled">
-              <input name="not-save-message-history" type="checkbox" checked={true} onChange={handleNotSaveMessageHistoryChange} />
+              <input name="not-save-message-history" type="checkbox" checked={true} onChange={handleDisableMessageHistoryChange} />
               <div className="label">{t('not-save-message-history-label') + t('soon')}</div>
             </div>
           </div>

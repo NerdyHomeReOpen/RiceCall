@@ -193,7 +193,7 @@ const SocketManager: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('userUpdate', (...args) => {
       const newActives = args.reduce<Types.FriendActivity[]>((acc, curr) => {
         if (curr.update.signature && userRef.current.signature !== curr.update.signature) {
-          acc.push(getDefaultFriendActivity({ ...userRef.current, content: curr.update.signature, timestamp: Date.now() }));
+          acc.push(getDefaultFriendActivity({ ...userRef.current, content: curr.update.signature, occurredAt: Date.now() }));
         }
         return acc;
       }, []);
@@ -227,7 +227,7 @@ const SocketManager: React.FC = React.memo(() => {
       const newActivities = args.reduce<Types.FriendActivity[]>((acc, curr) => {
         const targetFriend = friendsRef.current.find((f) => f.targetId === curr.targetId && f.relationStatus === 2);
         if (targetFriend && curr.update.signature && targetFriend.signature !== curr.update.signature) {
-          acc.push(getDefaultFriendActivity({ ...targetFriend, content: curr.update.signature, timestamp: Date.now() }));
+          acc.push(getDefaultFriendActivity({ ...targetFriend, content: curr.update.signature, occurredAt: Date.now() }));
         }
         return acc;
       }, []);

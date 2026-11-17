@@ -74,7 +74,7 @@ export const store = new Store({
     mixMode: 'all',
     speakingMode: 'auto',
     defaultSpeakingKey: '',
-    notSaveMessageHistory: true,
+    disableMessageHistory: true,
     hotKeyOpenMainWindow: '',
     hotKeyScreenshot: '',
     hotKeyIncreaseVolume: '',
@@ -96,6 +96,11 @@ export const store = new Store({
     token: '',
   },
 });
+
+if (typeof localStorage !== 'undefined' && localStorage.getItem('notSaveMessageHistory') !== null) {
+  localStorage.setItem('disableMessageHistory', localStorage.getItem('notSaveMessageHistory') as string);
+  localStorage.removeItem('notSaveMessageHistory');
+}
 
 export function getSettings(): Types.SystemSettings {
   return {
@@ -123,7 +128,7 @@ export function getSettings(): Types.SystemSettings {
     mixMode: store.get('mixMode'),
     speakingMode: store.get('speakingMode'),
     defaultSpeakingKey: store.get('defaultSpeakingKey'),
-    notSaveMessageHistory: store.get('notSaveMessageHistory'),
+    disableMessageHistory: store.get('disableMessageHistory'),
     hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow'),
     hotKeyScreenshot: store.get('hotKeyScreenshot'),
     hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume'),

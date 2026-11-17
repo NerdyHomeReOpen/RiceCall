@@ -8,7 +8,7 @@ import ContextMenu from '@/utils/context-menu';
 
 interface UseServerSettingCtxMenuProps {
   user: Pick<Types.User, 'userId' | 'permissionLevel'>;
-  currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'favorite' | 'receiveApply'>;
+  currentServer: Pick<Types.Server, 'serverId' | 'permissionLevel' | 'isFavorite' | 'receiveApply'>;
   onLocateMe: () => void;
 }
 
@@ -25,7 +25,7 @@ export const useServerSettingCtxMenu = ({ user, currentServer, onLocateMe }: Use
         .addLocateMeOption(() => onLocateMe())
         .addSeparator()
         .addReportOption(() => window.open('https://ricecall.com/report-server', '_blank'))
-        .addFavoriteServerOption({ isFavorite: currentServer.favorite }, () => favoriteServer(currentServer.serverId))
+        .addFavoriteServerOption({ isFavorite: currentServer.isFavorite }, () => favoriteServer(currentServer.serverId))
         .build(),
     [user, currentServer, permissionLevel, onLocateMe],
   );

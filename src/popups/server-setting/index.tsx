@@ -655,7 +655,7 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
       </td>
       <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(member.permissionLevel)}</td>
       <td style={{ width: `${columnWidths[2]}px` }}>{member.contribution}</td>
-      <td style={{ width: `${columnWidths[3]}px` }}>{new Date(member.joinAt).toLocaleDateString()}</td>
+      <td style={{ width: `${columnWidths[3]}px` }}>{new Date(member.joinedAt).toLocaleDateString()}</td>
     </tr>
   );
 });

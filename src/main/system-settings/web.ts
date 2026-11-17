@@ -109,8 +109,8 @@ export function getDefaultSpeakingKey() {
   return store.get('defaultSpeakingKey');
 }
 
-export function getNotSaveMessageHistory() {
-  return store.get('notSaveMessageHistory');
+export function getDisableMessageHistory() {
+  return store.get('disableMessageHistory');
 }
 
 export function getHotKeyOpenMainWindow() {
@@ -297,9 +297,9 @@ export function setDefaultSpeakingKey(key: string = '') {
   eventEmitter.emit('default-speaking-key', key);
 }
 
-export function setNotSaveMessageHistory(enable: boolean = false) {
-  store.set('notSaveMessageHistory', enable);
-  eventEmitter.emit('not-save-message-history', enable);
+export function setDisableMessageHistory(enable: boolean = false) {
+  store.set('disableMessageHistory', enable);
+  eventEmitter.emit('disable-message-history', enable);
 }
 
 export function setHotKeyOpenMainWindow(key: string = '') {

@@ -162,7 +162,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   };
 
   const handleQueueTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChannel((prev) => ({ ...prev, queueTime: Math.max(10, Math.min(3600, parseInt(e.target.value) || 0)) }));
+    setChannel((prev) => ({ ...prev, queueSeconds: Math.max(10, Math.min(3600, parseInt(e.target.value) || 0)) }));
   };
 
   const handleBitrateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -210,11 +210,11 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   };
 
   const handleGuestTextWaitTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChannel((prev) => ({ ...prev, guestTextWaitTime: Math.max(0, Math.min(1000, parseInt(e.target.value) || 0)) }));
+    setChannel((prev) => ({ ...prev, guestTextWaitSeconds: Math.max(0, Math.min(1000, parseInt(e.target.value) || 0)) }));
   };
 
   const handleGuestTextGapTimeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setChannel((prev) => ({ ...prev, guestTextGapTime: Math.max(0, Math.min(1000, parseInt(e.target.value) || 0)) }));
+    setChannel((prev) => ({ ...prev, guestTextGapSeconds: Math.max(0, Math.min(1000, parseInt(e.target.value) || 0)) }));
   };
 
   const handleModeratorQueryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -313,7 +313,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
               {channel.voiceMode === 'queue' && (
                 <div className="input-box col">
                   <div className="label">{t('queue-time')}</div>
-                  <input name="queue-time" type="number" value={channel.queueTime} min={10} max={3600} onChange={handleQueueTimeChange} readOnly={isReadOnly} />
+                  <input name="queue-time" type="number" value={channel.queueSeconds} min={10} max={3600} onChange={handleQueueTimeChange} readOnly={isReadOnly} />
                 </div>
               )}
             </div>
@@ -453,7 +453,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   <input
                     name="guest-text-wait-time"
                     type="number"
-                    value={channel.guestTextWaitTime}
+                    value={channel.guestTextWaitSeconds}
                     min={0}
                     max={1000}
                     onChange={handleGuestTextWaitTimeChange}
@@ -469,7 +469,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   <input
                     name="guest-text-gap-time"
                     type="number"
-                    value={channel.guestTextGapTime}
+                    value={channel.guestTextGapSeconds}
                     min={0}
                     max={1000}
                     onChange={handleGuestTextGapTimeChange}
@@ -620,7 +620,7 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
       </td>
       <td style={{ width: `${columnWidths[1]}px` }}>{getPermissionText(moderator.permissionLevel)}</td>
       <td style={{ width: `${columnWidths[2]}px` }}>{moderator.contribution}</td>
-      <td style={{ width: `${columnWidths[3]}px` }}>{new Date(moderator.joinAt).toLocaleDateString()}</td>
+      <td style={{ width: `${columnWidths[3]}px` }}>{new Date(moderator.joinedAt).toLocaleDateString()}</td>
     </tr>
   );
 });

@@ -76,13 +76,13 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   }, [targetServers]);
 
   const favoriteServers = useMemo(() => {
-    return targetServers.filter((s) => s.favorite && s.permissionLevel < Permission.ServerAdmin).sort((a, b) => b.permissionLevel - a.permissionLevel);
+    return targetServers.filter((s) => s.isFavorite && s.permissionLevel < Permission.ServerAdmin).sort((a, b) => b.permissionLevel - a.permissionLevel);
   }, [targetServers]);
 
   const recentServers = useMemo(() => {
     return targetServers
-      .filter((s) => s.recent)
-      .sort((a, b) => b.timestamp - a.timestamp)
+      .filter((s) => s.isRecent)
+      .sort((a, b) => b.lastConnectedAt - a.lastConnectedAt)
       .slice(0, 4);
   }, [targetServers]);
 

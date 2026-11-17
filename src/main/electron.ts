@@ -325,7 +325,7 @@ export const store = new Store<Types.StoreType>({
     mixMode: 'all',
     speakingMode: 'auto',
     defaultSpeakingKey: '',
-    notSaveMessageHistory: true,
+    disableMessageHistory: true,
     hotKeyOpenMainWindow: '',
     hotKeyScreenshot: '',
     hotKeyIncreaseVolume: '',
@@ -347,6 +347,12 @@ export const store = new Store<Types.StoreType>({
     token: '',
   },
 });
+
+const legacyStore = store as unknown as { has(key: string): boolean; get(key: string): unknown; delete(key: string): void };
+if (legacyStore.has('notSaveMessageHistory')) {
+  store.set('disableMessageHistory', Boolean(legacyStore.get('notSaveMessageHistory')));
+  legacyStore.delete('notSaveMessageHistory');
+}
 
 export function setAutoLaunch(enable: boolean) {
   try {
@@ -397,7 +403,7 @@ export function getSettings(): Types.SystemSettings {
     mixMode: store.get('mixMode'),
     speakingMode: store.get('speakingMode'),
     defaultSpeakingKey: store.get('defaultSpeakingKey'),
-    notSaveMessageHistory: store.get('notSaveMessageHistory'),
+    disableMessageHistory: store.get('disableMessageHistory'),
     hotKeyOpenMainWindow: store.get('hotKeyOpenMainWindow'),
     hotKeyScreenshot: store.get('hotKeyScreenshot'),
     hotKeyIncreaseVolume: store.get('hotKeyIncreaseVolume'),

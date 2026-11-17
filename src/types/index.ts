@@ -109,7 +109,7 @@ export type SystemSettings = {
   speakingMode: SpeakingMode;
   defaultSpeakingKey: string;
 
-  notSaveMessageHistory: boolean;
+  disableMessageHistory: boolean;
 
   hotKeyOpenMainWindow: string;
   hotKeyScreenshot: string;
@@ -376,8 +376,13 @@ export type ServerToClientEvents = {
 };
 
 export type ClientToServerEventsWithAck = {
-  showViewer: (payload: { channelId: string }) => { viewer: { userId: string; heartUsed: boolean; availableFlowers: number; nextRestoreAt: number | null; totalSentFlowers: number; maxFlowers: number } };
-  showGift: (payload: { channelId: string; action: 'heart' | 'flower'; requestId: string }) => { duplicate: boolean; viewer: { userId: string; heartUsed: boolean; availableFlowers: number; nextRestoreAt: number | null; totalSentFlowers: number; maxFlowers: number } };
+  showViewer: (payload: { channelId: string }) => {
+    viewer: { userId: string; heartUsed: boolean; availableFlowers: number; nextRestoreAt: number | null; totalSentFlowers: number; maxFlowers: number };
+  };
+  showGift: (payload: { channelId: string; action: 'heart' | 'flower'; requestId: string }) => {
+    duplicate: boolean;
+    viewer: { userId: string; heartUsed: boolean; availableFlowers: number; nextRestoreAt: number | null; totalSentFlowers: number; maxFlowers: number };
+  };
   SFUCreateTransport: (payload: SFUCreateTransportParams) => SFUCreateTransportReturnType;
   SFUConnectTransport: (payload: SFUConnectTransportParams) => void;
   SFUCreateProducer: (payload: SFUCreateProducerParams) => SFUCreateProducerReturnType;
@@ -415,7 +420,7 @@ export type StoreType = {
   mixMode: MixMode;
   speakingMode: SpeakingMode;
   defaultSpeakingKey: string;
-  notSaveMessageHistory: boolean;
+  disableMessageHistory: boolean;
   hotKeyOpenMainWindow: string;
   hotKeyScreenshot: string;
   hotKeyIncreaseVolume: string;

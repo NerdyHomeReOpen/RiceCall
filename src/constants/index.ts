@@ -103,7 +103,7 @@ export const MEMBER_MANAGEMENT_TABLE_FIELDS: { tKey: string; key: string; minWid
   },
   {
     tKey: 'join-date',
-    key: 'joinAt',
+    key: 'joinedAt',
     minWidth: 100,
   },
 ];

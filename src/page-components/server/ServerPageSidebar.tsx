@@ -43,7 +43,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
       serverId: state.currentServer.data.serverId,
       permissionLevel: state.currentServer.data.permissionLevel,
       receptionLobbyId: state.currentServer.data.receptionLobbyId,
-      favorite: state.currentServer.data.favorite,
+      isFavorite: state.currentServer.data.isFavorite,
       avatarUrl: state.currentServer.data.avatarUrl,
       name: state.currentServer.data.name,
       specialId: state.currentServer.data.specialId,

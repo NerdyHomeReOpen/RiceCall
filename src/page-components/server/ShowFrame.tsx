@@ -48,7 +48,12 @@ const ShowFrame: React.FC = React.memo(() => {
       if (event.origin !== SHOW_FRAME_ORIGIN || event.source !== frameRef.current?.contentWindow) return;
       const message = event.data as Partial<ShowMessage>;
       if (!message || typeof message !== 'object') return;
-      if (message.type !== 'ricecall-show:gift' || (message.action !== 'heart' && message.action !== 'flower') || typeof message.requestId !== 'string' || !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(message.requestId))
+      if (
+        message.type !== 'ricecall-show:gift' ||
+        (message.action !== 'heart' && message.action !== 'flower') ||
+        typeof message.requestId !== 'string' ||
+        !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(message.requestId)
+      )
         return;
       const activeChannelId = channelIdRef.current;
       if (!activeChannelId || message.channelId !== activeChannelId) return;

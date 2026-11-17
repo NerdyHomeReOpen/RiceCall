@@ -43,7 +43,7 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
           <div className={styles['name-text']} onClick={handleUserNameClick}>
             {friendActivity.name}
           </div>
-          <div className={styles['timestamp-text']}>{getFormatTimeDiff(friendActivity.timestamp)}</div>
+          <div className={styles['timestamp-text']}>{getFormatTimeDiff(friendActivity.occurredAt)}</div>
         </div>
         <div className={styles['friend-activity-content-bottom']}>{friendActivity.content}</div>
       </div>

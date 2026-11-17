@@ -22,7 +22,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
-  const isPermanent = badge.showTo <= 0;
+  const isPermanent = badge.showEndsAt <= 0;
 
   useLayoutEffect(() => {
     if (!cardRef.current) return;
@@ -69,7 +69,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
           <div className={styles['description']}>{t(badge.description, { nickname: badge.displayNickname })}</div>
         </div>
       </div>
-      <div className={styles['show-time']}>{t('show-to', { '0': isPermanent ? t('permanent') : new Date(badge.showTo).toLocaleDateString() })}</div>
+      <div className={styles['show-time']}>{t('show-to', { '0': isPermanent ? t('permanent') : new Date(badge.showEndsAt).toLocaleDateString() })}</div>
     </div>
   );
 });
