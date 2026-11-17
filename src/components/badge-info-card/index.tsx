@@ -18,7 +18,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
 
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
@@ -54,11 +54,11 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
 
     setCardX(newPosX);
     setCardY(newPosY);
-    setDisplay(true);
+    setIsVisible(true);
   }, [x, y, direction]);
 
   return (
-    <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['card']}`} style={display ? { top: cardY, left: cardX } : { opacity: 0 }}>
+    <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['card']}`} style={isVisible ? { top: cardY, left: cardX } : { opacity: 0 }}>
       <div className={styles['info-wrapper']}>
         <div className={styles['avatar-wrapper']}>
           <Image src={badge.iconUrl} alt="badge_icon" width={64} height={64} loading="lazy" draggable="false" />

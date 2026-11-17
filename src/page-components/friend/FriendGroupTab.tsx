@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
+import { RelationStatus } from '@/types';
 
 import * as Store from '@/store';
 
@@ -39,13 +40,13 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
 
   const friendGroupFriends = useMemo(() => {
     if (friendGroup.friendGroupId === 'default') {
-      return friends.filter((f) => !f.isBlocked && !f.friendGroupId && f.relationStatus !== 0);
+      return friends.filter((f) => !f.isBlocked && !f.friendGroupId && f.relationStatus !== RelationStatus.Stranger);
     } else if (friendGroup.friendGroupId === 'blacklist') {
       return friends.filter((f) => f.isBlocked);
     } else if (friendGroup.friendGroupId === 'stranger') {
-      return friends.filter((f) => !f.isBlocked && f.relationStatus === 0);
+      return friends.filter((f) => !f.isBlocked && f.relationStatus === RelationStatus.Stranger);
     } else {
-      return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroup.friendGroupId && f.relationStatus !== 0);
+      return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroup.friendGroupId && f.relationStatus !== RelationStatus.Stranger);
     }
   }, [friendGroup.friendGroupId, friends]);
   const sortedFriendGroupFriends = useMemo(() => [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)), [friendGroupFriends]);

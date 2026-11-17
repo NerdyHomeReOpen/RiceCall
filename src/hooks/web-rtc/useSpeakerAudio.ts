@@ -114,12 +114,12 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
 
   useEffect(() => {
     const changeOutputAudioDevice = (outputAudioDevice: string) => {
-      new Logger('WebRTC').info(`Output audio device updated: ${outputAudioDevice}`);
+      new Logger('WEB_RTC').info(`Output audio device updated: ${outputAudioDevice}`);
       const el = speakerRef.current;
       if (el && typeof el.setSinkId === 'function') {
         el.setSinkId(outputAudioDevice).catch((e) => {
           const error = e instanceof Error ? e : new Error('Unknown error');
-          new Logger('WebRTC').warn(`Set output device failed: ${error.message}`);
+          new Logger('WEB_RTC').warn(`Set output device failed: ${error.message}`);
         });
       }
     };

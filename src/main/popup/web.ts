@@ -7,8 +7,8 @@ import { createPopup, getSettings } from '@/main/web';
 import { eventEmitter } from '@/main/event';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function openPopup(type: Types.PopupType, id: string, initialData: any, force: boolean = true) {
-  new Logger('System').info(`Opening ${type} (${id})...`);
+export async function openPopup(type: Types.PopupType, id: string, initialData: any, force: boolean = true): Promise<void> {
+  new Logger('SYSTEM').info(`Opening ${type} (${id})...`);
 
   if (typeof initialData !== 'object' || initialData === null) {
     initialData = {};
@@ -17,7 +17,7 @@ export async function openPopup(type: Types.PopupType, id: string, initialData: 
   const loader = initialDataLoader[type];
   if (loader) {
     const loadedData = await loader({ ...initialData }).catch(() => {
-      new Logger('System').error(`Cannot load ${type} data, aborting...`);
+      new Logger('SYSTEM').error(`Cannot load ${type} data, aborting...`);
       return null;
     });
     if (!loadedData) return;
@@ -30,14 +30,14 @@ export async function openPopup(type: Types.PopupType, id: string, initialData: 
   createPopup(type, id, initialData, force);
 }
 
-export function closePopup(id: string) {
+export function closePopup(id: string): void {
   eventEmitter.emit('close-popup', id);
 }
 
-export function closeAllPopups() {
+export function closeAllPopups(): void {
   eventEmitter.emit('close-all-popups');
 }
 
-export function popupSubmit(to: string, data: unknown | null = null) {
+export function popupSubmit(to: string, data: unknown | null = null): void {
   eventEmitter.emit(`popup-submit-${to}`, data);
 }

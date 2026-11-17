@@ -69,22 +69,17 @@ export const DEV = process.argv.includes('--dev');
 export const PORT = 3000;
 export const PRELOAD_PATH = DEV ? path.join(app.getAppPath(), 'preload.ts') : path.join(app.getAppPath(), 'build', 'src', 'main', 'preload.js');
 export const BASE_URI = DEV ? `http://localhost:${PORT}` : 'app://-';
-export const APP_ICON = DEV
-  ? path.join(app.getAppPath(), '..', '..', 'resources', 'icon.ico')
-  : process.platform === 'win32'
-    ? path.join(app.getAppPath(), 'resources', 'icon.ico')
-    : path.join(app.getAppPath(), 'resources', 'icon.png');
+
+function getIconPath(name: string): string {
+  if (DEV) return path.join(app.getAppPath(), '..', '..', 'resources', `${name}.ico`);
+  const extension = process.platform === 'win32' ? 'ico' : 'png';
+  return path.join(app.getAppPath(), 'resources', `${name}.${extension}`);
+}
+
+export const APP_ICON = getIconPath('icon');
 export const APP_TRAY_ICON = {
-  gray: DEV
-    ? path.join(app.getAppPath(), '..', '..', 'resources', 'tray_gray.ico')
-    : process.platform === 'win32'
-      ? path.join(app.getAppPath(), 'resources', 'tray_gray.ico')
-      : path.join(app.getAppPath(), 'resources', 'tray_gray.png'),
-  normal: DEV
-    ? path.join(app.getAppPath(), '..', '..', 'resources', 'tray.ico')
-    : process.platform === 'win32'
-      ? path.join(app.getAppPath(), 'resources', 'tray.ico')
-      : path.join(app.getAppPath(), 'resources', 'tray.png'),
+  gray: getIconPath('tray_gray'),
+  normal: getIconPath('tray'),
 };
 
 export let tray: Tray | null = null;
@@ -110,7 +105,7 @@ async function openDeepLink(url: string) {
     }
   } catch (e) {
     const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('System').error(`Error parsing deep link: ${error.message}`);
+    new Logger('SYSTEM').error(`Error parsing deep link: ${error.message}`);
   }
 }
 
@@ -119,7 +114,7 @@ function openAppWindow() {
   else authWindow?.show();
 }
 
-export function setTrayDetail(isLogin?: boolean) {
+export function setTrayDetail(isLogin?: boolean): void {
   if (!tray) return;
 
   if (isLogin !== undefined) _isLogin = isLogin;
@@ -152,7 +147,7 @@ export function setTrayDetail(isLogin?: boolean) {
   tray.setContextMenu(contextMenu);
 }
 
-export function configureTray() {
+export function configureTray(): void {
   if (tray) tray.destroy();
 
   const trayIconPath = APP_TRAY_ICON.gray;
@@ -165,8 +160,8 @@ export function configureTray() {
   setTrayDetail();
 }
 
-export async function checkForUpdates(force = false) {
-  if (_isUpdateNotified && !force) return;
+export async function checkForUpdates(force = false): Promise<ElectronUpdater.UpdateCheckResult | null> {
+  if (_isUpdateNotified && !force) return null;
 
   if (DEV) {
     autoUpdater.forceDevUpdateConfig = true;
@@ -174,7 +169,7 @@ export async function checkForUpdates(force = false) {
   }
 
   const channel = store.get('updateChannel');
-  new Logger('System').info(`Checking for updates, channel: ${channel}`);
+  new Logger('SYSTEM').info(`Checking for updates, channel: ${channel}`);
 
   if (channel === 'dev') {
     autoUpdater.allowPrerelease = true;
@@ -189,7 +184,7 @@ export async function checkForUpdates(force = false) {
     autoUpdater.allowDowngrade = true;
     const result = await autoUpdater.checkForUpdates().catch((e) => {
       const error = e instanceof Error ? e : new Error('Unknown error');
-      new Logger('System').error(`Cannot check for updates in dev channel: ${error.message}`);
+      new Logger('SYSTEM').error(`Cannot check for updates in dev channel: ${error.message}`);
     });
     if (result?.isUpdateAvailable) return result;
   }
@@ -206,25 +201,26 @@ export async function checkForUpdates(force = false) {
   autoUpdater.allowDowngrade = false;
   const result = await autoUpdater.checkForUpdates().catch((e) => {
     const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('System').error(`Cannot check for updates in latest channel: ${error.message}`);
+    new Logger('SYSTEM').error(`Cannot check for updates in latest channel: ${error.message}`);
   });
   if (result?.isUpdateAvailable) return result;
+  return null;
 }
 
-export function startCheckForUpdates() {
+export function startCheckForUpdates(): void {
   if (_updateCheckInterval) clearInterval(_updateCheckInterval);
   _updateCheckInterval = setInterval(checkForUpdates, store.get('updateCheckInterval'));
   checkForUpdates();
 }
 
-export function stopCheckForUpdates() {
+export function stopCheckForUpdates(): void {
   if (_updateCheckInterval) clearInterval(_updateCheckInterval);
   _updateCheckInterval = null;
 }
 
-export async function configureAutoUpdater() {
+export async function configureAutoUpdater(): Promise<void> {
   autoUpdater.on('update-available', (info: UpdateInfo) => {
-    new Logger('System').info(`Update available: ${info.version}`);
+    new Logger('SYSTEM').info(`Update available: ${info.version}`);
 
     dialog
       .showMessageBox({
@@ -241,24 +237,24 @@ export async function configureAutoUpdater() {
       })
       .catch((e) => {
         const error = e instanceof Error ? e : new Error('Unknown error');
-        new Logger('System').error(`Cannot show update dialog: ${error.message}`);
+        new Logger('SYSTEM').error(`Cannot show update dialog: ${error.message}`);
       });
     _isUpdateNotified = true;
   });
 
   autoUpdater.on('update-not-available', () => {
-    new Logger('System').info(`Is latest version`);
+    new Logger('SYSTEM').info(`Is latest version`);
   });
 
   autoUpdater.on('download-progress', (progressInfo: ProgressInfo) => {
     let message = `${progressInfo.bytesPerSecond}`;
     message = `${message} - ${progressInfo.percent}%`;
     message = `${message} (${progressInfo.transferred}/${progressInfo.total})`;
-    new Logger('System').info(`Downloading update: ${message}`);
+    new Logger('SYSTEM').info(`Downloading update: ${message}`);
   });
 
   autoUpdater.on('update-downloaded', (info: UpdateInfo) => {
-    new Logger('System').info(`Update downloaded: ${info.version}`);
+    new Logger('SYSTEM').info(`Update downloaded: ${info.version}`);
 
     dialog
       .showMessageBox({
@@ -277,7 +273,7 @@ export async function configureAutoUpdater() {
       })
       .catch((e) => {
         const error = e instanceof Error ? e : new Error('Unknown error');
-        new Logger('System').error(`Cannot show update dialog: ${error.message}`);
+        new Logger('SYSTEM').error(`Cannot show update dialog: ${error.message}`);
       });
     _isUpdateNotified = false;
   });
@@ -285,7 +281,7 @@ export async function configureAutoUpdater() {
   if (store.get('autoCheckForUpdates')) startCheckForUpdates();
 }
 
-export function configureLogger() {
+export function configureLogger(): void {
   log.initialize();
   log.transports.file.level = 'info';
   log.transports.file.resolvePathFn = () => path.join(app.getPath('userData'), 'logs', 'main.log');
@@ -348,7 +344,7 @@ export const store = new Store<Types.StoreType>({
   },
 });
 
-export function setAutoLaunch(enable: boolean) {
+export function setAutoLaunch(enable: boolean): void {
   try {
     app.setLoginItemSettings({
       openAtLogin: enable,
@@ -356,7 +352,7 @@ export function setAutoLaunch(enable: boolean) {
     });
   } catch (e) {
     const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('System').error(`Set auto launch error: ${error.message}`);
+    new Logger('SYSTEM').error(`Set auto launch error: ${error.message}`);
   }
 }
 
@@ -366,7 +362,7 @@ export function isAutoLaunchEnabled(): boolean {
     return settings.openAtLogin;
   } catch (e) {
     const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('System').error(`Get auto launch error: ${error.message}`);
+    new Logger('SYSTEM').error(`Get auto launch error: ${error.message}`);
     return false;
   }
 }
@@ -651,7 +647,7 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
   return popups[id];
 }
 
-export function closeAllPopups() {
+export function closeAllPopups(): void {
   Object.values(popups).forEach((popup) => {
     if (popup && !popup.isDestroyed()) {
       popup.close();
@@ -660,7 +656,7 @@ export function closeAllPopups() {
   popups = {};
 }
 
-export function broadcast(channel: string, ...args: unknown[]) {
+export function broadcast(channel: string, ...args: unknown[]): void {
   BrowserWindow.getAllWindows().forEach((window) => {
     window.webContents.send(channel, ...args);
   });
@@ -739,10 +735,10 @@ app.on('open-url', (event, url) => {
 
 process.on('uncaughtException', (e) => {
   const error = e instanceof Error ? e : new Error('Unknown error');
-  new Logger('System').error(`Uncaught exception: ${error.message}`);
+  new Logger('SYSTEM').error(`Uncaught exception: ${error.message}`);
 });
 
 process.on('unhandledRejection', (e) => {
   const error = e instanceof Error ? e : new Error('Unknown error');
-  new Logger('System').error(`Unhandled rejection: ${error.message}`);
+  new Logger('SYSTEM').error(`Unhandled rejection: ${error.message}`);
 });

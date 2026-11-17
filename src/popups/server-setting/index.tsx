@@ -23,7 +23,7 @@ import { useServerSettingBlockedMemberCtxMenu } from '@/hooks/context-menus/useS
 import AnnouncementEditor from '@/components/announcement-editor';
 
 import { getPermissionText } from '@/utils/language';
-import { sorter } from '@/utils/sorter';
+import { sorter, getNextSortDirection, getSortIndicator } from '@/utils/sorter';
 import { objDiff } from '@/utils';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
@@ -63,7 +63,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const [serverMembers, setServerMembers] = useState<Types.Member[]>(serverMembersData);
   const [memberApplications, setMemberApplications] = useState<Types.MemberApplication[]>(memberApplicationsData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  const [showPreview, setShowPreview] = useState(false);
+  const [isPreviewVisible, setIsPreviewVisible] = useState(false);
   const [memberSortDirection, setMemberSortDirection] = useState<1 | -1>(-1);
   const [applicationSortDirection, setApplicationSortDirection] = useState<1 | -1>(-1);
   const [blockMemberSortDirection, setBlockMemberSortDirection] = useState<1 | -1>(-1);
@@ -102,33 +102,35 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     return { totalBlockMembersCount: total.length, filteredBlockMembers: filtered, sortedBlockMembers: sorted };
   }, [serverMembers, blockMemberQuery, blockMemberSortField, blockMemberSortDirection]);
 
-  const settingPages =
-    permissionLevel >= Permission.ServerAdmin
-      ? [
-          t('server-info'),
-          t('server-announcement'),
-          t('member-management'),
-          t('access-permission'),
-          `${t('member-application-management')} (${totalApplicationsCount})`,
-          `${t('blacklist-management')} (${totalBlockMembersCount})`,
-        ]
-      : permissionLevel >= Permission.Member
-        ? [t('server-info'), t('server-announcement'), t('member-management')]
-        : [t('server-info'), t('server-announcement')];
+  const getSettingPages = (): string[] => {
+    if (permissionLevel >= Permission.ServerAdmin) {
+      return [
+        t('server-info'),
+        t('server-announcement'),
+        t('member-management'),
+        t('access-permission'),
+        `${t('member-application-management')} (${totalApplicationsCount})`,
+        `${t('blacklist-management')} (${totalBlockMembersCount})`,
+      ];
+    }
+    if (permissionLevel >= Permission.Member) return [t('server-info'), t('server-announcement'), t('member-management')];
+    return [t('server-info'), t('server-announcement')];
+  };
+  const settingPages = getSettingPages();
 
   const handleMemberSort = (field: keyof Types.Member) => {
     setMemberSortField(field);
-    setMemberSortDirection((d) => (field === memberSortField ? (d === 1 ? -1 : 1) : -1));
+    setMemberSortDirection((d) => getNextSortDirection(field === memberSortField, d));
   };
 
   const handleApplicationSort = (field: keyof Types.MemberApplication) => {
     setApplicationSortField(field);
-    setApplicationSortDirection((d) => (field === applicationSortField ? (d === 1 ? -1 : 1) : -1));
+    setApplicationSortDirection((d) => getNextSortDirection(field === applicationSortField, d));
   };
 
   const handleBlockMemberSort = (field: keyof Types.Member) => {
     setBlockMemberSortField(field);
-    setBlockMemberSortDirection((d) => (field === blockMemberSortField ? (d === 1 ? -1 : 1) : -1));
+    setBlockMemberSortDirection((d) => getNextSortDirection(field === blockMemberSortField, d));
   };
 
   const handleMemberColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
@@ -226,7 +228,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   };
 
   const handleShowPreviewBtnClick = () => {
-    setShowPreview((prev) => !prev);
+    setIsPreviewVisible((prev) => !prev);
   };
 
   const handleAnnouncementChange = (value: string) => {
@@ -282,25 +284,9 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberAdd', (...args: { data: Types.Member }[]) => {
-      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setServerMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
     const unsub = ipc.socket.on('serverMemberUpdate', (...args: { userId: string; serverId: string; update: Partial<Types.Member> }[]) => {
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       setServerMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberRemove', (...args: { userId: string; serverId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-      setServerMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
     });
     return () => unsub();
   }, []);
@@ -418,11 +404,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
               <div className="label">{t('input-announcement')}</div>
               {!isReadOnly && (
                 <div className="button" onClick={handleShowPreviewBtnClick}>
-                  {showPreview ? t('edit') : t('preview')}
+                  {isPreviewVisible ? t('edit') : t('preview')}
                 </div>
               )}
             </div>
-            <AnnouncementEditor announcement={server.announcement} showPreview={showPreview || isReadOnly} onChange={handleAnnouncementChange} targetServerId={server.serverId} />
+            <AnnouncementEditor announcement={server.announcement} showPreview={isPreviewVisible || isReadOnly} onChange={handleAnnouncementChange} targetServerId={server.serverId} />
           </div>
         </div>
         <div className="popup-content" style={activeTabIndex === 2 ? {} : { display: 'none' }}>
@@ -440,7 +426,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${memberColumnWidths[index]}px` }} onClick={() => handleMemberSort(field.key as keyof Types.Member)}>
-                        {`${t(field.tKey)} ${memberSortField === field.key ? (memberSortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        {`${t(field.tKey)} ${getSortIndicator(memberSortField === field.key, memberSortDirection)}`}
                         <div className="resizer" onPointerDown={(e) => handleMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}
@@ -503,7 +489,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     {MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${applicationColumnWidths[index]}px` }} onClick={() => handleApplicationSort(field.key as keyof Types.MemberApplication)}>
-                        {`${t(field.tKey)} ${applicationSortField === field.key ? (applicationSortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        {`${t(field.tKey)} ${getSortIndicator(applicationSortField === field.key, applicationSortDirection)}`}
                         <div className="resizer" onPointerDown={(e) => handleApplicationColumnHandleDown(e, index)} onPointerMove={(e) => handleApplicationColumnHandleMove(e, index)} />
                       </th>
                     ))}
@@ -580,7 +566,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }} onClick={() => handleBlockMemberSort(field.key as keyof Types.Member)}>
-                        {`${t(field.tKey)} ${blockMemberSortField === field.key ? (blockMemberSortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        {`${t(field.tKey)} ${getSortIndicator(blockMemberSortField === field.key, blockMemberSortDirection)}`}
                         <div className="resizer" onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}

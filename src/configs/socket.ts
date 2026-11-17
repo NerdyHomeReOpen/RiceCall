@@ -1,15 +1,6 @@
 import type * as Types from '@/types';
 
-export const EMIT_EVENTS: (keyof Types.ClientToServerEventsWithAck)[] = [
-  'sfuCreateTransport',
-  'sfuConnectTransport',
-  'sfuCreateProducer',
-  'sfuCreateConsumer',
-  'sfuJoin',
-  'sfuLeave',
-  'showViewer',
-  'showGift',
-];
+export const EMIT_EVENTS: (keyof Types.ClientToServerEventsWithAck)[] = ['sfuCreateTransport', 'sfuConnectTransport', 'sfuCreateProducer', 'sfuCreateConsumer', 'showViewer', 'showGift'];
 
 export const ON_EVENTS: (keyof Types.ClientToServerEvents)[] = [
   'acceptMemberInvitation',
@@ -34,9 +25,7 @@ export const ON_EVENTS: (keyof Types.ClientToServerEvents)[] = [
   'deleteFriendGroup',
   'deleteMemberApplication',
   'deleteMemberInvitation',
-  'deleteServer',
   'directMessage',
-  'disconnectChannel',
   'disconnectServer',
   'editChannel',
   'editChannelPermission',
@@ -88,26 +77,21 @@ export const SEND_EVENTS: (keyof Types.ServerToClientEvents)[] = [
   'friendGroupAdd',
   'friendGroupRemove',
   'friendGroupUpdate',
-  'friendRemove',
   'friendUpdate',
   'memberInvitationAdd',
   'memberInvitationRemove',
   'memberInvitationUpdate',
-  'notification',
   'openPopup',
   'playSound',
   'queueMembersSet',
   'serverAdd',
-  'serverMemberAdd',
   'serverMemberApplicationAdd',
   'serverMemberApplicationRemove',
   'serverMemberApplicationUpdate',
-  'serverMemberRemove',
   'serverMemberUpdate',
   'serverOnlineMemberAdd',
   'serverOnlineMemberRemove',
   'serverOnlineMemberUpdate',
-  'serverRemove',
   'serverUpdate',
   'sfuJoined',
   'sfuLeft',

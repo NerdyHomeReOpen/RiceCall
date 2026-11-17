@@ -2,7 +2,7 @@ import { store, eventEmitter } from '@/main/web';
 
 import Env from '@/utils/env';
 
-export function changeEnv(enviroment: 'prod' | 'dev') {
+export function changeEnv(enviroment: 'prod' | 'dev'): void {
   store.set('env', enviroment);
   Env.load(enviroment);
   eventEmitter.emit('env', enviroment);

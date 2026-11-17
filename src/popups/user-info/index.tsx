@@ -4,7 +4,7 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
-import { Permission } from '@/types';
+import { Permission, RelationStatus } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -62,7 +62,10 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   const monthOptions = Array.from({ length: 12 }, (_, i) => i + 1);
   const dayOptions = Array.from({ length: new Date(target.birthYear, target.birthMonth, 0).getDate() }, (_, i) => i + 1);
   const isSelf = user.userId === target.userId;
-  const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === 2) !== undefined;
+  const isRecentServersHidden = !isSelf && !target.shareRecentServers;
+  const isJoinedServersHidden = !isSelf && !target.shareJoinedServers;
+  const isFavoriteServersHidden = !isSelf && !target.shareFavoriteServers;
+  const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === RelationStatus.Friend) !== undefined;
   const isAboutTab = selectedTabId === 'about';
   const isGroupsTab = selectedTabId === 'groups';
   const isEditTab = selectedTabId === 'edit';
@@ -241,6 +244,20 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
     }
   }, [target.birthYear, target.birthMonth, target.birthDay, currentYear, currentMonth, currentDay, isFutureDate]);
 
+  const renderServerListContent = (isHidden: boolean, hiddenTipKey: string, emptyTipKey: string, serverCards: React.ReactNode[]) => {
+    if (isHidden) {
+      return (
+        <div className={styles['server-list-tips']}>
+          {t(`${hiddenTipKey}.top`)}
+          <br />
+          {t(`${hiddenTipKey}.bottom`)}
+        </div>
+      );
+    }
+    if (!serverCards.length) return <div className={styles['server-list-tips']}>{t(emptyTipKey)}</div>;
+    return serverCards;
+  };
+
   return (
     <div className={`popup-wrapper ${styles['user-profile']}`}>
       <div className={styles['user-profile']}>
@@ -298,16 +315,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
           )}
           <div className="label">{t('recent-servers')}</div>
           <div className={styles['server-list']}>
-            {!isSelf && !target.shareRecentServers ? (
-              <div className={styles['server-list-tips']}>
-                {t('not-public-recent-servers.top')}
-                <br />
-                {t('not-public-recent-servers.bottom')}
-              </div>
-            ) : !recentServers.length ? (
-              <div className={styles['server-list-tips']}>{t('no-recent-servers')}</div>
-            ) : (
-              recentServers.map((server) => <RecentServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
+            {renderServerListContent(
+              isRecentServersHidden,
+              'not-public-recent-servers',
+              'no-recent-servers',
+              recentServers.map((server) => <RecentServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />),
             )}
           </div>
           <div className="label">{t('recent-earned')}</div>
@@ -327,29 +339,19 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
             </select>
           </div>
           <div className={styles['server-list']} style={isJoinedServersView ? {} : { display: 'none' }}>
-            {!isSelf && !target.shareJoinedServers ? (
-              <div className={styles['server-list-tips']}>
-                {t('not-public-joined-servers.top')}
-                <br />
-                {t('not-public-joined-servers.bottom')}
-              </div>
-            ) : !joinedServers.length ? (
-              <div className={styles['server-list-tips']}>{t('no-joined-servers')}</div>
-            ) : (
-              joinedServers.map((server) => <JoinedServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
+            {renderServerListContent(
+              isJoinedServersHidden,
+              'not-public-joined-servers',
+              'no-joined-servers',
+              joinedServers.map((server) => <JoinedServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />),
             )}
           </div>
           <div className={styles['server-list']} style={isFavoriteServersView ? {} : { display: 'none' }}>
-            {!isSelf && !target.shareFavoriteServers ? (
-              <div className={styles['server-list-tips']}>
-                {t('not-public-favorite-servers.top')}
-                <br />
-                {t('not-public-favorite-servers.bottom')}
-              </div>
-            ) : !favoriteServers.length ? (
-              <div className={styles['server-list-tips']}>{t('no-favorite-servers')}</div>
-            ) : (
-              favoriteServers.map((server) => <FavoriteServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />)
+            {renderServerListContent(
+              isFavoriteServersHidden,
+              'not-public-favorite-servers',
+              'no-favorite-servers',
+              favoriteServers.map((server) => <FavoriteServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />),
             )}
           </div>
         </div>

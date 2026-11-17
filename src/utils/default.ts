@@ -1,4 +1,5 @@
 import type * as Types from '@/types';
+import { RelationStatus } from '@/types';
 
 const defaultTableUser: Types.table_users = {
   userId: '',
@@ -53,7 +54,7 @@ const defaultTableFriend: Types.table_friends = {
   userId: '',
   targetId: '',
   note: '',
-  relationStatus: 0,
+  relationStatus: RelationStatus.Stranger,
   isBlocked: false,
   friendGroupId: null,
   createdAt: 0,

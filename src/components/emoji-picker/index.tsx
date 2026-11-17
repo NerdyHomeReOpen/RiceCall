@@ -29,7 +29,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
 
     const emojiPickerRef = useRef<HTMLDivElement>(null);
 
-    const [display, setDisplay] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
     const [pickerX, setPickerX] = useState<number>(x);
     const [pickerY, setPickerY] = useState<number>(y);
     const [activeTab, setActiveTab] = useState<'def' | 'other' | 'vip'>('def');
@@ -124,7 +124,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
 
         setPickerX(newPosX);
         setPickerY(newPosY);
-        setDisplay(true);
+        setIsVisible(true);
       };
 
       recalc();
@@ -142,7 +142,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       <div
         ref={emojiPickerRef}
         className={`context-menu-container ${styles['panel']} ${!showFontbar ? styles['panel-compact'] : ''}`}
-        style={display ? { left: pickerX, top: pickerY, position: 'fixed' } : { opacity: 0, position: 'fixed' }}
+        style={isVisible ? { left: pickerX, top: pickerY, position: 'fixed' } : { opacity: 0, position: 'fixed' }}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {showFontbar && (

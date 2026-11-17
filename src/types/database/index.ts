@@ -186,12 +186,16 @@ export type table_recommend_servers = {
   serverId: string;
   categoryId: string | null;
   tags: string;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_recommend_server_categories = {
   categoryId: string;
   name: string;
   order: number;
+  updatedAt: number;
+  createdAt: number;
 };
 
 export type table_reset_email_requests = {
@@ -345,9 +349,11 @@ export type table_user_show_stats = {
   createdAt: number;
 };
 
-export type table_user_show_daily_record = {
+export type table_user_show_daily_records = {
   userId: string;
-  date: string;
+  recordedAt: number;
   totalFlower: number;
   dailyTotalFlower: number;
+  updatedAt: number;
+  createdAt: number;
 };

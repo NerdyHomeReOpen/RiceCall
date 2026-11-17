@@ -4,12 +4,12 @@ import Logger from '@/utils/logger';
 
 import { store, eventEmitter } from '@/main/web';
 
-export function getCustomThemes() {
+export function getCustomThemes(): Types.Theme[] {
   const customThemes = store.get('customThemes');
   return Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
 }
 
-export function addCustomTheme(theme: Types.Theme) {
+export function addCustomTheme(theme: Types.Theme): void {
   const customThemes = store.get('customThemes');
   customThemes.unshift(theme);
   store.set('customThemes', customThemes);
@@ -19,7 +19,7 @@ export function addCustomTheme(theme: Types.Theme) {
   );
 }
 
-export function deleteCustomTheme(index: number) {
+export function deleteCustomTheme(index: number): void {
   const customThemes = store.get('customThemes');
   customThemes.splice(index, 1);
   store.set('customThemes', customThemes);
@@ -29,11 +29,11 @@ export function deleteCustomTheme(index: number) {
   );
 }
 
-export function getCurrentTheme() {
+export function getCurrentTheme(): Types.Theme | null {
   return store.get('currentTheme');
 }
 
-export function setCurrentTheme(theme: Types.Theme | null) {
+export function setCurrentTheme(theme: Types.Theme | null): void {
   store.set('currentTheme', theme);
   eventEmitter.emit('current-theme', theme);
 }
@@ -44,17 +44,17 @@ export async function saveImage(buffer: ArrayBuffer): Promise<string | null> {
       const blob = new Blob([buffer]);
       const reader = new FileReader();
       reader.onloadend = () => {
-        new Logger('System').info(`Save image success: ${reader.result as string}`);
+        new Logger('SYSTEM').info(`Save image success: ${reader.result as string}`);
         resolve(reader.result as string);
       };
       reader.onerror = () => {
-        new Logger('System').error(`Save image error: unknown error`);
+        new Logger('SYSTEM').error(`Save image error: unknown error`);
         resolve(null);
       };
       reader.readAsDataURL(blob);
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');
-      new Logger('System').error(`Save image error: ${error.message}`);
+      new Logger('SYSTEM').error(`Save image error: ${error.message}`);
       resolve(null);
     }
   });

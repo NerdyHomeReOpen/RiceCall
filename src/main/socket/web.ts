@@ -1,5 +1,7 @@
 import { io, Socket } from 'socket.io-client';
 
+import { setToken } from '@/api';
+
 import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
@@ -8,6 +10,7 @@ import Env from '@/utils/env';
 import { NO_LOG_ON_EVENTS, SEND_EVENTS } from '@/configs/socket';
 
 import { eventEmitter } from '@/main/event';
+import { store } from '@/main/web';
 
 export let socket: Socket | null = null;
 export let seq: number = 0;
@@ -25,7 +28,7 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
       });
     } catch (e) {
       if (i === retries) throw e;
-      new Logger('Socket').warn(`Retrying(#${i}) socket.emit ${event}`);
+      new Logger('SOCKET').warn(`Retrying(#${i}) socket.emit ${event}`);
     }
   }
   throw new Error('Failed to emit event with retry');
@@ -35,16 +38,16 @@ function sendHeartbeat() {
   const start = Date.now();
   socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (e: unknown, ack: { seq: number; t: number }) => {
     if (e) {
-      new Logger('Socket').warn(`Heartbeat ${seq} timeout`);
+      new Logger('SOCKET').warn(`Heartbeat ${seq} timeout`);
     } else {
       const latency = Date.now() - start;
-      new Logger('Socket').info(`ACK for #${ack.seq} in ${latency} ms`);
+      new Logger('SOCKET').info(`ACK for #${ack.seq} in ${latency} ms`);
       eventEmitter.emit('heartbeat', { seq: ack.seq, latency });
     }
   });
 }
 
-export function connectSocket(token: string) {
+export function connectSocket(token: string): void {
   if (!token) return;
 
   if (socket) disconnectSocket();
@@ -63,46 +66,53 @@ export function connectSocket(token: string) {
 
   SEND_EVENTS.forEach((event) => {
     socket?.on(event, (...args: unknown[]) => {
-      if (!NO_LOG_ON_EVENTS.includes(event)) new Logger('Socket').info(`socket.on ${event}`);
+      if (!NO_LOG_ON_EVENTS.includes(event)) new Logger('SOCKET').info(`socket.on ${event}`);
       eventEmitter.emit(event, ...args);
     });
+  });
+
+  socket.on('tokenUpdate', ({ token: newToken }: { token: string }) => {
+    if (socket) socket.io.opts.query = { token: newToken };
+    store.set('token', newToken);
+    setToken(newToken);
+    new Logger('SOCKET').info('Token refreshed');
   });
 
   socket.on('connect', () => {
     sendHeartbeat();
     if (interval) clearInterval(interval);
     interval = setInterval(sendHeartbeat, 30000);
-    new Logger('Socket').info(`Socket connected`);
+    new Logger('SOCKET').info(`Socket connected`);
     eventEmitter.emit('connect', null);
   });
 
   socket.on('disconnect', (reason) => {
     if (interval) clearInterval(interval);
-    new Logger('Socket').info(`Socket disconnected, reason: ${reason}`);
+    new Logger('SOCKET').info(`Socket disconnected, reason: ${reason}`);
     eventEmitter.emit('disconnect', reason);
   });
 
   socket.on('connect_error', (e) => {
     const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('Socket').error(`Socket connect error: ${error.message}`);
+    new Logger('SOCKET').error(`Socket connect error: ${error.message}`);
     eventEmitter.emit('connect_error', e);
   });
 
   socket.on('reconnect', (attemptNumber) => {
-    new Logger('Socket').info(`Socket reconnected, attempt number: ${attemptNumber}`);
+    new Logger('SOCKET').info(`Socket reconnected, attempt number: ${attemptNumber}`);
     eventEmitter.emit('reconnect', attemptNumber);
   });
 
   socket.on('reconnect_error', (e) => {
     const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('Socket').error(`Socket reconnect error: ${error.message}`);
+    new Logger('SOCKET').error(`Socket reconnect error: ${error.message}`);
     eventEmitter.emit('reconnect_error', e);
   });
 
   socket.connect();
 }
 
-export function disconnectSocket() {
+export function disconnectSocket(): void {
   if (!socket) return;
   socket.emit('disconnectUser');
   socket.disconnect();
@@ -113,22 +123,22 @@ export async function socketEmit<T extends keyof Types.ClientToServerEventsWithA
   event: T,
   payload: Parameters<Types.ClientToServerEventsWithAck[T]>[0],
 ): Promise<Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>> {
-  new Logger('Socket').info(`socket.emit ${event}`);
+  new Logger('SOCKET').info(`socket.emit ${event}`);
   return new Promise<Types.ACK<ReturnType<Types.ClientToServerEventsWithAck[T]>>>((resolve) => {
     emitWithRetry<ReturnType<Types.ClientToServerEventsWithAck[T]>>(event, payload)
       .then((ack) => {
-        new Logger('Socket').info(`socket.onAck ${event}`);
+        new Logger('SOCKET').info(`socket.onAck ${event}`);
         resolve(ack);
       })
       .catch((e) => {
         const error = e instanceof Error ? e : new Error('Unknown error');
-        new Logger('Socket').error(`socket.emit ${event} error: ${error.message}`);
+        new Logger('SOCKET').error(`socket.emit ${event} error: ${error.message}`);
         resolve({ ok: false, error: error.message });
       });
   });
 }
 
-export function socketSend(event: string, ...args: unknown[]) {
-  new Logger('Socket').info(`socket.emit ${event}`);
+export function socketSend(event: string, ...args: unknown[]): void {
+  new Logger('SOCKET').info(`socket.emit ${event}`);
   socket?.emit(event, ...args);
 }

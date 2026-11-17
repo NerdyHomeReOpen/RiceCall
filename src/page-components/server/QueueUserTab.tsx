@@ -1,7 +1,7 @@
 import React, { useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
-import { Permission } from '@/types';
+import { Permission, RelationStatus } from '@/types';
 
 import * as Store from '@/store';
 
@@ -70,7 +70,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
     if (!onlineMember || !queueUser) return getDefaultQueueMember();
     return { ...queueUser, ...onlineMember };
   }, [onlineMembers, queueUser, queueUserId]);
-  const isFriend = useMemo(() => friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === 2), [friends, queueMember.userId]);
+  const isFriend = useMemo(() => friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === RelationStatus.Friend), [friends, queueMember.userId]);
   const isSelf = queueMember.userId === user.userId;
   const hasVip = queueMember.vip > 0;
   const isOnMic = queueMember.position === 0;

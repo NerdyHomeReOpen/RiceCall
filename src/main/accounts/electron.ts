@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 
 import { store, broadcast } from '@/main/electron';
 
-export function registerAccountHandlers() {
+export function registerAccountHandlers(): void {
   ipcMain.on('get-accounts', (event) => {
     event.returnValue = store.get('accounts');
   });

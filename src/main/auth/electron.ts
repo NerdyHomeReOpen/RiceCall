@@ -7,7 +7,7 @@ import { login as _login, register as _register, autoLogin as _autoLogin } from 
 import { createPopup, closeAllPopups, mainWindow, authWindow, store, setTrayDetail } from '@/main/electron';
 import { connectSocket, disconnectSocket } from '@/main/socket/electron';
 
-export async function login(formData: { account: string; password: string }) {
+export async function login(formData: { account: string; password: string }): Promise<{ success: true; token: string } | { success: false }> {
   return await _login(formData)
     .then((res) => {
       if (res.success) {
@@ -27,7 +27,7 @@ export async function login(formData: { account: string; password: string }) {
     });
 }
 
-export async function logout() {
+export async function logout(): Promise<void> {
   store.set('token', '');
   removeToken();
   disconnectSocket();
@@ -46,7 +46,7 @@ async function register(formData: { account: string; password: string; email: st
   });
 }
 
-export async function autoLogin(token: string) {
+export async function autoLogin(token: string): Promise<{ success: true; token: string } | { success: false }> {
   return await _autoLogin(token)
     .then((res) => {
       if (res.success) {
@@ -70,7 +70,7 @@ export async function autoLogin(token: string) {
     });
 }
 
-export function registerAuthHandlers() {
+export function registerAuthHandlers(): void {
   ipcMain.handle('auth-login', async (_, formData: { account: string; password: string }) => {
     return await login(formData);
   });

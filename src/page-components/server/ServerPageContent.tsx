@@ -34,6 +34,8 @@ import { getFormatTimeFromSecond } from '@/utils/language';
 
 import styles from './server.module.css';
 
+const VOICE_MODE_TEXT_KEYS: Record<Types.Channel['voiceMode'], string> = { free: 'free-speech', admin: 'admin-speech', queue: 'queue-speech' };
+
 const ServerPageContent: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { changeBitrate, toggleMixMode, toggleRecording } = useWebRTC();
@@ -81,7 +83,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   const messageAreaRef = useRef<HTMLDivElement>(null);
   const isResizingAnnAreaRef = useRef<boolean>(false);
 
-  const [showActionMessage, setShowActionMessage] = useState<boolean>(false);
+  const [isActionMessageVisible, setIsActionMessageVisible] = useState<boolean>(false);
   const [channelUIMode, setChannelUIMode] = useState<Types.ChannelUIMode>('three-line');
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
@@ -112,9 +114,6 @@ const ServerPageContent: React.FC = React.memo(() => {
   const isCentralAreaShowMode = centralAreaMode === 'show';
   const isChannelUIClassicMode = channelUIMode === 'classic' || (channelUIMode === 'auto' && isCentralAreaAnnouncementMode);
   const isChannelUIThreeLineMode = channelUIMode === 'three-line' || (channelUIMode === 'auto' && isCentralAreaShowMode);
-  const isCurrentChannelFreeMode = currentChannel.voiceMode === 'free';
-  const isCurrentChannelAdminMode = currentChannel.voiceMode === 'admin';
-  const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
 
   const clearUnreadMessageNotification = () => {
     setIsAtBottom(true);
@@ -206,7 +205,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   };
 
   const handleCloseActionMessageBtnClick = () => {
-    setShowActionMessage(false);
+    setIsActionMessageVisible(false);
   };
 
   const handleMixingBtnClick = () => {
@@ -222,8 +221,8 @@ const ServerPageContent: React.FC = React.memo(() => {
   }, [currentChannel.bitrate, changeBitrate]);
 
   useEffect(() => {
-    if (actionMessages.length === 0) setShowActionMessage(false);
-    else setShowActionMessage(true);
+    if (actionMessages.length === 0) setIsActionMessageVisible(false);
+    else setIsActionMessageVisible(true);
   }, [actionMessages]);
 
   useEffect(() => {
@@ -306,21 +305,21 @@ const ServerPageContent: React.FC = React.memo(() => {
             <span className={styles['widget-bar-item-text']}>{t('more')}</span>
           </div>
         </div>
-        {!isCentralAreaNoneMode &&
-          (isCentralAreaAnnouncementMode ? (
-            <div
-              ref={annAreaRef}
-              className={styles['announcement-area']}
-              style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
-              onContextMenu={handleAnnAreaContextMenu}
-            >
-              <MarkdownContent markdownText={currentChannel.announcement} imageSize={'big'} />
-            </div>
-          ) : isCentralAreaShowMode ? (
-            <div ref={showAreaRef} className={styles['show-area']} style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
-              <ShowFrame />
-            </div>
-          ) : null)}
+        {isCentralAreaAnnouncementMode && (
+          <div
+            ref={annAreaRef}
+            className={styles['announcement-area']}
+            style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
+            onContextMenu={handleAnnAreaContextMenu}
+          >
+            <MarkdownContent markdownText={currentChannel.announcement} imageSize={'big'} />
+          </div>
+        )}
+        {isCentralAreaShowMode && (
+          <div ref={showAreaRef} className={styles['show-area']} style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
+            <ShowFrame />
+          </div>
+        )}
         <div
           className="resize-handle-vertical"
           style={isChannelUIClassicMode && !isCentralAreaNoneMode ? {} : { display: 'none' }}
@@ -340,7 +339,7 @@ const ServerPageContent: React.FC = React.memo(() => {
             <UnreadMessageAlert unreadMessageCount={unreadMessageCount} onAlertClick={handleUnreadMessageAlertClick} />
           </div>
           <div className={styles['input-area']}>
-            <div className={styles['broadcast-area']} style={!showActionMessage ? { display: 'none' } : {}}>
+            <div className={styles['broadcast-area']} style={!isActionMessageVisible ? { display: 'none' } : {}}>
               <MessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} />
               <div className={styles['broadcast-close-button']} onClick={handleCloseActionMessageBtnClick} />
             </div>
@@ -351,7 +350,7 @@ const ServerPageContent: React.FC = React.memo(() => {
       <div className={styles['control-area']}>
         <div className={styles['control-buttons']}>
           <div className={styles['voice-mode-dropdown']} style={isChannelMod ? {} : { display: 'none' }} onClick={handleVoiceModeDropdownClick}>
-            {isCurrentChannelQueueMode ? t('queue-speech') : isCurrentChannelFreeMode ? t('free-speech') : isCurrentChannelAdminMode ? t('admin-speech') : ''}
+            {t(VOICE_MODE_TEXT_KEYS[currentChannel.voiceMode])}
           </div>
         </div>
         <MicButton />

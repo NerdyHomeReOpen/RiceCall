@@ -83,7 +83,7 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
       })
       .catch((e) => {
         const error = e instanceof Error ? e : new Error('Unknown error');
-        new Logger('WebRTC').error(`Error capturing audio from system: ${error.message}`);
+        new Logger('WEB_RTC').error(`Error capturing audio from system: ${error.message}`);
       });
 
     Store.store.dispatch(Store.setWebRTC({ isMixModeActive: true }));

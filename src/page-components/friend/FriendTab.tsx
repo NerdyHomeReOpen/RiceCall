@@ -4,6 +4,7 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
+import { RelationStatus } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -52,8 +53,10 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: -1, userId: user.userId }), [t, user.userId]);
   const isOnline = friend.status === 'online';
   const isOffline = friend.status === 'offline';
-  const isPending = friend.relationStatus === 1;
-  const isFriend = friend.relationStatus === 2;
+  const isPending = friend.relationStatus === RelationStatus.Pending;
+  const isFriend = friend.relationStatus === RelationStatus.Friend;
+  const displayedServer = isPending ? null : friendCurrentServer;
+  const isSignatureVisible = !isPending && !displayedServer;
   const hasVip = friend.vip > 0;
   const hasNote = friend.note !== '' && friend.note !== null;
 
@@ -109,16 +112,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
           <LevelIcon level={friend.level} xp={friend.xp} requiredXp={friend.requiredXp} showTooltip={false} />
           <BadgeList badges={JSON.parse(friend.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
-        {isPending ? (
-          <div className={styles['signature-text']}>{`(${t('pending')})`}</div>
-        ) : friendCurrentServer ? (
+        {isPending && <div className={styles['signature-text']}>{`(${t('pending')})`}</div>}
+        {displayedServer && (
           <div className={`${styles['detail-row']} ${styles['has-server']}`} onClick={handleServerNameClick}>
             <div className={styles['location-icon']} />
-            <div className={styles['server-name-text']}>{friendCurrentServer.name}</div>
+            <div className={styles['server-name-text']}>{displayedServer.name}</div>
           </div>
-        ) : (
-          <div className={styles['signature-text']}>{friend.signature}</div>
         )}
+        {isSignatureVisible && <div className={styles['signature-text']}>{friend.signature}</div>}
       </div>
     </div>
   );

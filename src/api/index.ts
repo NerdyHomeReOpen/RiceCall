@@ -22,7 +22,7 @@ export function removeToken(): void {
   _token = null;
 }
 
-export async function handleResponse<T>(response: Response, method: 'GET' | 'POST' | 'PATCH'): Promise<T> {
+export async function handleResponse<T>(response: Response, method: 'GET' | 'POST'): Promise<T> {
   const result = await response.json();
   if (!response.ok) {
     new Logger('API').error(`HTTP ${method} ${response.url} [${response.status}]: ${result.message}`);
@@ -73,29 +73,6 @@ export async function post<T>(endpoint: string, data: ApiRequestData | FormData,
   } catch (e) {
     if (retryCount < maxRetry) {
       return await post(endpoint, data, options, maxRetry, retryCount + 1);
-    }
-    throw e;
-  }
-}
-
-export async function patch<T>(endpoint: string, data: Record<string, unknown>, options?: RequestOptions, maxRetry = 3, retryCount = 0): Promise<T | null> {
-  try {
-    const headers = new Headers({
-      ...(options?.headers || {}),
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${_token}`,
-    });
-
-    const response = await fetch(`${Env.get().MAIN_SERVICE_URL}${endpoint}`, {
-      method: 'PATCH',
-      headers: headers,
-      body: JSON.stringify(data),
-    });
-
-    return await handleResponse<T>(response, 'PATCH');
-  } catch (e) {
-    if (retryCount < maxRetry) {
-      return await patch(endpoint, data, options, maxRetry, retryCount + 1);
     }
     throw e;
   }

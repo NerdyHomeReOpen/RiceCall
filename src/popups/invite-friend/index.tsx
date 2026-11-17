@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import Image from 'next/image';
 
 import type * as Types from '@/types';
+import { RelationStatus } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -34,7 +35,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: 0 }), [t]);
 
   const selectedUserIdSet = new Set(selectedUserIds);
-  const sortedFriends = friends.filter((f) => !f.isBlocked && f.relationStatus === 2 && f.name.includes(query)).sort((a, b) => a.name.localeCompare(b.name));
+  const sortedFriends = friends.filter((f) => !f.isBlocked && f.relationStatus === RelationStatus.Friend && f.name.includes(query)).sort((a, b) => a.name.localeCompare(b.name));
   const sortedFriendGroups = [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order);
   const isAllSelected = sortedFriends.every((f) => selectedUserIdSet.has(f.targetId));
 

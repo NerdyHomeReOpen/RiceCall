@@ -1,7 +1,7 @@
 type SortDirection = 1 | -1;
 type SortField<T> = keyof T;
 
-export function sorter<T extends object>(field: SortField<T>, direction: SortDirection = 1) {
+export function sorter<T extends object>(field: SortField<T>, direction: SortDirection = 1): (a: T, b: T) => number {
   return (a: T, b: T) => {
     const valueA = a[field];
     const valueB = b[field];
@@ -20,4 +20,14 @@ export function sorter<T extends object>(field: SortField<T>, direction: SortDir
 
     return 0;
   };
+}
+
+export function getNextSortDirection(isSameField: boolean, direction: SortDirection): SortDirection {
+  if (isSameField && direction === -1) return 1;
+  return -1;
+}
+
+export function getSortIndicator(isSorted: boolean, direction: SortDirection): string {
+  if (!isSorted) return '';
+  return direction === 1 ? '⏶' : '⏷';
 }

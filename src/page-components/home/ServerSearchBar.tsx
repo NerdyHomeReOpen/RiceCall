@@ -57,7 +57,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
       const sorted = [...serverResults].sort((a, b) => {
         const aHasId = a.displayId.toString().includes(q);
         const bHasId = b.displayId.toString().includes(q);
-        return aHasId === bHasId ? 0 : aHasId ? -1 : 1;
+        return Number(bHasId) - Number(aHasId);
       });
 
       const { exact, personal, related } = sorted.reduce<{ exact: Types.Server | null; personal: Types.Server[]; related: Types.Server[] }>(

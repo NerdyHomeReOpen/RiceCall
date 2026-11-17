@@ -1,6 +1,6 @@
 import Logger from '@/utils/logger';
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-export function setTrayTitle(_title: string) {
-  new Logger('System').info(`Set tray title only available in desktop version`);
+export function setTrayTitle(_title: string): void {
+  new Logger('SYSTEM').info(`Set tray title only available in desktop version`);
 }

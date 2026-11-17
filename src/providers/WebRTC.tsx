@@ -101,7 +101,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
 
       try {
         if (!refs.recvTransportRef.current) {
-          new Logger('WebRTC').info('Not in a channel, attempting to join one for diagnosis using standard logic...');
+          new Logger('WEB_RTC').info('Not in a channel, attempting to join one for diagnosis using standard logic...');
 
           let targetServer = null;
 
@@ -109,7 +109,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           targetServer = searchResults.find((s) => s.displayId === '10' || s.serverId === '10');
 
           if (!targetServer) {
-            const userId = window.localStorage.getItem('userId');
+            const userId = window.localStorage.getItem('user-id');
             if (userId) {
               const servers = await ipc.api.fetchServers({ userId });
               if (servers && servers.length > 0) {
@@ -119,7 +119,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           }
 
           if (targetServer) {
-            new Logger('WebRTC').info(`Standard joining server: ${targetServer.name} (${targetServer.displayId})`);
+            new Logger('WEB_RTC').info(`Standard joining server: ${targetServer.name} (${targetServer.displayId})`);
 
             loadServer(targetServer.specialId || targetServer.displayId);
             ipc.socket.send('connectServer', { serverId: targetServer.serverId });
@@ -135,7 +135,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
                 if (unsub) unsub();
                 resolve();
               });
-            }).catch((e) => new Logger('WebRTC').error(e.message));
+            }).catch((e) => new Logger('WEB_RTC').error(e.message));
 
             for (let i = 0; i < 5; i++) {
               if (refs.recvTransportRef.current) break;
@@ -143,7 +143,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
             }
           }
         } else {
-          new Logger('WebRTC').info('Already in an SFU session, reusing existing transport for diagnosis.');
+          new Logger('WEB_RTC').info('Already in an SFU session, reusing existing transport for diagnosis.');
         }
 
         if (refs.recvTransportRef.current) {
@@ -170,7 +170,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
           }
         }
       } catch (e) {
-        new Logger('WebRTC').error(`Error getting stats or joining channel: ${e}`);
+        new Logger('WEB_RTC').error(`Error getting stats or joining channel: ${e}`);
       }
 
       ipc.sfuDiagnosis.response(info);

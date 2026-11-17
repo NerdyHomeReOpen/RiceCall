@@ -4,7 +4,7 @@ import Env from '@/utils/env';
 
 import { broadcast, store } from '@/main/electron';
 
-export function registerEnvHandlers() {
+export function registerEnvHandlers(): void {
   ipcMain.on('change-env', (_, enviroment: 'prod' | 'dev') => {
     store.set('env', enviroment);
     Env.load(enviroment);

@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 
 import type * as Types from '@/types';
+import { RelationStatus } from '@/types';
 
 import { openDirectMessage, openUserInfo, openApplyFriend, openEditFriendNote, editFriend, unblockUser, blockUser, deleteFriend, deleteFriendApplication } from '@/services';
 
@@ -15,9 +16,9 @@ interface UseFriendTabCtxMenuProps {
 
 export const useFriendTabCtxMenu = ({ user, friend, friendGroups, defaultFriendGroup }: UseFriendTabCtxMenuProps) => {
   const isSelf = friend.targetId === user.userId;
-  const isFriend = friend.relationStatus === 2;
-  const isStranger = friend.relationStatus === 0;
-  const isPending = friend.relationStatus === 1;
+  const isFriend = friend.relationStatus === RelationStatus.Friend;
+  const isStranger = friend.relationStatus === RelationStatus.Stranger;
+  const isPending = friend.relationStatus === RelationStatus.Pending;
 
   const buildContextMenu = useCallback(
     () =>

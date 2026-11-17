@@ -152,24 +152,24 @@ export function getLanguage(): Types.LanguageKey {
   return match.code;
 }
 
-export function exit() {
+export function exit(): void {
   window.close();
 }
 
-export function listen(channel: string, listener: (...args: unknown[]) => void) {
+export function listen(channel: string, listener: (...args: unknown[]) => void): () => void {
   eventEmitter.on(channel, listener);
   return () => eventEmitter.removeListener(channel, listener);
 }
 
-export function createPopup(type: Types.PopupType, id: string, initialData: unknown = {}, force = true) {
+export function createPopup(type: Types.PopupType, id: string, initialData: unknown = {}, force = true): void {
   eventEmitter.emit('open-popup', type, id, initialData, force);
 }
 
-export function closeAllPopups() {
+export function closeAllPopups(): void {
   eventEmitter.emit('close-all-popups');
 }
 
-export function getInitialData(id: string) {
+export function getInitialData(id: string): null {
   return id ? null : null;
 }
 

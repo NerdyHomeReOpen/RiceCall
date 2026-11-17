@@ -22,7 +22,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   const ImageInputRef = useRef<HTMLInputElement>(null);
   const colorSelectorRef = useRef<HTMLDivElement>(null);
 
-  const [showColorPicker, setShowColorPicker] = useState<boolean>(false);
+  const [isColorPickerVisible, setIsColorPickerVisible] = useState<boolean>(false);
   const [pickedColor, setPickedColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
   const [customThemes, setCustomThemes] = useState<Types.Theme[]>(Array.from({ length: 7 }));
 
@@ -64,7 +64,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       }
     };
     img.onerror = () => {
-      new Logger('ColorSelector').error(`Error loading color selector image: ${imgSrc}`);
+      new Logger('COLOR_SELECTOR').error(`Error loading color selector image: ${imgSrc}`);
     };
   };
 
@@ -89,15 +89,15 @@ const ChangeThemePopup: React.FC = React.memo(() => {
 
     ipc.customThemes.current.set(newTheme);
     ipc.customThemes.add(newTheme);
-    setShowColorPicker(false);
+    setIsColorPickerVisible(false);
   };
 
   const handleColorCancelBtnClick = () => {
-    setShowColorPicker(false);
+    setIsColorPickerVisible(false);
   };
 
   const handleColorSelectBtnClick = () => {
-    setShowColorPicker((prev) => !prev);
+    setIsColorPickerVisible((prev) => !prev);
   };
 
   const handleUploadImageBtnClick = () => {
@@ -112,7 +112,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
         const buffer = imageUnit8Array.buffer;
         const imageUrl = await ipc.customThemes.saveImage(buffer as ArrayBuffer, 'custom_themes', 'theme', 'webp').catch((e) => {
           const error = e instanceof Error ? e : new Error('Unknown error');
-          new Logger('ChangeTheme').error(`Error saving image: ${error.message}`);
+          new Logger('CHANGE_THEME').error(`Error saving image: ${error.message}`);
           return null;
         });
 
@@ -136,7 +136,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
 
   useEffect(() => {
     const changeCustomTheme = (customThemes: Types.Theme[]) => {
-      new Logger('CustomThemes').info(`Custom themes updated: ${customThemes}`);
+      new Logger('CUSTOM_THEMES').info(`Custom themes updated: ${customThemes}`);
       setCustomThemes(customThemes);
     };
     changeCustomTheme(ipc.customThemes.get());
@@ -191,7 +191,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
                   <div className={styles['image-selector']} onClick={handleUploadImageBtnClick} />
                   <input type="file" ref={ImageInputRef} style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp" onChange={handleImageChange} />
                 </div>
-                {showColorPicker && (
+                {isColorPickerVisible && (
                   <div className={styles['color-selector-box']}>
                     <div ref={colorSelectorRef} className={styles['color-selector-image']} onMouseDown={handleColorSelect} onMouseMove={handleColorSelect} />
                     <div className={styles['color-selector-footer']}>

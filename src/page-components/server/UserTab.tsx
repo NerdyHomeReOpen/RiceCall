@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
-import { Permission } from '@/types';
+import { Permission, RelationStatus } from '@/types';
 
 import * as Store from '@/store';
 
@@ -69,7 +69,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const isSelf = member.userId === user.userId;
-  const isFriend = useMemo(() => friends.some((f) => f.targetId === member.userId && f.relationStatus === 2), [friends, member.userId]);
+  const isFriend = useMemo(() => friends.some((f) => f.targetId === member.userId && f.relationStatus === RelationStatus.Friend), [friends, member.userId]);
   const isLowerLevel = member.permissionLevel < permissionLevel;
   const isChannelQueueMode = channel.voiceMode === 'queue';
   const isDraggable = !isSelf && isLowerLevel && permissionLevel >= Permission.ChannelMod;

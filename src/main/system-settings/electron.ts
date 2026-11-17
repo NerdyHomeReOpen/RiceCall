@@ -7,7 +7,7 @@ import { changeLanguage } from '@/i18n';
 
 import { store, getSettings, broadcast, isAutoLaunchEnabled, setAutoLaunch, mainWindow, getLanguage, setTrayDetail, startCheckForUpdates, stopCheckForUpdates } from '@/main/electron';
 
-export function registerSystemHandlers() {
+export function registerSystemHandlers(): void {
   ipcMain.on('get-system-settings', (event) => {
     event.returnValue = getSettings();
   });

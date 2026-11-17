@@ -164,7 +164,7 @@ const PopupProvider = ({ children }: PopupProviderProps) => {
 
   const open = useCallback(
     async (type: Types.PopupType, id: string, initialData: unknown = {}, force = true) => {
-      new Logger('Popup').info(`Opening ${type} (${id})...`);
+      new Logger('POPUP').info(`Opening ${type} (${id})...`);
 
       if (force) {
         close(id);

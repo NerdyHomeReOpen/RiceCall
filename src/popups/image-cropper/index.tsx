@@ -21,7 +21,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
   const startPosRef = useRef({ x: 0, y: 0 });
 
   const [cropBox, setCropBox] = useState({ x: 100, y: 100, size: INITIAL_CROP_SIZE });
-  const [draggingBox, setDraggingBox] = useState(false);
+  const [isDraggingBox, setIsDraggingBox] = useState(false);
 
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
@@ -68,15 +68,15 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     const y = e.clientY - rect.top;
     const { x: bx, y: by, size } = cropBox;
     if (x >= bx && x <= bx + size && y >= by && y <= by + size) {
-      setDraggingBox(true);
+      setIsDraggingBox(true);
       startPosRef.current = { x, y };
     }
   };
 
-  const handleMouseUp = () => setDraggingBox(false);
+  const handleMouseUp = () => setIsDraggingBox(false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (!draggingBox || !canvasRef.current) return;
+    if (!isDraggingBox || !canvasRef.current) return;
 
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
@@ -93,7 +93,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     startPosRef.current = { x, y };
   };
 
-  const handleMouseLeave = () => setDraggingBox(false);
+  const handleMouseLeave = () => setIsDraggingBox(false);
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     const rect = canvasRef.current!.getBoundingClientRect();

@@ -15,6 +15,12 @@ interface NetworkDiagnosisPopupProps {
   id: string;
 }
 
+function getLossClassName(loss: number): string {
+  if (loss > 10) return 'loss-bad';
+  if (loss > 0) return 'loss-warn';
+  return 'loss-ok';
+}
+
 const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
 
@@ -306,7 +312,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
                   <td className={ndStyles['host-cell']} title={hop.host || hop.ip}>
                     {hop.host || hop.ip}
                   </td>
-                  <td className={hop.loss > 10 ? ndStyles['loss-bad'] : hop.loss > 0 ? ndStyles['loss-warn'] : ndStyles['loss-ok']}>{hop.loss}%</td>
+                  <td className={ndStyles[getLossClassName(hop.loss)]}>{hop.loss}%</td>
                   <td>{hop.best}ms</td>
                   <td>{hop.worst}ms</td>
                   <td>{hop.avg}ms</td>

@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
+import { RelationStatus } from '@/types';
+
 import * as ipc from '@/main/ipc';
 
 import { openApplyFriend } from '@/services';
@@ -39,7 +41,7 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
         }
 
         ipc.api.fetchFriend({ userId: user.userId, targetId: target.userId }).then((friend) => {
-          if (friend && friend.relationStatus === 2) setError(t('user-is-friend'));
+          if (friend && friend.relationStatus === RelationStatus.Friend) setError(t('user-is-friend'));
           else if (target.userId === user.userId) setError(t('cannot-add-yourself'));
           else {
             openApplyFriend(user.userId, target.userId).then(() => {

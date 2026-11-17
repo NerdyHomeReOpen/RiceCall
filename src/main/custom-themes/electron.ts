@@ -8,7 +8,7 @@ import Logger from '@/utils/logger';
 
 import { broadcast, store } from '@/main/electron';
 
-export function registerCustomThemesHandlers() {
+export function registerCustomThemesHandlers(): void {
   ipcMain.on('get-custom-themes', (event) => {
     const customThemes = store.get('customThemes');
     event.returnValue = Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {});
@@ -61,7 +61,7 @@ export function registerCustomThemesHandlers() {
       return `local-resource://${directory}/${fileName}`;
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');
-      new Logger('FileStorage').error(`Electron Storage Error: ${error.message}`);
+      new Logger('FILE_STORAGE').error(`Electron Storage Error: ${error.message}`);
       return null;
     }
   });

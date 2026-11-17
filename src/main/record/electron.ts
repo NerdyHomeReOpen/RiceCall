@@ -3,8 +3,6 @@ import path from 'path';
 import { Readable } from 'stream';
 import ffmpeg from 'fluent-ffmpeg';
 import ffmpegPath from 'ffmpeg-static';
-const binaryPath = ffmpegPath ? (app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath) : '';
-ffmpeg.setFfmpegPath(binaryPath);
 import { app, ipcMain, dialog } from 'electron';
 
 import Logger from '@/utils/logger';
@@ -12,6 +10,10 @@ import Logger from '@/utils/logger';
 import { t } from '@/i18n';
 
 import { createPopup, store } from '@/main/electron';
+
+const unpackedFfmpegPath = ffmpegPath && app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath;
+const binaryPath = unpackedFfmpegPath ?? '';
+ffmpeg.setFfmpegPath(binaryPath);
 
 function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
   const buffer = Buffer.from(inputWav);
@@ -26,7 +28,7 @@ function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
     });
 }
 
-export function registerRecordHandlers() {
+export function registerRecordHandlers(): void {
   ipcMain.on('save-record', (_, record: ArrayBuffer) => {
     try {
       const outputDir = store.get('recordSavePath');
@@ -49,7 +51,7 @@ export function registerRecordHandlers() {
       }
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');
-      new Logger('System').error(`Save audio error: ${error.message}`);
+      new Logger('SYSTEM').error(`Save audio error: ${error.message}`);
     }
   });
 

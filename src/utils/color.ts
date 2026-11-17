@@ -93,7 +93,7 @@ export function toRGBString({ r, g, b }: RGB): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-export function getLerpColor(color1: string, color2: string, t: number) {
+export function getLerpColor(color1: string, color2: string, t: number): string {
   const c1 = parseInt(color1.slice(1), 16);
   const c2 = parseInt(color2.slice(1), 16);
 

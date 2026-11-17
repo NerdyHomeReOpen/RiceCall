@@ -23,7 +23,7 @@ export function escapeHtml(str: unknown): string {
     .replace(/(^|\n)&gt;\s/g, '$1> ');
 }
 
-export function fromTags(raw: string) {
+export function fromTags(raw: string): string {
   return raw
     .replace(emojiRegex, (_, code) => {
       const emoji = EMOJIS.find((e) => e.code === code);
@@ -48,7 +48,7 @@ export function fromTags(raw: string) {
     });
 }
 
-export function toTags(raw: string) {
+export function toTags(raw: string): string {
   return raw
     .replace(emojiBackRegex, (_: string, code: string) => {
       return `:${escapeHtml(code)}:`;

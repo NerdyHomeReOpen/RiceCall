@@ -31,7 +31,7 @@ import {
   searchUser,
 } from '@/services';
 
-export function registerApiHandlers() {
+export function registerApiHandlers(): void {
   ipcMain.handle('fetch-user', async (_, params: { userId: string }) => {
     return await fetchUser(params);
   });

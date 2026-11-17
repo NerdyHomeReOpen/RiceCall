@@ -8,7 +8,7 @@ import { objDiff } from '@/utils';
 
 let cache: Types.StoreStateSnapshot | null = null;
 
-export function registerStoreStateHandlers() {
+export function registerStoreStateHandlers(): void {
   ipcMain.on('sync-store-state', (_, state: Types.StoreStateSnapshot) => {
     const diff = objDiff(state, cache || {});
     if (Object.keys(diff).length === 0) return;

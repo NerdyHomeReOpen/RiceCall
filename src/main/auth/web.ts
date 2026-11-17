@@ -21,7 +21,7 @@ export async function login(formData: { account: string; password: string }): Pr
     });
 }
 
-export async function logout() {
+export async function logout(): Promise<void> {
   store.set('token', '');
   removeToken();
   disconnectSocket();

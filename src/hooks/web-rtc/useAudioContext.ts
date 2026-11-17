@@ -69,7 +69,7 @@ export const useAudioContext = (refs: SharedRefs) => {
       speakerRef.current.play().catch(() => {});
       document.body.appendChild(speakerRef.current);
 
-      new Logger('WebRTC').info('Initialized audio context');
+      new Logger('WEB_RTC').info('Initialized audio context');
     };
 
     initPromiseRef.current = run().finally(() => {

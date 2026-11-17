@@ -1,6 +1,6 @@
 import Logger from '@/utils/logger';
 
-export function saveRecord(record: ArrayBuffer) {
+export function saveRecord(record: ArrayBuffer): void {
   try {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
 
@@ -10,11 +10,11 @@ export function saveRecord(record: ArrayBuffer) {
     a.click();
   } catch (e) {
     const error = e instanceof Error ? e : new Error('Unknown error');
-    new Logger('System').error(`Save audio error: ${error.message}`);
+    new Logger('SYSTEM').error(`Save audio error: ${error.message}`);
   }
 }
 
-export function selectRecordSavePath() {
-  new Logger('System').info(`Select record save path only available in desktop version`);
+export function selectRecordSavePath(): null {
+  new Logger('SYSTEM').info(`Select record save path only available in desktop version`);
   return null;
 }

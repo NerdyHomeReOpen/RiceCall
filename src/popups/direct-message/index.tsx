@@ -9,6 +9,7 @@ import TextAlign from '@tiptap/extension-text-align';
 import { TextStyle, FontSize, FontFamily } from '@tiptap/extension-text-style';
 
 import type * as Types from '@/types';
+import { RelationStatus } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -77,9 +78,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
 
   const textLength = editor?.getText().length || 0;
   const isWarning = textLength > MAX_INPUT_LENGTH;
-  const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === 2) !== undefined;
+  const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === RelationStatus.Friend) !== undefined;
   const isBlocked = friends.find((f) => f.targetId === target.userId && f.isBlocked) !== undefined;
   const isOffline = target.status === 'offline';
+  const isOnlineFriend = isFriend && !isOffline;
   const hasVip = target.vip > 0;
   const badges = typeof target.badges === 'string' ? JSON.parse(target.badges) : target.badges;
   const hasBadges = badges.length > 0;
@@ -151,14 +153,14 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     fontSizeRef.current = size;
     editor?.chain().setFontSize(size).focus().run();
     syncStyles();
-    localStorage.setItem('dm-fontSize', size);
+    localStorage.setItem('dm-font-size', size);
   };
 
   const handleTextColorChange = (color: string) => {
     textColorRef.current = color;
     editor?.chain().setColor(color).focus().run();
     syncStyles();
-    localStorage.setItem('dm-textColor', color);
+    localStorage.setItem('dm-text-color', color);
   };
 
   const handleShakeWindowBtnClick = () => {
@@ -388,17 +390,18 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
         </div>
         <div className={styles['main-content']}>
           <div className={styles['action-body']}>
-            {isFriend && !isOffline && targetCurrentServer ? (
+            {isOnlineFriend && targetCurrentServer && (
               <div className={`${styles['action-area']} ${styles['clickable']}`} onClick={handleServerNameClick}>
                 <div className={`${styles['action-icon']} ${styles['in-server']}`} />
                 <div className={styles['action-title']}>{targetCurrentServer.name}</div>
               </div>
-            ) : !isFriend || isOffline ? (
+            )}
+            {!isOnlineFriend && (
               <div className={styles['action-area']}>
                 {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
                 {isFriend && isOffline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
               </div>
-            ) : null}
+            )}
             {target.isVerified ? (
               <div className={styles['action-area']}>
                 <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />

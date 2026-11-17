@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
+import { RelationStatus } from '@/types';
 
 import * as ipc from '@/main/ipc';
 
@@ -58,7 +59,7 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     if (user.userId) return;
 
-    const userId = localStorage.getItem('userId');
+    const userId = localStorage.getItem('user-id');
     if (!userId) return;
 
     ipc.api.fetchUserHotReload({ userId }).then((user) => {
@@ -210,7 +211,7 @@ const SocketManager: React.FC = React.memo(() => {
         dispatch(Store.clearChannelEvents());
       }
       dispatch(Store.updateUser(args[0].update));
-      if (args[0].update.userId) localStorage.setItem('userId', args[0].update.userId);
+      if (args[0].update.userId) localStorage.setItem('user-id', args[0].update.userId);
     });
     return () => unsub();
   }, [dispatch]);
@@ -225,7 +226,7 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('friendUpdate', (...args) => {
       const newActivities = args.reduce<Types.FriendActivity[]>((acc, curr) => {
-        const targetFriend = friendsRef.current.find((f) => f.targetId === curr.targetId && f.relationStatus === 2);
+        const targetFriend = friendsRef.current.find((f) => f.targetId === curr.targetId && f.relationStatus === RelationStatus.Friend);
         if (targetFriend && curr.update.signature && targetFriend.signature !== curr.update.signature) {
           acc.push(getDefaultFriendActivity({ ...targetFriend, content: curr.update.signature, occurredAt: Date.now() }));
         }
@@ -233,13 +234,6 @@ const SocketManager: React.FC = React.memo(() => {
       }, []);
       dispatch(Store.addFriendActivities(newActivities));
       dispatch(Store.updateFriends(args));
-    });
-    return () => unsub();
-  }, [dispatch]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('friendRemove', (...args) => {
-      dispatch(Store.removeFriends(args));
     });
     return () => unsub();
   }, [dispatch]);
@@ -298,13 +292,6 @@ const SocketManager: React.FC = React.memo(() => {
       const currentServerUpdate = args.filter((i) => i.serverId === serverRef.current.serverId).reduce<Partial<Types.Server>>((acc, curr) => ({ ...acc, ...curr.update }), {});
       dispatch(Store.updateCurrentServer(currentServerUpdate));
       dispatch(Store.updateServers(args));
-    });
-    return () => unsub();
-  }, [dispatch]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverRemove', (...args) => {
-      dispatch(Store.removeServers(args));
     });
     return () => unsub();
   }, [dispatch]);

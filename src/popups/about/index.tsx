@@ -19,7 +19,7 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
   const { staffList } = useStaffList();
 
-  const [dontShowNextTime, setDontShowNextTime] = useState(false);
+  const [shouldHideNextTime, setShouldHideNextTime] = useState(false);
 
   const currentYear = new Date().getFullYear();
 
@@ -36,11 +36,11 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   };
 
   const handleShowDisclaimerChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setDontShowNextTime(e.target.checked);
+    setShouldHideNextTime(e.target.checked);
   };
 
   const handleCloseBtnClick = () => {
-    if (dontShowNextTime) ipc.dontShowDisclaimerNextTime();
+    if (shouldHideNextTime) ipc.dontShowDisclaimerNextTime();
     ipc.popup.close(id);
   };
 

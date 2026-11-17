@@ -7,10 +7,10 @@ import Logger from '@/utils/logger';
 import initialDataLoader from '@/main/popup/initial-data-loader';
 import { broadcast, closeAllPopups, createPopup, getSettings, popups } from '@/main/electron';
 
-export function registerPopupHandlers() {
+export function registerPopupHandlers(): void {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   ipcMain.on('open-popup', async (_, type: Types.PopupType, id: string, initialData: any, force = true) => {
-    new Logger('System').info(`Opening ${type} (${id})...`);
+    new Logger('SYSTEM').info(`Opening ${type} (${id})...`);
 
     if (typeof initialData !== 'object' || initialData === null) {
       initialData = {};
@@ -19,7 +19,7 @@ export function registerPopupHandlers() {
     const loader = initialDataLoader[type];
     if (loader) {
       const loadedData = await loader(initialData).catch(() => {
-        new Logger('System').error(`Cannot load ${type} data, aborting...`);
+        new Logger('SYSTEM').error(`Cannot load ${type} data, aborting...`);
         return null;
       });
       if (!loadedData) return;

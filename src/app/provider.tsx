@@ -33,7 +33,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
 
   useEffect(() => {
     const changeFont = (font: string | null) => {
-      new Logger('Font').info(`Font updated: ${font}`);
+      new Logger('FONT').info(`Font updated: ${font}`);
       if (!font) return;
       document.body.style.setProperty('font-family', font, 'important');
       document.body.style.setProperty('--font-family', font, 'important');
@@ -45,7 +45,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
 
   useEffect(() => {
     const changeFontSize = (fontSize: number | null) => {
-      new Logger('Font').info(`Font size updated: ${fontSize}`);
+      new Logger('FONT').info(`Font size updated: ${fontSize}`);
       if (!fontSize) return;
       document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
     };
@@ -56,7 +56,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
 
   useEffect(() => {
     const changeTheme = (theme: Types.Theme | null) => {
-      new Logger('Theme').info(`Theme updated: ${theme}`);
+      new Logger('THEME').info(`Theme updated: ${theme}`);
       if (!theme) return;
       document.body.style.setProperty('--header-image', theme.headerImage, 'important');
       document.body.style.setProperty('--main-color', theme.mainColor, 'important');
@@ -71,7 +71,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
     if (!i18nLoaded) return;
 
     const changeLang = (language: Types.LanguageKey) => {
-      new Logger('Language').info(`Language updated: ${language}`);
+      new Logger('LANGUAGE').info(`Language updated: ${language}`);
       if (!language) return;
       changeLanguage(language);
     };

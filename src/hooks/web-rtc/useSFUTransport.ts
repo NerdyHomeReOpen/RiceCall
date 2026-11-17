@@ -30,7 +30,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
   const consumeOne = useCallback(
     async (producerId: string, channelId: string) => {
       if (!recvTransportRef.current) {
-        new Logger('WebRTC').error('No recv transport found');
+        new Logger('WEB_RTC').error('No recv transport found');
         return;
       }
 
@@ -42,7 +42,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
           channelId,
         })
         .catch((e) => {
-          new Logger('WebRTC').error(`Error creating consumer: ${e}`);
+          new Logger('WEB_RTC').error(`Error creating consumer: ${e}`);
           return null;
         });
       if (!consumerInfo) return;
@@ -63,7 +63,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       initSpeakerAudio(userId, stream);
 
-      new Logger('WebRTC').info(`Consumed producer: ${userId}`);
+      new Logger('WEB_RTC').info(`Consumed producer: ${userId}`);
     },
     [initSpeakerAudio, recvTransportRef, deviceRef, consumersRef],
   );
@@ -83,7 +83,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       removeSpeakerAudio(userId);
 
-      new Logger('WebRTC').info(`Unconsumed producer: ${userId}`);
+      new Logger('WEB_RTC').info(`Unconsumed producer: ${userId}`);
     },
     [removeSpeakerAudio, consumersRef],
   );
@@ -97,7 +97,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       const track = inputDesRef.current.stream.getAudioTracks()[0];
       if (!track) {
-        new Logger('WebRTC').error('setupSend: no input track available');
+        new Logger('WEB_RTC').error('setupSend: no input track available');
         return;
       }
 
@@ -110,7 +110,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       }
 
       const transport = await ipc.socket.emit('sfuCreateTransport', { direction: 'send', channelId }).catch((e) => {
-        new Logger('WebRTC').error(`Error creating send transport: ${e}`);
+        new Logger('WEB_RTC').error(`Error creating send transport: ${e}`);
         return null;
       });
       if (!transport) return;
@@ -125,7 +125,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         ipc.socket
           .emit('sfuConnectTransport', { transportId: sendTransport.id, dtlsParameters })
           .then(() => {
-            new Logger('WebRTC').info('SendTransport connected to SFU');
+            new Logger('WEB_RTC').info('SendTransport connected to SFU');
             cb();
           })
           .catch(eb);
@@ -135,14 +135,14 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         ipc.socket
           .emit('sfuCreateProducer', { transportId: sendTransport.id, kind, rtpParameters, channelId })
           .then(({ id }) => {
-            new Logger('WebRTC').info('SendTransport produced to SFU');
+            new Logger('WEB_RTC').info('SendTransport produced to SFU');
             cb({ id });
           })
           .catch(eb);
       });
 
       sendTransport.on('connectionstatechange', async (s) => {
-        new Logger('WebRTC').info(`SendTransport connection state = ${s}`);
+        new Logger('WEB_RTC').info(`SendTransport connection state = ${s}`);
 
         if (sendTransportRef.current !== sendTransport) return;
 
@@ -173,12 +173,12 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
           ipc.webrtc.signalStateChange({
             signalState: s,
-            userId: localStorage.getItem('userId') || 'unknown-user',
+            userId: localStorage.getItem('user-id') || 'unknown-user',
             channelId,
             info,
           });
 
-          new Logger('WebRTC').error(`SendTransport connection stats: ${JSON.stringify(info)}`);
+          new Logger('WEB_RTC').error(`SendTransport connection stats: ${JSON.stringify(info)}`);
 
           if (currentChannelIdRef.current && sendRetryCountRef.current < MAX_TRANSPORT_RETRY_COUNT) {
             sendRetryCountRef.current++;
@@ -196,7 +196,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
               setupSend(channelId);
             }, delay);
 
-            new Logger('WebRTC').info(`Retrying send transport in ${delay}ms (attempt ${sendRetryCountRef.current})`);
+            new Logger('WEB_RTC').info(`Retrying send transport in ${delay}ms (attempt ${sendRetryCountRef.current})`);
           }
         }
       });
@@ -217,7 +217,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       });
 
       producer.on('transportclose', () => {
-        new Logger('WebRTC').info('Producer transport closed');
+        new Logger('WEB_RTC').info('Producer transport closed');
         if (audioProducerRef.current === producer) audioProducerRef.current = null;
         try {
           producer.close();
@@ -225,7 +225,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       });
 
       producer.on('trackended', () => {
-        new Logger('WebRTC').info('Producer track ended');
+        new Logger('WEB_RTC').info('Producer track ended');
         if (audioProducerRef.current === producer) audioProducerRef.current = null;
         try {
           producer.close();
@@ -258,7 +258,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       consumersRef.current = {};
 
       const transport = await ipc.socket.emit('sfuCreateTransport', { direction: 'recv', channelId }).catch((e) => {
-        new Logger('WebRTC').error(`Error creating recv transport: ${e}`);
+        new Logger('WEB_RTC').error(`Error creating recv transport: ${e}`);
         return null;
       });
       if (!transport) return;
@@ -273,14 +273,14 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         ipc.socket
           .emit('sfuConnectTransport', { transportId: recvTransport.id, dtlsParameters })
           .then(() => {
-            new Logger('WebRTC').info('RecvTransport connected to SFU');
+            new Logger('WEB_RTC').info('RecvTransport connected to SFU');
             cb();
           })
           .catch(eb);
       });
 
       recvTransport.on('connectionstatechange', (s) => {
-        new Logger('WebRTC').info(`RecvTransport connection state = ${s}`);
+        new Logger('WEB_RTC').info(`RecvTransport connection state = ${s}`);
 
         if (recvTransportRef.current !== recvTransport) return;
 
@@ -310,7 +310,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
               setupRecv(channelId);
             }, delay);
 
-            new Logger('WebRTC').info(`Retrying recv transport in ${delay}ms (attempt ${recvRetryCountRef.current})`);
+            new Logger('WEB_RTC').info(`Retrying recv transport in ${delay}ms (attempt ${recvRetryCountRef.current})`);
           }
         }
       });
@@ -319,7 +319,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
       for (const producer of transport.producers ?? []) {
         consumeOne(producer.id, channelId).catch((e) => {
-          new Logger('WebRTC').error(`Error consuming producer: ${e}`);
+          new Logger('WEB_RTC').error(`Error consuming producer: ${e}`);
         });
       }
     },
@@ -446,7 +446,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
       const recvHealthy = recv && !recv.closed && recv.connectionState === 'connected';
       const sendHealthy = !Store.store.getState().webrtc.isMicTaken || (send && !send.closed && send.connectionState === 'connected');
       if (currentChannelIdRef.current === channelId && recvHealthy && sendHealthy) {
-        new Logger('WebRTC').info(`sfuJoined dedup: already healthy on channel ${channelId}`);
+        new Logger('WEB_RTC').info(`sfuJoined dedup: already healthy on channel ${channelId}`);
         return;
       }
 
@@ -482,9 +482,9 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
   useEffect(() => {
     const unsub = ipc.socket.on('sfuProducerAdd', ({ userId, producerId, channelId }: { userId: string; producerId: string; channelId: string }) => {
-      new Logger('WebRTC').info(`New producer: ${userId}`);
+      new Logger('WEB_RTC').info(`New producer: ${userId}`);
       consumeOne(producerId, channelId).catch((e) => {
-        new Logger('WebRTC').error(`Error consuming producer: ${e}`);
+        new Logger('WEB_RTC').error(`Error consuming producer: ${e}`);
       });
     });
     return () => unsub();
@@ -492,9 +492,9 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
 
   useEffect(() => {
     const unsub = ipc.socket.on('sfuProducerRemove', ({ userId, producerId }: { userId: string; producerId: string }) => {
-      new Logger('WebRTC').info(`Producer closed: ${userId}`);
+      new Logger('WEB_RTC').info(`Producer closed: ${userId}`);
       unconsumeOne(producerId).catch((e) => {
-        new Logger('WebRTC').error(`Error unconsuming producer: ${e}`);
+        new Logger('WEB_RTC').error(`Error unconsuming producer: ${e}`);
       });
     });
     return () => unsub();
@@ -513,7 +513,7 @@ export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeake
         else if (s === 'new' || s === 'connecting') Store.store.dispatch(Store.setWebRTC({ status: 'connecting' }));
         else Store.store.dispatch(Store.setWebRTC({ status: 'disconnected' }));
 
-        const activeTransport = sendTransport && sendTransport.connectionState === 'connected' ? sendTransport : recvTransport && recvTransport.connectionState === 'connected' ? recvTransport : null;
+        const activeTransport = [sendTransport, recvTransport].find((t) => t?.connectionState === 'connected') ?? null;
 
         if (activeTransport) {
           const stats = await activeTransport.getStats();

@@ -2,6 +2,8 @@ import React, { useMemo } from 'react';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
+import { Permission } from '@/types';
+
 import { useAppSelector } from '@/hooks/useStore';
 
 import ServerList from './ServerList';
@@ -15,7 +17,7 @@ const HomePagePersonalExclusive: React.FC = React.memo(() => {
 
   const recentServers = useMemo(() => servers.filter((s) => s.isRecent).sort((a, b) => b.lastConnectedAt - a.lastConnectedAt), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.isFavorite), [servers]);
-  const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > 1), [servers]);
+  const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > Permission.Guest), [servers]);
 
   return (
     <>

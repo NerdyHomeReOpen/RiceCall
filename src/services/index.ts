@@ -8,204 +8,204 @@ import { post, get } from '@/api';
 
 import * as ipc from '@/main/ipc';
 
-export function acceptMemberInvitation(serverId: Types.Server['serverId']) {
+export function acceptMemberInvitation(serverId: Types.Server['serverId']): void {
   ipc.socket.send('acceptMemberInvitation', { serverId });
 }
 
-export function addUserToQueue(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function addUserToQueue(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.socket.send('addUserToQueue', { userId, serverId, channelId });
 }
 
-export function applyMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], isReceiveApply: boolean) {
+export function applyMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], isReceiveApply: boolean): void {
   if (!isReceiveApply) openAlertDialog(t('cannot-apply-member'), () => {});
   else openApplyMember(userId, serverId);
 }
 
-export function approveFriendApplication(senderId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId'] | null, friendNote: Types.Friend['note']) {
+export function approveFriendApplication(senderId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId'] | null, friendNote: Types.Friend['note']): void {
   ipc.socket.send('approveFriendApplication', { senderId, friendGroupId, note: friendNote });
 }
 
-export function approveMemberApplication(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function approveMemberApplication(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.socket.send('approveMemberApplication', { userId, serverId });
 }
 
-export function blockUser(targetId: Types.User['userId'], targetName: Types.User['name']) {
+export function blockUser(targetId: Types.User['userId'], targetName: Types.User['name']): void {
   openAlertDialog(t('confirm-block-user', { '0': targetName }), () => ipc.socket.send('blockUser', { targetId }));
 }
 
-export function blockUserFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], blockUntil: number) {
+export function blockUserFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], blockUntil: number): void {
   ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId, blockUntil });
 }
 
-export function blockUserFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId'], blockUntil: number) {
+export function blockUserFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId'], blockUntil: number): void {
   ipc.socket.send('blockUserFromServer', { userId, serverId, blockUntil });
   ipc.socket.send('terminateMember', { userId, serverId });
 }
 
-export function broadcastChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], preset: Partial<Types.PromptMessage>) {
+export function broadcastChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], preset: Partial<Types.PromptMessage>): void {
   ipc.socket.send('actionMessage', { serverId, channelId, preset });
 }
 
-export function broadcastServer(serverId: Types.Server['serverId'], preset: Partial<Types.PromptMessage>) {
+export function broadcastServer(serverId: Types.Server['serverId'], preset: Partial<Types.PromptMessage>): void {
   ipc.socket.send('actionMessage', { serverId, preset });
 }
 
-export function clearQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function clearQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   openAlertDialog(t('confirm-clear-queue'), () => ipc.socket.send('clearQueue', { serverId, channelId }));
 }
 
-export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, isPasswordNeeded: boolean) {
+export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, isPasswordNeeded: boolean): void {
   if (!canJoin) return;
   if (isPasswordNeeded) openChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
   else ipc.socket.send('connectChannel', { serverId, channelId });
 }
 
-export function controlQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function controlQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.socket.send('controlQueue', { serverId, channelId });
 }
 
-export function createChannel(serverId: Types.Server['serverId'], preset: Partial<Types.Channel>) {
+export function createChannel(serverId: Types.Server['serverId'], preset: Partial<Types.Channel>): void {
   ipc.socket.send('createChannel', { serverId, preset });
 }
 
-export function createServer(preset: Partial<Types.Server>) {
+export function createServer(preset: Partial<Types.Server>): void {
   ipc.socket.send('createServer', { preset });
 }
 
-export function deleteChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], channelName: Types.Channel['name']) {
+export function deleteChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], channelName: Types.Channel['name']): void {
   openAlertDialog(t('confirm-delete-channel', { '0': channelName }), () => ipc.socket.send('deleteChannel', { serverId, channelId }));
 }
 
-export function deleteFriend(targetId: Types.User['userId'], targetName: Types.User['name']) {
+export function deleteFriend(targetId: Types.User['userId'], targetName: Types.User['name']): void {
   openAlertDialog(t('confirm-delete-friend', { '0': targetName }), () => ipc.socket.send('deleteFriend', { targetId }));
 }
 
-export function deleteFriendApplication(receiverId: Types.User['userId']) {
+export function deleteFriendApplication(receiverId: Types.User['userId']): void {
   openAlertDialog(t('confirm-delete-friend-application'), () => ipc.socket.send('deleteFriendApplication', { receiverId }));
 }
 
-export function deleteFriendGroup(friendGroupId: Types.FriendGroup['friendGroupId'], friendGroupName: Types.FriendGroup['name']) {
+export function deleteFriendGroup(friendGroupId: Types.FriendGroup['friendGroupId'], friendGroupName: Types.FriendGroup['name']): void {
   openAlertDialog(t('confirm-delete-friend-group', { '0': friendGroupName }), () => ipc.socket.send('deleteFriendGroup', { friendGroupId }));
 }
 
-export function editChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>) {
+export function editChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>): void {
   ipc.socket.send('editChannel', { serverId, channelId, update });
 }
 
-export function editChannelPermission(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>) {
+export function editChannelPermission(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], update: Partial<Types.Channel>): void {
   ipc.socket.send('editChannelPermission', { userId, serverId, channelId, update });
 }
 
-export function editChannels(serverId: Types.Server['serverId'], updates: Partial<Types.Channel>[]) {
+export function editChannels(serverId: Types.Server['serverId'], updates: Partial<Types.Channel>[]): void {
   ipc.socket.send('editChannel', ...updates.map((update) => ({ serverId, channelId: update.channelId!, update })));
 }
 
-export function editFriend(targetId: Types.User['userId'], update: Partial<Types.Friend>) {
+export function editFriend(targetId: Types.User['userId'], update: Partial<Types.Friend>): void {
   ipc.socket.send('editFriend', { targetId, update });
 }
 
-export function editFriendApplication(receiverId: Types.User['userId'], update: Partial<Types.FriendApplication>) {
+export function editFriendApplication(receiverId: Types.User['userId'], update: Partial<Types.FriendApplication>): void {
   ipc.socket.send('editFriendApplication', { receiverId, update });
 }
 
-export function editFriendGroup(friendGroupId: Types.FriendGroup['friendGroupId'], update: Partial<Types.FriendGroup>) {
+export function editFriendGroup(friendGroupId: Types.FriendGroup['friendGroupId'], update: Partial<Types.FriendGroup>): void {
   ipc.socket.send('editFriendGroup', { friendGroupId, update });
 }
 
-export function editMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Member>) {
+export function editMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Member>): void {
   ipc.socket.send('editMember', { userId, serverId, update });
 }
 
-export function editMemberApplication(serverId: Types.Server['serverId'], update: Partial<Types.MemberApplication>) {
+export function editMemberApplication(serverId: Types.Server['serverId'], update: Partial<Types.MemberApplication>): void {
   ipc.socket.send('editMemberApplication', { serverId, update });
 }
 
-export function editMemberInvitation(receiverId: Types.Member['userId'], serverId: Types.Server['serverId'], update: Partial<Types.MemberInvitation>) {
+export function editMemberInvitation(receiverId: Types.Member['userId'], serverId: Types.Server['serverId'], update: Partial<Types.MemberInvitation>): void {
   ipc.socket.send('editMemberInvitation', { receiverId, serverId, update });
 }
 
-export function editServer(serverId: Types.Server['serverId'], update: Partial<Types.Server>) {
+export function editServer(serverId: Types.Server['serverId'], update: Partial<Types.Server>): void {
   ipc.socket.send('editServer', { serverId, update });
 }
 
-export function editServerPermission(userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Server>) {
+export function editServerPermission(userId: Types.User['userId'], serverId: Types.Server['serverId'], update: Partial<Types.Server>): void {
   ipc.socket.send('editServerPermission', { userId, serverId, update });
 }
 
-export function editUser(update: Partial<Types.User>) {
+export function editUser(update: Partial<Types.User>): void {
   ipc.socket.send('editUser', { update });
 }
 
-export function editUserStatus(status: Types.User['status']) {
+export function editUserStatus(status: Types.User['status']): void {
   ipc.socket.send('editUser', { update: { status } });
 }
 
-export function favoriteServer(serverId: Types.Server['serverId']) {
+export function favoriteServer(serverId: Types.Server['serverId']): void {
   ipc.socket.send('favoriteServer', { serverId });
 }
 
-export function forbidUserTextInChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isTextMuted: boolean) {
+export function forbidUserTextInChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isTextMuted: boolean): void {
   ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isTextMuted } });
 }
 
-export function forbidUserVoiceInChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isVoiceMuted: boolean) {
+export function forbidUserVoiceInChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], isVoiceMuted: boolean): void {
   ipc.socket.send('muteUserInChannel', { userId, serverId, channelId, mute: { isVoiceMuted } });
 }
 
-export function increaseUserQueueTime(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function increaseUserQueueTime(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.socket.send('increaseUserQueueTime', { serverId, channelId, userId });
 }
 
-export function joinQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], position?: number) {
+export function joinQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], position?: number): void {
   ipc.socket.send('joinQueue', { serverId, channelId, position });
 }
 
-export function kickUserFromChannel(userId: Types.User['userId'], channelId: Types.Channel['channelId'], serverId: Types.Server['serverId'], userName: Types.User['name']) {
+export function kickUserFromChannel(userId: Types.User['userId'], channelId: Types.Channel['channelId'], serverId: Types.Server['serverId'], userName: Types.User['name']): void {
   openAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipc.socket.send('blockUserFromChannel', { userId, serverId, channelId }));
 }
 
-export function kickUserFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']) {
+export function kickUserFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']): void {
   openAlertDialog(t('confirm-kick-user', { '0': userName }), () => ipc.socket.send('blockUserFromServer', { userId, serverId }));
 }
 
-export function kickUsersFromServer(userIds: Types.User['userId'][], serverId: Types.Server['serverId']) {
+export function kickUsersFromServer(userIds: Types.User['userId'][], serverId: Types.Server['serverId']): void {
   openAlertDialog(t('confirm-kick-users-from-server', { '0': userIds.length }), () => ipc.socket.send('blockUserFromServer', ...userIds.map((userId) => ({ userId, serverId }))));
 }
 
-export function leaveQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function leaveQueue(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.socket.send('leaveQueue', { serverId, channelId });
 }
 
-export function leaveServer(serverId: Types.Server['serverId']) {
+export function leaveServer(serverId: Types.Server['serverId']): void {
   ipc.socket.send('disconnectServer', { serverId });
 }
 
-export function moveAllUsersToChannel(userIds: Types.User['userId'][], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function moveAllUsersToChannel(userIds: Types.User['userId'][], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   openAlertDialog(t('confirm-move-members-to-channel', { '0': userIds.length }), () => ipc.socket.send('moveUserToChannel', ...userIds.map((userId) => ({ userId, serverId, channelId }))));
 }
 
-export function moveUserQueuePositionDown(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], position: number) {
+export function moveUserQueuePositionDown(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], position: number): void {
   ipc.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
 }
 
-export function moveUserQueuePositionUp(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], position: number) {
+export function moveUserQueuePositionUp(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], position: number): void {
   ipc.socket.send('moveUserQueuePosition', { serverId, channelId, userId, position });
 }
 
-export function moveUserToChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function moveUserToChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   openAlertDialog(t('confirm-move-members-to-channel', { '0': 1 }), () => ipc.socket.send('moveUserToChannel', { userId, serverId, channelId }));
 }
 
-export function openAboutUs() {
+export function openAboutUs(): void {
   ipc.popup.open('aboutus', 'aboutUs');
 }
 
-export function openAlertDialog(message: string, callback: () => void) {
+export function openAlertDialog(message: string, callback: () => void): void {
   ipc.popup.open('dialogAlert', 'dialogAlert', { message });
   ipc.popup.onSubmit('dialogAlert', callback);
 }
 
-export async function openApplyFriend(senderId: Types.User['userId'], receiverId: Types.User['userId']) {
+export async function openApplyFriend(senderId: Types.User['userId'], receiverId: Types.User['userId']): Promise<void> {
   await ipc.api.fetchFriendApplication({ receiverId, senderId }).then((receivedFriendApplication) => {
     if (receivedFriendApplication) {
       ipc.popup.open('approveFriend', 'approveFriend', { senderId, receiverId });
@@ -215,205 +215,205 @@ export async function openApplyFriend(senderId: Types.User['userId'], receiverId
   });
 }
 
-export function openApplyMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openApplyMember(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('applyMember', 'applyMember', { userId, serverId });
 }
 
-export function openApproveFriend(receiverId: Types.User['userId'], senderId: Types.User['userId']) {
+export function openApproveFriend(receiverId: Types.User['userId'], senderId: Types.User['userId']): void {
   ipc.popup.open('approveFriend', 'approveFriend', { receiverId, senderId });
 }
 
-export function openBlockMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openBlockMember(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('blockMember', `blockMember`, { userId, serverId });
 }
 
-export function openChangeTheme() {
+export function openChangeTheme(): void {
   ipc.popup.open('changeTheme', 'changeTheme');
 }
 
-export function openChannelEvent() {
+export function openChannelEvent(): void {
   ipc.popup.open('channelEvent', 'channelEvent');
 }
 
-export function openChannelPassword(onSubmit: (password: string) => void) {
+export function openChannelPassword(onSubmit: (password: string) => void): void {
   ipc.popup.open('channelPassword', 'channelPassword');
   ipc.popup.onSubmit('channelPassword', onSubmit);
 }
 
-export function openChannelSetting(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function openChannelSetting(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
 }
 
-export function openChatHistory(userId: Types.User['userId'], targetId: Types.User['userId']) {
+export function openChatHistory(userId: Types.User['userId'], targetId: Types.User['userId']): void {
   ipc.popup.open('chatHistory', 'chatHistory', { userId, targetId });
 }
 
-export function openCreateChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId?: Types.Channel['channelId']) {
+export function openCreateChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId?: Types.Channel['channelId']): void {
   ipc.popup.open('createChannel', 'createChannel', { userId, serverId, channelId });
 }
 
-export function openCreateFriendGroup() {
+export function openCreateFriendGroup(): void {
   ipc.popup.open('createFriendGroup', 'createFriendGroup');
 }
 
-export function openCreateServer() {
+export function openCreateServer(): void {
   ipc.popup.open('createServer', 'createServer');
 }
 
-export function openDirectMessage(userId: Types.User['userId'], targetId: Types.User['userId']) {
+export function openDirectMessage(userId: Types.User['userId'], targetId: Types.User['userId']): void {
   ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
 }
 
-export function openEditChannelName(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function openEditChannelName(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.popup.open('editChannelName', 'editChannelName', { userId, serverId, channelId });
 }
 
-export function openEditChannelOrder(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openEditChannelOrder(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('editChannelOrder', 'editChannelOrder', { serverId, userId });
 }
 
-export function openEditFriendGroupName(userId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId']) {
+export function openEditFriendGroupName(userId: Types.User['userId'], friendGroupId: Types.FriendGroup['friendGroupId']): void {
   ipc.popup.open('editFriendGroupName', 'editFriendGroupName', { userId, friendGroupId });
 }
 
-export function openEditFriendNote(userId: Types.User['userId'], targetId: Types.User['userId']) {
+export function openEditFriendNote(userId: Types.User['userId'], targetId: Types.User['userId']): void {
   ipc.popup.open('editFriendNote', 'editFriendNote', { userId, targetId });
 }
 
-export function openEditNickname(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openEditNickname(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('editNickname', 'editNickname', { serverId, userId });
 }
 
-export function openErrorDialog(error: Error, callback: () => void) {
+export function openErrorDialog(error: Error, callback: () => void): void {
   ipc.popup.open('dialogError', 'dialogError', { error });
   ipc.popup.onSubmit('dialogError', callback);
 }
 
-export function openFriendVerification() {
+export function openFriendVerification(): void {
   ipc.popup.open('friendVerification', 'friendVerification');
 }
 
-export function openImageCropper(imageUnit8Array: Uint8Array, onSubmit: (imageUnit8Array: Uint8Array) => void) {
+export function openImageCropper(imageUnit8Array: Uint8Array, onSubmit: (imageUnit8Array: Uint8Array) => void): void {
   ipc.popup.open('imageCropper', 'imageCropper', { imageUnit8Array });
   ipc.popup.onSubmit('imageCropper', onSubmit);
 }
 
-export function openInviteFriend(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openInviteFriend(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('inviteFriend', `inviteFriend`, { userId, serverId });
 }
 
-export function openInviteMember(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openInviteMember(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('inviteMember', `inviteMember`, { receiverId: userId, serverId });
 }
 
-export function openKickMemberFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function openKickMemberFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.popup.open('kickMemberFromChannel', `kickMemberFromChannel`, { userId, serverId, channelId });
 }
 
-export function openKickMemberFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openKickMemberFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('kickMemberFromServer', `kickMemberFromServer`, { userId, serverId });
 }
 
-export function openMemberApplicationSetting(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openMemberApplicationSetting(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('memberApplicationSetting', 'memberApplicationSetting', { userId, serverId });
 }
 
-export function openMemberInvitation() {
+export function openMemberInvitation(): void {
   ipc.popup.open('memberInvitation', 'memberInvitation');
 }
 
-export function openNetworkDiagnosis() {
+export function openNetworkDiagnosis(): void {
   ipc.popup.open('networkDiagnosis', 'networkDiagnosis');
 }
 
-export function openSearchUser() {
+export function openSearchUser(): void {
   ipc.popup.open('searchUser', 'searchUser');
 }
 
-export function openServerAnnouncement(serverAnnouncement: Types.Server['announcement']) {
+export function openServerAnnouncement(serverAnnouncement: Types.Server['announcement']): void {
   ipc.popup.open('serverAnnouncement', 'serverAnnouncement', { serverAnnouncement });
 }
 
-export function openServerApplication(userId: Types.User['userId'], serverId: Types.Server['serverId'], onSubmit: (action: string) => void) {
+export function openServerApplication(userId: Types.User['userId'], serverId: Types.Server['serverId'], onSubmit: (action: string) => void): void {
   ipc.popup.open('serverApplication', 'serverApplication', { userId, serverId });
   ipc.popup.onSubmit('serverApplication', onSubmit);
 }
 
-export function openServerBroadcast(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']) {
+export function openServerBroadcast(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
   ipc.popup.open('serverBroadcast', 'serverBroadcast', { serverId, channelId });
 }
 
-export function openServerSetting(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function openServerSetting(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.popup.open('serverSetting', 'serverSetting', { userId, serverId });
 }
 
-export function openSystemSetting(userId: Types.User['userId']) {
+export function openSystemSetting(userId: Types.User['userId']): void {
   ipc.popup.open('systemSetting', 'systemSetting', { userId });
 }
 
-export function openUserInfo(userId: Types.User['userId'], targetId: Types.User['userId']) {
+export function openUserInfo(userId: Types.User['userId'], targetId: Types.User['userId']): void {
   ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
 }
 
-export function rejectAllFriendApplication(friendApplications: Types.FriendApplication[]) {
+export function rejectAllFriendApplication(friendApplications: Types.FriendApplication[]): void {
   if (friendApplications.length === 0) return;
   openAlertDialog(t('confirm-reject-all-friend-application'), () => ipc.socket.send('rejectFriendApplication', ...friendApplications.map((item) => ({ senderId: item.senderId }))));
 }
 
-export function rejectAllMemberInvitation(memberInvitations: Types.MemberInvitation[]) {
+export function rejectAllMemberInvitation(memberInvitations: Types.MemberInvitation[]): void {
   if (memberInvitations.length === 0) return;
   openAlertDialog(t('confirm-reject-all-member-invitation'), () => ipc.socket.send('rejectMemberInvitation', ...memberInvitations.map((item) => ({ serverId: item.serverId }))));
 }
 
-export function rejectFriendApplication(senderId: Types.User['userId'], senderName: Types.FriendApplication['name']) {
+export function rejectFriendApplication(senderId: Types.User['userId'], senderName: Types.FriendApplication['name']): void {
   openAlertDialog(t('confirm-reject-friend-application', { 0: senderName }), () => ipc.socket.send('rejectFriendApplication', { senderId }));
 }
 
-export function rejectMemberApplication(userId: Types.User['userId'], serverId: Types.Server['serverId']) {
+export function rejectMemberApplication(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
   ipc.socket.send('rejectMemberApplication', { userId, serverId });
 }
 
-export function rejectMemberInvitation(serverId: Types.Server['serverId']) {
+export function rejectMemberInvitation(serverId: Types.Server['serverId']): void {
   ipc.socket.send('rejectMemberInvitation', { serverId });
 }
 
-export function removeUserFromQueue(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], userName: Types.User['name']) {
+export function removeUserFromQueue(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], userName: Types.User['name']): void {
   openAlertDialog(t('confirm-remove-from-queue', { '0': userName }), () => ipc.socket.send('removeUserFromQueue', { serverId, channelId, userId }));
 }
 
-export function sendChannelMessage(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], preset: Partial<Types.ChannelMessage>) {
+export function sendChannelMessage(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], preset: Partial<Types.ChannelMessage>): void {
   ipc.socket.send('channelMessage', { serverId, channelId, preset });
 }
 
-export function sendFriendApplication(receiverId: Types.User['userId'], preset: Partial<Types.FriendApplication>, friendGroupId: Types.FriendGroup['friendGroupId'] | null) {
+export function sendFriendApplication(receiverId: Types.User['userId'], preset: Partial<Types.FriendApplication>, friendGroupId: Types.FriendGroup['friendGroupId'] | null): void {
   ipc.socket.send('sendFriendApplication', { receiverId, preset, friendGroupId });
 }
 
-export function sendMemberApplication(serverId: Types.Server['serverId'], preset: Partial<Types.MemberApplication>) {
+export function sendMemberApplication(serverId: Types.Server['serverId'], preset: Partial<Types.MemberApplication>): void {
   ipc.socket.send('sendMemberApplication', { serverId, preset });
 }
 
-export function sendMemberInvitation(receiverId: Types.Member['userId'], serverId: Types.Server['serverId'], preset: Partial<Types.MemberInvitation>) {
+export function sendMemberInvitation(receiverId: Types.Member['userId'], serverId: Types.Server['serverId'], preset: Partial<Types.MemberInvitation>): void {
   ipc.socket.send('sendMemberInvitation', { receiverId, serverId, preset });
 }
 
-export function sendMessage(targetId: Types.User['userId'], preset: Partial<Types.DirectMessage>) {
+export function sendMessage(targetId: Types.User['userId'], preset: Partial<Types.DirectMessage>): void {
   ipc.socket.send('directMessage', { targetId, preset });
 }
 
-export function terminateMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']) {
+export function terminateMember(userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']): void {
   openAlertDialog(t('confirm-terminate-membership', { '0': userName }), () => ipc.socket.send('terminateMember', { userId, serverId }));
 }
 
-export function unblockUser(targetId: Types.User['userId'], targetName: Types.User['name']) {
+export function unblockUser(targetId: Types.User['userId'], targetName: Types.User['name']): void {
   openAlertDialog(t('confirm-unblock-user', { '0': targetName }), () => ipc.socket.send('unblockUser', { targetId }));
 }
 
-export function unblockUserFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], userName: Types.User['name']) {
+export function unblockUserFromChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], userName: Types.User['name']): void {
   openAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipc.socket.send('unblockUserFromChannel', { userId, serverId, channelId }));
 }
 
-export function unblockUserFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']) {
+export function unblockUserFromServer(userId: Types.User['userId'], serverId: Types.Server['serverId'], userName: Types.User['name']): void {
   openAlertDialog(t('confirm-unblock-user', { '0': userName }), () => ipc.socket.send('unblockUserFromServer', { userId, serverId }));
 }
 

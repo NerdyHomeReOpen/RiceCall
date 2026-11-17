@@ -43,7 +43,9 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
   const [serverAvatarUrl, setServerAvatarUrl] = useState<Types.Server['avatarUrl']>(getDefaultServer().avatarUrl);
 
   const remainingServers = useMemo(() => {
-    const maxGroups = user.level >= 16 ? 5 : user.level >= 6 && user.level < 16 ? 4 : 3;
+    let maxGroups = 3;
+    if (user.level >= 16) maxGroups = 5;
+    else if (user.level >= 6) maxGroups = 4;
     return maxGroups - servers.filter((s) => s.isOwned).length;
   }, [user.level, servers]);
   const canSubmit = remainingServers > 0 && serverName.trim();

@@ -32,7 +32,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
   const outputDeviceIdRef = useRef<string | null>(null);
 
   const playSound = useCallback((sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => {
-    new Logger('SoundPlayer').info(`Play sound: ${sound} in ${window.location.href}`);
+    new Logger('SOUND_PLAYER').info(`Play sound: ${sound} in ${window.location.href}`);
 
     if (disableAllSoundEffectRef.current && !force) return;
 
@@ -87,35 +87,35 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
 
   useEffect(() => {
     const changeOutputAudioDevice = (deviceId: string) => {
-      new Logger('SoundPlayer').info(`Output device updated: ${deviceId}`);
+      new Logger('SOUND_PLAYER').info(`Output device updated: ${deviceId}`);
       outputDeviceIdRef.current = deviceId || null;
     };
     const changeDisableAllSoundEffect = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`Disable all sound effect updated: ${enabled}`);
+      new Logger('SOUND_PLAYER').info(`Disable all sound effect updated: ${enabled}`);
       disableAllSoundEffectRef.current = enabled;
     };
     const changeEnterVoiceChannelSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`Enter voice channel sound updated: ${enabled}`);
+      new Logger('SOUND_PLAYER').info(`Enter voice channel sound updated: ${enabled}`);
       enterVoiceChannelSoundRef.current = enabled;
     };
     const changeLeaveVoiceChannelSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`Leave voice channel sound updated: ${enabled}`);
+      new Logger('SOUND_PLAYER').info(`Leave voice channel sound updated: ${enabled}`);
       leaveVoiceChannelSoundRef.current = enabled;
     };
     const changeStartSpeakingSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`Start speaking sound updated: ${enabled}`);
+      new Logger('SOUND_PLAYER').info(`Start speaking sound updated: ${enabled}`);
       startSpeakingSoundRef.current = enabled;
     };
     const changeStopSpeakingSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`Stop speaking sound updated: ${enabled}`);
+      new Logger('SOUND_PLAYER').info(`Stop speaking sound updated: ${enabled}`);
       stopSpeakingSoundRef.current = enabled;
     };
     const changeReceiveDirectMessageSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`Receive direct message sound updated: ${enabled}`);
+      new Logger('SOUND_PLAYER').info(`Receive direct message sound updated: ${enabled}`);
       receiveDirectMessageSoundRef.current = enabled;
     };
     const changeReceiveChannelMessageSound = (enabled: boolean) => {
-      new Logger('SoundPlayer').info(`Receive channel message sound updated: ${enabled}`);
+      new Logger('SOUND_PLAYER').info(`Receive channel message sound updated: ${enabled}`);
       receiveChannelMessageSoundRef.current = enabled;
     };
 

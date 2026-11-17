@@ -19,7 +19,7 @@ interface StatusDropdownProps {
 const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direction, onClose, onStatusSelect }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [dropdownX, setDropdownX] = useState(x);
   const [dropdownY, setDropdownY] = useState(y);
 
@@ -53,11 +53,11 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
 
     setDropdownX(newPosX);
     setDropdownY(newPosY);
-    setDisplay(true);
+    setIsVisible(true);
   }, [x, y, direction]);
 
   return (
-    <div ref={dropdownRef} className={`context-menu-container ${styles['status-dropdown']}`} style={display ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
+    <div ref={dropdownRef} className={`context-menu-container ${styles['status-dropdown']}`} style={isVisible ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
       {STATUS_OPTIONS.map((status) => (
         <StatusItem key={status} status={status} onStatusSelect={onStatusSelect} onClose={onClose} />
       ))}

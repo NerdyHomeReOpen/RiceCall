@@ -6,7 +6,6 @@ type EnvType = {
   MAIN_SERVICE_URL: string;
   MAIN_SERVICE_WS_URL: string;
   DOCS_BASE_URL: string;
-  REACT_DEV_TOOLS_PATH: string | undefined;
   ERROR_SUBMISSION_URL: string | undefined;
 };
 
@@ -46,7 +45,7 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
       expand(cfg);
       envLoaded = { ...envLoaded, ...(cfg.parsed ?? {}) };
     } catch (e) {
-      new Logger('Env').error(`Failed to load Electron env files: ${e instanceof Error ? e.message : String(e)}`);
+      new Logger('ENV').error(`Failed to load Electron env files: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
@@ -62,12 +61,11 @@ export default class Env {
 
   static get(): EnvType {
     if (!env) {
-      new Logger('Env').error('Env is not loaded');
+      new Logger('ENV').error('Env is not loaded');
       return {
         MAIN_SERVICE_URL: '',
         MAIN_SERVICE_WS_URL: '',
         DOCS_BASE_URL: '',
-        REACT_DEV_TOOLS_PATH: undefined,
         ERROR_SUBMISSION_URL: undefined,
       };
     }

@@ -5,7 +5,7 @@ import Env from '@/utils/env';
 
 import { createPopup } from '@/main/electron';
 
-export function registerErrorHandlers() {
+export function registerErrorHandlers(): void {
   ipcMain.on('error-submit', (_, errorId: string, error: Error) => {
     const errorSubmissionUrl = Env.get().ERROR_SUBMISSION_URL;
     if (!errorSubmissionUrl) return;
@@ -37,14 +37,14 @@ export function registerErrorHandlers() {
     })
       .then((response) => {
         if (response.ok) {
-          new Logger('Error').error(`(${errorId}), Error submitted: ${error.message}`);
+          new Logger('ERROR').error(`(${errorId}), Error submitted: ${error.message}`);
         } else {
-          new Logger('Error').error(`(${errorId}), Failed to submit error: ${response.statusText}`);
+          new Logger('ERROR').error(`(${errorId}), Failed to submit error: ${response.statusText}`);
         }
       })
       .catch((e) => {
         const error = e instanceof Error ? e : new Error('Unknown error');
-        new Logger('Error').error(`(${errorId}), Failed to submit error: ${error.message}`);
+        new Logger('ERROR').error(`(${errorId}), Failed to submit error: ${error.message}`);
       });
   });
 
@@ -88,13 +88,13 @@ export function registerErrorHandlers() {
       })
         .then((response) => {
           if (response.ok) {
-            new Logger('System').info(`WebRTC signal log sent to Discord: ${formData.userId}, ${formData.channelId}, ${formData.signalState}`);
+            new Logger('SYSTEM').info(`WebRTC signal log sent to Discord: ${formData.userId}, ${formData.channelId}, ${formData.signalState}`);
           } else {
-            new Logger('System').error(`Failed to send WebRTC signal log to Discord: ${response.statusText}`);
+            new Logger('SYSTEM').error(`Failed to send WebRTC signal log to Discord: ${response.statusText}`);
           }
         })
         .catch((error) => {
-          new Logger('System').error(`Failed to send WebRTC signal log to Discord: ${error.message}`);
+          new Logger('SYSTEM').error(`Failed to send WebRTC signal log to Discord: ${error.message}`);
         });
 
       resolve(true);

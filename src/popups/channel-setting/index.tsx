@@ -22,7 +22,7 @@ import { useChannelSettingBlockedMemberCtxMenu } from '@/hooks/context-menus/use
 import AnnouncementEditor from '@/components/announcement-editor';
 
 import { objDiff } from '@/utils';
-import { sorter } from '@/utils/sorter';
+import { sorter, getNextSortDirection, getSortIndicator } from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 
 import styles from './channel-setting.module.css';
@@ -53,7 +53,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   const [channel, setChannel] = useState<Types.Channel>(channelData);
   const [channelMembers, setChannelMembers] = useState<Types.Member[]>(channelMembersData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
-  const [showPreview, setShowPreview] = useState<boolean>(false);
+  const [isPreviewVisible, setIsPreviewVisible] = useState<boolean>(false);
   const [moderatorSortDirection, setModeratorSortDirection] = useState<1 | -1>(-1);
   const [blockMemberSortDirection, setBlockMemberSortDirection] = useState<1 | -1>(-1);
   const [moderatorSortField, setModeratorSortField] = useState<keyof Types.Member>('permissionLevel');
@@ -83,32 +83,30 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
     return { totalBlockMembersCount: total.length, filteredBlockMembers: filtered, sortedBlockMembers: sorted };
   }, [channelMembers, blockMemberQuery, blockMemberSortField, blockMemberSortDirection]);
 
-  const settingPages = useMemo(
-    () =>
-      permissionLevel >= Permission.ChannelMod
-        ? [
-            t('channel-info'),
-            t('channel-announcement'),
-            t('access-permission'),
-            t('speaking-permission'),
-            t('text-permission'),
-            `${t('channel-management')} (${totalModeratorsCount})`,
-            `${t('blacklist-management')} (${totalBlockMembersCount})`,
-          ]
-        : isReadOnly
-          ? [t('channel-info'), t('channel-announcement')]
-          : [t('channel-info')],
-    [isReadOnly, permissionLevel, t, totalModeratorsCount, totalBlockMembersCount],
-  );
+  const settingPages = useMemo(() => {
+    if (permissionLevel >= Permission.ChannelMod) {
+      return [
+        t('channel-info'),
+        t('channel-announcement'),
+        t('access-permission'),
+        t('speaking-permission'),
+        t('text-permission'),
+        `${t('channel-management')} (${totalModeratorsCount})`,
+        `${t('blacklist-management')} (${totalBlockMembersCount})`,
+      ];
+    }
+    if (isReadOnly) return [t('channel-info'), t('channel-announcement')];
+    return [t('channel-info')];
+  }, [isReadOnly, permissionLevel, t, totalModeratorsCount, totalBlockMembersCount]);
 
   const handleModeratorSort = (field: keyof Types.Member) => {
     setModeratorSortField(field);
-    setModeratorSortDirection((d) => (field === moderatorSortField ? (d === 1 ? -1 : 1) : -1));
+    setModeratorSortDirection((d) => getNextSortDirection(field === moderatorSortField, d));
   };
 
   const handleBlockMemberSort = (field: keyof Types.Member) => {
     setBlockMemberSortField(field);
-    setBlockMemberSortDirection((d) => (field === blockMemberSortField ? (d === 1 ? -1 : 1) : -1));
+    setBlockMemberSortDirection((d) => getNextSortDirection(field === blockMemberSortField, d));
   };
 
   const handleModeratorColumnHandleDown = (e: React.PointerEvent<HTMLDivElement>, index: number) => {
@@ -170,7 +168,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   };
 
   const handleShowPreviewBtnClick = () => {
-    setShowPreview((prev) => !prev);
+    setIsPreviewVisible((prev) => !prev);
   };
 
   const handleAnnouncementChange = (value: string) => {
@@ -244,28 +242,12 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   }, []);
 
   useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberAdd', (...args: { data: Types.Member }[]) => {
-      const add = new Set(args.map((i) => `${i.data.userId}#${i.data.serverId}`));
-      setChannelMembers((prev) => prev.filter((m) => !add.has(`${m.userId}#${m.serverId}`)).concat(args.map((i) => i.data)));
-    });
-    return () => unsub();
-  }, []);
-
-  useEffect(() => {
     const unsub = ipc.socket.on('channelMemberUpdate', (...args: { userId: string; serverId: string; channelId: string; update: Partial<Types.Member> }[]) => {
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}#${i.channelId}`, i.update] as const));
       setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}#${channel.channelId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}#${channel.channelId}`) } : m)));
     });
     return () => unsub();
   }, [channel.channelId]);
-
-  useEffect(() => {
-    const unsub = ipc.socket.on('serverMemberRemove', (...args: { userId: string; serverId: string }[]) => {
-      const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
-      setChannelMembers((prev) => prev.filter((m) => !remove.has(`${m.userId}#${m.serverId}`)));
-    });
-    return () => unsub();
-  }, []);
 
   return (
     <div className="popup-wrapper">
@@ -345,13 +327,13 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
               <div className="label">{t('input-announcement')}</div>
               {!isReadOnly && (
                 <div className="button" onClick={handleShowPreviewBtnClick}>
-                  {showPreview ? t('edit') : t('preview')}
+                  {isPreviewVisible ? t('edit') : t('preview')}
                 </div>
               )}
             </div>
             <AnnouncementEditor
               announcement={channel.announcement}
-              showPreview={showPreview || isReadOnly}
+              showPreview={isPreviewVisible || isReadOnly}
               onChange={handleAnnouncementChange}
               targetServerId={server.serverId}
               targetChannelId={channel.channelId}
@@ -497,7 +479,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   <tr>
                     {MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${moderatorColumnWidths[index]}px` }} onClick={() => handleModeratorSort(field.key as keyof Types.Member)}>
-                        {`${t(field.tKey)} ${moderatorSortField === field.key ? (moderatorSortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        {`${t(field.tKey)} ${getSortIndicator(moderatorSortField === field.key, moderatorSortDirection)}`}
                         <div className="resizer" onPointerDown={(e) => handleModeratorColumnHandleDown(e, index)} onPointerMove={(e) => handleModeratorColumnHandleMove(e, index)} />
                       </th>
                     ))}
@@ -536,7 +518,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
                   <tr>
                     {BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field, index) => (
                       <th key={field.key} style={{ width: `${blockMemberColumnWidths[index]}px` }} onClick={() => handleBlockMemberSort(field.key as keyof Types.Member)}>
-                        {`${t(field.tKey)} ${blockMemberSortField === field.key ? (blockMemberSortDirection === 1 ? '⏶' : '⏷') : ''}`}
+                        {`${t(field.tKey)} ${getSortIndicator(blockMemberSortField === field.key, blockMemberSortDirection)}`}
                         <div className="resizer" onPointerDown={(e) => handleBlockMemberColumnHandleDown(e, index)} onPointerMove={(e) => handleBlockMemberColumnHandleMove(e, index)} />
                       </th>
                     ))}

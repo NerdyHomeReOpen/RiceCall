@@ -25,7 +25,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
 
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
 
@@ -63,14 +63,14 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
 
     setCardX(newPosX);
     setCardY(newPosY);
-    setDisplay(true);
+    setIsVisible(true);
   }, [x, y, direction]);
 
   return (
     <div
       ref={cardRef}
       className={`user-info-card-container ${styles['user-info-card']} ${styles[`vip-${member.vip}`]}`}
-      style={display ? { top: cardY, left: cardX } : { opacity: 0 }}
+      style={isVisible ? { top: cardY, left: cardX } : { opacity: 0 }}
       onClick={(e) => e.stopPropagation()}
     >
       <div className={styles['body']}>

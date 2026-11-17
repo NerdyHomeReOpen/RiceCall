@@ -23,7 +23,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
   const [autoLogin, setAutoLogin] = useState<boolean>(false);
   const [accounts, setAccounts] = useState<Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [showAccountselectBox, setShowAccountselectBox] = useState<boolean>(false);
+  const [isAccountSelectBoxVisible, setIsAccountSelectBoxVisible] = useState<boolean>(false);
 
   const deleteAccount = (account: string) => {
     ipc.accounts.delete(account);
@@ -52,7 +52,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
 
   const handleAccountSelectClick = (e: React.MouseEvent<HTMLDivElement>) => {
     e.stopPropagation();
-    setShowAccountselectBox((prev) => !prev);
+    setIsAccountSelectBoxVisible((prev) => !prev);
   };
 
   const handleForgotPasswordClick = () => {
@@ -103,7 +103,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
 
   useEffect(() => {
     const onPointerDown = (e: MouseEvent) => {
-      if (!comboRef.current?.contains(e.target as Node)) setShowAccountselectBox(false);
+      if (!comboRef.current?.contains(e.target as Node)) setIsAccountSelectBoxVisible(false);
     };
     document.addEventListener('pointerdown', onPointerDown);
     return () => document.removeEventListener('pointerdown', onPointerDown);
@@ -126,7 +126,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
                 <div className={styles['input-box']} ref={comboRef}>
                   <input type="text" name="account" value={account} onChange={handleInputChange} placeholder={t('please-input-account')} className={styles['input']} />
                   <div className={styles['account-dropdown-arrow']} onClick={handleAccountSelectClick} />
-                  <div className={styles['account-options']} style={showAccountselectBox ? {} : { display: 'none' }}>
+                  <div className={styles['account-options']} style={isAccountSelectBoxVisible ? {} : { display: 'none' }}>
                     {Object.entries(accounts).map(([account, { autoLogin, rememberAccount, password }]) => (
                       <div
                         key={account}
@@ -136,7 +136,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
                           setRememberAccount(rememberAccount);
                           setAutoLogin(autoLogin);
                           setPassword(password);
-                          setShowAccountselectBox(false);
+                          setIsAccountSelectBoxVisible(false);
                         }}
                       >
                         {account}

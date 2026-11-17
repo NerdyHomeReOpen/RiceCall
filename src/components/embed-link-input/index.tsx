@@ -16,7 +16,7 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
 
   const embedLinkInputRef = useRef<HTMLDivElement>(null);
 
-  const [display, setDisplay] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
   const [pickerX, setPickerX] = useState<number>(x);
   const [pickerY, setPickerY] = useState<number>(y);
   const [linkUrl, setLinkUrl] = useState<string>('');
@@ -64,11 +64,11 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
 
     setPickerX(newPosX);
     setPickerY(newPosY);
-    setDisplay(true);
+    setIsVisible(true);
   }, [x, y, direction]);
 
   return (
-    <div ref={embedLinkInputRef} className={`context-menu-container col ${styles['input-dropdown']}`} style={display ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
+    <div ref={embedLinkInputRef} className={`context-menu-container col ${styles['input-dropdown']}`} style={isVisible ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
       <div className="input-box col">
         <div className="label">{t('link')}</div>
         <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={handleLinkUrlChange} />

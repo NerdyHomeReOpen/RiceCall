@@ -54,7 +54,7 @@ class FsAdapter implements I18nStorageType {
     try {
       this.fs.writeFileSync(this.filePath(key), value, 'utf-8');
     } catch (e) {
-      new Logger('I18nStorage').warn(`fs write failed: ${e instanceof Error ? e.message : String(e)}`);
+      new Logger('I18N_STORAGE').warn(`fs write failed: ${e instanceof Error ? e.message : String(e)}`);
     }
   }
 
@@ -111,7 +111,7 @@ export default class I18nStorage {
 
   static get(): I18nStorageType {
     if (!storage) {
-      new Logger('I18nStorage').error('storage not initialized');
+      new Logger('I18N_STORAGE').error('storage not initialized');
       return new NoopStorage();
     }
     return storage;

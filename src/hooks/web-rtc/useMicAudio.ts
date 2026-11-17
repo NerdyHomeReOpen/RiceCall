@@ -72,7 +72,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
           await audioProducerRef.current.replaceTrack({ track: newTrack });
           audioProducerRef.current.resume();
         } catch (e) {
-          new Logger('WebRTC').warn(`replaceTrack failed: ${e instanceof Error ? e.message : String(e)}`);
+          new Logger('WEB_RTC').warn(`replaceTrack failed: ${e instanceof Error ? e.message : String(e)}`);
         }
       }
     },
@@ -95,7 +95,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       })
       .catch((e) => {
         const error = e instanceof Error ? e : new Error('Unknown error');
-        new Logger('WebRTC').error(`Access input device failed: ${error.message}`);
+        new Logger('WEB_RTC').error(`Access input device failed: ${error.message}`);
       });
 
     Store.store.dispatch(Store.setWebRTC({ isMicTaken: true }));
@@ -163,7 +163,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
   useEffect(() => {
     const changeInputAudioDevice = (inputAudioDevice: string) => {
-      new Logger('WebRTC').info(`Input audio device updated: ${inputAudioDevice}`);
+      new Logger('WEB_RTC').info(`Input audio device updated: ${inputAudioDevice}`);
       inputAudioDeviceRef.current = inputAudioDevice;
       if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
     };
@@ -174,7 +174,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
   useEffect(() => {
     const changeEchoCancellation = (echoCancellation: boolean) => {
-      new Logger('WebRTC').info(`Echo cancellation updated: ${echoCancellation}`);
+      new Logger('WEB_RTC').info(`Echo cancellation updated: ${echoCancellation}`);
       echoCancellationRef.current = echoCancellation;
       if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
     };
@@ -185,7 +185,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
   useEffect(() => {
     const changeNoiseCancellation = (noiseCancellation: boolean) => {
-      new Logger('WebRTC').info(`Noise cancellation updated: ${noiseCancellation}`);
+      new Logger('WEB_RTC').info(`Noise cancellation updated: ${noiseCancellation}`);
       noiseCancellationRef.current = noiseCancellation;
       if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
     };
@@ -196,7 +196,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
   useEffect(() => {
     const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
-      new Logger('WebRTC').info(`Microphone amplification updated: ${microphoneAmplification}`);
+      new Logger('WEB_RTC').info(`Microphone amplification updated: ${microphoneAmplification}`);
       microphoneAmplificationRef.current = microphoneAmplification;
       changeMicVolume(Store.store.getState().webrtc.micVolume || 100);
     };
@@ -207,7 +207,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
-      new Logger('WebRTC').info(`Speaking mode updated: ${speakingMode}`);
+      new Logger('WEB_RTC').info(`Speaking mode updated: ${speakingMode}`);
       micNodesRef.current.stream?.getAudioTracks().forEach((track) => {
         track.enabled = speakingMode === 'key' ? Store.store.getState().webrtc.isSpeakKeyPressed : true;
       });

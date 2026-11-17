@@ -8,8 +8,8 @@ import I18nStorage from '@/i18n/storage';
 import Logger from '@/utils/logger';
 import Env from '@/utils/env';
 
-const I18N_VERSION_KEY = 'i18n_version';
-const I18N_CACHE_PREFIX = 'i18n_cache:';
+const I18N_VERSION_KEY = 'i18n-version';
+const I18N_CACHE_PREFIX = 'i18n-cache:';
 
 function cacheKey(lng: string, ns: string): string {
   return `${I18N_CACHE_PREFIX}${lng}:${ns}`;
@@ -30,7 +30,7 @@ function writeCache(lng: string, ns: string, data: Record<string, unknown>): voi
   try {
     I18nStorage.get().setItem(cacheKey(lng, ns), JSON.stringify(data));
   } catch {
-    new Logger('i18n').warn('storage write failed');
+    new Logger('I18N').warn('storage write failed');
   }
 }
 
@@ -52,7 +52,7 @@ async function checkCacheVersion(): Promise<void> {
     const remoteVersion = typeof manifest.version === 'string' ? manifest.version : null;
 
     if (!remoteVersion) {
-      new Logger('i18n').warn('manifest.json missing version field, skipping cache invalidation');
+      new Logger('I18N').warn('manifest.json missing version field, skipping cache invalidation');
       return;
     }
 
@@ -62,7 +62,7 @@ async function checkCacheVersion(): Promise<void> {
       I18nStorage.get().setItem(I18N_VERSION_KEY, remoteVersion);
     }
   } catch (e) {
-    new Logger('i18n').warn(`manifest.json fetch failed, using existing cache: ${e}`);
+    new Logger('I18N').warn(`manifest.json fetch failed, using existing cache: ${e}`);
   }
 }
 
@@ -115,17 +115,17 @@ export const i18nReady = I18nStorage.load()
       }),
   );
 
-export function t(key: string, params?: Record<string, string>) {
+export function t(key: string, params?: Record<string, string>): string {
   if (!i18next.isInitialized) {
-    new Logger('i18n').error('i18next is not initialized');
+    new Logger('I18N').error('i18next is not initialized');
     return key;
   }
   return i18next.t(key, params);
 }
 
-export function changeLanguage(language: Types.LanguageKey) {
+export function changeLanguage(language: Types.LanguageKey): void {
   if (!i18next.isInitialized) {
-    new Logger('i18n').error('i18next is not initialized');
+    new Logger('I18N').error('i18next is not initialized');
     return;
   }
   i18next.changeLanguage(language);

@@ -1,6 +1,6 @@
 import { BrowserWindow, ipcMain } from 'electron';
 
-export function registerWindowHandlers() {
+export function registerWindowHandlers(): void {
   ipcMain.on('window-control-minimize', (event) => {
     const window = BrowserWindow.fromWebContents(event.sender);
     if (!window) return;
