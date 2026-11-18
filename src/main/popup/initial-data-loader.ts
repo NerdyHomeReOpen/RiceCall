@@ -18,15 +18,20 @@ import {
   fetchMemberInvitation,
 } from '@/services';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => Promise<any>>> = {
+// A popup cannot open without the records it shows, so a missing one aborts the open.
+function required<T>(value: T | null, name: string): T {
+  if (value === null) throw new Error(`Popup data ${name} not found`);
+  return value;
+}
+
+const initialDataLoader: Types.PopupLoaders = {
   applyMember: async ({ userId, serverId }: { userId: string; serverId: string }) => {
     const serverPromise = fetchServer({ userId, serverId });
     const memberApplicationPromise = fetchMemberApplication({ userId, serverId });
 
     const [server, memberApplication] = await Promise.all([serverPromise, memberApplicationPromise]);
 
-    return { server, memberApplication };
+    return { server: required(server, 'server'), memberApplication };
   },
 
   applyFriend: async ({ senderId, receiverId }: { senderId: string; receiverId: string }) => {
@@ -35,7 +40,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [receiver, friendApplication] = await Promise.all([receiverPromise, friendApplicationPromise]);
 
-    return { receiver, friendApplication };
+    return { receiver: required(receiver, 'receiver'), friendApplication };
   },
 
   blockMember: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -43,7 +48,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [member] = await Promise.all([memberPromise]);
 
-    return { serverId, member };
+    return { serverId, member: required(member, 'member') };
   },
 
   channelSetting: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) => {
@@ -53,7 +58,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [server, channel, channelMembers] = await Promise.all([serverPromise, channelPromise, channelMembersPromise]);
 
-    return { server, channel, channelMembers };
+    return { server: required(server, 'server'), channel: required(channel, 'channel'), channelMembers };
   },
 
   createChannel: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId?: string }) => {
@@ -66,12 +71,12 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
     return { parent };
   },
 
-  directMessage: async ({ targetId, event, message }: { targetId: string; event: 'directMessage' | 'shakeWindow'; message: unknown }) => {
+  directMessage: async ({ targetId, event, message }) => {
     const targetPromise = fetchUser({ userId: targetId });
 
     const [target] = await Promise.all([targetPromise]);
 
-    return { target, event, message };
+    return { target: required(target, 'target'), event, message };
   },
 
   editChannelOrder: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -87,7 +92,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [channel] = await Promise.all([channelPromise]);
 
-    return { channel };
+    return { channel: required(channel, 'channel') };
   },
 
   editFriendNote: async ({ userId, targetId }: { userId: string; targetId: string }) => {
@@ -95,7 +100,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [friend] = await Promise.all([friendPromise]);
 
-    return { friend };
+    return { friend: required(friend, 'friend') };
   },
 
   editFriendGroupName: async ({ userId, friendGroupId }: { userId: string; friendGroupId: string }) => {
@@ -103,7 +108,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [friendGroup] = await Promise.all([friendGroupPromise]);
 
-    return { friendGroup };
+    return { friendGroup: required(friendGroup, 'friendGroup') };
   },
 
   editNickname: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -111,7 +116,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [member] = await Promise.all([memberPromise]);
 
-    return { member };
+    return { member: required(member, 'member') };
   },
 
   inviteFriend: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -119,7 +124,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [server] = await Promise.all([serverPromise]);
 
-    return { server };
+    return { server: required(server, 'server') };
   },
 
   inviteMember: async ({ receiverId, serverId }: { receiverId: string; serverId: string }) => {
@@ -128,7 +133,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [receiverMember, memberInvitation] = await Promise.all([receiverMemberPromise, memberInvitationPromise]);
 
-    return { receiverMember, memberInvitation };
+    return { receiverMember: required(receiverMember, 'receiverMember'), memberInvitation };
   },
 
   kickMemberFromServer: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -136,7 +141,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [member] = await Promise.all([memberPromise]);
 
-    return { member };
+    return { member: required(member, 'member') };
   },
 
   kickMemberFromChannel: async ({ userId, serverId, channelId }: { userId: string; serverId: string; channelId: string }) => {
@@ -145,7 +150,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [member, channel] = await Promise.all([memberPromise, channelPromise]);
 
-    return { channel, member };
+    return { channel: required(channel, 'channel'), member: required(member, 'member') };
   },
 
   memberApplicationSetting: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -153,7 +158,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [server] = await Promise.all([serverPromise]);
 
-    return { server };
+    return { server: required(server, 'server') };
   },
 
   serverApplication: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -161,7 +166,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [server] = await Promise.all([serverPromise]);
 
-    return { server };
+    return { server: required(server, 'server') };
   },
 
   serverSetting: async ({ userId, serverId }: { userId: string; serverId: string }) => {
@@ -171,7 +176,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [server, serverMembers, memberApplications] = await Promise.all([serverPromise, serverMembersPromise, memberApplicationsPromise]);
 
-    return { server, serverMembers, memberApplications };
+    return { server: required(server, 'server'), serverMembers, memberApplications };
   },
 
   systemSetting: async ({ userId }: { userId: string }) => {
@@ -179,7 +184,7 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [userSettings] = await Promise.all([userSettingsPromise]);
 
-    return { userSettings };
+    return { userSettings: required(userSettings, 'userSettings') };
   },
 
   userInfo: async ({ targetId }: { targetId: string }) => {
@@ -188,8 +193,14 @@ const initialDataLoader: Partial<Record<Types.PopupType, (initialData: any) => P
 
     const [target, targetServers] = await Promise.all([targetPromise, targetServersPromise]);
 
-    return { target, targetServers };
+    return { target: required(target, 'target'), targetServers };
   },
 };
 
-export default initialDataLoader;
+// Fetches the data a popup needs and merges it with what the caller passed.
+export async function loadPopupData<T extends Types.PopupType>(type: T, data: Types.PopupOpenData<T>, systemSettings: Types.SystemSettings): Promise<Types.PopupInitialData[T]> {
+  const loader = (initialDataLoader as Partial<Record<Types.PopupType, (data: unknown) => Promise<object>>>)[type];
+  if (!loader) return data as Types.PopupInitialData[T];
+  const loadedData = await loader(data);
+  return { ...loadedData, ...data, systemSettings } as Types.PopupInitialData[T];
+}

@@ -7,11 +7,7 @@ import * as ipc from '@/main/ipc';
 
 import { blockUserFromServer } from '@/services';
 
-interface BlockMemberPopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  member: Types.Member;
-}
+type BlockMemberPopupProps = Types.PopupProps<'blockMember'>;
 
 const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serverId, member }) => {
   const { t } = useTranslation();

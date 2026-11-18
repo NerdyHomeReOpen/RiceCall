@@ -26,15 +26,15 @@ export const useMessageCtxMenu = ({ user, currentServer, currentChannel, member 
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, member.userId))
-        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+        .addDirectMessageOption({ isSelf }, () => openDirectMessage(member.userId))
+        .addViewProfileOption(() => openUserInfo(member.userId))
         .addKickUserFromChannelOption({ permissionLevel, isSelf, isLowerLevel, isInLobby }, () => openKickMemberFromChannel(member.userId, currentServer.serverId, currentChannel.channelId))
         .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(member.userId, currentServer.serverId))
         .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(member.userId, currentServer.serverId))
         .addInviteToBeMemberOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => openInviteMember(member.userId, currentServer.serverId))
         .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, buildMemberManagementCtxMenu())
         .build(),
-    [user, currentServer, currentChannel, member, permissionLevel, isSelf, isLowerLevel, isInLobby, buildMemberManagementCtxMenu],
+    [currentServer, currentChannel, member, permissionLevel, isSelf, isLowerLevel, isInLobby, buildMemberManagementCtxMenu],
   );
 
   return { buildContextMenu };

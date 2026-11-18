@@ -89,7 +89,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     onExit: exit,
   });
 
-  // TODO: Make a NotificationMenuBuilder
+  // TODO(backlog#7): Make a NotificationMenuBuilder
   const buildNotificationMenuItems = () => [
     {
       id: 'no-unread-notify',
@@ -176,7 +176,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   };
 
   const handleNameClick = () => {
-    openUserInfo(user.userId, user.userId);
+    openUserInfo(user.userId);
   };
 
   const handleTabSelect = (tabId: 'home' | 'friends' | 'server') => {

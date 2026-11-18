@@ -18,6 +18,11 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 
 import { getRegion, getDefaultFriendActivity } from '@/utils';
 
+// Direct messages carry the other user in initialData.targetId.
+function getTargetId(initialData: unknown): string | null {
+  if (!initialData || typeof initialData !== 'object' || !('targetId' in initialData)) return null;
+  return typeof initialData.targetId === 'string' ? initialData.targetId : null;
+}
 const SocketManager: React.FC = React.memo(() => {
   const { playSound } = useSoundPlayer();
   const dispatch = useAppDispatch();
@@ -430,7 +435,7 @@ const SocketManager: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.socket.on('openPopup', (...args) => {
       args.forEach((p) => {
-        ipc.popup.open(p.type, p.id, p.initialData, p.force);
+        ipc.popup.openRequest(p);
         popupOffSubmitRef.current?.();
         popupOffSubmitRef.current = ipc.popup.onSubmit(p.id, () => {
           if (p.id === 'logout') {
@@ -453,9 +458,9 @@ const SocketManager: React.FC = React.memo(() => {
     const unsub = ipc.socket.on('shakeWindow', (...args) => {
       args.forEach((item) => {
         if (!item) return;
-        const initialData: unknown | undefined = item.initialData;
-        if (!initialData || typeof initialData !== 'object' || !('targetId' in initialData)) return;
-        ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'shakeWindow', message: item }, false);
+        const targetId = getTargetId(item.initialData);
+        if (!targetId) return;
+        ipc.popup.open('directMessage', `directMessage-${targetId}`, { targetId, event: 'shakeWindow', message: item }, false);
       });
     });
     return () => unsub();
@@ -463,9 +468,9 @@ const SocketManager: React.FC = React.memo(() => {
 
   useEffect(() => {
     const unsub = ipc.socket.on('directMessage', (...args) => {
-      const initialData: unknown | undefined = args[0].initialData;
-      if (!initialData || typeof initialData !== 'object' || !('targetId' in initialData)) return;
-      ipc.popup.open('directMessage', `directMessage-${initialData.targetId}`, { ...initialData, event: 'directMessage', message: args[0] }, false);
+      const targetId = getTargetId(args[0].initialData);
+      if (!targetId) return;
+      ipc.popup.open('directMessage', `directMessage-${targetId}`, { targetId, event: 'directMessage', message: args[0] }, false);
     });
     return () => unsub();
   }, []);

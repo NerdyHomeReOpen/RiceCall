@@ -1,12 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+
+import type * as Types from '@/types';
 import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
-interface ImageCropperPopupProps {
-  id: string;
-  imageUnit8Array: Uint8Array;
-}
+type ImageCropperPopupProps = Types.PopupProps<'imageCropper'>;
 
 const INITIAL_CROP_SIZE = 200;
 const MIN_CROP_SIZE = 100;

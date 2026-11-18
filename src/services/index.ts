@@ -208,7 +208,7 @@ export function openAlertDialog(message: string, callback: () => void): void {
 export async function openApplyFriend(senderId: Types.User['userId'], receiverId: Types.User['userId']): Promise<void> {
   await ipc.api.fetchFriendApplication({ receiverId, senderId }).then((receivedFriendApplication) => {
     if (receivedFriendApplication) {
-      ipc.popup.open('approveFriend', 'approveFriend', { senderId, receiverId });
+      ipc.popup.open('approveFriend', 'approveFriend', { senderId });
     } else {
       ipc.popup.open('applyFriend', 'applyFriend', { senderId, receiverId });
     }
@@ -219,8 +219,8 @@ export function openApplyMember(userId: Types.User['userId'], serverId: Types.Se
   ipc.popup.open('applyMember', 'applyMember', { userId, serverId });
 }
 
-export function openApproveFriend(receiverId: Types.User['userId'], senderId: Types.User['userId']): void {
-  ipc.popup.open('approveFriend', 'approveFriend', { receiverId, senderId });
+export function openApproveFriend(senderId: Types.User['userId']): void {
+  ipc.popup.open('approveFriend', 'approveFriend', { senderId });
 }
 
 export function openBlockMember(userId: Types.User['userId'], serverId: Types.Server['serverId']): void {
@@ -244,8 +244,8 @@ export function openChannelSetting(userId: Types.User['userId'], serverId: Types
   ipc.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
 }
 
-export function openChatHistory(userId: Types.User['userId'], targetId: Types.User['userId']): void {
-  ipc.popup.open('chatHistory', 'chatHistory', { userId, targetId });
+export function openChatHistory(): void {
+  ipc.popup.open('chatHistory', 'chatHistory');
 }
 
 export function openCreateChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId?: Types.Channel['channelId']): void {
@@ -260,8 +260,8 @@ export function openCreateServer(): void {
   ipc.popup.open('createServer', 'createServer');
 }
 
-export function openDirectMessage(userId: Types.User['userId'], targetId: Types.User['userId']): void {
-  ipc.popup.open('directMessage', `directMessage-${targetId}`, { userId, targetId });
+export function openDirectMessage(targetId: Types.User['userId']): void {
+  ipc.popup.open('directMessage', `directMessage-${targetId}`, { targetId });
 }
 
 export function openEditChannelName(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId: Types.Channel['channelId']): void {
@@ -351,8 +351,8 @@ export function openSystemSetting(userId: Types.User['userId']): void {
   ipc.popup.open('systemSetting', 'systemSetting', { userId });
 }
 
-export function openUserInfo(userId: Types.User['userId'], targetId: Types.User['userId']): void {
-  ipc.popup.open('userInfo', `userInfo-${targetId}`, { userId, targetId });
+export function openUserInfo(targetId: Types.User['userId']): void {
+  ipc.popup.open('userInfo', `userInfo-${targetId}`, { targetId });
 }
 
 export function rejectAllFriendApplication(friendApplications: Types.FriendApplication[]): void {

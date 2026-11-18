@@ -7,10 +7,7 @@ import type * as Types from '@/types';
 
 import { editFriendGroup } from '@/services';
 
-interface EditFriendGroupNamePopupProps {
-  id: string;
-  friendGroup: Types.FriendGroup;
-}
+type EditFriendGroupNamePopupProps = Types.PopupProps<'editFriendGroupName'>;
 
 const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ id, friendGroup }) => {
   const { t } = useTranslation();

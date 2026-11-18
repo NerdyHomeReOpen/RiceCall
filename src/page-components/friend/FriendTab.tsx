@@ -74,7 +74,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   };
 
   const handleTabDoubleClick = () => {
-    openDirectMessage(user.userId, friend.targetId);
+    openDirectMessage(friend.targetId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -11,9 +11,7 @@ import { isElectron } from '@/utils/platform';
 
 import ndStyles from './network-diagnosis.module.css';
 
-interface NetworkDiagnosisPopupProps {
-  id: string;
-}
+type NetworkDiagnosisPopupProps = Types.PopupProps<'networkDiagnosis'>;
 
 function getLossClassName(loss: number): string {
   if (loss > 10) return 'loss-bad';

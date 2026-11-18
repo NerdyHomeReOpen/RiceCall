@@ -13,20 +13,9 @@ import SendSection from './SendSection';
 import SentSection from './SentSection';
 import EditSection from './EditSection';
 
-interface ApplyFriendPopupProps {
-  id: string;
-  receiver: Types.User;
-  friendApplication: Types.FriendApplication | null;
-}
+type ApplyFriendPopupProps = Types.PopupProps<'applyFriend'>;
 
 const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, receiver, friendApplication }) => {
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
 
   const [section, setSection] = useState<number>(friendApplication ? 1 : 0);
@@ -38,7 +27,7 @@ const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, rece
   const isEditSection = section === 2;
 
   const handleReceiverNameClick = () => {
-    openUserInfo(user.userId, receiver.userId);
+    openUserInfo(receiver.userId);
   };
 
   const handleCreateFriendGroupBtnClick = () => {

@@ -57,19 +57,12 @@ interface FriendApplicationItemProps {
 const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo(({ application }) => {
   const { t } = useTranslation();
 
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
   const handleSenderAvatarClick = () => {
-    openUserInfo(user.userId, application.senderId);
+    openUserInfo(application.senderId);
   };
 
   const handleAcceptBtnClick = () => {
-    openApproveFriend(user.userId, application.senderId);
+    openApproveFriend(application.senderId);
   };
 
   const handleRejectBtnClick = () => {
@@ -77,7 +70,7 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
   };
 
   const handleDirectMessageBtnClick = () => {
-    openDirectMessage(user.userId, application.senderId);
+    openDirectMessage(application.senderId);
   };
 
   return (

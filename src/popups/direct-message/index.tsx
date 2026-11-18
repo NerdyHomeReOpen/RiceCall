@@ -35,11 +35,7 @@ import { toTags } from '@/utils/tag-converter';
 
 import styles from './direct-message.module.css';
 
-interface DirectMessagePopupProps {
-  target: Types.User;
-  event: 'directMessage' | 'shakeWindow';
-  message: Types.DirectMessage;
-}
+type DirectMessagePopupProps = Types.PopupInitialData['directMessage'];
 
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ target, event, message }) => {
   const { t } = useTranslation();
@@ -210,11 +206,11 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleTargetAvatarClick = () => {
-    openUserInfo(user.userId, target.userId);
+    openUserInfo(target.userId);
   };
 
   const handleUserAvatarClick = () => {
-    openUserInfo(user.userId, user.userId);
+    openUserInfo(user.userId);
   };
 
   const handleServerNameClick = () => {
@@ -222,7 +218,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleMessageHistoryBtnClick = () => {
-    openChatHistory(user.userId, target.userId);
+    openChatHistory();
   };
 
   const handleScreenShotBtnClick = () => {
@@ -314,7 +310,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
         if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
       });
     };
-    if (event === 'directMessage') onDirectMessage(message);
+    if (event === 'directMessage' && message) onDirectMessage(message);
     const unsub = ipc.socket.on('directMessage', onDirectMessage);
     return () => unsub();
   }, [event, message, user.userId, target.userId]);
@@ -346,7 +342,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
         }
       });
     };
-    if (event === 'shakeWindow') onShakeWindow(message);
+    if (event === 'shakeWindow' && message) onShakeWindow(message);
     const unsub = ipc.socket.on('shakeWindow', onShakeWindow);
     return () => unsub();
   }, [event, message, user.userId, target.userId]);

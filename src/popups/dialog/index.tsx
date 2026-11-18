@@ -1,4 +1,6 @@
 import React, { useEffect } from 'react';
+
+import type * as Types from '@/types';
 import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
@@ -16,13 +18,7 @@ enum DIALOG_ICON {
   SUCCESS = 'success',
 }
 
-interface DialogPopupProps {
-  id: string;
-  iconType: keyof typeof DIALOG_ICON;
-  message?: string;
-  parameter?: Record<string, string>;
-  error?: Error;
-}
+type DialogPopupProps = Types.PopupProps<'dialogInfo'> & { iconType: keyof typeof DIALOG_ICON };
 
 const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, message, parameter, error }) => {
   const { t } = useTranslation();

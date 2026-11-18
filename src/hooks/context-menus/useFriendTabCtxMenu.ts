@@ -23,8 +23,8 @@ export const useFriendTabCtxMenu = ({ user, friend, friendGroups, defaultFriendG
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, friend.targetId))
-        .addViewProfileOption(() => openUserInfo(user.userId, friend.targetId))
+        .addDirectMessageOption({ isSelf }, () => openDirectMessage(friend.targetId))
+        .addViewProfileOption(() => openUserInfo(friend.targetId))
         .addAddFriendOption({ isSelf, isFriend }, () => openApplyFriend(user.userId, friend.targetId))
         .addEditNoteOption({ isSelf, isFriend }, () => openEditFriendNote(user.userId, friend.targetId))
         .addSeparator()

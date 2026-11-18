@@ -7,11 +7,7 @@ import type * as Types from '@/types';
 
 import { editMember } from '@/services';
 
-interface EditNicknamePopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  member: Types.Member;
-}
+type EditNicknamePopupProps = Types.PopupProps<'editNickname'>;
 
 const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, serverId, member }) => {
   const { t } = useTranslation();

@@ -104,7 +104,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
 
   const handleTabDoubleClick = () => {
     if (isSelf) return;
-    openDirectMessage(user.userId, member.userId);
+    openDirectMessage(member.userId);
   };
 
   const handleTabDragStart = (e: React.DragEvent) => {

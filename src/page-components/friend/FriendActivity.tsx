@@ -1,12 +1,9 @@
 import React from 'react';
 import Image from 'next/image';
-import { shallowEqual } from 'react-redux';
 
 import type * as Types from '@/types';
 
 import { openUserInfo } from '@/services';
-
-import { useAppSelector } from '@/hooks/useStore';
 
 import { getFormatTimeDiff } from '@/utils/language';
 
@@ -19,17 +16,10 @@ interface FriendActivityProps {
 }
 
 const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivity }) => {
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
-
   const hasVip = friendActivity.vip > 0;
 
   const handleUserNameClick = () => {
-    openUserInfo(user.userId, friendActivity.userId);
+    openUserInfo(friendActivity.userId);
   };
 
   return (

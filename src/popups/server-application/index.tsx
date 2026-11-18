@@ -7,10 +7,7 @@ import type * as Types from '@/types';
 
 import styles from './server-application.module.css';
 
-interface ServerApplicationPopupProps {
-  id: string;
-  server: Types.Server;
-}
+type ServerApplicationPopupProps = Types.PopupProps<'serverApplication'>;
 
 const ServerApplicationPopup: React.FC<ServerApplicationPopupProps> = React.memo(({ id, server }) => {
   const { t } = useTranslation();

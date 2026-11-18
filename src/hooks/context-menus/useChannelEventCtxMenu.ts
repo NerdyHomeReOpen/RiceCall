@@ -20,11 +20,11 @@ export const useChannelEventCtxMenu = ({ user, currentServer, event, permissionL
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addViewProfileOption(() => openUserInfo(user.userId, event.userId))
+        .addViewProfileOption(() => openUserInfo(event.userId))
         .addKickUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openKickMemberFromServer(event.userId, currentServer.serverId))
         .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(event.userId, currentServer.serverId))
         .build(),
-    [user.userId, currentServer.serverId, event, permissionLevel, isSelf, isLowerLevel],
+    [currentServer.serverId, event, permissionLevel, isSelf, isLowerLevel],
   );
 
   return { buildContextMenu };

@@ -19,10 +19,10 @@ export const useServerSettingBlockedMemberCtxMenu = ({ user, server, member, per
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+        .addViewProfileOption(() => openUserInfo(member.userId))
         .addUnblockUserFromServerOption({ permissionLevel, isSelf }, () => unblockUserFromServer(member.userId, server.serverId, member.name))
         .build(),
-    [user.userId, server.serverId, member, permissionLevel, isSelf],
+    [server.serverId, member, permissionLevel, isSelf],
   );
 
   return { buildContextMenu };

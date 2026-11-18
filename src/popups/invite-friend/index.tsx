@@ -18,10 +18,7 @@ import { getDefaultFriendGroup } from '@/utils/default';
 
 import styles from './invite-friend.module.css';
 
-interface InviteFriendPopupProps {
-  id: string;
-  server: Types.Server;
-}
+type InviteFriendPopupProps = Types.PopupProps<'inviteFriend'>;
 
 const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, server }) => {
   const { t } = useTranslation();

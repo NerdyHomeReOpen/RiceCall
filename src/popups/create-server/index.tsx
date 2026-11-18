@@ -17,9 +17,7 @@ import { getDefaultServer } from '@/utils/default';
 
 import styles from './create-server.module.css';
 
-interface CreateServerPopupProps {
-  id: string;
-}
+type CreateServerPopupProps = Types.PopupProps<'createServer'>;
 
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();

@@ -9,11 +9,7 @@ import { broadcastChannel, broadcastServer } from '@/services';
 
 import { MAX_BROADCAST_LENGTH } from '@/constants';
 
-interface ServerBroadcastPopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  channelId: Types.Channel['channelId'];
-}
+type ServerBroadcastPopupProps = Types.PopupProps<'serverBroadcast'>;
 
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ id, serverId, channelId }) => {
   const { t } = useTranslation();

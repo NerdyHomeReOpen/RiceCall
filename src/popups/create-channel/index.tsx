@@ -9,11 +9,7 @@ import { createChannel } from '@/services';
 
 import { getDefaultChannel } from '@/utils/default';
 
-interface CreateChannelPopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  parent: Types.Channel | null;
-}
+type CreateChannelPopupProps = Types.PopupProps<'createChannel'>;
 
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, serverId, parent }) => {
   const { t } = useTranslation();

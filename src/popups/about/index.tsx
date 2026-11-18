@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+
+import type * as Types from '@/types';
 import { useTranslation } from 'react-i18next';
 import packageJson from '../../../package.json';
 
@@ -11,9 +13,7 @@ import MarkdownContent from '@/components/markdown-content';
 
 import styles from './about.module.css';
 
-interface AboutPopupProps {
-  id: string;
-}
+type AboutPopupProps = Types.PopupProps<'aboutus'>;
 
 const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();

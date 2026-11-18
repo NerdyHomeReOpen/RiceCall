@@ -2,32 +2,20 @@ import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 
-import initialDataLoader from '@/main/popup/initial-data-loader';
+import { loadPopupData } from '@/main/popup/initial-data-loader';
 import { createPopup, getSettings } from '@/main/web';
 import { eventEmitter } from '@/main/event';
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function openPopup(type: Types.PopupType, id: string, initialData: any, force: boolean = true): Promise<void> {
+export async function openPopup<T extends Types.PopupType>(type: T, id: string, initialData: Types.PopupOpenData<T>, force: boolean = true): Promise<void> {
   new Logger('SYSTEM').info(`Opening ${type} (${id})...`);
 
-  if (typeof initialData !== 'object' || initialData === null) {
-    initialData = {};
-  }
+  const popupData = await loadPopupData(type, initialData ?? {}, getSettings()).catch(() => {
+    new Logger('SYSTEM').error(`Cannot load ${type} data, aborting...`);
+    return null;
+  });
+  if (!popupData) return;
 
-  const loader = initialDataLoader[type];
-  if (loader) {
-    const loadedData = await loader({ ...initialData }).catch(() => {
-      new Logger('SYSTEM').error(`Cannot load ${type} data, aborting...`);
-      return null;
-    });
-    if (!loadedData) return;
-
-    initialData = { ...loadedData, ...initialData, systemSettings: getSettings() };
-  }
-
-  if (!initialData) return;
-
-  createPopup(type, id, initialData, force);
+  createPopup(type, id, popupData, force);
 }
 
 export function closePopup(id: string): void {

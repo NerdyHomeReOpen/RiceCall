@@ -9,11 +9,7 @@ import { blockUserFromServer } from '@/services';
 
 import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constants';
 
-interface KickMemberFromServerPopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  member: Types.Member;
-}
+type KickMemberFromServerPopupProps = Types.PopupProps<'kickMemberFromServer'>;
 
 const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = React.memo(({ id, serverId, member }) => {
   const { t } = useTranslation();

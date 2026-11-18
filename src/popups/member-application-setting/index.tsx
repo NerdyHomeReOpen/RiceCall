@@ -7,10 +7,7 @@ import type * as Types from '@/types';
 
 import { editServer } from '@/services';
 
-interface MemberApplicationSettingPopupProps {
-  id: string;
-  server: Types.Server;
-}
+type MemberApplicationSettingPopupProps = Types.PopupProps<'memberApplicationSetting'>;
 
 const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ id, server }) => {
   const { t } = useTranslation();

@@ -15,10 +15,7 @@ import ChannelTab from './ChannelTab';
 
 import styles from './edit-channel-order.module.css';
 
-interface EditChannelOrderPopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-}
+type EditChannelOrderPopupProps = Types.PopupProps<'editChannelOrder'>;
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId }) => {
   const { t } = useTranslation();

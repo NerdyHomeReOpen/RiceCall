@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+
+import type * as Types from '@/types';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
@@ -10,9 +12,7 @@ import { openApplyFriend } from '@/services';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-interface SearchUserPopupProps {
-  id: string;
-}
+type SearchUserPopupProps = Types.PopupProps<'searchUser'>;
 
 const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();

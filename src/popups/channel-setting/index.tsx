@@ -27,12 +27,7 @@ import { getPermissionText } from '@/utils/language';
 
 import styles from './channel-setting.module.css';
 
-interface ChannelSettingPopupProps {
-  id: string;
-  server: Types.Server;
-  channel: Types.Channel;
-  channelMembers: Types.Member[];
-}
+type ChannelSettingPopupProps = Types.PopupProps<'channelSetting'>;
 
 const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id, server, channel: channelData, channelMembers: channelMembersData }) => {
   const { t } = useTranslation();

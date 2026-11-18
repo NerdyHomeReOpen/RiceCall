@@ -1,14 +1,13 @@
 import React, { useEffect, useState } from 'react';
+
+import type * as Types from '@/types';
 import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
 import MarkdownContent from '@/components/markdown-content';
 
-interface RTCDisconnectPopupProps {
-  id: string;
-  count?: number;
-}
+type RTCDisconnectPopupProps = Types.PopupProps<'rtcDisconnect'>;
 
 const RTCDisconnectPopup: React.FC<RTCDisconnectPopupProps> = React.memo(({ id, count }) => {
   const { t } = useTranslation();

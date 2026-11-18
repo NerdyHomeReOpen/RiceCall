@@ -10,12 +10,7 @@ import SendSection from './SendSection';
 import SentSection from './SentSection';
 import EditSection from './EditSection';
 
-interface InviteMemberPopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  receiverMember: Types.Member;
-  memberInvitation: Types.MemberInvitation | null;
-}
+type InviteMemberPopupProps = Types.PopupProps<'inviteMember'>;
 
 const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, serverId, receiverMember, memberInvitation }) => {
   const [section, setSection] = useState<number>(memberInvitation ? 1 : 0);

@@ -20,10 +20,10 @@ export const useChannelSettingBlockedMemberCtxMenu = ({ user, server, channel, m
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()
-        .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+        .addViewProfileOption(() => openUserInfo(member.userId))
         .addUnblockUserFromChannelOption({ permissionLevel, isSelf }, () => unblockUserFromChannel(member.userId, server.serverId, channel.channelId, member.name))
         .build(),
-    [user.userId, server.serverId, channel.channelId, member, permissionLevel, isSelf],
+    [server.serverId, channel.channelId, member, permissionLevel, isSelf],
   );
 
   return { buildContextMenu };

@@ -1,10 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import type * as Types from '@/types';
 
 export type eventEmitterHandlers = {
   send: (channel: string, ...args: unknown[]) => void;
-  sendSync: <T = any>(channel: string, ...args: unknown[]) => T;
-  invoke: <T = any>(channel: string, ...args: unknown[]) => Promise<T>;
+  sendSync: <T = unknown>(channel: string, ...args: unknown[]) => T;
+  invoke: <T = unknown>(channel: string, ...args: unknown[]) => Promise<T>;
   removeAllListeners: (channel: string) => void;
 };
 
@@ -16,7 +15,7 @@ export type ElectronLogHandlers = {
 
 export type IpcRendererHandlers = {
   eventEmitter: eventEmitterHandlers;
-  listen: (channel: string, listener: (...args: any[]) => void) => () => void;
+  listen: <A extends unknown[]>(channel: string, listener: (...args: A) => void) => () => void;
   socketSend: <T extends keyof Types.ClientToServerEvents>(event: T, ...args: Parameters<Types.ClientToServerEvents[T]>) => void;
   socketEmit: <T extends keyof Types.ClientToServerEventsWithAck>(
     event: T,

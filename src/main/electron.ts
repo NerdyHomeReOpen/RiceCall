@@ -555,8 +555,7 @@ export async function createAuthWindow(title?: string): Promise<BrowserWindow> {
   return authWindow;
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export async function createPopup(type: Types.PopupType, id: string, initialData: any = {}, force = true, title?: string): Promise<BrowserWindow> {
+export async function createPopup(type: Types.PopupType, id: string, initialData: unknown = {}, force = true, title?: string): Promise<BrowserWindow> {
   const fullTitle = title ? `${title} · ${MAIN_TITLE}` : VERSION_TITLE;
   const behavior = POPUP_BEHAVIORS[type] ?? { resizable: false, maximizable: false, fullscreenable: false };
   const size = POPUP_SIZES[type] ?? { width: 400, height: 300 };

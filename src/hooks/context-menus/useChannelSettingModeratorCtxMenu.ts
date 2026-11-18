@@ -40,14 +40,14 @@ export const useChannelSettingModeratorCtxMenu = ({ user, server, channel, moder
       .build();
 
     return new ContextMenu()
-      .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, moderator.userId))
-      .addViewProfileOption(() => openUserInfo(user.userId, moderator.userId))
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(moderator.userId))
+      .addViewProfileOption(() => openUserInfo(moderator.userId))
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(moderator.userId, server.serverId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(moderator.userId, server.serverId))
       .addSeparator()
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: moderator.permissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
       .build();
-  }, [user.userId, server.serverId, channel, moderator, permissionLevel, isSelf, isLowerLevel]);
+  }, [server.serverId, channel, moderator, permissionLevel, isSelf, isLowerLevel]);
 
   return { buildContextMenu };
 };

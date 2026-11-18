@@ -1,5 +1,4 @@
 import React, { useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
@@ -7,8 +6,6 @@ import type * as Types from '@/types';
 import { openUserInfo } from '@/services';
 
 import { ALLOWED_MESSAGE_KEYS } from '@/constants';
-
-import { useAppSelector } from '@/hooks/useStore';
 
 import MarkdownContent from '@/components/markdown-content';
 
@@ -22,13 +19,6 @@ interface DirectMessageProps {
 
 const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }) => {
   const { t } = useTranslation();
-
-  const user = useAppSelector(
-    (state) => ({
-      userId: state.user.data.userId,
-    }),
-    shallowEqual,
-  );
 
   const hasVip = messageGroup.vip > 0;
   const formattedTimestamp = getFormatTimestamp(messageGroup.timestamp);
@@ -44,7 +34,7 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   );
 
   const handleUsernameClick = () => {
-    openUserInfo(user.userId, messageGroup.userId);
+    openUserInfo(messageGroup.userId);
   };
 
   return (

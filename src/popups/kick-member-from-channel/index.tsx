@@ -9,12 +9,7 @@ import { blockUserFromChannel } from '@/services';
 
 import { KICK_TIME_FORMAT_OPTIONS, KICK_REASON_OPTIONS, KICK_REASON_OTHER_MAX_LENGTH } from '@/constants';
 
-interface KickMemberFromChannelPopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  channel: Types.Channel;
-  member: Types.Member;
-}
+type KickMemberFromChannelPopupProps = Types.PopupProps<'kickMemberFromChannel'>;
 
 const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = React.memo(({ id, serverId, channel, member }) => {
   const { t } = useTranslation();

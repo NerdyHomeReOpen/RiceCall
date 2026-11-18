@@ -6,15 +6,19 @@ import Logger from '@/utils/logger';
 
 import { broadcast } from '@/main/electron';
 
-let DiagnosisTool: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
-let activeTool: any = null; // eslint-disable-line @typescript-eslint/no-explicit-any
+// networkdiagnosistool ships without types; these are the parts this module uses.
+type DiagnosisToolInstance = { run: (onProgress: (progress: Types.ProgressData) => void) => Promise<Types.FullReport>; cancel?: () => void };
+type DiagnosisToolConstructor = new (domains: string[], duration: number) => DiagnosisToolInstance;
+
+let DiagnosisTool: DiagnosisToolConstructor | null = null;
+let activeTool: DiagnosisToolInstance | null = null;
 
 async function loadTool() {
   if (DiagnosisTool) return DiagnosisTool;
   try {
     const createdRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
-    DiagnosisTool = createdRequire('networkdiagnosistool');
-    if (DiagnosisTool.default) DiagnosisTool = DiagnosisTool.default;
+    const loaded = createdRequire('networkdiagnosistool') as DiagnosisToolConstructor | { default: DiagnosisToolConstructor };
+    DiagnosisTool = 'default' in loaded ? loaded.default : loaded;
     return DiagnosisTool;
   } catch (e1) {
     const error = e1 instanceof Error ? e1 : new Error('Unknown error');
@@ -23,7 +27,7 @@ async function loadTool() {
     try {
       // @ts-expect-error - No types for networkdiagnosistool
       const { default: module } = await import('networkdiagnosistool');
-      DiagnosisTool = module.default || module;
+      DiagnosisTool = (module.default || module) as DiagnosisToolConstructor;
       return DiagnosisTool;
     } catch (e2) {
       const error = e2 instanceof Error ? e2 : new Error('Unknown error');
@@ -55,9 +59,10 @@ export function registerNetworkHandlers(): void {
           const { domains, duration = 3 } = params;
           const uniqueDomains = Array.from(new Set(domains)).filter(Boolean);
 
-          activeTool = new Tool(uniqueDomains, duration);
+          const tool = new Tool(uniqueDomains, duration);
+          activeTool = tool;
 
-          activeTool
+          tool
             .run((progress: Types.ProgressData) => {
               if (!sender.isDestroyed()) {
                 sender.send('network-diagnosis-progress', progress);

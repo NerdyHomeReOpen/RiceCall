@@ -10,11 +10,7 @@ import SendSection from './SendSection';
 import SentSection from './SentSection';
 import EditSection from './EditSection';
 
-interface ApplyMemberPopupProps {
-  id: string;
-  server: Types.Server;
-  memberApplication: Types.MemberApplication | null;
-}
+type ApplyMemberPopupProps = Types.PopupProps<'applyMember'>;
 
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, server, memberApplication }) => {
   const [section, setSection] = useState<number>(memberApplication ? 1 : 0);

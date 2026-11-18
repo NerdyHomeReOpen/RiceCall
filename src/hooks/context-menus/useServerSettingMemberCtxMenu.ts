@@ -29,14 +29,14 @@ export const useServerSettingMemberCtxMenu = ({ user, server, member, permission
       .build();
 
     return new ContextMenu()
-      .addDirectMessageOption({ isSelf }, () => openDirectMessage(user.userId, member.userId))
-      .addViewProfileOption(() => openUserInfo(user.userId, member.userId))
+      .addDirectMessageOption({ isSelf }, () => openDirectMessage(member.userId))
+      .addViewProfileOption(() => openUserInfo(member.userId))
       .addEditNicknameOption({ permissionLevel, isSelf, isLowerLevel }, () => openEditNickname(member.userId, server.serverId))
       .addBlockUserFromServerOption({ permissionLevel, isSelf, isLowerLevel }, () => openBlockMember(member.userId, server.serverId))
       .addSeparator()
       .addMemberManagementOption({ permissionLevel, targetPermissionLevel: member.permissionLevel, isSelf, isLowerLevel }, () => {}, submenuItems)
       .build();
-  }, [user.userId, server.serverId, member, permissionLevel, isSelf, isLowerLevel]);
+  }, [server.serverId, member, permissionLevel, isSelf, isLowerLevel]);
 
   return { buildContextMenu };
 };

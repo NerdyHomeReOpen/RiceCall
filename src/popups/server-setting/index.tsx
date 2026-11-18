@@ -30,12 +30,7 @@ import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
 import styles from './server-setting.module.css';
 
-interface ServerSettingPopupProps {
-  id: string;
-  server: Types.Server;
-  serverMembers: Types.Member[];
-  memberApplications: Types.MemberApplication[];
-}
+type ServerSettingPopupProps = Types.PopupProps<'serverSetting'>;
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData, memberApplications: memberApplicationsData }) => {
   const { t } = useTranslation();
@@ -505,7 +500,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                         id: 'view-profile',
                         label: t('view-profile'),
                         show: !isSelf,
-                        onClick: () => openUserInfo(user.userId, application.userId),
+                        onClick: () => openUserInfo(application.userId),
                       },
                       {
                         id: 'accept-application',

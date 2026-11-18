@@ -27,11 +27,7 @@ import { objDiff } from '@/utils';
 
 import styles from './user-setting.module.css';
 
-interface UserInfoPopupProps {
-  id: string;
-  target: Types.User;
-  targetServers: Types.Server[];
-}
+type UserInfoPopupProps = Types.PopupProps<'userInfo'>;
 
 const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: targetData, targetServers }) => {
   const { t } = useTranslation();
@@ -177,7 +173,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   };
 
   const handleChatBtnClick = () => {
-    openDirectMessage(user.userId, target.userId);
+    openDirectMessage(target.userId);
   };
 
   const handleNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -82,7 +82,7 @@ const ChannelMessage: React.FC<ChannelMessageProps> = React.memo(({ messageGroup
   };
 
   const handleUsernameClick = () => {
-    openUserInfo(user.userId, messageGroup.userId);
+    openUserInfo(messageGroup.userId);
   };
 
   return (

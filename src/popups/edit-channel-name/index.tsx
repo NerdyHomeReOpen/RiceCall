@@ -7,11 +7,7 @@ import type * as Types from '@/types';
 
 import { editChannel } from '@/services';
 
-interface EditChannelNamePopupProps {
-  id: string;
-  serverId: Types.Server['serverId'];
-  channel: Types.Channel;
-}
+type EditChannelNamePopupProps = Types.PopupProps<'editChannelName'>;
 
 const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ id, serverId, channel }) => {
   const { t } = useTranslation();

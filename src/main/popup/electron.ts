@@ -4,32 +4,20 @@ import type * as Types from '@/types';
 
 import Logger from '@/utils/logger';
 
-import initialDataLoader from '@/main/popup/initial-data-loader';
+import { loadPopupData } from '@/main/popup/initial-data-loader';
 import { broadcast, closeAllPopups, createPopup, getSettings, popups } from '@/main/electron';
 
 export function registerPopupHandlers(): void {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  ipcMain.on('open-popup', async (_, type: Types.PopupType, id: string, initialData: any, force = true) => {
+  ipcMain.on('open-popup', async (_, type: Types.PopupType, id: string, initialData: Types.PopupOpenData<Types.PopupType>, force = true) => {
     new Logger('SYSTEM').info(`Opening ${type} (${id})...`);
 
-    if (typeof initialData !== 'object' || initialData === null) {
-      initialData = {};
-    }
+    const popupData = await loadPopupData(type, initialData ?? {}, getSettings()).catch(() => {
+      new Logger('SYSTEM').error(`Cannot load ${type} data, aborting...`);
+      return null;
+    });
+    if (!popupData) return;
 
-    const loader = initialDataLoader[type];
-    if (loader) {
-      const loadedData = await loader(initialData).catch(() => {
-        new Logger('SYSTEM').error(`Cannot load ${type} data, aborting...`);
-        return null;
-      });
-      if (!loadedData) return;
-
-      initialData = { ...loadedData, ...initialData, systemSettings: getSettings() };
-    }
-
-    if (!initialData) return;
-
-    createPopup(type, id, initialData, force);
+    createPopup(type, id, popupData, force);
   });
 
   ipcMain.on('close-popup', (_, id: string) => {

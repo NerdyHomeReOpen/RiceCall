@@ -10,10 +10,7 @@ import { approveFriendApplication, openCreateFriendGroup } from '@/services';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-interface ApproveFriendPopupProps {
-  id: string;
-  senderId: Types.User['userId'];
-}
+type ApproveFriendPopupProps = Types.PopupProps<'approveFriend'>;
 
 const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, senderId }) => {
   const { t } = useTranslation();

@@ -7,9 +7,7 @@ import type * as Types from '@/types';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
-interface CreateFriendGroupPopupProps {
-  id: string;
-}
+type CreateFriendGroupPopupProps = Types.PopupProps<'createFriendGroup'>;
 
 const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();

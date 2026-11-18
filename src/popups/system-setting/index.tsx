@@ -11,11 +11,7 @@ import { objDiff } from '@/utils';
 
 import styles from './system-setting.module.css';
 
-interface SystemSettingPopupProps {
-  id: string;
-  userSettings: Types.UserSetting;
-  systemSettings: Types.SystemSettings;
-}
+type SystemSettingPopupProps = Types.PopupProps<'systemSetting'>;
 
 const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, userSettings: userSettingsData, systemSettings: systemSettingsData }) => {
   const { t } = useTranslation();

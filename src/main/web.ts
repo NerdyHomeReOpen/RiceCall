@@ -156,9 +156,9 @@ export function exit(): void {
   window.close();
 }
 
-export function listen(channel: string, listener: (...args: unknown[]) => void): () => void {
-  eventEmitter.on(channel, listener);
-  return () => eventEmitter.removeListener(channel, listener);
+export function listen<A extends unknown[]>(channel: string, listener: (...args: A) => void): () => void {
+  eventEmitter.on(channel, listener as (...args: unknown[]) => void);
+  return () => eventEmitter.removeListener(channel, listener as (...args: unknown[]) => void);
 }
 
 export function createPopup(type: Types.PopupType, id: string, initialData: unknown = {}, force = true): void {

@@ -100,7 +100,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   const handleTabDoubleClick = () => {
     if (isSelf) return;
-    openDirectMessage(user.userId, queueMember.userId);
+    openDirectMessage(queueMember.userId);
   };
 
   const handleTabContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {

@@ -24,6 +24,7 @@ import {
   table_announcements,
   table_notifications,
 } from './database';
+import type { PopupOpenRequest } from './popup';
 
 export type Announcement = table_announcements;
 
@@ -364,7 +365,7 @@ export type ServerToClientEvents = {
   sfuProducerRemove: (...args: { userId: string; producerId: string }[]) => void;
   webrtcDisconnectCountUpdate: (count: number) => void;
   playSound: (...args: ('enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking')[]) => void;
-  openPopup: (...args: { type: PopupType; id: string; initialData?: unknown; force?: boolean }[]) => void;
+  openPopup: (...args: PopupOpenRequest[]) => void;
   error: (error: { code: number; message: string }) => void;
 };
 
@@ -440,22 +441,22 @@ export type SfuCreateTransportParams = {
 
 export type SfuCreateTransportReturnType = {
   id: string;
-  iceParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  iceCandidates: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  dtlsParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
-  routerRtpCapabilities: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  iceParameters: mediasoupClient.types.IceParameters;
+  iceCandidates: mediasoupClient.types.IceCandidate[];
+  dtlsParameters: mediasoupClient.types.DtlsParameters;
+  routerRtpCapabilities: mediasoupClient.types.RtpCapabilities;
   producers?: SfuCreateProducerReturnType[];
 };
 
 export type SfuConnectTransportParams = {
   transportId: string;
-  dtlsParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  dtlsParameters: mediasoupClient.types.DtlsParameters;
 };
 
 export type SfuCreateProducerParams = {
   kind: mediasoupClient.types.MediaKind;
   transportId: string;
-  rtpParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  rtpParameters: mediasoupClient.types.RtpParameters;
   channelId: string;
 };
 
@@ -468,7 +469,7 @@ export type SfuCreateProducerReturnType = {
 export type SfuCreateConsumerParams = {
   transportId: string;
   producerId: string;
-  rtpCapabilities: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  rtpCapabilities: mediasoupClient.types.RtpCapabilities;
   channelId: string;
 };
 
@@ -477,7 +478,7 @@ export type SfuCreateConsumerReturnType = {
   userId: string;
   producerId: string;
   kind: mediasoupClient.types.MediaKind;
-  rtpParameters: any; // eslint-disable-line @typescript-eslint/no-explicit-any
+  rtpParameters: mediasoupClient.types.RtpParameters;
 };
 
 export type Staff = {
@@ -558,3 +559,4 @@ export type StoreStateSnapshot = {
 };
 
 export * from './database';
+export * from './popup';

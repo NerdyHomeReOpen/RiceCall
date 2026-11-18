@@ -9,10 +9,7 @@ import AnnouncementEditor from '@/components/announcement-editor';
 
 import styles from './server-announcement.module.css';
 
-interface ServerAnnouncementPopupProps {
-  id: string;
-  serverAnnouncement: Types.Server['announcement'];
-}
+type ServerAnnouncementPopupProps = Types.PopupProps<'serverAnnouncement'>;
 
 const ServerAnnouncementPopup: React.FC<ServerAnnouncementPopupProps> = React.memo(({ id, serverAnnouncement }) => {
   const { t } = useTranslation();

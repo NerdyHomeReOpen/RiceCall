@@ -1,12 +1,10 @@
 import React, { useMemo } from 'react';
-import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
-import { useAppSelector } from '@/hooks/useStore';
 import { usePromptMessageCtxMenu } from '@/hooks/context-menus/usePromptMessageCtxMenu';
 
 import MarkdownContent from '@/components/markdown-content';
@@ -25,8 +23,6 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
 
-  const user = useAppSelector((state) => ({ userId: state.user.data.userId }), shallowEqual);
-
   const escapedMessageParameter = Object.fromEntries(Object.entries(messageGroup.parameter).map(([key, value]) => [key, escapeHtml(value)]));
   const formattedMessagesContents = useMemo(
     () =>
@@ -41,7 +37,7 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
     [messageGroup.contents, escapedMessageParameter, messageGroup.parameter, t],
   );
 
-  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageCtxMenu({ user, contentMetadata: messageGroup.contentMetadata });
+  const { buildContextMenu: buildMessageContextMenu } = usePromptMessageCtxMenu({ contentMetadata: messageGroup.contentMetadata });
 
   const handleMessageContextMenu = (e: React.MouseEvent<HTMLDivElement>) => {
     e.preventDefault();
