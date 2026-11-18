@@ -42,7 +42,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
 
   const userHasVip = user.vip > 0;
   const userBadges = useMemo(() => (typeof user.badges === 'string' ? JSON.parse(user.badges) : user.badges), [user.badges]);
-  const userWealth = 0; // TODO: get user wealth
+  const userWealth = 0; // TODO(backlog#8): get user wealth
 
   const changeSignature = (signature: Types.User['signature']) => {
     if (signature === user.signature) return;

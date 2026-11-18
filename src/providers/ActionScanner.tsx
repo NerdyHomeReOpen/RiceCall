@@ -70,7 +70,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
   }, [releaseSpeakKey]);
 
   const toggleMainWindows = useCallback(() => {
-    // TODO: key detection in background
+    // TODO(backlog#5): key detection in background
   }, []);
 
   const toggleUpVolume = useCallback(() => {
@@ -166,7 +166,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
       }
     };
 
-    // TODO: Use system event instead of window event
+    // TODO(backlog#6): Use system event instead of window event
     const onBlur = () => stopSpeak();
     const onVisibility = () => {
       if (document.hidden) stopSpeak();

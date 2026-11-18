@@ -10,7 +10,7 @@
   },
   "main": "./build/src/main/electron.js",
   "engines": {
-    "node": ">=20"
+    "node": ">=22"
   },
   "type": "module",
   "scripts": {
@@ -30,7 +30,7 @@
     "lint": "eslint \"src/**/*.{ts,tsx,js,jsx}\" && stylelint \"src/**/*.css\" && prettier --check \"src/**/*.{ts,tsx,js,jsx,css}\"",
     "check-names": "node scripts/check-file-names.cjs",
     "typecheck": "tsc --noEmit && tsc -p tsconfig.electron.json --noEmit",
-    "test": "node --experimental-strip-types --test tests/*.test.mjs",
+    "test": "node --import tsx --test tests/*.test.mjs",
     "format": "prettier --write \"src/**/*.{ts,tsx,js,jsx,css}\""
   },
   "dependencies": {

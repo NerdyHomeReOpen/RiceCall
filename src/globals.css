@@ -502,10 +502,7 @@ textarea {
   height: 19px;
 }
 
-/* TODO: Remove .Male and .Female */
-
-.permission-male,
-.permission-Male {
+.permission-male {
   width: 14px;
   min-width: 14px;
   height: 16px;
@@ -517,8 +514,7 @@ textarea {
   background-size: auto;
 }
 
-.permission-female,
-.permission-Female {
+.permission-female {
   width: 14px;
   min-width: 14px;
   height: 16px;

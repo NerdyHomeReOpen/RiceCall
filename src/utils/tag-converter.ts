@@ -8,7 +8,7 @@ const twitchRegex = /<tw[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/tw>/g;
 const kickRegex = /<kick[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/kick>/g;
 
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
-const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>[\s\S]*?<\/span><\/span>/g;
+const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>(?:<span[^>]*?permission-([a-z]+)[^>]*?permission-lv-(\d+)[^>]*><\/span>)?[\s\S]*?<\/span><\/span>/g;
 const ytBackRegex = /<iframe[^>]+data-yt=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const twitchBackRegex = /<iframe[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/iframe>/g;
 const kickBackRegex = /<iframe[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/iframe>/g;
@@ -25,9 +25,9 @@ export function escapeHtml(str: unknown): string {
 
 export function fromTags(raw: string): string {
   return raw
-    .replace(emojiRegex, (_, code) => {
+    .replace(emojiRegex, (match, code) => {
       const emoji = EMOJIS.find((e) => e.code === code);
-      if (!emoji) return code;
+      if (!emoji) return match;
       return `<img data-emoji='${code}' loading='lazy' class='markdown-emoji' alt=':${code}:' src='${emoji.path}'/>`;
     })
     .replace(discordTimestampRegex, (_, timestamp) => {
@@ -56,7 +56,7 @@ export function toTags(raw: string): string {
     .replace(discordTimestampRegex, (_, timestamp) => {
       return `<time data-timestamp='${escapeHtml(timestamp)}'></time>`;
     })
-    .replace(userTagBackRegex, (_: string, name: string, _level: string, level: string = '2', _gender: string, gender: string = 'male') => {
+    .replace(userTagBackRegex, (_: string, name: string, gender: string = 'male', level: string = '2') => {
       return `<tag data-tag='${escapeHtml(name)}-${escapeHtml(level)}-${escapeHtml(gender)}'></tag>`;
     })
     .replace(ytBackRegex, (_: string, videoId: string) => {
