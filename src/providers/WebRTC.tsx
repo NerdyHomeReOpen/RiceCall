@@ -53,7 +53,7 @@ interface WebRTCProviderProps {
   children: React.ReactNode;
 }
 
-const WebRTCProvider = ({ children }: WebRTCProviderProps) => {
+const WebRTCProvider = ({ children }: WebRTCProviderProps): React.JSX.Element => {
   const { playSound } = useSoundPlayer();
   const { loadServer } = useLoading();
 

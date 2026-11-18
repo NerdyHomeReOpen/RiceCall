@@ -13,7 +13,7 @@ interface UseVoiceModeCtxMenuProps {
   isQueueControlled: boolean;
 }
 
-export const useVoiceModeCtxMenu = ({ currentServer, currentChannel, permissionLevel, isQueueControlled }: UseVoiceModeCtxMenuProps) => {
+export const useVoiceModeCtxMenu = ({ currentServer, currentChannel, permissionLevel, isQueueControlled }: UseVoiceModeCtxMenuProps): Types.ContextMenuBuilder => {
   const isCurrentChannelFreeMode = currentChannel.voiceMode === 'free';
   const isCurrentChannelAdminMode = currentChannel.voiceMode === 'admin';
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';

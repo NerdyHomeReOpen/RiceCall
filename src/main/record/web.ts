@@ -14,7 +14,7 @@ export function saveRecord(record: ArrayBuffer): void {
   }
 }
 
-export function selectRecordSavePath(): null {
+export async function selectRecordSavePath(): Promise<null> {
   new Logger('SYSTEM').info(`Select record save path only available in desktop version`);
   return null;
 }

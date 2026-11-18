@@ -14,7 +14,7 @@ type ActionScannerContextType = {
 
 const ActionScannerContext = createContext<ActionScannerContextType | null>(null);
 
-export const useActionScanner = () => {
+export const useActionScanner = (): ActionScannerContextType => {
   const context = useContext(ActionScannerContext);
   if (!context) throw new Error('useActionScanner must be used within a ActionScannerProvider');
   return context;
@@ -24,7 +24,7 @@ interface ActionScannerProviderProps {
   children: ReactNode;
 }
 
-const ActionScannerProvider = ({ children }: ActionScannerProviderProps) => {
+const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.JSX.Element => {
   const { pressSpeakKey, releaseSpeakKey, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted, toggleMicMuted } = useWebRTC();
 
   const idleCheck = useRef<boolean>(false);

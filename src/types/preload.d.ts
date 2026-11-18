@@ -1,9 +1,6 @@
 import type * as Types from '@/types';
 
 export type eventEmitterHandlers = {
-  send: (channel: string, ...args: unknown[]) => void;
-  sendSync: <T = unknown>(channel: string, ...args: unknown[]) => T;
-  invoke: <T = unknown>(channel: string, ...args: unknown[]) => Promise<T>;
   removeAllListeners: (channel: string) => void;
 };
 
@@ -28,7 +25,7 @@ export type IpcRendererHandlers = {
   windowMaximize: () => void;
   windowUnmaximize: () => void;
   windowClose: () => void;
-  openPopup: (type: Types.PopupType, id: string, initialData: unknown, force?: boolean) => void;
+  openPopup: <T extends Types.PopupType>(type: T, id: string, initialData: Types.PopupOpenData<T>, force?: boolean) => void;
   closePopup: (id: string) => void;
   closeAllPopups: () => void;
   popupSubmit: (to: string, data?: unknown) => void;

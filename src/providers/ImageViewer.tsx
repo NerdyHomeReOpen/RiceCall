@@ -8,7 +8,7 @@ type ImageViewerContextType = {
 
 const ImageViewerContext = createContext<ImageViewerContextType | null>(null);
 
-export const useImageViewer = () => {
+export const useImageViewer = (): ImageViewerContextType => {
   const context = useContext(ImageViewerContext);
   if (!context) throw new Error('useImageViewer must be used within a ImageViewerProvider');
   return context;
@@ -18,7 +18,7 @@ interface ImageViewerProviderProps {
   children: ReactNode;
 }
 
-const ImageViewerProvider = ({ children }: ImageViewerProviderProps) => {
+const ImageViewerProvider = ({ children }: ImageViewerProviderProps): React.JSX.Element => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   const selectImage = useCallback((image: string) => {

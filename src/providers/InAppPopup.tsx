@@ -15,7 +15,7 @@ interface PopupProviderProps {
   children: ReactNode;
 }
 
-const PopupProvider = ({ children }: PopupProviderProps) => {
+const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
   const [popups, setPopups] = useState<Types.Popup[]>([]);
   const [minimizedIds, setMinimizedIds] = useState<Set<string>>(new Set());
 

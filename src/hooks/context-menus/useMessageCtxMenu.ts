@@ -15,7 +15,7 @@ interface UseMessageCtxMenuProps {
   member: Pick<Types.ChannelMessage, 'userId' | 'permissionLevel' | 'name' | 'currentChannelId'>;
 }
 
-export const useMessageCtxMenu = ({ user, currentServer, currentChannel, member }: UseMessageCtxMenuProps) => {
+export const useMessageCtxMenu = ({ user, currentServer, currentChannel, member }: UseMessageCtxMenuProps): Types.ContextMenuBuilder => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isSelf = member.userId === user.userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;

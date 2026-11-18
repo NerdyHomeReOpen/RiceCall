@@ -14,7 +14,7 @@ interface UseServerSettingMemberCtxMenuProps {
   permissionLevel: Types.Permission;
 }
 
-export const useServerSettingMemberCtxMenu = ({ user, server, member, permissionLevel }: UseServerSettingMemberCtxMenuProps) => {
+export const useServerSettingMemberCtxMenu = ({ user, server, member, permissionLevel }: UseServerSettingMemberCtxMenuProps): Types.ContextMenuBuilder => {
   const isSelf = member.userId === user.userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;
 

@@ -54,7 +54,7 @@ export const useMemberCtxMenu = ({
   isPasswordNeeded,
   onMuteUser,
   onUnmuteUser,
-}: UseMemberCtxMenuProps) => {
+}: UseMemberCtxMenuProps): Types.ContextMenuBuilder => {
   const { t } = useTranslation();
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);

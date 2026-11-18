@@ -14,7 +14,9 @@ interface UseMemberManagementCtxMenuProps {
   member: Pick<Types.OnlineMember | Types.ChannelMessage, 'userId' | 'permissionLevel' | 'name'>;
 }
 
-export const useMemberManagementCtxMenu = ({ user, currentServer, channel, member }: UseMemberManagementCtxMenuProps) => {
+export type UseMemberManagementCtxMenuResult = { buildMemberManagementCtxMenu: () => Types.ContextMenuItem[] };
+
+export const useMemberManagementCtxMenu = ({ user, currentServer, channel, member }: UseMemberManagementCtxMenuProps): UseMemberManagementCtxMenuResult => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const isSelf = user.userId === member.userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;

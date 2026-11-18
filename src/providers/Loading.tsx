@@ -10,7 +10,7 @@ interface LoadingContextType {
 
 const LoadingContext = createContext<LoadingContextType | null>(null);
 
-export const useLoading = () => {
+export const useLoading = (): LoadingContextType => {
   const context = useContext(LoadingContext);
   if (!context) {
     throw new Error('useLoading must be used within a LoadingProvider');
@@ -22,7 +22,7 @@ interface LoadingProviderProps {
   children: ReactNode;
 }
 
-const LoadingProvider = ({ children }: LoadingProviderProps) => {
+const LoadingProvider = ({ children }: LoadingProviderProps): React.JSX.Element => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [loadingServerId, setLoadingServerId] = useState<string>('');
 

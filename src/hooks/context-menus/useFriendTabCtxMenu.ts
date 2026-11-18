@@ -14,7 +14,7 @@ interface UseFriendTabCtxMenuProps {
   defaultFriendGroup: Types.FriendGroup;
 }
 
-export const useFriendTabCtxMenu = ({ user, friend, friendGroups, defaultFriendGroup }: UseFriendTabCtxMenuProps) => {
+export const useFriendTabCtxMenu = ({ user, friend, friendGroups, defaultFriendGroup }: UseFriendTabCtxMenuProps): Types.ContextMenuBuilder => {
   const isSelf = friend.targetId === user.userId;
   const isFriend = friend.relationStatus === RelationStatus.Friend;
   const isStranger = friend.relationStatus === RelationStatus.Stranger;

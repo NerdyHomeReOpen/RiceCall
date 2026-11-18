@@ -18,7 +18,21 @@ interface UseSFUTransportDeps {
   stopSpeaking: () => void;
 }
 
-export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeakerAudio, removeSpeakerAudio, startSpeaking, stopSpeaking }: UseSFUTransportDeps) => {
+export type UseSFUTransportResult = {
+  setupSend: (channelId: string) => Promise<void>;
+  setupRecv: (channelId: string) => Promise<void>;
+  closeSend: () => Promise<void>;
+  closeRecv: () => void;
+  consumeOne: (producerId: string, channelId: string) => Promise<void>;
+  unconsumeOne: (producerId: string) => Promise<void>;
+  takeMic: (channelId: string) => Promise<void>;
+  releaseMic: () => Promise<void>;
+  muteUser: (userId: string) => void;
+  unmuteUser: (userId: string) => void;
+  changeBitrate: (bitrate: number) => void;
+};
+
+export const useSFUTransport = (refs: SharedRefs, { initAudioContext, initSpeakerAudio, removeSpeakerAudio, startSpeaking, stopSpeaking }: UseSFUTransportDeps): UseSFUTransportResult => {
   const { audioProducerRef, inputDesRef, bitrateRef, deviceRef, sendTransportRef, recvTransportRef, consumersRef } = refs;
 
   const currentChannelIdRef = useRef<string | null>(null);

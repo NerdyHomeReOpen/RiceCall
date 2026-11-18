@@ -1,7 +1,7 @@
 import { modules } from '@/main/modules';
 
 export const webrtc = {
-  signalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: unknown }) => {
+  signalStateChange: (formData: { signalState: string; userId: string; channelId: string; info?: unknown }): void => {
     modules.default.webRTCSignalStateChange(formData);
   },
 };

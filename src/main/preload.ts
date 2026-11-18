@@ -4,9 +4,6 @@
 const { contextBridge, ipcRenderer } = require('electron');
 
 const eventEmitterHandlers = {
-  send: (channel, ...args) => ipcRenderer.send(channel, ...args),
-  sendSync: (channel, ...args) => ipcRenderer.sendSync(channel, ...args),
-  invoke: (channel, ...args) => ipcRenderer.invoke(channel, ...args),
   removeAllListeners: (channel) => ipcRenderer.removeAllListeners(channel),
 };
 

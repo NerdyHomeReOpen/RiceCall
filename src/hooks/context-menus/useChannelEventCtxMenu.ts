@@ -13,7 +13,7 @@ interface UseChannelEventCtxMenuProps {
   permissionLevel: Types.Permission;
 }
 
-export const useChannelEventCtxMenu = ({ user, currentServer, event, permissionLevel }: UseChannelEventCtxMenuProps) => {
+export const useChannelEventCtxMenu = ({ user, currentServer, event, permissionLevel }: UseChannelEventCtxMenuProps): Types.ContextMenuBuilder => {
   const isSelf = event.userId === user.userId;
   const isLowerLevel = event.permissionLevel < permissionLevel;
 

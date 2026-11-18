@@ -1,4 +1,4 @@
-import { createContext, ReactNode, useContext, useEffect, useRef, useCallback, useMemo } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useRef, useCallback, useMemo } from 'react';
 
 import * as ipc from '@/main/ipc';
 
@@ -20,7 +20,7 @@ interface SoundPlayerProviderProps {
   children: ReactNode;
 }
 
-const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps) => {
+const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.Element => {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const disableAllSoundEffectRef = useRef(false);
   const enterVoiceChannelSoundRef = useRef(false);

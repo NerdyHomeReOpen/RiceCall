@@ -12,7 +12,7 @@ interface UseServerSettingCtxMenuProps {
   onLocateMe: () => void;
 }
 
-export const useServerSettingCtxMenu = ({ user, currentServer, onLocateMe }: UseServerSettingCtxMenuProps) => {
+export const useServerSettingCtxMenu = ({ user, currentServer, onLocateMe }: UseServerSettingCtxMenuProps): Types.ContextMenuBuilder => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
 
   const buildContextMenu = useCallback(

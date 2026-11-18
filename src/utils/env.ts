@@ -55,7 +55,7 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
 loadEnv();
 
 export default class Env {
-  static async load(enviroment: 'prod' | 'dev' = 'prod') {
+  static async load(enviroment: 'prod' | 'dev' = 'prod'): Promise<void> {
     loadEnv(enviroment);
   }
 

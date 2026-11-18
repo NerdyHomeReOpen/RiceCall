@@ -12,7 +12,9 @@ interface UseRecordingDeps {
   initAudioContext: () => Promise<void>;
 }
 
-export const useRecording = (refs: SharedRefs, { initAudioContext }: UseRecordingDeps) => {
+export type UseRecordingResult = { startRecording: () => void; stopRecording: () => void; toggleRecording: () => void };
+
+export const useRecording = (refs: SharedRefs, { initAudioContext }: UseRecordingDeps): UseRecordingResult => {
   const { audioContextRef, recorderDesRef, recorderGainRef, micNodesRef, mixNodesRef, masterGainNodeRef, recordBuffersRef, recordTimerRef } = refs;
 
   const startRecording = useCallback(() => {

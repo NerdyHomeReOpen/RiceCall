@@ -4,7 +4,9 @@ import type * as Types from '@/types';
 
 import Env from '@/utils/env';
 
-export const useStaffList = () => {
+export type UseStaffListResult = { staffList: Types.Staff[] };
+
+export const useStaffList = (): UseStaffListResult => {
   const [staffList, setStaffList] = useState<Types.Staff[]>([]);
 
   useEffect(() => {

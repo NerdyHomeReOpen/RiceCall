@@ -13,7 +13,7 @@ interface UseChannelListCtxMenuProps {
   movableServerUserIds: string[];
 }
 
-export const useChannelListCtxMenu = ({ user, currentServer, currentChannel, movableServerUserIds }: UseChannelListCtxMenuProps) => {
+export const useChannelListCtxMenu = ({ user, currentServer, currentChannel, movableServerUserIds }: UseChannelListCtxMenuProps): Types.ContextMenuBuilder => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
 
   const buildContextMenu = useCallback(

@@ -12,7 +12,7 @@ interface UseRecommendServerCtxMenuProps {
   onJoinServer: () => void;
 }
 
-export const useRecommendServerCtxMenu = ({ user, recommendServer, onJoinServer }: UseRecommendServerCtxMenuProps) => {
+export const useRecommendServerCtxMenu = ({ user, recommendServer, onJoinServer }: UseRecommendServerCtxMenuProps): Types.ContextMenuBuilder => {
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()

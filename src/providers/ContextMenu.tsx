@@ -56,7 +56,7 @@ interface ContextMenuProviderProps {
   children: ReactNode;
 }
 
-const ContextMenuProvider = ({ children }: ContextMenuProviderProps) => {
+const ContextMenuProvider = ({ children }: ContextMenuProviderProps): React.JSX.Element => {
   const [contextMenu, setContextMenu] = React.useState<React.ReactNode | null>(null);
   const [micContextMenu, setMicContextMenu] = React.useState<React.ReactNode | null>(null);
   const [notificationMenu, setNotificationMenu] = React.useState<React.ReactNode | null>(null);

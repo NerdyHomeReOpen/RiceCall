@@ -14,7 +14,7 @@ interface UseChannelSettingBlockedMemberCtxMenuProps {
   permissionLevel: Types.Permission;
 }
 
-export const useChannelSettingBlockedMemberCtxMenu = ({ user, server, channel, member, permissionLevel }: UseChannelSettingBlockedMemberCtxMenuProps) => {
+export const useChannelSettingBlockedMemberCtxMenu = ({ user, server, channel, member, permissionLevel }: UseChannelSettingBlockedMemberCtxMenuProps): Types.ContextMenuBuilder => {
   const isSelf = member.userId === user.userId;
 
   const buildContextMenu = useCallback(

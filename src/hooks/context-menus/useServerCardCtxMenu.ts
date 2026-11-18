@@ -13,7 +13,7 @@ interface UseServerCardCtxMenuProps {
   onJoinServer: () => void;
 }
 
-export const useServerCardCtxMenu = ({ user, server, onJoinServer }: UseServerCardCtxMenuProps) => {
+export const useServerCardCtxMenu = ({ user, server, onJoinServer }: UseServerCardCtxMenuProps): Types.ContextMenuBuilder => {
   const { t } = useTranslation();
 
   const buildContextMenu = useCallback(

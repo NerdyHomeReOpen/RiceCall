@@ -16,7 +16,18 @@ interface UseMicAudioDeps {
   playSound: (sound: 'startSpeaking' | 'stopSpeaking' | 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage', force?: boolean) => void;
 }
 
-export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: UseMicAudioDeps) => {
+export type UseMicAudioResult = {
+  initMicAudio: (stream: MediaStream) => Promise<void>;
+  removeMicAudio: () => void;
+  startSpeaking: () => void;
+  stopSpeaking: () => void;
+  pressSpeakKey: () => void;
+  releaseSpeakKey: () => void;
+  changeMicVolume: (volume: number) => void;
+  toggleMicMuted: () => void;
+};
+
+export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: UseMicAudioDeps): UseMicAudioResult => {
   const { audioContextRef, inputDesRef, inputAnalyserRef, micNodesRef, rafIdListRef, microphoneAmplificationRef, inputAudioDeviceRef, echoCancellationRef, noiseCancellationRef, audioProducerRef } =
     refs;
 

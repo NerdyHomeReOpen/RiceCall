@@ -15,7 +15,7 @@ interface UseHeaderCtxMenuProps {
   onExit: () => void;
 }
 
-export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: UseHeaderCtxMenuProps) => {
+export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: UseHeaderCtxMenuProps): Types.ContextMenuBuilder => {
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()

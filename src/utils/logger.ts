@@ -28,31 +28,31 @@ export default class Logger {
     this.origin = origin;
   }
 
-  static async load() {
+  static async load(): Promise<void> {
     loadLogger();
   }
 
-  info(...messages: string[]) {
+  info(...messages: string[]): void {
     if (!logger) return;
     logger.info(`[${this.origin}] ${messages.join(' ')}`);
   }
 
-  command(...messages: string[]) {
+  command(...messages: string[]): void {
     if (!logger) return;
     logger.info(`[${this.origin}] ${messages.join(' ')}`);
   }
 
-  success(...messages: string[]) {
+  success(...messages: string[]): void {
     if (!logger) return;
     logger.info(`[${this.origin}] ${messages.join(' ')}`);
   }
 
-  warn(...messages: string[]) {
+  warn(...messages: string[]): void {
     if (!logger) return;
     logger.warn(`[${this.origin}] ${messages.join(' ')}`);
   }
 
-  error(...messages: string[]) {
+  error(...messages: string[]): void {
     if (!logger) return;
     logger.error(`[${this.origin}] ${messages.join(' ')}`);
   }

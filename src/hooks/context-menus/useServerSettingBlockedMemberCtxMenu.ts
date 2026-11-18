@@ -13,7 +13,7 @@ interface UseServerSettingBlockedMemberCtxMenuProps {
   permissionLevel: Types.Permission;
 }
 
-export const useServerSettingBlockedMemberCtxMenu = ({ user, server, member, permissionLevel }: UseServerSettingBlockedMemberCtxMenuProps) => {
+export const useServerSettingBlockedMemberCtxMenu = ({ user, server, member, permissionLevel }: UseServerSettingBlockedMemberCtxMenuProps): Types.ContextMenuBuilder => {
   const isSelf = member.userId === user.userId;
 
   const buildContextMenu = useCallback(

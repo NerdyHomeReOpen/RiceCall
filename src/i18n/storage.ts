@@ -105,7 +105,7 @@ export async function loadStorage(): Promise<void> {
 }
 
 export default class I18nStorage {
-  static async load() {
+  static async load(): Promise<void> {
     loadStorage();
   }
 

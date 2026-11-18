@@ -15,7 +15,7 @@ interface UseChannelSettingModeratorCtxMenuProps {
   permissionLevel: Types.Permission;
 }
 
-export const useChannelSettingModeratorCtxMenu = ({ user, server, channel, moderator, permissionLevel }: UseChannelSettingModeratorCtxMenuProps) => {
+export const useChannelSettingModeratorCtxMenu = ({ user, server, channel, moderator, permissionLevel }: UseChannelSettingModeratorCtxMenuProps): Types.ContextMenuBuilder => {
   const isSelf = moderator.userId === user.userId;
   const isLowerLevel = moderator.permissionLevel < permissionLevel;
 

@@ -18,7 +18,16 @@ interface UseChannelCtxMenuProps {
   isPasswordNeeded: boolean;
 }
 
-export const useChannelCtxMenu = ({ channel, user, currentServer, currentChannel, movableChannelUserIds, movableServerUserIds, canJoin, isPasswordNeeded }: UseChannelCtxMenuProps) => {
+export const useChannelCtxMenu = ({
+  channel,
+  user,
+  currentServer,
+  currentChannel,
+  movableChannelUserIds,
+  movableServerUserIds,
+  canJoin,
+  isPasswordNeeded,
+}: UseChannelCtxMenuProps): Types.ContextMenuBuilder => {
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isInChannel = currentChannel.channelId === channel.channelId;

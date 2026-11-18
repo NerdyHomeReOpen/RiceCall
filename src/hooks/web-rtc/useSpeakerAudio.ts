@@ -15,7 +15,16 @@ interface UseSpeakerAudioDeps {
   initAudioContext: () => Promise<void>;
 }
 
-export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeakerAudioDeps) => {
+export type UseSpeakerAudioResult = {
+  initSpeakerAudio: (userId: string, stream: MediaStream) => void;
+  removeSpeakerAudio: (userId: string) => void;
+  changeSpeakerVolume: (volume: number) => void;
+  addSpeakerVolume: (value?: number) => void;
+  subtractSpeakerVolume: (value?: number) => void;
+  toggleSpeakerMuted: () => void;
+};
+
+export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeakerAudioDeps): UseSpeakerAudioResult => {
   const { audioContextRef, outputDesRef, masterGainNodeRef, speakerNodesRef, rafIdListRef, speakerRef, audioProducerRef } = refs;
 
   const removeSpeakerAudio = useCallback(

@@ -11,7 +11,7 @@ interface UseFriendGroupCtxMenuProps {
   friendGroup: Pick<Types.FriendGroup, 'friendGroupId' | 'name'>;
 }
 
-export const useFriendGroupCtxMenu = ({ user, friendGroup }: UseFriendGroupCtxMenuProps) => {
+export const useFriendGroupCtxMenu = ({ user, friendGroup }: UseFriendGroupCtxMenuProps): Types.ContextMenuBuilder => {
   const buildContextMenu = useCallback(
     () =>
       new ContextMenu()

@@ -13,7 +13,16 @@ interface UseMixAudioDeps {
   initAudioContext: () => Promise<void>;
 }
 
-export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioDeps) => {
+export type UseMixAudioResult = {
+  initMixAudio: (systemStream: MediaStream) => void;
+  removeMixAudio: () => void;
+  startMixing: () => void;
+  stopMixing: () => void;
+  toggleMixMode: () => void;
+  changeMixVolume: (volume: number) => void;
+};
+
+export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioDeps): UseMixAudioResult => {
   const { audioContextRef, inputDesRef, inputAnalyserRef, mixNodesRef, recorderGainRef, rafIdListRef, audioProducerRef } = refs;
 
   const removeMixAudio = useCallback(() => {

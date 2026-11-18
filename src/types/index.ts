@@ -145,6 +145,9 @@ export type ContextMenuItem = {
   onClick?: () => void;
 };
 
+// What every context menu hook returns.
+export type ContextMenuBuilder = { buildContextMenu: () => ContextMenuItem[] };
+
 export type NotificationMenuItem = {
   id: string;
   label: string;

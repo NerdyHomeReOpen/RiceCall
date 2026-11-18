@@ -37,7 +37,7 @@ interface UseQueueUserCtxMenuProps {
   onUnmuteUser: (userId: string) => void;
 }
 
-export const useQueueUserCtxMenu = ({ user, currentServer, currentChannel, queueMember, isMuted, isFriend, onMuteUser, onUnmuteUser }: UseQueueUserCtxMenuProps) => {
+export const useQueueUserCtxMenu = ({ user, currentServer, currentChannel, queueMember, isMuted, isFriend, onMuteUser, onUnmuteUser }: UseQueueUserCtxMenuProps): Types.ContextMenuBuilder => {
   const { t } = useTranslation();
 
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);

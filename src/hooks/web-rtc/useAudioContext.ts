@@ -26,7 +26,9 @@ class RecorderProcessor extends AudioWorkletProcessor {
 registerProcessor('recorder-processor', RecorderProcessor);
 `;
 
-export const useAudioContext = (refs: SharedRefs) => {
+export type UseAudioContextResult = { initAudioContext: () => Promise<void> };
+
+export const useAudioContext = (refs: SharedRefs): UseAudioContextResult => {
   const { audioContextRef, inputDesRef, outputDesRef, recorderDesRef, inputAnalyserRef, masterGainNodeRef, speakerRef } = refs;
 
   const initPromiseRef = useRef<Promise<void> | null>(null);

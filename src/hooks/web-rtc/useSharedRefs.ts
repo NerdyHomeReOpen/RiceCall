@@ -1,7 +1,35 @@
 import { useRef } from 'react';
+import type { RefObject } from 'react';
 import * as mediasoupClient from 'mediasoup-client';
 
-export const useSharedRefs = () => {
+export type SharedRefs = {
+  rafIdListRef: RefObject<{ [userId: string]: number }>;
+  audioContextRef: RefObject<AudioContext | null>;
+  audioProducerRef: RefObject<mediasoupClient.types.Producer<mediasoupClient.types.AppData> | null>;
+  speakerRef: RefObject<HTMLAudioElement | null>;
+  micNodesRef: RefObject<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null }>;
+  mixNodesRef: RefObject<{ stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null }>;
+  speakerNodesRef: RefObject<{ [id: string]: { stream: MediaStream | null; source: MediaStreamAudioSourceNode | null; gain: GainNode | null; analyser: AnalyserNode | null } }>;
+  masterGainNodeRef: RefObject<GainNode | null>;
+  inputAnalyserRef: RefObject<AnalyserNode | null>;
+  inputDesRef: RefObject<MediaStreamAudioDestinationNode | null>;
+  outputDesRef: RefObject<MediaStreamAudioDestinationNode | null>;
+  recorderDesRef: RefObject<MediaStreamAudioDestinationNode | null>;
+  recorderGainRef: RefObject<GainNode | null>;
+  bitrateRef: RefObject<number>;
+  deviceRef: RefObject<mediasoupClient.types.Device>;
+  sendTransportRef: RefObject<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>;
+  recvTransportRef: RefObject<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>;
+  consumersRef: RefObject<{ [producerId: string]: mediasoupClient.types.Consumer<mediasoupClient.types.AppData> }>;
+  microphoneAmplificationRef: RefObject<boolean>;
+  inputAudioDeviceRef: RefObject<string | null>;
+  echoCancellationRef: RefObject<boolean>;
+  noiseCancellationRef: RefObject<boolean>;
+  recordBuffersRef: RefObject<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>;
+  recordTimerRef: RefObject<NodeJS.Timeout | null>;
+};
+
+export const useSharedRefs = (): SharedRefs => {
   const rafIdListRef = useRef<{ [userId: string]: number }>({});
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
@@ -74,5 +102,3 @@ export const useSharedRefs = () => {
     recordTimerRef,
   };
 };
-
-export type SharedRefs = ReturnType<typeof useSharedRefs>;

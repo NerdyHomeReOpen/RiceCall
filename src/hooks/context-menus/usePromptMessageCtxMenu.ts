@@ -10,7 +10,7 @@ interface UsePromptMessageCtxMenuProps {
   contentMetadata: Types.PromptMessage['contentMetadata'];
 }
 
-export const usePromptMessageCtxMenu = ({ contentMetadata }: UsePromptMessageCtxMenuProps) => {
+export const usePromptMessageCtxMenu = ({ contentMetadata }: UsePromptMessageCtxMenuProps): Types.ContextMenuBuilder => {
   const buildContextMenu = useCallback(
     () => (contentMetadata && contentMetadata.userId ? new ContextMenu().addViewProfileOption(() => openUserInfo(contentMetadata.userId)).build() : []),
     [contentMetadata],

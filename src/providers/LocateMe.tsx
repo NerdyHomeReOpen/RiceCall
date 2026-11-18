@@ -1,4 +1,4 @@
-import { createContext, useContext, useMemo, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useMemo, useRef, useCallback } from 'react';
 
 interface LocateMeContextType {
   locateMe: (useSmooth?: boolean) => void;
@@ -9,7 +9,7 @@ interface LocateMeContextType {
 
 const LocateMeContext = createContext<LocateMeContextType | null>(null);
 
-export const useLocateMeContext = () => {
+export const useLocateMeContext = (): LocateMeContextType => {
   const context = useContext(LocateMeContext);
   if (!context) {
     throw new Error('useLocateMeContext must be used within an LocateMeProvider');
@@ -17,7 +17,7 @@ export const useLocateMeContext = () => {
   return context;
 };
 
-const LocateMeProvider = ({ children }: { children: React.ReactNode }) => {
+const LocateMeProvider = ({ children }: { children: React.ReactNode }): React.JSX.Element => {
   const expandCategoryHandlerRef = useRef<() => void>(null);
   const expandChannelHandlerRef = useRef<() => void>(null);
   const currentUserRef = useRef<HTMLDivElement>(null);
