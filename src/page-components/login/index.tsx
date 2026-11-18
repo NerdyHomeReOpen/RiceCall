@@ -56,7 +56,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
   };
 
   const handleForgotPasswordClick = () => {
-    window.open('https://ricecall.com/forget', '_blank');
+    window.open('https://ricecall.com/password/forget', '_blank');
   };
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {

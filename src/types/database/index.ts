@@ -145,6 +145,13 @@ export type table_channels = {
   createdAt: number;
 };
 
+export type table_email_verification_requests = {
+  userId: string;
+  code: string;
+  updatedAt: number;
+  createdAt: number;
+};
+
 export type table_friend_applications = {
   senderId: string;
   receiverId: string;
@@ -237,6 +244,13 @@ export type table_oauth_states = {
   updatedAt: number;
 };
 
+export type table_password_forget_requests = {
+  userId: string;
+  code: string;
+  updatedAt: number;
+  createdAt: number;
+};
+
 export type table_queued_emails = {
   queuedEmailId: string;
   path: string;
@@ -260,20 +274,6 @@ export type table_recommend_servers = {
   serverId: string;
   categoryId: string | null;
   tags: string;
-  updatedAt: number;
-  createdAt: number;
-};
-
-export type table_reset_email_requests = {
-  userId: string;
-  code: string;
-  updatedAt: number;
-  createdAt: number;
-};
-
-export type table_reset_password_requests = {
-  userId: string;
-  code: string;
   updatedAt: number;
   createdAt: number;
 };
