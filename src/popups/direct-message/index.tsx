@@ -202,7 +202,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleReportBtnClick = () => {
-    window.open('https://ricecall.com/report-user', '_blank');
+    window.open('https://ricecall.com/report', '_blank');
   };
 
   const handleTargetAvatarClick = () => {

@@ -24,7 +24,7 @@ export const useServerSettingCtxMenu = ({ user, currentServer, onLocateMe }: Use
         .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => openEditNickname(user.userId, currentServer.serverId))
         .addLocateMeOption(() => onLocateMe())
         .addSeparator()
-        .addReportOption(() => window.open('https://ricecall.com/report-server', '_blank'))
+        .addReportOption(() => window.open('https://ricecall.com/report', '_blank'))
         .addFavoriteServerOption({ isFavorite: currentServer.isFavorite }, () => favoriteServer(currentServer.serverId))
         .build(),
     [user, currentServer, permissionLevel, onLocateMe],

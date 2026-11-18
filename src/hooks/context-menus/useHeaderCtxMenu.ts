@@ -27,7 +27,7 @@ export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: U
           {
             onFaqClick: () => window.open('https://ricecall.com/#faq', '_blank'),
             onAgreementClick: () => window.open('https://ricecall.com/terms', '_blank'),
-            onSpecificationClick: () => window.open('https://ricecall.com/specification', '_blank'),
+            onSpecificationClick: () => window.open('https://ricecall.com/rules', '_blank'),
             onContactUsClick: () => window.open('https://ricecall.com/contact', '_blank'),
             onAboutUsClick: () => openAboutUs(),
           },
