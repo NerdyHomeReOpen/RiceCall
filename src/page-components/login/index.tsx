@@ -20,8 +20,8 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
   const [account, setAccount] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [rememberAccount, setRememberAccount] = useState<boolean>(false);
-  const [autoLogin, setAutoLogin] = useState<boolean>(false);
-  const [accounts, setAccounts] = useState<Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>>({});
+  const [isAutoLoginEnabled, setIsAutoLoginEnabled] = useState<boolean>(false);
+  const [accounts, setAccounts] = useState<Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isAccountSelectBoxVisible, setIsAccountSelectBoxVisible] = useState<boolean>(false);
 
@@ -35,15 +35,15 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
       const match = accounts[value];
       setAccount(value);
       setRememberAccount(match?.rememberAccount ?? false);
-      setAutoLogin(match?.autoLogin ?? false);
+      setIsAutoLoginEnabled(match?.isAutoLoginEnabled ?? false);
     } else if (name === 'password') {
       setPassword(value);
-    } else if (name === 'autoLogin') {
-      setAutoLogin(checked);
+    } else if (name === 'isAutoLoginEnabled') {
+      setIsAutoLoginEnabled(checked);
       setRememberAccount(checked ? true : rememberAccount);
     } else if (name === 'rememberAccount') {
-      if (autoLogin && !checked) {
-        setAutoLogin(false);
+      if (isAutoLoginEnabled && !checked) {
+        setIsAutoLoginEnabled(false);
         setRememberAccount(false);
       }
       setRememberAccount(checked);
@@ -68,7 +68,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
 
     await ipc.auth.login({ account, password }).then((res) => {
       if (res.success) {
-        if (rememberAccount) ipc.accounts.add(account, { autoLogin, rememberAccount, password });
+        if (rememberAccount) ipc.accounts.add(account, { isAutoLoginEnabled, rememberAccount, password });
         localStorage.setItem('login-account', account);
       }
     });
@@ -89,11 +89,11 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     setAccount(accounts[loginAccount] ? loginAccount : '');
     setPassword(accounts[loginAccount]?.password ?? '');
     setRememberAccount(!!accounts[loginAccount]?.rememberAccount);
-    setAutoLogin(!!accounts[loginAccount]?.autoLogin);
+    setIsAutoLoginEnabled(!!accounts[loginAccount]?.isAutoLoginEnabled);
   }, [accounts]);
 
   useEffect(() => {
-    const changeAccounts = (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => {
+    const changeAccounts = (accounts: Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>) => {
       setAccounts(accounts);
     };
     changeAccounts(ipc.accounts.get());
@@ -127,14 +127,14 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
                   <input type="text" name="account" value={account} onChange={handleInputChange} placeholder={t('please-input-account')} className={styles['input']} />
                   <div className={styles['account-dropdown-arrow']} onClick={handleAccountSelectClick} />
                   <div className={styles['account-options']} style={isAccountSelectBoxVisible ? {} : { display: 'none' }}>
-                    {Object.entries(accounts).map(([account, { autoLogin, rememberAccount, password }]) => (
+                    {Object.entries(accounts).map(([account, { isAutoLoginEnabled, rememberAccount, password }]) => (
                       <div
                         key={account}
                         className={styles['account-option']}
                         onClick={() => {
                           setAccount(account);
                           setRememberAccount(rememberAccount);
-                          setAutoLogin(autoLogin);
+                          setIsAutoLoginEnabled(isAutoLoginEnabled);
                           setPassword(password);
                           setIsAccountSelectBoxVisible(false);
                         }}
@@ -164,7 +164,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
                   {t('remember-account')}
                 </div>
                 <div className={styles['check-box']}>
-                  <input type="checkbox" name="autoLogin" checked={autoLogin} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
+                  <input type="checkbox" name="isAutoLoginEnabled" checked={isAutoLoginEnabled} onChange={handleInputChange} className={styles['check']} tabIndex={-1} />
                   {t('auto-login')}
                 </div>
               </div>

@@ -1,11 +1,11 @@
 import { modules } from '@/main/modules';
 
 export const accounts = {
-  get: (): Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }> => {
+  get: (): Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }> => {
     return modules.default.getAccounts();
   },
 
-  add: (account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }): void => {
+  add: (account: string, data: { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }): void => {
     modules.default.addAccount(account, data);
   },
 
@@ -13,7 +13,7 @@ export const accounts = {
     modules.default.deleteAccount(account);
   },
 
-  onUpdate: (callback: (accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>) => void): (() => void) => {
+  onUpdate: (callback: (accounts: Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>) => void): (() => void) => {
     return modules.default.listen('accounts', callback);
   },
 };

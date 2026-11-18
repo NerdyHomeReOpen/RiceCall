@@ -12,8 +12,8 @@ export const server = {
   },
 };
 
-export const dontShowDisclaimerNextTime = (): void => {
-  modules.default.dontShowDisclaimerNextTime();
+export const hideDisclaimerNextTime = (): void => {
+  modules.default.hideDisclaimerNextTime();
 };
 
 export const checkForUpdates = (): void => {

@@ -83,12 +83,12 @@ export type DirectMessage = Message & User & { type: 'dm'; user1Id: string; user
 export type PromptMessage = Message & { type: 'alert' | 'info' | 'warn' | 'event'; displaySeconds?: number };
 
 export type SystemSettings = {
-  autoLogin: boolean;
-  autoLaunch: boolean;
-  alwaysOnTop: boolean;
-  statusAutoIdle: boolean;
+  isAutoLoginEnabled: boolean;
+  isAutoLaunchEnabled: boolean;
+  isAlwaysOnTop: boolean;
+  isStatusAutoIdleEnabled: boolean;
   statusAutoIdleMinutes: number;
-  statusAutoDnd: boolean;
+  isStatusAutoDndEnabled: boolean;
   channelUIMode: ChannelUIMode;
   closeToTray: boolean;
   fontSize: number;
@@ -98,13 +98,13 @@ export type SystemSettings = {
   outputAudioDevice: string;
   recordFormat: RecordFormat;
   recordSavePath: string;
-  mixEffect: boolean;
+  isMixEffectEnabled: boolean;
   mixEffectType: string;
-  autoMixSetting: boolean;
-  echoCancellation: boolean;
-  noiseCancellation: boolean;
-  microphoneAmplification: boolean;
-  manualMixMode: boolean;
+  isAutoMixSettingEnabled: boolean;
+  isEchoCancellationEnabled: boolean;
+  isNoiseCancellationEnabled: boolean;
+  isMicrophoneAmplificationEnabled: boolean;
+  isManualMixMode: boolean;
   mixMode: MixMode;
 
   speakingMode: SpeakingMode;
@@ -120,14 +120,14 @@ export type SystemSettings = {
   hotKeyToggleMicrophone: string;
 
   disableAllSoundEffect: boolean;
-  enterVoiceChannelSound: boolean;
-  leaveVoiceChannelSound: boolean;
-  startSpeakingSound: boolean;
-  stopSpeakingSound: boolean;
-  receiveDirectMessageSound: boolean;
-  receiveChannelMessageSound: boolean;
+  isEnterVoiceChannelSoundEnabled: boolean;
+  isLeaveVoiceChannelSoundEnabled: boolean;
+  isStartSpeakingSoundEnabled: boolean;
+  isStopSpeakingSoundEnabled: boolean;
+  isReceiveDirectMessageSoundEnabled: boolean;
+  isReceiveChannelMessageSoundEnabled: boolean;
 
-  autoCheckForUpdates: boolean;
+  isAutoCheckForUpdatesEnabled: boolean;
   updateCheckInterval: number;
   updateChannel: string;
 };
@@ -387,17 +387,17 @@ export type ClientToServerEventsWithAck = {
 };
 
 export type StoreType = {
-  accounts: Record<string, { autoLogin: boolean; rememberAccount: boolean; password: string }>;
+  accounts: Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>;
   language: LanguageKey;
   customThemes: Theme[];
   currentTheme: Theme | null;
-  autoLogin: boolean;
-  autoLaunch: boolean;
-  alwaysOnTop: boolean;
+  isAutoLoginEnabled: boolean;
+  isAutoLaunchEnabled: boolean;
+  isAlwaysOnTop: boolean;
   closeToTray: boolean;
-  statusAutoIdle: boolean;
+  isStatusAutoIdleEnabled: boolean;
   statusAutoIdleMinutes: number;
-  statusAutoDnd: boolean;
+  isStatusAutoDndEnabled: boolean;
   channelUIMode: ChannelUIMode;
   font: string;
   fontSize: number;
@@ -405,13 +405,13 @@ export type StoreType = {
   outputAudioDevice: string;
   recordFormat: RecordFormat;
   recordSavePath: string;
-  mixEffect: boolean;
+  isMixEffectEnabled: boolean;
   mixEffectType: string;
-  autoMixSetting: boolean;
-  echoCancellation: boolean;
-  noiseCancellation: boolean;
-  microphoneAmplification: boolean;
-  manualMixMode: boolean;
+  isAutoMixSettingEnabled: boolean;
+  isEchoCancellationEnabled: boolean;
+  isNoiseCancellationEnabled: boolean;
+  isMicrophoneAmplificationEnabled: boolean;
+  isManualMixMode: boolean;
   mixMode: MixMode;
   speakingMode: SpeakingMode;
   defaultSpeakingKey: string;
@@ -423,14 +423,14 @@ export type StoreType = {
   hotKeyToggleSpeaker: string;
   hotKeyToggleMicrophone: string;
   disableAllSoundEffect: boolean;
-  enterVoiceChannelSound: boolean;
-  leaveVoiceChannelSound: boolean;
-  startSpeakingSound: boolean;
-  stopSpeakingSound: boolean;
-  receiveDirectMessageSound: boolean;
-  receiveChannelMessageSound: boolean;
-  dontShowDisclaimer: boolean;
-  autoCheckForUpdates: boolean;
+  isEnterVoiceChannelSoundEnabled: boolean;
+  isLeaveVoiceChannelSoundEnabled: boolean;
+  isStartSpeakingSoundEnabled: boolean;
+  isStopSpeakingSoundEnabled: boolean;
+  isReceiveDirectMessageSoundEnabled: boolean;
+  isReceiveChannelMessageSoundEnabled: boolean;
+  isDisclaimerHidden: boolean;
+  isAutoCheckForUpdatesEnabled: boolean;
   updateCheckInterval: number;
   updateChannel: string;
   env: 'prod' | 'dev';

@@ -7,7 +7,7 @@ export function registerAccountHandlers(): void {
     event.returnValue = store.get('accounts');
   });
 
-  ipcMain.on('add-account', (_, account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }) => {
+  ipcMain.on('add-account', (_, account: string, data: { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }) => {
     const accounts = store.get('accounts');
     accounts[account] = data;
     store.set('accounts', accounts);

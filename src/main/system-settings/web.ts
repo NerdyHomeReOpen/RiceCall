@@ -8,28 +8,28 @@ export function getSystemSettings(): Types.SystemSettings {
   return getSettings();
 }
 
-export function getAutoLogin(): boolean {
-  return store.get('autoLogin');
+export function getIsAutoLoginEnabled(): boolean {
+  return store.get('isAutoLoginEnabled');
 }
 
-export function getAutoLaunch(): boolean {
+export function getIsAutoLaunchEnabled(): boolean {
   return false;
 }
 
-export function getAlwaysOnTop(): boolean {
-  return store.get('alwaysOnTop');
+export function getIsAlwaysOnTop(): boolean {
+  return store.get('isAlwaysOnTop');
 }
 
-export function getStatusAutoIdle(): boolean {
-  return store.get('statusAutoIdle');
+export function getIsStatusAutoIdleEnabled(): boolean {
+  return store.get('isStatusAutoIdleEnabled');
 }
 
 export function getStatusAutoIdleMinutes(): number {
   return store.get('statusAutoIdleMinutes');
 }
 
-export function getStatusAutoDnd(): boolean {
-  return store.get('statusAutoDnd');
+export function getIsStatusAutoDndEnabled(): boolean {
+  return store.get('isStatusAutoDndEnabled');
 }
 
 export function getChannelUIMode(): Types.ChannelUIMode {
@@ -69,32 +69,32 @@ export function getRecordSavePath(): string {
   return store.get('recordSavePath');
 }
 
-export function getMixEffect(): boolean {
-  return store.get('mixEffect');
+export function getIsMixEffectEnabled(): boolean {
+  return store.get('isMixEffectEnabled');
 }
 
 export function getMixEffectType(): string {
   return store.get('mixEffectType');
 }
 
-export function getAutoMixSetting(): boolean {
-  return store.get('autoMixSetting');
+export function getIsAutoMixSettingEnabled(): boolean {
+  return store.get('isAutoMixSettingEnabled');
 }
 
-export function getEchoCancellation(): boolean {
-  return store.get('echoCancellation');
+export function getIsEchoCancellationEnabled(): boolean {
+  return store.get('isEchoCancellationEnabled');
 }
 
-export function getNoiseCancellation(): boolean {
-  return store.get('noiseCancellation');
+export function getIsNoiseCancellationEnabled(): boolean {
+  return store.get('isNoiseCancellationEnabled');
 }
 
-export function getMicrophoneAmplification(): boolean {
-  return store.get('microphoneAmplification');
+export function getIsMicrophoneAmplificationEnabled(): boolean {
+  return store.get('isMicrophoneAmplificationEnabled');
 }
 
-export function getManualMixMode(): boolean {
-  return store.get('manualMixMode');
+export function getIsManualMixMode(): boolean {
+  return store.get('isManualMixMode');
 }
 
 export function getMixMode(): Types.MixMode {
@@ -137,32 +137,32 @@ export function getDisableAllSoundEffect(): boolean {
   return store.get('disableAllSoundEffect');
 }
 
-export function getEnterVoiceChannelSound(): boolean {
-  return store.get('enterVoiceChannelSound');
+export function getIsEnterVoiceChannelSoundEnabled(): boolean {
+  return store.get('isEnterVoiceChannelSoundEnabled');
 }
 
-export function getLeaveVoiceChannelSound(): boolean {
-  return store.get('leaveVoiceChannelSound');
+export function getIsLeaveVoiceChannelSoundEnabled(): boolean {
+  return store.get('isLeaveVoiceChannelSoundEnabled');
 }
 
-export function getStartSpeakingSound(): boolean {
-  return store.get('startSpeakingSound');
+export function getIsStartSpeakingSoundEnabled(): boolean {
+  return store.get('isStartSpeakingSoundEnabled');
 }
 
-export function getStopSpeakingSound(): boolean {
-  return store.get('stopSpeakingSound');
+export function getIsStopSpeakingSoundEnabled(): boolean {
+  return store.get('isStopSpeakingSoundEnabled');
 }
 
-export function getReceiveDirectMessageSound(): boolean {
-  return store.get('receiveDirectMessageSound');
+export function getIsReceiveDirectMessageSoundEnabled(): boolean {
+  return store.get('isReceiveDirectMessageSoundEnabled');
 }
 
-export function getReceiveChannelMessageSound(): boolean {
-  return store.get('receiveChannelMessageSound');
+export function getIsReceiveChannelMessageSoundEnabled(): boolean {
+  return store.get('isReceiveChannelMessageSoundEnabled');
 }
 
-export function getAutoCheckForUpdates(): boolean {
-  return store.get('autoCheckForUpdates');
+export function getIsAutoCheckForUpdatesEnabled(): boolean {
+  return store.get('isAutoCheckForUpdatesEnabled');
 }
 
 export function getUpdateCheckInterval(): number {
@@ -177,24 +177,24 @@ export function getLanguage(): Types.LanguageKey {
   return store.get('language');
 }
 
-export function setAutoLogin(enable: boolean = false): void {
-  store.set('autoLogin', enable);
-  eventEmitter.emit('auto-login', enable);
+export function setIsAutoLoginEnabled(enable: boolean = false): void {
+  store.set('isAutoLoginEnabled', enable);
+  eventEmitter.emit('is-auto-login-enabled', enable);
 }
 
-export function setAutoLaunch(enable: boolean = false): void {
-  store.set('autoLaunch', enable);
-  eventEmitter.emit('auto-launch', enable);
+export function setIsAutoLaunchEnabled(enable: boolean = false): void {
+  store.set('isAutoLaunchEnabled', enable);
+  eventEmitter.emit('is-auto-launch-enabled', enable);
 }
 
-export function setAlwaysOnTop(enable: boolean = false): void {
-  store.set('alwaysOnTop', enable);
-  eventEmitter.emit('always-on-top', enable);
+export function setIsAlwaysOnTop(enable: boolean = false): void {
+  store.set('isAlwaysOnTop', enable);
+  eventEmitter.emit('is-always-on-top', enable);
 }
 
-export function setStatusAutoIdle(enable: boolean = false): void {
-  store.set('statusAutoIdle', enable);
-  eventEmitter.emit('status-auto-idle', enable);
+export function setIsStatusAutoIdleEnabled(enable: boolean = false): void {
+  store.set('isStatusAutoIdleEnabled', enable);
+  eventEmitter.emit('is-status-auto-idle-enabled', enable);
 }
 
 export function setStatusAutoIdleMinutes(minutes: number = 10): void {
@@ -202,9 +202,9 @@ export function setStatusAutoIdleMinutes(minutes: number = 10): void {
   eventEmitter.emit('status-auto-idle-minutes', minutes);
 }
 
-export function setStatusAutoDnd(enable: boolean = false): void {
-  store.set('statusAutoDnd', enable);
-  eventEmitter.emit('status-auto-dnd', enable);
+export function setIsStatusAutoDndEnabled(enable: boolean = false): void {
+  store.set('isStatusAutoDndEnabled', enable);
+  eventEmitter.emit('is-status-auto-dnd-enabled', enable);
 }
 
 export function setChannelUIMode(mode: Types.ChannelUIMode = 'classic'): void {
@@ -247,9 +247,9 @@ export function setRecordSavePath(path: string = ''): void {
   eventEmitter.emit('record-save-path', path);
 }
 
-export function setMixEffect(enable: boolean = false): void {
-  store.set('mixEffect', enable);
-  eventEmitter.emit('mix-effect', enable);
+export function setIsMixEffectEnabled(enable: boolean = false): void {
+  store.set('isMixEffectEnabled', enable);
+  eventEmitter.emit('is-mix-effect-enabled', enable);
 }
 
 export function setMixEffectType(type: string = ''): void {
@@ -257,29 +257,29 @@ export function setMixEffectType(type: string = ''): void {
   eventEmitter.emit('mix-effect-type', type);
 }
 
-export function setAutoMixSetting(enable: boolean = false): void {
-  store.set('autoMixSetting', enable);
-  eventEmitter.emit('auto-mix-setting', enable);
+export function setIsAutoMixSettingEnabled(enable: boolean = false): void {
+  store.set('isAutoMixSettingEnabled', enable);
+  eventEmitter.emit('is-auto-mix-setting-enabled', enable);
 }
 
-export function setEchoCancellation(enable: boolean = false): void {
-  store.set('echoCancellation', enable);
-  eventEmitter.emit('echo-cancellation', enable);
+export function setIsEchoCancellationEnabled(enable: boolean = false): void {
+  store.set('isEchoCancellationEnabled', enable);
+  eventEmitter.emit('is-echo-cancellation-enabled', enable);
 }
 
-export function setNoiseCancellation(enable: boolean = false): void {
-  store.set('noiseCancellation', enable);
-  eventEmitter.emit('noise-cancellation', enable);
+export function setIsNoiseCancellationEnabled(enable: boolean = false): void {
+  store.set('isNoiseCancellationEnabled', enable);
+  eventEmitter.emit('is-noise-cancellation-enabled', enable);
 }
 
-export function setMicrophoneAmplification(enable: boolean = false): void {
-  store.set('microphoneAmplification', enable);
-  eventEmitter.emit('microphone-amplification', enable);
+export function setIsMicrophoneAmplificationEnabled(enable: boolean = false): void {
+  store.set('isMicrophoneAmplificationEnabled', enable);
+  eventEmitter.emit('is-microphone-amplification-enabled', enable);
 }
 
-export function setManualMixMode(enable: boolean = false): void {
-  store.set('manualMixMode', enable);
-  eventEmitter.emit('manual-mix-mode', enable);
+export function setIsManualMixMode(enable: boolean = false): void {
+  store.set('isManualMixMode', enable);
+  eventEmitter.emit('is-manual-mix-mode', enable);
 }
 
 export function setMixMode(mode: Types.MixMode = 'all'): void {
@@ -332,39 +332,39 @@ export function setDisableAllSoundEffect(enable: boolean = false): void {
   eventEmitter.emit('disable-all-sound-effect', enable);
 }
 
-export function setEnterVoiceChannelSound(enable: boolean = false): void {
-  store.set('enterVoiceChannelSound', enable);
-  eventEmitter.emit('enter-voice-channel-sound', enable);
+export function setIsEnterVoiceChannelSoundEnabled(enable: boolean = false): void {
+  store.set('isEnterVoiceChannelSoundEnabled', enable);
+  eventEmitter.emit('is-enter-voice-channel-sound-enabled', enable);
 }
 
-export function setLeaveVoiceChannelSound(enable: boolean = false): void {
-  store.set('leaveVoiceChannelSound', enable);
-  eventEmitter.emit('leave-voice-channel-sound', enable);
+export function setIsLeaveVoiceChannelSoundEnabled(enable: boolean = false): void {
+  store.set('isLeaveVoiceChannelSoundEnabled', enable);
+  eventEmitter.emit('is-leave-voice-channel-sound-enabled', enable);
 }
 
-export function setStartSpeakingSound(enable: boolean = false): void {
-  store.set('startSpeakingSound', enable);
-  eventEmitter.emit('start-speaking-sound', enable);
+export function setIsStartSpeakingSoundEnabled(enable: boolean = false): void {
+  store.set('isStartSpeakingSoundEnabled', enable);
+  eventEmitter.emit('is-start-speaking-sound-enabled', enable);
 }
 
-export function setStopSpeakingSound(enable: boolean = false): void {
-  store.set('stopSpeakingSound', enable);
-  eventEmitter.emit('stop-speaking-sound', enable);
+export function setIsStopSpeakingSoundEnabled(enable: boolean = false): void {
+  store.set('isStopSpeakingSoundEnabled', enable);
+  eventEmitter.emit('is-stop-speaking-sound-enabled', enable);
 }
 
-export function setReceiveDirectMessageSound(enable: boolean = false): void {
-  store.set('receiveDirectMessageSound', enable);
-  eventEmitter.emit('receive-direct-message-sound', enable);
+export function setIsReceiveDirectMessageSoundEnabled(enable: boolean = false): void {
+  store.set('isReceiveDirectMessageSoundEnabled', enable);
+  eventEmitter.emit('is-receive-direct-message-sound-enabled', enable);
 }
 
-export function setReceiveChannelMessageSound(enable: boolean = false): void {
-  store.set('receiveChannelMessageSound', enable);
-  eventEmitter.emit('receive-channel-message-sound', enable);
+export function setIsReceiveChannelMessageSoundEnabled(enable: boolean = false): void {
+  store.set('isReceiveChannelMessageSoundEnabled', enable);
+  eventEmitter.emit('is-receive-channel-message-sound-enabled', enable);
 }
 
-export function setAutoCheckForUpdates(enable: boolean = false): void {
-  store.set('autoCheckForUpdates', enable);
-  eventEmitter.emit('auto-check-for-updates', enable);
+export function setIsAutoCheckForUpdatesEnabled(enable: boolean = false): void {
+  store.set('isAutoCheckForUpdatesEnabled', enable);
+  eventEmitter.emit('is-auto-check-for-updates-enabled', enable);
 }
 
 export function setUpdateCheckInterval(interval: number = 1 * 60 * 1000): void {

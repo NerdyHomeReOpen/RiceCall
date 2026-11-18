@@ -68,11 +68,11 @@ const ALLOWED_ATTR: string[] = [
 
 interface MarkdownContentProps {
   markdownText: string;
-  selectable?: boolean;
+  isSelectable?: boolean;
   imageSize?: 'small' | 'medium' | 'big';
 }
 
-const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, selectable = true, imageSize = 'small' }) => {
+const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownText, isSelectable = true, imageSize = 'small' }) => {
   const { selectImage } = useImageViewer();
 
   const components: Components = {
@@ -117,7 +117,7 @@ const MarkdownContent: React.FC<MarkdownContentProps> = React.memo(({ markdownTe
   const converted = useMemo(() => fromTags(sanitized), [sanitized]);
 
   return (
-    <div className={`markdown-content image-size-${imageSize}`} style={{ userSelect: selectable ? 'text' : 'none' }}>
+    <div className={`markdown-content image-size-${imageSize}`} style={{ userSelect: isSelectable ? 'text' : 'none' }}>
       <ReactMarkdown remarkPlugins={[]} rehypePlugins={[rehypeRaw, rehypeHighlight]} components={components} skipHtml={false} unwrapDisallowed={false}>
         {converted}
       </ReactMarkdown>

@@ -185,13 +185,13 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
   }, [startSpeak, stopSpeak, toggleMainWindows, toggleUpVolume, toggleDownVolume, toggleSpeakerMute, toggleMicMute]);
 
   useEffect(() => {
-    const changeStatusAutoIdle = (enable: boolean) => {
+    const changeIsStatusAutoIdleEnabled = (enable: boolean) => {
       new Logger('ACTION_SCANNER').info(`Status auto idle updated: ${enable}`);
       idleCheck.current = enable;
       lastActiveRef.current = Date.now();
     };
-    changeStatusAutoIdle(ipc.systemSettings.statusAutoIdle.get());
-    const unsub = ipc.systemSettings.statusAutoIdle.onUpdate(changeStatusAutoIdle);
+    changeIsStatusAutoIdleEnabled(ipc.systemSettings.isStatusAutoIdleEnabled.get());
+    const unsub = ipc.systemSettings.isStatusAutoIdleEnabled.onUpdate(changeIsStatusAutoIdleEnabled);
     return () => unsub();
   }, []);
 

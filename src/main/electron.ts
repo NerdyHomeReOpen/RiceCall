@@ -278,7 +278,7 @@ export async function configureAutoUpdater(): Promise<void> {
     _isUpdateNotified = false;
   });
 
-  if (store.get('autoCheckForUpdates')) startCheckForUpdates();
+  if (store.get('isAutoCheckForUpdatesEnabled')) startCheckForUpdates();
 }
 
 export function configureLogger(): void {
@@ -297,13 +297,13 @@ export const store = new Store<Types.StoreType>({
     language: getLanguage(),
     customThemes: [],
     currentTheme: null,
-    autoLogin: false,
-    autoLaunch: false,
-    alwaysOnTop: false,
+    isAutoLoginEnabled: false,
+    isAutoLaunchEnabled: false,
+    isAlwaysOnTop: false,
     closeToTray: false,
-    statusAutoIdle: false,
+    isStatusAutoIdleEnabled: false,
     statusAutoIdleMinutes: 10,
-    statusAutoDnd: false,
+    isStatusAutoDndEnabled: false,
     channelUIMode: 'classic',
     font: '',
     fontSize: 13,
@@ -311,13 +311,13 @@ export const store = new Store<Types.StoreType>({
     outputAudioDevice: '',
     recordFormat: 'wav',
     recordSavePath: app.getPath('documents'),
-    mixEffect: false,
+    isMixEffectEnabled: false,
     mixEffectType: '',
-    autoMixSetting: false,
-    echoCancellation: false,
-    noiseCancellation: false,
-    microphoneAmplification: false,
-    manualMixMode: false,
+    isAutoMixSettingEnabled: false,
+    isEchoCancellationEnabled: false,
+    isNoiseCancellationEnabled: false,
+    isMicrophoneAmplificationEnabled: false,
+    isManualMixMode: false,
     mixMode: 'all',
     speakingMode: 'auto',
     defaultSpeakingKey: '',
@@ -329,14 +329,14 @@ export const store = new Store<Types.StoreType>({
     hotKeyToggleSpeaker: '',
     hotKeyToggleMicrophone: '',
     disableAllSoundEffect: false,
-    enterVoiceChannelSound: true,
-    leaveVoiceChannelSound: true,
-    startSpeakingSound: true,
-    stopSpeakingSound: true,
-    receiveDirectMessageSound: true,
-    receiveChannelMessageSound: true,
-    dontShowDisclaimer: false,
-    autoCheckForUpdates: true,
+    isEnterVoiceChannelSoundEnabled: true,
+    isLeaveVoiceChannelSoundEnabled: true,
+    isStartSpeakingSoundEnabled: true,
+    isStopSpeakingSoundEnabled: true,
+    isReceiveDirectMessageSoundEnabled: true,
+    isReceiveChannelMessageSoundEnabled: true,
+    isDisclaimerHidden: false,
+    isAutoCheckForUpdatesEnabled: true,
     updateCheckInterval: 1 * 60 * 1000,
     updateChannel: 'latest',
     env: 'prod',
@@ -344,7 +344,7 @@ export const store = new Store<Types.StoreType>({
   },
 });
 
-export function setAutoLaunch(enable: boolean): void {
+export function setIsAutoLaunchEnabled(enable: boolean): void {
   try {
     app.setLoginItemSettings({
       openAtLogin: enable,
@@ -369,12 +369,12 @@ export function isAutoLaunchEnabled(): boolean {
 
 export function getSettings(): Types.SystemSettings {
   return {
-    autoLogin: store.get('autoLogin'),
-    autoLaunch: isAutoLaunchEnabled(),
-    alwaysOnTop: store.get('alwaysOnTop'),
-    statusAutoIdle: store.get('statusAutoIdle'),
+    isAutoLoginEnabled: store.get('isAutoLoginEnabled'),
+    isAutoLaunchEnabled: isAutoLaunchEnabled(),
+    isAlwaysOnTop: store.get('isAlwaysOnTop'),
+    isStatusAutoIdleEnabled: store.get('isStatusAutoIdleEnabled'),
     statusAutoIdleMinutes: store.get('statusAutoIdleMinutes'),
-    statusAutoDnd: store.get('statusAutoDnd'),
+    isStatusAutoDndEnabled: store.get('isStatusAutoDndEnabled'),
     channelUIMode: store.get('channelUIMode'),
     closeToTray: store.get('closeToTray'),
     font: store.get('font'),
@@ -383,13 +383,13 @@ export function getSettings(): Types.SystemSettings {
     outputAudioDevice: store.get('outputAudioDevice'),
     recordFormat: store.get('recordFormat'),
     recordSavePath: store.get('recordSavePath'),
-    mixEffect: store.get('mixEffect'),
+    isMixEffectEnabled: store.get('isMixEffectEnabled'),
     mixEffectType: store.get('mixEffectType'),
-    autoMixSetting: store.get('autoMixSetting'),
-    echoCancellation: store.get('echoCancellation'),
-    noiseCancellation: store.get('noiseCancellation'),
-    microphoneAmplification: store.get('microphoneAmplification'),
-    manualMixMode: store.get('manualMixMode'),
+    isAutoMixSettingEnabled: store.get('isAutoMixSettingEnabled'),
+    isEchoCancellationEnabled: store.get('isEchoCancellationEnabled'),
+    isNoiseCancellationEnabled: store.get('isNoiseCancellationEnabled'),
+    isMicrophoneAmplificationEnabled: store.get('isMicrophoneAmplificationEnabled'),
+    isManualMixMode: store.get('isManualMixMode'),
     mixMode: store.get('mixMode'),
     speakingMode: store.get('speakingMode'),
     defaultSpeakingKey: store.get('defaultSpeakingKey'),
@@ -401,13 +401,13 @@ export function getSettings(): Types.SystemSettings {
     hotKeyToggleSpeaker: store.get('hotKeyToggleSpeaker'),
     hotKeyToggleMicrophone: store.get('hotKeyToggleMicrophone'),
     disableAllSoundEffect: store.get('disableAllSoundEffect'),
-    enterVoiceChannelSound: store.get('enterVoiceChannelSound'),
-    leaveVoiceChannelSound: store.get('leaveVoiceChannelSound'),
-    startSpeakingSound: store.get('startSpeakingSound'),
-    stopSpeakingSound: store.get('stopSpeakingSound'),
-    receiveDirectMessageSound: store.get('receiveDirectMessageSound'),
-    receiveChannelMessageSound: store.get('receiveChannelMessageSound'),
-    autoCheckForUpdates: store.get('autoCheckForUpdates'),
+    isEnterVoiceChannelSoundEnabled: store.get('isEnterVoiceChannelSoundEnabled'),
+    isLeaveVoiceChannelSoundEnabled: store.get('isLeaveVoiceChannelSoundEnabled'),
+    isStartSpeakingSoundEnabled: store.get('isStartSpeakingSoundEnabled'),
+    isStopSpeakingSoundEnabled: store.get('isStopSpeakingSoundEnabled'),
+    isReceiveDirectMessageSoundEnabled: store.get('isReceiveDirectMessageSoundEnabled'),
+    isReceiveChannelMessageSoundEnabled: store.get('isReceiveChannelMessageSoundEnabled'),
+    isAutoCheckForUpdatesEnabled: store.get('isAutoCheckForUpdatesEnabled'),
     updateCheckInterval: store.get('updateCheckInterval'),
     updateChannel: store.get('updateChannel'),
   };
@@ -699,7 +699,7 @@ app.on('ready', async () => {
   registerTrayHandlers();
   registerWindowHandlers();
 
-  if (!store.get('dontShowDisclaimer')) createPopup('aboutus', 'aboutUs');
+  if (!store.get('isDisclaimerHidden')) createPopup('aboutus', 'aboutUs');
   createAuthWindow().then((authWindow) => authWindow.showInactive());
   createMainWindow().then((mainWindow) => mainWindow.hide());
 

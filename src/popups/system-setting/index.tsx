@@ -29,28 +29,28 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
   const [inputFocus, setInputFocus] = useState<string | null>(null);
   const [conflicts, setConflicts] = useState<string[]>([]);
 
-  const handleAutoLoginChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, autoLogin: e.target.checked }));
+  const handleIsAutoLoginEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isAutoLoginEnabled: e.target.checked }));
   };
 
-  const handleAutoLaunchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, autoLaunch: e.target.checked }));
+  const handleIsAutoLaunchEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isAutoLaunchEnabled: e.target.checked }));
   };
 
-  const handleAlwaysOnTopChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, alwaysOnTop: e.target.checked }));
+  const handleIsAlwaysOnTopChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isAlwaysOnTop: e.target.checked }));
   };
 
-  const handleStatusAutoIdleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, statusAutoIdle: e.target.checked }));
+  const handleIsStatusAutoIdleEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isStatusAutoIdleEnabled: e.target.checked }));
   };
 
   const handleStatusAutoIdleMinutesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSystemSettings((prev) => ({ ...prev, statusAutoIdleMinutes: Math.max(1, Math.min(60, Number(e.target.value))) }));
   };
 
-  const handleStatusAutoDndChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, statusAutoDnd: e.target.checked }));
+  const handleIsStatusAutoDndEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isStatusAutoDndEnabled: e.target.checked }));
   };
 
   const handleChannelUIModeClassicSelect = () => {
@@ -99,16 +99,16 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
     });
   };
 
-  const handleEchoCancellationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, echoCancellation: e.target.checked }));
+  const handleIsEchoCancellationEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isEchoCancellationEnabled: e.target.checked }));
   };
 
-  const handleNoiseCancellationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, noiseCancellation: e.target.checked }));
+  const handleIsNoiseCancellationEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isNoiseCancellationEnabled: e.target.checked }));
   };
 
-  const handleMicrophoneAmplificationChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, microphoneAmplification: e.target.checked }));
+  const handleIsMicrophoneAmplificationEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isMicrophoneAmplificationEnabled: e.target.checked }));
   };
 
   const handleDefaultSpeakingModeKeyChange = () => {
@@ -159,32 +159,32 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
     setSystemSettings((prev) => ({ ...prev, disableAllSoundEffect: e.target.checked }));
   };
 
-  const handleEnableEnterVoiceChannelSoundChange = () => {
-    setSystemSettings((prev) => ({ ...prev, enterVoiceChannelSound: !prev.enterVoiceChannelSound }));
+  const handleIsEnterVoiceChannelSoundEnabledChange = () => {
+    setSystemSettings((prev) => ({ ...prev, isEnterVoiceChannelSoundEnabled: !prev.isEnterVoiceChannelSoundEnabled }));
   };
 
-  const handleEnableLeaveVoiceChannelSoundChange = () => {
-    setSystemSettings((prev) => ({ ...prev, leaveVoiceChannelSound: !prev.leaveVoiceChannelSound }));
+  const handleIsLeaveVoiceChannelSoundEnabledChange = () => {
+    setSystemSettings((prev) => ({ ...prev, isLeaveVoiceChannelSoundEnabled: !prev.isLeaveVoiceChannelSoundEnabled }));
   };
 
-  const handleEnableStartSpeakingSoundChange = () => {
-    setSystemSettings((prev) => ({ ...prev, startSpeakingSound: !prev.startSpeakingSound }));
+  const handleIsStartSpeakingSoundEnabledChange = () => {
+    setSystemSettings((prev) => ({ ...prev, isStartSpeakingSoundEnabled: !prev.isStartSpeakingSoundEnabled }));
   };
 
-  const handleEnableStopSpeakingSoundChange = () => {
-    setSystemSettings((prev) => ({ ...prev, stopSpeakingSound: !prev.stopSpeakingSound }));
+  const handleIsStopSpeakingSoundEnabledChange = () => {
+    setSystemSettings((prev) => ({ ...prev, isStopSpeakingSoundEnabled: !prev.isStopSpeakingSoundEnabled }));
   };
 
-  const handleEnableReceiveDirectMessageSoundChange = () => {
-    setSystemSettings((prev) => ({ ...prev, receiveDirectMessageSound: !prev.receiveDirectMessageSound }));
+  const handleIsReceiveDirectMessageSoundEnabledChange = () => {
+    setSystemSettings((prev) => ({ ...prev, isReceiveDirectMessageSoundEnabled: !prev.isReceiveDirectMessageSoundEnabled }));
   };
 
-  const handleEnableReceiveChannelMessageSoundChange = () => {
-    setSystemSettings((prev) => ({ ...prev, receiveChannelMessageSound: !prev.receiveChannelMessageSound }));
+  const handleIsReceiveChannelMessageSoundEnabledChange = () => {
+    setSystemSettings((prev) => ({ ...prev, isReceiveChannelMessageSoundEnabled: !prev.isReceiveChannelMessageSoundEnabled }));
   };
 
-  const handleAutoCheckForUpdatesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSystemSettings((prev) => ({ ...prev, autoCheckForUpdates: e.target.checked }));
+  const handleIsAutoCheckForUpdatesEnabledChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSystemSettings((prev) => ({ ...prev, isAutoCheckForUpdatesEnabled: e.target.checked }));
   };
 
   const handleUpdateChannelChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -381,22 +381,22 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
               <div className="label">{t('general-setting')}</div>
             </div>
             <div className={`input-box row disabled`}>
-              <input name="autoLogin" type="checkbox" checked={systemSettings.autoLogin} onChange={handleAutoLoginChange} />
+              <input name="isAutoLoginEnabled" type="checkbox" checked={systemSettings.isAutoLoginEnabled} onChange={handleIsAutoLoginEnabledChange} />
               <div className="label">{t('auto-login-label')}</div>
             </div>
             <div className="input-box row">
-              <input name="autoLaunch" type="checkbox" checked={systemSettings.autoLaunch} onChange={handleAutoLaunchChange} />
+              <input name="isAutoLaunchEnabled" type="checkbox" checked={systemSettings.isAutoLaunchEnabled} onChange={handleIsAutoLaunchEnabledChange} />
               <div className="label">{t('auto-launch-label')}</div>
             </div>
             <div className="input-box row">
-              <input name="alwaysOnTop" type="checkbox" checked={systemSettings.alwaysOnTop} onChange={handleAlwaysOnTopChange} />
+              <input name="isAlwaysOnTop" type="checkbox" checked={systemSettings.isAlwaysOnTop} onChange={handleIsAlwaysOnTopChange} />
               <div className="label">{t('always-on-top-label')}</div>
             </div>
             <div className="label-header">
               <div className="label">{t('status-setting')}</div>
             </div>
             <div className="input-box row">
-              <input name="status-auto-idle" type="checkbox" checked={systemSettings.statusAutoIdle} onChange={handleStatusAutoIdleChange} />
+              <input name="status-auto-idle" type="checkbox" checked={systemSettings.isStatusAutoIdleEnabled} onChange={handleIsStatusAutoIdleEnabledChange} />
               <div className="label">
                 {t('status-auto-idle-label-1')}
                 <input
@@ -412,7 +412,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
               </div>
             </div>
             <div className={`input-box row disabled`}>
-              <input name="status-auto-dnd" type="checkbox" checked={systemSettings.statusAutoDnd} onChange={handleStatusAutoDndChange} />
+              <input name="status-auto-dnd" type="checkbox" checked={systemSettings.isStatusAutoDndEnabled} onChange={handleIsStatusAutoDndEnabledChange} />
               <div className="label">{t('status-auto-dnd-label') + ' ' + t('soon')}</div>
             </div>
             <div className="label-header">
@@ -527,15 +527,15 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
             </div>
             {}
             <div className="input-box row">
-              <input name="echo-cancellation" type="checkbox" checked={systemSettings.echoCancellation} onChange={handleEchoCancellationChange} />
+              <input name="echo-cancellation" type="checkbox" checked={systemSettings.isEchoCancellationEnabled} onChange={handleIsEchoCancellationEnabledChange} />
               <div className="label">{t('echo-cancellation-label')}</div>
             </div>
             <div className="input-box row">
-              <input name="noise-cancellation" type="checkbox" checked={systemSettings.noiseCancellation} onChange={handleNoiseCancellationChange} />
+              <input name="noise-cancellation" type="checkbox" checked={systemSettings.isNoiseCancellationEnabled} onChange={handleIsNoiseCancellationEnabledChange} />
               <div className="label">{t('noise-cancellation-label')}</div>
             </div>
             <div className="input-box row">
-              <input name="microphone-amplification" type="checkbox" checked={systemSettings.microphoneAmplification} onChange={handleMicrophoneAmplificationChange} />
+              <input name="microphone-amplification" type="checkbox" checked={systemSettings.isMicrophoneAmplificationEnabled} onChange={handleIsMicrophoneAmplificationEnabledChange} />
               <div className="label">{t('microphone-amplification-label')}</div>
             </div>
             {}
@@ -724,8 +724,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                     <td>
                       <div className={styles['sound-effect-preview-button']} onClick={handlePlayEnterVoiceChannelSound} />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleEnableEnterVoiceChannelSoundChange}>
-                      {!systemSettings.enterVoiceChannelSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
+                    <td className={styles['sound-effect-enable-text']} onClick={handleIsEnterVoiceChannelSoundEnabledChange}>
+                      {!systemSettings.isEnterVoiceChannelSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
@@ -733,8 +733,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                     <td>
                       <div className={styles['sound-effect-preview-button']} onClick={handlePlayLeaveVoiceChannelSound} />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleEnableLeaveVoiceChannelSoundChange}>
-                      {!systemSettings.leaveVoiceChannelSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
+                    <td className={styles['sound-effect-enable-text']} onClick={handleIsLeaveVoiceChannelSoundEnabledChange}>
+                      {!systemSettings.isLeaveVoiceChannelSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
@@ -742,8 +742,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                     <td>
                       <div className={styles['sound-effect-preview-button']} onClick={handlePlayStartSpeakingSound} />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleEnableStartSpeakingSoundChange}>
-                      {!systemSettings.startSpeakingSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
+                    <td className={styles['sound-effect-enable-text']} onClick={handleIsStartSpeakingSoundEnabledChange}>
+                      {!systemSettings.isStartSpeakingSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
@@ -751,8 +751,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                     <td>
                       <div className={styles['sound-effect-preview-button']} onClick={handlePlayStopSpeakingSound} />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleEnableStopSpeakingSoundChange}>
-                      {!systemSettings.stopSpeakingSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
+                    <td className={styles['sound-effect-enable-text']} onClick={handleIsStopSpeakingSoundEnabledChange}>
+                      {!systemSettings.isStopSpeakingSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
@@ -760,8 +760,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                     <td>
                       <div className={styles['sound-effect-preview-button']} onClick={handlePlayReceiveDirectMessageSound} />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleEnableReceiveDirectMessageSoundChange}>
-                      {!systemSettings.receiveDirectMessageSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
+                    <td className={styles['sound-effect-enable-text']} onClick={handleIsReceiveDirectMessageSoundEnabledChange}>
+                      {!systemSettings.isReceiveDirectMessageSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
@@ -769,8 +769,8 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                     <td>
                       <div className={styles['sound-effect-preview-button']} onClick={handlePlayReceiveChannelMessageSound} />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleEnableReceiveChannelMessageSoundChange}>
-                      {!systemSettings.receiveChannelMessageSound || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
+                    <td className={styles['sound-effect-enable-text']} onClick={handleIsReceiveChannelMessageSoundEnabledChange}>
+                      {!systemSettings.isReceiveChannelMessageSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                 </tbody>
@@ -785,7 +785,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
             </div>
             <div className="row">
               <div className="input-box row">
-                <input name="auto-check-for-updates" type="checkbox" checked={systemSettings.autoCheckForUpdates} onChange={handleAutoCheckForUpdatesChange} />
+                <input name="auto-check-for-updates" type="checkbox" checked={systemSettings.isAutoCheckForUpdatesEnabled} onChange={handleIsAutoCheckForUpdatesEnabledChange} />
                 <div className="label">{t('auto-check-for-updates-label')}</div>
               </div>
               <div className="button" onClick={handleCheckForUpdatesBtnClick}>

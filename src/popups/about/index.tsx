@@ -40,7 +40,7 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   };
 
   const handleCloseBtnClick = () => {
-    if (shouldHideNextTime) ipc.dontShowDisclaimerNextTime();
+    if (shouldHideNextTime) ipc.hideDisclaimerNextTime();
     ipc.popup.close(id);
   };
 

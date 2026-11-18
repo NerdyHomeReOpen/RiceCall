@@ -4,12 +4,12 @@ import { modules } from '@/main/modules';
 
 export const systemSettings = {
   set: (settings: Partial<Types.SystemSettings>): void => {
-    if (settings.autoLogin !== undefined) modules.default.setAutoLogin(settings.autoLogin);
-    if (settings.autoLaunch !== undefined) modules.default.setAutoLaunch(settings.autoLaunch);
-    if (settings.alwaysOnTop !== undefined) modules.default.setAlwaysOnTop(settings.alwaysOnTop);
-    if (settings.statusAutoIdle !== undefined) modules.default.setStatusAutoIdle(settings.statusAutoIdle);
+    if (settings.isAutoLoginEnabled !== undefined) modules.default.setIsAutoLoginEnabled(settings.isAutoLoginEnabled);
+    if (settings.isAutoLaunchEnabled !== undefined) modules.default.setIsAutoLaunchEnabled(settings.isAutoLaunchEnabled);
+    if (settings.isAlwaysOnTop !== undefined) modules.default.setIsAlwaysOnTop(settings.isAlwaysOnTop);
+    if (settings.isStatusAutoIdleEnabled !== undefined) modules.default.setIsStatusAutoIdleEnabled(settings.isStatusAutoIdleEnabled);
     if (settings.statusAutoIdleMinutes !== undefined) modules.default.setStatusAutoIdleMinutes(settings.statusAutoIdleMinutes);
-    if (settings.statusAutoDnd !== undefined) modules.default.setStatusAutoDnd(settings.statusAutoDnd);
+    if (settings.isStatusAutoDndEnabled !== undefined) modules.default.setIsStatusAutoDndEnabled(settings.isStatusAutoDndEnabled);
     if (settings.channelUIMode !== undefined) modules.default.setChannelUIMode(settings.channelUIMode);
     if (settings.closeToTray !== undefined) modules.default.setCloseToTray(settings.closeToTray);
     if (settings.font !== undefined) modules.default.setFont(settings.font);
@@ -18,13 +18,13 @@ export const systemSettings = {
     if (settings.outputAudioDevice !== undefined) modules.default.setOutputAudioDevice(settings.outputAudioDevice);
     if (settings.recordFormat !== undefined) modules.default.setRecordFormat(settings.recordFormat);
     if (settings.recordSavePath !== undefined) modules.default.setRecordSavePath(settings.recordSavePath);
-    if (settings.mixEffect !== undefined) modules.default.setMixEffect(settings.mixEffect);
+    if (settings.isMixEffectEnabled !== undefined) modules.default.setIsMixEffectEnabled(settings.isMixEffectEnabled);
     if (settings.mixEffectType !== undefined) modules.default.setMixEffectType(settings.mixEffectType);
-    if (settings.autoMixSetting !== undefined) modules.default.setAutoMixSetting(settings.autoMixSetting);
-    if (settings.echoCancellation !== undefined) modules.default.setEchoCancellation(settings.echoCancellation);
-    if (settings.noiseCancellation !== undefined) modules.default.setNoiseCancellation(settings.noiseCancellation);
-    if (settings.microphoneAmplification !== undefined) modules.default.setMicrophoneAmplification(settings.microphoneAmplification);
-    if (settings.manualMixMode !== undefined) modules.default.setManualMixMode(settings.manualMixMode);
+    if (settings.isAutoMixSettingEnabled !== undefined) modules.default.setIsAutoMixSettingEnabled(settings.isAutoMixSettingEnabled);
+    if (settings.isEchoCancellationEnabled !== undefined) modules.default.setIsEchoCancellationEnabled(settings.isEchoCancellationEnabled);
+    if (settings.isNoiseCancellationEnabled !== undefined) modules.default.setIsNoiseCancellationEnabled(settings.isNoiseCancellationEnabled);
+    if (settings.isMicrophoneAmplificationEnabled !== undefined) modules.default.setIsMicrophoneAmplificationEnabled(settings.isMicrophoneAmplificationEnabled);
+    if (settings.isManualMixMode !== undefined) modules.default.setIsManualMixMode(settings.isManualMixMode);
     if (settings.mixMode !== undefined) modules.default.setMixMode(settings.mixMode);
     if (settings.speakingMode !== undefined) modules.default.setSpeakingMode(settings.speakingMode);
     if (settings.defaultSpeakingKey !== undefined) modules.default.setDefaultSpeakingKey(settings.defaultSpeakingKey);
@@ -35,13 +35,13 @@ export const systemSettings = {
     if (settings.hotKeyToggleSpeaker !== undefined) modules.default.setHotKeyToggleSpeaker(settings.hotKeyToggleSpeaker);
     if (settings.hotKeyToggleMicrophone !== undefined) modules.default.setHotKeyToggleMicrophone(settings.hotKeyToggleMicrophone);
     if (settings.disableAllSoundEffect !== undefined) modules.default.setDisableAllSoundEffect(settings.disableAllSoundEffect);
-    if (settings.enterVoiceChannelSound !== undefined) modules.default.setEnterVoiceChannelSound(settings.enterVoiceChannelSound);
-    if (settings.leaveVoiceChannelSound !== undefined) modules.default.setLeaveVoiceChannelSound(settings.leaveVoiceChannelSound);
-    if (settings.startSpeakingSound !== undefined) modules.default.setStartSpeakingSound(settings.startSpeakingSound);
-    if (settings.stopSpeakingSound !== undefined) modules.default.setStopSpeakingSound(settings.stopSpeakingSound);
-    if (settings.receiveDirectMessageSound !== undefined) modules.default.setReceiveDirectMessageSound(settings.receiveDirectMessageSound);
-    if (settings.receiveChannelMessageSound !== undefined) modules.default.setReceiveChannelMessageSound(settings.receiveChannelMessageSound);
-    if (settings.autoCheckForUpdates !== undefined) modules.default.setAutoCheckForUpdates(settings.autoCheckForUpdates);
+    if (settings.isEnterVoiceChannelSoundEnabled !== undefined) modules.default.setIsEnterVoiceChannelSoundEnabled(settings.isEnterVoiceChannelSoundEnabled);
+    if (settings.isLeaveVoiceChannelSoundEnabled !== undefined) modules.default.setIsLeaveVoiceChannelSoundEnabled(settings.isLeaveVoiceChannelSoundEnabled);
+    if (settings.isStartSpeakingSoundEnabled !== undefined) modules.default.setIsStartSpeakingSoundEnabled(settings.isStartSpeakingSoundEnabled);
+    if (settings.isStopSpeakingSoundEnabled !== undefined) modules.default.setIsStopSpeakingSoundEnabled(settings.isStopSpeakingSoundEnabled);
+    if (settings.isReceiveDirectMessageSoundEnabled !== undefined) modules.default.setIsReceiveDirectMessageSoundEnabled(settings.isReceiveDirectMessageSoundEnabled);
+    if (settings.isReceiveChannelMessageSoundEnabled !== undefined) modules.default.setIsReceiveChannelMessageSoundEnabled(settings.isReceiveChannelMessageSoundEnabled);
+    if (settings.isAutoCheckForUpdatesEnabled !== undefined) modules.default.setIsAutoCheckForUpdatesEnabled(settings.isAutoCheckForUpdatesEnabled);
     if (settings.updateCheckInterval !== undefined) modules.default.setUpdateCheckInterval(settings.updateCheckInterval);
     if (settings.updateChannel !== undefined) modules.default.setUpdateChannel(settings.updateChannel);
   },
@@ -50,51 +50,51 @@ export const systemSettings = {
     return modules.default.getSystemSettings();
   },
 
-  autoLogin: {
+  isAutoLoginEnabled: {
     set: (enable: boolean): void => {
-      modules.default.setAutoLogin(enable);
+      modules.default.setIsAutoLoginEnabled(enable);
     },
     get: (): boolean => {
-      return modules.default.getAutoLogin();
+      return modules.default.getIsAutoLoginEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('auto-login', callback);
+      return modules.default.listen('is-auto-login-enabled', callback);
     },
   },
 
-  autoLaunch: {
+  isAutoLaunchEnabled: {
     set: (enable: boolean): void => {
-      modules.default.setAutoLaunch(enable);
+      modules.default.setIsAutoLaunchEnabled(enable);
     },
     get: (): boolean => {
-      return modules.default.getAutoLaunch();
+      return modules.default.getIsAutoLaunchEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('auto-launch', callback);
+      return modules.default.listen('is-auto-launch-enabled', callback);
     },
   },
 
-  alwaysOnTop: {
+  isAlwaysOnTop: {
     set: (enable: boolean): void => {
-      modules.default.setAlwaysOnTop(enable);
+      modules.default.setIsAlwaysOnTop(enable);
     },
     get: (): boolean => {
-      return modules.default.getAlwaysOnTop();
+      return modules.default.getIsAlwaysOnTop();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('always-on-top', callback);
+      return modules.default.listen('is-always-on-top', callback);
     },
   },
 
-  statusAutoIdle: {
+  isStatusAutoIdleEnabled: {
     set: (enable: boolean): void => {
-      modules.default.setStatusAutoIdle(enable);
+      modules.default.setIsStatusAutoIdleEnabled(enable);
     },
     get: (): boolean => {
-      return modules.default.getStatusAutoIdle();
+      return modules.default.getIsStatusAutoIdleEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('status-auto-idle', callback);
+      return modules.default.listen('is-status-auto-idle-enabled', callback);
     },
   },
 
@@ -110,15 +110,15 @@ export const systemSettings = {
     },
   },
 
-  statusAutoDnd: {
+  isStatusAutoDndEnabled: {
     set: (enable: boolean): void => {
-      modules.default.setStatusAutoDnd(enable);
+      modules.default.setIsStatusAutoDndEnabled(enable);
     },
     get: (): boolean => {
-      return modules.default.getStatusAutoDnd();
+      return modules.default.getIsStatusAutoDndEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('status-auto-dnd', callback);
+      return modules.default.listen('is-status-auto-dnd-enabled', callback);
     },
   },
 
@@ -218,15 +218,15 @@ export const systemSettings = {
     },
   },
 
-  mixEffect: {
+  isMixEffectEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setMixEffect(enabled);
+      modules.default.setIsMixEffectEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getMixEffect();
+      return modules.default.getIsMixEffectEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('mix-effect', callback);
+      return modules.default.listen('is-mix-effect-enabled', callback);
     },
   },
 
@@ -242,63 +242,63 @@ export const systemSettings = {
     },
   },
 
-  autoMixSetting: {
+  isAutoMixSettingEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setAutoMixSetting(enabled);
+      modules.default.setIsAutoMixSettingEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getAutoMixSetting();
+      return modules.default.getIsAutoMixSettingEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('auto-mix-setting', callback);
+      return modules.default.listen('is-auto-mix-setting-enabled', callback);
     },
   },
 
-  echoCancellation: {
+  isEchoCancellationEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setEchoCancellation(enabled);
+      modules.default.setIsEchoCancellationEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getEchoCancellation();
+      return modules.default.getIsEchoCancellationEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('echo-cancellation', callback);
+      return modules.default.listen('is-echo-cancellation-enabled', callback);
     },
   },
 
-  noiseCancellation: {
+  isNoiseCancellationEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setNoiseCancellation(enabled);
+      modules.default.setIsNoiseCancellationEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getNoiseCancellation();
+      return modules.default.getIsNoiseCancellationEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('noise-cancellation', callback);
+      return modules.default.listen('is-noise-cancellation-enabled', callback);
     },
   },
 
-  microphoneAmplification: {
+  isMicrophoneAmplificationEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setMicrophoneAmplification(enabled);
+      modules.default.setIsMicrophoneAmplificationEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getMicrophoneAmplification();
+      return modules.default.getIsMicrophoneAmplificationEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('microphone-amplification', callback);
+      return modules.default.listen('is-microphone-amplification-enabled', callback);
     },
   },
 
-  manualMixMode: {
+  isManualMixMode: {
     set: (enabled: boolean): void => {
-      modules.default.setManualMixMode(enabled);
+      modules.default.setIsManualMixMode(enabled);
     },
     get: (): boolean => {
-      return modules.default.getManualMixMode();
+      return modules.default.getIsManualMixMode();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('manual-mix-mode', callback);
+      return modules.default.listen('is-manual-mix-mode', callback);
     },
   },
 
@@ -422,87 +422,87 @@ export const systemSettings = {
     },
   },
 
-  enterVoiceChannelSound: {
+  isEnterVoiceChannelSoundEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setEnterVoiceChannelSound(enabled);
+      modules.default.setIsEnterVoiceChannelSoundEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getEnterVoiceChannelSound();
+      return modules.default.getIsEnterVoiceChannelSoundEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('enter-voice-channel-sound', callback);
+      return modules.default.listen('is-enter-voice-channel-sound-enabled', callback);
     },
   },
 
-  leaveVoiceChannelSound: {
+  isLeaveVoiceChannelSoundEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setLeaveVoiceChannelSound(enabled);
+      modules.default.setIsLeaveVoiceChannelSoundEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getLeaveVoiceChannelSound();
+      return modules.default.getIsLeaveVoiceChannelSoundEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('leave-voice-channel-sound', callback);
+      return modules.default.listen('is-leave-voice-channel-sound-enabled', callback);
     },
   },
 
-  startSpeakingSound: {
+  isStartSpeakingSoundEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setStartSpeakingSound(enabled);
+      modules.default.setIsStartSpeakingSoundEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getStartSpeakingSound();
+      return modules.default.getIsStartSpeakingSoundEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('start-speaking-sound', callback);
+      return modules.default.listen('is-start-speaking-sound-enabled', callback);
     },
   },
 
-  stopSpeakingSound: {
+  isStopSpeakingSoundEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setStopSpeakingSound(enabled);
+      modules.default.setIsStopSpeakingSoundEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getStopSpeakingSound();
+      return modules.default.getIsStopSpeakingSoundEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('stop-speaking-sound', callback);
+      return modules.default.listen('is-stop-speaking-sound-enabled', callback);
     },
   },
 
-  receiveDirectMessageSound: {
+  isReceiveDirectMessageSoundEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setReceiveDirectMessageSound(enabled);
+      modules.default.setIsReceiveDirectMessageSoundEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getReceiveDirectMessageSound();
+      return modules.default.getIsReceiveDirectMessageSoundEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('receive-direct-message-sound', callback);
+      return modules.default.listen('is-receive-direct-message-sound-enabled', callback);
     },
   },
 
-  receiveChannelMessageSound: {
+  isReceiveChannelMessageSoundEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setReceiveChannelMessageSound(enabled);
+      modules.default.setIsReceiveChannelMessageSoundEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getReceiveChannelMessageSound();
+      return modules.default.getIsReceiveChannelMessageSoundEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('receive-channel-message-sound', callback);
+      return modules.default.listen('is-receive-channel-message-sound-enabled', callback);
     },
   },
 
-  autoCheckForUpdates: {
+  isAutoCheckForUpdatesEnabled: {
     set: (enabled: boolean): void => {
-      modules.default.setAutoCheckForUpdates(enabled);
+      modules.default.setIsAutoCheckForUpdatesEnabled(enabled);
     },
     get: (): boolean => {
-      return modules.default.getAutoCheckForUpdates();
+      return modules.default.getIsAutoCheckForUpdatesEnabled();
     },
     onUpdate: (callback: (enabled: boolean) => void): (() => void) => {
-      return modules.default.listen('auto-check-for-updates', callback);
+      return modules.default.listen('is-auto-check-for-updates-enabled', callback);
     },
   },
 

@@ -6,7 +6,7 @@ export function getAccounts(): Types.StoreType['accounts'] {
   return store.get('accounts');
 }
 
-export function addAccount(account: string, data: { autoLogin: boolean; rememberAccount: boolean; password: string }): void {
+export function addAccount(account: string, data: { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }): void {
   const accounts = store.get('accounts');
   accounts[account] = data;
   store.set('accounts', accounts);

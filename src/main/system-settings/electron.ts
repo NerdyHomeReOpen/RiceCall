@@ -5,35 +5,35 @@ import type * as Types from '@/types';
 
 import { changeLanguage } from '@/i18n';
 
-import { store, getSettings, broadcast, isAutoLaunchEnabled, setAutoLaunch, mainWindow, getLanguage, setTrayDetail, startCheckForUpdates, stopCheckForUpdates } from '@/main/electron';
+import { store, getSettings, broadcast, isAutoLaunchEnabled, setIsAutoLaunchEnabled, mainWindow, getLanguage, setTrayDetail, startCheckForUpdates, stopCheckForUpdates } from '@/main/electron';
 
 export function registerSystemHandlers(): void {
   ipcMain.on('get-system-settings', (event) => {
     event.returnValue = getSettings();
   });
 
-  ipcMain.on('get-auto-login', (event) => {
-    event.returnValue = store.get('autoLogin');
+  ipcMain.on('get-is-auto-login-enabled', (event) => {
+    event.returnValue = store.get('isAutoLoginEnabled');
   });
 
-  ipcMain.on('get-auto-launch', (event) => {
+  ipcMain.on('get-is-auto-launch-enabled', (event) => {
     event.returnValue = isAutoLaunchEnabled();
   });
 
-  ipcMain.on('get-always-on-top', (event) => {
-    event.returnValue = store.get('alwaysOnTop');
+  ipcMain.on('get-is-always-on-top', (event) => {
+    event.returnValue = store.get('isAlwaysOnTop');
   });
 
-  ipcMain.on('get-status-auto-idle', (event) => {
-    event.returnValue = store.get('statusAutoIdle');
+  ipcMain.on('get-is-status-auto-idle-enabled', (event) => {
+    event.returnValue = store.get('isStatusAutoIdleEnabled');
   });
 
   ipcMain.on('get-status-auto-idle-minutes', (event) => {
     event.returnValue = store.get('statusAutoIdleMinutes');
   });
 
-  ipcMain.on('get-status-auto-dnd', (event) => {
-    event.returnValue = store.get('statusAutoDnd');
+  ipcMain.on('get-is-status-auto-dnd-enabled', (event) => {
+    event.returnValue = store.get('isStatusAutoDndEnabled');
   });
 
   ipcMain.on('get-channel-ui-mode', (event) => {
@@ -73,32 +73,32 @@ export function registerSystemHandlers(): void {
     event.returnValue = store.get('recordSavePath');
   });
 
-  ipcMain.on('get-mix-effect', (event) => {
-    event.returnValue = store.get('mixEffect');
+  ipcMain.on('get-is-mix-effect-enabled', (event) => {
+    event.returnValue = store.get('isMixEffectEnabled');
   });
 
   ipcMain.on('get-mix-effect-type', (event) => {
     event.returnValue = store.get('mixEffectType');
   });
 
-  ipcMain.on('get-auto-mix-setting', (event) => {
-    event.returnValue = store.get('autoMixSetting');
+  ipcMain.on('get-is-auto-mix-setting-enabled', (event) => {
+    event.returnValue = store.get('isAutoMixSettingEnabled');
   });
 
-  ipcMain.on('get-echo-cancellation', (event) => {
-    event.returnValue = store.get('echoCancellation');
+  ipcMain.on('get-is-echo-cancellation-enabled', (event) => {
+    event.returnValue = store.get('isEchoCancellationEnabled');
   });
 
-  ipcMain.on('get-noise-cancellation', (event) => {
-    event.returnValue = store.get('noiseCancellation');
+  ipcMain.on('get-is-noise-cancellation-enabled', (event) => {
+    event.returnValue = store.get('isNoiseCancellationEnabled');
   });
 
-  ipcMain.on('get-microphone-amplification', (event) => {
-    event.returnValue = store.get('microphoneAmplification');
+  ipcMain.on('get-is-microphone-amplification-enabled', (event) => {
+    event.returnValue = store.get('isMicrophoneAmplificationEnabled');
   });
 
-  ipcMain.on('get-manual-mix-mode', (event) => {
-    event.returnValue = store.get('manualMixMode');
+  ipcMain.on('get-is-manual-mix-mode', (event) => {
+    event.returnValue = store.get('isManualMixMode');
   });
 
   ipcMain.on('get-mix-mode', (event) => {
@@ -141,32 +141,32 @@ export function registerSystemHandlers(): void {
     event.returnValue = store.get('disableAllSoundEffect');
   });
 
-  ipcMain.on('get-enter-voice-channel-sound', (event) => {
-    event.returnValue = store.get('enterVoiceChannelSound');
+  ipcMain.on('get-is-enter-voice-channel-sound-enabled', (event) => {
+    event.returnValue = store.get('isEnterVoiceChannelSoundEnabled');
   });
 
-  ipcMain.on('get-leave-voice-channel-sound', (event) => {
-    event.returnValue = store.get('leaveVoiceChannelSound');
+  ipcMain.on('get-is-leave-voice-channel-sound-enabled', (event) => {
+    event.returnValue = store.get('isLeaveVoiceChannelSoundEnabled');
   });
 
-  ipcMain.on('get-start-speaking-sound', (event) => {
-    event.returnValue = store.get('startSpeakingSound');
+  ipcMain.on('get-is-start-speaking-sound-enabled', (event) => {
+    event.returnValue = store.get('isStartSpeakingSoundEnabled');
   });
 
-  ipcMain.on('get-stop-speaking-sound', (event) => {
-    event.returnValue = store.get('stopSpeakingSound');
+  ipcMain.on('get-is-stop-speaking-sound-enabled', (event) => {
+    event.returnValue = store.get('isStopSpeakingSoundEnabled');
   });
 
-  ipcMain.on('get-receive-direct-message-sound', (event) => {
-    event.returnValue = store.get('receiveDirectMessageSound');
+  ipcMain.on('get-is-receive-direct-message-sound-enabled', (event) => {
+    event.returnValue = store.get('isReceiveDirectMessageSoundEnabled');
   });
 
-  ipcMain.on('get-receive-channel-message-sound', (event) => {
-    event.returnValue = store.get('receiveChannelMessageSound');
+  ipcMain.on('get-is-receive-channel-message-sound-enabled', (event) => {
+    event.returnValue = store.get('isReceiveChannelMessageSoundEnabled');
   });
 
-  ipcMain.on('get-auto-check-for-updates', (event) => {
-    event.returnValue = store.get('autoCheckForUpdates');
+  ipcMain.on('get-is-auto-check-for-updates-enabled', (event) => {
+    event.returnValue = store.get('isAutoCheckForUpdatesEnabled');
   });
 
   ipcMain.on('get-update-check-interval', (event) => {
@@ -181,25 +181,25 @@ export function registerSystemHandlers(): void {
     event.returnValue = store.get('language');
   });
 
-  ipcMain.on('set-auto-login', (_, enable = false) => {
-    store.set('autoLogin', enable);
-    broadcast('auto-login', enable);
+  ipcMain.on('set-is-auto-login-enabled', (_, enable = false) => {
+    store.set('isAutoLoginEnabled', enable);
+    broadcast('is-auto-login-enabled', enable);
   });
 
-  ipcMain.on('set-auto-launch', (_, enable = false) => {
-    setAutoLaunch(enable);
-    broadcast('auto-launch', enable);
+  ipcMain.on('set-is-auto-launch-enabled', (_, enable = false) => {
+    setIsAutoLaunchEnabled(enable);
+    broadcast('is-auto-launch-enabled', enable);
   });
 
-  ipcMain.on('set-always-on-top', (_, enable = false) => {
-    store.set('alwaysOnTop', enable);
-    broadcast('always-on-top', enable);
+  ipcMain.on('set-is-always-on-top', (_, enable = false) => {
+    store.set('isAlwaysOnTop', enable);
+    broadcast('is-always-on-top', enable);
     mainWindow?.setAlwaysOnTop(enable);
   });
 
-  ipcMain.on('set-status-auto-idle', (_, enable = false) => {
-    store.set('statusAutoIdle', enable);
-    broadcast('status-auto-idle', enable);
+  ipcMain.on('set-is-status-auto-idle-enabled', (_, enable = false) => {
+    store.set('isStatusAutoIdleEnabled', enable);
+    broadcast('is-status-auto-idle-enabled', enable);
   });
 
   ipcMain.on('set-status-auto-idle-minutes', (_, value = 10) => {
@@ -207,9 +207,9 @@ export function registerSystemHandlers(): void {
     broadcast('status-auto-idle-minutes', value);
   });
 
-  ipcMain.on('set-status-auto-dnd', (_, enable = false) => {
-    store.set('statusAutoDnd', enable);
-    broadcast('status-auto-dnd', enable);
+  ipcMain.on('set-is-status-auto-dnd-enabled', (_, enable = false) => {
+    store.set('isStatusAutoDndEnabled', enable);
+    broadcast('is-status-auto-dnd-enabled', enable);
   });
 
   ipcMain.on('set-channel-ui-mode', (_, mode = 'classic') => {
@@ -252,9 +252,9 @@ export function registerSystemHandlers(): void {
     broadcast('record-save-path', path);
   });
 
-  ipcMain.on('set-mix-effect', (_, enable = false) => {
-    store.set('mixEffect', enable);
-    broadcast('mix-effect', enable);
+  ipcMain.on('set-is-mix-effect-enabled', (_, enable = false) => {
+    store.set('isMixEffectEnabled', enable);
+    broadcast('is-mix-effect-enabled', enable);
   });
 
   ipcMain.on('set-mix-effect-type', (_, type = '') => {
@@ -262,29 +262,29 @@ export function registerSystemHandlers(): void {
     broadcast('mix-effect-type', type);
   });
 
-  ipcMain.on('set-auto-mix-setting', (_, enable = false) => {
-    store.set('autoMixSetting', enable);
-    broadcast('auto-mix-setting', enable);
+  ipcMain.on('set-is-auto-mix-setting-enabled', (_, enable = false) => {
+    store.set('isAutoMixSettingEnabled', enable);
+    broadcast('is-auto-mix-setting-enabled', enable);
   });
 
-  ipcMain.on('set-echo-cancellation', (_, enable = false) => {
-    store.set('echoCancellation', enable);
-    broadcast('echo-cancellation', enable);
+  ipcMain.on('set-is-echo-cancellation-enabled', (_, enable = false) => {
+    store.set('isEchoCancellationEnabled', enable);
+    broadcast('is-echo-cancellation-enabled', enable);
   });
 
-  ipcMain.on('set-noise-cancellation', (_, enable = false) => {
-    store.set('noiseCancellation', enable);
-    broadcast('noise-cancellation', enable);
+  ipcMain.on('set-is-noise-cancellation-enabled', (_, enable = false) => {
+    store.set('isNoiseCancellationEnabled', enable);
+    broadcast('is-noise-cancellation-enabled', enable);
   });
 
-  ipcMain.on('set-microphone-amplification', (_, enable = false) => {
-    store.set('microphoneAmplification', enable);
-    broadcast('microphone-amplification', enable);
+  ipcMain.on('set-is-microphone-amplification-enabled', (_, enable = false) => {
+    store.set('isMicrophoneAmplificationEnabled', enable);
+    broadcast('is-microphone-amplification-enabled', enable);
   });
 
-  ipcMain.on('set-manual-mix-mode', (_, enable = false) => {
-    store.set('manualMixMode', enable);
-    broadcast('manual-mix-mode', enable);
+  ipcMain.on('set-is-manual-mix-mode', (_, enable = false) => {
+    store.set('isManualMixMode', enable);
+    broadcast('is-manual-mix-mode', enable);
   });
 
   ipcMain.on('set-mix-mode', (_, mode = 'all') => {
@@ -337,41 +337,41 @@ export function registerSystemHandlers(): void {
     broadcast('disable-all-sound-effect', enable);
   });
 
-  ipcMain.on('set-enter-voice-channel-sound', (_, enable = false) => {
-    store.set('enterVoiceChannelSound', enable);
-    broadcast('enter-voice-channel-sound', enable);
+  ipcMain.on('set-is-enter-voice-channel-sound-enabled', (_, enable = false) => {
+    store.set('isEnterVoiceChannelSoundEnabled', enable);
+    broadcast('is-enter-voice-channel-sound-enabled', enable);
   });
 
-  ipcMain.on('set-leave-voice-channel-sound', (_, enable = false) => {
-    store.set('leaveVoiceChannelSound', enable);
-    broadcast('leave-voice-channel-sound', enable);
+  ipcMain.on('set-is-leave-voice-channel-sound-enabled', (_, enable = false) => {
+    store.set('isLeaveVoiceChannelSoundEnabled', enable);
+    broadcast('is-leave-voice-channel-sound-enabled', enable);
   });
 
-  ipcMain.on('set-start-speaking-sound', (_, enable = false) => {
-    store.set('startSpeakingSound', enable);
-    broadcast('start-speaking-sound', enable);
+  ipcMain.on('set-is-start-speaking-sound-enabled', (_, enable = false) => {
+    store.set('isStartSpeakingSoundEnabled', enable);
+    broadcast('is-start-speaking-sound-enabled', enable);
   });
 
-  ipcMain.on('set-stop-speaking-sound', (_, enable = false) => {
-    store.set('stopSpeakingSound', enable);
-    broadcast('stop-speaking-sound', enable);
+  ipcMain.on('set-is-stop-speaking-sound-enabled', (_, enable = false) => {
+    store.set('isStopSpeakingSoundEnabled', enable);
+    broadcast('is-stop-speaking-sound-enabled', enable);
   });
 
-  ipcMain.on('set-receive-direct-message-sound', (_, enable = false) => {
-    store.set('receiveDirectMessageSound', enable);
-    broadcast('receive-direct-message-sound', enable);
+  ipcMain.on('set-is-receive-direct-message-sound-enabled', (_, enable = false) => {
+    store.set('isReceiveDirectMessageSoundEnabled', enable);
+    broadcast('is-receive-direct-message-sound-enabled', enable);
   });
 
-  ipcMain.on('set-receive-channel-message-sound', (_, enable = false) => {
-    store.set('receiveChannelMessageSound', enable);
-    broadcast('receive-channel-message-sound', enable);
+  ipcMain.on('set-is-receive-channel-message-sound-enabled', (_, enable = false) => {
+    store.set('isReceiveChannelMessageSoundEnabled', enable);
+    broadcast('is-receive-channel-message-sound-enabled', enable);
   });
 
-  ipcMain.on('set-auto-check-for-updates', (_, enable = false) => {
-    store.set('autoCheckForUpdates', enable);
+  ipcMain.on('set-is-auto-check-for-updates-enabled', (_, enable = false) => {
+    store.set('isAutoCheckForUpdatesEnabled', enable);
     if (enable) startCheckForUpdates();
     else stopCheckForUpdates();
-    broadcast('auto-check-for-updates', enable);
+    broadcast('is-auto-check-for-updates-enabled', enable);
   });
 
   ipcMain.on('set-update-check-interval', (_, interval = 1 * 60 * 1000) => {

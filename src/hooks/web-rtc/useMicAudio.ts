@@ -28,8 +28,18 @@ export type UseMicAudioResult = {
 };
 
 export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: UseMicAudioDeps): UseMicAudioResult => {
-  const { audioContextRef, inputDesRef, inputAnalyserRef, micNodesRef, rafIdListRef, microphoneAmplificationRef, inputAudioDeviceRef, echoCancellationRef, noiseCancellationRef, audioProducerRef } =
-    refs;
+  const {
+    audioContextRef,
+    inputDesRef,
+    inputAnalyserRef,
+    micNodesRef,
+    rafIdListRef,
+    isMicrophoneAmplificationEnabledRef,
+    inputAudioDeviceRef,
+    isEchoCancellationEnabledRef,
+    isNoiseCancellationEnabledRef,
+    audioProducerRef,
+  } = refs;
 
   const removeMicAudio = useCallback(() => {
     if (rafIdListRef.current['user']) {
@@ -64,7 +74,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
 
       const sourceNode = audioContextRef.current.createMediaStreamSource(stream);
       const gainNode = audioContextRef.current.createGain();
-      gainNode.gain.value = Store.store.getState().webrtc.micVolume / (microphoneAmplificationRef.current ? 20 : 100);
+      gainNode.gain.value = Store.store.getState().webrtc.micVolume / (isMicrophoneAmplificationEnabledRef.current ? 20 : 100);
 
       micNodesRef.current = { stream, source: sourceNode, gain: gainNode };
 
@@ -87,7 +97,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
         }
       }
     },
-    [removeMicAudio, initAudioContext, audioContextRef, inputDesRef, inputAnalyserRef, micNodesRef, microphoneAmplificationRef, rafIdListRef, audioProducerRef],
+    [removeMicAudio, initAudioContext, audioContextRef, inputDesRef, inputAnalyserRef, micNodesRef, isMicrophoneAmplificationEnabledRef, rafIdListRef, audioProducerRef],
   );
 
   const startSpeaking = useCallback(() => {
@@ -95,8 +105,8 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       .getUserMedia({
         audio: {
           channelCount: 2,
-          echoCancellation: echoCancellationRef.current,
-          noiseSuppression: noiseCancellationRef.current,
+          echoCancellation: isEchoCancellationEnabledRef.current,
+          noiseSuppression: isNoiseCancellationEnabledRef.current,
           autoGainControl: false,
           ...(inputAudioDeviceRef.current ? { deviceId: { exact: inputAudioDeviceRef.current } } : {}),
         },
@@ -110,7 +120,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       });
 
     Store.store.dispatch(Store.setWebRTC({ isMicTaken: true }));
-  }, [initMicAudio, echoCancellationRef, noiseCancellationRef, inputAudioDeviceRef]);
+  }, [initMicAudio, isEchoCancellationEnabledRef, isNoiseCancellationEnabledRef, inputAudioDeviceRef]);
 
   const stopSpeaking = useCallback(() => {
     removeMicAudio();
@@ -149,7 +159,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       volume = Math.min(100, Math.max(0, volume));
 
       if (micNodesRef.current.gain) {
-        micNodesRef.current.gain.gain.value = volume / (microphoneAmplificationRef.current ? 20 : 100);
+        micNodesRef.current.gain.gain.value = volume / (isMicrophoneAmplificationEnabledRef.current ? 20 : 100);
       }
 
       const isMicMuted = volume === 0;
@@ -158,7 +168,7 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
       window.localStorage.setItem('mic-volume', volume.toString());
       window.localStorage.setItem('is-mic-mute', isMicMuted.toString());
     },
-    [micNodesRef, microphoneAmplificationRef],
+    [micNodesRef, isMicrophoneAmplificationEnabledRef],
   );
 
   const toggleMicMuted = useCallback(() => {
@@ -184,37 +194,37 @@ export const useMicAudio = (refs: SharedRefs, { initAudioContext, playSound }: U
   }, [startSpeaking, inputAudioDeviceRef]);
 
   useEffect(() => {
-    const changeEchoCancellation = (echoCancellation: boolean) => {
-      new Logger('WEB_RTC').info(`Echo cancellation updated: ${echoCancellation}`);
-      echoCancellationRef.current = echoCancellation;
+    const changeIsEchoCancellationEnabled = (isEchoCancellationEnabled: boolean) => {
+      new Logger('WEB_RTC').info(`Echo cancellation updated: ${isEchoCancellationEnabled}`);
+      isEchoCancellationEnabledRef.current = isEchoCancellationEnabled;
       if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
     };
-    changeEchoCancellation(ipc.systemSettings.echoCancellation.get());
-    const unsub = ipc.systemSettings.echoCancellation.onUpdate(changeEchoCancellation);
+    changeIsEchoCancellationEnabled(ipc.systemSettings.isEchoCancellationEnabled.get());
+    const unsub = ipc.systemSettings.isEchoCancellationEnabled.onUpdate(changeIsEchoCancellationEnabled);
     return () => unsub();
-  }, [startSpeaking, echoCancellationRef]);
+  }, [startSpeaking, isEchoCancellationEnabledRef]);
 
   useEffect(() => {
-    const changeNoiseCancellation = (noiseCancellation: boolean) => {
-      new Logger('WEB_RTC').info(`Noise cancellation updated: ${noiseCancellation}`);
-      noiseCancellationRef.current = noiseCancellation;
+    const changeIsNoiseCancellationEnabled = (isNoiseCancellationEnabled: boolean) => {
+      new Logger('WEB_RTC').info(`Noise cancellation updated: ${isNoiseCancellationEnabled}`);
+      isNoiseCancellationEnabledRef.current = isNoiseCancellationEnabled;
       if (Store.store.getState().webrtc.isMicTaken) startSpeaking();
     };
-    changeNoiseCancellation(ipc.systemSettings.noiseCancellation.get());
-    const unsub = ipc.systemSettings.noiseCancellation.onUpdate(changeNoiseCancellation);
+    changeIsNoiseCancellationEnabled(ipc.systemSettings.isNoiseCancellationEnabled.get());
+    const unsub = ipc.systemSettings.isNoiseCancellationEnabled.onUpdate(changeIsNoiseCancellationEnabled);
     return () => unsub();
-  }, [startSpeaking, noiseCancellationRef]);
+  }, [startSpeaking, isNoiseCancellationEnabledRef]);
 
   useEffect(() => {
-    const changeMicrophoneAmplification = (microphoneAmplification: boolean) => {
-      new Logger('WEB_RTC').info(`Microphone amplification updated: ${microphoneAmplification}`);
-      microphoneAmplificationRef.current = microphoneAmplification;
+    const changeIsMicrophoneAmplificationEnabled = (isMicrophoneAmplificationEnabled: boolean) => {
+      new Logger('WEB_RTC').info(`Microphone amplification updated: ${isMicrophoneAmplificationEnabled}`);
+      isMicrophoneAmplificationEnabledRef.current = isMicrophoneAmplificationEnabled;
       changeMicVolume(Store.store.getState().webrtc.micVolume || 100);
     };
-    changeMicrophoneAmplification(ipc.systemSettings.microphoneAmplification.get());
-    const unsub = ipc.systemSettings.microphoneAmplification.onUpdate(changeMicrophoneAmplification);
+    changeIsMicrophoneAmplificationEnabled(ipc.systemSettings.isMicrophoneAmplificationEnabled.get());
+    const unsub = ipc.systemSettings.isMicrophoneAmplificationEnabled.onUpdate(changeIsMicrophoneAmplificationEnabled);
     return () => unsub();
-  }, [changeMicVolume, microphoneAmplificationRef]);
+  }, [changeMicVolume, isMicrophoneAmplificationEnabledRef]);
 
   useEffect(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {

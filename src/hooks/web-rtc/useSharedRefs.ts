@@ -21,10 +21,10 @@ export type SharedRefs = {
   sendTransportRef: RefObject<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>;
   recvTransportRef: RefObject<mediasoupClient.types.Transport<mediasoupClient.types.AppData> | null>;
   consumersRef: RefObject<{ [producerId: string]: mediasoupClient.types.Consumer<mediasoupClient.types.AppData> }>;
-  microphoneAmplificationRef: RefObject<boolean>;
+  isMicrophoneAmplificationEnabledRef: RefObject<boolean>;
   inputAudioDeviceRef: RefObject<string | null>;
-  echoCancellationRef: RefObject<boolean>;
-  noiseCancellationRef: RefObject<boolean>;
+  isEchoCancellationEnabledRef: RefObject<boolean>;
+  isNoiseCancellationEnabledRef: RefObject<boolean>;
   recordBuffersRef: RefObject<{ left: Float32Array<ArrayBufferLike>; right: Float32Array<ArrayBufferLike> }[]>;
   recordTimerRef: RefObject<NodeJS.Timeout | null>;
 };
@@ -63,10 +63,10 @@ export const useSharedRefs = (): SharedRefs => {
   const sendTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const recvTransportRef = useRef<mediasoupClient.types.Transport | null>(null);
   const consumersRef = useRef<{ [producerId: string]: mediasoupClient.types.Consumer }>({});
-  const microphoneAmplificationRef = useRef<boolean>(false);
+  const isMicrophoneAmplificationEnabledRef = useRef<boolean>(false);
   const inputAudioDeviceRef = useRef<string | null>(null);
-  const echoCancellationRef = useRef<boolean>(false);
-  const noiseCancellationRef = useRef<boolean>(false);
+  const isEchoCancellationEnabledRef = useRef<boolean>(false);
+  const isNoiseCancellationEnabledRef = useRef<boolean>(false);
   const recordBuffersRef = useRef<
     {
       left: Float32Array<ArrayBufferLike>;
@@ -94,10 +94,10 @@ export const useSharedRefs = (): SharedRefs => {
     sendTransportRef,
     recvTransportRef,
     consumersRef,
-    microphoneAmplificationRef,
+    isMicrophoneAmplificationEnabledRef,
     inputAudioDeviceRef,
-    echoCancellationRef,
-    noiseCancellationRef,
+    isEchoCancellationEnabledRef,
+    isNoiseCancellationEnabledRef,
     recordBuffersRef,
     recordTimerRef,
   };

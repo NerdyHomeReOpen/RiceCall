@@ -5,8 +5,8 @@ import { t } from '@/i18n';
 import { broadcast, checkForUpdates, createPopup, store } from '@/main/electron';
 
 export function registerAppHandlers(): void {
-  ipcMain.on('dont-show-disclaimer-next-time', () => {
-    store.set('dontShowDisclaimer', true);
+  ipcMain.on('hide-disclaimer-next-time', () => {
+    store.set('isDisclaimerHidden', true);
   });
 
   ipcMain.on('server-select', (_, data: { serverDisplayId: string; serverId: string; timestamp: number }) => {
