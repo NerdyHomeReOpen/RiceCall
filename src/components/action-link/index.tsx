@@ -18,7 +18,7 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
 
   const [server, setServer] = useState<Types.Server>(getDefaultServer());
 
-  const displayId = new URL(href).searchParams.get('sid') || '';
+  const displayId = new URL(href).searchParams.get('serverDisplayId') || '';
 
   const handleLinkClick = () => {
     ipc.server.select({ serverDisplayId: displayId, serverId: server.serverId, timestamp: Date.now() });

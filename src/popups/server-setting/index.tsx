@@ -12,7 +12,7 @@ import * as Store from '@/store';
 
 import { openImageCropper, openAlertDialog, editServer, openMemberApplicationSetting, openUserInfo, approveMemberApplication, rejectMemberApplication } from '@/services';
 
-import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS } from '@/constants';
+import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS, INVITATION_BASE_URL } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -384,7 +384,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
               </div>
               <div className="input-box col">
                 <div className="label">{t('server-link')}</div>
-                <input name="link" type="text" value={`https://ricecall.com/join?sid=${server.specialId || server.displayId}`} readOnly />
+                <input name="link" type="text" value={`${INVITATION_BASE_URL}?serverDisplayId=${server.specialId || server.displayId}`} readOnly />
               </div>
               <div className="input-box col">
                 <div className="label">{t('description')}</div>

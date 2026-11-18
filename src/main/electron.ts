@@ -99,8 +99,8 @@ async function openDeepLink(url: string) {
     const { hostname } = new URL(url);
     switch (hostname) {
       case 'join':
-        const serverId = new URL(url).searchParams.get('sid');
-        broadcast('deepLink', serverId);
+        const serverDisplayId = new URL(url).searchParams.get('serverDisplayId');
+        broadcast('deepLink', serverDisplayId);
         break;
     }
   } catch (e) {

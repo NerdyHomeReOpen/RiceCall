@@ -7,7 +7,7 @@ export const webrtc = {
 };
 
 export const deepLink = {
-  onDeepLink: (callback: (serverId: string) => void): (() => void) => {
+  onDeepLink: (callback: (serverDisplayId: string) => void): (() => void) => {
     return modules.default.listen('deepLink', callback);
   },
 };

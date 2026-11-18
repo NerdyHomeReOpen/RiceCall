@@ -53,7 +53,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
   const handleInviteFriendBtnClick = () => {
     if (selectedUserIds.length === 0) return;
     openAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
-      const invitationLink = `${INVITATION_BASE_URL}?sid=${server.specialId || server.displayId}`;
+      const invitationLink = `${INVITATION_BASE_URL}?serverDisplayId=${server.specialId || server.displayId}`;
       const formatedMessage = `<a href='${invitationLink}' type='invitation' customLink='true' >${invitationLink}</a>`;
       for (const userId of selectedUserIds) {
         ipc.socket.send('directMessage', { targetId: userId, preset: { type: 'dm', content: formatedMessage } });
