@@ -41,7 +41,7 @@ export type table_admin_permissions = {
   category: string;
   action: string;
   displayName: string;
-  description: string | null;
+  description: string;
   isSystem: number;
   createdAt: number;
   updatedAt: number;
@@ -61,7 +61,7 @@ export type table_admin_roles = {
   roleId: number;
   name: string;
   displayName: string;
-  description: string | null;
+  description: string;
   isSystem: number;
   level: number;
   updatedAt: number;
