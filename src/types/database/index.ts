@@ -392,7 +392,7 @@ export type table_user_show_gift_requests = {
   userId: string;
   requestId: string;
   action: string;
-  targetUserId: string;
+  receiverId: string;
   updatedAt: number;
   createdAt: number;
 };
