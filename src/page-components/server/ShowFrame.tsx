@@ -1,5 +1,6 @@
 import React, { useCallback, useEffect, useRef } from 'react';
 import { shallowEqual } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 import { SHOW_FRAME_ORIGIN } from '@/constants';
@@ -8,6 +9,7 @@ import { useAppSelector } from '@/hooks/useStore';
 type ShowMessage = { type: 'ricecall-show:gift'; channelId: string; action: 'heart' | 'flower'; requestId: string };
 
 const ShowFrame: React.FC = React.memo(() => {
+  const { i18n } = useTranslation();
   const frameRef = useRef<HTMLIFrameElement>(null);
   const channelId = useAppSelector((state) => state.currentChannel.data.channelId, shallowEqual);
   const channelIdRef = useRef(channelId);
@@ -78,6 +80,8 @@ const ShowFrame: React.FC = React.memo(() => {
 
   const src = new URL(SHOW_FRAME_ORIGIN);
   if (channelId) src.searchParams.set('channelId', channelId);
+  // Show renders in the App's interface language; changing it reloads the frame.
+  src.searchParams.set('locale', i18n.language);
   return <iframe key={channelId} ref={frameRef} id="showFrame" src={src.toString()} height="100%" width="100%" onLoad={() => void sendViewer()} />;
 });
 
