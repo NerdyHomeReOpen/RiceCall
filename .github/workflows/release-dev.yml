@@ -56,10 +56,10 @@ jobs:
 
       - name: Create environment files
         env:
-          MAIN_SERVICE_URL: ${{ secrets.MAIN_SERVICE_URL || secrets.API_URL }}
-          MAIN_SERVICE_DEV_URL: ${{ secrets.MAIN_SERVICE_DEV_URL || secrets.API_DEV_URL }}
-          MAIN_SERVICE_WS_URL: ${{ secrets.MAIN_SERVICE_WS_URL || secrets.WS_URL }}
-          MAIN_SERVICE_WS_DEV_URL: ${{ secrets.MAIN_SERVICE_WS_DEV_URL || secrets.WS_DEV_URL }}
+          MAIN_SERVICE_URL: ${{ secrets.MAIN_SERVICE_URL }}
+          MAIN_SERVICE_DEV_URL: ${{ secrets.MAIN_SERVICE_DEV_URL }}
+          MAIN_SERVICE_WS_URL: ${{ secrets.MAIN_SERVICE_WS_URL }}
+          MAIN_SERVICE_WS_DEV_URL: ${{ secrets.MAIN_SERVICE_WS_DEV_URL }}
           DOCS_BASE_URL: ${{ secrets.DOCS_BASE_URL }}
           ERROR_SUBMISSION_URL: ${{ secrets.ERROR_SUBMISSION_URL }}
         run: |
