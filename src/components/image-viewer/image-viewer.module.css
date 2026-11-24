@@ -1,30 +1,9 @@
-.image-viewer {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 10000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  padding: 5%;
-  background-color: #00000080;
-}
-
-.image-viewer.visible {
-  display: flex;
+/* Only the animations stay here: Tailwind needs `@theme` in globals.css for custom `animate-*` keyframes. */
+.visible {
   animation: visibility 0.2s ease-in-out;
 }
 
-.image-viewer.hidden {
-  display: none;
-}
-
-.image-viewer img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
+.image {
   animation: fade-in 0.2s ease-in-out;
 }
 

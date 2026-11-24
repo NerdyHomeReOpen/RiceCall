@@ -3,8 +3,6 @@ import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
-import styles from './maximized-popup.module.css';
-
 interface MaximizedPopupProps {
   id: string;
   title: string;
@@ -24,9 +22,21 @@ const MaximizedPopup: React.FC<MaximizedPopupProps> = React.memo(({ title, butto
   };
 
   return (
-    <button key={id} type="button" onClick={handleRestoreBtnClick} title={t(title)} className={styles['popup']}>
-      <div className={styles['title-text']}>{t(title)}</div>
-      {buttons.includes('close') && <div className={styles['close-button']} onClick={handleCloseBtnClick} title={t('close')} />}
+    <button
+      key={id}
+      type="button"
+      onClick={handleRestoreBtnClick}
+      title={t(title)}
+      className="flex gap-[8px] items-center justify-between h-[40px] px-[10px] py-[8px] overflow-hidden text-ellipsis text-secondary-color whitespace-nowrap bg-main-color rounded-[20px] opacity-50 transition-opacity duration-100 ease-[ease-in-out] hover:opacity-100"
+    >
+      <div className="text-[14px] font-bold">{t(title)}</div>
+      {buttons.includes('close') && (
+        <div
+          className="inline-block min-w-[20px] min-h-[20px] cursor-pointer bg-[url('/Button_Close.svg')] bg-no-repeat bg-position-[0_0] bg-cover hover:bg-position-[-20px_0] active:bg-position-[-40px_0]"
+          onClick={handleCloseBtnClick}
+          title={t('close')}
+        />
+      )}
     </button>
   );
 });

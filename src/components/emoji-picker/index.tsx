@@ -7,8 +7,6 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import EmojiItem from './EmojiItem';
 
-import styles from './emoji-picker.module.css';
-
 interface EmojiPickerProps {
   x: number;
   y: number;
@@ -141,14 +139,14 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
     return (
       <div
         ref={emojiPickerRef}
-        className={`context-menu-container ${styles['panel']} ${!showFontbar ? styles['panel-compact'] : ''}`}
+        className={`context-menu-container absolute z-10000 box-border flex flex-col pr-px pb-px overflow-hidden bg-background rounded-[2px] shadow-box-shadow ${!showFontbar ? 'h-[200px]' : ''}`}
         style={isVisible ? { left: pickerX, top: pickerY, position: 'fixed' } : { opacity: 0, position: 'fixed' }}
         onMouseDown={(e) => e.stopPropagation()}
       >
         {showFontbar && (
-          <div className={styles['font-bar']}>
-            <div className={styles['font-icon']} aria-hidden="true" />
-            <div className="select-box ${styles['font-select-box']}">
+          <div className="flex gap-[5px] items-center h-[34px] pt-[10px] pl-[10px]">
+            <div className="flex-[0_0_12px] w-[12px] h-[12px] mr-[8px] ml-[10px] bg-[url('/channel/FontButton.svg')] bg-no-repeat bg-center bg-contain" aria-hidden="true" />
+            <div className="select-box">
               <div className="select-box">
                 <select value={fontSize} onChange={handleFontSizeChange}>
                   {Array.from({ length: 17 }, (_, i) => (
@@ -159,34 +157,67 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
                 </select>
               </div>
             </div>
-            <div className={`${styles['color-select-box']}`} onMouseDown={handleColorPickerClick}>
-              <div className={styles['color-swatch']} style={{ backgroundColor: selectedColor }} />
+            <div
+              className="relative flex items-center w-[90px] min-w-max max-w-full h-[28px] ml-[8px] overflow-visible border border-border before:absolute before:right-0 before:bottom-0 before:z-1 before:w-[25px] before:h-[2em] before:pointer-events-none before:content-[''] before:bg-[url('/channel/spliter.svg')] before:bg-no-repeat before:bg-contain after:absolute after:right-0 after:bottom-[8px] after:w-[26px] after:h-[12px] after:pointer-events-none after:content-[''] after:bg-[url('/login_combobox_triangle.svg')] after:bg-no-repeat after:bg-cover hover:after:bg-position-[-26px_0] active:after:bg-position-[-52px_0]"
+              onMouseDown={handleColorPickerClick}
+            >
+              <div className="w-[50px] h-[17px] ml-[6px] cursor-pointer border border-border" style={{ backgroundColor: selectedColor }} />
             </div>
           </div>
         )}
-        <div className={styles['pages']}>
-          <div className={`${styles['page']} ${activeTab === 'def' ? styles['active'] : ''}`} aria-labelledby="btn-def" tabIndex={0}>
-            <div className={styles['grid']}>
+        <div className="relative box-border self-center w-[250px] h-[145px] m-[10px] overflow-hidden">
+          <div
+            className={`w-full h-full overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:h-0 ${activeTab === 'def' ? 'block' : 'hidden'}`}
+            aria-labelledby="btn-def"
+            tabIndex={0}
+          >
+            <div className="grid grid-cols-[repeat(10,1fr)] auto-rows-[24px] gap-0 w-full h-full p-0 overflow-auto bg-background border-t border-l border-t-[#0000001f] border-l-[#0000001f]">
               {DEFAULT_EMOJIS.map((e) => (
                 <EmojiItem key={`def-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${styles['page']} ${activeTab === 'other' ? styles['active'] : ''}`} aria-labelledby="btn-other" tabIndex={0}>
-            <div className={styles['grid']}>
+          <div
+            className={`w-full h-full overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:h-0 ${activeTab === 'other' ? 'block' : 'hidden'}`}
+            aria-labelledby="btn-other"
+            tabIndex={0}
+          >
+            <div className="grid grid-cols-[repeat(10,1fr)] auto-rows-[24px] gap-0 w-full h-full p-0 overflow-auto bg-background border-t border-l border-t-[#0000001f] border-l-[#0000001f]">
               {TW_EMOJIS.map((e) => (
                 <EmojiItem key={`other-${e.code}`} emoji={e} onEmojiSelect={handleEmojiSelect} />
               ))}
             </div>
           </div>
-          <div className={`${styles['page']} ${activeTab === 'vip' ? styles['active'] : ''}`} aria-labelledby="btn-vip" tabIndex={0}>
-            <div className={styles['vip-placeholder']}>{t('soon')}</div>
+          <div
+            className={`w-full h-full overflow-auto [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:w-0 [&::-webkit-scrollbar]:h-0 ${activeTab === 'vip' ? 'block' : 'hidden'}`}
+            aria-labelledby="btn-vip"
+            tabIndex={0}
+          >
+            <div className="grid place-items-center w-full h-full text-text-color-quaternary">{t('soon')}</div>
           </div>
         </div>
-        <div className={styles['tabs']} role="tablist">
-          <button id="btn-def" className={`${styles['tab-button']} ${styles['tab-def']}`} role="tab" aria-selected={activeTab === 'def'} onClick={handleDefTabClick} />
-          <button id="btn-other" className={`${styles['tab-button']} ${styles['tab-other']}`} role="tab" aria-selected={activeTab === 'other'} onClick={handleOtherTabClick} />
-          <button id="btn-vip" className={`${styles['tab-button']} ${styles['tab-vip']}`} role="tab" aria-selected={activeTab === 'vip'} onClick={handleVipTabClick} />
+        <div className="flex gap-[8px] items-center h-[32px] bg-background-secondary border-t border-t-border" role="tablist">
+          <button
+            id="btn-def"
+            className="relative w-[42px] h-[32px] p-0 cursor-pointer bg-transparent border-none before:block before:w-[42px] before:h-[32px] before:content-[''] before:bg-no-repeat before:bg-position-[0_-1px] before:opacity-85 hover:before:bg-position-[-42px_-1px] aria-selected:before:bg-position-[0_-32px] ml-[15px] before:bg-[url('/im/deftab.svg')]"
+            role="tab"
+            aria-selected={activeTab === 'def'}
+            onClick={handleDefTabClick}
+          />
+          <button
+            id="btn-other"
+            className="relative w-[42px] h-[32px] p-0 cursor-pointer bg-transparent border-none before:block before:w-[42px] before:h-[32px] before:content-[''] before:bg-no-repeat before:bg-position-[0_-1px] before:opacity-85 hover:before:bg-position-[-42px_-1px] aria-selected:before:bg-position-[0_-32px] before:bg-[url('/im/vipEm_Sign.svg')]"
+            role="tab"
+            aria-selected={activeTab === 'other'}
+            onClick={handleOtherTabClick}
+          />
+          <button
+            id="btn-vip"
+            className="relative w-[42px] h-[32px] p-0 cursor-pointer bg-transparent border-none before:block before:w-[42px] before:h-[32px] before:content-[''] before:bg-no-repeat before:bg-position-[0_-1px] before:opacity-85 hover:before:bg-position-[-42px_-1px] aria-selected:before:bg-position-[0_-32px] before:bg-[url('/im/viptab.svg')]"
+            role="tab"
+            aria-selected={activeTab === 'vip'}
+            onClick={handleVipTabClick}
+          />
         </div>
       </div>
     );

@@ -6,8 +6,6 @@ import type * as Types from '@/types';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import styles from './apply-member.module.css';
-
 interface SendSectionProps {
   server: Types.Server;
   applicationDesc: string;
@@ -25,10 +23,10 @@ const SendSection: React.FC<SendSectionProps> = React.memo(({ server, applicatio
       <div className="popup-body">
         <div className="popup-content col">
           <div className="row">
-            <div className={styles['server-avatar']}>
+            <div className="relative self-center w-[40px] h-[40px] mr-[5px] before:absolute before:-top-px before:-left-px before:z-1 before:min-w-[42px] before:min-h-[42px] before:content-[''] before:bg-[url('/channel/server_logo_border.svg')] before:bg-no-repeat before:bg-position-[0_0] before:bg-cover">
               <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
-            <div className={styles['server-info']}>
+            <div className="flex flex-1 flex-col justify-around h-full">
               <div className="link-text" onClick={onServerNameLinkClick}>
                 {server.name}
               </div>
@@ -39,7 +37,7 @@ const SendSection: React.FC<SendSectionProps> = React.memo(({ server, applicatio
             <div className="label">{t('apply-member-note')}</div>
             <div className="hint-text">{server.applyNotice || t('none')}</div>
           </div>
-          <div className={styles['split']} />
+          <div className="w-full my-[5px] border-b border-b-border" />
           <div className="input-box col">
             <div className="label">{t('note')}</div>
             <textarea rows={2} value={applicationDesc} onChange={onApplicationDescChange} />

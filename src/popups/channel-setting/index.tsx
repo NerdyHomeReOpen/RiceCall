@@ -25,8 +25,6 @@ import { objDiff } from '@/utils';
 import { sorter, getNextSortDirection, getSortIndicator } from '@/utils/sorter';
 import { getPermissionText } from '@/utils/language';
 
-import styles from './channel-setting.module.css';
-
 type ChannelSettingPopupProps = Types.PopupProps<'channelSetting'>;
 
 const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id, server, channel: channelData, channelMembers: channelMembersData }) => {
@@ -295,7 +293,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
               )}
             </div>
           </div>
-          <div className={styles['separator']} />
+          <div className="w-full h-px my-[20px] bg-border" />
           <div className="col">
             <div className="label">{t('channel-audio-quality')}</div>
             <div className="col">

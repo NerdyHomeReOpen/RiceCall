@@ -8,8 +8,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import MemberInvitationItem from './MemberInvitationItem';
 
-import styles from './member-invitation.module.css';
-
 const MemberInvitationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
@@ -22,16 +20,16 @@ const MemberInvitationPopup: React.FC = React.memo(() => {
   return (
     <div className="popup-wrapper" tabIndex={0}>
       <div className="popup-body" style={{ flexDirection: 'column' }}>
-        <div className={styles['header']}>
-          <div className={styles['processing-status']}>
+        <div className="z-1 flex justify-between w-full p-[10px]">
+          <div>
             {t('unprocessed')}
-            <span className={styles['processing-status-count']}>({memberInvitations.length})</span>
+            <span>({memberInvitations.length})</span>
           </div>
-          <div className={styles['all-cancel-text']} onClick={handleRejectAllBtnClick}>
+          <div className="cursor-pointer hover:text-text-color-quaternary active:text-text-color-senary" onClick={handleRejectAllBtnClick}>
             {t('reject-all')}
           </div>
         </div>
-        <div className={styles['content']}>
+        <div className="flex flex-col gap-[5px] items-center justify-start w-full h-auto p-[15px] overflow-y-scroll">
           {memberInvitations.map((invitation) => (
             <MemberInvitationItem key={invitation.serverId} invitation={invitation} />
           ))}

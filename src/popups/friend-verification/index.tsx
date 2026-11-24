@@ -13,8 +13,6 @@ import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 
-import styles from './friend-verification.module.css';
-
 const FriendVerificationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
@@ -27,16 +25,16 @@ const FriendVerificationPopup: React.FC = React.memo(() => {
   return (
     <div className="popup-wrapper" tabIndex={0}>
       <div className="popup-body" style={{ flexDirection: 'column' }}>
-        <div className={styles['header']}>
-          <div className={styles['processing-status']}>
+        <div className="z-1 flex justify-between w-full p-[10px]">
+          <div>
             {t('unprocessed')}
-            <span className={styles['processing-status-count']}>({friendApplications.length})</span>
+            <span>({friendApplications.length})</span>
           </div>
-          <div className={styles['all-cancel-text']} onClick={handleRejectAllBtnClick}>
+          <div className="cursor-pointer hover:text-text-color-quaternary active:text-text-color-senary" onClick={handleRejectAllBtnClick}>
             {t('reject-all')}
           </div>
         </div>
-        <div className={styles['content']}>
+        <div className="flex flex-col gap-[5px] items-center justify-start w-full h-auto p-[15px] overflow-y-scroll">
           {friendApplications.map((application) => (
             <FriendApplicationItem key={application.senderId} application={application} />
           ))}
@@ -74,35 +72,35 @@ const FriendApplicationItem: React.FC<FriendApplicationItemProps> = React.memo((
   };
 
   return (
-    <div className={styles['application']}>
-      <div className={styles['avatar-picture']} onClick={handleSenderAvatarClick}>
+    <div className="flex justify-center w-full">
+      <div className="relative w-[40px] h-[40px] mr-[15px] cursor-pointer" onClick={handleSenderAvatarClick}>
         <Image src={application.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="sender_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
       <div style={{ flex: 1 }}>
-        <div className={styles['user-info-box']}>
-          <div className={styles['user-name-text']}>{application.name}</div>
-          <div className={styles['time-text']} title={getFormatTimestamp(application.createdAt)}>
+        <div className="flex items-center justify-between">
+          <div className="font-bold">{application.name}</div>
+          <div className="text-text-color-quaternary" title={getFormatTimestamp(application.createdAt)}>
             {getFormatTimeDiff(application.createdAt)}
           </div>
         </div>
-        <div className={styles['application-content-box']}>
+        <div className="flex flex-row items-start justify-between h-[80px] p-[2px] bg-background-secondary border border-border">
           <div className="col">
-            <div className={styles['content-text']}>{t('request-to-add-you-as-a-friend')}</div>
-            <div className={styles['content-text']}>
+            <div className="flex overflow-y-auto text-text-color-quaternary break-all">{t('request-to-add-you-as-a-friend')}</div>
+            <div className="flex overflow-y-auto text-text-color-quaternary break-all">
               {t('note')}: {application.description}
             </div>
           </div>
           <div className="row" style={{ alignSelf: 'flex-end' }}>
-            <div className={styles['action-buttons']}>
-              <div className={styles['action-button']} onClick={handleAcceptBtnClick}>
+            <div className="flex items-center justify-end min-w-max h-[28px] cursor-pointer">
+              <div className="flex items-center justify-center h-[23px] p-[3px] mb-[2px] bg-background border border-border hover:bg-hover active:bg-selected" onClick={handleAcceptBtnClick}>
                 {t('accept')}
               </div>
-              <div className={styles['action-button']} onClick={handleRejectBtnClick}>
+              <div className="flex items-center justify-center h-[23px] p-[3px] mb-[2px] bg-background border border-border hover:bg-hover active:bg-selected" onClick={handleRejectBtnClick}>
                 {t('reject')}
               </div>
             </div>
-            <div className={styles['direct-message-button']} onClick={handleDirectMessageBtnClick}>
-              <div className={styles['direct-message-icon']} />
+            <div className="w-[30px] h-[28px] cursor-pointer" onClick={handleDirectMessageBtnClick}>
+              <div className="w-full h-full bg-[url('/icon_notice_chat.svg')] bg-position-[0_0] bg-auto hover:bg-position-[-30px_0] active:bg-position-[-60px_0]" />
             </div>
           </div>
         </div>

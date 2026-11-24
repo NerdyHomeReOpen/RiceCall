@@ -28,8 +28,6 @@ import { objDiff } from '@/utils';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import styles from './server-setting.module.css';
-
 type ServerSettingPopupProps = Types.PopupProps<'serverSetting'>;
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData, memberApplications: memberApplicationsData }) => {
@@ -350,8 +348,8 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                   </div>
                 </div>
               </div>
-              <div className={styles['avatar-wrapper']}>
-                <div className={styles['avatar']}>
+              <div className="flex flex-col items-center justify-center w-[30%] h-auto">
+                <div className="w-[100px] h-[100px] border border-border">
                   <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
                 </div>
                 <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onChange={handleImageChange} />
@@ -377,7 +375,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
                 <div className="input-box col">
                   <div style={{ display: 'flex', alignItems: 'center' }}>
                     <div className="label">{t('wealth')}</div>
-                    <div className={styles['wealth-coin-icon']} />
+                    <div className="block w-[16px] h-[16px] bg-[url('/golden_pea.svg')] bg-cover" />
                   </div>
                   <input name="wealth" type="text" value={server.wealth} readOnly />
                 </div>

@@ -4,8 +4,6 @@ import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
 
-import styles from './badge-info-card.module.css';
-
 interface BadgeInfoCardProps {
   x: number;
   y: number;
@@ -58,18 +56,22 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
   }, [x, y, direction]);
 
   return (
-    <div ref={cardRef} className={`badge-info-card-container user-info-card-container ${styles['card']}`} style={isVisible ? { top: cardY, left: cardX } : { opacity: 0 }}>
-      <div className={styles['info-wrapper']}>
-        <div className={styles['avatar-wrapper']}>
+    <div
+      ref={cardRef}
+      className={`badge-info-card-container user-info-card-container fixed z-10000 flex flex-col gap-[10px] items-center w-[300px] min-h-[145px] p-[10px] bg-background-secondary border border-border`}
+      style={isVisible ? { top: cardY, left: cardX } : { opacity: 0 }}
+    >
+      <div className="flex flex-1 flex-row gap-[10px] items-start w-full">
+        <div className="flex flex-col items-center max-w-[75px]">
           <Image src={badge.iconUrl} alt="badge_icon" width={64} height={64} loading="lazy" draggable="false" />
-          <div className={styles['rarity-text']}>{`[${t('rare')}]`}</div>
+          <div className="mt-[8px] text-text-vip-name">{`[${t('rare')}]`}</div>
         </div>
-        <div className={styles['description-section']}>
-          <div className={styles['name-text']}>{t(badge.name)}</div>
-          <div className={styles['description']}>{t(badge.description, { nickname: badge.displayNickname })}</div>
+        <div className="flex flex-col gap-[10px] items-start justify-start w-full h-full ml-[10px]">
+          <div className="text-[1.1em] font-bold text-text-color-quaternary">{t(badge.name)}</div>
+          <div className="text-text-color-quaternary">{t(badge.description, { nickname: badge.displayNickname })}</div>
         </div>
       </div>
-      <div className={styles['show-time']}>{t('show-to', { '0': isPermanent ? t('permanent') : new Date(badge.showEndsAt).toLocaleDateString() })}</div>
+      <div className="w-full text-text-color-quaternary">{t('show-to', { '0': isPermanent ? t('permanent') : new Date(badge.showEndsAt).toLocaleDateString() })}</div>
     </div>
   );
 });

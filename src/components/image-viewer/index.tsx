@@ -10,8 +10,10 @@ interface ImageViewerProps {
 
 const ImageViewer: React.FC<ImageViewerProps> = React.memo(({ selectedImage, onUnselectImage }) => {
   return (
-    <div className={`${styles['image-viewer']} ${selectedImage ? styles['visible'] : styles['hidden']}`} onClick={onUnselectImage}>
-      {selectedImage && <Image loading="lazy" src={selectedImage} alt="image" onClick={(e) => e.stopPropagation()} width={-1} height={-1} />}
+    <div className={`fixed top-0 left-0 z-10000 items-center justify-center w-full h-full p-[5%] bg-[#00000080] ${selectedImage ? `flex ${styles['visible']}` : 'hidden'}`} onClick={onUnselectImage}>
+      {selectedImage && (
+        <Image className={`max-w-full max-h-full object-contain ${styles['image']}`} loading="lazy" src={selectedImage} alt="image" onClick={(e) => e.stopPropagation()} width={-1} height={-1} />
+      )}
     </div>
   );
 });

@@ -7,8 +7,6 @@ import * as ipc from '@/main/ipc';
 
 import { getDefaultServer } from '@/utils/default';
 
-import styles from './action-link.module.css';
-
 interface ActionLinkProps {
   href: string;
 }
@@ -36,16 +34,16 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
 
   if (!displayId) return <span>{href}</span>;
   return (
-    <span className={styles['invitation-container']}>
-      <span className={styles['invitation-header']}>
-        <span className={styles['icon']} />
-        <span className={styles['title']}>{t('join-server-invitation')}</span>
+    <span className="relative flex flex-col p-[5px] bg-white border border-[#ccc] rounded-[10px] shadow-[0_0_5px_1px_rgb(0_0_0/10%)]">
+      <span className="flex flex-row items-center justify-start">
+        <span className="w-[15px] h-[15px] bg-[url('/im/invitenotify.svg')] bg-no-repeat bg-center bg-contain" />
+        <span className="ml-[5px] text-[14px] text-[#999]">{t('join-server-invitation')}</span>
       </span>
-      <span className={styles['invitation-content']}>
+      <span className="px-[25px] py-[10px]">
         {t('server-invitation-content.prefix')}
-        <span className={styles['server-name']}>{server.name}</span>
+        <span className="text-text-link">{server.name}</span>
         {t('server-invitation-content.suffix')}
-        <span className={styles['action-link']} onClick={handleLinkClick}>
+        <span className="font-bold text-text-link cursor-pointer hover:text-[#013880]" onClick={handleLinkClick}>
           {t('join-server')}
         </span>
       </span>

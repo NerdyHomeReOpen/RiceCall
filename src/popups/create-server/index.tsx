@@ -15,8 +15,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { getDefaultServer } from '@/utils/default';
 
-import styles from './create-server.module.css';
-
 type CreateServerPopupProps = Types.PopupProps<'createServer'>;
 
 const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) => {
@@ -100,14 +98,16 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
           <div className="popup-tab">{t('fill-info')}</div>
         </div>
         <div className="popup-body">
-          <div className={styles['create-server-content']}>
-            <div className={styles['message']}>{t('remaining-server', { '0': remainingServers.toString() })}</div>
-            <div className={styles['select-type-text']}>{t('please-select-server-type')}</div>
-            <div className={styles['button-group']}>
+          <div className="flex flex-col justify-center w-full h-full p-[15px]">
+            <div className="p-[8px] mb-[15px] text-[0.9rem] text-text-color-quaternary bg-notification-toaster-background border border-notification-toaster-border">
+              {t('remaining-server', { '0': remainingServers.toString() })}
+            </div>
+            <div className="font-bold text-text-color-quaternary">{t('please-select-server-type')}</div>
+            <div className="flex flex-col gap-[10px] items-center p-[30px]">
               {SERVER_TYPES.map((type) => (
                 <div
                   key={type.value}
-                  className={`${styles['button']} ${serverType === type.value ? styles['selected'] : ''}`}
+                  className="w-1/2 p-[10px] text-center cursor-pointer bg-button-background border border-border rounded-[4px] hover:bg-hover active:bg-selected"
                   onClick={() => {
                     setServerType(type.value as Types.Server['type']);
                     setSection(1);
@@ -131,9 +131,9 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
           <div className="popup-tab active">{t('fill-info')}</div>
         </div>
         <div className="popup-body">
-          <div className={styles['create-server-content']} style={{ justifyContent: 'space-evenly' }}>
-            <div className={styles['avatar-wrapper']}>
-              <div className={styles['avatar-picture']}>
+          <div className="flex flex-col justify-center w-full h-full p-[15px]" style={{ justifyContent: 'space-evenly' }}>
+            <div className="flex flex-col items-center justify-center w-full h-auto">
+              <div className="relative w-[100px] h-[100px]">
                 <Image src={serverAvatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={100} height={100} loading="lazy" draggable="false" />
               </div>
               <input name="avatar" type="file" id="avatar-upload" style={{ display: 'none' }} accept="image/png, image/jpg, image/jpeg, image/webp, image/gif" onChange={handleImageChange} />

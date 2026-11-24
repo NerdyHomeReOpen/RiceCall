@@ -9,8 +9,6 @@ import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
 
 import ChannelTab from './ChannelTab';
 
-import styles from './edit-channel-order.module.css';
-
 interface CategoryTabProps {
   channels: (Types.Channel | Types.Category)[];
   category: Types.Category;
@@ -33,14 +31,16 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category
 
   return (
     <>
-      <div className={`${styles['channel-item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
-        <div className={`${styles['channel-icon']} ${styles['expanded']} ${styles[category.visibility]} ${category.isLobby ? styles['lobby'] : ''}`} />
-        <div className={styles['channel-label']} style={{ display: 'inline-flex' }}>
+      <div className={`relative flex gap-[2px] items-center h-[25px] py-[2px] pr-[20px] pl-[10px] mr-[5px] hover:bg-hover ${isSelected ? 'bg-selected' : ''}`} onClick={handleTabClick}>
+        <div
+          className={`inline-block min-w-[14px] min-h-[14px] cursor-pointer bg-[url('/channel/channelIcon.svg')] bg-no-repeat bg-auto ${category.isLobby ? 'bg-position-[-56px_-14px]' : { public: 'bg-position-[-14px_0]', member: 'bg-position-[-14px_-14px]', private: 'bg-position-[-28px_-14px]', readonly: 'bg-position-[-42px_-14px]' }[category.visibility]}`}
+        />
+        <div className="overflow-hidden text-ellipsis text-text-color-secondary whitespace-nowrap" style={{ display: 'inline-flex' }}>
           {category.name}
-          <div className={styles['channel-index-text']}>{`(${category.order})`}</div>
+          <div className="ml-[5px] text-[rgb(255_0_0)]">{`(${category.order})`}</div>
         </div>
       </div>
-      <div className={styles['channel-list']}>
+      <div className="flex flex-col *:pl-[25px]">
         {categoryChildren
           .sort((a, b) => a.order - b.order)
           .filter((c) => c.type === 'channel')

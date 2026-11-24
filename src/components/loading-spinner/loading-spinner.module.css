@@ -1,9 +1,0 @@
-.spinner {
-  min-width: 35px;
-  min-height: 35px;
-  background-image: url('/loading.gif');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: auto;
-  border-radius: 50%;
-}

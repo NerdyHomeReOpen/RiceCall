@@ -4,8 +4,6 @@ import type * as Types from '@/types';
 
 import NotificationMenuItem from './NotificationMenuItem';
 
-import styles from './notification-menu.module.css';
-
 interface NotificationMenuProps {
   x: number;
   y: number;
@@ -57,7 +55,11 @@ const NotificationMenu: React.FC<NotificationMenuProps> = React.memo(({ x, y, di
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['menu']}`} style={isVisible ? { top: menuY, left: menuX } : { opacity: 0 }}>
+    <div
+      ref={menuRef}
+      className={`context-menu-container not-empty:fixed not-empty:z-10000 not-empty:flex not-empty:flex-col not-empty:justify-around not-empty:min-w-[200px] not-empty:overflow-hidden not-empty:bg-background not-empty:rounded-[3px] not-empty:shadow-box-shadow`}
+      style={isVisible ? { top: menuY, left: menuX } : { opacity: 0 }}
+    >
       {filteredItems.map((item) => (
         <NotificationMenuItem key={item.id} item={item} onClose={onClose} />
       ))}

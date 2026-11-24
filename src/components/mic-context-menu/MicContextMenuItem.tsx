@@ -5,8 +5,6 @@ import type * as Types from '@/types';
 
 import MicContextMenu from '.';
 
-import styles from '../context-menu/context-menu.module.css';
-
 interface MicContextMenuItemProps {
   direction: 'left-top' | 'left-bottom' | 'right-top' | 'right-bottom';
   item: Types.ContextMenuItem;
@@ -38,7 +36,7 @@ const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ dire
 
   return (
     <div
-      className={`${styles['mic-context-menu-option']} ${item.hasSubmenu ? styles['has-submenu'] : ''} ${item.disabled ? 'disabled' : ''}`}
+      className={`relative flex items-center justify-center w-full px-[30px] py-[8px] text-text-color-quaternary hover:text-text-color-secondary before:absolute before:left-[6px] before:self-center before:min-w-[16px] before:min-h-[16px] before:content-[''] before:bg-no-repeat before:bg-center before:bg-auto ${item.disabled ? 'disabled' : ''}`}
       data-type={item.icon || ''}
       onClick={handleClick}
       onMouseEnter={handleMouseEnter}

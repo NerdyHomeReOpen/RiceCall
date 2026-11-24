@@ -9,8 +9,6 @@ import { useSoundPlayer } from '@/providers/SoundPlayer';
 
 import { objDiff } from '@/utils';
 
-import styles from './system-setting.module.css';
-
 type SystemSettingPopupProps = Types.PopupProps<'systemSetting'>;
 
 const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, userSettings: userSettingsData, systemSettings: systemSettingsData }) => {
@@ -722,54 +720,72 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
                   <tr>
                     <td>{t('enter-channel-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayEnterVoiceChannelSound} />
+                      <div
+                        className="min-w-[17px] min-h-[17px] cursor-pointer bg-[url('/playback.svg')] bg-no-repeat bg-position-[0] bg-cover hover:bg-position-[-17px] active:bg-position-[-34px]"
+                        onClick={handlePlayEnterVoiceChannelSound}
+                      />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleIsEnterVoiceChannelSoundEnabledChange}>
+                    <td className="cursor-pointer" onClick={handleIsEnterVoiceChannelSoundEnabledChange}>
                       {!systemSettings.isEnterVoiceChannelSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
                     <td>{t('leave-channel-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayLeaveVoiceChannelSound} />
+                      <div
+                        className="min-w-[17px] min-h-[17px] cursor-pointer bg-[url('/playback.svg')] bg-no-repeat bg-position-[0] bg-cover hover:bg-position-[-17px] active:bg-position-[-34px]"
+                        onClick={handlePlayLeaveVoiceChannelSound}
+                      />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleIsLeaveVoiceChannelSoundEnabledChange}>
+                    <td className="cursor-pointer" onClick={handleIsLeaveVoiceChannelSoundEnabledChange}>
                       {!systemSettings.isLeaveVoiceChannelSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
                     <td>{t('start-speaking-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayStartSpeakingSound} />
+                      <div
+                        className="min-w-[17px] min-h-[17px] cursor-pointer bg-[url('/playback.svg')] bg-no-repeat bg-position-[0] bg-cover hover:bg-position-[-17px] active:bg-position-[-34px]"
+                        onClick={handlePlayStartSpeakingSound}
+                      />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleIsStartSpeakingSoundEnabledChange}>
+                    <td className="cursor-pointer" onClick={handleIsStartSpeakingSoundEnabledChange}>
                       {!systemSettings.isStartSpeakingSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
                     <td>{t('stop-speaking-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayStopSpeakingSound} />
+                      <div
+                        className="min-w-[17px] min-h-[17px] cursor-pointer bg-[url('/playback.svg')] bg-no-repeat bg-position-[0] bg-cover hover:bg-position-[-17px] active:bg-position-[-34px]"
+                        onClick={handlePlayStopSpeakingSound}
+                      />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleIsStopSpeakingSoundEnabledChange}>
+                    <td className="cursor-pointer" onClick={handleIsStopSpeakingSoundEnabledChange}>
                       {!systemSettings.isStopSpeakingSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
                     <td>{t('receive-direct-message-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayReceiveDirectMessageSound} />
+                      <div
+                        className="min-w-[17px] min-h-[17px] cursor-pointer bg-[url('/playback.svg')] bg-no-repeat bg-position-[0] bg-cover hover:bg-position-[-17px] active:bg-position-[-34px]"
+                        onClick={handlePlayReceiveDirectMessageSound}
+                      />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleIsReceiveDirectMessageSoundEnabledChange}>
+                    <td className="cursor-pointer" onClick={handleIsReceiveDirectMessageSoundEnabledChange}>
                       {!systemSettings.isReceiveDirectMessageSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>
                   <tr>
                     <td>{t('receive-channel-message-sound-label')}</td>
                     <td>
-                      <div className={styles['sound-effect-preview-button']} onClick={handlePlayReceiveChannelMessageSound} />
+                      <div
+                        className="min-w-[17px] min-h-[17px] cursor-pointer bg-[url('/playback.svg')] bg-no-repeat bg-position-[0] bg-cover hover:bg-position-[-17px] active:bg-position-[-34px]"
+                        onClick={handlePlayReceiveChannelMessageSound}
+                      />
                     </td>
-                    <td className={styles['sound-effect-enable-text']} onClick={handleIsReceiveChannelMessageSoundEnabledChange}>
+                    <td className="cursor-pointer" onClick={handleIsReceiveChannelMessageSoundEnabledChange}>
                       {!systemSettings.isReceiveChannelMessageSoundEnabled || systemSettings.disableAllSoundEffect ? <div className={'disabled'}>{t('disable')}</div> : <div>{t('enable')}</div>}
                     </td>
                   </tr>

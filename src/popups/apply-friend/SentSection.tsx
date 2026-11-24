@@ -6,8 +6,6 @@ import type * as Types from '@/types';
 
 import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 
-import styles from './apply-friend.module.css';
-
 interface SentSectionProps {
   receiver: Types.User;
   onReceiverNameClick: () => void;
@@ -24,17 +22,17 @@ const SentSection: React.FC<SentSectionProps> = React.memo(({ receiver, onReceiv
         <div className="popup-content col">
           <div className="label">{t('apply-friend-label')}</div>
           <div className="row">
-            <div className={styles['user-avatar']}>
+            <div className="relative self-center w-[40px] h-[40px] mr-[5px] before:absolute before:-top-px before:-left-px before:z-1 before:min-w-[42px] before:min-h-[42px] before:content-[''] before:bg-[url('/channel/server_logo_border.svg')] before:bg-no-repeat before:bg-position-[0_0] before:bg-cover">
               <Image src={receiver.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="receiver_avatar" width={40} height={40} loading="lazy" draggable="false" />
             </div>
-            <div className={styles['user-info']}>
+            <div className="flex flex-1 flex-col justify-around h-full">
               <div className="link-text" onClick={onReceiverNameClick}>
                 {receiver.name}
               </div>
               <div className="sub-text">{receiver.displayId}</div>
             </div>
           </div>
-          <div className={styles['split']} />
+          <div className="w-full my-[5px] border-b border-b-border" />
           <div className="hint-text">{t('friend-application-sent')}</div>
         </div>
       </div>

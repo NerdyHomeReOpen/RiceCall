@@ -6,8 +6,6 @@ import { cleanMenu } from '@/utils';
 
 import ContextMenuItem from './ContextMenuItem';
 
-import styles from './context-menu.module.css';
-
 interface ContextMenuProps {
   x: number;
   y: number;
@@ -59,9 +57,17 @@ const ContextMenu: React.FC<ContextMenuProps> = React.memo(({ x, y, direction, i
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['context-menu']}`} style={isVisible ? { top: menuY, left: menuX } : { opacity: 0 }}>
+    <div
+      ref={menuRef}
+      className={`context-menu-container not-empty:fixed not-empty:z-10000 not-empty:flex not-empty:flex-col not-empty:justify-around not-empty:overflow-hidden not-empty:bg-background not-empty:rounded-[3px] not-empty:shadow-box-shadow not-empty:min-w-max`}
+      style={isVisible ? { top: menuY, left: menuX } : { opacity: 0 }}
+    >
       {filteredItems.map((item, index) =>
-        item.id === 'separator' ? <div key={index} className={styles['separator']} /> : <ContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />,
+        item.id === 'separator' ? (
+          <div key={index} className="block min-w-full min-h-px my-[2px] bg-[url('/ctrl/menu_spliter.svg')] bg-no-repeat bg-size-[100%_100%]" />
+        ) : (
+          <ContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />
+        ),
       )}
     </div>
   );

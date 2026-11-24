@@ -5,8 +5,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import MarkdownContent from '@/components/markdown-content';
 
-import styles from './notification-toaster.module.css';
-
 const NotificationToaster: React.FC = React.memo(() => {
   const notifications = useAppSelector((state) => state.notifications.data, shallowEqual);
 
@@ -35,9 +33,14 @@ const NotificationToaster: React.FC = React.memo(() => {
   }, [filteredNotifications]);
 
   return (
-    <div className={`${styles['toaster']} ${isVisible ? styles['show'] : ''}`}>
+    <div
+      className={`absolute right-0 bottom-0 z-10000 flex flex-row gap-[3px] justify-center max-w-full min-h-[25px] p-[3px] m-[10px] bg-notification-toaster-background border-[1.5px] border-notification-toaster-border rounded-[2px] transition-transform duration-1000 ease-linear ${isVisible ? 'transform-[translateY(0)]' : 'transform-[translateY(calc(100%+10px))]'}`}
+    >
       <MarkdownContent markdownText={filteredNotifications[showNotificationIndex]?.content ?? ''} isSelectable={false} />
-      <div className={styles['close-button']} onClick={handleCloseBtnClick} />
+      <div
+        className="w-[18px] min-w-[18px] h-[18px] min-h-[18px] cursor-pointer bg-[url('/loading_close.svg')] bg-position-[0_0] bg-cover hover:bg-position-[-18px_0] active:bg-position-[-36px_0]"
+        onClick={handleCloseBtnClick}
+      />
     </div>
   );
 });

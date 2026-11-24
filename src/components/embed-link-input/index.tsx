@@ -1,8 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
-import styles from './embed-link-input.module.css';
-
 interface EmbedLinkInputProps {
   x: number;
   y: number;
@@ -68,7 +66,11 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
   }, [x, y, direction]);
 
   return (
-    <div ref={embedLinkInputRef} className={`context-menu-container col ${styles['input-dropdown']}`} style={isVisible ? { left: pickerX, top: pickerY } : { opacity: 0 }}>
+    <div
+      ref={embedLinkInputRef}
+      className={`context-menu-container col absolute z-10000 w-[200px] p-[5px] bg-background rounded-[5px] shadow-box-shadow`}
+      style={isVisible ? { left: pickerX, top: pickerY } : { opacity: 0 }}
+    >
       <div className="input-box col">
         <div className="label">{t('link')}</div>
         <input type="text" placeholder="YouTube/Twitch/Kick" value={linkUrl} onChange={handleLinkUrlChange} />

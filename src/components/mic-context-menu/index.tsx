@@ -6,8 +6,6 @@ import { cleanMenu } from '@/utils';
 
 import MicContextMenuItem from './MicContextMenuItem';
 
-import styles from '../context-menu/context-menu.module.css';
-
 interface MicContextMenuProps {
   x: number;
   y: number;
@@ -59,9 +57,17 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
   }, [x, y, direction]);
 
   return (
-    <div ref={menuRef} className={`context-menu-container ${styles['mic-context-menu']}`} style={isVisible ? { top: menuY, left: menuX } : { opacity: 0 }}>
+    <div
+      ref={menuRef}
+      className={`context-menu-container not-empty:fixed not-empty:z-10000 not-empty:flex not-empty:flex-col not-empty:justify-around not-empty:overflow-hidden not-empty:bg-background not-empty:rounded-[3px] not-empty:shadow-box-shadow not-empty:min-w-[154px] not-empty:max-w-[154px]`}
+      style={isVisible ? { top: menuY, left: menuX } : { opacity: 0 }}
+    >
       {filteredItems.map((item, index) => {
-        return item.id === 'separator' ? <div key={index} className={styles['separator']} /> : <MicContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />;
+        return item.id === 'separator' ? (
+          <div key={index} className="block min-w-full min-h-px my-[2px] bg-[url('/ctrl/menu_spliter.svg')] bg-no-repeat bg-size-[100%_100%]" />
+        ) : (
+          <MicContextMenuItem key={item.id} direction={direction} item={item} onClose={onClose} />
+        );
       })}
     </div>
   );

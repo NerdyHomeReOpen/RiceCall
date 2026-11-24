@@ -13,8 +13,6 @@ import { useAppSelector } from '@/hooks/useStore';
 import CategoryTab from './CategoryTab';
 import ChannelTab from './ChannelTab';
 
-import styles from './edit-channel-order.module.css';
-
 type EditChannelOrderPopupProps = Types.PopupProps<'editChannelOrder'>;
 
 const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo(({ id, serverId }) => {
@@ -166,32 +164,53 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
   return (
     <div className="popup-wrapper">
-      <div className={styles['edit-channel-order-header']}>
-        <div className={`${styles['add-channel-button']} ${!canAdd ? 'disabled' : ''}`} onClick={handleAddChannelBtnClick}>
+      <div className="sticky top-0 z-1 flex justify-between w-full px-[5px] py-[8px] bg-[url('/channel/chn_toolbar_bg.svg')]">
+        <div
+          className={`flex px-[8px] py-[5px] cursor-pointer border border-[#fff0] hover:bg-[#ffffff4d] hover:border-border active:bg-[#ffffff96] before:block before:w-[16px] before:h-[16px] before:mr-[5px] before:content-[''] before:bg-position-[0_0] before:bg-auto before:bg-no-repeat before:bg-[url('/channel/channel_add.svg')] ${!canAdd ? 'disabled' : ''}`}
+          onClick={handleAddChannelBtnClick}
+        >
           {t('create')}
         </div>
-        <div className={`${styles['change-channel-name-button']} ${!canRename ? 'disabled' : ''}`} onClick={handleChangeChannelNameBtnClick}>
+        <div
+          className={`flex px-[8px] py-[5px] cursor-pointer border border-[#fff0] hover:bg-[#ffffff4d] hover:border-border active:bg-[#ffffff96] before:block before:w-[16px] before:h-[16px] before:mr-[5px] before:content-[''] before:bg-position-[0_0] before:bg-auto before:bg-no-repeat before:bg-[url('/channel/channel_rename.svg')] ${!canRename ? 'disabled' : ''}`}
+          onClick={handleChangeChannelNameBtnClick}
+        >
           {t('change-name')}
         </div>
-        <div className={`${styles['delete-channel-button']} ${!canDelete ? 'disabled' : ''}`} onClick={handleDeleteChannelBtnClick}>
+        <div
+          className={`flex px-[8px] py-[5px] cursor-pointer border border-[#fff0] hover:bg-[#ffffff4d] hover:border-border active:bg-[#ffffff96] before:block before:w-[16px] before:h-[16px] before:mr-[5px] before:content-[''] before:bg-position-[0_0] before:bg-auto before:bg-no-repeat before:bg-[url('/channel/channel_delete.svg')] ${!canDelete ? 'disabled' : ''}`}
+          onClick={handleDeleteChannelBtnClick}
+        >
           {t('delete')}
         </div>
-        <div className={`${styles['up-channel-order-button']} ${!canMoveUp ? 'disabled' : ''}`} onClick={handleMoveUpBtnClick}>
+        <div
+          className={`flex px-[8px] py-[5px] cursor-pointer border border-[#fff0] hover:bg-[#ffffff4d] hover:border-border active:bg-[#ffffff96] before:block before:w-[16px] before:h-[16px] before:mr-[5px] before:content-[''] before:bg-position-[0_0] before:bg-auto before:bg-no-repeat before:bg-[url('/channel/channel_up.svg')] ${!canMoveUp ? 'disabled' : ''}`}
+          onClick={handleMoveUpBtnClick}
+        >
           {t('move-up')}
         </div>
-        <div className={`${styles['down-channel-order-button']} ${!canMoveDown ? 'disabled' : ''}`} onClick={handleMoveDownBtnClick}>
+        <div
+          className={`flex px-[8px] py-[5px] cursor-pointer border border-[#fff0] hover:bg-[#ffffff4d] hover:border-border active:bg-[#ffffff96] before:block before:w-[16px] before:h-[16px] before:mr-[5px] before:content-[''] before:bg-position-[0_0] before:bg-auto before:bg-no-repeat before:bg-[url('/channel/channel_down.svg')] ${!canMoveDown ? 'disabled' : ''}`}
+          onClick={handleMoveDownBtnClick}
+        >
           {t('move-down')}
         </div>
-        <div className={`${styles['top-channel-order-button']} ${!canTop ? 'disabled' : ''}`} onClick={handleTopBtnClick}>
+        <div
+          className={`flex px-[8px] py-[5px] cursor-pointer border border-[#fff0] hover:bg-[#ffffff4d] hover:border-border active:bg-[#ffffff96] before:block before:w-[16px] before:h-[16px] before:mr-[5px] before:content-[''] before:bg-position-[0_0] before:bg-auto before:bg-no-repeat before:bg-[url('/channel/channel_head.svg')] ${!canTop ? 'disabled' : ''}`}
+          onClick={handleTopBtnClick}
+        >
           {t('move-top')}
         </div>
-        <div className={`${styles['bottom-channel-order-button']} ${!canBottom ? 'disabled' : ''}`} onClick={handleBottomBtnClick}>
+        <div
+          className={`flex px-[8px] py-[5px] cursor-pointer border border-[#fff0] hover:bg-[#ffffff4d] hover:border-border active:bg-[#ffffff96] before:block before:w-[16px] before:h-[16px] before:mr-[5px] before:content-[''] before:bg-position-[0_0] before:bg-auto before:bg-no-repeat before:bg-[url('/channel/channel_end.svg')] ${!canBottom ? 'disabled' : ''}`}
+          onClick={handleBottomBtnClick}
+        >
           {t('move-bottom')}
         </div>
       </div>
       <div className="popup-body">
-        <div className={styles['edit-channel-order-body']}>
-          <div className={styles['channel-list']} onClick={(e) => e.stopPropagation()}>
+        <div className="flex flex-col justify-start w-full h-full overflow-y-auto">
+          <div className="flex flex-col" onClick={(e) => e.stopPropagation()}>
             {sortedChannels.map((c) =>
               c.type === 'category' ? <CategoryTab key={c.channelId} channels={channels} category={c} onSelect={handleSelect} /> : <ChannelTab key={c.channelId} channel={c} onSelect={handleSelect} />,
             )}

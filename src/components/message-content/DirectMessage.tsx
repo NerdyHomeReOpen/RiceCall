@@ -11,8 +11,6 @@ import MarkdownContent from '@/components/markdown-content';
 
 import { getFormatTimestamp } from '@/utils/language';
 
-import styles from './message-content.module.css';
-
 interface DirectMessageProps {
   messageGroup: Types.DirectMessage & { contents: string[] };
 }
@@ -38,12 +36,15 @@ const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }
   };
 
   return (
-    <div className={styles['message-box']}>
-      <div className={styles['details']}>
-        <div className={`${styles['username-text']} ${hasVip ? styles['vip'] : ''}`} onClick={handleUsernameClick}>
+    <div className="flex flex-col gap-[3px] items-start justify-start min-w-0">
+      <div className="flex flex-row gap-[3px] items-center overflow-hidden">
+        <div
+          className={`overflow-hidden text-ellipsis whitespace-nowrap cursor-pointer select-text hover:underline ${hasVip ? 'text-text-vip-name hover:text-text-vip-name-hover' : 'text-text-username'}`}
+          onClick={handleUsernameClick}
+        >
           {messageGroup.name}
         </div>
-        <div className={styles['timestamp-text']}>{formattedTimestamp}</div>
+        <div className="min-w-fit ml-[5px] text-text-color-quinary select-text">{formattedTimestamp}</div>
       </div>
       {formattedMessageContents.map((content, index) => (
         <MarkdownContent key={index} markdownText={content} />

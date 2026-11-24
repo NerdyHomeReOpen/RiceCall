@@ -6,8 +6,6 @@ import { STATUS_OPTIONS } from '@/constants';
 
 import StatusItem from './StatusItem';
 
-import styles from './status-dropdown.module.css';
-
 interface StatusDropdownProps {
   x: number;
   y: number;
@@ -57,7 +55,11 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
   }, [x, y, direction]);
 
   return (
-    <div ref={dropdownRef} className={`context-menu-container ${styles['status-dropdown']}`} style={isVisible ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}>
+    <div
+      ref={dropdownRef}
+      className={`context-menu-container absolute top-[20px] z-10000 flex flex-col flex-wrap items-center justify-between w-fit h-fit bg-background rounded-[3px] shadow-box-shadow`}
+      style={isVisible ? { top: dropdownY, left: dropdownX } : { opacity: 0 }}
+    >
       {STATUS_OPTIONS.map((status) => (
         <StatusItem key={status} status={status} onStatusSelect={onStatusSelect} onClose={onClose} />
       ))}

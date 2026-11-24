@@ -16,8 +16,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { getDefaultFriendGroup } from '@/utils/default';
 
-import styles from './invite-friend.module.css';
-
 type InviteFriendPopupProps = Types.PopupProps<'inviteFriend'>;
 
 const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, server }) => {
@@ -64,11 +62,11 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
 
   return (
     <div className="popup-wrapper">
-      <div className={styles['header']}>
-        <div className={styles['options-content']}>
-          <div className={styles['search-bar']}>
-            <div className={styles['search-icon']} />
-            <input name="query" type="text" className={styles['search-input']} placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
+      <div className="flex flex-1 items-center justify-center w-full max-h-[45px] border-b border-b-border">
+        <div className="min-w-[80%]">
+          <div className="group flex items-center pl-[10px] mr-[10px] border border-border rounded-[5px]">
+            <div className="min-w-[20px] min-h-[20px] bg-[url('/channel/channel_search.svg')] bg-no-repeat bg-position-[0_0] group-hover:bg-position-[-20px_0]" />
+            <input name="query" type="text" className="flex-1 w-[125px] p-[5px]" placeholder={t('search-friend-placeholder')} value={query} onChange={handleQueryChange} />
           </div>
         </div>
         <div className={`button ${selectedUserIds.length === 0 ? 'disabled' : ''}`} onClick={handleInviteFriendBtnClick}>
@@ -76,14 +74,14 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
         </div>
       </div>
       <div className="popup-body">
-        <div className={styles['friend-group-list']}>
+        <div className="flex flex-1 flex-col min-w-0 min-h-0 p-[10px]">
           <div className="row">
-            <div className={styles['checkbox']}>
+            <div className="flex items-center p-[5px] text-[14px]">
               <input type="checkbox" checked={isAllSelected} onChange={handleSelectAllChange} />
               {t('select-all')} {t('invite-total-for', { 0: selectedUserIds.length })}
             </div>
           </div>
-          <div className={styles['scroll-view']}>
+          <div className="flex-1 overflow-y-auto">
             {sortedFriendGroups.map((friendGroup) => (
               <FriendGroupTab key={friendGroup.friendGroupId} friendGroup={friendGroup} friends={sortedFriends} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
             ))}
@@ -129,15 +127,15 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, fri
 
   return (
     <>
-      <div className={`${styles['group-item']}`}>
+      <div className="flex gap-[2px] items-center h-[25px] p-[5px]">
         <input type="checkbox" checked={isAllSelected} onChange={handleSelectAllChange} />
-        <div className={`${styles['group-details']} ${selectedUserIdSet.has(friendGroup.friendGroupId) ? styles['selected'] : ''}`} onClick={handleTabClick}>
-          <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
-          <div className={styles['group-label']}>{friendGroup.name}</div>
-          <div className={styles['group-count-text']}>{`(${friendGroupFriends.length})`}</div>
+        <div className="flex flex-row gap-[5px] items-center" onClick={handleTabClick}>
+          <div className={`inline-block min-w-[14px] min-h-[14px] bg-[url('/channel/channelIcon.svg')] bg-no-repeat bg-auto ${isExpanded ? 'bg-position-[-14px_0]' : 'bg-position-[0_0]'}`} />
+          <div>{friendGroup.name}</div>
+          <div>{`(${friendGroupFriends.length})`}</div>
         </div>
       </div>
-      <div className={styles['group-content']} style={isExpanded ? {} : { display: 'none' }}>
+      <div style={isExpanded ? {} : { display: 'none' }}>
         {friendGroupFriends.map((friend) => (
           <FriendTab key={friend.targetId} friend={friend} selectedUserIdSet={selectedUserIdSet} onSelect={handleSelect} />
         ))}
@@ -164,14 +162,14 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend, selectedUserId
   };
 
   return (
-    <div className={`${styles['friend-item']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick}>
+    <div className={`relative flex gap-[5px] items-center justify-start p-[5px] pl-[20px] ${isSelected ? 'bg-selected' : 'hover:bg-hover'}`} onClick={handleTabClick}>
       <input type="checkbox" checked={isSelected} readOnly />
-      <div className={styles['avatar']}>
+      <div className="relative w-[25px] h-[25px]">
         <Image src={friend.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="friend_avatar" width={25} height={25} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['base-info']}>
+      <div className="flex flex-row items-center">
         {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
-        <div className={`${styles['name-text']} ${hasVip ? styles['vip'] : ''}`}>
+        <div className="overflow-hidden text-ellipsis font-bold whitespace-nowrap">
           {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
         </div>
       </div>

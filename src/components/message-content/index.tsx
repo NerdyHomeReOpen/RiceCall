@@ -6,8 +6,6 @@ import ChannelMessage from './ChannelMessage';
 import DirectMessage from './DirectMessage';
 import PromptMessage from './PromptMessage';
 
-import styles from './message-content.module.css';
-
 type MessageGroup = (Types.ChannelMessage | Types.DirectMessage | Types.PromptMessage) & { contents: string[] };
 
 interface MessageContentProps {
@@ -34,7 +32,7 @@ const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages }) 
   }, [messages]);
 
   return (
-    <div className={styles['message-content-wrapper']}>
+    <div className="relative flex flex-1 flex-col gap-[5px] min-w-0 max-w-full">
       {messageGroups.map((messageGroup, index) => {
         switch (messageGroup.type) {
           case 'general':

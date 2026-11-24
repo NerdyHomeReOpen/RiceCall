@@ -1,8 +1,6 @@
 import React, { useLayoutEffect, useRef, useState } from 'react';
 import { ColorResult, SketchPicker } from 'react-color';
 
-import styles from './color-picker.module.css';
-
 interface ColorPickerProps {
   x: number;
   y: number;
@@ -59,7 +57,7 @@ const ColorPicker: React.FC<ColorPickerProps> = React.memo(({ x, y, direction, o
   return (
     <div
       ref={colorPickerRef}
-      className={`color-picker-container context-menu-container ${styles['color-picker']}`}
+      className={`color-picker-container context-menu-container absolute z-10000`}
       style={isVisible ? { left: pickerX, top: pickerY } : { opacity: 0 }}
       onMouseDown={(e) => e.stopPropagation()}
     >

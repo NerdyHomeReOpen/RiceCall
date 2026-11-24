@@ -10,8 +10,6 @@ import { getFormatTimestamp, getFormatTimeDiff } from '@/utils/language';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import styles from './member-invitation.module.css';
-
 interface MemberInvitationItemProps {
   invitation: Types.MemberInvitation;
 }
@@ -28,32 +26,28 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
   };
 
   return (
-    <div className={styles['application']}>
-      <div className={styles['avatar-picture']}>
+    <div className="flex justify-center w-full">
+      <div className="w-[45px] h-[45px] mr-[15px] cursor-pointer bg-[url('/im/SecretaryLogo.svg')] bg-center bg-cover border border-border">
         <Image src={invitation.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="sender_avatar" width={45} height={45} loading="lazy" draggable="false" />
       </div>
       <div style={{ flex: 1 }}>
-        <div className={styles['user-info-box']}>
-          <div className={styles['user-name-text']}>{invitation.name}</div>
-          <div className={styles['time-text']} title={getFormatTimestamp(invitation.createdAt)}>
+        <div className="flex items-center justify-between">
+          <div className="font-bold">{invitation.name}</div>
+          <div className="text-text-color-quaternary" title={getFormatTimestamp(invitation.createdAt)}>
             {getFormatTimeDiff(invitation.createdAt)}
           </div>
         </div>
-        <div className={styles['application-content-box']}>
+        <div className="flex flex-row items-start justify-between h-[80px] p-[2px] bg-background-secondary border border-border">
           <div className="col">
-            <div className={styles['content-text']}>{t('invite-you-to-be-member')}</div>
-            <div className={styles['content-text']}>
+            <div className="flex overflow-y-auto text-text-color-quaternary break-all">{t('invite-you-to-be-member')}</div>
+            <div className="flex overflow-y-auto text-text-color-quaternary break-all">
               {t('note')}: {invitation.description}
             </div>
           </div>
           <div className="row" style={{ alignSelf: 'flex-end' }}>
-            <div className={styles['action-buttons']}>
-              <div className={styles['button']} onClick={handleAcceptBtnClick}>
-                {t('accept')}
-              </div>
-              <div className={styles['button']} onClick={handleRejectBtnClick}>
-                {t('reject')}
-              </div>
+            <div className="flex items-center justify-end min-w-max h-[28px] cursor-pointer">
+              <div onClick={handleAcceptBtnClick}>{t('accept')}</div>
+              <div onClick={handleRejectBtnClick}>{t('reject')}</div>
             </div>
           </div>
         </div>

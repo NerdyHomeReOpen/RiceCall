@@ -12,8 +12,6 @@ import MarkdownContent from '@/components/markdown-content';
 import { escapeHtml } from '@/utils/tag-converter';
 import { getPermissionText } from '@/utils/language';
 
-import styles from './message-content.module.css';
-
 interface PromptMessageProps {
   messageGroup: Types.PromptMessage & { contents: string[] };
   messageType?: Types.PromptMessage['type'];
@@ -47,8 +45,10 @@ const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, 
   };
 
   return (
-    <div className={`${styles['message-box']} ${styles['event']}`} onContextMenu={handleMessageContextMenu}>
-      <div className={styles[`${messageType}-icon`]} />
+    <div className="flex flex-row gap-[3px] items-start justify-start min-w-0" onContextMenu={handleMessageContextMenu}>
+      <div
+        className={`flex w-[12px] min-w-[12px] h-[12px] min-h-[12px] bg-no-repeat bg-center ${{ info: "bg-[url('/channel/NT_NOTIFY.svg')]", event: "bg-[url('/channel/NT_NOTIFY.svg')]", warn: "bg-[url('/channel/NT_WARNING.svg')]", alert: "bg-[url('/channel/NT_ANNOUNCEMENT.svg')]" }[messageType]}`}
+      />
       {formattedMessagesContents.map((content, index) => (
         <MarkdownContent key={index} markdownText={content} />
       ))}
