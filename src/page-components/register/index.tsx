@@ -137,7 +137,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
     setIsLoading(true);
 
-    await ipc.auth.register({ account, password, email, username, locale: ipc.systemSettings.language.get() }).then((res) => {
+    await ipc.auth.register({ account, password, email, username, locale: ipc.systemSettings.locale.get() }).then((res) => {
       if (res.success) {
         openAlertDialog(t(res.message, { '0': email }), onBackToLoginBtnClick);
       }

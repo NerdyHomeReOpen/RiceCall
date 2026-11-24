@@ -488,15 +488,15 @@ export const systemSettings = {
       return modules.default.listen('update-channel', callback);
     },
   },
-  language: {
-    set: (language: Types.Locale): void => {
-      modules.default.setLanguage(language);
+  locale: {
+    set: (locale: Types.Locale): void => {
+      modules.default.setLocale(locale);
     },
     get: (): Types.Locale => {
-      return modules.default.getLanguage();
+      return modules.default.getLocale();
     },
-    onUpdate: (callback: (language: Types.Locale) => void): (() => void) => {
-      return modules.default.listen('language', callback);
+    onUpdate: (callback: (locale: Types.Locale) => void): (() => void) => {
+      return modules.default.listen('locale', callback);
     },
   },
 };

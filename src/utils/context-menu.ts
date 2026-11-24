@@ -252,16 +252,16 @@ export default class ContextMenu {
     return this;
   }
 
-  addLanguageSelectOption(params: { languages: readonly { code: Types.Locale; label: string }[] }, onClick: (code: Types.Locale | null) => void): this {
+  addLocaleSelectOption(params: { locales: readonly { code: Types.Locale; label: string }[] }, onClick: (code: Types.Locale | null) => void): this {
     this.options.push({
       id: 'language-select',
       label: 'language-select',
       icon: 'submenu-left',
-      hasSubmenu: params.languages.length > 0,
-      submenuItems: params.languages.map((language) => ({
-        id: `language-select-${language.code}`,
-        label: language.label,
-        onClick: () => onClick(language.code),
+      hasSubmenu: params.locales.length > 0,
+      submenuItems: params.locales.map((locale) => ({
+        id: `language-select-${locale.code}`,
+        label: locale.label,
+        onClick: () => onClick(locale.code),
       })),
       onClick: () => onClick(null),
     });

@@ -74,13 +74,13 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     ipc.exit();
   };
 
-  const changeLanguage = (language: Types.Locale) => {
-    ipc.systemSettings.language.set(language);
+  const changeLocale = (locale: Types.Locale) => {
+    ipc.systemSettings.locale.set(locale);
   };
 
   const { buildContextMenu: buildHeaderContextMenu } = useHeaderCtxMenu({
     user,
-    onChangeLanguage: changeLanguage,
+    onChangeLocale: changeLocale,
     onLogout: logout,
     onExit: exit,
   });

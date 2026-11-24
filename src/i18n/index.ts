@@ -128,13 +128,13 @@ export function t(key: string, params?: Record<string, string>): string {
   return i18next.t(key, params);
 }
 
-export function changeLanguage(language: Types.Locale): void {
+export function changeLocale(locale: Types.Locale): void {
   if (!i18next.isInitialized) {
     new Logger('I18N').error('i18next is not initialized');
     return;
   }
 
-  i18next.changeLanguage(language);
+  i18next.changeLanguage(locale);
 }
 
 export default i18next;

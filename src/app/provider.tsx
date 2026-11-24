@@ -8,7 +8,7 @@ import type * as Types from '@/types';
 
 import * as ipc from '@/main/ipc';
 
-import { changeLanguage, i18nReady } from '@/i18n';
+import { changeLocale, i18nReady } from '@/i18n';
 
 import Logger from '@/utils/logger';
 
@@ -73,14 +73,14 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
   useEffect(() => {
     if (!i18nLoaded) return;
 
-    const changeLang = (language: Types.Locale) => {
-      new Logger('LANGUAGE').info(`Language updated: ${language}`);
-      if (!language) return;
-      changeLanguage(language);
+    const applyLocale = (locale: Types.Locale) => {
+      new Logger('LOCALE').info(`Locale updated: ${locale}`);
+      if (!locale) return;
+      changeLocale(locale);
     };
 
-    changeLang(ipc.systemSettings.language.get());
-    const unsub = ipc.systemSettings.language.onUpdate(changeLang);
+    applyLocale(ipc.systemSettings.locale.get());
+    const unsub = ipc.systemSettings.locale.onUpdate(applyLocale);
     return () => unsub();
   }, [i18nLoaded]);
 

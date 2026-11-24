@@ -2,7 +2,7 @@ import type * as Types from '@/types';
 
 import { SYSTEM_FONT_LIST } from '@/constants';
 
-import { store, eventEmitter, getSettings, getLanguage as getLang } from '@/main/web';
+import { store, eventEmitter, getSettings, getSystemLocale } from '@/main/web';
 
 export function getSystemSettings(): Types.SystemSettings {
   return getSettings();
@@ -173,8 +173,8 @@ export function getUpdateChannel(): string {
   return store.get('updateChannel');
 }
 
-export function getLanguage(): Types.Locale {
-  return store.get('language');
+export function getLocale(): Types.Locale {
+  return store.get('locale');
 }
 
 export function setIsAutoLoginEnabled(enable: boolean = false): void {
@@ -377,7 +377,7 @@ export function setUpdateChannel(channel: string = 'latest'): void {
   eventEmitter.emit('update-channel', channel);
 }
 
-export function setLanguage(language: string = getLang()): void {
-  store.set('language', language);
-  eventEmitter.emit('language', language);
+export function setLocale(locale: string = getSystemLocale()): void {
+  store.set('locale', locale);
+  eventEmitter.emit('locale', locale);
 }

@@ -3,9 +3,9 @@ import fontList from 'font-list';
 
 import type * as Types from '@/types';
 
-import { changeLanguage } from '@/i18n';
+import { changeLocale } from '@/i18n';
 
-import { store, getSettings, broadcast, isAutoLaunchEnabled, setIsAutoLaunchEnabled, mainWindow, getLanguage, setTrayDetail, startCheckForUpdates, stopCheckForUpdates } from '@/main/electron';
+import { store, getSettings, broadcast, isAutoLaunchEnabled, setIsAutoLaunchEnabled, mainWindow, getSystemLocale, setTrayDetail, startCheckForUpdates, stopCheckForUpdates } from '@/main/electron';
 
 export function registerSystemHandlers(): void {
   ipcMain.on('get-system-settings', (event) => {
@@ -177,8 +177,8 @@ export function registerSystemHandlers(): void {
     event.returnValue = store.get('updateChannel');
   });
 
-  ipcMain.on('get-language', (event) => {
-    event.returnValue = store.get('language');
+  ipcMain.on('get-locale', (event) => {
+    event.returnValue = store.get('locale');
   });
 
   ipcMain.on('set-is-auto-login-enabled', (_, enable = false) => {
@@ -386,10 +386,10 @@ export function registerSystemHandlers(): void {
     broadcast('update-channel', channel);
   });
 
-  ipcMain.on('set-language', (_, language: Types.Locale = getLanguage()) => {
-    store.set('language', language);
-    changeLanguage(language);
+  ipcMain.on('set-locale', (_, locale: Types.Locale = getSystemLocale()) => {
+    store.set('locale', locale);
+    changeLocale(locale);
     setTrayDetail();
-    broadcast('language', language);
+    broadcast('locale', locale);
   });
 }

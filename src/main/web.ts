@@ -46,7 +46,7 @@ class Store {
 export const store = new Store({
   defaults: {
     accounts: {},
-    language: getLanguage(),
+    locale: getSystemLocale(),
     customThemes: [],
     currentTheme: null,
     isAutoLoginEnabled: false,
@@ -142,7 +142,7 @@ export function getSettings(): Types.SystemSettings {
   };
 }
 
-export function getLanguage(): Types.Locale {
+export function getSystemLocale(): Types.Locale {
   return pickLocale(navigator.languages?.length ? navigator.languages : [navigator.language]);
 }
 

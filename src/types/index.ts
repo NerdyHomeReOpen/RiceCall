@@ -361,7 +361,7 @@ export type ClientToServerEventsWithAck = {
 
 export type StoreType = {
   accounts: Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>;
-  language: Locale;
+  locale: Locale;
   customThemes: Theme[];
   currentTheme: Theme | null;
   isAutoLoginEnabled: boolean;

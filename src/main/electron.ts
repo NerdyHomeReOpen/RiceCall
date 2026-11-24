@@ -304,7 +304,7 @@ export function configureLogger(): void {
 export const store = new Store<Types.StoreType>({
   defaults: {
     accounts: {},
-    language: getLanguage(),
+    locale: getSystemLocale(),
     customThemes: [],
     currentTheme: null,
     isAutoLoginEnabled: false,
@@ -423,7 +423,7 @@ export function getSettings(): Types.SystemSettings {
   };
 }
 
-export function getLanguage(): Types.Locale {
+export function getSystemLocale(): Types.Locale {
   return pickLocale(app.getPreferredSystemLanguages().length ? app.getPreferredSystemLanguages() : [app.getLocale()]);
 }
 
