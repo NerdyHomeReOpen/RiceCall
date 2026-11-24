@@ -37,7 +37,7 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
   const isAllSelected = sortedFriends.every((f) => selectedUserIdSet.has(f.targetId));
 
   const handleSelect = (userId: Types.User['userId']) => {
-    if (selectedUserIdSet.has(userId)) setSelectedUserIds((prev) => prev.filter((userId) => userId !== userId));
+    if (selectedUserIdSet.has(userId)) setSelectedUserIds((prev) => prev.filter((selectedUserId) => selectedUserId !== userId));
     else setSelectedUserIds((prev) => [...prev, userId]);
   };
 
