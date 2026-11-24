@@ -38,6 +38,7 @@ type DirectMessagePopupProps = Types.PopupInitialData['directMessage'];
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ target, event, message }) => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
+
   const editor = useEditor({
     extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode, ChatEnter],
     content: '',
@@ -52,7 +53,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   const messageAreaRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const shakeTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
 
   const user = useAppSelector(
@@ -69,7 +69,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   const [canShakeWindow, setCanShakeWindow] = useState<boolean>(true);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
   const [unreadMessageCount, setUnreadMessageCount] = useState<number>(0);
-
   const textLength = editor?.getText().length || 0;
   const isWarning = textLength > MAX_INPUT_LENGTH;
   const isFriend = friends.find((f) => f.targetId === target.userId && f.relationStatus === RelationStatus.Friend) !== undefined;
@@ -93,23 +92,28 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
 
   const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
+
     for (const item of items) {
       if (item.type.startsWith('image/')) {
         const image = item.getAsFile();
         if (!image || isUploadingRef.current) return;
+
         image.arrayBuffer().then((arrayBuffer) => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
+
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
             openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
+
           ipc.api.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
               syncStyles();
             }
+
             isUploadingRef.current = false;
           });
         });
@@ -121,6 +125,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     if (isWarning) return;
     if (isComposingRef.current) return;
     if (e.shiftKey || e.ctrlKey) return;
+
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInput.trim().length === 0) return;
@@ -167,6 +172,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     }
 
     setCanShakeWindow(false);
+
     shakeTimeoutRef.current = setTimeout(() => {
       setCanShakeWindow(true);
       shakeTimeoutRef.current = null;
@@ -227,19 +233,23 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     const file = e.target.files?.[0];
     if (!file || isUploadingRef.current) return;
     e.target.value = '';
+
     file.arrayBuffer().then((arrayBuffer) => {
       const imageUnit8Array = new Uint8Array(arrayBuffer);
       isUploadingRef.current = true;
+
       if (imageUnit8Array.length > MAX_FILE_SIZE) {
         openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
         isUploadingRef.current = false;
         return;
       }
+
       ipc.api.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
         if (response) {
           editor?.chain().insertImage({ src: response.imageUrl, alt: file.name }).focus().run();
           syncStyles();
         }
+
         isUploadingRef.current = false;
       });
     });
@@ -261,6 +271,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
       setTargetCurrentServer(null);
       return;
     }
+
     ipc.api.fetchServer({ userId: target.userId, serverId: targetCurrentServer.serverId }).then((server) => {
       if (server) setTargetCurrentServer(server);
     });
@@ -272,7 +283,6 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
 
   useEffect(() => {
     if (!messageAreaRef.current || directMessages.length === 0) return;
-
     const lastMessage = directMessages[directMessages.length - 1];
     const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= 100;
 
@@ -289,6 +299,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') scrollToBottom();
     };
+
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [scrollToBottom]);
@@ -304,10 +315,10 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
         const user1Id = user.userId.localeCompare(target.userId) < 0 ? user.userId : target.userId;
         const user2Id = user.userId.localeCompare(target.userId) < 0 ? target.userId : user.userId;
         const isCurrentConversation = item.user1Id === user1Id && item.user2Id === user2Id;
-
         if (isCurrentConversation) setDirectMessages((prev) => [...prev, item]);
       });
     };
+
     if (event === 'directMessage' && message) onDirectMessage(message);
     const unsub = ipc.socket.on('directMessage', onDirectMessage);
     return () => unsub();
@@ -323,23 +334,27 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
 
         if (isCurrentConversation) {
           setDirectMessages((prev) => [...prev, item]);
-
           const start = performance.now();
+
           const shake = (time: number) => {
             const elapsed = time - start;
+
             if (elapsed > 500) {
               document.body.style.transform = 'translate(0, 0)';
               return;
             }
+
             const x = Math.round((Math.random() - 0.5) * 10);
             const y = Math.round((Math.random() - 0.5) * 10);
             document.body.style.transform = `translate(${x}px, ${y}px)`;
             requestAnimationFrame(shake);
           };
+
           requestAnimationFrame(shake);
         }
       });
     };
+
     if (event === 'shakeWindow' && message) onShakeWindow(message);
     const unsub = ipc.socket.on('shakeWindow', onShakeWindow);
     return () => unsub();

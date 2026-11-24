@@ -11,6 +11,7 @@ function srgbToLinear(c: number): number {
 function linearToSrgb(c: number): number {
   return c <= 0.0031308 ? c * 12.92 : 1.055 * Math.pow(c, 1 / 2.4) - 0.055;
 }
+
 function luminance(rLin: number, gLin: number, bLin: number): number {
   return 0.2126 * rLin + 0.7152 * gLin + 0.0722 * bLin;
 }
@@ -32,19 +33,14 @@ export function getVisibleColor({ r, g, b }: RGB, minContrast = 3): RGB {
   const G = srgbToLinear(norm(g));
   const B = srgbToLinear(norm(b));
   const L = luminance(R, G, B);
-
   const Lmax = 1.05 / minContrast - 0.05;
-
   if (L <= Lmax) return { r, g, b };
-
   const scale = Lmax / L;
   const R2 = Math.max(0, Math.min(1, R * scale));
   const G2 = Math.max(0, Math.min(1, G * scale));
   const B2 = Math.max(0, Math.min(1, B * scale));
-
   const to8bit = (x: number) => Math.round(Math.max(0, Math.min(1, linearToSrgb(x))) * 255);
   const out: RGB = { r: to8bit(R2), g: to8bit(G2), b: to8bit(B2) };
-
   return out;
 }
 
@@ -62,16 +58,13 @@ export function getDominantColor(url: string): Promise<RGB> {
       const canvas = document.createElement('canvas');
       canvas.width = img.width;
       canvas.height = img.height;
-
       const ctx = canvas.getContext('2d');
       if (!ctx) return reject('No canvas context');
-
       ctx.drawImage(img, 0, 0);
-
       const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const data = imageData.data;
-
       const colorCount: Record<string, number> = {};
+
       for (let i = 0; i < data.length; i += 4) {
         const r = data[i];
         const g = data[i + 1];
@@ -96,18 +89,14 @@ export function toRGBString({ r, g, b }: RGB): string {
 export function getLerpColor(color1: string, color2: string, t: number): string {
   const c1 = parseInt(color1.slice(1), 16);
   const c2 = parseInt(color2.slice(1), 16);
-
   const r1 = (c1 >> 16) & 0xff;
   const g1 = (c1 >> 8) & 0xff;
   const b1 = c1 & 0xff;
-
   const r2 = (c2 >> 16) & 0xff;
   const g2 = (c2 >> 8) & 0xff;
   const b2 = c2 & 0xff;
-
   const r = Math.round(r1 + (r2 - r1) * t);
   const g = Math.round(g1 + (g2 - g1) * t);
   const b = Math.round(b1 + (b2 - b1) * t);
-
   return `#${((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1)}`;
 }

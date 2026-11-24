@@ -4,7 +4,8 @@ This is the RiceCall desktop app (Next.js renderer and Electron main process). T
 
 - `RiceCallEngineeringStandard/docs/code-style.md`: naming, imports, file order, functions, types, control flow, errors and comments.
 - `RiceCallEngineeringStandard/docs/environment.md`: shared environment variable names and the `.env.example` format.
-- `docs/naming-conventions.md` and `docs/css-naming-convention.md`: React, hook and CSS Module file names specific to this repository.
+- `docs/naming-conventions.md`: React and hook file names specific to this repository.
+- `docs/styling.md`: Tailwind CSS conventions; do not add CSS files or CSS Modules.
 
 Rules:
 

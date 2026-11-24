@@ -21,6 +21,7 @@ export function clearDiscordPresence(): void {
 export async function configureDiscordRPC(): Promise<void> {
   DiscordRPC.register(DISCORD_RPC_CLIENT_ID);
   rpc = new DiscordRPC.Client({ transport: 'ipc' });
+
   rpc = await rpc.login({ clientId: DISCORD_RPC_CLIENT_ID }).catch((e) => {
     const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('DISCORD_RPC').error(`Cannot login to discord rpc: ${error.message}`);

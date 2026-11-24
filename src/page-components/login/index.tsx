@@ -12,9 +12,7 @@ interface LoginPageProps {
 
 const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRegisterBtnClick, onChangeServerBtnClick }) => {
   const { t } = useTranslation();
-
   const comboRef = useRef<HTMLDivElement>(null);
-
   const [account, setAccount] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [rememberAccount, setRememberAccount] = useState<boolean>(false);
@@ -29,6 +27,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value, checked } = e.target;
+
     if (name === 'account') {
       const match = accounts[value];
       setAccount(value);
@@ -44,6 +43,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
         setIsAutoLoginEnabled(false);
         setRememberAccount(false);
       }
+
       setRememberAccount(checked);
     }
   };
@@ -59,9 +59,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement> | React.MouseEvent<HTMLButtonElement>) => {
     e.preventDefault();
-
     if (!account || !password) return;
-
     setIsLoading(true);
 
     await ipc.auth.login({ account, password }).then((res) => {
@@ -94,6 +92,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     const changeAccounts = (accounts: Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>) => {
       setAccounts(accounts);
     };
+
     changeAccounts(ipc.accounts.get());
     const unsub = ipc.accounts.onUpdate(changeAccounts);
     return () => unsub();
@@ -103,6 +102,7 @@ const LoginPageComponent: React.FC<LoginPageProps> = React.memo(({ display, onRe
     const onPointerDown = (e: MouseEvent) => {
       if (!comboRef.current?.contains(e.target as Node)) setIsAccountSelectBoxVisible(false);
     };
+
     document.addEventListener('pointerdown', onPointerDown);
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);

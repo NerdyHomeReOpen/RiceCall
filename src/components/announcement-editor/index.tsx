@@ -33,6 +33,7 @@ interface AnnouncementEditorProps {
 const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ announcement, showPreview = false, onChange, targetServerId, targetChannelId }) => {
   const { t } = useTranslation();
   const { showColorPicker, showEmojiPicker, showEmbedLinkInput } = useContextMenu();
+
   const editor = useEditor({
     extensions: [StarterKit, Color, TextAlign.configure({ types: ['paragraph', 'heading'] }), TextStyle, FontFamily, FontSize, EmojiNode, YouTubeNode, TwitchNode, KickNode, ImageNode],
     content: fromTags(announcement),
@@ -41,7 +42,6 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
   });
 
   const isUploadingRef = useRef(false);
-
   const [isBold, setIsBold] = useState(false);
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
@@ -130,6 +130,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showColorPicker(x, y, 'right-bottom', (color) => {
       editor?.chain().setColor(color).focus().run();
       setTextColor(color);
@@ -141,6 +142,7 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, undefined, undefined, (code) => {
       editor?.chain().insertEmoji({ code }).focus().run();
       syncStyles();
@@ -151,24 +153,29 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showEmbedLinkInput(x, y, 'right-bottom', (linkUrl) => {
       const isYouTube = linkUrl.trim().includes('youtube.com/');
       const isTwitch = linkUrl.trim().includes('twitch.tv/');
       const isKick = linkUrl.trim().includes('kick.com/');
+
       if (isYouTube) {
         const videoId = linkUrl.trim().split('/watch?v=')[1].split('&')[0];
+
         if (videoId && videoId.match(/^[\w-]+$/)) {
           editor?.chain().insertYouTube(videoId).focus().run();
           syncStyles();
         }
       } else if (isTwitch) {
         const username = linkUrl.trim().split('twitch.tv/')[1].split('&')[0];
+
         if (username && username.match(/^[\w-]+$/)) {
           editor?.chain().insertTwitch(username).focus().run();
           syncStyles();
         }
       } else if (isKick) {
         const username = linkUrl.trim().split('kick.com/')[1].split('&')[0];
+
         if (username && username.match(/^[\w-]+$/)) {
           editor?.chain().insertKick(username).focus().run();
           syncStyles();
@@ -179,23 +186,28 @@ const AnnouncementEditor: React.FC<AnnouncementEditorProps> = React.memo(({ anno
 
   const handlePaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
+
     for (const item of items) {
       if (item.type.startsWith('image/')) {
         const image = item.getAsFile();
         if (!image || isUploadingRef.current) return;
+
         image.arrayBuffer().then((arrayBuffer) => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
+
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
             openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
+
           ipc.api.uploadImage({ folder: 'announcement', imageName: `${Date.now()}`, imageUnit8Array, targetServerId, targetChannelId }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
               syncStyles();
             }
+
             isUploadingRef.current = false;
           });
         });

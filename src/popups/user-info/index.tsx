@@ -20,6 +20,7 @@ import { useCountries } from '@/hooks/useCountries';
 import RecentServerCard from './RecentServerCard';
 import JoinedServerCard from './JoinedServerCard';
 import FavoriteServerCard from './FavoriteServerCard';
+
 import LevelIcon from '@/components/level-icon';
 import BadgeItem from '@/components/badge-item';
 
@@ -31,10 +32,8 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
   const { countries } = useCountries();
-
   const signatureInputRef = useRef<HTMLInputElement>(null);
   const isUploadingRef = useRef<boolean>(false);
-
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
 
   const user = useAppSelector(
@@ -48,7 +47,6 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   const [editedTarget, setEditedTarget] = useState(targetData);
   const [serversView, setServersView] = useState<'joined' | 'favorite'>('joined');
   const [selectedTabId, setSelectedTabId] = useState<'about' | 'groups' | 'edit'>('about');
-
   const currentYear = new Date().getFullYear();
   const currentMonth = new Date().getMonth() + 1;
   const currentDay = new Date().getDate();
@@ -110,27 +108,33 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
     const fileInput = document.createElement('input');
     fileInput.type = 'file';
     fileInput.accept = 'image/png, image/jpg, image/jpeg, image/webp, image/gif';
+
     fileInput.onchange = (e) => {
       const image = (e.target as HTMLInputElement).files?.[0];
       if (!image || isUploadingRef.current) return;
+
       image.arrayBuffer().then((arrayBuffer) => {
         openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
           isUploadingRef.current = true;
+
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
             openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
+
           ipc.api.uploadImage({ folder: 'user', imageName: target.userId, imageUnit8Array }).then((response) => {
             if (response) {
               setTarget((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
               editUser({ avatar: response.imageName, avatarUrl: response.imageUrl });
             }
+
             isUploadingRef.current = false;
           });
         });
       });
     };
+
     fileInput.click();
   };
 
@@ -161,6 +165,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
       openErrorDialog(new Error('invalid-country'), () => {});
       return;
     }
+
     editUser(objDiff(editedTarget, target));
     setTarget(editedTarget);
     setSelectedTabId('about');
@@ -214,6 +219,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
     e.preventDefault();
     e.stopPropagation();
     const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
+
     showEmojiPicker(x, y, 'left-top', e.currentTarget as HTMLElement, false, undefined, undefined, (_, full) => {
       signatureInputRef.current?.focus();
       document.execCommand('insertText', false, full as string);
@@ -230,9 +236,11 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
 
   useEffect(() => {
     const daysInMonth = new Date(target.birthYear, target.birthMonth, 0).getDate();
+
     if (target.birthDay > daysInMonth) {
       setTarget((prev) => ({ ...prev, birthDay: daysInMonth }));
     }
+
     if (isFutureDate(target.birthYear, target.birthMonth, target.birthDay)) {
       setTarget((prev) => ({ ...prev, birthYear: currentYear, birthMonth: currentMonth, birthDay: currentDay }));
     }
@@ -248,12 +256,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
         </div>
       );
     }
+
     if (!serverCards.length)
       return (
         <div className="flex items-center justify-center w-full h-[76px] [font-family:'Noto_Sans_TC',sans-serif] text-[16px] leading-[1.2] text-[#436da1] text-center bg-[url('/card/bg_list_tips.svg')] bg-no-repeat bg-center bg-auto">
           {t(emptyTipKey)}
         </div>
       );
+
     return serverCards;
   };
 

@@ -15,7 +15,6 @@ import SearchResultItem from './SearchResultItem';
 const ServerSearchBar: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { getIsLoading, loadServer } = useLoading();
-
   const searchRef = useRef<HTMLDivElement>(null);
   const canSearchRef = useRef<boolean>(true);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -31,11 +30,9 @@ const ServerSearchBar: React.FC = React.memo(() => {
   );
 
   const servers = useAppSelector((state) => state.servers.data, shallowEqual);
-
   const [exactMatch, setExactMatch] = useState<Types.Server | null>(null);
   const [personalResults, setPersonalResults] = useState<Types.Server[]>([]);
   const [relatedResults, setRelatedResults] = useState<Types.Server[]>([]);
-
   const hasResults = !!exactMatch || !!personalResults.length || !!relatedResults.length;
   const hasInput = !!inputRef.current?.value.trim();
 
@@ -47,9 +44,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
 
     ipc.api.searchServer({ query }).then((serverResults) => {
       const q = queryRef.current;
-
       clearSearchState();
-
       if (!serverResults.length) return;
 
       const sorted = [...serverResults].sort((a, b) => {
@@ -63,6 +58,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
           if (s.specialId === q || s.displayId === q) acc.exact = s;
           else if (servers.some((ps) => ps.serverId === s.serverId)) acc.personal.push(s);
           else acc.related.push(s);
+
           return acc;
         },
         { exact: null, personal: [], related: [] },
@@ -72,12 +68,14 @@ const ServerSearchBar: React.FC = React.memo(() => {
       setPersonalResults(personal);
       setRelatedResults(related);
     });
+
     queryRef.current = query;
     canSearchRef.current = false;
-
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
     searchTimerRef.current = setTimeout(() => {
       canSearchRef.current = true;
+
       if (queryRef.current !== inputRef.current?.value) {
         searchServers(inputRef.current?.value || '');
       }
@@ -128,6 +126,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
         clearSearchState(true);
       }
     };
+
     document.addEventListener('pointerdown', onPointerDown);
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
@@ -135,12 +134,14 @@ const ServerSearchBar: React.FC = React.memo(() => {
   useEffect(() => {
     const unsub = ipc.deepLink.onDeepLink((serverDisplayId: string) => {
       if (!user.userId || !serverDisplayId) return;
+
       ipc.api.searchServer({ query: serverDisplayId }).then((servers) => {
         const target = servers.find((s) => s.specialId === serverDisplayId || s.displayId === serverDisplayId);
         if (!target) return;
         selectServer(target);
       });
     });
+
     return () => unsub();
   }, [user.userId, selectServer]);
 

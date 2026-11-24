@@ -19,4 +19,5 @@ export const uiSlice = createSlice({
 });
 
 export const { setSelectedItemId } = uiSlice.actions;
+
 export default uiSlice.reducer;

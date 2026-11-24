@@ -13,6 +13,7 @@ import { createPopup, store } from '@/main/electron';
 
 const unpackedFfmpegPath = ffmpegPath && app.isPackaged ? ffmpegPath.replace('app.asar', 'app.asar.unpacked') : ffmpegPath;
 const binaryPath = unpackedFfmpegPath ?? '';
+
 ffmpeg.setFfmpegPath(binaryPath);
 
 function convertWavToMp3AndSave(inputWav: ArrayBuffer, outputMp3: string) {
@@ -38,7 +39,6 @@ export function registerRecordHandlers(): void {
       }
 
       const format = store.get('recordFormat') === 'mp3' ? 'mp3' : 'wav';
-
       const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
       const fileName = `recording-${timestamp}.${format}`;
       const outputPath = path.join(outputDir, fileName);
@@ -61,6 +61,7 @@ export function registerRecordHandlers(): void {
       defaultPath: store.get('recordSavePath'),
       properties: ['openDirectory'],
     });
+
     if (canceled) return null;
     return filePaths[0];
   });

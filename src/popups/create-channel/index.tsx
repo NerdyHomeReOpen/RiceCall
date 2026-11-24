@@ -13,9 +13,7 @@ type CreateChannelPopupProps = Types.PopupProps<'createChannel'>;
 
 const CreateChannelPopup: React.FC<CreateChannelPopupProps> = React.memo(({ id, serverId, parent }) => {
   const { t } = useTranslation();
-
   const [channelName, setChannelName] = useState<string>(getDefaultChannel({ type: 'channel' }).name);
-
   const canSubmit = channelName.trim();
 
   const handleChannelNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

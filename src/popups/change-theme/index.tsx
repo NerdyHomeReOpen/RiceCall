@@ -6,12 +6,11 @@ import type * as Types from '@/types';
 import * as ipc from '@/main/ipc';
 
 import Logger from '@/utils/logger';
+import { getDominantColor, getVisibleColor, getContrastColor, toRGBString, RGB } from '@/utils/color';
 
 import { openImageCropper } from '@/services';
 
 import { useContextMenu } from '@/providers/ContextMenu';
-
-import { getDominantColor, getVisibleColor, getContrastColor, toRGBString, RGB } from '@/utils/color';
 
 // Preset theme tiles: handleThemeSelect reads --header-image / --main-color / --secondary-color back with getComputedStyle.
 const PRESET_THEMES = [
@@ -38,11 +37,9 @@ const PRESET_THEMES = [
 
 const ChangeThemePopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
-
   const isSelectingColorRef = useRef<boolean>(false);
   const ImageInputRef = useRef<HTMLInputElement>(null);
   const colorSelectorRef = useRef<HTMLDivElement>(null);
-
   const [isColorPickerVisible, setIsColorPickerVisible] = useState<boolean>(false);
   const [pickedColor, setPickedColor] = useState<RGB>({ r: 0, g: 0, b: 0 });
   const [customThemes, setCustomThemes] = useState<Types.Theme[]>(Array.from({ length: 7 }));
@@ -53,7 +50,6 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const headerImage = computedStyle.getPropertyValue('--header-image');
     const mainColor = computedStyle.getPropertyValue('--main-color');
     const secondaryColor = computedStyle.getPropertyValue('--secondary-color');
-
     ipc.customThemes.current.set({ headerImage, mainColor, secondaryColor });
   };
 
@@ -70,11 +66,13 @@ const ChangeThemePopup: React.FC = React.memo(() => {
     const img = new Image();
     img.crossOrigin = 'Anonymous';
     img.src = imgSrc;
+
     img.onload = () => {
       const canvas = document.createElement('canvas');
       canvas.width = img.naturalWidth;
       canvas.height = img.naturalHeight;
       const ctx = canvas.getContext('2d');
+
       if (ctx) {
         ctx.drawImage(img, 0, 0, img.naturalWidth, img.naturalHeight);
         const safeOffsetX = Math.max(0, Math.min(offsetX, img.naturalWidth - 1));
@@ -84,6 +82,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
         setPickedColor(color);
       }
     };
+
     img.onerror = () => {
       new Logger('COLOR_SELECTOR').error(`Error loading color selector image: ${imgSrc}`);
     };
@@ -99,6 +98,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       ctx.fillRect(0, 0, 20, 20);
       return canvas.toDataURL('webp', 1);
     };
+
     const visibleColor = getVisibleColor(pickedColor);
     const contrastColor = getContrastColor(pickedColor);
 
@@ -128,9 +128,11 @@ const ChangeThemePopup: React.FC = React.memo(() => {
   const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     if (!image) return;
+
     image.arrayBuffer().then((arrayBuffer) => {
       openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         const buffer = imageUnit8Array.buffer;
+
         const imageUrl = await ipc.customThemes.saveImage(buffer as ArrayBuffer, 'custom_themes', 'theme', 'webp').catch((e) => {
           const error = e instanceof Error ? e : new Error('Unknown error');
           new Logger('CHANGE_THEME').error(`Error saving image: ${error.message}`);
@@ -160,6 +162,7 @@ const ChangeThemePopup: React.FC = React.memo(() => {
       new Logger('CUSTOM_THEMES').info(`Custom themes updated: ${customThemes}`);
       setCustomThemes(customThemes);
     };
+
     changeCustomTheme(ipc.customThemes.get());
     const unsub = ipc.customThemes.onUpdate(changeCustomTheme);
     return () => unsub();
@@ -171,11 +174,14 @@ const ChangeThemePopup: React.FC = React.memo(() => {
         isSelectingColorRef.current = true;
       }
     };
+
     const onPointerUp = () => {
       isSelectingColorRef.current = false;
     };
+
     document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('pointerup', onPointerUp);
+
     return () => {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('pointerup', onPointerUp);

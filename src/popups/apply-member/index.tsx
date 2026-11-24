@@ -15,7 +15,6 @@ type ApplyMemberPopupProps = Types.PopupProps<'applyMember'>;
 const ApplyMemberPopup: React.FC<ApplyMemberPopupProps> = React.memo(({ id, server, memberApplication }) => {
   const [section, setSection] = useState<number>(memberApplication ? 1 : 0);
   const [applicationDesc, setApplicationDesc] = useState<Types.MemberApplication['description']>(memberApplication?.description || '');
-
   const isSendSection = section === 0;
   const isSentSection = section === 1;
   const isEditSection = section === 2;

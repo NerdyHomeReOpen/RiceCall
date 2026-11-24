@@ -10,7 +10,6 @@ import MemberInvitationItem from './MemberInvitationItem';
 
 const MemberInvitationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
-
   const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
 
   const handleRejectAllBtnClick = () => {

@@ -23,10 +23,12 @@ class LocalStorageAdapter implements I18nStorageType {
 
   keys(): string[] {
     const result: string[] = [];
+
     for (let i = 0; i < localStorage.length; i++) {
       const k = localStorage.key(i);
       if (k) result.push(k);
     }
+
     return result;
   }
 }
@@ -78,8 +80,10 @@ class NoopStorage implements I18nStorageType {
   getItem(_key: string): string | null {
     return null;
   }
+
   setItem(_key: string, _value: string): void {}
   removeItem(_key: string): void {}
+
   keys(): string[] {
     return [];
   }
@@ -114,6 +118,7 @@ export default class I18nStorage {
       new Logger('I18N_STORAGE').error('storage not initialized');
       return new NoopStorage();
     }
+
     return storage;
   }
 }

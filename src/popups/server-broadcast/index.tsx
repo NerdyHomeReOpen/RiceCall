@@ -13,11 +13,9 @@ type ServerBroadcastPopupProps = Types.PopupProps<'serverBroadcast'>;
 
 const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ id, serverId, channelId }) => {
   const { t } = useTranslation();
-
   const [sendType, setSendType] = useState<'text' | 'voice'>('text');
   const [broadcastType, setBroadcastType] = useState<'channel' | 'server'>('channel');
   const [broadcastContent, setBroadcastContent] = useState<string>('');
-
   const canSend = broadcastContent.trim() && broadcastContent.length <= MAX_BROADCAST_LENGTH;
 
   const handleBroadcastChannelClick = () => {
@@ -42,8 +40,10 @@ const ServerBroadcastPopup: React.FC<ServerBroadcastPopupProps> = React.memo(({ 
 
   const handleConfirmBtnClick = () => {
     if (!canSend) return;
+
     if (broadcastType === 'channel') broadcastChannel(serverId, channelId, { type: 'alert', content: broadcastContent });
     else broadcastServer(serverId, { type: 'alert', content: broadcastContent });
+
     ipc.popup.close(id);
   };
 

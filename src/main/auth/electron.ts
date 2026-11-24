@@ -18,6 +18,7 @@ export async function login(formData: { account: string; password: string }): Pr
         mainWindow?.showInactive();
         authWindow?.hide();
       }
+
       return res;
     })
     .catch((e) => {
@@ -60,6 +61,7 @@ export async function autoLogin(token: string): Promise<{ success: true; token: 
         store.set('token', '');
         removeToken();
       }
+
       return res;
     })
     .catch((e) => {

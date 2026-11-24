@@ -27,4 +27,5 @@ export const channelEventsSlice = createSlice({
 });
 
 export const { setChannelEvents, addChannelEvents, clearChannelEvents } = channelEventsSlice.actions;
+
 export default channelEventsSlice.reducer;

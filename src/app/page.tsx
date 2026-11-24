@@ -29,7 +29,6 @@ import ServerPage from '@/page-components/server';
 const RootPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { getIsLoading, loadServer, stopLoading } = useLoading();
-
   const [selectedTab, setSelectedTab] = useState<'home' | 'friends' | 'server'>('home');
 
   const user = useAppSelector(
@@ -50,7 +49,6 @@ const RootPageComponent: React.FC = React.memo(() => {
 
   const onlineMembersLength = useAppSelector((state) => state.onlineMembers.data.length, shallowEqual);
   const isSocketConnected = useAppSelector((state) => state.socket.isSocketConnected, shallowEqual);
-
   const isSelectedHomePage = selectedTab === 'home';
   const isSelectedFriendsPage = selectedTab === 'friends';
   const isSelectedServerPage = selectedTab === 'server';
@@ -66,6 +64,7 @@ const RootPageComponent: React.FC = React.memo(() => {
   useEffect(() => {
     if (user.currentServerId) setSelectedTab('server');
     else if (!user.currentServerId) setSelectedTab('home');
+
     stopLoading();
   }, [user.currentServerId, stopLoading]);
 
@@ -75,6 +74,7 @@ const RootPageComponent: React.FC = React.memo(() => {
       loadServer(data.serverDisplayId);
       ipc.socket.send('connectServer', { serverId: data.serverId });
     };
+
     const unsub = ipc.server.onSelect(onServerSelect);
     return () => unsub();
   }, [user.currentServerId, getIsLoading, loadServer]);
@@ -92,6 +92,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           timestamp: Date.now(),
           buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
         });
+
         break;
       case 'friends':
         ipc.discord.updatePresence({
@@ -104,6 +105,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           timestamp: Date.now(),
           buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
         });
+
         break;
       case 'server':
         ipc.discord.updatePresence({
@@ -116,6 +118,7 @@ const RootPageComponent: React.FC = React.memo(() => {
           timestamp: Date.now(),
           buttons: [{ label: t('rpc:join-discord-server'), url: 'https://discord.gg/adCWzv6wwS' }],
         });
+
         break;
     }
   }, [selectedTab, user.name, currentServer.name, onlineMembersLength, t]);

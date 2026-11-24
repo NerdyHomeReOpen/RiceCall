@@ -24,4 +24,5 @@ export const socketSlice = createSlice({
 });
 
 export const { setIsSocketConnected, setLatency } = socketSlice.actions;
+
 export default socketSlice.reducer;

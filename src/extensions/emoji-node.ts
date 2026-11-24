@@ -16,14 +16,12 @@ export const EmojiNode = Node.create({
   inline: true,
   atom: true,
   selectable: true,
-
   addAttributes() {
     return {
       code: { default: '' },
       src: { default: '' },
     };
   },
-
   parseHTML() {
     return [
       {
@@ -35,7 +33,6 @@ export const EmojiNode = Node.create({
       },
     ];
   },
-
   renderHTML({ node }) {
     return [
       'img',
@@ -46,7 +43,6 @@ export const EmojiNode = Node.create({
       },
     ];
   },
-
   addCommands() {
     return {
       insertEmoji:

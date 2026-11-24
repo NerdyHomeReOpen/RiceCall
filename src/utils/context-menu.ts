@@ -9,6 +9,7 @@ export default class ContextMenu {
       id: 'separator',
       label: '',
     });
+
     return this;
   }
 
@@ -20,6 +21,7 @@ export default class ContextMenu {
       disabled: params.isInChannel,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -30,6 +32,7 @@ export default class ContextMenu {
       show: true,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -40,6 +43,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -50,6 +54,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -60,6 +65,7 @@ export default class ContextMenu {
       show: params.isSubChannel ? params.permissionLevel >= Permission.ChannelAdmin : params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -70,6 +76,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -83,6 +90,7 @@ export default class ContextMenu {
       show: !params.isInChannel && params.currentPermissionLevel >= Permission.ChannelMod && params.permissionLevel >= Permission.ChannelMod && params.movableChannelUserIds.length > 0,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -93,6 +101,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -103,6 +112,7 @@ export default class ContextMenu {
       show: params.movableChannelUserIds.length > 0 && params.permissionLevel >= Permission.Staff,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -113,6 +123,7 @@ export default class ContextMenu {
       show: params.movableServerUserIds.length > 0 && params.permissionLevel >= Permission.Staff,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -124,6 +135,7 @@ export default class ContextMenu {
       disabled: params.isPrivateChannel || params.isReadonlyChannel,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -134,6 +146,7 @@ export default class ContextMenu {
       show: params.permissionLevel < Permission.Member,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -145,6 +158,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -156,6 +170,7 @@ export default class ContextMenu {
       icon: 'edit-nickname',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -167,6 +182,7 @@ export default class ContextMenu {
       icon: 'edit-nickname-no-icon',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -177,6 +193,7 @@ export default class ContextMenu {
       icon: 'locate-me',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -187,6 +204,7 @@ export default class ContextMenu {
       icon: 'report',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -197,6 +215,7 @@ export default class ContextMenu {
       icon: params.isFavorite ? 'unfavorite-server' : 'favorite-server',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -207,6 +226,7 @@ export default class ContextMenu {
       icon: 'system-setting',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -217,6 +237,7 @@ export default class ContextMenu {
       icon: 'change-theme',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -227,6 +248,7 @@ export default class ContextMenu {
       icon: 'feedback',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -243,6 +265,7 @@ export default class ContextMenu {
       })),
       onClick: () => onClick(null),
     });
+
     return this;
   }
 
@@ -264,6 +287,7 @@ export default class ContextMenu {
       ],
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -274,6 +298,7 @@ export default class ContextMenu {
       icon: 'logout',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -284,6 +309,7 @@ export default class ContextMenu {
       icon: 'exit',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -294,6 +320,7 @@ export default class ContextMenu {
       show: !params.isSelf,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -303,6 +330,7 @@ export default class ContextMenu {
       label: 'view-profile',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -313,6 +341,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isLowerLevel && !params.isInLobby && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -323,6 +352,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -333,6 +363,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -343,6 +374,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -353,6 +385,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.permissionLevel >= Permission.ChannelAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -363,6 +396,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.targetPermissionLevel < Permission.Member && params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -385,6 +419,7 @@ export default class ContextMenu {
       submenuItems: submenuItems,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -400,6 +435,7 @@ export default class ContextMenu {
         params.permissionLevel >= Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -413,6 +449,7 @@ export default class ContextMenu {
       show: !!params.channelCategoryId && params.permissionLevel >= Permission.ChannelAdmin && params.targetPermissionLevel < Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -426,6 +463,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ServerAdmin && params.targetPermissionLevel < Permission.ChannelAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -436,6 +474,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ServerOwner && params.targetPermissionLevel < Permission.ServerAdmin,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -446,6 +485,7 @@ export default class ContextMenu {
       show: !['', 'blacklist', 'stranger'].includes(params.friendGroupId),
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -456,6 +496,7 @@ export default class ContextMenu {
       show: !['', 'blacklist', 'stranger'].includes(params.friendGroupId),
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -466,6 +507,7 @@ export default class ContextMenu {
       show: !params.isSelf && !params.isFriend,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -476,6 +518,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isFriend,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -492,6 +535,7 @@ export default class ContextMenu {
       ],
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -505,6 +549,7 @@ export default class ContextMenu {
       submenuItems: submenuItems,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -517,6 +562,7 @@ export default class ContextMenu {
         onClick: () => onClick(group.friendGroupId || null),
       })),
     );
+
     return this;
   }
 
@@ -527,6 +573,7 @@ export default class ContextMenu {
       show: !params.isSelf,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -537,6 +584,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isFriend,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -547,6 +595,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isPending,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -556,6 +605,7 @@ export default class ContextMenu {
       label: 'join-server',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -565,6 +615,7 @@ export default class ContextMenu {
       label: 'view-server-info',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -575,6 +626,7 @@ export default class ContextMenu {
       show: params.isSelf && params.permissionLevel >= Permission.Member && params.permissionLevel < Permission.ServerOwner,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -585,6 +637,7 @@ export default class ContextMenu {
       show: !params.isSelf && !params.isInSameChannel,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -596,6 +649,7 @@ export default class ContextMenu {
       disabled: params.isInQueue,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -606,6 +660,7 @@ export default class ContextMenu {
       show: !params.isSelf,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -619,6 +674,7 @@ export default class ContextMenu {
       show: !params.isSelf && !params.isInSameChannel && params.isEqualOrLowerLevel && params.currentPermissionLevel >= Permission.ChannelMod && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -629,6 +685,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -639,6 +696,7 @@ export default class ContextMenu {
       show: !params.isSelf && params.isLowerLevel && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -648,6 +706,7 @@ export default class ContextMenu {
       label: 'open-announcement',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -657,6 +716,7 @@ export default class ContextMenu {
       label: 'close-announcement',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -666,6 +726,7 @@ export default class ContextMenu {
       label: 'clean-up-message',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -675,6 +736,7 @@ export default class ContextMenu {
       label: 'channel-event',
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -686,6 +748,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -697,6 +760,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -710,6 +774,7 @@ export default class ContextMenu {
       submenuItems: submenuItems,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -721,6 +786,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -732,6 +798,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -742,6 +809,7 @@ export default class ContextMenu {
       show: params.queuePosition === 0 && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -752,6 +820,7 @@ export default class ContextMenu {
       show: params.queuePosition > 1 && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -762,6 +831,7 @@ export default class ContextMenu {
       show: params.queuePosition > 0 && params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -772,6 +842,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -782,6 +853,7 @@ export default class ContextMenu {
       show: params.permissionLevel >= Permission.ChannelMod,
       onClick: onClick,
     });
+
     return this;
   }
 
@@ -791,6 +863,7 @@ export default class ContextMenu {
       label: 'network-diagnosis',
       onClick: onClick,
     });
+
     return this;
   }
 

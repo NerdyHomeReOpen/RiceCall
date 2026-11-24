@@ -17,9 +17,9 @@ interface DirectMessageProps {
 
 const DirectMessage: React.FC<DirectMessageProps> = React.memo(({ messageGroup }) => {
   const { t } = useTranslation();
-
   const hasVip = messageGroup.vip > 0;
   const formattedTimestamp = getFormatTimestamp(messageGroup.timestamp);
+
   const formattedMessageContents = useMemo(
     () =>
       messageGroup.contents.map((content) =>

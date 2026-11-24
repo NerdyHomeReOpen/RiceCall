@@ -36,4 +36,5 @@ export const onlineMembersSlice = createSlice({
 });
 
 export const { setOnlineMembers, addOnlineMembers, updateOnlineMembers, removeOnlineMembers, clearOnlineMembers } = onlineMembersSlice.actions;
+
 export default onlineMembersSlice.reducer;

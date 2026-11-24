@@ -15,7 +15,6 @@ import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 
 const FriendVerificationPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
-
   const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
 
   const handleRejectAllBtnClick = () => {

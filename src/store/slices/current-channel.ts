@@ -29,4 +29,5 @@ export const currentChannelSlice = createSlice({
 });
 
 export const { setCurrentChannel, updateCurrentChannel, clearCurrentChannel } = currentChannelSlice.actions;
+
 export default currentChannelSlice.reducer;

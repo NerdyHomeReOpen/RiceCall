@@ -56,6 +56,7 @@ export function clearQueue(serverId: Types.Server['serverId'], channelId: Types.
 
 export function connectChannel(serverId: Types.Server['serverId'], channelId: Types.Channel['channelId'], canJoin: boolean, isPasswordNeeded: boolean): void {
   if (!canJoin) return;
+
   if (isPasswordNeeded) openChannelPassword((password) => ipc.socket.send('connectChannel', { serverId, channelId, password }));
   else ipc.socket.send('connectChannel', { serverId, channelId });
 }
@@ -687,7 +688,6 @@ type RegisterForm = {
 export async function register(formData: RegisterForm): Promise<{ success: true; message: string } | { success: false }> {
   const res = await post('/account/register', formData);
   if (!res || typeof res !== 'object' || !('message' in res) || typeof res.message !== 'string') return { success: false };
-
   return { success: true, message: res.message };
 }
 
@@ -699,13 +699,11 @@ type LoginForm = {
 export async function login(formData: LoginForm): Promise<{ success: true; token: string } | { success: false }> {
   const res = await post('/account/login', { ...formData, version: packageJson.version });
   if (!res || typeof res !== 'object' || !('token' in res) || typeof res.token !== 'string') return { success: false };
-
   return { success: true, token: res.token };
 }
 
 export async function autoLogin(token: string): Promise<{ success: true; token: string } | { success: false }> {
   const res = await post('/token/verify', { token, version: packageJson.version });
   if (!res || typeof res !== 'object' || !('token' in res) || typeof res.token !== 'string') return { success: false };
-
   return { success: true, token: res.token };
 }

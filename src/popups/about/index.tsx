@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
-import { useTranslation } from 'react-i18next';
+
 import packageJson from '../../../package.json';
+import StaffCard from './StaffCard';
 
 import * as ipc from '@/main/ipc';
 
 import { useStaffList } from '@/hooks/useStaffList';
 
-import StaffCard from './StaffCard';
 import MarkdownContent from '@/components/markdown-content';
 
 type AboutPopupProps = Types.PopupProps<'aboutus'>;
@@ -16,9 +17,7 @@ type AboutPopupProps = Types.PopupProps<'aboutus'>;
 const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
   const { staffList } = useStaffList();
-
   const [shouldHideNextTime, setShouldHideNextTime] = useState(false);
-
   const currentYear = new Date().getFullYear();
 
   const handleGetHelpLinkClick = () => {

@@ -15,6 +15,7 @@ export function registerAppHandlers(): void {
 
   ipcMain.on('check-for-updates', async () => {
     const result = await checkForUpdates(true);
+
     if (!result || !result.isUpdateAvailable) {
       createPopup('dialogInfo', 'dialogInfo', { message: t('is-latest-version'), timestamp: Date.now() }, true);
     }

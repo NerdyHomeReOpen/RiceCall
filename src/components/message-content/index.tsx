@@ -15,6 +15,7 @@ interface MessageContentProps {
 const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages }) => {
   const messageGroups = useMemo(() => {
     const sortedMessages = [...messages].sort((a, b) => a.timestamp - b.timestamp);
+
     return sortedMessages.reduce<MessageGroup[]>((acc, message) => {
       const lastGroup = acc[acc.length - 1];
       const isNearTime = lastGroup && message.timestamp - lastGroup.timestamp <= 5 * 60 * 1000;
@@ -27,6 +28,7 @@ const MessageContent: React.FC<MessageContentProps> = React.memo(({ messages }) 
       } else {
         acc.push({ ...message, contents: [message.content] });
       }
+
       return acc;
     }, []);
   }, [messages]);

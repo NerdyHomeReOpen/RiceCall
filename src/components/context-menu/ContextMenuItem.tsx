@@ -13,7 +13,6 @@ interface ContextMenuItemProps {
 
 const ContextMenuItem: React.FC<ContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
   const { t } = useTranslation();
-
   const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
 
   const handleClick = () => {

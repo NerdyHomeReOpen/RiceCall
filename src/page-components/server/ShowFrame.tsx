@@ -3,7 +3,9 @@ import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
+
 import { SHOW_FRAME_ORIGIN } from '@/constants';
+
 import { useAppSelector } from '@/hooks/useStore';
 
 type ShowMessage = { type: 'ricecall-show:gift'; channelId: string; action: 'heart' | 'flower'; requestId: string };
@@ -22,6 +24,7 @@ const ShowFrame: React.FC = React.memo(() => {
   const sendViewer = useCallback(async () => {
     const activeChannelId = channelIdRef.current;
     if (!activeChannelId) return;
+
     try {
       const { viewer } = await ipc.socket.emit('showViewer', { channelId: activeChannelId });
       if (activeChannelId === channelIdRef.current) postToShow({ type: 'ricecall-show:viewer', channelId: activeChannelId, viewer });
@@ -39,6 +42,7 @@ const ShowFrame: React.FC = React.memo(() => {
   useEffect(() => {
     const offConnect = ipc.socket.on('connect', () => void sendViewer());
     const offDisconnect = ipc.socket.on('disconnect', () => postToShow({ type: 'ricecall-show:viewer', channelId: channelIdRef.current, viewer: null }));
+
     return () => {
       offConnect();
       offDisconnect();
@@ -50,6 +54,7 @@ const ShowFrame: React.FC = React.memo(() => {
       if (event.origin !== SHOW_FRAME_ORIGIN || event.source !== frameRef.current?.contentWindow) return;
       const message = event.data as Partial<ShowMessage>;
       if (!message || typeof message !== 'object') return;
+
       if (
         message.type !== 'ricecall-show:gift' ||
         (message.action !== 'heart' && message.action !== 'flower') ||
@@ -57,10 +62,12 @@ const ShowFrame: React.FC = React.memo(() => {
         !/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(message.requestId)
       )
         return;
+
       const activeChannelId = channelIdRef.current;
       if (!activeChannelId || message.channelId !== activeChannelId) return;
       const action = message.action;
       const requestId = message.requestId;
+
       void ipc.socket.emit('showGift', { channelId: activeChannelId, action, requestId }).then(
         ({ viewer }) => {
           if (activeChannelId !== channelIdRef.current) return;
@@ -74,14 +81,17 @@ const ShowFrame: React.FC = React.memo(() => {
         },
       );
     };
+
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [postToShow, sendViewer]);
 
   const src = new URL(SHOW_FRAME_ORIGIN);
   if (channelId) src.searchParams.set('channelId', channelId);
+
   // Show renders in the App's interface language; changing it reloads the frame.
   src.searchParams.set('locale', i18n.language);
+
   return <iframe key={channelId} ref={frameRef} id="showFrame" src={src.toString()} height="100%" width="100%" onLoad={() => void sendViewer()} />;
 });
 

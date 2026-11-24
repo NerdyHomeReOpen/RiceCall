@@ -11,7 +11,6 @@ type EditNicknamePopupProps = Types.PopupProps<'editNickname'>;
 
 const EditNicknamePopup: React.FC<EditNicknamePopupProps> = React.memo(({ id, serverId, member }) => {
   const { t } = useTranslation();
-
   const [memberNickname, setMemberNickname] = useState<string>(member.nickname || '');
 
   const handleConfirmBtnClick = () => {

@@ -24,8 +24,8 @@ export function encodeAudio(buffers: StereoBuffer[], sampleRate: number): ArrayB
   view.setUint16(34, 16, true);
   writeStr(36, 'data');
   view.setUint32(40, length * 2, true);
-
   let offset = 44;
+
   for (let i = 0; i < left.length; i++) {
     const l = Math.max(-1, Math.min(1, left[i]));
     const r = Math.max(-1, Math.min(1, right[i]));

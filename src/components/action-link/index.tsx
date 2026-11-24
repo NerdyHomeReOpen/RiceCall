@@ -13,9 +13,7 @@ interface ActionLinkProps {
 
 const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
   const { t } = useTranslation();
-
   const [server, setServer] = useState<Types.Server>(getDefaultServer());
-
   const displayId = new URL(href).searchParams.get('serverDisplayId') || '';
 
   const handleLinkClick = () => {
@@ -24,15 +22,18 @@ const ActionLink: React.FC<ActionLinkProps> = React.memo(({ href }) => {
 
   useEffect(() => {
     if (!displayId) return;
+
     const refresh = async () => {
       ipc.api.searchServer({ query: displayId }).then((server) => {
         if (server) setServer(server[0]);
       });
     };
+
     refresh();
   }, [displayId]);
 
   if (!displayId) return <span>{href}</span>;
+
   return (
     <span className="relative flex flex-col p-[5px] bg-white border border-[#ccc] rounded-[10px] shadow-[0_0_5px_1px_rgb(0_0_0/10%)]">
       <span className="flex flex-row items-center justify-start">

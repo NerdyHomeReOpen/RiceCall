@@ -1,5 +1,4 @@
 import { isMain } from '@/utils/platform';
-
 import Logger from '@/utils/logger';
 
 type EnvType = {
@@ -27,7 +26,6 @@ async function loadEnv(enviroment: 'dev' | 'prod' = 'prod') {
       const path = createRequire('path');
       const dotenv = createRequire('dotenv');
       const expand = createRequire('dotenv-expand').expand;
-
       const app = electron.app || (electron.remote && electron.remote.app);
       const envPaths: string[] = [];
       const root = process.cwd();
@@ -62,6 +60,7 @@ export default class Env {
   static get(): EnvType {
     if (!env) {
       new Logger('ENV').error('Env is not loaded');
+
       return {
         MAIN_SERVICE_URL: '',
         MAIN_SERVICE_WS_URL: '',
@@ -69,6 +68,7 @@ export default class Env {
         ERROR_SUBMISSION_URL: undefined,
       };
     }
+
     return env;
   }
 }

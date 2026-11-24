@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
-import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
@@ -12,13 +12,11 @@ const MIN_CROP_SIZE = 100;
 
 const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, imageUnit8Array }) => {
   const { t } = useTranslation();
-
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const previewRef = useRef<HTMLCanvasElement>(null);
   const imgRef = useRef<HTMLImageElement>(new Image());
   const imageInfoRef = useRef({ drawX: 0, drawY: 0, drawWidth: 0, drawHeight: 0 });
   const startPosRef = useRef({ x: 0, y: 0 });
-
   const [cropBox, setCropBox] = useState({ x: 100, y: 100, size: INITIAL_CROP_SIZE });
   const [isDraggingBox, setIsDraggingBox] = useState(false);
 
@@ -27,10 +25,8 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     const ctx = canvas?.getContext('2d');
     if (!canvas || !ctx) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-
     const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
     ctx.drawImage(imgRef.current, drawX, drawY, drawWidth, drawHeight);
-
     const { x: cropX, y: cropY, size } = cropBox;
     ctx.save();
     ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
@@ -39,33 +35,30 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     ctx.rect(cropX, cropY, size, size);
     ctx.fill('evenodd');
     ctx.restore();
-
     const previewCanvas = previewRef.current;
     const previewCtx = previewCanvas?.getContext('2d');
+
     if (previewCanvas && previewCtx) {
       const sx = ((cropX - drawX) / drawWidth) * imgRef.current.width;
       const sy = ((cropY - drawY) / drawHeight) * imgRef.current.height;
       const sSize = (cropBox.size / drawWidth) * imgRef.current.width;
-
       const previewSize = 500;
       previewCanvas.width = previewSize;
       previewCanvas.height = previewSize;
       previewCtx.clearRect(0, 0, previewSize, previewSize);
-
       previewCtx.imageSmoothingEnabled = true;
       previewCtx.imageSmoothingQuality = 'high';
-
       previewCtx.drawImage(imgRef.current, sx, sy, sSize, sSize, 0, 0, previewSize, previewSize);
     }
   }, [cropBox]);
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (!canvasRef.current) return;
-
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     const { x: bx, y: by, size } = cropBox;
+
     if (x >= bx && x <= bx + size && y >= by && y <= by + size) {
       setIsDraggingBox(true);
       startPosRef.current = { x, y };
@@ -76,7 +69,6 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!isDraggingBox || !canvasRef.current) return;
-
     const rect = canvasRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -84,10 +76,8 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     const dy = y - startPosRef.current.y;
     const size = cropBox.size;
     const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
-
     const newX = Math.min(Math.max(drawX, cropBox.x + dx), drawX + drawWidth - size);
     const newY = Math.min(Math.max(drawY, cropBox.y + dy), drawY + drawHeight - size);
-
     setCropBox({ ...cropBox, x: newX, y: newY });
     startPosRef.current = { x, y };
   };
@@ -96,26 +86,19 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
 
   const handleWheel = (e: React.WheelEvent<HTMLCanvasElement>) => {
     const rect = canvasRef.current!.getBoundingClientRect();
-
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
-
     const delta = e.deltaY < 0 ? -10 : 10;
     const newSize = cropBox.size + delta;
     const { drawX, drawY, drawWidth, drawHeight } = imageInfoRef.current;
-
     const maxSize = Math.min(drawWidth, drawHeight);
     const clampedSize = Math.min(maxSize, Math.max(MIN_CROP_SIZE, newSize));
-
     const relX = (mouseX - cropBox.x) / cropBox.size;
     const relY = (mouseY - cropBox.y) / cropBox.size;
-
     let newX = mouseX - relX * clampedSize;
     let newY = mouseY - relY * clampedSize;
-
     newX = Math.min(drawX + drawWidth - clampedSize, Math.max(drawX, newX));
     newY = Math.min(drawY + drawHeight - clampedSize, Math.max(drawY, newY));
-
     setCropBox({ x: newX, y: newY, size: clampedSize });
   };
 
@@ -139,6 +122,7 @@ const ImageCropperPopup: React.FC<ImageCropperPopupProps> = React.memo(({ id, im
     const blob = new Blob([imageUnit8Array as unknown as ArrayBuffer]);
     const imageUrl = URL.createObjectURL(blob);
     imgRef.current.src = imageUrl;
+
     imgRef.current.onload = () => {
       const canvas = canvasRef.current;
       if (!canvas) return;

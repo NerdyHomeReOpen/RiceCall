@@ -30,9 +30,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
   );
 
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-group-${friendGroup.friendGroupId}`, shallowEqual);
-
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
-
   const isStranger = friendGroup.friendGroupId === 'stranger';
   const isBlacklist = friendGroup.friendGroupId === 'blacklist';
 
@@ -47,14 +45,15 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
       return friends.filter((f) => !f.isBlocked && f.friendGroupId === friendGroup.friendGroupId && f.relationStatus !== RelationStatus.Stranger);
     }
   }, [friendGroup.friendGroupId, friends]);
+
   const sortedFriendGroupFriends = useMemo(() => [...friendGroupFriends].sort((a, b) => (b.status !== 'offline' ? 1 : 0) - (a.status !== 'offline' ? 1 : 0)), [friendGroupFriends]);
   const onlineCount = useMemo(() => friendGroupFriends.filter((f) => f.status !== 'offline').length, [friendGroupFriends]);
-
   const { buildContextMenu: buildFriendGroupContextMenu } = useFriendGroupCtxMenu({ user, friendGroup });
 
   const handleTabClick = () => {
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`friend-group-${friendGroup.friendGroupId}`));
+
     setIsExpanded((prev) => !prev);
   };
 

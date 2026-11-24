@@ -25,4 +25,5 @@ export const systemNotificationsSlice = createSlice({
 });
 
 export const { setSystemNotifications, addSystemNotifications, clearSystemNotifications } = systemNotificationsSlice.actions;
+
 export default systemNotificationsSlice.reducer;

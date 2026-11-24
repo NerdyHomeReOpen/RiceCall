@@ -38,6 +38,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
       document.body.style.setProperty('font-family', font, 'important');
       document.body.style.setProperty('--font-family', font, 'important');
     };
+
     changeFont(ipc.systemSettings.font.get());
     const unsub = ipc.systemSettings.font.onUpdate(changeFont);
     return () => unsub();
@@ -49,6 +50,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
       if (!fontSize) return;
       document.body.style.setProperty('font-size', `${fontSize}px`, 'important');
     };
+
     changeFontSize(ipc.systemSettings.fontSize.get());
     const unsub = ipc.systemSettings.fontSize.onUpdate(changeFontSize);
     return () => unsub();
@@ -62,6 +64,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
       document.body.style.setProperty('--main-color', theme.mainColor, 'important');
       document.body.style.setProperty('--secondary-color', theme.secondaryColor, 'important');
     };
+
     changeTheme(ipc.customThemes.current.get());
     const unsub = ipc.customThemes.current.onUpdate(changeTheme);
     return () => unsub();
@@ -75,6 +78,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
       if (!language) return;
       changeLanguage(language);
     };
+
     changeLang(ipc.systemSettings.language.get());
     const unsub = ipc.systemSettings.language.onUpdate(changeLang);
     return () => unsub();

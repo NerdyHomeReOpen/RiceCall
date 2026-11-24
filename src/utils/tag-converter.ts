@@ -6,7 +6,6 @@ const userTagRegex = /<tag[^>]+data-tag=['"](.+?)(-(\d+))?(-(\w+))?['"][^>]*><\/
 const ytRegex = /<yt[^>]+data-yt=['"]([^'"]+)['"][^>]*><\/yt>/g;
 const twitchRegex = /<tw[^>]+data-tw=['"]([^'"]+)['"][^>]*><\/tw>/g;
 const kickRegex = /<kick[^>]+data-kick=['"]([^'"]+)['"][^>]*><\/kick>/g;
-
 const emojiBackRegex = /<img[^>]+data-emoji=['"]([^'"]+)['"][^>]*>/g;
 const userTagBackRegex = /<span[^>]+data-name=['"]([^'"]+)['"][^>]*>(?:<span[^>]*?permission-([a-z]+)[^>]*?permission-lv-(\d+)[^>]*><\/span>)?[\s\S]*?<\/span><\/span>/g;
 const ytBackRegex = /<iframe[^>]+data-yt=['"]([^'"]+)['"][^>]*><\/iframe>/g;
@@ -16,6 +15,7 @@ const pTagRegex = /<p><\/p>/g;
 
 export function escapeHtml(str: unknown): string {
   if (typeof str !== 'string') return str as string;
+
   return str
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')

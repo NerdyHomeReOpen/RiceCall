@@ -13,7 +13,6 @@ interface RegisterPageProps {
 
 const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display, onBackToLoginBtnClick }) => {
   const { t } = useTranslation();
-
   const [account, setAccount] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const [username, setUsername] = useState<string>('');
@@ -78,6 +77,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     if (name === 'account') {
       setAccount(value);
       setAccountError(validateAccount(value));
@@ -98,6 +98,7 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
 
   const handleInputBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+
     if (name === 'account') {
       setAccountError(validateAccount(value));
     } else if (name === 'password') {
@@ -117,15 +118,19 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
     if (!account.trim()) {
       setAccountError(t('please-input-account'));
     }
+
     if (!password.trim()) {
       setPasswordError(t('please-input-password'));
     }
+
     if (!username.trim()) {
       setUsernameError(t('please-input-nickname'));
     }
+
     if (!confirmPassword.trim()) {
       setConfirmPasswordError(t('please-input-password-again'));
     }
+
     if (!email.trim()) {
       setEmailError(t('please-input-email'));
     }

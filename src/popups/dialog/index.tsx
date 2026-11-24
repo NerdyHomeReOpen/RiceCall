@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
-import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
@@ -22,7 +22,6 @@ type DialogPopupProps = Types.PopupProps<'dialogInfo'> & { iconType: keyof typeo
 
 const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, message, parameter, error }) => {
   const { t } = useTranslation();
-
   const formattedMessageContents = fromTags(t(message ?? error?.message ?? '', parameter));
   const errorId = error ? crypto.randomUUID().substring(0, 8) : undefined;
 

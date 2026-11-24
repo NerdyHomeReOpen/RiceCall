@@ -20,7 +20,6 @@ export const useMessageCtxMenu = ({ user, currentServer, currentChannel, member 
   const isSelf = member.userId === user.userId;
   const isLowerLevel = member.permissionLevel < permissionLevel;
   const isInLobby = member.currentChannelId === currentServer.lobbyId;
-
   const { buildMemberManagementCtxMenu } = useMemberManagementCtxMenu({ user, currentServer, channel: currentChannel, member });
 
   const buildContextMenu = useCallback(

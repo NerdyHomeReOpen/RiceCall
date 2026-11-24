@@ -24,9 +24,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
   ({ x, y, direction, anchorEl, showFontbar = false, fontSize: propFontSize = '13px', textColor: propTextColor = '#000000', onEmojiSelect, onFontSizeChange, onTextColorChange }) => {
     const { showColorPicker } = useContextMenu();
     const { t } = useTranslation();
-
     const emojiPickerRef = useRef<HTMLDivElement>(null);
-
     const [isVisible, setIsVisible] = useState(false);
     const [pickerX, setPickerX] = useState<number>(x);
     const [pickerY, setPickerY] = useState<number>(y);
@@ -44,6 +42,7 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       e.preventDefault();
       e.stopPropagation();
       const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
+
       showColorPicker(x, y, 'left-top', (color) => {
         setSelectedColor(color);
         onTextColorChange?.(color);
@@ -91,17 +90,21 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
           const isLeft = direction === 'left-top' || direction === 'left-bottom';
           const gap = 6;
           newPosX = isLeft ? rect.left - (pickerWidth - rect.width) : rect.left;
+
           if (!isLeft && newPosX + pickerWidth + marginEdge > windowWidth) {
             newPosX = rect.right - pickerWidth;
           }
+
           if (isLeft && newPosX < marginEdge) {
             newPosX = rect.left;
           }
+
           newPosY = isTop ? rect.top - pickerHeight - gap : rect.bottom + gap;
         } else {
           if (direction === 'left-top' || direction === 'right-top') {
             newPosY -= pickerHeight;
           }
+
           if (direction === 'left-top' || direction === 'left-bottom') {
             newPosX -= pickerWidth;
           }
@@ -110,12 +113,15 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
         if (newPosX + pickerWidth + marginEdge > windowWidth) {
           newPosX = windowWidth - pickerWidth - marginEdge;
         }
+
         if (newPosX < marginEdge) {
           newPosX = marginEdge;
         }
+
         if (newPosY + pickerHeight + marginEdge > windowHeight) {
           newPosY = windowHeight - pickerHeight - marginEdge;
         }
+
         if (newPosY < marginEdge) {
           newPosY = marginEdge;
         }
@@ -126,9 +132,11 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
       };
 
       recalc();
+
       if (anchorEl) {
         window.addEventListener('resize', recalc);
         window.addEventListener('scroll', recalc, true);
+
         return () => {
           window.removeEventListener('resize', recalc);
           window.removeEventListener('scroll', recalc, true);

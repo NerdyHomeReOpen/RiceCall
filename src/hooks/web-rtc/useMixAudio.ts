@@ -30,6 +30,7 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
       cancelAnimationFrame(rafIdListRef.current['system']);
       delete rafIdListRef.current['system'];
     }
+
     if (mixNodesRef.current) {
       const { stream, source, gain } = mixNodesRef.current;
       if (source) source.disconnect();
@@ -55,14 +56,11 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
       const sourceNode = audioContextRef.current.createMediaStreamSource(systemStream);
       const gainNode = audioContextRef.current.createGain();
       gainNode.gain.value = Store.store.getState().webrtc.mixVolume / 100;
-
       mixNodesRef.current = { stream: systemStream, source: sourceNode, gain: gainNode };
-
       sourceNode.connect(gainNode);
       gainNode.connect(inputDesRef.current);
       gainNode.connect(inputAnalyserRef.current);
       if (Store.store.getState().webrtc.isRecording) gainNode.connect(recorderGainRef.current!);
-
       const dataArray = new Uint8Array(inputAnalyserRef.current.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking('system', inputAnalyserRef.current, dataArray, rafIdListRef, audioProducerRef);
     },
@@ -71,8 +69,8 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
 
   const startMixing = useCallback(() => {
     if (!Store.store.getState().webrtc.isMicTaken) return;
-
     ipc.loopbackAudio.enable();
+
     navigator.mediaDevices
       .getDisplayMedia({
         video: true,
@@ -88,6 +86,7 @@ export const useMixAudio = (refs: SharedRefs, { initAudioContext }: UseMixAudioD
           track.stop();
           stream.removeTrack(track);
         }
+
         initMixAudio(stream);
       })
       .catch((e) => {

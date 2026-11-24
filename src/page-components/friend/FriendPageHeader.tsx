@@ -19,7 +19,6 @@ import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 const FriendPageHeader: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
-
   const signatureInputRef = useRef<HTMLTextAreaElement>(null);
   const isComposingRef = useRef<boolean>(false);
 
@@ -54,6 +53,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
   const handleSignatureInputKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key !== 'Enter') return;
     else e.preventDefault();
+
     if (isComposingRef.current || !signatureInputRef.current) return;
     signatureInputRef.current.blur();
   };
@@ -70,6 +70,7 @@ const FriendPageHeader: React.FC = React.memo(() => {
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showEmojiPicker(x, y, 'right-bottom', e.currentTarget as HTMLElement, false, undefined, undefined, (_, full) => {
       signatureInputRef.current?.focus();
       document.execCommand('insertText', false, full);

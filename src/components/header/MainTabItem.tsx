@@ -26,6 +26,7 @@ const MainTabItem = React.memo(({ tab, currentServerId, isSelected, onTabSelect 
   };
 
   if (tab.id === 'server' && !currentServerId) return null;
+
   return (
     <div
       key={`tabs-${tab.id}`}

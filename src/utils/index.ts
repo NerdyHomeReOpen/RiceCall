@@ -6,12 +6,14 @@ export function cleanMenu(items: Types.ContextMenuItem[]): Types.ContextMenuItem
 
   for (let i = 0; i < preFiltered.length; i++) {
     const cur = preFiltered[i];
+
     if (cur.id === 'separator') {
       if (result.length === 0) continue;
       const hasVisibleAfter = preFiltered.slice(i + 1).some((it) => it.id !== 'separator');
       if (!hasVisibleAfter) continue;
       if (result[result.length - 1].id === 'separator') continue;
     }
+
     result.push(cur);
   }
 
@@ -23,6 +25,7 @@ export function objDiff<T extends object>(newObj: Partial<T>, originalObj: T): P
     if (newObj[key as keyof T] !== originalObj[key as keyof T]) {
       acc[key as keyof T] = newObj[key as keyof T];
     }
+
     return acc;
   }, {} as Partial<T>);
 }

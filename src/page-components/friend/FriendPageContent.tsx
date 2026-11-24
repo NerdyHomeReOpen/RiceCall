@@ -8,7 +8,6 @@ import FriendActivity from './FriendActivity';
 
 const FriendPageContent: React.FC = React.memo(() => {
   const { t } = useTranslation();
-
   const friendActivities = useAppSelector((state) => state.friendActivities.data, shallowEqual);
 
   return (

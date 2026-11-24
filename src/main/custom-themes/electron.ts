@@ -18,6 +18,7 @@ export function registerCustomThemesHandlers(): void {
     const customThemes = store.get('customThemes');
     customThemes.unshift(theme);
     store.set('customThemes', customThemes);
+
     broadcast(
       'custom-themes',
       Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
@@ -28,6 +29,7 @@ export function registerCustomThemesHandlers(): void {
     const customThemes = store.get('customThemes');
     customThemes.splice(index, 1);
     store.set('customThemes', customThemes);
+
     broadcast(
       'custom-themes',
       Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
@@ -55,9 +57,7 @@ export function registerCustomThemesHandlers(): void {
       const timestamp = Date.now();
       const fileName = `${filenamePrefix}-${timestamp}.${extension}`;
       const filePath = path.join(dirPath, fileName);
-
       fs.writeFileSync(filePath, Buffer.from(buffer));
-
       return `local-resource://${directory}/${fileName}`;
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');

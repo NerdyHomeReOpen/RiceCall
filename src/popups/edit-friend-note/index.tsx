@@ -11,7 +11,6 @@ type EditFriendNotePopupProps = Types.PopupProps<'editFriendNote'>;
 
 const EditFriendNotePopup: React.FC<EditFriendNotePopupProps> = React.memo(({ id, friend }) => {
   const { t } = useTranslation();
-
   const [friendNote, setFriendNote] = useState<string>(friend.note);
 
   const handleFriendNoteChange = (e: React.ChangeEvent<HTMLInputElement>) => {

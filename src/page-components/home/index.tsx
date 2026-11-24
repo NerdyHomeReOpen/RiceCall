@@ -11,6 +11,7 @@ import HomePageHeader from './HomePageHeader';
 import HomePageContent from './HomePageContent';
 import HomePagePersonalExclusive from './HomePagePersonalExclusive';
 import HomePageNotAvailable from './HomePageNotAvailable';
+
 import MarkdownContent from '@/components/markdown-content';
 
 import { getFormatDate } from '@/utils/language';
@@ -21,10 +22,8 @@ interface HomePageProps {
 
 const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   const { t } = useTranslation();
-
   const [section, setSection] = useState<'home' | 'personal-exclusive'>('home');
   const [selectedAnn, setSelectedAnn] = useState<Types.Announcement | null>(null);
-
   const isHomeSection = section === 'home';
   const isPersonalExclusiveSection = section === 'personal-exclusive';
 

@@ -45,6 +45,7 @@ const ALLOWED_TAGS = [
   'tag',
   'time',
 ];
+
 const ALLOWED_ATTR: string[] = [
   'id',
   'src',

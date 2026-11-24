@@ -7,7 +7,6 @@ import * as ipc from '@/main/ipc';
 import type * as Types from '@/types';
 
 import { useAppSelector } from '@/hooks/useStore';
-
 import { useServerCardCtxMenu } from '@/hooks/context-menus/useServerCardCtxMenu';
 
 import { useContextMenu } from '@/providers/ContextMenu';

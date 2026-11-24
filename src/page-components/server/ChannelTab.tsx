@@ -27,6 +27,7 @@ const ICON_POSITIONS: Record<string, [string, string]> = {
   readonly: ['bg-[position:-42px_0]', 'bg-[position:-42px_-14px]'],
   lobby: ['bg-[position:-56px_0]', 'bg-[position:-56px_-14px]'],
 };
+
 const DEFAULT_ICON_POSITIONS: [string, string] = ['bg-[position:0_0]', 'bg-[position:-14px_0]'];
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
@@ -63,13 +64,12 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
 
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
-
   const [isExpanded, setIsExpanded] = useState(true);
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const channelMembers = onlineMembers.filter((om) => om.currentChannelId === channel.channelId);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableChannelUserIds = channelMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
+
   const sortedChannelMembers = [...channelMembers].sort((a, b) => {
     if (a.userId === user.userId && b.userId !== user.userId) return -1;
     if (b.userId === user.userId && a.userId !== user.userId) return 1;

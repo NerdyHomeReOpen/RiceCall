@@ -87,7 +87,5 @@ export type PopupLoaders = {
 export type PopupOpenArgs<T extends PopupType> = Record<string, never> extends PopupOpenData<T> ? [initialData?: PopupOpenData<T>, force?: boolean] : [initialData: PopupOpenData<T>, force?: boolean];
 
 export type PopupOpenRequest = { [T in PopupType]: { type: T; id: string; initialData: PopupOpenData<T>; force?: boolean } }[PopupType];
-
 export type PopupProps<T extends PopupType> = { id: string } & PopupInitialData[T];
-
 export type PopupData = { [T in PopupType]: { type: T; data: PopupInitialData[T] } }[PopupType];

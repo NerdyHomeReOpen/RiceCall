@@ -369,8 +369,10 @@ export function registerSystemHandlers(): void {
 
   ipcMain.on('set-is-auto-check-for-updates-enabled', (_, enable = false) => {
     store.set('isAutoCheckForUpdatesEnabled', enable);
+
     if (enable) startCheckForUpdates();
     else stopCheckForUpdates();
+
     broadcast('is-auto-check-for-updates-enabled', enable);
   });
 

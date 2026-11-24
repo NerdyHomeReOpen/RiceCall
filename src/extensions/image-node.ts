@@ -12,11 +12,9 @@ export const ImageNode = Node.create({
   name: 'image',
   group: 'block',
   atom: true,
-
   addAttributes() {
     return { src: {}, alt: {} };
   },
-
   parseHTML() {
     return [
       {
@@ -28,7 +26,6 @@ export const ImageNode = Node.create({
       },
     ];
   },
-
   renderHTML({ node }) {
     return [
       'img',
@@ -39,7 +36,6 @@ export const ImageNode = Node.create({
       },
     ];
   },
-
   addCommands() {
     return {
       insertImage:

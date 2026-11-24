@@ -2,11 +2,14 @@ import path from 'path';
 import { app, BrowserWindow, ipcMain, shell, protocol, nativeImage, Menu, Tray, dialog, net } from 'electron';
 import { pathToFileURL } from 'url';
 import ElectronUpdater, { ProgressInfo, UpdateInfo } from 'electron-updater';
+
 const { autoUpdater } = ElectronUpdater;
+
 import serve from 'electron-serve';
 import Store from 'electron-store';
 import log from 'electron-log';
 import { initMain } from 'electron-audio-loopback-josh';
+
 initMain();
 
 import type * as Types from '@/types';
@@ -77,6 +80,7 @@ function getIconPath(name: string): string {
 }
 
 export const APP_ICON = getIconPath('icon');
+
 export const APP_TRAY_ICON = {
   gray: getIconPath('tray_gray'),
   normal: getIconPath('tray'),
@@ -86,7 +90,6 @@ export let tray: Tray | null = null;
 export let mainWindow: BrowserWindow | null = null;
 export let authWindow: BrowserWindow | null = null;
 export let popups: Record<string, BrowserWindow> = {};
-
 let _isLogin: boolean = false;
 let _isUpdateNotified: boolean = false;
 let _updateCheckInterval: NodeJS.Timeout | null = null;
@@ -95,8 +98,10 @@ const appServe = serve({ directory: path.join(app.getAppPath(), 'out') });
 
 async function openDeepLink(url: string) {
   if (!url) return;
+
   try {
     const { hostname } = new URL(url);
+
     switch (hostname) {
       case 'join':
         const serverDisplayId = new URL(url).searchParams.get('serverDisplayId');
@@ -116,10 +121,9 @@ function openAppWindow() {
 
 export function setTrayDetail(isLogin?: boolean): void {
   if (!tray) return;
-
   if (isLogin !== undefined) _isLogin = isLogin;
-
   const trayIconPath = _isLogin ? APP_TRAY_ICON.normal : APP_TRAY_ICON.gray;
+
   const contextMenu = Menu.buildFromTemplate([
     {
       id: 'open-main-window',
@@ -149,14 +153,10 @@ export function setTrayDetail(isLogin?: boolean): void {
 
 export function configureTray(): void {
   if (tray) tray.destroy();
-
   const trayIconPath = APP_TRAY_ICON.gray;
-
   tray = new Tray(nativeImage.createFromPath(trayIconPath));
-
   tray.setToolTip(VERSION_TITLE);
   tray.on('click', openAppWindow);
-
   setTrayDetail();
 }
 
@@ -173,36 +173,44 @@ export async function checkForUpdates(force = false): Promise<ElectronUpdater.Up
 
   if (channel === 'dev') {
     autoUpdater.allowPrerelease = true;
+
     autoUpdater.setFeedURL({
       provider: 'github',
       owner: 'NerdyHomeReOpen',
       repo: 'RiceCall',
       channel: 'dev',
     });
+
     autoUpdater.autoDownload = false;
     autoUpdater.autoInstallOnAppQuit = false;
     autoUpdater.allowDowngrade = true;
+
     const result = await autoUpdater.checkForUpdates().catch((e) => {
       const error = e instanceof Error ? e : new Error('Unknown error');
       new Logger('SYSTEM').error(`Cannot check for updates in dev channel: ${error.message}`);
     });
+
     if (result?.isUpdateAvailable) return result;
   }
 
   autoUpdater.allowPrerelease = false;
+
   autoUpdater.setFeedURL({
     provider: 'github',
     owner: 'NerdyHomeReOpen',
     repo: 'RiceCall',
     channel: 'latest',
   });
+
   autoUpdater.autoDownload = false;
   autoUpdater.autoInstallOnAppQuit = false;
   autoUpdater.allowDowngrade = false;
+
   const result = await autoUpdater.checkForUpdates().catch((e) => {
     const error = e instanceof Error ? e : new Error('Unknown error');
     new Logger('SYSTEM').error(`Cannot check for updates in latest channel: ${error.message}`);
   });
+
   if (result?.isUpdateAvailable) return result;
   return null;
 }
@@ -239,6 +247,7 @@ export async function configureAutoUpdater(): Promise<void> {
         const error = e instanceof Error ? e : new Error('Unknown error');
         new Logger('SYSTEM').error(`Cannot show update dialog: ${error.message}`);
       });
+
     _isUpdateNotified = true;
   });
 
@@ -275,6 +284,7 @@ export async function configureAutoUpdater(): Promise<void> {
         const error = e instanceof Error ? e : new Error('Unknown error');
         new Logger('SYSTEM').error(`Cannot show update dialog: ${error.message}`);
       });
+
     _isUpdateNotified = false;
   });
 
@@ -602,6 +612,7 @@ export async function createPopup(type: Types.PopupType, id: string, initialData
   }
 
   ipcMain.removeAllListeners(`get-initial-data?id=${id}`);
+
   ipcMain.on(`get-initial-data?id=${id}`, (event) => {
     event.returnValue = initialData;
   });
@@ -647,6 +658,7 @@ export function closeAllPopups(): void {
       popup.close();
     }
   });
+
   popups = {};
 }
 
@@ -674,9 +686,9 @@ app.on('ready', async () => {
     configureAutoUpdater();
     configureDiscordRPC();
   }
+
   configureTray();
   configureLogger();
-
   registerAccountHandlers();
   registerApiHandlers();
   registerAppHandlers();
@@ -693,11 +705,9 @@ app.on('ready', async () => {
   registerSystemHandlers();
   registerTrayHandlers();
   registerWindowHandlers();
-
   if (!store.get('isDisclaimerHidden')) createPopup('aboutus', 'aboutUs');
   createAuthWindow().then((authWindow) => authWindow.showInactive());
   createMainWindow().then((mainWindow) => mainWindow.hide());
-
   const token = store.get('token');
   if (token) autoLogin(token);
 

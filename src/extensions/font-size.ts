@@ -2,11 +2,9 @@ import { Mark } from '@tiptap/core';
 
 export const FontSize = Mark.create({
   name: 'fontSize',
-
   addOptions() {
     return { types: ['textStyle'] };
   },
-
   addAttributes() {
     return {
       fontSize: {
@@ -16,14 +14,12 @@ export const FontSize = Mark.create({
       },
     };
   },
-
   addCommands() {
     return {
       setFontSize:
         (size) =>
         ({ chain }) =>
           chain().setMark('textStyle', { 'font-size': size }).run(),
-
       unsetFontSize:
         () =>
         ({ chain }) =>

@@ -18,11 +18,9 @@ interface PopupProviderProps {
 const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
   const [popups, setPopups] = useState<Types.Popup[]>([]);
   const [minimizedIds, setMinimizedIds] = useState<Set<string>>(new Set());
-
   const holdingPopupIdRef = useRef<string | null>(null);
   const topZIndexRef = useRef(201);
   const popupsRef = useRef<Types.Popup[]>([]);
-
   const minimizedPopups = popups.filter((p) => minimizedIds.has(p.id));
 
   const close = useCallback((id: string) => {
@@ -31,6 +29,7 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
       next.delete(id);
       return next;
     });
+
     setPopups((prev) => prev.filter((p) => p.id !== id));
   }, []);
 
@@ -59,13 +58,10 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
       } else {
         if (popupsRef.current.findIndex((p) => p.id === id) !== -1) {
           restore(id);
-
           const popupEl = document.querySelector(`[data-popup-id="${id}"]`) as HTMLElement;
           if (!popupEl) return;
-
           topZIndexRef.current++;
           popupEl.style.zIndex = `${topZIndexRef.current}`;
-
           return;
         }
       }
@@ -77,10 +73,8 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
       const screenHeight = window.innerHeight;
       const popupWidth = popup.size.width;
       const popupHeight = popup.size.height;
-
       const centerX = Math.max(0, (screenWidth - popupWidth) / 2);
       const centerY = Math.max(0, (screenHeight - popupHeight) / 2);
-
       setPopups((prev) => [...prev, { ...popup, position: { top: centerY, left: centerX } }]);
     },
     [close, restore],
@@ -88,6 +82,7 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
 
   useEffect(() => {
     eventEmitter.on('open-popup', open);
+
     return () => {
       eventEmitter.off('open-popup', open);
     };
@@ -95,6 +90,7 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
 
   useEffect(() => {
     eventEmitter.on('close-popup', close);
+
     return () => {
       eventEmitter.off('close-popup', close);
     };
@@ -102,6 +98,7 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
 
   useEffect(() => {
     eventEmitter.on('minimize-popup', minimize);
+
     return () => {
       eventEmitter.off('minimize-popup', minimize);
     };
@@ -109,6 +106,7 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
 
   useEffect(() => {
     eventEmitter.on('restore-popup', restore);
+
     return () => {
       eventEmitter.off('restore-popup', restore);
     };
@@ -122,20 +120,14 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
 
     const handleMouseDown = (e: MouseEvent) => {
       const el = e.target as HTMLElement;
-
       const popupEl = el.closest('[data-popup-id]') as HTMLElement | null;
       if (!popupEl) return;
-
       topZIndexRef.current++;
       popupEl.style.zIndex = `${topZIndexRef.current}`;
-
       if (!el.closest('[data-draggable]')) return;
-
       const id = popupEl.getAttribute('data-popup-id');
       if (!id) return;
-
       holdingPopupIdRef.current = id;
-
       startX = e.clientX;
       startY = e.clientY;
       popupStartX = popupEl.offsetLeft;
@@ -145,22 +137,16 @@ const PopupProvider = ({ children }: PopupProviderProps): React.JSX.Element => {
     const handleMouseMove = (e: MouseEvent) => {
       const id = holdingPopupIdRef.current;
       if (!id) return;
-
       const popupEl = document.querySelector(`[data-popup-id="${id}"]`) as HTMLElement;
       if (!popupEl) return;
-
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
-
       let newLeft = popupStartX + dx;
       let newTop = popupStartY + dy;
-
       const popupWidth = popupEl.offsetWidth;
       const popupHeight = popupEl.offsetHeight;
-
       newLeft = Math.max(0, Math.min(newLeft, window.innerWidth - popupWidth));
       newTop = Math.max(0, Math.min(newTop, window.innerHeight - popupHeight));
-
       popupEl.style.left = `${newLeft}px`;
       popupEl.style.top = `${newTop}px`;
     };

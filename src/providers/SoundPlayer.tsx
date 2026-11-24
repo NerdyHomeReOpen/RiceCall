@@ -33,7 +33,6 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
 
   const playSound = useCallback((sound: 'enterVoiceChannel' | 'leaveVoiceChannel' | 'receiveChannelMessage' | 'receiveDirectMessage' | 'startSpeaking' | 'stopSpeaking', force?: boolean) => {
     new Logger('SOUND_PLAYER').info(`Play sound: ${sound} in ${window.location.href}`);
-
     if (disableAllSoundEffectRef.current && !force) return;
 
     if (audioRef.current) {
@@ -48,6 +47,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
+
     if (sound === 'leaveVoiceChannel') {
       if (!isLeaveVoiceChannelSoundEnabledRef.current && !force) return;
       audioRef.current = new Audio('/sounds/LeaveVoiceChannel.mp3');
@@ -55,6 +55,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
+
     if (sound === 'receiveChannelMessage') {
       if (!isReceiveChannelMessageSoundEnabledRef.current && !force) return;
       audioRef.current = new Audio('/sounds/ReceiveChannelMsg.mp3');
@@ -62,6 +63,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
+
     if (sound === 'receiveDirectMessage') {
       if (!isReceiveDirectMessageSoundEnabledRef.current && !force) return;
       audioRef.current = new Audio('/sounds/ReceiveDirectMsg.mp3');
@@ -69,6 +71,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
+
     if (sound === 'startSpeaking') {
       if (!isStartSpeakingSoundEnabledRef.current && !force) return;
       audioRef.current = new Audio('/sounds/MicKeyDown.mp3');
@@ -76,6 +79,7 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
       audioRef.current.volume = 0.5;
       audioRef.current.play();
     }
+
     if (sound === 'stopSpeaking') {
       if (!isStopSpeakingSoundEnabledRef.current && !force) return;
       audioRef.current = new Audio('/sounds/MicKeyUp.mp3');
@@ -90,30 +94,37 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
       new Logger('SOUND_PLAYER').info(`Output device updated: ${deviceId}`);
       outputDeviceIdRef.current = deviceId || null;
     };
+
     const changeDisableAllSoundEffect = (enabled: boolean) => {
       new Logger('SOUND_PLAYER').info(`Disable all sound effect updated: ${enabled}`);
       disableAllSoundEffectRef.current = enabled;
     };
+
     const changeIsEnterVoiceChannelSoundEnabled = (enabled: boolean) => {
       new Logger('SOUND_PLAYER').info(`Enter voice channel sound updated: ${enabled}`);
       isEnterVoiceChannelSoundEnabledRef.current = enabled;
     };
+
     const changeIsLeaveVoiceChannelSoundEnabled = (enabled: boolean) => {
       new Logger('SOUND_PLAYER').info(`Leave voice channel sound updated: ${enabled}`);
       isLeaveVoiceChannelSoundEnabledRef.current = enabled;
     };
+
     const changeIsStartSpeakingSoundEnabled = (enabled: boolean) => {
       new Logger('SOUND_PLAYER').info(`Start speaking sound updated: ${enabled}`);
       isStartSpeakingSoundEnabledRef.current = enabled;
     };
+
     const changeIsStopSpeakingSoundEnabled = (enabled: boolean) => {
       new Logger('SOUND_PLAYER').info(`Stop speaking sound updated: ${enabled}`);
       isStopSpeakingSoundEnabledRef.current = enabled;
     };
+
     const changeIsReceiveDirectMessageSoundEnabled = (enabled: boolean) => {
       new Logger('SOUND_PLAYER').info(`Receive direct message sound updated: ${enabled}`);
       isReceiveDirectMessageSoundEnabledRef.current = enabled;
     };
+
     const changeIsReceiveChannelMessageSoundEnabled = (enabled: boolean) => {
       new Logger('SOUND_PLAYER').info(`Receive channel message sound updated: ${enabled}`);
       isReceiveChannelMessageSoundEnabledRef.current = enabled;
@@ -138,11 +149,11 @@ const SoundPlayerProvider = ({ children }: SoundPlayerProviderProps): React.JSX.
       ipc.systemSettings.isReceiveDirectMessageSoundEnabled.onUpdate(changeIsReceiveDirectMessageSoundEnabled),
       ipc.systemSettings.isReceiveChannelMessageSoundEnabled.onUpdate(changeIsReceiveChannelMessageSoundEnabled),
     ];
+
     return () => unsubs.forEach((unsub) => unsub());
   }, []);
 
   const contextValue = useMemo(() => ({ playSound }), [playSound]);
-
   return <SoundPlayerContext.Provider value={contextValue}>{children}</SoundPlayerContext.Provider>;
 };
 

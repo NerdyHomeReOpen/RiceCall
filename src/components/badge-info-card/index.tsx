@@ -13,13 +13,10 @@ interface BadgeInfoCardProps {
 
 const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, direction, badge }) => {
   const { t } = useTranslation();
-
   const cardRef = useRef<HTMLDivElement>(null);
-
   const [isVisible, setIsVisible] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
-
   const isPermanent = badge.showEndsAt <= 0;
 
   useLayoutEffect(() => {
@@ -33,6 +30,7 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= cardHeight;
     }
+
     if (direction === 'left-top' || direction === 'left-bottom') {
       newPosX -= cardWidth;
     }
@@ -40,12 +38,15 @@ const BadgeInfoCard: React.FC<BadgeInfoCardProps> = React.memo(({ x, y, directio
     if (newPosX + cardWidth + marginEdge > windowWidth) {
       newPosX = windowWidth - cardWidth - marginEdge;
     }
+
     if (newPosX < marginEdge) {
       newPosX = marginEdge;
     }
+
     if (newPosY + cardHeight + marginEdge > windowHeight) {
       newPosY = windowHeight - cardHeight - marginEdge;
     }
+
     if (newPosY < marginEdge) {
       newPosY = marginEdge;
     }

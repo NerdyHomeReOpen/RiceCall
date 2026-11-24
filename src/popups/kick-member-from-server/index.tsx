@@ -13,7 +13,6 @@ type KickMemberFromServerPopupProps = Types.PopupProps<'kickMemberFromServer'>;
 
 const KickMemberFromServerPopup: React.FC<KickMemberFromServerPopupProps> = React.memo(({ id, serverId, member }) => {
   const { t } = useTranslation();
-
   const [formatType, setFormatType] = useState<string>('hours');
   const [time, setTime] = useState<number>(1);
   const [reason, setReason] = useState<string>('');

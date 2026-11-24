@@ -18,26 +18,25 @@ import { getDefaultFriendGroup } from '@/utils/default';
 import { getFormatDate } from '@/utils/language';
 
 type ChatHistoryPopupProps = Types.PopupProps<'chatHistory'>;
-
 type HistorySource = 'direct' | 'channel';
 
 const DAY_MILLISECONDS = 24 * 60 * 60 * 1000;
+
 const RANGES = [
   { days: 7, labelKey: 'chat-history-last-week' },
   { days: 30, labelKey: 'chat-history-last-month' },
   { days: 90, labelKey: 'chat-history-last-three-months' },
 ];
+
 // How many page numbers the pagination shows around the current page.
 const PAGE_LINK_COUNT = 5;
 
 const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId: initialTargetId }) => {
   const { t } = useTranslation();
-
   const user = useAppSelector((state) => ({ currentServerId: state.user.data.currentServerId, currentChannelId: state.user.data.currentChannelId }), shallowEqual);
   const currentChannelName = useAppSelector((state) => state.currentChannel.data.name);
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
-
   const [source, setSource] = useState<HistorySource>('direct');
   const [targetId, setTargetId] = useState<string | null>(initialTargetId ?? null);
   const [targetName, setTargetName] = useState<string>('');
@@ -47,10 +46,8 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
   const [page, setPage] = useState<number>(1);
   const [history, setHistory] = useState<Types.HistoryPage | null>(null);
   const [selectedMessageId, setSelectedMessageId] = useState<number | null>(null);
-
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: 0 }), [t]);
   const blacklistGroup = useMemo(() => getDefaultFriendGroup({ friendGroupId: 'blacklist', name: t('blacklist'), order: Number.MAX_SAFE_INTEGER }), [t]);
-
   const contacts = friends.filter((f) => f.relationStatus === RelationStatus.Friend || f.isBlocked);
   const sortedFriendGroups = [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order);
   const targetFriend = friends.find((f) => f.targetId === targetId) ?? null;
@@ -62,11 +59,14 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
   // Messages arrive oldest first within a page; a date heading starts each day.
   const messageDays = useMemo(() => {
     const days: { date: string; messages: Types.HistoryMessage[] }[] = [];
+
     for (const message of history?.messages ?? []) {
       const date = getFormatDate(message.createdAt, 'd');
+
       if (days.at(-1)?.date === date) days.at(-1)?.messages.push(message);
       else days.push({ date, messages: [message] });
     }
+
     return days;
   }, [history]);
 
@@ -105,13 +105,16 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
 
   useEffect(() => {
     if (!targetId || friends.some((f) => f.targetId === targetId)) return;
+
     // A conversation with someone who is not a friend still needs their name for the title.
     let isCancelled = false;
+
     fetchUser({ userId: targetId })
       .then((target) => {
         if (!isCancelled) setTargetName(target?.name ?? '');
       })
       .catch(() => {});
+
     return () => {
       isCancelled = true;
     };
@@ -119,6 +122,7 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
 
   useEffect(() => {
     const filter = { page, since: Date.now() - rangeDays * DAY_MILLISECONDS, keyword };
+
     const request =
       source === 'direct'
         ? targetId
@@ -127,11 +131,14 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
         : user.currentServerId && user.currentChannelId
           ? fetchChannelMessages({ serverId: user.currentServerId, channelId: user.currentChannelId, ...filter })
           : null;
+
     if (!request) {
       setHistory(null);
       return;
     }
+
     let isCancelled = false;
+
     request
       .then((result) => {
         if (!isCancelled) setHistory(result);
@@ -139,6 +146,7 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
       .catch(() => {
         if (!isCancelled) setHistory(null);
       });
+
     return () => {
       isCancelled = true;
     };

@@ -28,43 +28,24 @@ import type { PopupOpenRequest } from './popup';
 import type { Locale } from './locales';
 
 export type Announcement = table_announcements;
-
 export type Notification = table_notifications;
-
 export type User = table_users & table_global_permissions & table_user_settings & { badges: string };
-
 export type UserSetting = table_user_settings;
-
 export type Badge = table_badges & table_user_badges;
-
 export type Friend = table_friends & table_users & table_user_settings & { badges: string };
-
 export type FriendActivity = table_users & table_user_activities;
-
 export type FriendGroup = table_friend_groups;
-
 export type FriendApplication = table_friend_applications & table_users;
-
 export type Server = table_servers & table_user_servers & table_server_permissions & { contribution: number };
-
 export type RecommendServer = table_servers & table_recommend_servers & { online: number };
-
 export type Category = table_channels & table_channel_muted_users & table_channel_permissions & { type: 'category' };
-
 export type Channel = table_channels & table_channel_muted_users & table_channel_permissions & { type: 'channel' };
-
 export type ChannelEvent = OnlineMember & { type: 'join' | 'move' | 'leave'; prevChannelId: string | null; nextChannelId: string | null; timestamp: number };
-
 export type OnlineMember = table_members & table_users & table_channel_muted_users & table_server_permissions & { badges: string };
-
 export type QueueUser = { userId: string; position: number; leftTime: number; isQueueControlled: boolean };
-
 export type QueueMember = QueueUser & OnlineMember;
-
 export type Member = table_members & table_users & table_server_blocked_users & table_server_permissions;
-
 export type MemberApplication = table_member_applications & table_users;
-
 export type MemberInvitation = table_member_invitations & table_servers;
 
 export type Message = {
@@ -76,7 +57,6 @@ export type Message = {
 };
 
 export type ChannelMessage = Message & Member & { type: 'general' };
-
 export type DirectMessage = Message & User & { type: 'dm'; user1Id: string; user2Id: string };
 
 // A stored message from GET /direct-messages or /channel-messages; nickname is the sender's nickname in the channel's server.
@@ -98,7 +78,6 @@ export type SystemSettings = {
   closeToTray: boolean;
   fontSize: number;
   font: string;
-
   inputAudioDevice: string;
   outputAudioDevice: string;
   recordFormat: RecordFormat;
@@ -111,19 +90,15 @@ export type SystemSettings = {
   isMicrophoneAmplificationEnabled: boolean;
   isManualMixMode: boolean;
   mixMode: MixMode;
-
   speakingMode: SpeakingMode;
   defaultSpeakingKey: string;
-
   disableMessageHistory: boolean;
-
   hotKeyOpenMainWindow: string;
   hotKeyScreenshot: string;
   hotKeyIncreaseVolume: string;
   hotKeyDecreaseVolume: string;
   hotKeyToggleSpeaker: string;
   hotKeyToggleMicrophone: string;
-
   disableAllSoundEffect: boolean;
   isEnterVoiceChannelSoundEnabled: boolean;
   isLeaveVoiceChannelSoundEnabled: boolean;
@@ -131,7 +106,6 @@ export type SystemSettings = {
   isStopSpeakingSoundEnabled: boolean;
   isReceiveDirectMessageSoundEnabled: boolean;
   isReceiveChannelMessageSoundEnabled: boolean;
-
   isAutoCheckForUpdatesEnabled: boolean;
   updateCheckInterval: number;
   updateChannel: string;
@@ -195,13 +169,9 @@ export type DiscordPresence = {
 };
 
 export type SpeakingMode = 'key' | 'auto';
-
 export type MixMode = 'all' | 'app';
-
 export type RTCStatus = 'disconnected' | 'connecting' | 'connected' | 'failed';
-
 export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
-
 export type RecordFormat = 'wav' | 'mp3';
 
 export type { Locale } from './locales';

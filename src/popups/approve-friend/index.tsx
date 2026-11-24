@@ -14,9 +14,7 @@ type ApproveFriendPopupProps = Types.PopupProps<'approveFriend'>;
 
 const ApproveFriendPopup: React.FC<ApproveFriendPopupProps> = React.memo(({ id, senderId }) => {
   const { t } = useTranslation();
-
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
-
   const [friendNotes, setFriendNotes] = useState<string>('');
   const [friendGroupId, setFriendGroupId] = useState<Types.FriendGroup['friendGroupId']>('');
 

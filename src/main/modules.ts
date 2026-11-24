@@ -13,12 +13,14 @@ export const modules = {
       if (!_ipcRenderer) {
         _ipcRenderer = window.ipcRenderer;
       }
+
       return _ipcRenderer!;
     } else if (isWebsite()) {
       if (!_webMain) {
         const webMain: typeof import('@/main/web') = require('@/main/web');
         _webMain = webMain;
       }
+
       return _webMain!;
     } else {
       throw new Error('Unsupported platform');

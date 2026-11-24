@@ -36,4 +36,5 @@ export const friendGroupsSlice = createSlice({
 });
 
 export const { setFriendGroups, addFriendGroups, updateFriendGroups, removeFriendGroups, clearFriendGroups } = friendGroupsSlice.actions;
+
 export default friendGroupsSlice.reducer;

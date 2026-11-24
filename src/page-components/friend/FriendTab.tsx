@@ -45,9 +45,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
 
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `friend-${friend.targetId}`, shallowEqual);
-
   const [friendCurrentServer, setFriendCurrentServer] = useState<Types.Server | null>(null);
-
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: -1, userId: user.userId }), [t, user.userId]);
   const isOnline = friend.status === 'online';
   const isOffline = friend.status === 'offline';
@@ -57,7 +55,6 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   const isSignatureVisible = !isPending && !displayedServer;
   const hasVip = friend.vip > 0;
   const hasNote = friend.note !== '' && friend.note !== null;
-
   const { buildContextMenu: buildFriendTabContextMenu } = useFriendTabCtxMenu({ user, friend, friendGroups, defaultFriendGroup });
 
   const handleServerNameClick = () => {
@@ -87,6 +84,7 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
       setFriendCurrentServer(null);
       return;
     }
+
     ipc.api.fetchServer({ userId: friend.targetId, serverId: friend.currentServerId }).then((server) => {
       if (server) setFriendCurrentServer(server);
     });

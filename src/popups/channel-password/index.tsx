@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
-import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
@@ -9,7 +9,6 @@ type ChannelPasswordPopupProps = Types.PopupProps<'channelPassword'>;
 
 const ChannelPasswordPopup: React.FC<ChannelPasswordPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
-
   const [password, setPassword] = useState<string>('');
 
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {

@@ -11,9 +11,11 @@ const LocateMeContext = createContext<LocateMeContextType | null>(null);
 
 export const useLocateMeContext = (): LocateMeContextType => {
   const context = useContext(LocateMeContext);
+
   if (!context) {
     throw new Error('useLocateMeContext must be used within an LocateMeProvider');
   }
+
   return context;
 };
 

@@ -22,7 +22,6 @@ export const loopbackAudio = {
   enable: async (): Promise<void> => {
     return await modules.default.enableLoopbackAudio();
   },
-
   disable: async (): Promise<void> => {
     return await modules.default.disableLoopbackAudio();
   },

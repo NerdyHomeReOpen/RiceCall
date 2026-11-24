@@ -29,4 +29,5 @@ export const currentServerSlice = createSlice({
 });
 
 export const { setCurrentServer, updateCurrentServer, clearCurrentServer } = currentServerSlice.actions;
+
 export default currentServerSlice.reducer;

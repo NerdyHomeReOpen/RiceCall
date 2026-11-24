@@ -17,15 +17,11 @@ interface HomePageContentProps {
 
 const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnouncementSelect }) => {
   const { t } = useTranslation();
-
   const containerRef = useRef<HTMLDivElement>(null);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
-
   const announcements = useAppSelector((state) => state.announcements.data, shallowEqual);
   const recommendServers = useAppSelector((state) => state.recommendServers.data, shallowEqual);
-
   const [selectedAnnIndex, setSelectedAnnIndex] = useState<number>(0);
-
   const sortedAnnouncements = [...announcements].sort((a, b) => b.publishedAt - a.publishedAt);
   const filteredRecommendServers = recommendServers.filter((server) => !server.tags.includes('official'));
   const filteredOfficialServers = recommendServers.filter((server) => server.tags.includes('official'));
@@ -42,6 +38,7 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
     if (!containerRef.current) return;
     const number = selectedAnnIndex % sortedAnnouncements.length;
     const width = containerRef.current.clientWidth;
+
     containerRef.current.scrollTo({
       left: width * number,
       behavior: 'smooth',
@@ -51,6 +48,7 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
   useEffect(() => {
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => setSelectedAnnIndex((prev) => (prev + 1) % sortedAnnouncements.length), ANNOUNCEMENT_SLIDE_INTERVAL);
+
     return () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
       intervalRef.current = null;

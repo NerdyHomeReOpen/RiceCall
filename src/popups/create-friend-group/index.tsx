@@ -11,9 +11,7 @@ type CreateFriendGroupPopupProps = Types.PopupProps<'createFriendGroup'>;
 
 const CreateFriendGroupPopup: React.FC<CreateFriendGroupPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
-
   const [friendGroupName, setFriendGroupName] = useState<Types.FriendGroup['name']>(getDefaultFriendGroup({ friendGroupId: 'default' }).name);
-
   const canSubmit = friendGroupName.trim();
 
   const handleFriendGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

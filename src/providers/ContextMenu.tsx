@@ -186,10 +186,12 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps): React.JSX.
       if (!(e.target as HTMLElement).closest('.user-info-card-container')) {
         closeUserInfoBlock();
       }
+
       if (!(e.target as HTMLElement).closest('.badge-info-card-container')) {
         closeBadgeInfoCard();
       }
     };
+
     const onPointerDown = (e: MouseEvent) => {
       if (!(e.target as HTMLElement).closest('.context-menu-container')) {
         closeContextMenu();
@@ -199,12 +201,15 @@ const ContextMenuProvider = ({ children }: ContextMenuProviderProps): React.JSX.
         closeStatusDropdown();
         closeEmbedLinkInput();
       }
+
       if (!(e.target as HTMLElement).closest('.color-picker-container')) {
         closeColorPicker();
       }
     };
+
     document.addEventListener('pointerdown', onPointerDown);
     document.addEventListener('mousemove', onMouseMove);
+
     return () => {
       document.removeEventListener('pointerdown', onPointerDown);
       document.removeEventListener('mousemove', onMouseMove);

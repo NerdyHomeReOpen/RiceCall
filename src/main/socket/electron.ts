@@ -19,6 +19,7 @@ export let interval: NodeJS.Timeout | null = null;
 async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): Promise<Types.ACK<T>> {
   for (let i = 0; i <= retries; i++) {
     if (!socket?.connected) throw new Error('Socket is not connected');
+
     try {
       return await new Promise<Types.ACK<T>>((resolve, reject) => {
         socket?.timeout(5000).emit(event, payload, (e: unknown, ack: Types.ACK<T>) => {
@@ -31,11 +32,13 @@ async function emitWithRetry<T>(event: string, payload: unknown, retries = 10): 
       new Logger('SOCKET').warn(`Retrying(#${i}) socket.emit ${event}`);
     }
   }
+
   throw new Error('Failed to emit event with retry');
 }
 
 function sendHeartbeat() {
   const start = Date.now();
+
   socket?.timeout(5000).emit('heartbeat', { seq: ++seq }, (e: unknown, ack: { seq: number; t: number }) => {
     if (e) {
       new Logger('SOCKET').warn(`Heartbeat ${seq} timeout`);
@@ -49,9 +52,7 @@ function sendHeartbeat() {
 
 export function connectSocket(token: string): void {
   if (!token) return;
-
   if (socket) disconnectSocket();
-
   seq = 0;
 
   socket = io(Env.get().MAIN_SERVICE_WS_URL, {
@@ -123,6 +124,7 @@ export function registerSocketHandlers(): void {
   EMIT_EVENTS.forEach((event) => {
     ipcMain.handle(event, (_, payload) => {
       new Logger('SOCKET').info(`socket.emit ${event}`);
+
       return new Promise((resolve) => {
         emitWithRetry(event, payload)
           .then((ack) => {

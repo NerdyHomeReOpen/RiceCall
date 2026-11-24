@@ -36,4 +36,5 @@ export const friendApplicationsSlice = createSlice({
 });
 
 export const { setFriendApplications, addFriendApplications, updateFriendApplications, removeFriendApplications, clearFriendApplications } = friendApplicationsSlice.actions;
+
 export default friendApplicationsSlice.reducer;

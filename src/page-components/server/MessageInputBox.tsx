@@ -30,6 +30,7 @@ import { toTags } from '@/utils/tag-converter';
 const MessageInputBox: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
+
   const editor = useEditor({
     extensions: [
       StarterKit,
@@ -86,10 +87,8 @@ const MessageInputBox: React.FC = React.memo(() => {
   const isComposingRef = useRef<boolean>(false);
   const fontSizeRef = useRef<string>('13px');
   const textColorRef = useRef<string>('#000000');
-
   const [lastJoinChannelTime, setLastJoinChannelTime] = useState<number>(0);
   const [lastMessageTime, setLastMessageTime] = useState<number>(0);
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const textLength = editor?.getText().length || 0;
   const isCloseToMaxLength = textLength >= currentChannel.guestTextMaxLength - 100;
@@ -132,23 +131,28 @@ const MessageInputBox: React.FC = React.memo(() => {
 
   const handleInputPaste = (e: React.ClipboardEvent<HTMLDivElement>) => {
     const items = e.clipboardData.items;
+
     for (const item of items) {
       if (item.type.startsWith('image/')) {
         const image = item.getAsFile();
         if (!image || isUploadingRef.current) return;
+
         image.arrayBuffer().then((arrayBuffer) => {
           const imageUnit8Array = new Uint8Array(arrayBuffer);
           isUploadingRef.current = true;
+
           if (imageUnit8Array.length > MAX_FILE_SIZE) {
             openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
             isUploadingRef.current = false;
             return;
           }
+
           ipc.api.uploadImage({ folder: 'message', imageName: `${Date.now()}`, imageUnit8Array }).then((response) => {
             if (response) {
               editor?.chain().insertImage({ src: response.imageUrl, alt: image.name }).focus().run();
               setStyles();
             }
+
             isUploadingRef.current = false;
           });
         });
@@ -161,6 +165,7 @@ const MessageInputBox: React.FC = React.memo(() => {
     if (isWarning) return;
     if (isComposingRef.current) return;
     if (e.shiftKey || e.ctrlKey) return;
+
     if (e.key === 'Enter') {
       e.preventDefault();
       if (messageInputRef.current.trim().length === 0) return;

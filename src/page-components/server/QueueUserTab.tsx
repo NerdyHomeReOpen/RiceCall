@@ -8,7 +8,6 @@ import * as Store from '@/store';
 import { openDirectMessage } from '@/services';
 
 import { useAppDispatch, useAppSelector } from '@/hooks/useStore';
-
 import { useQueueUserCtxMenu } from '@/hooks/context-menus/useQueueUserCtxMenu';
 
 import BadgeList from '@/components/badge-list';
@@ -26,7 +25,6 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const { showContextMenu, showUserInfoBlock } = useContextMenu();
   const { unmuteUser, muteUser } = useWebRTC();
   const dispatch = useAppDispatch();
-
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const user = useAppSelector(
@@ -61,13 +59,14 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `queue-${queueUserId}`, shallowEqual);
   const isSpeaking = useAppSelector((state) => (queueUserId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[queueUserId]), shallowEqual);
   const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[queueUserId], shallowEqual);
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
+
   const queueMember = useMemo(() => {
     const onlineMember = onlineMembers.find((om) => om.userId === queueUserId);
     if (!onlineMember || !queueUser) return getDefaultQueueMember();
     return { ...queueUser, ...onlineMember };
   }, [onlineMembers, queueUser, queueUserId]);
+
   const isFriend = useMemo(() => friends.some((f) => f.targetId === queueMember.userId && f.relationStatus === RelationStatus.Friend), [friends, queueMember.userId]);
   const isSelf = queueMember.userId === user.userId;
   const hasVip = queueMember.vip > 0;
@@ -111,6 +110,7 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const handleTabMouseEnter = (e: React.MouseEvent<HTMLDivElement>) => {
     const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+
     hoverTimerRef.current = setTimeout(() => {
       showUserInfoBlock(x, y, 'right-bottom', queueMember);
     }, 200);

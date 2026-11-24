@@ -45,11 +45,9 @@ export const systemSettings = {
     if (settings.updateCheckInterval !== undefined) modules.default.setUpdateCheckInterval(settings.updateCheckInterval);
     if (settings.updateChannel !== undefined) modules.default.setUpdateChannel(settings.updateChannel);
   },
-
   get: (): Types.SystemSettings | null => {
     return modules.default.getSystemSettings();
   },
-
   isAutoLoginEnabled: {
     set: (enable: boolean): void => {
       modules.default.setIsAutoLoginEnabled(enable);
@@ -61,7 +59,6 @@ export const systemSettings = {
       return modules.default.listen('is-auto-login-enabled', callback);
     },
   },
-
   isAutoLaunchEnabled: {
     set: (enable: boolean): void => {
       modules.default.setIsAutoLaunchEnabled(enable);
@@ -73,7 +70,6 @@ export const systemSettings = {
       return modules.default.listen('is-auto-launch-enabled', callback);
     },
   },
-
   isAlwaysOnTop: {
     set: (enable: boolean): void => {
       modules.default.setIsAlwaysOnTop(enable);
@@ -85,7 +81,6 @@ export const systemSettings = {
       return modules.default.listen('is-always-on-top', callback);
     },
   },
-
   isStatusAutoIdleEnabled: {
     set: (enable: boolean): void => {
       modules.default.setIsStatusAutoIdleEnabled(enable);
@@ -97,7 +92,6 @@ export const systemSettings = {
       return modules.default.listen('is-status-auto-idle-enabled', callback);
     },
   },
-
   statusAutoIdleMinutes: {
     set: (fontSize: number): void => {
       modules.default.setStatusAutoIdleMinutes(fontSize);
@@ -109,7 +103,6 @@ export const systemSettings = {
       return modules.default.listen('status-auto-idle-minutes', callback);
     },
   },
-
   isStatusAutoDndEnabled: {
     set: (enable: boolean): void => {
       modules.default.setIsStatusAutoDndEnabled(enable);
@@ -121,7 +114,6 @@ export const systemSettings = {
       return modules.default.listen('is-status-auto-dnd-enabled', callback);
     },
   },
-
   channelUIMode: {
     set: (key: Types.ChannelUIMode): void => {
       modules.default.setChannelUIMode(key);
@@ -133,7 +125,6 @@ export const systemSettings = {
       return modules.default.listen('channel-ui-mode', callback);
     },
   },
-
   closeToTray: {
     set: (enable: boolean): void => {
       modules.default.setCloseToTray(enable);
@@ -145,7 +136,6 @@ export const systemSettings = {
       return modules.default.listen('close-to-tray', callback);
     },
   },
-
   font: {
     set: (font: string): void => {
       modules.default.setFont(font);
@@ -157,7 +147,6 @@ export const systemSettings = {
       return modules.default.listen('font', callback);
     },
   },
-
   fontSize: {
     set: (fontSize: number): void => {
       modules.default.setFontSize(fontSize);
@@ -169,7 +158,6 @@ export const systemSettings = {
       return modules.default.listen('font-size', callback);
     },
   },
-
   inputAudioDevice: {
     set: (deviceId: string): void => {
       modules.default.setInputAudioDevice(deviceId);
@@ -181,7 +169,6 @@ export const systemSettings = {
       return modules.default.listen('input-audio-device', callback);
     },
   },
-
   outputAudioDevice: {
     set: (deviceId: string): void => {
       modules.default.setOutputAudioDevice(deviceId);
@@ -193,7 +180,6 @@ export const systemSettings = {
       return modules.default.listen('output-audio-device', callback);
     },
   },
-
   recordFormat: {
     set: (format: Types.RecordFormat): void => {
       modules.default.setRecordFormat(format);
@@ -205,7 +191,6 @@ export const systemSettings = {
       return modules.default.listen('record-format', callback);
     },
   },
-
   recordSavePath: {
     set: (path: string): void => {
       modules.default.setRecordSavePath(path);
@@ -217,7 +202,6 @@ export const systemSettings = {
       return modules.default.listen('record-save-path', callback);
     },
   },
-
   isMixEffectEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsMixEffectEnabled(enabled);
@@ -229,7 +213,6 @@ export const systemSettings = {
       return modules.default.listen('is-mix-effect-enabled', callback);
     },
   },
-
   mixEffectType: {
     set: (key: string): void => {
       modules.default.setMixEffectType(key);
@@ -241,7 +224,6 @@ export const systemSettings = {
       return modules.default.listen('mix-effect-type', callback);
     },
   },
-
   isAutoMixSettingEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsAutoMixSettingEnabled(enabled);
@@ -253,7 +235,6 @@ export const systemSettings = {
       return modules.default.listen('is-auto-mix-setting-enabled', callback);
     },
   },
-
   isEchoCancellationEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsEchoCancellationEnabled(enabled);
@@ -265,7 +246,6 @@ export const systemSettings = {
       return modules.default.listen('is-echo-cancellation-enabled', callback);
     },
   },
-
   isNoiseCancellationEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsNoiseCancellationEnabled(enabled);
@@ -277,7 +257,6 @@ export const systemSettings = {
       return modules.default.listen('is-noise-cancellation-enabled', callback);
     },
   },
-
   isMicrophoneAmplificationEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsMicrophoneAmplificationEnabled(enabled);
@@ -289,7 +268,6 @@ export const systemSettings = {
       return modules.default.listen('is-microphone-amplification-enabled', callback);
     },
   },
-
   isManualMixMode: {
     set: (enabled: boolean): void => {
       modules.default.setIsManualMixMode(enabled);
@@ -301,7 +279,6 @@ export const systemSettings = {
       return modules.default.listen('is-manual-mix-mode', callback);
     },
   },
-
   mixMode: {
     set: (key: Types.MixMode): void => {
       modules.default.setMixMode(key);
@@ -313,7 +290,6 @@ export const systemSettings = {
       return modules.default.listen('mix-mode', callback);
     },
   },
-
   speakingMode: {
     set: (key: Types.SpeakingMode): void => {
       modules.default.setSpeakingMode(key);
@@ -325,7 +301,6 @@ export const systemSettings = {
       return modules.default.listen('speaking-mode', callback);
     },
   },
-
   defaultSpeakingKey: {
     set: (key: string): void => {
       modules.default.setDefaultSpeakingKey(key);
@@ -337,7 +312,6 @@ export const systemSettings = {
       return modules.default.listen('default-speaking-key', callback);
     },
   },
-
   disableMessageHistory: {
     set: (enabled: boolean): void => {
       modules.default.setDisableMessageHistory(enabled);
@@ -349,7 +323,6 @@ export const systemSettings = {
       return modules.default.listen('disable-message-history', callback);
     },
   },
-
   hotKeyOpenMainWindow: {
     set: (key: string): void => {
       modules.default.setHotKeyOpenMainWindow(key);
@@ -361,7 +334,6 @@ export const systemSettings = {
       return modules.default.listen('hot-key-open-main-window', callback);
     },
   },
-
   hotKeyIncreaseVolume: {
     set: (key: string): void => {
       modules.default.setHotKeyIncreaseVolume(key);
@@ -373,7 +345,6 @@ export const systemSettings = {
       return modules.default.listen('hot-key-increase-volume', callback);
     },
   },
-
   hotKeyDecreaseVolume: {
     set: (key: string): void => {
       modules.default.setHotKeyDecreaseVolume(key);
@@ -385,7 +356,6 @@ export const systemSettings = {
       return modules.default.listen('hot-key-decrease-volume', callback);
     },
   },
-
   hotKeyToggleSpeaker: {
     set: (key: string): void => {
       modules.default.setHotKeyToggleSpeaker(key);
@@ -397,7 +367,6 @@ export const systemSettings = {
       return modules.default.listen('hot-key-toggle-speaker', callback);
     },
   },
-
   hotKeyToggleMicrophone: {
     set: (key: string): void => {
       modules.default.setHotKeyToggleMicrophone(key);
@@ -409,7 +378,6 @@ export const systemSettings = {
       return modules.default.listen('hot-key-toggle-microphone', callback);
     },
   },
-
   disableAllSoundEffect: {
     set: (enabled: boolean): void => {
       modules.default.setDisableAllSoundEffect(enabled);
@@ -421,7 +389,6 @@ export const systemSettings = {
       return modules.default.listen('disable-all-sound-effect', callback);
     },
   },
-
   isEnterVoiceChannelSoundEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsEnterVoiceChannelSoundEnabled(enabled);
@@ -433,7 +400,6 @@ export const systemSettings = {
       return modules.default.listen('is-enter-voice-channel-sound-enabled', callback);
     },
   },
-
   isLeaveVoiceChannelSoundEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsLeaveVoiceChannelSoundEnabled(enabled);
@@ -445,7 +411,6 @@ export const systemSettings = {
       return modules.default.listen('is-leave-voice-channel-sound-enabled', callback);
     },
   },
-
   isStartSpeakingSoundEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsStartSpeakingSoundEnabled(enabled);
@@ -457,7 +422,6 @@ export const systemSettings = {
       return modules.default.listen('is-start-speaking-sound-enabled', callback);
     },
   },
-
   isStopSpeakingSoundEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsStopSpeakingSoundEnabled(enabled);
@@ -469,7 +433,6 @@ export const systemSettings = {
       return modules.default.listen('is-stop-speaking-sound-enabled', callback);
     },
   },
-
   isReceiveDirectMessageSoundEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsReceiveDirectMessageSoundEnabled(enabled);
@@ -481,7 +444,6 @@ export const systemSettings = {
       return modules.default.listen('is-receive-direct-message-sound-enabled', callback);
     },
   },
-
   isReceiveChannelMessageSoundEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsReceiveChannelMessageSoundEnabled(enabled);
@@ -493,7 +455,6 @@ export const systemSettings = {
       return modules.default.listen('is-receive-channel-message-sound-enabled', callback);
     },
   },
-
   isAutoCheckForUpdatesEnabled: {
     set: (enabled: boolean): void => {
       modules.default.setIsAutoCheckForUpdatesEnabled(enabled);
@@ -505,7 +466,6 @@ export const systemSettings = {
       return modules.default.listen('is-auto-check-for-updates-enabled', callback);
     },
   },
-
   updateCheckInterval: {
     set: (interval: number): void => {
       modules.default.setUpdateCheckInterval(interval);
@@ -517,7 +477,6 @@ export const systemSettings = {
       return modules.default.listen('update-check-interval', callback);
     },
   },
-
   updateChannel: {
     set: (channel: string): void => {
       modules.default.setUpdateChannel(channel);
@@ -529,7 +488,6 @@ export const systemSettings = {
       return modules.default.listen('update-channel', callback);
     },
   },
-
   language: {
     set: (language: Types.Locale): void => {
       modules.default.setLanguage(language);

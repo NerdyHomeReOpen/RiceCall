@@ -11,9 +11,7 @@ interface EmbedLinkInputProps {
 
 const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direction, onSubmit, onClose }) => {
   const { t } = useTranslation();
-
   const embedLinkInputRef = useRef<HTMLDivElement>(null);
-
   const [isVisible, setIsVisible] = useState(false);
   const [pickerX, setPickerX] = useState<number>(x);
   const [pickerY, setPickerY] = useState<number>(y);
@@ -43,6 +41,7 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= pickerHeight;
     }
+
     if (direction === 'left-top' || direction === 'left-bottom') {
       newPosX -= pickerWidth;
     }
@@ -50,12 +49,15 @@ const EmbedLinkInput: React.FC<EmbedLinkInputProps> = React.memo(({ x, y, direct
     if (newPosX + pickerWidth + marginEdge > windowWidth) {
       newPosX = windowWidth - pickerWidth - marginEdge;
     }
+
     if (newPosX < marginEdge) {
       newPosX = marginEdge;
     }
+
     if (newPosY + pickerHeight + marginEdge > windowHeight) {
       newPosY = windowHeight - pickerHeight - marginEdge;
     }
+
     if (newPosY < marginEdge) {
       newPosY = marginEdge;
     }

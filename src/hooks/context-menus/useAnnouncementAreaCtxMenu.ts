@@ -10,6 +10,5 @@ interface UseAnnouncementAreaCtxMenuProps {
 
 export const useAnnouncementAreaCtxMenu = ({ onCloseAnnouncement }: UseAnnouncementAreaCtxMenuProps): Types.ContextMenuBuilder => {
   const buildContextMenu = useCallback(() => new ContextMenu().addCloseAnnouncementOption(onCloseAnnouncement).build(), [onCloseAnnouncement]);
-
   return { buildContextMenu };
 };

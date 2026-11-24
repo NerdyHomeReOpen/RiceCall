@@ -13,7 +13,6 @@ interface MicContextMenuItemProps {
 
 const MicContextMenuItem: React.FC<MicContextMenuItemProps> = React.memo(({ direction, item, onClose }) => {
   const { t } = useTranslation();
-
   const [subMenu, setSubMenu] = useState<React.ReactNode>(null);
 
   const handleClick = () => {

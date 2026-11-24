@@ -26,6 +26,7 @@ const ServerPageComponent: React.FC<ServerPageProps> = React.memo(({ display }) 
     const onPointerup = () => {
       isResizingSidebarRef.current = false;
     };
+
     document.addEventListener('pointerup', onPointerup);
     return () => document.removeEventListener('pointerup', onPointerup);
   }, []);

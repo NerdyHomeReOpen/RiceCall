@@ -26,7 +26,6 @@ interface ActionScannerProviderProps {
 
 const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.JSX.Element => {
   const { pressSpeakKey, releaseSpeakKey, addSpeakerVolume, subtractSpeakerVolume, toggleSpeakerMuted, toggleMicMuted } = useWebRTC();
-
   const idleCheck = useRef<boolean>(false);
   const idleMinutes = useRef<number>(0);
   const speakingKeyRef = useRef<string>('v');
@@ -38,7 +37,6 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
   const lastActiveRef = useRef<number>(Date.now());
   const isSpeakingRef = useRef<boolean>(false);
   const isManualIdlingRef = useRef<boolean>(false);
-
   const [isIdling, setIsIdling] = useState<boolean>(false);
 
   const buildKey = (e: KeyboardEvent) => {
@@ -47,12 +45,10 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
     if (e.shiftKey) parts.push('Shift');
     if (e.altKey) parts.push('Alt');
     if (e.metaKey) parts.push('Cmd');
-
     let key = e.key;
     if (key === ' ') key = 'Space';
     if (/^f\d+$/i.test(key)) key = key.toUpperCase();
     if (key === 'Meta') key = 'Cmd';
-
     parts.push(key.length === 1 ? key.toLowerCase() : key);
     return parts.join('+');
   };
@@ -91,6 +87,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
 
   const setIsManualIdling = useCallback((value: boolean) => {
     isManualIdlingRef.current = value;
+
     requestAnimationFrame(() => {
       setIsIdling(value);
     });
@@ -99,10 +96,12 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
   useEffect(() => {
     const interval = setInterval(() => {
       const now = Date.now();
+
       if (idleCheck.current && now - lastActiveRef.current >= idleMinutes.current * 60_000) {
         setIsIdling(true);
       }
     }, 1000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -112,6 +111,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
     const updateActivity = () => {
       if (!ticking) {
         ticking = true;
+
         requestAnimationFrame(() => {
           lastActiveRef.current = Date.now();
           if (isIdling && !isManualIdlingRef.current) setIsIdling(false);
@@ -134,6 +134,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
       if (e.repeat) return;
       const mk = buildKey(e);
+
       switch (mk) {
         case speakingKeyRef.current:
           startSpeak();
@@ -159,6 +160,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
     const onKeyUp = (e: KeyboardEvent) => {
       if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
       const mk = buildKey(e);
+
       switch (mk) {
         case speakingKeyRef.current:
           stopSpeak();
@@ -168,6 +170,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
 
     // TODO(backlog#6): Use system event instead of window event
     const onBlur = () => stopSpeak();
+
     const onVisibility = () => {
       if (document.hidden) stopSpeak();
     };
@@ -176,6 +179,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
     window.addEventListener('keyup', onKeyUp);
     window.addEventListener('blur', onBlur);
     document.addEventListener('visibilitychange', onVisibility);
+
     return () => {
       window.removeEventListener('keydown', onKeyDown);
       window.removeEventListener('keyup', onKeyUp);
@@ -190,6 +194,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       idleCheck.current = enable;
       lastActiveRef.current = Date.now();
     };
+
     changeIsStatusAutoIdleEnabled(ipc.systemSettings.isStatusAutoIdleEnabled.get());
     const unsub = ipc.systemSettings.isStatusAutoIdleEnabled.onUpdate(changeIsStatusAutoIdleEnabled);
     return () => unsub();
@@ -200,6 +205,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       new Logger('ACTION_SCANNER').info(`Status auto idle minutes updated: ${value}`);
       idleMinutes.current = value;
     };
+
     changeStatusAutoIdleMinutes(ipc.systemSettings.statusAutoIdleMinutes.get());
     const unsub = ipc.systemSettings.statusAutoIdleMinutes.onUpdate(changeStatusAutoIdleMinutes);
     return () => unsub();
@@ -210,6 +216,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       new Logger('ACTION_SCANNER').info(`Default speaking key updated: ${key}`);
       speakingKeyRef.current = key;
     };
+
     changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
     const unsub = ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey);
     return () => unsub();
@@ -220,6 +227,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       new Logger('ACTION_SCANNER').info(`Hot key open main window updated: ${key}`);
       openMainWindowKeyRef.current = key;
     };
+
     changeHotKeyOpenMainWindow(ipc.systemSettings.hotKeyOpenMainWindow.get());
     const unsub = ipc.systemSettings.hotKeyOpenMainWindow.onUpdate(changeHotKeyOpenMainWindow);
     return () => unsub();
@@ -230,6 +238,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       new Logger('ACTION_SCANNER').info(`Hot key increase volume updated: ${key}`);
       increaseVolumeKeyRef.current = key;
     };
+
     changeHotKeyIncreaseVolume(ipc.systemSettings.hotKeyIncreaseVolume.get());
     const unsub = ipc.systemSettings.hotKeyIncreaseVolume.onUpdate(changeHotKeyIncreaseVolume);
     return () => unsub();
@@ -240,6 +249,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       new Logger('ACTION_SCANNER').info(`Hot key decrease volume updated: ${key}`);
       decreaseVolumeKeyRef.current = key;
     };
+
     changeHotKeyDecreaseVolume(ipc.systemSettings.hotKeyDecreaseVolume.get());
     const unsub = ipc.systemSettings.hotKeyDecreaseVolume.onUpdate(changeHotKeyDecreaseVolume);
     return () => unsub();
@@ -250,6 +260,7 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       new Logger('ACTION_SCANNER').info(`Hot key toggle speaker updated: ${key}`);
       toggleSpeakerKeyRef.current = key;
     };
+
     changeHotKeyToggleSpeaker(ipc.systemSettings.hotKeyToggleSpeaker.get());
     const unsub = ipc.systemSettings.hotKeyToggleSpeaker.onUpdate(changeHotKeyToggleSpeaker);
     return () => unsub();
@@ -260,13 +271,13 @@ const ActionScannerProvider = ({ children }: ActionScannerProviderProps): React.
       new Logger('ACTION_SCANNER').info(`Hot key toggle microphone updated: ${key}`);
       toggleMicrophoneKeyRef.current = key;
     };
+
     changeHotKeyToggleMicrophone(ipc.systemSettings.hotKeyToggleMicrophone.get());
     const unsub = ipc.systemSettings.hotKeyToggleMicrophone.onUpdate(changeHotKeyToggleMicrophone);
     return () => unsub();
   }, []);
 
   const contextValue = useMemo(() => ({ isIdling, isManualIdling: isManualIdlingRef.current, setIsManualIdling }), [isIdling, setIsManualIdling]);
-
   return <ActionScannerContext.Provider value={contextValue}>{children}</ActionScannerContext.Provider>;
 };
 

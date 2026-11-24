@@ -11,9 +11,7 @@ type EditFriendGroupNamePopupProps = Types.PopupProps<'editFriendGroupName'>;
 
 const EditFriendGroupNamePopup: React.FC<EditFriendGroupNamePopupProps> = React.memo(({ id, friendGroup }) => {
   const { t } = useTranslation();
-
   const [friendGroupName, setFriendGroupName] = useState<string>(friendGroup.name);
-
   const canSubmit = friendGroupName.trim();
 
   const handleFriendGroupNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

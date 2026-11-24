@@ -33,6 +33,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
         cancelAnimationFrame(rafIdListRef.current[userId]);
         delete rafIdListRef.current[userId];
       }
+
       if (speakerNodesRef.current[userId]) {
         const { stream, source, gain, analyser } = speakerNodesRef.current[userId];
         if (source) source.disconnect();
@@ -41,6 +42,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
         if (stream) stream.getTracks().forEach((t) => t.stop());
         delete speakerNodesRef.current[userId];
       }
+
       Store.store.dispatch(Store.setSpeakingId({ id: userId, value: false }));
     },
     [rafIdListRef, speakerNodesRef],
@@ -63,17 +65,13 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
       const gainNode = audioContextRef.current.createGain();
       gainNode.gain.value = 1;
       const analyserNode = audioContextRef.current.createAnalyser();
-
       speakerNodesRef.current[userId] = { stream, source: sourceNode, gain: gainNode, analyser: analyserNode };
-
       sourceNode.connect(gainNode);
       gainNode.connect(analyserNode);
       gainNode.connect(masterGainNodeRef.current);
-
       analyserNode.fftSize = 2048;
       const dataArray = new Uint8Array(analyserNode.fftSize) as Uint8Array<ArrayBuffer>;
       detectSpeaking(userId, analyserNode, dataArray, rafIdListRef, audioProducerRef);
-
       const speaker = new Audio();
       speaker.srcObject = stream;
       speaker.volume = 0;
@@ -125,6 +123,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
     const changeOutputAudioDevice = (outputAudioDevice: string) => {
       new Logger('WEB_RTC').info(`Output audio device updated: ${outputAudioDevice}`);
       const el = speakerRef.current;
+
       if (el && typeof el.setSinkId === 'function') {
         el.setSinkId(outputAudioDevice).catch((e) => {
           const error = e instanceof Error ? e : new Error('Unknown error');
@@ -132,6 +131,7 @@ export const useSpeakerAudio = (refs: SharedRefs, { initAudioContext }: UseSpeak
         });
       }
     };
+
     changeOutputAudioDevice(ipc.systemSettings.outputAudioDevice.get());
     const unsub = ipc.systemSettings.outputAudioDevice.onUpdate(changeOutputAudioDevice);
     return () => unsub();

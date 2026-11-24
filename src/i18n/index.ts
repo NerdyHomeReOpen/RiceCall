@@ -39,6 +39,7 @@ function purgeCache(): void {
   const keysToRemove = I18nStorage.get()
     .keys()
     .filter((k) => k.startsWith(I18N_CACHE_PREFIX));
+
   keysToRemove.forEach((k) => I18nStorage.get().removeItem(k));
 }
 
@@ -58,6 +59,7 @@ async function checkCacheVersion(): Promise<void> {
     }
 
     const cachedVersion = I18nStorage.get().getItem(I18N_VERSION_KEY);
+
     if (cachedVersion !== remoteVersion) {
       purgeCache();
       I18nStorage.get().setItem(I18N_VERSION_KEY, remoteVersion);
@@ -69,14 +71,17 @@ async function checkCacheVersion(): Promise<void> {
 
 class HttpBackend {
   type = 'backend' as const;
+
   read(lng: string, ns: string, cb: (error: Error | null, data: Record<string, unknown> | null) => void) {
     const cached = readCache(lng, ns);
+
     if (cached) {
       cb(null, cached);
       return;
     }
 
     const baseUrl = Env.get().DOCS_BASE_URL;
+
     if (!baseUrl) {
       cb(new Error('DOCS_BASE_URL is not configured'), null);
       return;
@@ -105,11 +110,9 @@ export const i18nReady = I18nStorage.load()
         lng: DEFAULT_LOCALE,
         fallbackLng: DEFAULT_LOCALE,
         supportedLngs: [...LOCALE_CODES],
-
         ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
         defaultNS: 'app',
         fallbackNS: ['app'],
-
         interpolation: { escapeValue: false },
         load: 'currentOnly' as const,
         nonExplicitSupportedLngs: false,
@@ -121,6 +124,7 @@ export function t(key: string, params?: Record<string, string>): string {
     new Logger('I18N').error('i18next is not initialized');
     return key;
   }
+
   return i18next.t(key, params);
 }
 
@@ -129,6 +133,7 @@ export function changeLanguage(language: Types.Locale): void {
     new Logger('I18N').error('i18next is not initialized');
     return;
   }
+
   i18next.changeLanguage(language);
 }
 

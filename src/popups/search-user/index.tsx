@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
-
-import type * as Types from '@/types';
 import { shallowEqual } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
+import type * as Types from '@/types';
 import { RelationStatus } from '@/types';
 
 import * as ipc from '@/main/ipc';
@@ -26,7 +25,6 @@ const SearchUserPopup: React.FC<SearchUserPopupProps> = React.memo(({ id }) => {
 
   const [query, setQuery] = useState<string>('');
   const [error, setError] = useState<string | null>(null);
-
   const canSubmit = query.trim();
 
   const searchUser = (query: string) => {

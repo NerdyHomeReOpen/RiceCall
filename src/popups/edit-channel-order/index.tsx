@@ -50,6 +50,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
           if (c.order !== index || c.order !== channelOrderMapRef.current[c.channelId]) {
             acc.push({ order: index, channelId: c.channelId });
           }
+
           channels
             .filter((sc) => sc.categoryId === c.channelId)
             .sort((a, b) => a.order - b.order)
@@ -58,6 +59,7 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
                 acc.push({ order: sindex, channelId: sc.channelId });
               }
             });
+
           return acc;
         },
         [] as { order: number; channelId: string }[],
@@ -84,7 +86,6 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
     if (currentIndex === targetIndex) return;
     if (currentIndex < 0 || currentIndex > categoryChildren.length - 1) return;
     if (targetIndex < 0 || targetIndex > categoryChildren.length - 1) return;
-
     const newChannels = [...channels];
     const newCategoryChildren = categoryChildren.map((c) => ({ ...c }));
 
@@ -104,10 +105,12 @@ const EditChannelOrderPopup: React.FC<EditChannelOrderPopupProps> = React.memo((
 
     for (const child of newCategoryChildren) {
       const index = newChannels.findIndex((c) => c.channelId === child.channelId);
+
       if (index !== -1) {
         newChannels[index] = { ...newChannels[index], order: child.order };
       }
     }
+
     setChannels(newChannels.sort((a, b) => a.order - b.order));
     setCategoryChildren(newCategoryChildren.sort((a, b) => a.order - b.order));
   };

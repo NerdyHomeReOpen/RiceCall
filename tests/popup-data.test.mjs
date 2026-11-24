@@ -2,7 +2,6 @@ import assert from 'node:assert/strict';
 import { test } from 'node:test';
 
 const { loadPopupData } = await import('@/main/popup/initial-data-loader');
-
 const systemSettings = { theme: 'test' };
 
 test('a popup without a loader receives exactly what the caller passed', async () => {

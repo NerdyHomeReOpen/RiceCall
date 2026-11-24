@@ -24,4 +24,5 @@ export const queueUsersSlice = createSlice({
 });
 
 export const { setQueueUsers, clearQueueUsers } = queueUsersSlice.actions;
+
 export default queueUsersSlice.reducer;

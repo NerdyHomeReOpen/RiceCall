@@ -27,6 +27,7 @@ const ICON_POSITIONS: Record<string, [string, string]> = {
   readonly: ['bg-[position:-42px_0]', 'bg-[position:-42px_-14px]'],
   lobby: ['bg-[position:-56px_0]', 'bg-[position:-56px_-14px]'],
 };
+
 const DEFAULT_ICON_POSITIONS: [string, string] = ['bg-[position:0_0]', 'bg-[position:-14px_0]'];
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
@@ -63,15 +64,14 @@ const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ category }) => {
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
   const onlineMembers = useAppSelector((state) => state.onlineMembers.data, shallowEqual);
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
-
   const [isExpanded, setIsExpanded] = useState(true);
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, category.permissionLevel);
   const categoryChannels = channels.filter((c) => c.type === 'channel').filter((c) => c.categoryId === category.channelId);
   const categoryMembers = onlineMembers.filter((om) => om.currentChannelId === category.channelId);
   const movableServerUserIds = onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId);
   const movableCategoryUserIds = categoryMembers.filter((cm) => cm.userId !== user.userId && cm.permissionLevel <= permissionLevel).map((cm) => cm.userId);
   const sortedCategoryChannels = [...categoryChannels].sort((a, b) => a.order - b.order);
+
   const sortedCategoryMembers = [...categoryMembers].sort((a, b) => {
     if (a.userId === user.userId && b.userId !== user.userId) return -1;
     if (b.userId === user.userId && a.userId !== user.userId) return 1;

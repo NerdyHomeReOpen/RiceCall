@@ -6,10 +6,8 @@ import { useWebRTC } from '@/providers/WebRTC';
 
 const SpeakerVolumeSlider = React.memo(() => {
   const { changeSpeakerVolume, toggleSpeakerMuted } = useWebRTC();
-
   const sliderRef = useRef<HTMLInputElement>(null);
   const isBtnHoveredRef = useRef<boolean>(false);
-
   const isSpeakerMuted = useAppSelector((state) => state.webrtc.isSpeakerMuted);
   const speakerVolume = useAppSelector((state) => state.webrtc.speakerVolume);
 
@@ -31,10 +29,11 @@ const SpeakerVolumeSlider = React.memo(() => {
 
   const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
     if (!isBtnHoveredRef.current || !sliderRef.current) return;
-
     const newValue = parseInt(sliderRef.current.value);
+
     if (e.deltaY > 0) sliderRef.current.value = (newValue - 4).toString();
     else sliderRef.current.value = (newValue + 4).toString();
+
     changeSpeakerVolume(parseInt(sliderRef.current.value));
   };
 

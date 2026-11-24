@@ -3,7 +3,6 @@ import Logger from '@/utils/logger';
 export function saveRecord(record: ArrayBuffer): void {
   try {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-
     const a = document.createElement('a');
     a.href = URL.createObjectURL(new Blob([record]));
     a.download = `recording-${timestamp}.wav`;

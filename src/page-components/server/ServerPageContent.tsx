@@ -26,6 +26,7 @@ import MessageInputBox from './MessageInputBox';
 import MicVolumeSlider from './MicVolumeSlider';
 import SpeakerVolumeSlider from './SpeakerVolumeSlider';
 import ShowFrame from './ShowFrame';
+
 import MarkdownContent from '@/components/markdown-content';
 import MessageContent from '@/components/message-content';
 import UnreadMessageAlert from '@/components/unread-message-alert';
@@ -75,12 +76,10 @@ const ServerPageContent: React.FC = React.memo(() => {
   const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive, shallowEqual);
   const isRecording = useAppSelector((state) => state.webrtc.isRecording, shallowEqual);
   const recordTime = useAppSelector((state) => state.webrtc.recordTime, shallowEqual);
-
   const annAreaRef = useRef<HTMLDivElement>(null);
   const showAreaRef = useRef<HTMLIFrameElement>(null);
   const messageAreaRef = useRef<HTMLDivElement>(null);
   const isResizingAnnAreaRef = useRef<boolean>(false);
-
   const [isActionMessageVisible, setIsActionMessageVisible] = useState<boolean>(false);
   const [channelUIMode, setChannelUIMode] = useState<Types.ChannelUIMode>('three-line');
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
@@ -91,6 +90,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   const { buildContextMenu: buildAnnouncementAreaContextMenu } = useAnnouncementAreaCtxMenu({
     onCloseAnnouncement: () => setCentralAreaMode('none'),
   });
+
   const { buildContextMenu: buildMessageAreaContextMenu } = useMessageAreaCtxMenu({
     onOpenAnnouncement: () => setCentralAreaMode('announcement'),
     onClearMessages: () => {
@@ -98,6 +98,7 @@ const ServerPageContent: React.FC = React.memo(() => {
       dispatch(Store.clearActionMessages());
     },
   });
+
   const { buildContextMenu: buildVoiceModeContextMenu } = useVoiceModeCtxMenu({
     currentServer,
     currentChannel,
@@ -140,6 +141,7 @@ const ServerPageContent: React.FC = React.memo(() => {
   const handleAnnAreaHandleMove = (e: React.PointerEvent<HTMLDivElement>) => {
     const targetRef = getResizableAreaRef();
     if (!isResizingAnnAreaRef.current || !targetRef?.current) return;
+
     if (isChannelUIClassicMode) {
       targetRef.current.style.height = `${e.clientY - targetRef.current.offsetTop}px`;
     } else if (isChannelUIThreeLineMode) {
@@ -156,12 +158,14 @@ const ServerPageContent: React.FC = React.memo(() => {
   const handleWidgetAnnClick = () => {
     if (isCentralAreaAnnouncementMode) setCentralAreaMode('none');
     else setCentralAreaMode('announcement');
+
     setIsWidgetExpanded(false);
   };
 
   const handleWidgetShowClick = () => {
     if (isCentralAreaShowMode) setCentralAreaMode('none');
     else setCentralAreaMode('show');
+
     setIsWidgetExpanded(false);
   };
 
@@ -170,6 +174,7 @@ const ServerPageContent: React.FC = React.memo(() => {
       if (action === 'openShowFrame') setCentralAreaMode('show');
       if (action === 'openChannelEvent') openChannelEvent();
     });
+
     setIsWidgetExpanded(false);
   };
 
@@ -235,6 +240,7 @@ const ServerPageContent: React.FC = React.memo(() => {
     const onPointerup = () => {
       isResizingAnnAreaRef.current = false;
     };
+
     document.addEventListener('pointerup', onPointerup);
     return () => document.removeEventListener('pointerup', onPointerup);
   }, []);
@@ -245,6 +251,7 @@ const ServerPageContent: React.FC = React.memo(() => {
         setIsWidgetExpanded(false);
       }
     };
+
     document.addEventListener('pointerdown', onPointerDown);
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);
@@ -253,13 +260,13 @@ const ServerPageContent: React.FC = React.memo(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') scrollToBottom();
     };
+
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [scrollToBottom]);
 
   useEffect(() => {
     if (!messageAreaRef.current || channelMessages.length === 0) return;
-
     const lastMessage = channelMessages[channelMessages.length - 1];
     const isBottom = messageAreaRef.current.scrollHeight - messageAreaRef.current.scrollTop - messageAreaRef.current.clientHeight <= MESSAGE_VIERER_DEVIATION;
 
@@ -274,6 +281,7 @@ const ServerPageContent: React.FC = React.memo(() => {
     const changeChannelUIMode = (channelUIMode: Types.ChannelUIMode) => {
       setChannelUIMode(channelUIMode);
     };
+
     changeChannelUIMode(ipc.systemSettings.channelUIMode.get());
     const unsub = ipc.systemSettings.channelUIMode.onUpdate(changeChannelUIMode);
     return () => unsub();

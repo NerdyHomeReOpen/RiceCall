@@ -36,4 +36,5 @@ export const memberApplicationsSlice = createSlice({
 });
 
 export const { setMemberApplications, addMemberApplications, updateMemberApplications, removeMemberApplications, clearMemberApplications } = memberApplicationsSlice.actions;
+
 export default memberApplicationsSlice.reducer;

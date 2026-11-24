@@ -13,7 +13,6 @@ type KickMemberFromChannelPopupProps = Types.PopupProps<'kickMemberFromChannel'>
 
 const KickMemberFromChannelPopup: React.FC<KickMemberFromChannelPopupProps> = React.memo(({ id, serverId, channel, member }) => {
   const { t } = useTranslation();
-
   const [formatType, setFormatType] = useState<string>('hours');
   const [time, setTime] = useState<number>(1);
   const [reason, setReason] = useState<string>('');

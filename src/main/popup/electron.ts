@@ -15,8 +15,8 @@ export function registerPopupHandlers(): void {
       new Logger('SYSTEM').error(`Cannot load ${type} data, aborting...`);
       return null;
     });
-    if (!popupData) return;
 
+    if (!popupData) return;
     createPopup(type, id, popupData, force);
   });
 

@@ -14,10 +14,8 @@ type SystemSettingPopupProps = Types.PopupProps<'systemSetting'>;
 const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, userSettings: userSettingsData, systemSettings: systemSettingsData }) => {
   const { t } = useTranslation();
   const { playSound } = useSoundPlayer();
-
   const activeInputRef = useRef<string | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-
   const [systemSettings, setSystemSettings] = useState<Types.SystemSettings>(systemSettingsData);
   const [userSettings, setUserSettings] = useState<Types.UserSetting>(userSettingsData);
   const [activeTabIndex, setActiveTabIndex] = useState<number>(0);
@@ -286,7 +284,6 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
     const onKeyDown = (e: KeyboardEvent) => {
       const current = activeInputRef.current;
       if (!current || e.isComposing) return;
-
       e.preventDefault();
 
       if (e.key === 'Escape') {
@@ -304,18 +301,14 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
       }
 
       if (new Set(['Shift', 'Control', 'Alt', 'Meta']).has(e.key)) return;
-
       const parts = [];
       if (e.ctrlKey) parts.push('Ctrl');
       if (e.shiftKey) parts.push('Shift');
       if (e.altKey) parts.push('Alt');
-
       let key = e.key;
-
       if (key === ' ') key = 'Space';
       if (key === 'Meta') key = 'Cmd';
       if (/^f\d+$/i.test(key)) key = key.toUpperCase();
-
       parts.push(key.length === 1 ? key.toLowerCase() : key);
       const mergeKey = parts.join('+');
 
@@ -339,6 +332,7 @@ const SystemSettingPopup: React.FC<SystemSettingPopupProps> = React.memo(({ id, 
         closeDelection();
       }
     };
+
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, [

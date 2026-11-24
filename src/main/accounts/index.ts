@@ -4,15 +4,12 @@ export const accounts = {
   get: (): Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }> => {
     return modules.default.getAccounts();
   },
-
   add: (account: string, data: { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }): void => {
     modules.default.addAccount(account, data);
   },
-
   delete: (account: string): void => {
     modules.default.deleteAccount(account);
   },
-
   onUpdate: (callback: (accounts: Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>) => void): (() => void) => {
     return modules.default.listen('accounts', callback);
   },

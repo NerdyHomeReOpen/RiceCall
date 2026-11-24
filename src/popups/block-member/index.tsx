@@ -11,7 +11,6 @@ type BlockMemberPopupProps = Types.PopupProps<'blockMember'>;
 
 const BlockMemberPopup: React.FC<BlockMemberPopupProps> = React.memo(({ id, serverId, member }) => {
   const { t } = useTranslation();
-
   const [blockType, setBlockType] = useState<'block-permanent' | 'block-ip'>('block-permanent');
 
   const blockTypeOptions = [

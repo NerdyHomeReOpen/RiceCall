@@ -27,4 +27,5 @@ export const friendActivitiesSlice = createSlice({
 });
 
 export const { setFriendActivities, addFriendActivities, clearFriendActivities } = friendActivitiesSlice.actions;
+
 export default friendActivitiesSlice.reducer;

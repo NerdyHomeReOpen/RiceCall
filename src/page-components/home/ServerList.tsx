@@ -13,9 +13,7 @@ interface ServerListProps {
 
 const ServerList: React.FC<ServerListProps> = React.memo(({ title, servers }) => {
   const { t } = useTranslation();
-
   const [isExpanded, setIsExpanded] = useState(false);
-
   const displayedServers = isExpanded ? servers : servers.slice(0, 6);
   const canExpand = servers.length > 6;
 

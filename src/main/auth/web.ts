@@ -1,4 +1,5 @@
 import { setToken, removeToken } from '@/api';
+
 import { login as _login, register as _register, autoLogin as _autoLogin } from '@/services';
 
 import { createPopup, store } from '@/main/web';
@@ -12,6 +13,7 @@ export async function login(formData: { account: string; password: string }): Pr
         setToken(res.token);
         window.location.href = '/';
       }
+
       return res as { success: true; token: string };
     })
     .catch((e) => {
@@ -48,6 +50,7 @@ export async function autoLogin(token: string): Promise<{ success: true; token: 
         removeToken();
         window.location.href = '/auth';
       }
+
       return res;
     })
     .catch((e) => {

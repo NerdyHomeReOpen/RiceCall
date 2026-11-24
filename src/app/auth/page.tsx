@@ -14,9 +14,7 @@ import ChangeServerPage from '@/page-components/change-server';
 
 const AuthPageComponent: React.FC = React.memo(() => {
   const { t } = useTranslation();
-
   const [section, setSection] = useState<'register' | 'login' | 'change-server'>('login');
-
   const isDisplayLoginPage = section === 'login';
   const isDisplayRegisterPage = section === 'register';
   const isDisplayChangeServerPage = section === 'change-server';

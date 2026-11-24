@@ -19,14 +19,13 @@ function getLossClassName(loss: number): string {
 
 const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo(({ id }) => {
   const { t } = useTranslation();
-
   const scrollRef = useRef<HTMLDivElement>(null);
-
   const [logs, setLogs] = useState<string[]>([]);
   const [isTesting, setIsTesting] = useState(false);
   const [progress, setProgress] = useState({ current: 0, cycle: 0, totalCycles: 0 });
   const [activeTab, setActiveTab] = useState<'logs' | 'reports'>('logs');
   const [reports, setReports] = useState<{ domain?: Types.DiagnosisResult[]; sfu?: Types.DiagnosisResult[] }>({});
+
   const [stages, setStages] = useState<Types.Stage[]>([
     { id: 'init', label: t('diagnosis-initialize'), icon: <FaNetworkWired />, status: 'pending' },
     { id: 'domain', label: t('diagnosis-api-ws-test'), icon: <FaCloud />, status: 'pending' },
@@ -46,12 +45,15 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     async (domains: string[], duration: number = 3): Promise<Types.FullReport | null> => {
       addLog(`Starting diagnosis for: ${domains.join(', ')}`);
       setProgress({ current: 0, cycle: 0, totalCycles: duration });
+
       try {
         const report = await ipc.networkDiagnosis.run({ domains, duration });
+
         if (report && 'error' in report && (report as Types.ReportError).error) {
           addLog(`Diagnosis error: ${(report as Types.ReportError).error}`);
           return null;
         }
+
         return report as Types.FullReport;
       } catch (e) {
         const error = e instanceof Error ? e : new Error('Unknown error');
@@ -70,11 +72,10 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     setProgress({ current: 0, cycle: 0, totalCycles: 0 });
     setActiveTab('logs');
     setStages((prev) => prev.map((s) => ({ ...s, status: 'pending' })));
-
     addLog('Starting Network Diagnosis');
     updateStage('init', 'active');
-
     const env = Env.get();
+
     const getDomain = (url: string) => {
       try {
         return new URL(url).hostname;
@@ -85,10 +86,8 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
 
     const apiDomain = getDomain(env.MAIN_SERVICE_URL);
     const wsDomain = getDomain(env.MAIN_SERVICE_WS_URL);
-
     updateStage('init', 'completed');
     updateStage('domain', 'active');
-
     const domains = Array.from(new Set([apiDomain, wsDomain])).filter(Boolean);
 
     setReports((prev) => ({
@@ -101,6 +100,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
     }));
 
     const report1 = await runDiagnosis(domains, 3);
+
     if (report1) {
       setReports((prev) => ({ ...prev, domain: report1.diagnosis }));
       addLog('--- Domain Diagnosis Completed ---');
@@ -121,7 +121,6 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
           addLog(`SFU Connected: ${sfuIp}:${info.port ?? ''}`);
           updateStage('sfu_info', 'completed');
           updateStage('sfu_test', 'active');
-
           addLog(`Starting diagnosis for SFU: ${sfuIp}`);
 
           setReports((prev) => ({
@@ -143,6 +142,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
             } else {
               updateStage('sfu_test', 'failed');
             }
+
             addLog(t('diagnosis-finished'));
             setIsTesting(false);
           });
@@ -157,6 +157,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
           setIsTesting(false);
         }
       });
+
       ipc.sfuDiagnosis.request();
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');
@@ -168,44 +169,50 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
 
   const handleExportReportClick = useCallback(() => {
     if (logs.length === 0) return;
-
     const timestamp = new Date().toLocaleString();
     let content = `RiceCall Network Diagnosis Report\n`;
     content += `Generated: ${timestamp}\n`;
     content += `==========================================\n\n`;
-
     content += `--- DIAGNOSIS LOGS ---\n`;
     content += logs.join('\n');
     content += `\n\n`;
 
     if (reports.domain) {
       content += `--- API / WEBSOCKET SERVER REPORT ---\n`;
+
       reports.domain.forEach((res) => {
         content += `Target: ${res.domain} (${res.dns.addresses.join(', ') || 'DNS Failed'})\n`;
+
         if (res.mtr.executed) {
           content += `Hop | Host                 | Loss% | Min   | Max   | Avg\n`;
+
           res.mtr.hops.forEach((h, hIdx) => {
             content += `${String(h.hop || hIdx + 1).padEnd(3)} | ${String(h.host || h.ip).padEnd(20)} | ${String(h.loss + '%').padEnd(5)} | ${String(h.best + 'ms').padEnd(5)} | ${String(h.worst + 'ms').padEnd(5)} | ${h.avg}ms\n`;
           });
         } else {
           content += `MTR Error: ${res.mtr.error}\n`;
         }
+
         content += `\n`;
       });
     }
 
     if (reports.sfu) {
       content += `--- SFU (VOICE/VIDEO) SERVER REPORT ---\n`;
+
       reports.sfu.forEach((res) => {
         content += `Target: ${res.domain}\n`;
+
         if (res.mtr.executed) {
           content += `Hop | Host                 | Loss% | Min   | Max   | Avg\n`;
+
           res.mtr.hops.forEach((h, hIdx) => {
             content += `${String(h.hop || hIdx + 1).padEnd(3)} | ${String(h.host || h.ip).padEnd(20)} | ${String(h.loss + '%').padEnd(5)} | ${String(h.best + 'ms').padEnd(5)} | ${String(h.worst + 'ms').padEnd(5)} | ${h.avg}ms\n`;
           });
         } else {
           content += `MTR Error: ${res.mtr.error}\n`;
         }
+
         content += `\n`;
       });
     }
@@ -246,13 +253,13 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
           setReports((prev) => {
             const isSfu = prev.sfu?.some((r) => r.domain === domain);
             const updateTarget = (list?: Types.DiagnosisResult[]) => list?.map((r) => (r.domain === domain ? { ...r, mtr: { ...r.mtr, executed: true, hops } } : r));
-
             if (isSfu) return { ...prev, sfu: updateTarget(prev.sfu) };
             return { ...prev, domain: updateTarget(prev.domain) };
           });
         }
       }
     });
+
     return () => unsub();
   }, []);
 
@@ -295,6 +302,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
 
   const renderDiagnosisResult = (results?: Types.DiagnosisResult[]) => {
     if (!results) return null;
+
     return results.map((res, idx) => (
       <div key={idx} className="p-[12px] mb-[14px] overflow-x-scroll bg-popup-background border border-border rounded-[8px]">
         <div className="sticky top-0 left-0 flex items-center justify-between pb-[6px] mb-[8px] text-[0.9rem] font-semibold text-text-link border-b border-border">
@@ -357,9 +365,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
           <div className="flex items-center justify-between mb-[2px]">
             <h2 className="text-[1.1rem] font-semibold text-text-color">{t('network-diagnosis')}</h2>
           </div>
-
           {renderVisualProgress()}
-
           <div className="flex gap-0 mb-[10px] border-b border-border">
             <div
               className={`flex gap-[6px] items-center py-[8px] px-[18px] -mb-px text-[0.85rem] cursor-pointer border-b-2 transition-[color,border-color] duration-200 ease-[ease] hover:text-text-color-secondary ${activeTab === 'logs' ? 'font-semibold text-text-link border-b-text-link' : 'text-text-color-quaternary border-b-transparent'}`}
@@ -379,7 +385,6 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
               {(reports.domain || reports.sfu) && <span className="shrink-0 w-[6px] h-[6px] bg-[#0fb11f] rounded-[50%]" aria-hidden />}
             </div>
           </div>
-
           <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
             {activeTab === 'logs' ? (
               <div
@@ -426,7 +431,6 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
           </div>
         </div>
       </div>
-
       <div className="popup-footer">
         <div className={`button mr-auto ${logs.length === 0 || isTesting ? 'pointer-events-none opacity-50' : ''}`} onClick={handleExportReportClick}>
           {t('export-report')}

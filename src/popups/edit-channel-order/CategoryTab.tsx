@@ -17,15 +17,15 @@ interface CategoryTabProps {
 
 const CategoryTab: React.FC<CategoryTabProps> = React.memo(({ channels, category, onSelect }) => {
   const dispatch = useAppDispatch();
-
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `category-${category.channelId}`, shallowEqual);
-
   const categoryChildren = channels?.filter((c) => c.categoryId === category.channelId);
 
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`category-${category.channelId}`));
+
     onSelect(category);
   };
 

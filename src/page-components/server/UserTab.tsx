@@ -30,7 +30,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const { muteUser, unmuteUser } = useWebRTC();
   const { setCurrentUserRef } = useLocateMeContext();
   const dispatch = useAppDispatch();
-
   const userTabRef = useRef<HTMLDivElement>(null);
   const hoverTimerRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -64,7 +63,6 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `user-${member.userId}`, shallowEqual);
   const isSpeaking = useAppSelector((state) => (member.userId === user.userId ? !!state.webrtc.speakingById['user'] : !!state.webrtc.speakingById[member.userId]), shallowEqual);
   const isMuted = useAppSelector((state) => !!state.webrtc.mutedById[member.userId], shallowEqual);
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const isSelf = member.userId === user.userId;
   const isFriend = useMemo(() => friends.some((f) => f.targetId === member.userId && f.relationStatus === RelationStatus.Friend), [friends, member.userId]);
@@ -124,6 +122,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
     e.stopPropagation();
     const { right: x, top: y } = e.currentTarget.getBoundingClientRect();
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+
     hoverTimerRef.current = setTimeout(() => {
       showUserInfoBlock(x, y, 'right-bottom', member);
     }, 200);

@@ -34,16 +34,19 @@ export const useSharedRefs = (): SharedRefs => {
   const audioContextRef = useRef<AudioContext | null>(null);
   const audioProducerRef = useRef<mediasoupClient.types.Producer | null>(null);
   const speakerRef = useRef<HTMLAudioElement | null>(null);
+
   const micNodesRef = useRef<{
     stream: MediaStream | null;
     source: MediaStreamAudioSourceNode | null;
     gain: GainNode | null;
   }>({ stream: null, source: null, gain: null });
+
   const mixNodesRef = useRef<{
     stream: MediaStream | null;
     source: MediaStreamAudioSourceNode | null;
     gain: GainNode | null;
   }>({ stream: null, source: null, gain: null });
+
   const speakerNodesRef = useRef<{
     [id: string]: {
       stream: MediaStream | null;
@@ -52,6 +55,7 @@ export const useSharedRefs = (): SharedRefs => {
       analyser: AnalyserNode | null;
     };
   }>({});
+
   const masterGainNodeRef = useRef<GainNode | null>(null);
   const inputAnalyserRef = useRef<AnalyserNode | null>(null);
   const inputDesRef = useRef<MediaStreamAudioDestinationNode | null>(null);
@@ -67,12 +71,14 @@ export const useSharedRefs = (): SharedRefs => {
   const inputAudioDeviceRef = useRef<string | null>(null);
   const isEchoCancellationEnabledRef = useRef<boolean>(false);
   const isNoiseCancellationEnabledRef = useRef<boolean>(false);
+
   const recordBuffersRef = useRef<
     {
       left: Float32Array<ArrayBufferLike>;
       right: Float32Array<ArrayBufferLike>;
     }[]
   >([]);
+
   const recordTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   return {

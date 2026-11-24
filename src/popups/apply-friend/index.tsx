@@ -17,11 +17,9 @@ type ApplyFriendPopupProps = Types.PopupProps<'applyFriend'>;
 
 const ApplyFriendPopup: React.FC<ApplyFriendPopupProps> = React.memo(({ id, receiver, friendApplication }) => {
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
-
   const [section, setSection] = useState<number>(friendApplication ? 1 : 0);
   const [friendGroupId, setFriendGroupId] = useState<Types.FriendGroup['friendGroupId']>('');
   const [applicationDesc, setApplicationDesc] = useState<Types.FriendApplication['description']>(friendApplication?.description || '');
-
   const isSendSection = section === 0;
   const isSentSection = section === 1;
   const isEditSection = section === 2;

@@ -13,6 +13,7 @@ export function getPermissionText(permission: Permission): string {
     [Permission.Staff]: t('staff'),
     [Permission.SuperAdmin]: t('super-admin'),
   };
+
   return permissionMap[permission] || t('unknown-user');
 }
 
@@ -35,6 +36,7 @@ export function getFormatTimeDiff(timestamp: number): string {
   if (absDiff > 10) {
     for (const interval of intervals) {
       const count = Math.floor(absDiff / interval.seconds);
+
       if (count >= 1) {
         const tKey = `${interval.tKey}-${isFuture ? 'later' : 'ago'}`;
         return t(tKey, { 0: count.toString() });
@@ -53,6 +55,7 @@ export function getFormatDate(timestamp: number, type: string = 'd' as 'd' | 't'
   const hours = date.getHours().toString().padStart(2, '0');
   const minutes = date.getMinutes().toString().padStart(2, '0');
   const seconds = date.getSeconds().toString().padStart(2, '0');
+
   switch (type) {
     case 'd':
       return `${year}-${month}-${day}`;
@@ -79,7 +82,6 @@ export function getFormatTimestamp(timestamp: number): string {
   const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
   const yesterday = new Date(today);
   yesterday.setDate(yesterday.getDate() - 1);
-
   const hours = messageDate.getHours().toString().padStart(2, '0');
   const minutes = messageDate.getMinutes().toString().padStart(2, '0');
   const seconds = messageDate.getSeconds().toString().padStart(2, '0');
@@ -90,5 +92,6 @@ export function getFormatTimestamp(timestamp: number): string {
   } else if (messageDay.getTime() === yesterday.getTime()) {
     return `${t('yesterday')} ${timeString}`;
   }
+
   return `${messageDate.toLocaleDateString(timezoneLang)} ${timeString}`;
 }

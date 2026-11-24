@@ -13,11 +13,9 @@ import { getLerpColor } from '@/utils/color';
 const MicModeMenu: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { changeVoiceThreshold } = useWebRTC();
-
   const voiceThreshold = useAppSelector((state) => state.webrtc.voiceThreshold, shallowEqual);
   const speakingMode = useAppSelector((state) => state.webrtc.speakingMode, shallowEqual);
   const volumePercent = useAppSelector((state) => state.webrtc.volumePercent, shallowEqual);
-
   const volumeThreshold = voiceThreshold;
   const isActive = volumePercent > volumeThreshold;
   const activeColor = isActive ? getLerpColor('#0fb300', '#be0000', Math.pow(volumePercent / 100, 2)) : 'gray';

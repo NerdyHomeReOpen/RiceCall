@@ -20,8 +20,8 @@ interface PromptMessageProps {
 const PromptMessage: React.FC<PromptMessageProps> = React.memo(({ messageGroup, messageType = 'info' }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
-
   const escapedMessageParameter = Object.fromEntries(Object.entries(messageGroup.parameter).map(([key, value]) => [key, escapeHtml(value)]));
+
   const formattedMessagesContents = useMemo(
     () =>
       messageGroup.contents.map((content) =>

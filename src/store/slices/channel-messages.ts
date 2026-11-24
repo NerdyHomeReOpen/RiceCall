@@ -27,4 +27,5 @@ export const channelMessagesSlice = createSlice({
 });
 
 export const { setChannelMessages, addChannelMessages, clearChannelMessages } = channelMessagesSlice.actions;
+
 export default channelMessagesSlice.reducer;

@@ -24,6 +24,7 @@ export function removeToken(): void {
 
 export async function handleResponse<T>(response: Response, method: 'GET' | 'POST'): Promise<T> {
   const result = await response.json();
+
   if (!response.ok) {
     new Logger('API').error(`HTTP ${method} ${response.url} [${response.status}]: ${result.message}`);
     throw new Error(result.message);
@@ -48,6 +49,7 @@ export async function get<T>(endpoint: string, options?: RequestOptions, maxRetr
     if (retryCount < maxRetry) {
       return await get(endpoint, options, maxRetry, retryCount + 1);
     }
+
     throw e;
   }
 }
@@ -74,6 +76,7 @@ export async function post<T>(endpoint: string, data: ApiRequestData | FormData,
     if (retryCount < maxRetry) {
       return await post(endpoint, data, options, maxRetry, retryCount + 1);
     }
+
     throw e;
   }
 }

@@ -8,13 +8,10 @@ import MicModeMenu from './MicModeMenu';
 
 const MicVolumeSlider = React.memo(() => {
   const { changeMicVolume, toggleMicMuted } = useWebRTC();
-
   const sliderRef = useRef<HTMLInputElement>(null);
   const isBtnHoveredRef = useRef<boolean>(false);
-
   const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted);
   const micVolume = useAppSelector((state) => state.webrtc.micVolume);
-
   const [isMicModeMenuVisible, setIsMicModeMenuVisible] = useState<boolean>(false);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,10 +36,11 @@ const MicVolumeSlider = React.memo(() => {
 
   const handleBtnWheel = (e: React.WheelEvent<HTMLInputElement>) => {
     if (!isBtnHoveredRef.current || !sliderRef.current) return;
-
     const newValue = parseInt(sliderRef.current.value);
+
     if (e.deltaY > 0) sliderRef.current.value = (newValue - 4).toString();
     else sliderRef.current.value = (newValue + 4).toString();
+
     changeMicVolume(parseInt(sliderRef.current.value));
   };
 
@@ -52,6 +50,7 @@ const MicVolumeSlider = React.memo(() => {
         setIsMicModeMenuVisible(false);
       }
     };
+
     document.addEventListener('pointerdown', onPointerDown);
     return () => document.removeEventListener('pointerdown', onPointerDown);
   }, []);

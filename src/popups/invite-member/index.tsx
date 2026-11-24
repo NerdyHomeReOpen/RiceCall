@@ -15,7 +15,6 @@ type InviteMemberPopupProps = Types.PopupProps<'inviteMember'>;
 const InviteMemberPopup: React.FC<InviteMemberPopupProps> = React.memo(({ id, serverId, receiverMember, memberInvitation }) => {
   const [section, setSection] = useState<number>(memberInvitation ? 1 : 0);
   const [invitationDesc, setInvitationDesc] = useState<string>(memberInvitation?.description || '');
-
   const isSendSection = section === 0;
   const isSentSection = section === 1;
   const isEditSection = section === 2;

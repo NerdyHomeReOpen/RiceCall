@@ -7,17 +7,16 @@ import MarkdownContent from '@/components/markdown-content';
 
 const NotificationToaster: React.FC = React.memo(() => {
   const notifications = useAppSelector((state) => state.notifications.data, shallowEqual);
-
   const [isVisible, setIsVisible] = useState(false);
   const [closedNotificationIds, setClosedNotificationIds] = useState<Set<number>>(new Set());
   const [showNotificationIndex, setShowNotificationIndex] = useState<number>(0);
-
   const filteredNotifications = notifications.filter((notification) => !closedNotificationIds.has(notification.notificationId));
 
   const handleCloseBtnClick = () => {
     const notificationId = filteredNotifications[showNotificationIndex]?.notificationId ?? 0;
     setClosedNotificationIds((prev) => prev.add(notificationId));
     setIsVisible(false);
+
     setTimeout(() => {
       if (showNotificationIndex === 0) return;
       setShowNotificationIndex((prev) => Math.max(0, prev - 1));

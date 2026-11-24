@@ -10,9 +10,7 @@ import ServerList from './ServerList';
 
 const HomePagePersonalExclusive: React.FC = React.memo(() => {
   const { t } = useTranslation();
-
   const servers = useAppSelector((state) => state.servers.data, shallowEqual);
-
   const recentServers = useMemo(() => servers.filter((s) => s.isRecent).sort((a, b) => b.lastConnectedAt - a.lastConnectedAt), [servers]);
   const favoriteServers = useMemo(() => servers.filter((s) => s.isFavorite), [servers]);
   const ownedServers = useMemo(() => servers.filter((s) => s.permissionLevel > Permission.Guest), [servers]);

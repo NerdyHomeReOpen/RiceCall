@@ -2,11 +2,9 @@ import { Mark } from '@tiptap/core';
 
 export const FontFamily = Mark.create({
   name: 'fontFamily',
-
   addOptions() {
     return { types: ['textStyle'] };
   },
-
   addAttributes() {
     return {
       fontFamily: {
@@ -16,14 +14,12 @@ export const FontFamily = Mark.create({
       },
     };
   },
-
   addCommands() {
     return {
       setFontFamily:
         (family) =>
         ({ chain }) =>
           chain().setMark('textStyle', { 'font-family': family }).run(),
-
       unsetFontFamily:
         () =>
         ({ chain }) =>

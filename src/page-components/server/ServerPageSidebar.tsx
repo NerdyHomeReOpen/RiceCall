@@ -66,17 +66,16 @@ const ServerPageSidebar: React.FC = React.memo(() => {
   const queueUserIds = useAppSelector((state) => state.queueUsers.data.filter((q) => q.position >= 0).map((q) => q.userId), shallowEqual);
   const latency = useAppSelector((state) => state.socket.latency, shallowEqual);
   const rtcLatency = useAppSelector((state) => state.webrtc.latency, shallowEqual);
-
   const queueListRef = useRef<HTMLDivElement>(null);
   const isResizingQueueListRef = useRef<boolean>(false);
-
   const [selectedTabId, setSelectedTabId] = useState<'all' | 'current'>('all');
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel);
+
   const movableServerUserIds = useMemo(
     () => onlineMembers.filter((om) => om.userId !== user.userId && om.permissionLevel <= permissionLevel).map((om) => om.userId),
     [onlineMembers, user.userId, permissionLevel],
   );
+
   const sortedChannels = useMemo(() => [...channels].filter((c) => !c.categoryId).sort((a, b) => a.order - b.order), [channels]);
   const isAllTab = selectedTabId === 'all';
   const isCurrentTab = selectedTabId === 'current';
@@ -146,6 +145,7 @@ const ServerPageSidebar: React.FC = React.memo(() => {
     const onPointerup = () => {
       isResizingQueueListRef.current = false;
     };
+
     document.addEventListener('pointerup', onPointerup);
     return () => document.removeEventListener('pointerup', onPointerup);
   }, []);

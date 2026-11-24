@@ -12,6 +12,7 @@ export const detectSpeaking = (
 ): void => {
   analyserNode.getByteTimeDomainData(dataArray);
   let sum = 0;
+
   for (let i = 0; i < dataArray.length; i++) {
     const v = (dataArray[i] - 128) / 128;
     sum += v * v;
@@ -26,12 +27,14 @@ export const detectSpeaking = (
     if (volumePercent > Store.store.getState().webrtc.voiceThreshold) {
       Store.store.dispatch(Store.setWebRTC({ volumePercent, volumeLevel }));
       audioProducerRef.current?.resume();
+
       if (!Store.store.getState().webrtc.speakingById[targetId]) {
         Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: true }));
       }
     } else {
       Store.store.dispatch(Store.setWebRTC({ volumePercent: 0, volumeLevel: 0 }));
       audioProducerRef.current?.pause();
+
       if (Store.store.getState().webrtc.speakingById[targetId]) {
         Store.store.dispatch(Store.setSpeakingId({ id: targetId, value: false }));
       }

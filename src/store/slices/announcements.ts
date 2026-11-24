@@ -27,4 +27,5 @@ export const announcementsSlice = createSlice({
 });
 
 export const { setAnnouncements, addAnnouncements, clearAnnouncements } = announcementsSlice.actions;
+
 export default announcementsSlice.reducer;

@@ -16,7 +16,6 @@ interface StatusDropdownProps {
 
 const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direction, onClose, onStatusSelect }) => {
   const dropdownRef = useRef<HTMLDivElement>(null);
-
   const [isVisible, setIsVisible] = useState(false);
   const [dropdownX, setDropdownX] = useState(x);
   const [dropdownY, setDropdownY] = useState(y);
@@ -32,6 +31,7 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= menuHeight;
     }
+
     if (direction === 'left-top' || direction === 'left-bottom') {
       newPosX -= menuWidth;
     }
@@ -39,12 +39,15 @@ const StatusDropdown: React.FC<StatusDropdownProps> = React.memo(({ x, y, direct
     if (newPosX + menuWidth + marginEdge > windowWidth) {
       newPosX = windowWidth - menuWidth - marginEdge;
     }
+
     if (newPosX < marginEdge) {
       newPosX = marginEdge;
     }
+
     if (newPosY + menuHeight + marginEdge > windowHeight) {
       newPosY = windowHeight - menuHeight - marginEdge;
     }
+
     if (newPosY < marginEdge) {
       newPosY = marginEdge;
     }

@@ -11,7 +11,6 @@ type MemberApplicationSettingPopupProps = Types.PopupProps<'memberApplicationSet
 
 const MemberApplicationSettingPopup: React.FC<MemberApplicationSettingPopupProps> = React.memo(({ id, server }) => {
   const { t } = useTranslation();
-
   const [serverReceiveApplication, setServerReceiveApplication] = useState<boolean>(server.receiveApply);
   const [serverApplyNote, setServerApplyNote] = useState<string>(server.applyNotice);
 

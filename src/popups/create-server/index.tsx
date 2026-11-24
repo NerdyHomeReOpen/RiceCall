@@ -28,9 +28,7 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
   );
 
   const servers = useAppSelector((state) => state.servers.data, shallowEqual);
-
   const isUploadingRef = useRef<boolean>(false);
-
   const [section, setSection] = useState<number>(0);
   const [serverType, setServerType] = useState<Types.Server['type']>(getDefaultServer().type);
   const [serverName, setServerName] = useState<Types.Server['name']>(getDefaultServer().name);
@@ -40,28 +38,35 @@ const CreateServerPopup: React.FC<CreateServerPopupProps> = React.memo(({ id }) 
 
   const remainingServers = useMemo(() => {
     let maxGroups = 3;
+
     if (user.level >= 16) maxGroups = 5;
     else if (user.level >= 6) maxGroups = 4;
+
     return maxGroups - servers.filter((s) => s.isOwned).length;
   }, [user.level, servers]);
+
   const canSubmit = remainingServers > 0 && serverName.trim();
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const image = e.target.files?.[0];
     if (!image || isUploadingRef.current) return;
+
     image.arrayBuffer().then((arrayBuffer) => {
       openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
+
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
           openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }
+
         ipc.api.uploadImage({ folder: 'server', imageName: serverAvatar, imageUnit8Array }).then((response) => {
           if (response) {
             setServerAvatar(response.imageName);
             setServerAvatarUrl(response.imageUrl);
           }
+
           isUploadingRef.current = false;
         });
       });

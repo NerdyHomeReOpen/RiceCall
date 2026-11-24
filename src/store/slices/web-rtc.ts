@@ -51,18 +51,18 @@ export const webrtcSlice = createSlice({
     setWebRTC: (state, action: PayloadAction<Partial<WebRTCState>>) => {
       return { ...state, ...action.payload };
     },
-
     setSpeakingId: (state, action: PayloadAction<{ id: string; value: boolean }>) => {
       const { id, value } = action.payload;
+
       if (value) {
         state.speakingById[id] = true;
       } else {
         delete state.speakingById[id];
       }
     },
-
     setMutedId: (state, action: PayloadAction<{ id: string; value: boolean }>) => {
       const { id, value } = action.payload;
+
       if (value) {
         state.mutedById[id] = true;
       } else {
@@ -73,4 +73,5 @@ export const webrtcSlice = createSlice({
 });
 
 export const { setWebRTC, setSpeakingId, setMutedId } = webrtcSlice.actions;
+
 export default webrtcSlice.reducer;

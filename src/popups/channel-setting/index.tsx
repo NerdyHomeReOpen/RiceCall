@@ -29,7 +29,6 @@ type ChannelSettingPopupProps = Types.PopupProps<'channelSetting'>;
 
 const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id, server, channel: channelData, channelMembers: channelMembersData }) => {
   const { t } = useTranslation();
-
   const startXRef = useRef<number>(0);
   const startWidthRef = useRef<number>(0);
   const isResizingModeratorColumn = useRef<boolean>(false);
@@ -55,7 +54,6 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
   const [blockMemberQuery, setBlockMemberQuery] = useState('');
   const [moderatorColumnWidths, setModeratorColumnWidths] = useState<number[]>(MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
-
   const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel, channel.permissionLevel);
   const isReadOnly = permissionLevel < Permission.ChannelMod;
   const isLobby = server.lobbyId === channel.channelId;
@@ -88,6 +86,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
         `${t('blacklist-management')} (${totalBlockMembersCount})`,
       ];
     }
+
     if (isReadOnly) return [t('channel-info'), t('channel-announcement')];
     return [t('channel-info')];
   }, [isReadOnly, permissionLevel, t, totalModeratorsCount, totalBlockMembersCount]);
@@ -114,6 +113,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
     const deltaX = e.clientX - startXRef.current;
     const minWidth = MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
     const maxWidth = minWidth * 2.5;
+
     setModeratorColumnWidths((prev) => {
       const next = [...prev];
       next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
@@ -133,6 +133,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
     const deltaX = e.clientX - startXRef.current;
     const minWidth = BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
     const maxWidth = minWidth * 2.5;
+
     setBlockMemberColumnWidths((prev) => {
       const next = [...prev];
       next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
@@ -230,6 +231,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
       isResizingModeratorColumn.current = false;
       isResizingBlockMemberColumn.current = false;
     };
+
     window.addEventListener('pointerup', onPointerup);
     return () => window.removeEventListener('pointerup', onPointerup);
   }, []);
@@ -239,6 +241,7 @@ const ChannelSettingPopup: React.FC<ChannelSettingPopupProps> = React.memo(({ id
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}#${i.channelId}`, i.update] as const));
       setChannelMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}#${channel.channelId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}#${channel.channelId}`) } : m)));
     });
+
     return () => unsub();
   }, [channel.channelId]);
 
@@ -570,9 +573,7 @@ const ChannelSettingModeratorRow: React.FC<ChannelSettingModeratorRowProps> = Re
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
-
   const isSelected = selectedItemId === `member-${moderator.userId}`;
-
   const { buildContextMenu } = useChannelSettingModeratorCtxMenu({ user, server, channel, moderator, permissionLevel });
 
   const handleClick = () => {
@@ -616,10 +617,8 @@ const ChannelSettingBlockedMemberRow: React.FC<ChannelSettingBlockedMemberRowPro
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
-
   const isSelected = selectedItemId === `blocked-${member.userId}`;
   const isBlockedPermanently = member.blockedUntil === -1;
-
   const { buildContextMenu } = useChannelSettingBlockedMemberCtxMenu({ user, server, channel, member, permissionLevel });
 
   const handleClick = () => {

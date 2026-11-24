@@ -13,6 +13,7 @@ import * as Store from '@/store';
 import { openImageCropper, openAlertDialog, editServer, openMemberApplicationSetting, openUserInfo, approveMemberApplication, rejectMemberApplication } from '@/services';
 
 import { MAX_FILE_SIZE, MEMBER_MANAGEMENT_TABLE_FIELDS, MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS, BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS, INVITATION_BASE_URL } from '@/constants';
+import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -26,15 +27,12 @@ import { getPermissionText } from '@/utils/language';
 import { sorter, getNextSortDirection, getSortIndicator } from '@/utils/sorter';
 import { objDiff } from '@/utils';
 
-import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
-
 type ServerSettingPopupProps = Types.PopupProps<'serverSetting'>;
 
 const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, server: serverData, serverMembers: serverMembersData, memberApplications: memberApplicationsData }) => {
   const { t } = useTranslation();
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
-
   const startXRef = useRef<number>(0);
   const startWidthRef = useRef<number>(0);
   const isResizingMemberColumn = useRef<boolean>(false);
@@ -51,7 +49,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   );
 
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
-
   const [server, setServer] = useState<Types.Server>(serverData);
   const [serverMembers, setServerMembers] = useState<Types.Member[]>(serverMembersData);
   const [memberApplications, setMemberApplications] = useState<Types.MemberApplication[]>(memberApplicationsData);
@@ -69,7 +66,6 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const [memberColumnWidths, setMemberColumnWidths] = useState<number[]>(MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
   const [applicationColumnWidths, setApplicationColumnWidths] = useState<number[]>(MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
   const [blockMemberColumnWidths, setBlockMemberColumnWidths] = useState<number[]>(BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS.map((field) => field.minWidth ?? 0));
-
   const permissionLevel = Math.max(user.permissionLevel, server.permissionLevel);
   const isReadOnly = permissionLevel < Permission.ServerAdmin;
   const canSubmit = server.name.trim();
@@ -106,9 +102,11 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
         `${t('blacklist-management')} (${totalBlockMembersCount})`,
       ];
     }
+
     if (permissionLevel >= Permission.Member) return [t('server-info'), t('server-announcement'), t('member-management')];
     return [t('server-info'), t('server-announcement')];
   };
+
   const settingPages = getSettingPages();
 
   const handleMemberSort = (field: keyof Types.Member) => {
@@ -138,6 +136,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     const deltaX = e.clientX - startXRef.current;
     const minWidth = MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
     const maxWidth = minWidth * 2.5;
+
     setMemberColumnWidths((prev) => {
       const next = [...prev];
       next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
@@ -157,6 +156,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     const deltaX = e.clientX - startXRef.current;
     const minWidth = MEMBER_APPLICATION_MANAGEMENT_TABLE_FIELDS[index].minWidth;
     const maxWidth = minWidth * 2.5;
+
     setApplicationColumnWidths((prev) => {
       const next = [...prev];
       next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
@@ -176,6 +176,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     const deltaX = e.clientX - startXRef.current;
     const minWidth = BLOCK_MEMBER_MANAGEMENT_TABLE_FIELDS[index].minWidth;
     const maxWidth = minWidth * 2.5;
+
     setBlockMemberColumnWidths((prev) => {
       const next = [...prev];
       next[index] = Math.max(minWidth, Math.min(maxWidth, startWidthRef.current + deltaX));
@@ -186,18 +187,22 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file || isUploadingRef.current) return;
+
     file.arrayBuffer().then((arrayBuffer) => {
       openImageCropper(new Uint8Array(arrayBuffer), async (imageUnit8Array) => {
         isUploadingRef.current = true;
+
         if (imageUnit8Array.length > MAX_FILE_SIZE) {
           openAlertDialog(t('image-too-large', { '0': '5MB' }), () => {});
           isUploadingRef.current = false;
           return;
         }
+
         ipc.api.uploadImage({ folder: 'server', imageName: server.serverId, imageUnit8Array }).then((response) => {
           if (response) {
             setServer((prev) => ({ ...prev, avatar: response.imageName, avatarUrl: response.imageUrl }));
           }
+
           isUploadingRef.current = false;
         });
       });
@@ -272,6 +277,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       isResizingApplicationColumn.current = false;
       isResizingBlockMemberColumn.current = false;
     };
+
     window.addEventListener('pointerup', onPointerup);
     return () => window.removeEventListener('pointerup', onPointerup);
   }, []);
@@ -281,6 +287,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       setServerMembers((prev) => prev.map((m) => (update.has(`${m.userId}#${m.serverId}`) ? { ...m, ...update.get(`${m.userId}#${m.serverId}`) } : m)));
     });
+
     return () => unsub();
   }, []);
 
@@ -288,6 +295,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
     const unsub = ipc.socket.on('serverMemberApplicationAdd', (...args: { data: Types.MemberApplication }[]) => {
       setMemberApplications((prev) => prev.concat(args.map((i) => i.data)));
     });
+
     return () => unsub();
   }, []);
 
@@ -296,6 +304,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       const update = new Map(args.map((i) => [`${i.userId}#${i.serverId}`, i.update] as const));
       setMemberApplications((prev) => prev.map((ma) => (update.has(`${ma.userId}#${ma.serverId}`) ? { ...ma, ...update.get(`${ma.userId}#${ma.serverId}`) } : ma)));
     });
+
     return () => unsub();
   }, []);
 
@@ -304,6 +313,7 @@ const ServerSettingPopup: React.FC<ServerSettingPopupProps> = React.memo(({ id, 
       const remove = new Set(args.map((i) => `${i.userId}#${i.serverId}`));
       setMemberApplications((prev) => prev.filter((ma) => !remove.has(`${ma.userId}#${ma.serverId}`)));
     });
+
     return () => unsub();
   }, []);
 
@@ -609,9 +619,7 @@ const ServerSettingMemberRow: React.FC<ServerSettingMemberRowProps> = React.memo
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
-
   const isSelected = selectedItemId === `member-${member.userId}`;
-
   const { buildContextMenu } = useServerSettingMemberCtxMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {
@@ -654,9 +662,7 @@ const ServerSettingBlockedMemberRow: React.FC<ServerSettingBlockedMemberRowProps
   const { showContextMenu } = useContextMenu();
   const dispatch = useAppDispatch();
   const selectedItemId = useAppSelector((state) => state.ui.selectedItemId, shallowEqual);
-
   const isSelected = selectedItemId === `blocked-${member.userId}`;
-
   const { buildContextMenu } = useServerSettingBlockedMemberCtxMenu({ user, server, member, permissionLevel });
 
   const handleClick = () => {

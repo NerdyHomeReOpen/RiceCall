@@ -48,9 +48,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   const friendApplications = useAppSelector((state) => state.friendApplications.data, shallowEqual);
   const memberInvitations = useAppSelector((state) => state.memberInvitations.data, shallowEqual);
   const systemNotifications = useAppSelector((state) => state.systemNotifications.data, shallowEqual);
-
   const [isFullscreen, setIsFullscreen] = useState(false);
-
   const safeFriendApplications = friendApplications ?? [];
   const safeMemberInvitations = memberInvitations ?? [];
   const safeSystemNotifications = systemNotifications ?? [];
@@ -145,6 +143,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
 
   const handleCloseBtnClick = () => {
     const isCloseToTray = ipc.systemSettings.closeToTray.get();
+
     if (isCloseToTray) ipc.window.close();
     else ipc.exit();
   };
@@ -153,6 +152,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     e.preventDefault();
     e.stopPropagation();
     const { left: x, bottom: y } = e.currentTarget.getBoundingClientRect();
+
     showStatusDropdown(x, y, 'right-bottom', (status) => {
       setIsManualIdling(status !== 'online');
       editUserStatus(status);
@@ -183,6 +183,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
 
   useEffect(() => {
     const next = isIdling ? 'idle' : 'online';
+
     if (user.status !== next && !isManualIdling) {
       editUserStatus(next);
     }

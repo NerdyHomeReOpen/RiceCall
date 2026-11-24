@@ -18,11 +18,9 @@ export const YouTubeNode = Node.create({
   name: 'yt',
   group: 'block',
   atom: true,
-
   addAttributes() {
     return { videoId: {} };
   },
-
   parseHTML() {
     return [
       {
@@ -33,7 +31,6 @@ export const YouTubeNode = Node.create({
       },
     ];
   },
-
   renderHTML({ node }) {
     return [
       'iframe',
@@ -45,7 +42,6 @@ export const YouTubeNode = Node.create({
       },
     ];
   },
-
   addCommands() {
     return {
       insertYouTube:
@@ -62,11 +58,9 @@ export const TwitchNode = Node.create({
   name: 'tw',
   group: 'block',
   atom: true,
-
   addAttributes() {
     return { channel: {} };
   },
-
   parseHTML() {
     return [
       {
@@ -77,7 +71,6 @@ export const TwitchNode = Node.create({
       },
     ];
   },
-
   renderHTML({ node }) {
     return [
       'iframe',
@@ -89,7 +82,6 @@ export const TwitchNode = Node.create({
       },
     ];
   },
-
   addCommands() {
     return {
       insertTwitch:
@@ -106,11 +98,9 @@ export const KickNode = Node.create({
   name: 'kick',
   group: 'block',
   atom: true,
-
   addAttributes() {
     return { username: {} };
   },
-
   renderHTML({ node }) {
     return [
       'iframe',
@@ -122,7 +112,6 @@ export const KickNode = Node.create({
       },
     ];
   },
-
   addCommands() {
     return {
       insertKick:

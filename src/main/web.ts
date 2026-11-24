@@ -1,12 +1,11 @@
 import packageJson from '../../package.json';
 
 import type * as Types from '@/types';
+import { pickLocale } from '@/types/locales';
 
 import Env from '@/utils/env';
 
 import { i18nReady } from '@/i18n';
-
-import { pickLocale } from '@/types/locales';
 
 import { eventEmitter } from '@/main/event';
 import { autoLogin } from '@/main/auth/web';
@@ -196,12 +195,13 @@ export * from '@/main/window/web';
 async function onReady() {
   await Env.load(store.get('env'));
   await i18nReady;
-
   const token = store.get('token');
+
   if (!token) {
     if (window.location.pathname !== '/auth') window.location.replace('/auth');
     return;
   }
+
   autoLogin(token);
 }
 

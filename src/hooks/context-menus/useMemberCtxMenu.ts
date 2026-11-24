@@ -56,7 +56,6 @@ export const useMemberCtxMenu = ({
   onUnmuteUser,
 }: UseMemberCtxMenuProps): Types.ContextMenuBuilder => {
   const { t } = useTranslation();
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, channel.permissionLevel);
   const currentPermissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isSelf = member.userId === user.userId;
@@ -64,7 +63,6 @@ export const useMemberCtxMenu = ({
   const isEqualOrLowerLevel = member.permissionLevel <= permissionLevel;
   const isInSameChannel = member.currentChannelId === currentChannel.channelId;
   const isInLobby = member.currentChannelId === currentServer.lobbyId;
-
   const { buildMemberManagementCtxMenu } = useMemberManagementCtxMenu({ user, currentServer, channel, member });
 
   const buildContextMenu = useCallback(

@@ -20,15 +20,11 @@ type InviteFriendPopupProps = Types.PopupProps<'inviteFriend'>;
 
 const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, server }) => {
   const { t } = useTranslation();
-
   const friends = useAppSelector((state) => state.friends.data, shallowEqual);
   const friendGroups = useAppSelector((state) => state.friendGroups.data, shallowEqual);
-
   const [query, setQuery] = useState<string>('');
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
-
   const defaultFriendGroup = useMemo(() => getDefaultFriendGroup({ name: t('my-friends'), order: 0 }), [t]);
-
   const selectedUserIdSet = new Set(selectedUserIds);
   const sortedFriends = friends.filter((f) => !f.isBlocked && f.relationStatus === RelationStatus.Friend && f.name.includes(query)).sort((a, b) => a.name.localeCompare(b.name));
   const sortedFriendGroups = [defaultFriendGroup, ...friendGroups].sort((a, b) => a.order - b.order);
@@ -50,12 +46,15 @@ const InviteFriendPopup: React.FC<InviteFriendPopupProps> = React.memo(({ id, se
 
   const handleInviteFriendBtnClick = () => {
     if (selectedUserIds.length === 0) return;
+
     openAlertDialog(t('invite-friend-to-server-confirm', { 0: selectedUserIds.length, 1: server.name }), () => {
       const invitationLink = `${INVITATION_BASE_URL}?serverDisplayId=${server.specialId || server.displayId}`;
       const formatedMessage = `<a href='${invitationLink}' type='invitation' customLink='true' >${invitationLink}</a>`;
+
       for (const userId of selectedUserIds) {
         ipc.socket.send('directMessage', { targetId: userId, preset: { type: 'dm', content: formatedMessage } });
       }
+
       ipc.popup.close(id);
     });
   };
@@ -110,6 +109,7 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friends, fri
     if (friendGroup.friendGroupId) return friends.filter((f) => f.friendGroupId === friendGroup.friendGroupId);
     else return friends.filter((f) => !f.friendGroupId);
   }, [friendGroup.friendGroupId, friends]);
+
   const isAllSelected = useMemo(() => friendGroupFriends.every((f) => selectedUserIdSet.has(f.targetId)), [friendGroupFriends, selectedUserIdSet]);
 
   const handleSelectAllChange = () => {

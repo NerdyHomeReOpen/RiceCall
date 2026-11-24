@@ -13,7 +13,6 @@ import { getFormatDate } from '@/utils/language';
 
 const ChannelEventPopup: React.FC = React.memo(() => {
   const { t } = useTranslation();
-
   const [selectTab, setSelectTab] = useState<'current' | 'all'>('current');
   const [query, setQuery] = useState<string>('');
 
@@ -27,11 +26,11 @@ const ChannelEventPopup: React.FC = React.memo(() => {
   );
 
   const channelEvents = useAppSelector((state) => state.channelEvents.data, shallowEqual);
-
   const isCurrentChannelTab = selectTab === 'current';
   const isAllChannelTab = selectTab === 'all';
   const filteredChannelEvents = channelEvents.filter((e) => e.name.toLowerCase().includes(query.toLowerCase()) || e.nickname?.toLowerCase().includes(query.toLowerCase()));
   const sortedChannelEvents = filteredChannelEvents.sort((a, b) => b.timestamp - a.timestamp);
+
   const sortedCurrentChannelEvents = filteredChannelEvents
     .filter((e) => e.prevChannelId === currentChannel.channelId || e.nextChannelId === currentChannel.channelId)
     .sort((a, b) => b.timestamp - a.timestamp);
@@ -128,9 +127,7 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
   );
 
   const channels = useAppSelector((state) => state.channels.data, shallowEqual);
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
-
   const { buildContextMenu } = useChannelEventCtxMenu({ user, currentServer, event, permissionLevel });
 
   const getChannelName = (channelId: string | null) => {
@@ -155,6 +152,7 @@ const EventTab: React.FC<EventTabProps> = React.memo(({ event, section }) => {
     } else {
       const prevChannelName = getChannelName(channelEvent.prevChannelId);
       const nextChannelName = getChannelName(channelEvent.nextChannelId);
+
       return (
         <div
           className="flex-1 overflow-hidden text-ellipsis text-left whitespace-nowrap [&::-webkit-scrollbar]:h-[2px] text-[#0f8318]"

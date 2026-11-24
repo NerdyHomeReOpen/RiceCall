@@ -14,13 +14,14 @@ interface ChannelTabProps {
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel, onSelect }) => {
   const dispatch = useAppDispatch();
-
   const isSelected = useAppSelector((state) => state.ui.selectedItemId === `channel-${channel.channelId}`, shallowEqual);
 
   const handleTabClick = (e: React.MouseEvent) => {
     e.stopPropagation();
+
     if (isSelected) dispatch(Store.setSelectedItemId(null));
     else dispatch(Store.setSelectedItemId(`channel-${channel.channelId}`));
+
     onSelect(channel);
   };
 

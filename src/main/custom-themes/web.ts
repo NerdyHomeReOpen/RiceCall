@@ -13,6 +13,7 @@ export function addCustomTheme(theme: Types.Theme): void {
   const customThemes = store.get('customThemes');
   customThemes.unshift(theme);
   store.set('customThemes', customThemes);
+
   eventEmitter.emit(
     'custom-themes',
     Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
@@ -23,6 +24,7 @@ export function deleteCustomTheme(index: number): void {
   const customThemes = store.get('customThemes');
   customThemes.splice(index, 1);
   store.set('customThemes', customThemes);
+
   eventEmitter.emit(
     'custom-themes',
     Array.from({ length: 7 }, (_, i) => customThemes[i] ?? {}),
@@ -43,14 +45,17 @@ export async function saveImage(buffer: ArrayBuffer): Promise<string | null> {
     try {
       const blob = new Blob([buffer]);
       const reader = new FileReader();
+
       reader.onloadend = () => {
         new Logger('SYSTEM').info(`Save image success: ${reader.result as string}`);
         resolve(reader.result as string);
       };
+
       reader.onerror = () => {
         new Logger('SYSTEM').error(`Save image error: unknown error`);
         resolve(null);
       };
+
       reader.readAsDataURL(blob);
     } catch (e) {
       const error = e instanceof Error ? e : new Error('Unknown error');

@@ -1,7 +1,9 @@
 import React, { useCallback, useContext, createContext, useMemo, useEffect } from 'react';
 
 import * as ipc from '@/main/ipc';
+
 import * as Store from '@/store';
+
 import Logger from '@/utils/logger';
 
 import { useSoundPlayer } from '@/providers/SoundPlayer';
@@ -56,7 +58,6 @@ interface WebRTCProviderProps {
 const WebRTCProvider = ({ children }: WebRTCProviderProps): React.JSX.Element => {
   const { playSound } = useSoundPlayer();
   const { loadServer } = useLoading();
-
   const refs = useSharedRefs();
   const { initAudioContext } = useAudioContext(refs);
   const { startSpeaking, stopSpeaking, pressSpeakKey, releaseSpeakKey, changeMicVolume, toggleMicMuted } = useMicAudio(refs, { initAudioContext, playSound });
@@ -102,16 +103,16 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps): React.JSX.Element =>
       try {
         if (!refs.recvTransportRef.current) {
           new Logger('WEB_RTC').info('Not in a channel, attempting to join one for diagnosis using standard logic...');
-
           let targetServer = null;
-
           const searchResults = await ipc.api.searchServer({ query: '10' });
           targetServer = searchResults.find((s) => s.displayId === '10' || s.serverId === '10');
 
           if (!targetServer) {
             const userId = window.localStorage.getItem('user-id');
+
             if (userId) {
               const servers = await ipc.api.fetchServers({ userId });
+
               if (servers && servers.length > 0) {
                 targetServer = servers[0];
               }
@@ -120,16 +121,17 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps): React.JSX.Element =>
 
           if (targetServer) {
             new Logger('WEB_RTC').info(`Standard joining server: ${targetServer.name} (${targetServer.displayId})`);
-
             loadServer(targetServer.specialId || targetServer.displayId);
             ipc.socket.send('connectServer', { serverId: targetServer.serverId });
 
             await new Promise<void>((resolve, reject) => {
               let unsub: () => void = () => {};
+
               const timeout = setTimeout(() => {
                 if (unsub) unsub();
                 reject(new Error('Timeout waiting for sfuJoined after standard join'));
               }, 10000);
+
               unsub = ipc.socket.on('sfuJoined', () => {
                 clearTimeout(timeout);
                 if (unsub) unsub();
@@ -149,6 +151,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps): React.JSX.Element =>
         if (refs.recvTransportRef.current) {
           for (let retry = 0; retry < 10; retry++) {
             const stats = await refs.recvTransportRef.current.getStats();
+
             stats.forEach((report) => {
               if (report.type === 'candidate-pair' && report.state === 'succeeded') {
                 info = {
@@ -156,8 +159,10 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps): React.JSX.Element =>
                   ip: report.remoteCandidateId ? stats.get(report.remoteCandidateId)?.ip : 'unknown',
                   port: report.remoteCandidateId ? stats.get(report.remoteCandidateId)?.port : 'unknown',
                 };
+
                 if (!info.ip || info.ip === 'unknown') {
                   const remoteCandidate = stats.get(report.remoteCandidateId);
+
                   if (remoteCandidate) {
                     info.ip = remoteCandidate.ip || remoteCandidate.address;
                     info.port = remoteCandidate.port;
@@ -175,6 +180,7 @@ const WebRTCProvider = ({ children }: WebRTCProviderProps): React.JSX.Element =>
 
       ipc.sfuDiagnosis.response(info);
     });
+
     return () => unsub();
   }, [loadServer, refs.recvTransportRef]);
 

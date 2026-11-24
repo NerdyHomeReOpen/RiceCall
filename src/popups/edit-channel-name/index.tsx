@@ -11,9 +11,7 @@ type EditChannelNamePopupProps = Types.PopupProps<'editChannelName'>;
 
 const EditChannelNamePopup: React.FC<EditChannelNamePopupProps> = React.memo(({ id, serverId, channel }) => {
   const { t } = useTranslation();
-
   const [channelName, setChannelName] = useState<string>(channel.name);
-
   const canSubmit = channelName.trim();
 
   const handleChannelNameChange = (e: React.ChangeEvent<HTMLInputElement>) => {

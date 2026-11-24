@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import type * as Types from '@/types';
-import { useTranslation } from 'react-i18next';
 
 import * as ipc from '@/main/ipc';
 
@@ -11,7 +11,6 @@ type RTCDisconnectPopupProps = Types.PopupProps<'rtcDisconnect'>;
 
 const RTCDisconnectPopup: React.FC<RTCDisconnectPopupProps> = React.memo(({ id, count }) => {
   const { t } = useTranslation();
-
   const [currentCount, setCurrentCount] = useState(count || 1);
 
   const handleClose = () => {

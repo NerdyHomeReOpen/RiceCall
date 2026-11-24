@@ -27,4 +27,5 @@ export const recommendServersSlice = createSlice({
 });
 
 export const { setRecommendServers, addRecommendServers, clearRecommendServers } = recommendServersSlice.actions;
+
 export default recommendServersSlice.reducer;

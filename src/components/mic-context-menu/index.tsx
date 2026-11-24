@@ -16,11 +16,9 @@ interface MicContextMenuProps {
 
 const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direction, items, onClose }) => {
   const menuRef = useRef<HTMLDivElement>(null);
-
   const [isVisible, setIsVisible] = useState(false);
   const [menuX, setMenuX] = useState(x);
   const [menuY, setMenuY] = useState(y);
-
   const filteredItems = cleanMenu(items).filter((item) => item?.show ?? true);
 
   useLayoutEffect(() => {
@@ -34,6 +32,7 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= menuHeight;
     }
+
     if (direction === 'left-top' || direction === 'left-bottom') {
       newPosX -= menuWidth;
     }
@@ -41,12 +40,15 @@ const MicContextMenu: React.FC<MicContextMenuProps> = React.memo(({ x, y, direct
     if (newPosX + menuWidth + marginEdge > windowWidth) {
       newPosX = windowWidth - menuWidth - marginEdge;
     }
+
     if (newPosX < marginEdge) {
       newPosX = marginEdge;
     }
+
     if (newPosY + menuHeight + marginEdge > windowHeight) {
       newPosY = windowHeight - menuHeight - marginEdge;
     }
+
     if (newPosY < marginEdge) {
       newPosY = marginEdge;
     }

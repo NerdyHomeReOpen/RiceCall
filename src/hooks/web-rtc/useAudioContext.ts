@@ -30,7 +30,6 @@ export type UseAudioContextResult = { initAudioContext: () => Promise<void> };
 
 export const useAudioContext = (refs: SharedRefs): UseAudioContextResult => {
   const { audioContextRef, inputDesRef, outputDesRef, recorderDesRef, inputAnalyserRef, masterGainNodeRef, speakerRef } = refs;
-
   const initPromiseRef = useRef<Promise<void> | null>(null);
 
   const initAudioContext = useCallback(async (): Promise<void> => {
@@ -43,6 +42,7 @@ export const useAudioContext = (refs: SharedRefs): UseAudioContextResult => {
       if (recorderDesRef.current) recorderDesRef.current.disconnect();
       if (inputAnalyserRef.current) inputAnalyserRef.current.disconnect();
       if (masterGainNodeRef.current) masterGainNodeRef.current.disconnect();
+
       if (speakerRef.current) {
         speakerRef.current.srcObject = null;
         speakerRef.current.pause();
@@ -50,9 +50,7 @@ export const useAudioContext = (refs: SharedRefs): UseAudioContextResult => {
       }
 
       const audioContext = new AudioContext();
-
       await audioContext.audioWorklet.addModule(URL.createObjectURL(new Blob([workletCode], { type: 'text/javascript' })));
-
       audioContextRef.current = audioContext;
       inputDesRef.current = audioContext.createMediaStreamDestination();
       outputDesRef.current = audioContext.createMediaStreamDestination();
@@ -62,7 +60,6 @@ export const useAudioContext = (refs: SharedRefs): UseAudioContextResult => {
       masterGainNodeRef.current = audioContext.createGain();
       masterGainNodeRef.current.gain.value = Store.store.getState().webrtc.speakerVolume / 100;
       masterGainNodeRef.current.connect(outputDesRef.current!);
-
       speakerRef.current = new Audio();
       speakerRef.current.srcObject = outputDesRef.current.stream;
       speakerRef.current.volume = 1;
@@ -70,7 +67,6 @@ export const useAudioContext = (refs: SharedRefs): UseAudioContextResult => {
       speakerRef.current.style.display = 'none';
       speakerRef.current.play().catch(() => {});
       document.body.appendChild(speakerRef.current);
-
       new Logger('WEB_RTC').info('Initialized audio context');
     };
 
@@ -89,8 +85,10 @@ export const useAudioContext = (refs: SharedRefs): UseAudioContextResult => {
         speakerRef.current.play();
       }
     };
+
     document.addEventListener('click', initAudioOnInteraction, { capture: true });
     document.addEventListener('keydown', initAudioOnInteraction, { capture: true });
+
     return () => {
       document.removeEventListener('click', initAudioOnInteraction, { capture: true });
       document.removeEventListener('keydown', initAudioOnInteraction, { capture: true });

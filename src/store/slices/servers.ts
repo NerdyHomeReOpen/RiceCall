@@ -36,4 +36,5 @@ export const serversSlice = createSlice({
 });
 
 export const { setServers, addServers, updateServers, removeServers, clearServers } = serversSlice.actions;
+
 export default serversSlice.reducer;

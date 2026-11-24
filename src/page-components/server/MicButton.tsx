@@ -63,10 +63,8 @@ const MicButton: React.FC = React.memo(() => {
   const isMixModeActive = useAppSelector((state) => state.webrtc.isMixModeActive, shallowEqual);
   const isMicMuted = useAppSelector((state) => state.webrtc.isMicMuted, shallowEqual);
   const volumeLevel = useAppSelector((state) => state.webrtc.volumeLevel, shallowEqual);
-
   const [speakingMode, setSpeakingMode] = useState<Types.SpeakingMode>('key');
   const [speakingKey, setSpeakingKey] = useState<string>('');
-
   const permissionLevel = Math.max(user.permissionLevel, currentServer.permissionLevel, currentChannel.permissionLevel);
   const isCurrentChannelQueueMode = currentChannel.voiceMode === 'queue';
   const isControlled = permissionLevel < Permission.ChannelMod && isQueueControlled;
@@ -85,9 +83,11 @@ const MicButton: React.FC = React.memo(() => {
     if (isQueuing) return t('in-queue-position', { '0': queuePosition });
     if (currentChannel.isVoiceMuted) return t('mic-forbidden');
     if (isControlled) return t('mic-controlled');
+
     if (speakingMode === 'key' && !isSpeakKeyPressed) {
       return t('press-key-to-speak', { '0': speakingKey });
     }
+
     if (isMixModeActive) return t('speaking-with-mix');
     if (isMicMuted) return t('mic-muted');
     return t('speaking');
@@ -99,19 +99,23 @@ const MicButton: React.FC = React.memo(() => {
   const getMicBtnClass = () => {
     let className =
       "flex items-center justify-between min-w-[154px] max-w-[154px] min-h-[50px] max-h-[50px] px-[10px] font-[Arial,Helvetica,sans-serif] cursor-pointer bg-no-repeat bg-[position:0_2px] bg-auto hover:bg-[position:-154px_2px] active:bg-[position:-308px_2px] after:block after:min-w-[11px] after:min-h-[7px] after:cursor-pointer after:content-[''] after:bg-no-repeat";
+
     if (isMicTaken) className += " bg-[url('/channel/mic_state_speaking.svg')] after:bg-[position:-22px_0]";
     else if (isQueuing) className += " bg-[url('/channel/mic_state_queuing.svg')] after:bg-[position:-11px_0]";
     else className += " bg-[url('/channel/mic_state_menu.svg')] after:bg-[position:0_0]";
+
     className += isSelectionHidden ? ' after:bg-none' : " after:bg-[url('/channel/icon_mic_triangle.svg')]";
     return className;
   };
 
   const getMicIconClass = () => {
     let className = 'min-w-[24px] min-h-[30px] bg-no-repeat bg-cover';
+
     if (isMicTaken && !isMicMutedByChannel) className += ` bg-[url('/channel/icon_speaking_vol.svg')] ${VOLUME_LEVEL_POSITIONS[volumeLevel] ?? ''}`;
     else if (isMicMutedByChannel) className += " bg-[url('/channel/icon_mic_state.svg')] bg-[position:-72px_0]";
     else if (isQueuing) className += " bg-[url('/channel/icon_mic_state.svg')] bg-[position:-24px_0]";
     else className += " bg-[url('/channel/icon_mic_state.svg')]";
+
     return className;
   };
 
@@ -119,6 +123,7 @@ const MicButton: React.FC = React.memo(() => {
     if (isCurrentChannelQueueMode) {
       if (!isIdling) {
         const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
+
         showMicContextMenu(x, y, 'right-top', [
           {
             id: 'untake-mic',
@@ -129,6 +134,7 @@ const MicButton: React.FC = React.memo(() => {
         ]);
       } else if (permissionLevel >= Permission.ChannelMod) {
         const { left: x, top: y } = e.currentTarget.getBoundingClientRect();
+
         showMicContextMenu(x, y, 'right-top', [
           {
             id: 'take-mic-in-queue',
@@ -162,6 +168,7 @@ const MicButton: React.FC = React.memo(() => {
   useEffect(() => {
     if (isMicTaken && !isControlled) takeMic(currentChannel.channelId);
     else releaseMic();
+
     stopMixing();
   }, [isMicTaken, isControlled, currentChannel.channelId, takeMic, releaseMic, stopMixing]);
 
@@ -169,9 +176,11 @@ const MicButton: React.FC = React.memo(() => {
     const changeSpeakingMode = (speakingMode: Types.SpeakingMode) => {
       setSpeakingMode(speakingMode);
     };
+
     const changeDefaultSpeakingKey = (key: string) => {
       setSpeakingKey(key);
     };
+
     changeSpeakingMode(ipc.systemSettings.speakingMode.get());
     changeDefaultSpeakingKey(ipc.systemSettings.defaultSpeakingKey.get());
     const unsubs = [ipc.systemSettings.speakingMode.onUpdate(changeSpeakingMode), ipc.systemSettings.defaultSpeakingKey.onUpdate(changeDefaultSpeakingKey)];

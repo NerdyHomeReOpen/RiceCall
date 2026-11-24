@@ -29,13 +29,10 @@ interface UserInfoCardProps {
 
 const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction, member }) => {
   const { t } = useTranslation();
-
   const cardRef = useRef<HTMLDivElement>(null);
-
   const [isVisible, setIsVisible] = useState(false);
   const [cardX, setCardX] = useState(x);
   const [cardY, setCardY] = useState(y);
-
   const vipBoost = Math.min(2, 1 + member.vip * 0.2);
   const hasVip = member.vip > 0;
   const badges = useMemo(() => (typeof member.badges === 'string' ? JSON.parse(member.badges) : member.badges), [member.badges]);
@@ -51,6 +48,7 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     if (direction === 'left-top' || direction === 'right-top') {
       newPosY -= cardHeight;
     }
+
     if (direction === 'left-top' || direction === 'left-bottom') {
       newPosX -= cardWidth;
     }
@@ -58,12 +56,15 @@ const UserInfoCard: React.FC<UserInfoCardProps> = React.memo(({ x, y, direction,
     if (newPosX + cardWidth + marginEdge > windowWidth) {
       newPosX = windowWidth - cardWidth - marginEdge;
     }
+
     if (newPosX < marginEdge) {
       newPosX = marginEdge;
     }
+
     if (newPosY + cardHeight + marginEdge > windowHeight) {
       newPosY = windowHeight - cardHeight - marginEdge;
     }
+
     if (newPosY < marginEdge) {
       newPosY = marginEdge;
     }

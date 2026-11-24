@@ -36,4 +36,5 @@ export const memberInvitationsSlice = createSlice({
 });
 
 export const { setMemberInvitations, addMemberInvitations, updateMemberInvitations, removeMemberInvitations, clearMemberInvitations } = memberInvitationsSlice.actions;
+
 export default memberInvitationsSlice.reducer;

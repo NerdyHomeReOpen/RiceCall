@@ -8,6 +8,7 @@ import { broadcast } from '@/main/electron';
 
 // networkdiagnosistool ships without types; these are the parts this module uses.
 type DiagnosisToolInstance = { run: (onProgress: (progress: Types.ProgressData) => void) => Promise<Types.FullReport>; cancel?: () => void };
+
 type DiagnosisToolConstructor = new (domains: string[], duration: number) => DiagnosisToolInstance;
 
 let DiagnosisTool: DiagnosisToolConstructor | null = null;
@@ -15,6 +16,7 @@ let activeTool: DiagnosisToolInstance | null = null;
 
 async function loadTool() {
   if (DiagnosisTool) return DiagnosisTool;
+
   try {
     const createdRequire = await import(/* webpackIgnore: true */ 'module').then((module) => module.createRequire).then((createRequire) => createRequire(import.meta.url));
     const loaded = createdRequire('networkdiagnosistool') as DiagnosisToolConstructor | { default: DiagnosisToolConstructor };
@@ -27,6 +29,7 @@ async function loadTool() {
     try {
       // @ts-expect-error - No types for networkdiagnosistool
       const { default: module } = await import('networkdiagnosistool');
+
       DiagnosisTool = (module.default || module) as DiagnosisToolConstructor;
       return DiagnosisTool;
     } catch (e2) {
@@ -41,8 +44,10 @@ export function registerNetworkHandlers(): void {
   ipcMain.handle('run-network-diagnosis', async (event, params: { domains: string[]; duration?: number }): Promise<Types.FullReport | { error: string }> => {
     const sender = event.sender;
     new Logger('NETWORK_DIAGNOSIS_TOOL').info(`Received run-network-diagnosis request: ${JSON.stringify(params)}`);
+
     try {
       const Tool = await loadTool();
+
       if (!Tool) {
         new Logger('NETWORK_DIAGNOSIS_TOOL').error('Network diagnosis tool could not be loaded. Please check node_modules.');
         return { error: 'Network diagnosis tool could not be loaded. Please check node_modules.' };
@@ -58,7 +63,6 @@ export function registerNetworkHandlers(): void {
         try {
           const { domains, duration = 3 } = params;
           const uniqueDomains = Array.from(new Set(domains)).filter(Boolean);
-
           const tool = new Tool(uniqueDomains, duration);
           activeTool = tool;
 

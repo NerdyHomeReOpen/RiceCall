@@ -65,14 +65,17 @@ export const DEFAULT_EMOJIS: Types.Emoji[] = [
   { code: '60', alt: '抱抱', path: '/smiles/60.gif' },
   { code: '61', alt: '帶血的刀', path: '/smiles/61.gif' },
 ];
+
 export const TW_EMOJIS: Types.Emoji[] = emojiData
   .filter((emoji) => emoji.codes.length <= 5)
   .map((emoji) => {
     const code = twemoji.convert.toCodePoint(emoji.char);
+
     return {
       code,
       alt: emoji.name,
       path: `https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/${code}.png`,
     };
   });
+
 export const EMOJIS: Types.Emoji[] = [...DEFAULT_EMOJIS, ...TW_EMOJIS];
