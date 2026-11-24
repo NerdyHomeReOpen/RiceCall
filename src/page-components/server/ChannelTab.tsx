@@ -17,11 +17,17 @@ import { useChannelCtxMenu } from '@/hooks/context-menus/useChannelCtxMenu';
 
 import UserTab from './UserTab';
 
-import styles from './server.module.css';
-
 interface ChannelTabProps {
   channel: Types.Channel;
 }
+
+const ICON_POSITIONS: Record<string, [string, string]> = {
+  member: ['bg-[position:0_-14px]', 'bg-[position:-14px_-14px]'],
+  private: ['bg-[position:-28px_0]', 'bg-[position:-28px_-14px]'],
+  readonly: ['bg-[position:-42px_0]', 'bg-[position:-42px_-14px]'],
+  lobby: ['bg-[position:-56px_0]', 'bg-[position:-56px_-14px]'],
+};
+const DEFAULT_ICON_POSITIONS: [string, string] = ['bg-[position:0_0]', 'bg-[position:-14px_0]'];
 
 const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   const { t } = useTranslation();
@@ -143,7 +149,7 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
   return (
     <>
       <div
-        className={`${styles['channel']} ${isSelected ? styles['selected'] : ''}`}
+        className={`relative flex gap-[2px] items-center h-[25px] py-[2px] pr-[20px] pl-[10px] mr-[5px] ${isSelected ? 'bg-selected' : 'hover:bg-hover'}`}
         onClick={handleTabClick}
         onDoubleClick={handleTabDoubleClick}
         draggable={isDraggable}
@@ -152,12 +158,15 @@ const ChannelTab: React.FC<ChannelTabProps> = React.memo(({ channel }) => {
         onDrop={handleTabDrop}
         onContextMenu={handleTabContextMenu}
       >
-        <div className={`${styles['channel-icon']} ${isExpanded ? styles['expanded'] : ''} ${isLobby ? styles['lobby'] : styles[channel.visibility]}`} onClick={handleTabExpandedClick} />
-        <div className={`${styles['label']} ${isReceptionLobby ? styles['is-reception-lobby'] : ''}`}>{isLobby ? t(`lobby`) : channel.name}</div>
-        {!isReadonlyChannel && <div className={styles['user-count-text']}>{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
-        {isInChannel && !isExpanded && <div className={styles['my-location-icon']} />}
+        <div
+          className={`inline-block min-w-[14px] min-h-[14px] cursor-pointer bg-[url('/channel/channelIcon.svg')] bg-no-repeat bg-auto ${(ICON_POSITIONS[isLobby ? 'lobby' : channel.visibility] ?? DEFAULT_ICON_POSITIONS)[isExpanded ? 1 : 0]}`}
+          onClick={handleTabExpandedClick}
+        />
+        <div className={`truncate ${isReceptionLobby ? 'text-text-warning' : 'text-text-color-secondary'}`}>{isLobby ? t(`lobby`) : channel.name}</div>
+        {!isReadonlyChannel && <div className="text-[#808080]">{`(${channelMembers.length}${channel.userLimit > 0 ? `/${channel.userLimit}` : ''})`}</div>}
+        {isInChannel && !isExpanded && <div className="absolute right-[2px] min-w-[15px] min-h-[15px] cursor-pointer bg-[url('/mylocation.svg')] bg-no-repeat bg-cover" />}
       </div>
-      <div className={styles['user-list']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className="pl-0!" style={isExpanded ? {} : { display: 'none' }}>
         {sortedChannelMembers.map((member) => (
           <UserTab key={member.userId} member={member} channel={channel} canJoin={canJoin} isPasswordNeeded={isPasswordNeeded} />
         ))}

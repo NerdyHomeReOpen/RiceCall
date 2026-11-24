@@ -6,8 +6,6 @@ import * as ipc from '@/main/ipc';
 
 import { openAlertDialog } from '@/services';
 
-import styles from './register.module.css';
-
 interface RegisterPageProps {
   display: boolean;
   onBackToLoginBtnClick: () => void;
@@ -148,19 +146,19 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
   };
 
   return (
-    <main className={styles['page']} style={display ? {} : { display: 'none' }}>
-      <main className={styles['body']}>
-        <form className={styles['form-wrapper']} onSubmit={handleSubmit}>
+    <main className="flex flex-1 flex-col items-center justify-center bg-background-secondary" style={display ? {} : { display: 'none' }}>
+      <main className="flex flex-1 flex-col items-center justify-center w-full h-[60%]">
+        <form className="flex flex-col gap-[10px] items-center justify-center w-[300px]" onSubmit={handleSubmit}>
           {isLoading ? (
             <>
-              <div className={styles['loading-text']}>{`${t('registering')}...`}</div>
-              <div className={styles['loading-bar']} />
+              <div className="text-[0.9rem] text-text-color-secondary">{`${t('registering')}...`}</div>
+              <div className="flex items-center justify-center w-[256px] h-[12px] bg-[url('/icon_loading.gif')] bg-no-repeat bg-center bg-cover" />
             </>
           ) : (
             <>
-              <div className={styles['input-wrapper']}>
-                <div className={styles['input-box']}>
-                  <div className={styles['label']}>{t('account')}</div>
+              <div className="flex flex-col gap-[3px] w-full">
+                <div className="flex items-center w-full">
+                  <div className="inline-block w-[80px] pr-[10px] text-[0.9rem] text-text-color-secondary text-right">{t('account')}</div>
                   <input
                     type="text"
                     name="account"
@@ -168,15 +166,15 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     placeholder={t('please-input-account')}
-                    className={styles['input']}
+                    className="relative flex-1 h-[29px] p-[8px] border border-border shadow-[inset_1px_1px_3px_rgb(0_0_0/10%)] transition-shadow duration-300 ease-[ease]"
                     style={accountError ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
-                {accountError ? <div className={styles['warn-text']}>{accountError}</div> : <div className={styles['hint-text']}>{t('account-hint')}</div>}
+                {accountError ? <div className="ml-[80px] text-text-warning">{accountError}</div> : <div className="ml-[80px] text-text-color-quaternary">{t('account-hint')}</div>}
               </div>
-              <div className={styles['input-wrapper']}>
-                <div className={styles['input-box']}>
-                  <div className={styles['label']}>{t('password')}</div>
+              <div className="flex flex-col gap-[3px] w-full">
+                <div className="flex items-center w-full">
+                  <div className="inline-block w-[80px] pr-[10px] text-[0.9rem] text-text-color-secondary text-right">{t('password')}</div>
                   <input
                     type="password"
                     name="password"
@@ -184,15 +182,15 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     placeholder={t('please-input-password')}
-                    className={styles['input']}
+                    className="relative flex-1 h-[29px] p-[8px] border border-border shadow-[inset_1px_1px_3px_rgb(0_0_0/10%)] transition-shadow duration-300 ease-[ease]"
                     style={passwordError ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
-                {passwordError ? <div className={styles['warn-text']}>{passwordError}</div> : <div className={styles['hint-text']}>{t('password-hint')}</div>}
+                {passwordError ? <div className="ml-[80px] text-text-warning">{passwordError}</div> : <div className="ml-[80px] text-text-color-quaternary">{t('password-hint')}</div>}
               </div>
-              <div className={styles['input-wrapper']}>
-                <div className={styles['input-box']}>
-                  <div className={styles['label']}>{t('confirm-password')}</div>
+              <div className="flex flex-col gap-[3px] w-full">
+                <div className="flex items-center w-full">
+                  <div className="inline-block w-[80px] pr-[10px] text-[0.9rem] text-text-color-secondary text-right">{t('confirm-password')}</div>
                   <input
                     type="password"
                     name="confirmPassword"
@@ -200,15 +198,19 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     placeholder={t('please-input-password-again')}
-                    className={styles['input']}
+                    className="relative flex-1 h-[29px] p-[8px] border border-border shadow-[inset_1px_1px_3px_rgb(0_0_0/10%)] transition-shadow duration-300 ease-[ease]"
                     style={confirmPasswordError ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
-                {confirmPasswordError ? <div className={styles['warn-text']}>{confirmPasswordError}</div> : <div className={styles['hint-text']}>{t('repeat-password-hint')}</div>}
+                {confirmPasswordError ? (
+                  <div className="ml-[80px] text-text-warning">{confirmPasswordError}</div>
+                ) : (
+                  <div className="ml-[80px] text-text-color-quaternary">{t('repeat-password-hint')}</div>
+                )}
               </div>
-              <div className={styles['input-wrapper']}>
-                <div className={styles['input-box']}>
-                  <div className={styles['label']}>{t('email')}</div>
+              <div className="flex flex-col gap-[3px] w-full">
+                <div className="flex items-center w-full">
+                  <div className="inline-block w-[80px] pr-[10px] text-[0.9rem] text-text-color-secondary text-right">{t('email')}</div>
                   <input
                     type="email"
                     name="email"
@@ -216,36 +218,43 @@ const RegisterPageComponent: React.FC<RegisterPageProps> = React.memo(({ display
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     placeholder={t('please-input-email')}
-                    className={styles['input']}
+                    className="relative flex-1 h-[29px] p-[8px] border border-border shadow-[inset_1px_1px_3px_rgb(0_0_0/10%)] transition-shadow duration-300 ease-[ease]"
                     style={emailError ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
-                {emailError ? <div className={styles['warn-text']}>{emailError}</div> : <div className={styles['hint-text']}>{t('email-hint')}</div>}
+                {emailError ? <div className="ml-[80px] text-text-warning">{emailError}</div> : <div className="ml-[80px] text-text-color-quaternary">{t('email-hint')}</div>}
               </div>
-              <div className={styles['input-wrapper']}>
-                <div className={styles['input-box']}>
-                  <div className={styles['label']}>{t('nickname')}</div>
+              <div className="flex flex-col gap-[3px] w-full">
+                <div className="flex items-center w-full">
+                  <div className="inline-block w-[80px] pr-[10px] text-[0.9rem] text-text-color-secondary text-right">{t('nickname')}</div>
                   <input
                     name="username"
                     value={username}
                     onChange={handleInputChange}
                     onBlur={handleInputBlur}
                     placeholder={t('please-input-nickname')}
-                    className={styles['input']}
+                    className="relative flex-1 h-[29px] p-[8px] border border-border shadow-[inset_1px_1px_3px_rgb(0_0_0/10%)] transition-shadow duration-300 ease-[ease]"
                     style={usernameError ? { borderColor: 'var(--text-warning)' } : {}}
                   />
                 </div>
-                {usernameError ? <div className={styles['warn-text']}>{usernameError}</div> : <div className={styles['hint-text']}>{t('nickname-hint')}</div>}
+                {usernameError ? <div className="ml-[80px] text-text-warning">{usernameError}</div> : <div className="ml-[80px] text-text-color-quaternary">{t('nickname-hint')}</div>}
               </div>
-              <button className={styles['submit-button']} onClick={handleSubmit} disabled={!canSubmit}>
+              <button
+                className="w-[200px] h-[42px] mt-[10px] text-white cursor-pointer bg-[#1680ce] rounded-[4px] hover:bg-[#419ddd] active:bg-[#1680ce] disabled:cursor-not-allowed disabled:bg-[#1680ce] disabled:opacity-60"
+                onClick={handleSubmit}
+                disabled={!canSubmit}
+              >
                 {t('register')}
               </button>
             </>
           )}
         </form>
       </main>
-      <div className={styles['footer']}>
-        <div className={styles['back-to-login-button']} onClick={handleBackToLoginBtnClick}>
+      <div className="flex items-center justify-start w-full px-[15px] py-[10px] mt-auto text-[0.9rem] text-text-color-quaternary bg-footer-background border-t border-t-border">
+        <div
+          className="flex items-end no-underline cursor-pointer hover:text-[#0073c6] before:min-w-[14px] before:min-h-[14px] before:mr-[5px] before:align-middle before:content-[''] before:bg-no-repeat before:bg-[position:0_0]"
+          onClick={handleBackToLoginBtnClick}
+        >
           {t('back-to-login')}
         </div>
       </div>

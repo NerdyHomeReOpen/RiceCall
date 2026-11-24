@@ -27,8 +27,6 @@ import { ChatEnter } from '@/extensions/chat-enter';
 
 import { toTags } from '@/utils/tag-converter';
 
-import styles from './server.module.css';
-
 const MessageInputBox: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
@@ -193,11 +191,16 @@ const MessageInputBox: React.FC = React.memo(() => {
   }, [currentChannel.channelId]);
 
   return (
-    <div className={`${styles['message-input-box']} ${isWarning ? styles['warning'] : ''}`}>
-      <div className={styles['emoji-button']} onMouseDown={handleEmojiPickerClick} />
+    <div
+      className={`flex flex-1 flex-row gap-[5px] justify-start max-w-full p-[5px] bg-background border rounded-[5px] shadow-[inset_1px_1px_3px_rgb(0_0_0/10%)] ${isWarning ? 'border-text-warning' : 'border-border'}`}
+    >
+      <div
+        className="w-[18px] h-[18px] bg-no-repeat bg-center bg-contain before:block before:min-w-[18px] before:min-h-[18px] before:cursor-pointer before:content-[''] before:bg-[url('/channel/FaceButton.svg')] before:bg-no-repeat before:bg-[position:0_0] hover:before:bg-[position:-18px_0] active:before:bg-[position:-36px_0]"
+        onMouseDown={handleEmojiPickerClick}
+      />
       <EditorContent
         editor={editor}
-        className={`${styles['input']} markdown-content`}
+        className="flex-1 overflow-auto resize-none [&_div]:h-full markdown-content"
         style={{ wordBreak: 'break-all', border: 'none' }}
         onPaste={handleInputPaste}
         onKeyDown={handleInputKeyDown}
@@ -206,7 +209,7 @@ const MessageInputBox: React.FC = React.memo(() => {
         maxLength={maxLength}
       />
       {isCloseToMaxLength && (
-        <div className={styles['input-length-text']}>
+        <div className="absolute right-[5px] bottom-[5px] text-[0.9rem] text-text-color-senary">
           {textLength}/{maxLength}
         </div>
       )}

@@ -14,7 +14,17 @@ import { useContextMenu } from '@/providers/ContextMenu';
 
 import { useAppSelector } from '@/hooks/useStore';
 
-import styles from './server.module.css';
+const VOLUME_LEVEL_POSITIONS: Record<number, string> = {
+  1: 'bg-[position:-24px_0]',
+  2: 'bg-[position:-48px_0]',
+  3: 'bg-[position:-72px_0]',
+  4: 'bg-[position:-96px_0]',
+  5: 'bg-[position:-120px_0]',
+  6: 'bg-[position:-144px_0]',
+  7: 'bg-[position:-168px_0]',
+  8: 'bg-[position:-192px_0]',
+  9: 'bg-[position:-216px_0]',
+};
 
 const MicButton: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -83,12 +93,25 @@ const MicButton: React.FC = React.memo(() => {
     return t('speaking');
   };
 
+  const isMicMutedByChannel = currentChannel.isVoiceMuted || isControlled;
+  const isSelectionHidden = !isCurrentChannelQueueMode || (permissionLevel < Permission.ChannelMod && isIdling);
+
   const getMicBtnClass = () => {
-    let className = styles['mic-button'];
-    if (isMicTaken) className += ` ${styles['speaking']}`;
-    if (isQueuing) className += ` ${styles['queuing']}`;
-    if (currentChannel.isVoiceMuted || isControlled) className += ` ${styles['muted']}`;
-    if (!isCurrentChannelQueueMode || (permissionLevel < Permission.ChannelMod && isIdling)) className += ` ${styles['no-selection']}`;
+    let className =
+      "flex items-center justify-between min-w-[154px] max-w-[154px] min-h-[50px] max-h-[50px] px-[10px] font-[Arial,Helvetica,sans-serif] cursor-pointer bg-no-repeat bg-[position:0_2px] bg-auto hover:bg-[position:-154px_2px] active:bg-[position:-308px_2px] after:block after:min-w-[11px] after:min-h-[7px] after:cursor-pointer after:content-[''] after:bg-no-repeat";
+    if (isMicTaken) className += " bg-[url('/channel/mic_state_speaking.svg')] after:bg-[position:-22px_0]";
+    else if (isQueuing) className += " bg-[url('/channel/mic_state_queuing.svg')] after:bg-[position:-11px_0]";
+    else className += " bg-[url('/channel/mic_state_menu.svg')] after:bg-[position:0_0]";
+    className += isSelectionHidden ? ' after:bg-none' : " after:bg-[url('/channel/icon_mic_triangle.svg')]";
+    return className;
+  };
+
+  const getMicIconClass = () => {
+    let className = 'min-w-[24px] min-h-[30px] bg-no-repeat bg-cover';
+    if (isMicTaken && !isMicMutedByChannel) className += ` bg-[url('/channel/icon_speaking_vol.svg')] ${VOLUME_LEVEL_POSITIONS[volumeLevel] ?? ''}`;
+    else if (isMicMutedByChannel) className += " bg-[url('/channel/icon_mic_state.svg')] bg-[position:-72px_0]";
+    else if (isQueuing) className += " bg-[url('/channel/icon_mic_state.svg')] bg-[position:-24px_0]";
+    else className += " bg-[url('/channel/icon_mic_state.svg')]";
     return className;
   };
 
@@ -157,12 +180,12 @@ const MicButton: React.FC = React.memo(() => {
 
   return (
     <div className={getMicBtnClass()} onClick={handleMicBtnClick}>
-      <div className={`${styles['mic-button-icon']} ${isMicTaken ? styles[`level${volumeLevel}`] : ''}`} />
+      <div className={getMicIconClass()} />
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <div className={styles['mic-button-text']} style={{ fontSize: isIdling ? '1.3rem' : '1.1rem' }}>
+        <div className={isMicTaken ? 'text-[#62a35b]' : isQueuing ? 'text-[#dda11e]' : 'text-[#2594ca]'} style={{ fontSize: isIdling ? '1.3rem' : '1.1rem' }}>
           {getMicText()}
         </div>
-        <div className={styles['mic-button-sub-text']}>{getMicSubText()}</div>
+        <div className="text-[12px] text-[#777]">{getMicSubText()}</div>
       </div>
     </div>
   );

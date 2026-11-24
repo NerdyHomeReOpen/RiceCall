@@ -22,7 +22,12 @@ import QueueUserTab from './QueueUserTab';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import styles from './server.module.css';
+const CONNECT_STATUS_POSITIONS: Record<number, string> = {
+  1: 'bg-[position:-20px_0]',
+  2: 'bg-[position:-40px_0]',
+  3: 'bg-[position:-60px_0]',
+  4: 'bg-[position:-80px_0]',
+};
 
 const ServerPageSidebar: React.FC = React.memo(() => {
   const { t } = useTranslation();
@@ -152,54 +157,75 @@ const ServerPageSidebar: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={styles['sidebar-header']}>
-        <div className={styles['server-avatar']} onClick={handleServerAvatarClick}>
+      <div className="relative flex gap-[5px] items-center p-[8px] border-b border-b-border">
+        <div
+          className="relative w-[50px] h-[50px] cursor-pointer before:absolute before:top-[-1px] before:left-[-1px] before:z-1 before:min-w-[52px] before:min-h-[52px] before:content-[''] before:bg-[url('/channel/server_logo_border.svg')] before:bg-no-repeat before:bg-[position:0_0] before:bg-cover"
+          onClick={handleServerAvatarClick}
+        >
           <Image src={currentServer.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={50} height={50} loading="lazy" draggable="false" />
         </div>
-        <div className={styles['server-info-wrapper']}>
-          <div className={styles['server-info-box']}>
-            {!!currentServer.isVerified && <div className={styles['server-verify-icon']} title={t('official-verified-server')} />}
-            <div className={styles['server-name-text']}>{currentServer.name} </div>
+        <div className="flex flex-1 flex-col gap-[10px] justify-between overflow-hidden">
+          <div className="flex gap-[5px] items-center justify-start">
+            {!!currentServer.isVerified && <div className="min-w-[12px] min-h-[12px] bg-[url('/icon_verify.svg')] bg-no-repeat bg-[position:0_0]" title={t('official-verified-server')} />}
+            <div className="line-clamp-2 text-ellipsis text-text-color-quaternary wrap-break-word">{currentServer.name} </div>
           </div>
-          <div className={styles['server-info-box']}>
-            <div className={styles['server-id-text']}>{currentServer.specialId || currentServer.displayId}</div>
-            <div className={styles['server-online-count-text']}>{onlineMembers.length}</div>
-            <div className={styles['server-options']}>
-              <div className={styles['invitation-button']} onClick={handleInviteFriendClick} />
-              <div className={styles['options-separator']} />
-              <div className={styles['setting-button']} onClick={handleServerSettingClick}>
-                <div className={`${styles['setting-overlay']} ${hasNewMemberApplications ? styles['new'] : ''}`} />
+          <div className="flex gap-[5px] items-center justify-start">
+            <div className="flex items-center justify-start min-w-[75px] text-text-color-quaternary text-shadow-[0_1px_0_#fff] before:relative before:min-w-[12px] before:min-h-[12px] before:mr-[2px] before:content-[''] before:bg-no-repeat before:bg-[position:0_0] before:bg-[url('/channel/ID.svg')]">
+              {currentServer.specialId || currentServer.displayId}
+            </div>
+            <div className="flex items-center justify-start min-w-[55px] text-text-color-quaternary text-shadow-[0_1px_0_#fff] before:relative before:min-w-[12px] before:min-h-[12px] before:mr-[2px] before:content-[''] before:bg-no-repeat before:bg-[position:0_0] before:bg-[url('/channel/member.svg')]">
+              {onlineMembers.length}
+            </div>
+            <div className="flex flex-1 gap-[5px] items-center justify-end">
+              <div
+                className="min-w-[20px] min-h-[16px] cursor-pointer bg-[url('/channel/icon_invite_friend.svg')] bg-no-repeat bg-[position:0_0] hover:bg-[position:-20px_0] active:bg-[position:-40px_0]"
+                onClick={handleInviteFriendClick}
+              />
+              <div className="min-w-[2px] min-h-[16px] bg-[url('/icon_v_split.svg')] bg-no-repeat bg-[position:0_0] bg-auto" />
+              <div
+                className="relative min-w-[24px] min-h-[16px] cursor-pointer bg-[url('/channel/icon_group_option.svg')] bg-no-repeat bg-[position:0_0] hover:bg-[position:-24px_0] active:bg-[position:-48px_0]"
+                onClick={handleServerSettingClick}
+              >
+                <div
+                  className={`absolute inline-block min-w-[24px] min-h-[24px] cursor-pointer bg-[url('/icon_notice_overlay.svg')] bg-no-repeat bg-cover ${hasNewMemberApplications ? 'bg-[position:-24px_0]' : 'bg-[position:0_0]'}`}
+                />
               </div>
             </div>
           </div>
         </div>
       </div>
-      <div className={styles['current-channel-box']}>
-        <div className={`${styles['current-channel-icon']} ${styles[`status${connectStatus}`]} has-hover-text`}>
+      <div className="flex items-center w-full h-[35px]">
+        <div
+          className={`relative min-w-[20px] min-h-[20px] ml-[8px] bg-[url('/channel/NetworkStatus.svg')] bg-no-repeat ${CONNECT_STATUS_POSITIONS[connectStatus] ?? 'bg-[position:0_0]'} has-hover-text`}
+        >
           <div className={'hover-text'}>
             {`${t('latency', { 0: latency || '-' })}`}
             <br />
             {`${t('audio-latency', { 0: rtcLatency || '-' })}`}
           </div>
         </div>
-        <div className={styles['current-channel-name-text']}>{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
+        <div className="ml-[3px] truncate text-[1.1rem] text-text-color-quinary">{currentChannel.isLobby ? t(currentChannel.name) : currentChannel.name}</div>
       </div>
       {isCurrentChannelQueueMode && (
         <>
-          <div className={styles['section-title-text']}>{t('mic-order')}</div>
-          <div ref={queueListRef} className={styles['scroll-view']} style={{ minHeight: '120px', maxHeight: '120px' }}>
-            <div className={styles['queue-list']}>
+          <div className="px-[10px] py-[5px] text-text-color-senary text-shadow-[0_1px_#fff]">{t('mic-order')}</div>
+          <div ref={queueListRef} className="flex flex-1 flex-col min-w-0 min-h-0 overflow-y-auto" style={{ minHeight: '120px', maxHeight: '120px' }}>
+            <div className="flex flex-col">
               {queueUserIds.map((queueUserId) => (
                 <QueueUserTab key={queueUserId} queueUserId={queueUserId} />
               ))}
             </div>
           </div>
-          <div className={styles['queue-list-separator']} onPointerDown={handleQueueListHandleDown} onPointerMove={handleQueueListHandleMove} />
+          <div
+            className="min-h-[8px] cursor-ns-resize bg-[url('/channel/chn_tree_split.svg')] bg-no-repeat bg-[position:50%_0]"
+            onPointerDown={handleQueueListHandleDown}
+            onPointerMove={handleQueueListHandleMove}
+          />
         </>
       )}
-      <div className={styles['section-title-text']}>{isCurrentTab ? t('current-channel') : t('all-channel')}</div>
-      <div className={styles['scroll-view']} onContextMenu={handleChannelListContextMenu}>
-        <div className={styles['channel-list']}>
+      <div className="px-[10px] py-[5px] text-text-color-senary text-shadow-[0_1px_#fff]">{isCurrentTab ? t('current-channel') : t('all-channel')}</div>
+      <div className="flex flex-1 flex-col min-w-0 min-h-0 overflow-y-auto" onContextMenu={handleChannelListContextMenu}>
+        <div className="flex flex-col">
           {isCurrentTab ? (
             <ChannelTab key={currentChannel.channelId} channel={currentChannel} />
           ) : (
@@ -207,12 +233,18 @@ const ServerPageSidebar: React.FC = React.memo(() => {
           )}
         </div>
       </div>
-      <div className={styles['channel-list-separator']} />
-      <div className={styles['sidebar-footer']}>
-        <div className={`${styles['sidebar-navigate-tab']} ${isCurrentTab ? styles['active'] : ''}`} onClick={handleCurrentChannelTabClick}>
+      <div className="min-h-[1px] bg-[url('/channel/spliter_SpecialMenu.svg')] bg-no-repeat bg-[position:50%_0]" />
+      <div className="relative flex items-center justify-center">
+        <div
+          className={`z-1 flex items-center justify-center p-[8px] text-center cursor-pointer transition-transform duration-200 ease-[ease] before:inline-block before:w-[15px] before:min-w-[18px] before:h-[15px] before:min-h-[18px] before:mr-[4px] before:content-[''] before:bg-no-repeat before:bg-auto before:bg-[url('/channel/rdb_cur_channel.svg')] ${isCurrentTab ? "text-text-color-quaternary -translate-y-px before:bg-[position:0_-18px] after:absolute after:top-[-15px] after:min-w-[70px] after:min-h-[20px] after:content-[''] after:bg-[url('/channel/switch_arrow.svg')] after:bg-no-repeat after:bg-[position:0_0] after:bg-auto after:transition-[left] after:duration-200 after:ease-[ease]" : 'text-text-color-quinary before:bg-[position:0_0]'}`}
+          onClick={handleCurrentChannelTabClick}
+        >
           {t('current-channel')}
         </div>
-        <div className={`${styles['sidebar-navigate-tab']} ${isAllTab ? styles['active'] : ''}`} onClick={handleAllChannelTabClick}>
+        <div
+          className={`z-1 flex items-center justify-center p-[8px] text-center cursor-pointer transition-transform duration-200 ease-[ease] before:inline-block before:w-[15px] before:min-w-[18px] before:h-[15px] before:min-h-[18px] before:mr-[4px] before:content-[''] before:bg-no-repeat before:bg-auto before:bg-[url('/channel/rdb_all_channel.svg')] ${isAllTab ? "text-text-color-quaternary -translate-y-px before:bg-[position:0_-18px] after:absolute after:top-[-15px] after:min-w-[70px] after:min-h-[20px] after:content-[''] after:bg-[url('/channel/switch_arrow.svg')] after:bg-no-repeat after:bg-[position:0_0] after:bg-auto after:transition-[left] after:duration-200 after:ease-[ease]" : 'text-text-color-quinary before:bg-[position:0_0]'}`}
+          onClick={handleAllChannelTabClick}
+        >
           {t('all-channel')}
         </div>
       </div>

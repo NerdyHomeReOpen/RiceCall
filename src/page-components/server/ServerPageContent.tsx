@@ -243,7 +243,7 @@ const ServerPageContent: React.FC = React.memo(() => {
 
   useEffect(() => {
     const onPointerDown = (e: MouseEvent) => {
-      if (!(e.target as HTMLElement).closest(`.${styles['widget-bar']}`)) {
+      if (!(e.target as HTMLElement).closest('.widget-bar')) {
         setIsWidgetExpanded(false);
       }
     };
@@ -283,32 +283,38 @@ const ServerPageContent: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={`${styles['content-layout']} ${isChannelUIClassicMode ? styles['classic'] : ''} ${isChannelUIThreeLineMode ? styles['three-line'] : ''}`}>
-        <div className={styles['widget-bar-toggle-button']}>
-          <div className={styles['widget-bar-item']} onClick={handleWidgetMoreBtnClick}>
-            <span className={`${styles['widget-bar-item-icon']} ${styles['arrow-down-icon']}`} />
+      <div className={`flex flex-1 min-h-0 ${isChannelUIThreeLineMode ? 'flex-row' : 'flex-col'}`}>
+        <div className="absolute right-[15px] z-1 bg-white rounded-b-[5px] shadow-box-shadow">
+          <div className="group/item flex gap-[5px] place-items-center p-0 cursor-pointer" onClick={handleWidgetMoreBtnClick}>
+            <span className="flex w-[20px] h-[16px] bg-[url('/channel/widgetBar_Stretch.svg')] bg-[position:0_0] bg-auto group-hover/item:bg-[position:-20px_0] group-active/item:bg-[position:-20px_0]" />
           </div>
         </div>
-        <div className={`${styles['widget-bar']} ${isWidgetExpanded ? styles['widget-bar-expanded'] : ''}`}>
-          <div className={`${styles['widget-bar-item']} ${isCentralAreaAnnouncementMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetAnnClick}>
-            <div className={`${styles['widget-bar-item-icon']} ${styles['announcement-icon']}`} />
-            <span className={styles['widget-bar-item-text']}>{t('announcement')}</span>
+        <div
+          className={`widget-bar absolute right-[10px] z-1 flex gap-[5px] items-center overflow-hidden bg-white rounded-b-[5px] shadow-box-shadow transition-transform duration-500 ease-linear ${isWidgetExpanded ? 'translate-y-[0%]' : 'translate-y-[-110%]'}`}
+        >
+          <div className="group/item flex gap-[5px] place-items-center px-[25px] py-[3px] cursor-pointer" onClick={handleWidgetAnnClick}>
+            <div
+              className={`flex w-[12px] h-[12px] bg-auto group-hover/item:bg-[position:-12px_0] group-[:active:not(:hover)]/item:bg-[position:-24px_0] bg-[url('/channel/widgetbar_bullet.svg')] ${isCentralAreaAnnouncementMode ? 'bg-[position:-24px_0]' : 'bg-[position:0_0]'}`}
+            />
+            <span className={`text-[12px] whitespace-nowrap select-none ${isCentralAreaAnnouncementMode ? 'font-bold text-black' : 'text-[#333]'}`}>{t('announcement')}</span>
           </div>
-          <div className={styles['widget-bar-splitter']} />
-          <div className={`${styles['widget-bar-item']} ${isCentralAreaShowMode ? styles['widget-bar-item-active'] : ''}`} onClick={handleWidgetShowClick}>
-            <div className={`${styles['widget-bar-item-icon']} ${styles['show-icon']}`} />
-            <span className={styles['widget-bar-item-text']}>{t('send-flower')}</span>
+          <div className="w-[2px] h-[16px] bg-[url('/channel/widgetbar_spliter.svg')] bg-no-repeat bg-center" />
+          <div className="group/item flex gap-[5px] place-items-center px-[25px] py-[3px] cursor-pointer" onClick={handleWidgetShowClick}>
+            <div
+              className={`flex w-[12px] h-[12px] bg-auto group-hover/item:bg-[position:-12px_0] group-[:active:not(:hover)]/item:bg-[position:-24px_0] bg-[url('/channel/widgetbar_rcshow.svg')] ${isCentralAreaShowMode ? 'bg-[position:-24px_0]' : 'bg-[position:0_0]'}`}
+            />
+            <span className={`text-[12px] whitespace-nowrap select-none ${isCentralAreaShowMode ? 'font-bold text-black' : 'text-[#333]'}`}>{t('send-flower')}</span>
           </div>
-          <div className={styles['widget-bar-splitter']} />
-          <div className={styles['widget-bar-item']} onClick={handleWidgetMoreClick}>
-            <div className={`${styles['widget-bar-item-icon']} ${styles['more-icon']}`} />
-            <span className={styles['widget-bar-item-text']}>{t('more')}</span>
+          <div className="w-[2px] h-[16px] bg-[url('/channel/widgetbar_spliter.svg')] bg-no-repeat bg-center" />
+          <div className="group/item flex gap-[5px] place-items-center px-[25px] py-[3px] cursor-pointer" onClick={handleWidgetMoreClick}>
+            <div className="flex w-[12px] h-[12px] bg-auto group-hover/item:bg-[position:-12px_0] group-[:active:not(:hover)]/item:bg-[position:-24px_0] bg-[url('/channel/widgetbar_more.svg')] bg-[position:0_0]" />
+            <span className="text-[12px] whitespace-nowrap select-none text-[#333]">{t('more')}</span>
           </div>
         </div>
         {isCentralAreaAnnouncementMode && (
           <div
             ref={annAreaRef}
-            className={styles['announcement-area']}
+            className="w-full min-w-[200px] h-full min-h-[60px] p-[10px] overflow-y-auto"
             style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
             onContextMenu={handleAnnAreaContextMenu}
           >
@@ -316,7 +322,11 @@ const ServerPageContent: React.FC = React.memo(() => {
           </div>
         )}
         {isCentralAreaShowMode && (
-          <div ref={showAreaRef} className={styles['show-area']} style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}>
+          <div
+            ref={showAreaRef}
+            className="w-full min-w-[200px] h-full min-h-[60px] p-0 overflow-hidden"
+            style={isChannelUIClassicMode ? { minWidth: '100%', minHeight: '60px' } : { minWidth: '200px', minHeight: '100%' }}
+          >
             <ShowFrame />
           </div>
         )}
@@ -332,38 +342,55 @@ const ServerPageContent: React.FC = React.memo(() => {
           onPointerDown={handleAnnAreaHandleDown}
           onPointerMove={handleAnnAreaHandleMove}
         />
-        <div className={styles['chat-area']}>
-          <div ref={messageAreaRef} className={styles['message-area']} onScroll={handleScroll} onContextMenu={handleMessageAreaContextMenu}>
+        <div className="flex flex-[5] flex-col min-w-[260px] min-h-[200px] overflow-y-hidden bg-background-secondary">
+          <div ref={messageAreaRef} className="flex flex-col h-full px-[10px] pt-[10px] pb-0 overflow-x-hidden overflow-y-scroll" onScroll={handleScroll} onContextMenu={handleMessageAreaContextMenu}>
             <MessageContent messages={channelMessages} />
             <div style={{ minHeight: '10px' }} />
             <UnreadMessageAlert unreadMessageCount={unreadMessageCount} onAlertClick={handleUnreadMessageAlertClick} />
           </div>
-          <div className={styles['input-area']}>
-            <div className={styles['broadcast-area']} style={!isActionMessageVisible ? { display: 'none' } : {}}>
+          <div className="relative flex min-h-[70px] max-h-[50%] px-[10px] pb-[10px]">
+            <div
+              className="absolute bottom-[calc(100%+10px)] left-[10px] flex justify-center w-[calc(100%-20px)] min-h-[25px] p-[3px] bg-notification-toaster-background border-[1.5px] border-notification-toaster-border rounded-[2px]"
+              style={!isActionMessageVisible ? { display: 'none' } : {}}
+            >
               <MessageContent messages={actionMessages.length !== 0 ? [actionMessages[actionMessages.length - 1]] : []} />
-              <div className={styles['broadcast-close-button']} onClick={handleCloseActionMessageBtnClick} />
+              <div
+                className="w-[18px] min-w-[18px] h-[18px] min-h-[18px] cursor-pointer bg-[url('/loading_close.svg')] bg-[position:0_0] bg-cover hover:bg-[position:-18px_0] active:bg-[position:-36px_0]"
+                onClick={handleCloseActionMessageBtnClick}
+              />
             </div>
             <MessageInputBox />
           </div>
         </div>
       </div>
-      <div className={styles['control-area']}>
-        <div className={styles['control-buttons']}>
-          <div className={styles['voice-mode-dropdown']} style={isChannelMod ? {} : { display: 'none' }} onClick={handleVoiceModeDropdownClick}>
+      <div className="flex flex-none items-center justify-between w-full h-[55px] px-[10px] py-[4px] bg-[url('/channel/chn_toolbar_bg.svg')]">
+        <div className="flex gap-[10px] items-center justify-between">
+          <div
+            className="relative flex gap-[5px] items-center p-[5px] text-text-color-quaternary text-center cursor-pointer rounded-[4px] after:block after:min-w-[8px] after:min-h-[8px] after:cursor-pointer after:content-[''] after:bg-[url('/channel/triangle.svg')] after:bg-no-repeat after:bg-[position:0_0] after:rotate-180 hover:after:bg-[position:-9px_0] active:after:bg-[position:-18px_0]"
+            style={isChannelMod ? {} : { display: 'none' }}
+            onClick={handleVoiceModeDropdownClick}
+          >
             {t(VOICE_MODE_TEXT_KEYS[currentChannel.voiceMode])}
           </div>
         </div>
         <MicButton />
-        <div className={styles['control-buttons']}>
-          <div className={`${styles['mixing-mode-button']} ${isMixModeActive ? styles['active'] : ''}`} onClick={handleMixingBtnClick} title={isMixModeActive ? t('mixing-on') : t('mixing-off')}>
+        <div className="flex gap-[10px] items-center justify-between">
+          <div
+            className={`flex items-center text-text-color-quaternary cursor-pointer before:min-w-[18px] before:min-h-[18px] before:content-[''] before:bg-[url('/channel/music_bkg.svg')] before:bg-no-repeat ${isMixModeActive ? `before:bg-[position:-18px_0] ${styles['mixing-animation']}` : 'before:bg-[position:0_0]'}`}
+            onClick={handleMixingBtnClick}
+            title={isMixModeActive ? t('mixing-on') : t('mixing-off')}
+          >
             {t('mixing')}
           </div>
-          <div className={styles['control-button-separator']} />
+          <div className="min-w-[2px] min-h-[16px] bg-[url('/icon_v_split.svg')] bg-no-repeat bg-[position:0_0] bg-auto" />
           <MicVolumeSlider />
           <SpeakerVolumeSlider />
-          <div className={`${styles['record-box']} ${isRecording ? styles['active'] : ''}`}>
-            <div className={`${styles['record-button']} ${isRecording ? styles['active'] : ''}`} onClick={handleRecordModeBtnClick} />
-            <div className={`${styles['record-text']} ${isRecording ? styles['active'] : ''}`}>{getFormatTimeFromSecond(recordTime)}</div>
+          <div className="flex flex-row">
+            <div
+              className={`relative min-w-[18px] min-h-[18px] cursor-pointer bg-[url('/channel/recorder.svg')] bg-no-repeat ${isRecording ? "bg-[position:-18px_0] after:absolute after:top-[-5px] after:left-[-5px] after:z-[-1] after:min-w-[28px] after:min-h-[28px] after:content-[''] after:bg-[url('/channel/recorder_bg.svg')] after:bg-no-repeat after:bg-[position:0_0]" : 'bg-[position:0_0]'}`}
+              onClick={handleRecordModeBtnClick}
+            />
+            <div className={`items-center ml-[5px] text-text-color-quaternary ${isRecording ? 'flex' : 'hidden'}`}>{getFormatTimeFromSecond(recordTime)}</div>
           </div>
         </div>
       </div>

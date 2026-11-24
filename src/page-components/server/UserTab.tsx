@@ -18,8 +18,6 @@ import { useMemberCtxMenu } from '@/hooks/context-menus/useMemberCtxMenu';
 import BadgeList from '@/components/badge-list';
 import LevelIcon from '@/components/level-icon';
 
-import styles from './server.module.css';
-
 interface UserTabProps {
   member: Types.OnlineMember;
   channel: Types.Channel | Types.Category;
@@ -91,10 +89,10 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
     onUnmuteUser: unmuteUser,
   });
 
-  const getStatusIcon = () => {
-    if (isMuted || member.isVoiceMuted) return 'muted';
-    if (isSpeaking) return 'play';
-    return '';
+  const getStatusIconPosition = () => {
+    if (isMuted || member.isVoiceMuted) return 'bg-[position:-12px_0]';
+    if (isSpeaking) return 'bg-[position:-24px_0]';
+    return 'bg-[position:-36px_0]';
   };
 
   const handleTabClick = () => {
@@ -144,7 +142,7 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
   return (
     <div
       ref={userTabRef}
-      className={`user-info-card-container ${styles['user-tab']} ${isSelected ? styles['selected'] : ''}`}
+      className={`user-info-card-container relative flex gap-[2px] items-center h-[25px] py-[2px] pr-[20px] mr-[5px] text-shadow-[0_1px_#fff] pl-[25px] ${isSelected ? 'bg-selected' : 'hover:bg-hover'}`}
       onClick={handleTabClick}
       onDoubleClick={handleTabDoubleClick}
       onMouseEnter={handleTabMouseEnter}
@@ -153,14 +151,14 @@ const UserTab: React.FC<UserTabProps> = React.memo(({ member, channel, isPasswor
       onDragStart={handleTabDragStart}
       onContextMenu={handleTabContextMenu}
     >
-      <div className={`${styles['text-state']} ${member.isTextMuted ? styles['muted'] : ''}`} />
-      <div className={`${styles['audio-state']} ${styles[getStatusIcon()]}`} />
+      <div className={`min-w-[12px] min-h-[12px] bg-[url('/channel/audioState.svg')] bg-no-repeat bg-auto ${member.isTextMuted ? 'bg-[position:0_0]' : 'bg-[position:-36px_0]'}`} />
+      <div className={`left-0 min-w-[12px] min-h-[12px] bg-[url('/channel/audioState.svg')] bg-no-repeat bg-auto ${getStatusIconPosition()}`} />
       <div className={`permission-${member.gender} permission-lv-${member.permissionLevel}`} />
       {hasVip && <div className={`vip-icon vip-${member.vip}`} />}
-      <div className={`${styles['name-text']} ${member.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{member.nickname || member.name}</div>
+      <div className={`truncate ${hasVip ? 'text-text-vip-name' : member.nickname ? 'text-text-nickname' : 'text-text-color-quaternary'}`}>{member.nickname || member.name}</div>
       <LevelIcon level={member.level} xp={member.xp} requiredXp={member.requiredXp} showTooltip={false} />
       <BadgeList badges={JSON.parse(member.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
-      {isSelf && <div className={styles['my-location-icon']} />}
+      {isSelf && <div className="absolute right-[2px] min-w-[15px] min-h-[15px] cursor-pointer bg-[url('/mylocation.svg')] bg-no-repeat bg-cover" />}
     </div>
   );
 });

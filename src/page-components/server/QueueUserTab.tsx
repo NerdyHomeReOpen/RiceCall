@@ -18,8 +18,6 @@ import { useWebRTC } from '@/providers/WebRTC';
 
 import { getDefaultQueueMember } from '@/utils/default';
 
-import styles from './server.module.css';
-
 interface QueueUserTabProps {
   queueUserId: string;
 }
@@ -76,10 +74,10 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
   const isOnMic = queueMember.position === 0;
   const isControlled = isOnMic && queueMember.isQueueControlled && permissionLevel < Permission.ChannelMod;
 
-  const getStatusIcon = () => {
-    if (isMuted || queueMember.isVoiceMuted || (permissionLevel < Permission.ChannelMod && isControlled)) return 'muted';
-    if (isSpeaking) return 'play';
-    return '';
+  const getStatusIconPosition = () => {
+    if (isMuted || queueMember.isVoiceMuted || (permissionLevel < Permission.ChannelMod && isControlled)) return 'bg-[position:-12px_0]';
+    if (isSpeaking) return 'bg-[position:-24px_0]';
+    return 'bg-[position:-36px_0]';
   };
 
   const { buildContextMenu: buildTabContextMenu } = useQueueUserCtxMenu({
@@ -125,20 +123,24 @@ const QueueUserTab: React.FC<QueueUserTabProps> = React.memo(({ queueUserId }) =
 
   return (
     <div
-      className={`user-info-card-container ${styles['queue-user-tab']} ${isSelected ? styles['selected'] : ''}`}
+      className={`user-info-card-container relative flex gap-[2px] items-center h-[25px] py-[2px] pr-[20px] mr-[5px] text-shadow-[0_1px_#fff] pl-[10px] ${isSelected ? 'bg-selected' : 'hover:bg-hover'}`}
       onClick={handleTabClick}
       onDoubleClick={handleTabDoubleClick}
       onMouseEnter={handleTabMouseEnter}
       onMouseLeave={handleTabMouseLeave}
       onContextMenu={handleTabContextMenu}
     >
-      <div className={`${styles['audio-state']} ${styles[getStatusIcon()]}`} />
+      <div className={`left-0 min-w-[12px] min-h-[12px] bg-[url('/channel/audioState.svg')] bg-no-repeat bg-auto ${getStatusIconPosition()}`} />
       <div className={`permission-${queueMember.gender} permission-lv-${queueMember.permissionLevel}`} />
-      <div className={`${styles['position-text']}`}>{queueMember.position + 1}.</div>
+      <div className="text-text-color-quaternary">{queueMember.position + 1}.</div>
       {hasVip && <div className={`vip-icon vip-${queueMember.vip}`} />}
-      <div className={`${styles['name-text']} ${queueMember.nickname ? styles['member'] : ''} ${hasVip ? styles['vip'] : ''}`}>{queueMember.nickname || queueMember.name}</div>
+      <div className={`truncate ${hasVip ? 'text-text-vip-name' : queueMember.nickname ? 'text-text-nickname' : 'text-text-color-quaternary'}`}>{queueMember.nickname || queueMember.name}</div>
       <BadgeList badges={JSON.parse(queueMember.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
-      {isOnMic && <div className={styles['time-remaining']}>{queueMember.leftTime}s</div>}
+      {isOnMic && (
+        <div className="flex items-center px-[3px] ml-auto text-text-color-quaternary bg-notification-toaster-background border border-notification-toaster-border rounded-[3px]">
+          {queueMember.leftTime}s
+        </div>
+      )}
     </div>
   );
 });

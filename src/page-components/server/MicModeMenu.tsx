@@ -10,8 +10,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { getLerpColor } from '@/utils/color';
 
-import styles from './server.module.css';
-
 const MicModeMenu: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { changeVoiceThreshold } = useWebRTC();
@@ -43,7 +41,7 @@ const MicModeMenu: React.FC = React.memo(() => {
   };
 
   return (
-    <div className={styles['mode-menu']}>
+    <div className="mic-mode-menu absolute right-0 bottom-full z-10000 flex flex-col justify-around w-[250px] p-[10px] overflow-hidden cursor-default bg-background rounded-[3px] shadow-box-shadow">
       <div className="col">
         <div className="label">{t('current-speaking-mode')}</div>
         <div className="input-box row">
@@ -56,10 +54,10 @@ const MicModeMenu: React.FC = React.memo(() => {
         <div className="input-box row">
           <input type="radio" name="visibility" checked={isAutoMode} onChange={handleAutoModeSelect} />
           <div className="label">{t('default-speaking-mode-auto-label')}</div>
-          <div style={isAutoMode ? {} : { display: 'none' }} className={styles['threshold-input-wrapper']}>
-            <div className={styles['threshold-input-wrapper']}>
+          <div style={isAutoMode ? {} : { display: 'none' }} className="flex gap-[5px] items-center">
+            <div className="flex gap-[5px] items-center">
               <input
-                className={styles['voice-threshold-input']}
+                className="relative flex-1 h-[8px] appearance-none cursor-pointer border border-border rounded-[5px] shadow-[inset_0_2px_2px_-2px_#0000001f] [&::-webkit-slider-thumb]:w-[8px] [&::-webkit-slider-thumb]:h-[20px] [&::-webkit-slider-thumb]:mt-[-10px] [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:cursor-pointer [&::-webkit-slider-thumb]:bg-[url('/channel/Thresholdslider.svg')] before:absolute before:w-full before:h-full before:content-[''] before:bg-[url('/channel/ThresholdLine.svg')] before:bg-repeat-x before:bg-[position:50%_0]"
                 type="range"
                 min="0"
                 max="100"
@@ -67,7 +65,7 @@ const MicModeMenu: React.FC = React.memo(() => {
                 style={{ background: voiceThresholdColor }}
                 onChange={handleVoiceThresholdChange}
               />
-              <div className={`${styles['voice-state-icon']} ${isActive ? styles['active'] : ''}`} />
+              <div className={`min-w-[12px] min-h-[12px] bg-[url('/channel/audioState.svg')] bg-no-repeat bg-[position:-24px_0] bg-auto ${isActive ? 'opacity-100' : 'opacity-0'}`} />
             </div>
           </div>
         </div>
