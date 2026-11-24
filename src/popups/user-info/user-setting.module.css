@@ -10,7 +10,6 @@
 
 .user-profile {
   display: flex;
-  flex: unset;
   flex-direction: column;
   justify-content: space-between;
   height: 100%;

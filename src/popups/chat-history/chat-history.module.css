@@ -6,7 +6,7 @@
 
 .header-box {
   display: flex;
-  gap: 0.77rem;
+  gap: 5px; /* The global `.row` gap used to override 0.77rem here; keep what was rendered now that globals are layered. */
   place-items: center center;
   width: 100%;
   height: 50px;

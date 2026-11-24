@@ -1,5 +1,8 @@
 {
-  "extends": ["stylelint-config-standard", "stylelint-config-recess-order"],
+  "extends": [
+    "stylelint-config-standard",
+    "stylelint-config-recess-order"
+  ],
   "rules": {
     "comment-empty-line-before": null,
     "custom-property-pattern": [
@@ -11,15 +14,66 @@
     "selector-pseudo-class-no-unknown": [
       true,
       {
-        "ignorePseudoClasses": ["global", "local", "export"]
+        "ignorePseudoClasses": [
+          "global",
+          "local",
+          "export"
+        ]
       }
     ],
     "property-no-unknown": [
       true,
       {
-        "ignoreProperties": ["composes"]
+        "ignoreProperties": [
+          "composes"
+        ]
       }
     ],
-    "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$"
+    "selector-class-pattern": "^([a-z][a-z0-9]*)(-[a-z0-9]+)*$",
+    "at-rule-no-unknown": [
+      true,
+      {
+        "ignoreAtRules": [
+          "theme",
+          "source",
+          "utility",
+          "variant",
+          "custom-variant",
+          "apply",
+          "reference",
+          "config",
+          "plugin"
+        ]
+      }
+    ],
+    "at-rule-no-deprecated": [
+      true,
+      {
+        "ignoreAtRules": [
+          "apply"
+        ]
+      }
+    ],
+    "import-notation": "string",
+    "function-no-unknown": [
+      true,
+      {
+        "ignoreFunctions": [
+          "theme",
+          "--alpha",
+          "--spacing"
+        ]
+      }
+    ],
+    "declaration-property-value-no-unknown": [
+      true,
+      {
+        "ignoreProperties": {
+          "/.+/": [
+            "/(^|\\s)(--spacing|--alpha|theme)\\(/"
+          ]
+        }
+      }
+    ]
   }
 }
