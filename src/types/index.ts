@@ -76,8 +76,6 @@ export type Message = {
 
 export type ChannelMessage = Message & Member & { type: 'general' };
 
-export type ChatHistory = Message & User & { type: 'chatHistory'; user1Id: string; user2Id: string };
-
 export type DirectMessage = Message & User & { type: 'dm'; user1Id: string; user2Id: string };
 
 export type PromptMessage = Message & { type: 'alert' | 'info' | 'warn' | 'event'; displaySeconds?: number };
@@ -318,7 +316,6 @@ export type ClientToServerEvents = {
   actionMessage: (...args: { serverId: string; channelId?: string; preset: Partial<PromptMessage> }[]) => void;
   directMessage: (...args: { targetId: string; preset: Partial<DirectMessage> }[]) => void;
   shakeWindow: (...args: { targetId: string }[]) => void;
-  chatHistory: (...args: { userId: string; targetId: string }[]) => void;
 };
 
 export type ServerToClientEvents = {
@@ -361,7 +358,6 @@ export type ServerToClientEvents = {
   actionMessage: (...args: PromptMessage[]) => void;
   directMessage: (...args: (DirectMessage & { event?: 'directMessage'; message?: DirectMessage; initialData?: unknown })[]) => void;
   shakeWindow: (...args: (DirectMessage & { event?: 'shakeWindow'; message?: DirectMessage; initialData?: unknown })[]) => void;
-  chatHistory: (...args: ChatHistory[]) => void;
   sfuJoined: (...args: { channelId: string }[]) => void;
   sfuLeft: () => void;
   sfuProducerAdd: (...args: { userId: string; producerId: string; channelId: string }[]) => void;
