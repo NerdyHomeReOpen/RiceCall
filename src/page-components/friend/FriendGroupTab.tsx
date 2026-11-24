@@ -13,8 +13,6 @@ import { useFriendGroupCtxMenu } from '@/hooks/context-menus/useFriendGroupCtxMe
 
 import FriendTab from './FriendTab';
 
-import styles from './friend.module.css';
-
 interface FriendGroupTabProps {
   friendGroup: Types.FriendGroup;
   friends: Types.Friend[];
@@ -69,12 +67,14 @@ const FriendGroupTab: React.FC<FriendGroupTabProps> = React.memo(({ friendGroup,
 
   return (
     <>
-      <div className={`${styles['friend-group-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onContextMenu={handleTabContextMenu}>
-        <div className={`${styles['toggle-icon']} ${isExpanded ? styles['expanded'] : ''}`} />
-        <div className={styles['label']}>{friendGroup.name}</div>
-        <div className={styles['friend-count-text']}>{!isStranger && !isBlacklist ? `(${onlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}</div>
+      <div className={`flex gap-[2px] items-center h-[25px] p-[5px] rounded-[3px] hover:bg-hover ${isSelected ? 'bg-selected' : ''}`} onClick={handleTabClick} onContextMenu={handleTabContextMenu}>
+        <div
+          className={`inline-block min-w-[14px] min-h-[14px] content-[''] bg-[url('/channel/channelIcon.svg')] bg-no-repeat bg-auto ${isExpanded ? 'bg-position-[-14px_0]' : 'bg-position-[0_0]'}`}
+        />
+        <div className="truncate text-text-color-secondary">{friendGroup.name}</div>
+        <div className="text-[#808080]">{!isStranger && !isBlacklist ? `(${onlineCount}/${friendGroupFriends.length})` : `(${friendGroupFriends.length})`}</div>
       </div>
-      <div className={styles['friend-list']} style={isExpanded ? {} : { display: 'none' }}>
+      <div className="ml-[20px]" style={isExpanded ? {} : { display: 'none' }}>
         {sortedFriendGroupFriends.map((friend) => (
           <FriendTab key={friend.targetId} friend={friend} />
         ))}

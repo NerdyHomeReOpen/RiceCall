@@ -15,8 +15,6 @@ import { useLoading } from '@/providers/Loading';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import styles from './home.module.css';
-
 interface RecommendServerCardProps {
   recommendServer: Types.RecommendServer;
 }
@@ -54,15 +52,15 @@ const RecommendServerCard: React.FC<RecommendServerCardProps> = React.memo(({ re
   };
 
   return (
-    <div className={styles['card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <div className={styles['card-avatar']}>
+    <div className="flex items-center w-[270px] h-[90px] p-[10px] cursor-pointer bg-background border border-border" onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
+      <div className="w-[70px] h-[70px]">
         <Image src={recommendServer.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['card-info-text']}>
-        <div className={styles['card-name-text']}>{recommendServer.name}</div>
-        <div className={styles['card-id-text']}>{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>
-        <div className={styles['card-slogan-text']}>{recommendServer.slogan}</div>
-        <div className={styles['card-online-count-text']}>
+      <div className="flex flex-1 flex-col justify-between w-full h-full ml-[10px] truncate">
+        <div className="truncate text-text-link">{recommendServer.name}</div>
+        <div className="flex items-center text-text-color-quaternary">{`ID: ${recommendServer.specialId || recommendServer.displayId}`}</div>
+        <div className="flex items-center h-[1rem] text-text-color-quaternary">{recommendServer.slogan}</div>
+        <div className="flex items-center h-[1rem] text-text-color-quaternary">
           {t('online')}: {recommendServer.online}
         </div>
       </div>

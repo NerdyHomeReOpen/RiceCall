@@ -18,8 +18,6 @@ import MainTabItem from './MainTabItem';
 
 import { DEFAULT_SERVER_AVATAR_URL, DEFAULT_USER_AVATAR_URL } from '@/constants';
 
-import styles from './header.module.css';
-
 interface HeaderProps {
   selectedTab: 'home' | 'friends' | 'server';
   onTabSelect: (tabId: 'home' | 'friends' | 'server') => void;
@@ -196,32 +194,65 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
   }, []);
 
   return (
-    <header className={styles['header']}>
-      <div className={styles['title-box']}>
-        <div className={styles['name-box']} onClick={handleNameClick}>
+    <header className="z-10 flex justify-between min-h-[40px] text-secondary-color bg-main-color bg-(image:--header-image) bg-no-repeat bg-position-[0_0] bg-cover border-none [-webkit-app-region:drag]">
+      <div className="flex flex-row gap-[5px] items-center justify-between px-[10px] before:inline-block before:min-w-[18px] before:min-h-[18px] before:content-[''] before:bg-[url('/rc_logo_small.svg')] before:bg-no-repeat before:bg-center before:bg-auto">
+        <div
+          className="max-w-[150px] max-h-[26px] px-[2px] truncate text-[0.9rem] font-bold leading-[16px] text-text-color [text-shadow:0_0_4px_#fff9] [-webkit-app-region:no-drag] cursor-pointer hover:[text-shadow:0_0_4px_#fff] hover:bg-[#ffffff1f] hover:rounded-[3px] active:[text-shadow:0_0_4px_#fff] active:bg-[#ffffff36]"
+          onClick={handleNameClick}
+        >
           {user.name}
         </div>
-        <div className={styles['status-box']} onClick={handleStatusDropdownClick}>
-          <div className={styles['status-display']} datatype={user.status} />
-          <div className={styles['status-triangle']} />
+        <div
+          className="group/status relative flex h-fit p-[2px] [-webkit-app-region:no-drag] cursor-pointer hover:[text-shadow:0_0_4px_#fff] hover:bg-[#ffffff1f] hover:rounded-[3px] active:[text-shadow:0_0_4px_#fff] active:bg-[#ffffff36]"
+          onClick={handleStatusDropdownClick}
+        >
+          <div
+            className="inline-block min-w-[13px] min-h-[13px] bg-[url('/user_state.svg')] bg-no-repeat bg-position-[0_0] [&[datatype=dnd]]:bg-position-[-13px_0] [&[datatype=idle]]:bg-position-[-26px_0] [&[datatype=gn]]:bg-position-[-39px_0]"
+            datatype={user.status}
+          />
+          <div className="inline-block min-w-[8px] min-h-[13px] ml-[5px] bg-[url('/state_triangle.svg')] bg-no-repeat bg-position-[0_4px] group-hover/status:bg-position-[-9px_4px] group-active/status:bg-position-[-18px_4px]" />
         </div>
       </div>
-      <div className={styles['tabs']}>
+      <div className="flex items-end mr-auto ml-[5%]">
         {mainTabs.map((tab) => (
           <MainTabItem key={tab.id} tab={tab} currentServerId={user.currentServerId} isSelected={selectedTab === tab.id} onTabSelect={handleTabSelect} />
         ))}
       </div>
-      <div className={styles['buttons']}>
-        <div className={styles['gift-button']} />
-        <div className={styles['game-button']} />
-        <div className={styles['notice-button']} onClick={handleNotificationMenuClick}>
-          <div className={`${styles['notice-overlay']} ${hasNotification && styles['new']}`} />
+      <div className="flex gap-[5px] items-center justify-end min-w-fit mr-[10px] [-webkit-app-region:no-drag] cursor-pointer">
+        <div className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[28px] min-h-[28px] bg-[url('/gift.svg')] hover:bg-position-[-28px_0] active:bg-position-[-56px_0]" />
+        <div className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[28px] min-h-[28px] bg-[url('/game.svg')] hover:bg-position-[-28px_0] active:bg-position-[-56px_0]" />
+        <div
+          className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[24px] min-h-[24px] bg-[url('/icon_notice.svg')] hover:bg-position-[-24px_0] active:bg-position-[-48px_0]"
+          onClick={handleNotificationMenuClick}
+        >
+          <div
+            className={`absolute inline-block min-w-[24px] min-h-[24px] cursor-pointer bg-[url('/icon_notice_overlay.svg')] bg-no-repeat bg-cover ${hasNotification ? 'bg-position-[-24px_0]' : 'bg-position-[0_0]'}`}
+          />
         </div>
-        <div className={styles['splitter']} />
-        <div className={styles['menu-button']} onClick={handleMenuClick} />
-        <div className={styles['minimize-button']} onClick={handleMinimizeBtnClick} />
-        {isFullscreen ? <div className={styles['restore-button']} onClick={handleUnmaximizeBtnClick} /> : <div className={styles['maxsize-button']} onClick={handleMaximizeBtnClick} />}
-        <div className={styles['close-button']} onClick={handleCloseBtnClick} />
+        <div className="inline-block min-w-[2px] min-h-[19px] cursor-pointer bg-[url('/mf_spliter.svg')] bg-no-repeat bg-position-[0_0] bg-cover" />
+        <div
+          className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[20px] min-h-[20px] bg-[url('/BtnMenu.svg')] hover:bg-position-[-20px_0] active:bg-position-[-40px_0]"
+          onClick={handleMenuClick}
+        />
+        <div
+          className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[20px] min-h-[20px] bg-[url('/Button_Minsize.svg')] hover:bg-position-[-20px_0] active:bg-position-[-40px_0]"
+          onClick={handleMinimizeBtnClick}
+        />
+        {isFullscreen ? (
+          <div
+            className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[20px] min-h-[20px] bg-[url('/Button_Restore.svg')] hover:bg-position-[-20px_0] active:bg-position-[-40px_0]"
+            onClick={handleUnmaximizeBtnClick}
+          />
+        ) : (
+          <div
+            className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[20px] min-h-[20px] bg-[url('/Button_Maxsize.svg')] hover:bg-position-[-20px_0] active:bg-position-[-40px_0]"
+            onClick={handleMaximizeBtnClick}
+          />
+        )}
+        <div
+          className="inline-block cursor-pointer bg-no-repeat bg-cover bg-position-[0_0] min-w-[20px] min-h-[20px] bg-[url('/Button_Close.svg')] hover:bg-position-[-20px_0] active:bg-position-[-40px_0]"
+          onClick={handleCloseBtnClick}
+        />
       </div>
     </header>
   );

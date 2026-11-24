@@ -12,8 +12,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import SearchResultItem from './SearchResultItem';
 
-import styles from './home.module.css';
-
 const ServerSearchBar: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { getIsLoading, loadServer } = useLoading();
@@ -147,21 +145,28 @@ const ServerSearchBar: React.FC = React.memo(() => {
   }, [user.userId, selectServer]);
 
   return (
-    <div className={styles['search-bar']} ref={searchRef}>
+    <div className="relative flex items-center min-w-[180px] mr-[15px] bg-background" ref={searchRef}>
       <input
         ref={inputRef}
         placeholder={t('search-server-placeholder')}
-        className={styles['search-input']}
+        className="flex-1 w-auto px-[10px] py-[5px] text-text-color-quinary border border-border rounded-[5px]"
         onFocus={handleSearchInputFocus}
         onChange={handleSearchInputChange}
         onKeyDown={handleSearchInputKeyDown}
       />
-      <div className={styles['search-clear-button']} onClick={handleClearSearchInputBtnClick} style={hasInput ? {} : { display: 'none' }} />
-      <div className={styles['search-icon']} style={hasInput ? {} : { display: 'none' }} />
-      <div className={styles['dropdown']} style={hasResults ? {} : { display: 'none' }}>
+      <div
+        className="absolute right-[5px] flex w-[13px] h-[13px] cursor-pointer bg-background bg-[url('/channel/searchCancel.svg')] bg-position-[0_0] bg-auto hover:bg-position-[-13px_0] active:bg-position-[-26px_0]"
+        onClick={handleClearSearchInputBtnClick}
+        style={hasInput ? {} : { display: 'none' }}
+      />
+      <div className="absolute right-[5px] block w-[16px] h-[16px] bg-background bg-[url('/icon_search.svg')] bg-position-[0_0] bg-auto" style={hasInput ? {} : { display: 'none' }} />
+      <div
+        className="absolute top-full right-0 left-0 z-10000 w-[220px] max-h-[400px] mt-[4px] overflow-y-auto bg-background rounded-[3px] shadow-box-shadow [&::-webkit-scrollbar]:w-0"
+        style={hasResults ? {} : { display: 'none' }}
+      >
         {exactMatch && (
           <>
-            <div className={`${styles['dropdown-header-text']} ${styles['exact-match']}`} style={exactMatch ? {} : { display: 'none' }}>
+            <div className="block items-center w-full p-[10px] truncate bg-hover" style={exactMatch ? {} : { display: 'none' }}>
               {t('quick-enter-server', { '0': queryRef.current })}
             </div>
             <SearchResultItem key={exactMatch.serverId} server={exactMatch} onServerSelect={handleServerSelect} />
@@ -169,7 +174,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
         )}
         {personalResults.length > 0 && (
           <>
-            <div className={styles['dropdown-header-text']}>{t('personal-exclusive')}</div>
+            <div className="block items-center w-full p-[10px] truncate">{t('personal-exclusive')}</div>
             {personalResults.map((server) => (
               <SearchResultItem key={server.serverId} server={server} onServerSelect={handleServerSelect} />
             ))}
@@ -177,7 +182,7 @@ const ServerSearchBar: React.FC = React.memo(() => {
         )}
         {relatedResults.length > 0 && (
           <>
-            <div className={styles['dropdown-header-text']}>{t('related-search')}</div>
+            <div className="block items-center w-full p-[10px] truncate">{t('related-search')}</div>
             {relatedResults.map((server) => (
               <SearchResultItem key={server.serverId} server={server} onServerSelect={handleServerSelect} />
             ))}

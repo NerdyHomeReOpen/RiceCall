@@ -16,8 +16,6 @@ import LevelIcon from '@/components/level-icon';
 
 import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 
-import styles from './friend.module.css';
-
 const FriendPageHeader: React.FC = React.memo(() => {
   const { t } = useTranslation();
   const { showEmojiPicker } = useContextMenu();
@@ -84,25 +82,28 @@ const FriendPageHeader: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={styles['user-avatar']} datatype="">
+      <div
+        className="relative w-[40px] h-[40px] before:absolute before:-top-px before:-left-px before:z-1 before:content-[''] before:bg-[url('/win_border.svg')] before:bg-no-repeat before:bg-position-[0_0] before:bg-cover before:min-w-[42px] before:min-h-[42px] after:min-w-[13px] after:min-h-[13px] after:absolute after:right-0 after:bottom-0 after:inline-block after:content-[''] after:bg-[url('/user_state.svg')] after:bg-no-repeat after:bg-position-[0_0] [&[datatype='']]:after:bg-none [&[datatype=dnd]]:after:bg-position-[-13px_0] [&[datatype=idle]]:after:bg-position-[-26px_0] [&[datatype=gn]]:after:bg-position-[-39px_0]"
+        datatype=""
+      >
         <Image src={user.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['user-info']}>
-        <div className={styles['user-info-row']}>
-          <div className={styles['level-icon']} />
+      <div className="flex flex-col justify-between h-[40px] overflow-hidden">
+        <div className="flex gap-[2px] items-center">
+          <div className="min-w-[16px] min-h-[16px] bg-[url('/im/LV.svg')] bg-no-repeat bg-position-[0_0] bg-auto" />
           <LevelIcon level={user.level} xp={user.xp} requiredXp={user.requiredXp} showTooltip={true} />
-          <div className={styles['wealth-icon']} />
-          <div className={styles['wealth-value-text']}>{userWealth}</div>
+          <div className="min-w-[16px] min-h-[16px] ml-[20px] bg-[url('/silver_pea.svg')] bg-no-repeat bg-cover border-none" />
+          <div className="text-text-color-quaternary text-left">{userWealth}</div>
           {userHasVip && <div className={`vip-icon vip-${user.vip}`} />}
         </div>
-        <div className={styles['user-info-row']}>
+        <div className="flex gap-[2px] items-center">
           <BadgeList badges={userBadges} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
       </div>
-      <div className={styles['user-signature']}>
+      <div className="group/signature flex gap-[5px] items-center w-[60%] h-[40px] px-[5px] py-[2px] ml-[100px] border border-[#fff0] focus-within:border-border focus-within:rounded-[3px]">
         <textarea
           ref={signatureInputRef}
-          className={styles['signature-input']}
+          className="z-1 flex flex-wrap items-center justify-start w-full h-full resize-none empty:before:block empty:before:pointer-events-none empty:before:content-[attr(data-placeholder-text)]"
           defaultValue={user.signature}
           maxLength={100}
           placeholder={t('signature-placeholder')}
@@ -111,7 +112,10 @@ const FriendPageHeader: React.FC = React.memo(() => {
           onCompositionStart={handleSignatureInputCompositionStart}
           onCompositionEnd={handleSignatureInputCompositionEnd}
         />
-        <div className={styles['emoji-button']} onMouseDown={handleEmojiPickerClick} />
+        <div
+          className="hidden group-focus-within/signature:flex w-[18px] h-[18px] bg-no-repeat bg-center bg-contain before:block before:min-w-[18px] before:min-h-[18px] before:cursor-pointer before:content-[''] before:bg-[url('/channel/FaceButton.svg')] before:bg-no-repeat before:bg-position-[0_0] hover:before:bg-position-[-18px_0] active:before:bg-position-[-36px_0]"
+          onMouseDown={handleEmojiPickerClick}
+        />
       </div>
     </>
   );

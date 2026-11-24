@@ -25,8 +25,6 @@ import { getDefaultFriendGroup } from '@/utils/default';
 
 import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 
-import styles from './friend.module.css';
-
 interface FriendTabProps {
   friend: Types.Friend;
 }
@@ -95,31 +93,36 @@ const FriendTab: React.FC<FriendTabProps> = React.memo(({ friend }) => {
   }, [friend.targetId, friend.isBlocked, friend.shareCurrentServer, friend.currentServerId, isFriend]);
 
   return (
-    <div className={`${styles['friend-tab']} ${isSelected ? styles['selected'] : ''}`} onClick={handleTabClick} onDoubleClick={handleTabDoubleClick} onContextMenu={handleTabContextMenu}>
+    <div
+      className={`relative flex gap-[5px] items-center justify-start p-[5px] rounded-[3px] ${isSelected ? 'bg-selected' : 'hover:bg-hover'}`}
+      onClick={handleTabClick}
+      onDoubleClick={handleTabDoubleClick}
+      onContextMenu={handleTabContextMenu}
+    >
       <div
-        className={styles['friend-tab-avatar']}
+        className="relative w-[40px] h-[40px] before:absolute before:-top-px before:-left-px before:z-1 before:content-[''] before:bg-[url('/win_border.svg')] before:bg-no-repeat before:bg-position-[0_0] before:bg-cover before:w-[42px] before:h-[42px] after:w-[13px] after:h-[13px] after:absolute after:right-0 after:bottom-0 after:inline-block after:content-[''] after:bg-[url('/user_state.svg')] after:bg-no-repeat after:bg-position-[0_0] [&[datatype='']]:after:bg-none [&[datatype=dnd]]:after:bg-position-[-13px_0] [&[datatype=idle]]:after:bg-position-[-26px_0] [&[datatype=gn]]:after:bg-position-[-39px_0]"
         style={{ filter: isFriend && !isOffline && !friend.isBlocked ? '' : 'grayscale(100%)' }}
         datatype={isFriend && !isOnline && !isOffline && !friend.isBlocked ? friend.status : ''}
       >
         <Image src={friend.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="friend_avatar" width={40} height={40} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['base-info']}>
-        <div className={styles['detail-row']}>
+      <div className="flex flex-col justify-between h-[40px] overflow-hidden">
+        <div className="flex gap-[2px] items-center">
           {hasVip && <div className={`vip-icon vip-${friend.vip}`} />}
-          <div className={`${styles['friend-tab-name-text']} ${hasVip ? styles['vip'] : ''}`}>
+          <div className={`truncate font-bold ${hasVip ? 'text-text-vip-name' : ''}`}>
             {friend.note || friend.name} {hasNote ? `(${friend.name})` : ''}
           </div>
           <LevelIcon level={friend.level} xp={friend.xp} requiredXp={friend.requiredXp} showTooltip={false} />
           <BadgeList badges={JSON.parse(friend.badges)} position="left-bottom" direction="right-bottom" maxDisplay={5} />
         </div>
-        {isPending && <div className={styles['signature-text']}>{`(${t('pending')})`}</div>}
+        {isPending && <div className="max-w-full min-h-[18px] truncate text-text-color-quaternary select-none">{`(${t('pending')})`}</div>}
         {displayedServer && (
-          <div className={`${styles['detail-row']} ${styles['has-server']}`} onClick={handleServerNameClick}>
-            <div className={styles['location-icon']} />
-            <div className={styles['server-name-text']}>{displayedServer.name}</div>
+          <div className="flex gap-[2px] items-center cursor-pointer" onClick={handleServerNameClick}>
+            <div className="w-[16px] h-[18px] content-[''] bg-[url('/mylocation.svg')] bg-no-repeat bg-center bg-auto" />
+            <div className="min-h-[18px] truncate leading-[18px] text-[#3a9abe]">{displayedServer.name}</div>
           </div>
         )}
-        {isSignatureVisible && <div className={styles['signature-text']}>{friend.signature}</div>}
+        {isSignatureVisible && <div className="max-w-full min-h-[18px] truncate text-text-color-quaternary select-none">{friend.signature}</div>}
       </div>
     </div>
   );

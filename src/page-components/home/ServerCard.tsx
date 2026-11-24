@@ -15,8 +15,6 @@ import { useLoading } from '@/providers/Loading';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import styles from './home.module.css';
-
 interface ServerCardProps {
   server: Types.Server;
 }
@@ -55,14 +53,16 @@ const ServerCard: React.FC<ServerCardProps> = React.memo(({ server }) => {
   };
 
   return (
-    <div className={styles['card']} onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
-      <div className={styles['card-avatar']}>
+    <div className="flex items-center w-[270px] h-[90px] p-[10px] cursor-pointer bg-background border border-border" onClick={handleServerCardClick} onContextMenu={handleServerCardContextMenu}>
+      <div className="w-[70px] h-[70px]">
         <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={70} height={70} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['card-info-text']}>
-        <div className={styles['card-name-text']}>{server.name}</div>
-        <div className={`${styles['card-id-text']} ${isOwned ? styles['is-owner'] : ''}`}>{`ID: ${server.specialId || server.displayId}`}</div>
-        <div className={styles['card-slogan-text']}>{server.slogan}</div>
+      <div className="flex flex-1 flex-col justify-between w-full h-full ml-[10px] truncate">
+        <div className="truncate text-text-link">{server.name}</div>
+        <div
+          className={`flex items-center text-text-color-quaternary ${isOwned ? "before:block before:w-[13px] before:h-[15px] before:mr-[2px] before:content-[''] before:bg-[url('/icon_creator.svg')] before:bg-position-[0_0] before:bg-contain" : ''}`}
+        >{`ID: ${server.specialId || server.displayId}`}</div>
+        <div className="flex items-center h-[1rem] text-text-color-quaternary">{server.slogan}</div>
       </div>
     </div>
   );

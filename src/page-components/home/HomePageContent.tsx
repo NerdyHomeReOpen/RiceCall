@@ -11,8 +11,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import ServerList from './ServerList';
 
-import styles from './home.module.css';
-
 interface HomePageContentProps {
   onAnnouncementSelect: (announcement: Types.Announcement) => void;
 }
@@ -61,49 +59,67 @@ const HomePageContent: React.FC<HomePageContentProps> = React.memo(({ onAnnounce
 
   return (
     <>
-      <div className={styles['banner-wrapper']}>
-        <div className={styles['banner-container']}>
-          <div ref={containerRef} className={styles['banner-list']}>
+      <div className="w-full max-w-[900px]">
+        <div className="group/banner relative flex aspect-[3/1] overflow-hidden rounded-[5px] transition-all duration-200 ease-[ease-in-out] hover:shadow-[0_0_5px_0_#0000003f] hover:transform-[scale(1.01)]">
+          <div ref={containerRef} className="flex flex-row w-full h-full overflow-x-auto scroll-smooth snap-x snap-mandatory [&::-webkit-scrollbar]:hidden">
             {sortedAnnouncements.length > 0 ? (
               sortedAnnouncements.map((ann) =>
                 ann.attachmentUrl ? (
-                  <div key={ann.announcementId} className={styles['banner']} onClick={() => onAnnouncementSelect(ann)}>
+                  <div
+                    key={ann.announcementId}
+                    className="relative flex flex-col items-center justify-center w-full aspect-[3/1] font-[arial,sans-serif] text-[36px] font-black text-text-color-tertiary text-center bg-[#e6f1f9] bg-no-repeat bg-center bg-contain"
+                    onClick={() => onAnnouncementSelect(ann)}
+                  >
                     <Image src={ann.attachmentUrl} alt="announcement_attachment" width={100} height={100} loading="lazy" draggable="false" />
                   </div>
                 ) : (
-                  <div key={ann.announcementId} className={styles['banner']} onClick={() => onAnnouncementSelect(ann)}>
+                  <div
+                    key={ann.announcementId}
+                    className="relative flex flex-col items-center justify-center w-full aspect-[3/1] font-[arial,sans-serif] text-[36px] font-black text-text-color-tertiary text-center bg-[#e6f1f9] bg-no-repeat bg-center bg-contain"
+                    onClick={() => onAnnouncementSelect(ann)}
+                  >
                     <Image loading="lazy" src="/ricecall_logo.svg" alt="ricecall logo" height={80} width={-1} />
                     <span>{ann.title}</span>
                   </div>
                 ),
               )
             ) : (
-              <div className={styles['banner']}>
+              <div className="relative flex flex-col items-center justify-center w-full aspect-[3/1] font-[arial,sans-serif] text-[36px] font-black text-text-color-tertiary text-center bg-[#e6f1f9] bg-no-repeat bg-center bg-contain">
                 <Image loading="lazy" src="/ricecall_logo.svg" alt="ricecall logo" height={80} width={-1} />
               </div>
             )}
           </div>
           {sortedAnnouncements.length > 0 && (
             <>
-              <div className={styles['number-list']}>
+              <div className="absolute bottom-[5px] left-1/2 flex gap-[8px] px-[10px] py-[5px] rounded-[10px] transform-[translate(-50%)] transition-all duration-200 ease-[ease-in-out]">
                 {sortedAnnouncements.map((_, index) => (
-                  <nav key={index} className={`${index === selectedAnnIndex ? styles['active'] : ''}`} onClick={() => setSelectedAnnIndex(index)} />
+                  <nav
+                    key={index}
+                    className={`flex items-center justify-center h-[8px] aspect-square text-white border-none rounded-[4px] transition-all duration-200 ease-[ease-in-out] ${index === selectedAnnIndex ? 'w-[16px] bg-white shadow-[0_0_5px_0_#0000003f]' : 'w-[8px] bg-[#0006] hover:bg-[#000000b3]'}`}
+                    onClick={() => setSelectedAnnIndex(index)}
+                  />
                 ))}
               </div>
-              <nav className={`${styles['nav']} ${styles['prev-button']}`} onClick={handlePrevAnnBtnClick}>
+              <nav
+                className="absolute top-1/2 z-10 flex items-center justify-center w-[30px] h-[30px] p-[10px] text-[10px] text-white cursor-pointer bg-[#0006] border-none rounded-[10px] transition-all duration-200 ease-[ease-in-out] hover:bg-[#000000b3] group-hover/banner:transform-[translateX(0)] left-[10px] transform-[translateX(-100px)]"
+                onClick={handlePrevAnnBtnClick}
+              >
                 {'◀'}
               </nav>
-              <nav className={`${styles['nav']} ${styles['next-button']}`} onClick={handleNextAnnBtnClick}>
+              <nav
+                className="absolute top-1/2 z-10 flex items-center justify-center w-[30px] h-[30px] p-[10px] text-[10px] text-white cursor-pointer bg-[#0006] border-none rounded-[10px] transition-all duration-200 ease-[ease-in-out] hover:bg-[#000000b3] group-hover/banner:transform-[translateX(0)] right-[10px] transform-[translateX(100px)]"
+                onClick={handleNextAnnBtnClick}
+              >
                 {'▶'}
               </nav>
             </>
           )}
         </div>
       </div>
-      <div className={styles['wrapper']}>
+      <div className="w-full max-w-[900px]">
         <ServerList title={t('recommend-server')} servers={filteredRecommendServers} />
       </div>
-      <div className={styles['wrapper']}>
+      <div className="w-full max-w-[900px]">
         <ServerList title={t('official-server')} servers={filteredOfficialServers} />
       </div>
     </>

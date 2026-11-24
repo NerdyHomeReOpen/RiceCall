@@ -9,8 +9,6 @@ import { getFormatTimeDiff } from '@/utils/language';
 
 import { DEFAULT_USER_AVATAR_URL } from '@/constants';
 
-import styles from './friend.module.css';
-
 interface FriendActivityProps {
   friendActivity: Types.FriendActivity;
 }
@@ -23,19 +21,19 @@ const FriendActivity: React.FC<FriendActivityProps> = React.memo(({ friendActivi
   };
 
   return (
-    <div className={styles['friend-activity-item']}>
-      <div className={styles['friend-activity-avatar']}>
+    <div className="flex flex-row gap-[10px] items-center w-full">
+      <div className="w-[30px] h-[30px]">
         <Image src={friendActivity.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="friend_avatar" width={30} height={30} loading="lazy" draggable="false" />
       </div>
-      <div className={styles['friend-activity-content']}>
-        <div className={styles['friend-activity-content-top']}>
-          {hasVip && <div className={`vip-icon vip-${friendActivity.vip}`} />}
-          <div className={styles['name-text']} onClick={handleUserNameClick}>
+      <div className="flex flex-1 flex-col justify-between w-full overflow-hidden">
+        <div className="flex flex-row gap-[3px] items-center justify-between w-full min-w-0">
+          {hasVip && <div className={`vip-icon vip-${friendActivity.vip} shrink-0`} />}
+          <div className="shrink-0 truncate text-text-username cursor-pointer hover:underline" onClick={handleUserNameClick}>
             {friendActivity.name}
           </div>
-          <div className={styles['timestamp-text']}>{getFormatTimeDiff(friendActivity.occurredAt)}</div>
+          <div className="shrink-0 ml-auto text-text-color-quinary">{getFormatTimeDiff(friendActivity.occurredAt)}</div>
         </div>
-        <div className={styles['friend-activity-content-bottom']}>{friendActivity.content}</div>
+        <div className="max-w-full min-h-[18px] truncate text-text-color-quaternary select-text">{friendActivity.content}</div>
       </div>
     </div>
   );

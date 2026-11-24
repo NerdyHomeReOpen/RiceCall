@@ -8,8 +8,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import ServerList from './ServerList';
 
-import styles from './home.module.css';
-
 const HomePagePersonalExclusive: React.FC = React.memo(() => {
   const { t } = useTranslation();
 
@@ -21,7 +19,7 @@ const HomePagePersonalExclusive: React.FC = React.memo(() => {
 
   return (
     <>
-      <div className={styles['wrapper']}>
+      <div className="w-full max-w-[900px]">
         <ServerList title={t('recent-servers')} servers={recentServers} />
         <ServerList title={t('my-servers')} servers={ownedServers} />
         <ServerList title={t('favorited-servers')} servers={favoriteServers} />
