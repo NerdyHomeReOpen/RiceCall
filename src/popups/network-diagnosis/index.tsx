@@ -338,7 +338,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   if (!isElectron()) {
     return (
       <div className="popup-wrapper">
-        <div className="'popup-body flex flex-col gap-[20px] items-center justify-center h-full">
+        <div className="popup-body flex flex-col gap-[20px] items-center justify-center h-full">
           <div className="text-[1.2rem] font-bold text-[#555]">{t('app-only-feature')}</div>
         </div>
         <div className="popup-footer">

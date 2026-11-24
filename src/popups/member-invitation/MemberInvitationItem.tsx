@@ -46,8 +46,12 @@ const MemberInvitationItem: React.FC<MemberInvitationItemProps> = React.memo(({ 
           </div>
           <div className="row" style={{ alignSelf: 'flex-end' }}>
             <div className="flex items-center justify-end min-w-max h-[28px] cursor-pointer">
-              <div onClick={handleAcceptBtnClick}>{t('accept')}</div>
-              <div onClick={handleRejectBtnClick}>{t('reject')}</div>
+              <div className="flex items-center justify-center h-[23px] p-[3px] mb-[2px] bg-background border border-border hover:bg-hover active:bg-selected" onClick={handleAcceptBtnClick}>
+                {t('accept')}
+              </div>
+              <div className="flex items-center justify-center h-[23px] p-[3px] mb-[2px] bg-background border border-border hover:bg-hover active:bg-selected" onClick={handleRejectBtnClick}>
+                {t('reject')}
+              </div>
             </div>
           </div>
         </div>

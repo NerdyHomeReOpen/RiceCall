@@ -15,8 +15,6 @@ import MarkdownContent from '@/components/markdown-content';
 
 import { getFormatDate } from '@/utils/language';
 
-import styles from './home.module.css';
-
 interface HomePageProps {
   display: boolean;
 }
@@ -53,13 +51,13 @@ const HomePageComponent: React.FC<HomePageProps> = React.memo(({ display }) => {
   return (
     <main className="flex flex-col w-full min-w-0 h-full min-h-0" style={display ? {} : { display: 'none' }}>
       <div
-        className={`${styles['announcement-detail-wrapper']} absolute top-0 left-0 z-10000 flex items-center justify-center w-full h-full bg-[#00000080]`}
+        className={`animate-visibility absolute top-0 left-0 z-10000 flex items-center justify-center w-full h-full bg-[#00000080]`}
         style={selectedAnn ? {} : { display: 'none' }}
         onClick={() => setSelectedAnn(null)}
       >
         {selectedAnn && (
           <div
-            className={`${styles['announcement-detail-container']} flex flex-col w-[60%] h-[80%] px-[10px] overflow-y-auto bg-background border border-border rounded-[5px] shadow-[0_1px_1px_#00000080]`}
+            className={`animate-fade-in flex flex-col w-[60%] h-[80%] px-[10px] overflow-y-auto bg-background border border-border rounded-[5px] shadow-[0_1px_1px_#00000080]`}
             onClick={(e) => e.stopPropagation()}
           >
             <div className="sticky top-0 z-100 flex flex-row gap-[10px] items-center justify-start py-[10px] text-[1.2rem] font-bold bg-background border-b border-b-border">

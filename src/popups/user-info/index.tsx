@@ -444,7 +444,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
             </div>
             <div className="input-box col">
               <div className="label">{t('signature')}</div>
-              <div>
+              <div className="relative flex items-center">
                 <input
                   ref={signatureInputRef}
                   name="signature"
@@ -454,7 +454,10 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
                   onChange={handleSignatureChange}
                   style={{ paddingRight: '28px', width: '100%' }}
                 />
-                <div onMouseDown={handleEmojiPickerClick} />
+                <div
+                  className="absolute right-[5px] w-[18px] h-[18px] cursor-pointer bg-[url('/channel/FaceButton.svg')] bg-no-repeat bg-position-[0_0] hover:bg-position-[-18px_0] active:bg-position-[-36px_0]"
+                  onMouseDown={handleEmojiPickerClick}
+                />
               </div>
             </div>
             <div className="input-box col">

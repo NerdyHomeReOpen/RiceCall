@@ -32,8 +32,6 @@ import UnreadMessageAlert from '@/components/unread-message-alert';
 
 import { getFormatTimeFromSecond } from '@/utils/language';
 
-import styles from './server.module.css';
-
 const VOICE_MODE_TEXT_KEYS: Record<Types.Channel['voiceMode'], string> = { free: 'free-speech', admin: 'admin-speech', queue: 'queue-speech' };
 
 const ServerPageContent: React.FC = React.memo(() => {
@@ -376,7 +374,7 @@ const ServerPageContent: React.FC = React.memo(() => {
         <MicButton />
         <div className="flex gap-[10px] items-center justify-between">
           <div
-            className={`flex items-center text-text-color-quaternary cursor-pointer before:min-w-[18px] before:min-h-[18px] before:content-[''] before:bg-[url('/channel/music_bkg.svg')] before:bg-no-repeat ${isMixModeActive ? `before:bg-[position:-18px_0] ${styles['mixing-animation']}` : 'before:bg-[position:0_0]'}`}
+            className={`flex items-center text-text-color-quaternary cursor-pointer before:min-w-[18px] before:min-h-[18px] before:content-[''] before:bg-[url('/channel/music_bkg.svg')] before:bg-no-repeat ${isMixModeActive ? `before:bg-[position:-18px_0] before:animate-mixing` : 'before:bg-[position:0_0]'}`}
             onClick={handleMixingBtnClick}
             title={isMixModeActive ? t('mixing-on') : t('mixing-off')}
           >

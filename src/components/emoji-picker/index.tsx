@@ -146,8 +146,8 @@ const EmojiPicker: React.FC<EmojiPickerProps> = React.memo(
         {showFontbar && (
           <div className="flex gap-[5px] items-center h-[34px] pt-[10px] pl-[10px]">
             <div className="flex-[0_0_12px] w-[12px] h-[12px] mr-[8px] ml-[10px] bg-[url('/channel/FontButton.svg')] bg-no-repeat bg-center bg-contain" aria-hidden="true" />
-            <div className="select-box">
-              <div className="select-box">
+            <div className="select-box w-[65px]!">
+              <div className="select-box w-full">
                 <select value={fontSize} onChange={handleFontSizeChange}>
                   {Array.from({ length: 17 }, (_, i) => (
                     <option key={i} value={`${i + 8}px`}>
