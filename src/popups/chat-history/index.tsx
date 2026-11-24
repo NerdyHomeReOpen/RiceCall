@@ -17,8 +17,6 @@ import MarkdownContent from '@/components/markdown-content';
 import { getDefaultFriendGroup } from '@/utils/default';
 import { getFormatDate } from '@/utils/language';
 
-import styles from './chat-history.module.css';
-
 type ChatHistoryPopupProps = Types.PopupProps<'chatHistory'>;
 
 type HistorySource = 'direct' | 'channel';
@@ -150,8 +148,8 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
     <div className="popup-wrapper">
       <div className="popup-body">
         <div className="popup-content col">
-          <div className={`${styles['header-box']} row`}>
-            <div className={styles['select-wrapper']}>
+          <div className="flex gap-[5px] place-items-center w-full h-[50px] p-[10px] bg-[#f7f7f7] border-b border-[#d6d6d6] row">
+            <div className="flex flex-row gap-[1rem]">
               <div className="select-box" style={{ maxWidth: '100px', minWidth: '0' }}>
                 <select className="select" value={source} onChange={handleSourceChange}>
                   <option value="direct">{t('chat-history-current-contact')}</option>
@@ -168,17 +166,26 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
                 </select>
               </div>
             </div>
-            <div className={styles['search-wrapper']}>
-              <span className={styles['search-title']}>{t('chat-history-keyword')}</span>
-              <div className={`${styles['search-input-box']} input-box col`}>
-                <input type="text" value={keywordInput} onChange={handleKeywordInputChange} onKeyDown={handleKeywordKeyDown} />
-                <div className={styles['search-icon']} onClick={handleSearch} />
+            <div className="flex flex-row place-items-center">
+              <span className="flex items-center w-[80px] h-[25px]">{t('chat-history-keyword')}</span>
+              <div className="group flex items-center bg-background border border-border shadow-box-shadow input-box col">
+                <input
+                  type="text"
+                  className="[background-color:unset]! [border:unset]! [box-shadow:unset]!"
+                  value={keywordInput}
+                  onChange={handleKeywordInputChange}
+                  onKeyDown={handleKeywordKeyDown}
+                />
+                <div
+                  className="w-[16px] h-[16px] mr-[0.5rem] cursor-pointer bg-[url('/icon_search.png')] bg-no-repeat bg-position-[0_0] bg-auto group-hover:bg-position-[-16px_0] group-hover:active:bg-position-[-33px_0]"
+                  onClick={handleSearch}
+                />
               </div>
             </div>
           </div>
-          <div className={styles['body-box']}>
-            <div className={styles['body-left']}>
-              <div className={styles['friend-group-box']}>
+          <div className="flex w-full h-[calc(100vh-80px)] bg-[#fcfcfc]">
+            <div className="flex-[unset] w-[250px] h-full min-h-[467.34px] overflow-auto border-r border-[#d6d6d6]">
+              <div className="flex flex-col">
                 {[...sortedFriendGroups, blacklistGroup].map((friendGroup) => (
                   <ContactGroup
                     key={friendGroup.friendGroupId}
@@ -191,21 +198,23 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
                 ))}
               </div>
             </div>
-            <div className={styles['body-right']}>
-              <div className={styles['main']}>
-                <div className={styles['main-title']}>{title}</div>
+            <div className="flex flex-col w-full h-full">
+              <div className="flex items-center justify-between w-full h-[33px] bg-[#fafcff] border-b border-[#d6d6d6]">
+                <div className="ml-[0.8rem]">{title}</div>
                 {/* Deleting a shared conversation for one side is not designed yet. */}
-                <div className={`${styles['delete-button-container']} ${styles['disabled']}`} title={t('soon')}>
-                  <div className={styles['delete-icon']} />
-                  <div className={styles['delete-button-text']}>{t('chat-history-delete')}</div>
+                <div className="flex items-center justify-between w-[80px] h-[22px] p-[2px] mr-[0.5rem] cursor-not-allowed opacity-50 border border-[#b1b1b1] hover:bg-[#eee]" title={t('soon')}>
+                  <div className="w-[16px] h-[16px] bg-[url('/Delete_ico.png')] bg-auto" />
+                  <div>{t('chat-history-delete')}</div>
                 </div>
               </div>
-              <div className={styles['body-right-bottom']}>
-                {messageDays.length === 0 && <div className={styles['empty']}>{t('chat-history-empty')}</div>}
+              <div className="flex flex-1 flex-col items-center pt-[0.7rem] overflow-y-auto">
+                {messageDays.length === 0 && <div className="p-[1rem] text-[#888]">{t('chat-history-empty')}</div>}
                 {messageDays.map((day) => (
                   <React.Fragment key={day.date}>
-                    <div className={styles['message-date']}>{t('chat-history-date', { 0: day.date })}</div>
-                    <div className={styles['message-section']}>
+                    <div className="flex items-end w-[95%] h-[40px] pb-[0.5rem] font-bold text-[rgb(0_106_209)] bg-[linear-gradient(#fff_0%,#f4f7fc_100%)] border-b border-[#b6cedc]">
+                      {t('chat-history-date', { 0: day.date })}
+                    </div>
+                    <div className="flex flex-col gap-[0.5rem] items-center w-full py-[10px] px-0">
                       {day.messages.map((message) => (
                         <HistoryMessageItem key={message.messageId} message={message} isSelected={selectedMessageId === message.messageId} onSelect={setSelectedMessageId} />
                       ))}
@@ -213,26 +222,41 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
                   </React.Fragment>
                 ))}
               </div>
-              <div className={styles['pagination-wrapper']}>
-                <span className={styles['page-index']}>
+              <div className="flex shrink-0 gap-[5px] items-center h-[40px] py-[5px] px-[10px] bg-[rgb(244_247_252)] border-t border-[#d6d6d6]">
+                <span className="text-center">
                   {page}/{totalPages}
                 </span>
-                <div className={styles['spacer']} />
-                <button className={`${styles['page-button']} ${styles['first']} ${page === 1 ? styles['disabled'] : ''}`} onClick={() => changePage(1)} disabled={page === 1} />
-                <button className={`${styles['page-button']} ${styles['prev']} ${page === 1 ? styles['disabled'] : ''}`} onClick={() => changePage(page - 1)} disabled={page === 1} />
+                <div className="flex-1" />
+                <button
+                  className={`w-[11px] h-[11px] p-0 m-[0.5rem] cursor-pointer [background-color:unset] bg-[url('/btn_turn_page.png')] bg-no-repeat bg-auto border-none ${page === 1 ? 'bg-position-[-44px_0]' : 'bg-position-[0_0]'}`}
+                  onClick={() => changePage(1)}
+                  disabled={page === 1}
+                />
+                <button
+                  className={`w-[11px] h-[11px] p-0 m-[0.5rem] cursor-pointer [background-color:unset] bg-[url('/btn_turn_page.png')] bg-no-repeat bg-auto border-none ${page === 1 ? 'bg-position-[-55px_0]' : 'bg-position-[-11px_0]'}`}
+                  onClick={() => changePage(page - 1)}
+                  disabled={page === 1}
+                />
                 {pageLinks.map((pageLink) => (
-                  <label key={pageLink} className={`${styles['radio-wrapper']} ${page === pageLink ? styles['selected'] : ''}`}>
+                  <label
+                    key={pageLink}
+                    className={`flex items-center justify-center w-[3.5rem] h-[1.9rem] mx-[0.2rem] text-center cursor-pointer [&_input[type='radio']]:hidden ${page === pageLink ? 'bg-[#006ad1]' : 'hover:bg-[#c2c2c2]'}`}
+                  >
                     <input type="radio" name="page" checked={page === pageLink} onChange={() => changePage(pageLink)} />
                     {pageLink}
                   </label>
                 ))}
-                <button className={`${styles['page-button']} ${styles['next']} ${page === totalPages ? styles['disabled'] : ''}`} onClick={() => changePage(page + 1)} disabled={page === totalPages} />
                 <button
-                  className={`${styles['page-button']} ${styles['last']} ${page === totalPages ? styles['disabled'] : ''}`}
+                  className={`w-[11px] h-[11px] p-0 m-[0.5rem] cursor-pointer [background-color:unset] bg-[url('/btn_turn_page.png')] bg-no-repeat bg-auto border-none ${page === totalPages ? 'bg-position-[-66px_0]' : 'bg-position-[-22px_0]'}`}
+                  onClick={() => changePage(page + 1)}
+                  disabled={page === totalPages}
+                />
+                <button
+                  className={`w-[11px] h-[11px] p-0 m-[0.5rem] cursor-pointer [background-color:unset] bg-[url('/btn_turn_page.png')] bg-no-repeat bg-auto border-none ${page === totalPages ? 'bg-position-[-77px_0]' : 'bg-position-[-33px_0]'}`}
                   onClick={() => changePage(totalPages)}
                   disabled={page === totalPages}
                 />
-                <div className={styles['spacer']} />
+                <div className="flex-1" />
               </div>
             </div>
           </div>
@@ -270,19 +294,31 @@ const ContactGroup: React.FC<ContactGroupProps> = React.memo(({ friendGroup, con
   };
 
   return (
-    <div className={styles['friend-group-list']}>
-      <div className={styles['friend-group']} onClick={handleTabClick}>
+    <div className="flex flex-col">
+      <div className="flex gap-[2px] items-center h-[25px] p-[5px] cursor-pointer rounded-[3px]" onClick={handleTabClick}>
         <div>{friendGroup.name}</div>
         <div>{`(${groupContacts.length})`}</div>
       </div>
       {isExpanded &&
         groupContacts.map((friend) => (
-          <div key={friend.targetId} className={`${styles['friend-info-box']} ${selectedUserId === friend.targetId ? styles['selected'] : ''}`} onClick={() => onSelect(friend.targetId)}>
-            <div className={styles['avatar-box']}>
-              <div className={styles['avatar-border']} />
-              <Image className={styles['avatar']} src={friend.avatarUrl || DEFAULT_USER_AVATAR_URL} alt={friend.name} width={30} height={30} loading="lazy" draggable="false" />
+          <div
+            key={friend.targetId}
+            className={`relative flex gap-[5px] items-center justify-start py-[5px] pr-[10px] pl-[50px] rounded-[3px] hover:bg-hover ${selectedUserId === friend.targetId ? 'bg-selected' : ''}`}
+            onClick={() => onSelect(friend.targetId)}
+          >
+            <div className="flex">
+              <div className="absolute z-1 w-[30px] h-[30px] bg-[url('/win_border.png')] bg-no-repeat bg-center bg-cover" />
+              <Image
+                className="relative min-w-[30px] min-h-[30px] object-cover bg-[url('/im/SecretaryLogo.png')] bg-no-repeat bg-center bg-cover"
+                src={friend.avatarUrl || DEFAULT_USER_AVATAR_URL}
+                alt={friend.name}
+                width={30}
+                height={30}
+                loading="lazy"
+                draggable="false"
+              />
             </div>
-            <div className={styles['name']}>{friend.note || friend.name}</div>
+            <div className="overflow-hidden text-ellipsis whitespace-nowrap">{friend.note || friend.name}</div>
           </div>
         ))}
     </div>
@@ -307,12 +343,15 @@ const HistoryMessageItem: React.FC<HistoryMessageItemProps> = React.memo(({ mess
     .join(' ');
 
   return (
-    <div className={`${styles['message-item']} ${isSelected ? styles['selected'] : ''}`} onClick={() => onSelect(message.messageId)}>
-      <div className={styles['message-row-top']}>
-        <span className={styles['username']}>{message.sender.nickname || message.sender.name}</span>
-        <span className={styles['send-time']}>{getFormatDate(message.createdAt, 't')}</span>
+    <div
+      className={`flex flex-1 flex-col w-[95%] h-auto py-[6px] px-[10px] rounded-[4px] transition-[background] duration-150 ease-[ease] hover:bg-[#eaf3ff] ${isSelected ? 'bg-[#eaf3ff]' : ''}`}
+      onClick={() => onSelect(message.messageId)}
+    >
+      <div className="justify-between text-[14px] text-[#555]">
+        <span className="mr-[0.5rem] cursor-text select-text">{message.sender.nickname || message.sender.name}</span>
+        <span className="text-[13px] cursor-text select-text">{getFormatDate(message.createdAt, 't')}</span>
       </div>
-      <div className={styles['message-text']}>
+      <div className="mt-[10px] text-[13px] text-[#006ad1] cursor-text select-text">
         <MarkdownContent markdownText={content} />
       </div>
     </div>

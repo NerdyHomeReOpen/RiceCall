@@ -8,8 +8,6 @@ import { useAppSelector } from '@/hooks/useStore';
 
 import { DEFAULT_SERVER_AVATAR_URL } from '@/constants';
 
-import styles from './user-setting.module.css';
-
 interface RecentServerCardProps {
   target: Types.User;
   server: Types.Server;
@@ -32,13 +30,17 @@ const RecentServerCard: React.FC<RecentServerCardProps> = React.memo(({ target, 
   };
 
   return (
-    <div className={styles['server-card']} onDoubleClick={handleServerDoubleClick}>
+    <div className="flex flex-row gap-[5px] items-center w-[calc(50%-2.5px)] p-[5px] cursor-pointer bg-background-secondary border border-border" onDoubleClick={handleServerDoubleClick}>
       <Image src={server.avatarUrl || DEFAULT_SERVER_AVATAR_URL} alt="server_avatar" width={35} height={35} loading="lazy" draggable="false" />
-      <div className={styles['server-info']}>
-        <div className={styles['server-name-text']}>{server.name}</div>
+      <div className="flex flex-1 flex-col justify-between min-h-[33px] overflow-hidden">
+        <div className="flex items-center min-h-[1lh] overflow-hidden text-ellipsis text-text-color-quaternary whitespace-nowrap">{server.name}</div>
         <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
-          <div className={`${isSelf && isOwned ? styles['is-owner'] : ''}`} />
-          <div className={styles['display-id-text']}>{server.specialId || server.displayId}</div>
+          <div
+            className={`${isSelf && isOwned ? "before:block before:w-[13px] before:h-[15px] before:mr-[5px] before:content-[''] before:bg-[url('/icon_creator.svg')] before:bg-position-[0_0] before:bg-contain" : ''}`}
+          />
+          <div className="flex items-center min-h-[1lh] text-text-color-quaternary before:block before:w-[12px] before:h-[12px] before:mr-[2px] before:content-[''] before:bg-[url('/card/icon_id.svg')] before:bg-no-repeat before:bg-position-[0_0] before:bg-contain">
+            {server.specialId || server.displayId}
+          </div>
         </div>
       </div>
     </div>

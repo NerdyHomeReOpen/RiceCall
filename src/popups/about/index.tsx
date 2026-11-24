@@ -11,8 +11,6 @@ import { useStaffList } from '@/hooks/useStaffList';
 import StaffCard from './StaffCard';
 import MarkdownContent from '@/components/markdown-content';
 
-import styles from './about.module.css';
-
 type AboutPopupProps = Types.PopupProps<'aboutus'>;
 
 const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
@@ -48,10 +46,10 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
     <div className="popup-wrapper">
       <div className="popup-body">
         <div className="popup-content" style={{ justifyContent: 'flex-start', gap: '10px' }}>
-          <div className={styles['app-logo']} />
-          <div className={styles['app-info']}>
-            <div className={styles['app-version-text']}>{`RiceCall v${packageJson.version}`}</div>
-            <div className={styles['copyright-text']}>{`COPYRIGHT @ ${currentYear} ricecall.com ,ALL RIGHTS RESERVED.`}</div>
+          <div className="self-center min-w-[226px] min-h-[54px] bg-[url('/login_logo.svg')] bg-no-repeat bg-center bg-cover" />
+          <div className="flex flex-col items-start justify-center w-full">
+            <div className="w-full pb-[5px] font-bold text-center">{`RiceCall v${packageJson.version}`}</div>
+            <div className="w-full pb-[5px] text-center">{`COPYRIGHT @ ${currentYear} ricecall.com ,ALL RIGHTS RESERVED.`}</div>
             <div className="row" style={{ alignSelf: 'center' }}>
               <div className="link-text" onClick={handleGetHelpLinkClick}>
                 {t('get-help')}
@@ -65,7 +63,7 @@ const AboutPopup: React.FC<AboutPopupProps> = React.memo(({ id }) => {
             </div>
             <MarkdownContent markdownText={t('readme')} />
           </div>
-          <div className={styles['team-members']}>
+          <div className="flex flex-col w-full min-h-fit p-[10px] border border-border">
             <p>{t('team-members')}:</p>
             {staffList.map((staff) => (
               <StaffCard key={staff.contact} staff={staff} />

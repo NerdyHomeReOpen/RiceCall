@@ -9,14 +9,12 @@ import type * as Types from '@/types';
 import Env from '@/utils/env';
 import { isElectron } from '@/utils/platform';
 
-import ndStyles from './network-diagnosis.module.css';
-
 type NetworkDiagnosisPopupProps = Types.PopupProps<'networkDiagnosis'>;
 
 function getLossClassName(loss: number): string {
-  if (loss > 10) return 'loss-bad';
-  if (loss > 0) return 'loss-warn';
-  return 'loss-ok';
+  if (loss > 10) return 'text-text-warning';
+  if (loss > 0) return 'text-[#f0a020]';
+  return 'text-[#0fb11f]';
 }
 
 const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo(({ id }) => {
@@ -259,22 +257,34 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   }, []);
 
   const renderVisualProgress = () => (
-    <div className={ndStyles['steps']}>
+    <div className="flex gap-[4px] items-stretch justify-between py-[12px] px-[14px] mb-[4px] bg-popup-background border border-border rounded-[8px]">
       {stages.map((stage, index) => (
         <React.Fragment key={stage.id}>
-          <div className={`${ndStyles['step']} ${stage.status === 'active' ? ndStyles['step-active'] : ''} ${stage.status === 'completed' ? ndStyles['step-completed'] : ''}`}>
-            <div className={ndStyles['step-icon-row']}>
-              <div className={ndStyles['step-icon']}>{stage.status === 'active' ? <FaSpinner className={ndStyles['step-spinner']} /> : stage.icon}</div>
+          <div
+            className={`relative flex flex-1 flex-col gap-[6px] items-center min-w-0 transition-[opacity] duration-200 ease-[ease] ${stage.status === 'active' || stage.status === 'completed' ? 'opacity-100' : 'opacity-50'}`}
+          >
+            <div className="flex flex-row gap-[8px] items-center justify-center w-full min-h-[40px]">
+              <div
+                className={`flex shrink-0 items-center justify-center w-[40px] h-[40px] text-[1.5rem] transition-[color] duration-200 ease-[ease] ${stage.status === 'active' ? 'text-text-link' : stage.status === 'completed' ? 'text-[#0fb11f]' : 'text-text-color-quaternary'}`}
+              >
+                {stage.status === 'active' ? <FaSpinner className="animate-spin" /> : stage.icon}
+              </div>
             </div>
-            <div className={ndStyles['step-label']}>{stage.label}</div>
+            <div
+              className={`max-w-full overflow-hidden text-ellipsis text-[0.7rem] font-semibold text-center whitespace-nowrap ${stage.status === 'active' || stage.status === 'completed' ? 'text-text-color-secondary' : 'text-text-color-quaternary'}`}
+            >
+              {stage.label}
+            </div>
             {stage.status === 'active' && (stage.id === 'domain' || stage.id === 'sfu_test') && (
-              <span className={ndStyles['step-progress-label']}>
+              <span className="absolute bottom-[1rem] shrink-0 text-[0.65rem] text-text-link whitespace-nowrap">
                 {progress.cycle}/{progress.totalCycles}
               </span>
             )}
           </div>
           {index < stages.length - 1 && (
-            <div className={ndStyles['step-connector']}>
+            <div
+              className={`flex flex-[0_0_24px] items-center justify-center text-[0.85rem] transition-[color] duration-200 ease-[ease] ${stage.status === 'completed' ? 'text-[#0fb11f]' : 'text-border'}`}
+            >
               <FaArrowRight />
             </div>
           )}
@@ -286,13 +296,13 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   const renderDiagnosisResult = (results?: Types.DiagnosisResult[]) => {
     if (!results) return null;
     return results.map((res, idx) => (
-      <div key={idx} className={ndStyles['result-card']}>
-        <div className={ndStyles['result-header']}>
+      <div key={idx} className="p-[12px] mb-[14px] overflow-x-scroll bg-popup-background border border-border rounded-[8px]">
+        <div className="sticky top-0 left-0 flex items-center justify-between pb-[6px] mb-[8px] text-[0.9rem] font-semibold text-text-link border-b border-border">
           <span>Target: {res.domain}</span>
-          {res.dns.resolved && <span className={ndStyles['result-header-dns']}>{res.dns.addresses[0]}</span>}
+          {res.dns.resolved && <span className="text-[0.75rem] font-normal text-text-color-quaternary">{res.dns.addresses[0]}</span>}
         </div>
         {res.mtr.executed ? (
-          <table className={ndStyles['result-table']}>
+          <table className="w-full text-[0.8rem] text-text-color-secondary border-collapse [&_th]:py-[6px] [&_th]:px-[8px] [&_th]:font-medium [&_th]:text-text-color [&_th]:text-left [&_th]:border-b [&_th]:border-border [&_td]:py-[6px] [&_td]:px-[8px] [&_td]:border-b [&_td]:border-border [&_tr:last-child_td]:[border-bottom:none]">
             <thead>
               <tr>
                 <th>Hop</th>
@@ -307,10 +317,10 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
               {res.mtr.hops.map((hop, hIdx) => (
                 <tr key={hIdx}>
                   <td>{hop.hop || hIdx + 1}</td>
-                  <td className={ndStyles['host-cell']} title={hop.host || hop.ip}>
+                  <td className="max-w-[180px] overflow-hidden text-ellipsis whitespace-nowrap" title={hop.host || hop.ip}>
                     {hop.host || hop.ip}
                   </td>
-                  <td className={ndStyles[getLossClassName(hop.loss)]}>{hop.loss}%</td>
+                  <td className={getLossClassName(hop.loss)}>{hop.loss}%</td>
                   <td>{hop.best}ms</td>
                   <td>{hop.worst}ms</td>
                   <td>{hop.avg}ms</td>
@@ -319,7 +329,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
             </tbody>
           </table>
         ) : (
-          <div className={ndStyles['result-error']}>MTR Error: {res.mtr.error || 'Unknown error'}</div>
+          <div className="p-[10px] text-[0.8rem] text-text-warning">MTR Error: {res.mtr.error || 'Unknown error'}</div>
         )}
       </div>
     ));
@@ -328,8 +338,8 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   if (!isElectron()) {
     return (
       <div className="popup-wrapper">
-        <div className={`'popup-body ${ndStyles['app-only-body']}`}>
-          <div className={ndStyles['app-only-text']}>{t('app-only-feature')}</div>
+        <div className="'popup-body flex flex-col gap-[20px] items-center justify-center h-full">
+          <div className="text-[1.2rem] font-bold text-[#555]">{t('app-only-feature')}</div>
         </div>
         <div className="popup-footer">
           <div className="button" onClick={handleCloseBtnClick}>
@@ -343,47 +353,61 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
   return (
     <div className="popup-wrapper">
       <div className="popup-body">
-        <div className={ndStyles['content']}>
-          <div className={ndStyles['header']}>
-            <h2 className={ndStyles['title']}>{t('network-diagnosis')}</h2>
+        <div className="flex flex-col gap-[14px] w-full h-full min-h-0 py-[16px] px-[20px] overflow-hidden">
+          <div className="flex items-center justify-between mb-[2px]">
+            <h2 className="text-[1.1rem] font-semibold text-text-color">{t('network-diagnosis')}</h2>
           </div>
 
           {renderVisualProgress()}
 
-          <div className={ndStyles['tabs']}>
-            <div className={`${ndStyles['tab']} ${activeTab === 'logs' ? ndStyles['tab-active'] : ''}`} onClick={handleTabLogsClick} role="tab" aria-selected={activeTab === 'logs'}>
+          <div className="flex gap-0 mb-[10px] border-b border-border">
+            <div
+              className={`flex gap-[6px] items-center py-[8px] px-[18px] -mb-px text-[0.85rem] cursor-pointer border-b-2 transition-[color,border-color] duration-200 ease-[ease] hover:text-text-color-secondary ${activeTab === 'logs' ? 'font-semibold text-text-link border-b-text-link' : 'text-text-color-quaternary border-b-transparent'}`}
+              onClick={handleTabLogsClick}
+              role="tab"
+              aria-selected={activeTab === 'logs'}
+            >
               {t('diagnosis-logs')}
             </div>
-            <div className={`${ndStyles['tab']} ${activeTab === 'reports' ? ndStyles['tab-active'] : ''}`} onClick={handleTabReportsClick} role="tab" aria-selected={activeTab === 'reports'}>
+            <div
+              className={`flex gap-[6px] items-center py-[8px] px-[18px] -mb-px text-[0.85rem] cursor-pointer border-b-2 transition-[color,border-color] duration-200 ease-[ease] hover:text-text-color-secondary ${activeTab === 'reports' ? 'font-semibold text-text-link border-b-text-link' : 'text-text-color-quaternary border-b-transparent'}`}
+              onClick={handleTabReportsClick}
+              role="tab"
+              aria-selected={activeTab === 'reports'}
+            >
               {t('diagnosis-reports')}
-              {(reports.domain || reports.sfu) && <span className={ndStyles['tab-badge']} aria-hidden />}
+              {(reports.domain || reports.sfu) && <span className="shrink-0 w-[6px] h-[6px] bg-[#0fb11f] rounded-[50%]" aria-hidden />}
             </div>
           </div>
 
-          <div className={ndStyles['panel']}>
+          <div className="flex flex-1 flex-col min-h-0 overflow-hidden">
             {activeTab === 'logs' ? (
-              <div ref={scrollRef} className={ndStyles['logs-panel']} tabIndex={0}>
+              <div
+                ref={scrollRef}
+                className="flex-1 p-[12px] overflow-y-auto [font-family:ui-monospace,monospace] text-[0.8rem] text-text-color-secondary whitespace-pre-wrap select-text bg-popup-background border border-border rounded-[6px] focus:outline-none"
+                tabIndex={0}
+              >
                 {logs.length === 0 ? (
-                  <div className={ndStyles['logs-placeholder']}>Click &quot;Start Test&quot; to begin...</div>
+                  <div className="text-text-color-quaternary">Click &quot;Start Test&quot; to begin...</div>
                 ) : (
                   logs.map((log, i) => (
-                    <div key={i} className={ndStyles['log-line']}>
+                    <div key={i} className="pb-[4px] mb-[4px] text-text-color-secondary border-b border-border">
                       {log}
                     </div>
                   ))
                 )}
               </div>
             ) : (
-              <div className={ndStyles['reports-panel']}>
+              <div className="flex-1 overflow-y-auto select-text rounded-[6px]">
                 {!reports.domain && !reports.sfu && (
-                  <div className={ndStyles['reports-empty']}>
-                    <FaSpinner className={ndStyles['reports-empty-spinner']} />
+                  <div className="flex flex-col gap-[10px] items-center justify-center h-full min-h-[120px] text-text-color-quaternary">
+                    <FaSpinner className="text-[1.5rem] animate-spin" />
                     <span>{t('Diagnosis in progress...')}</span>
                   </div>
                 )}
                 {reports.domain && (
                   <>
-                    <div className={ndStyles['section-title']}>
+                    <div className="flex gap-[8px] items-center mb-[10px] text-[0.8rem] font-semibold text-text-color-tertiary">
                       <FaCloud /> API / WEBSOCKET SERVER
                     </div>
                     {renderDiagnosisResult(reports.domain)}
@@ -391,7 +415,7 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
                 )}
                 {reports.sfu && (
                   <>
-                    <div className={`${ndStyles['section-title']} ${ndStyles['section-title-reports']}`}>
+                    <div className="flex gap-[8px] items-center mt-[18px] mb-[10px] text-[0.8rem] font-semibold text-text-color-tertiary first:mt-0">
                       <FaServer /> SFU (VOICE/VIDEO) SERVER
                     </div>
                     {renderDiagnosisResult(reports.sfu)}
@@ -404,10 +428,10 @@ const NetworkDiagnosisPopup: React.FC<NetworkDiagnosisPopupProps> = React.memo((
       </div>
 
       <div className="popup-footer">
-        <div className={`button ${ndStyles['export-button']} ${logs.length === 0 || isTesting ? ndStyles['disabled-button'] : ''}`} onClick={handleExportReportClick}>
+        <div className={`button mr-auto ${logs.length === 0 || isTesting ? 'pointer-events-none opacity-50' : ''}`} onClick={handleExportReportClick}>
           {t('export-report')}
         </div>
-        <div className={`button ${isTesting ? ndStyles['disabled-button'] : ''}`} onClick={handleStartTestClick}>
+        <div className={`button ${isTesting ? 'pointer-events-none opacity-50' : ''}`} onClick={handleStartTestClick}>
           {isTesting ? t('testing') : t('start-test')}
         </div>
         <div className="button" onClick={handleCloseBtnClick}>

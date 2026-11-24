@@ -25,8 +25,6 @@ import BadgeItem from '@/components/badge-item';
 
 import { objDiff } from '@/utils';
 
-import styles from './user-setting.module.css';
-
 type UserInfoPopupProps = Types.PopupProps<'userInfo'>;
 
 const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: targetData, targetServers }) => {
@@ -243,51 +241,79 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
   const renderServerListContent = (isHidden: boolean, hiddenTipKey: string, emptyTipKey: string, serverCards: React.ReactNode[]) => {
     if (isHidden) {
       return (
-        <div className={styles['server-list-tips']}>
+        <div className="flex items-center justify-center w-full h-[76px] [font-family:'Noto_Sans_TC',sans-serif] text-[16px] leading-[1.2] text-[#436da1] text-center bg-[url('/card/bg_list_tips.svg')] bg-no-repeat bg-center bg-auto">
           {t(`${hiddenTipKey}.top`)}
           <br />
           {t(`${hiddenTipKey}.bottom`)}
         </div>
       );
     }
-    if (!serverCards.length) return <div className={styles['server-list-tips']}>{t(emptyTipKey)}</div>;
+    if (!serverCards.length)
+      return (
+        <div className="flex items-center justify-center w-full h-[76px] [font-family:'Noto_Sans_TC',sans-serif] text-[16px] leading-[1.2] text-[#436da1] text-center bg-[url('/card/bg_list_tips.svg')] bg-no-repeat bg-center bg-auto">
+          {t(emptyTipKey)}
+        </div>
+      );
     return serverCards;
   };
 
   return (
-    <div className={`popup-wrapper ${styles['user-profile']}`}>
-      <div className={styles['user-profile']}>
-        <div data-draggable className={styles['header']}>
-          <div className={styles['window-action-buttons']}>
-            <div className={styles['minimize-button']} onClick={handleMinimizeBtnClick} />
-            <div className={styles['close-button']} onClick={handleCloseBtnClick} />
+    <div className="popup-wrapper flex flex-col justify-between h-full min-h-0 [background-image:unset]!">
+      <div className="flex flex-col justify-between h-full min-h-0 [background-image:unset]!">
+        <div
+          data-draggable
+          className="relative flex flex-col gap-[5px] items-center justify-center w-full min-h-[225px] pt-[30px] pb-[60px] text-white bg-[url('/im/wallpaper.svg')] bg-cover [-webkit-app-region:drag]"
+        >
+          <div className="absolute top-[10px] right-0 flex items-center justify-evenly w-[50px] [-webkit-app-region:no-drag]">
+            <div
+              className="inline-block w-[14px] h-[14px] cursor-pointer bg-no-repeat bg-position-[0_0] bg-cover hover:bg-position-[-14px_0] active:bg-position-[-28px_0] bg-[url('/im/btn-min.svg')]"
+              onClick={handleMinimizeBtnClick}
+            />
+            <div
+              className="inline-block w-[14px] h-[14px] cursor-pointer bg-no-repeat bg-position-[0_0] bg-cover hover:bg-position-[-14px_0] active:bg-position-[-28px_0] bg-[url('/im/btn-close.svg')]"
+              onClick={handleCloseBtnClick}
+            />
           </div>
-          <div className={`${styles['user-avatar']} ${isSelf ? styles['editable'] : ''}`} onClick={handleAvatarClick}>
+          <div
+            className={`relative inline-block w-[74px] h-[74px] transition-all duration-300 ease-[ease-in-out] [-webkit-app-region:no-drag] after:absolute after:-top-[7px] after:-left-[7px] after:z-1 after:w-[88px] after:h-[88px] after:content-[''] after:bg-[url('/im/avatar_border.svg')] after:bg-no-repeat after:bg-position-[0_0] ${isSelf ? 'cursor-pointer hover:rounded-[3px] hover:[box-shadow:0_0_3px_6px_rgb(255_255_255/100%)]' : ''}`}
+            onClick={handleAvatarClick}
+          >
             <Image src={target.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={74} height={74} loading="lazy" draggable="false" />
           </div>
           <div className="row" style={{ gap: '3px', marginTop: '5px' }}>
-            <p className={styles['user-name-text']}>{target.name}</p>
+            <p className="max-w-[250px] overflow-hidden text-ellipsis text-[1.5em] font-bold text-white whitespace-nowrap cursor-text select-text [-webkit-app-region:no-drag]">{target.name}</p>
             {target.vip > 0 && <div className={`vip-icon vip-${target.vip}`} />}
             <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={true} />
-            {target.isVerified ? <div className={styles['official-icon']} title={t('is-official')} /> : null}
+            {target.isVerified ? <div className="w-[17px] h-[16px] [image-rendering:auto] bg-[url('/official.svg')] bg-no-repeat bg-center bg-cover" title={t('is-official')} /> : null}
           </div>
-          <p className={styles['user-account-text']} onClick={handleAccountTextClick}>
+          <p className="text-white cursor-pointer select-text [-webkit-app-region:no-drag]" onClick={handleAccountTextClick}>
             @{target.displayId}
           </p>
-          <p className={styles['user-info-text']}>
+          <p className="text-white [-webkit-app-region:no-drag]">
             {t(target.gender.toLowerCase())} · {getUserAge()} · {t(target.country, { ns: 'country' })}
           </p>
-          <p className={styles['user-signature-text']}>{target.signature}</p>
-          <div className={styles['tabs']}>
-            <div className={`${styles['tab']} ${styles['about']} ${isEditTab ? `${styles['selected']} disabled` : ''} ${isAboutTab ? styles['selected'] : ''}`} onClick={handleAboutTabClick}>
+          <p className="flex flex-wrap items-center justify-center max-w-[75%] overflow-auto [-webkit-line-clamp:2] [line-clamp:2] text-white text-center cursor-text select-text [-webkit-box-orient:vertical]">
+            {target.signature}
+          </p>
+          <div className="absolute bottom-0 flex w-full">
+            <div
+              className={`flex gap-[5px] items-center justify-center w-1/2 h-[38px] pb-[6px] cursor-pointer bg-[url('/im/userpage_tab.svg')] bg-repeat bg-auto [-webkit-app-region:no-drag] before:content-[''] before:bg-no-repeat before:bg-position-[0_0] before:bg-contain before:min-w-[13px] before:min-h-[14px] before:bg-[url('/im/icon-about.svg')] ${isEditTab || isAboutTab ? 'bg-position-[0_-38px]' : 'bg-position-[0_0]'} ${isEditTab ? 'disabled' : ''}`}
+              onClick={handleAboutTabClick}
+            >
               {t('about-me')}
             </div>
-            <div className={`${styles['tab']} ${styles['groups']} ${isEditTab ? 'disabled' : ''} ${isGroupsTab ? styles['selected'] : ''}`} onClick={handleGroupsTabClick}>
+            <div
+              className={`flex gap-[5px] items-center justify-center w-1/2 h-[38px] pb-[6px] cursor-pointer bg-[url('/im/userpage_tab.svg')] bg-repeat bg-auto [-webkit-app-region:no-drag] before:content-[''] before:bg-no-repeat before:bg-position-[0_0] before:bg-contain before:min-w-[18px] before:min-h-[14px] before:bg-[url('/im/icon-group.svg')] ${isGroupsTab ? 'bg-position-[0_-38px]' : 'bg-position-[0_0]'} ${isEditTab ? 'disabled' : ''}`}
+              onClick={handleGroupsTabClick}
+            >
               {t('servers')}
             </div>
           </div>
         </div>
-        <div className={styles['edit-tab-bar']} style={isSelf && !isGroupsTab ? {} : { display: 'none' }}>
+        <div
+          className="z-1 flex gap-[10px] items-center justify-end min-h-[45px] p-[10px] bg-[linear-gradient(to_bottom,var(--background),var(--sidebar))] border-b border-border"
+          style={isSelf && !isGroupsTab ? {} : { display: 'none' }}
+        >
           {isEditTab ? (
             <>
               <div className={`button button-primary ${!canSubmit ? 'disabled' : ''}`} onClick={handleConfirmBtnClick}>
@@ -303,14 +329,14 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
             </div>
           )}
         </div>
-        <div className={styles['content']} style={isAboutTab ? {} : { display: 'none' }}>
+        <div className="flex flex-[2] flex-col justify-start w-full p-[10px] overflow-y-auto" style={isAboutTab ? {} : { display: 'none' }}>
           {target.about && (
-            <div className={styles['user-about-me']}>
-              <div className={styles['user-about-me-text']}>{target.about}</div>
+            <div className="flex flex-1 items-center justify-between py-[10px] px-[15px] mb-[10px] text-text-color-quaternary border-b border-border before:block before:self-start before:min-w-[23px] before:min-h-[19px] before:mr-[10px] before:content-[''] before:bg-[url('/card/bg_left_quote.svg')] before:bg-no-repeat before:bg-cover after:block after:self-end after:min-w-[23px] after:min-h-[19px] after:ml-[10px] after:content-[''] after:bg-[url('/card/bg_right_quote.svg')] after:bg-no-repeat after:bg-cover">
+              <div className="flex flex-wrap items-center justify-start break-all cursor-text select-text">{target.about}</div>
             </div>
           )}
           <div className="label">{t('recent-servers')}</div>
-          <div className={styles['server-list']}>
+          <div className="flex flex-row flex-wrap gap-[5px] items-center justify-start py-[5px] px-0">
             {renderServerListContent(
               isRecentServersHidden,
               'not-public-recent-servers',
@@ -319,22 +345,22 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
             )}
           </div>
           <div className="label">{t('recent-earned')}</div>
-          <div className={styles['badge-viewer']}>
+          <div className="flex gap-[2px] items-center min-h-[30px] p-[2px] bg-background-secondary border border-border">
             {badges.map((badge: Types.Badge) => (
-              <div key={badge.badgeId} className={styles['badge-item']}>
+              <div key={badge.badgeId} className="flex p-[2px] border border-[#fff0] hover:bg-hover hover:border-border hover:rounded-[2px]">
                 <BadgeItem key={badge.badgeId} badge={badge} position="left-top" direction="right-top" />
               </div>
             ))}
           </div>
         </div>
-        <div className={styles['content']} style={isGroupsTab ? {} : { display: 'none' }}>
+        <div className="flex flex-[2] flex-col justify-start w-full p-[10px] overflow-y-auto" style={isGroupsTab ? {} : { display: 'none' }}>
           <div className="select-box">
             <select value={serversView} onChange={handleServersViewChange}>
               <option value="joined">{t('joined-servers')}</option>
               <option value="favorite">{t('favorited-servers')}</option>
             </select>
           </div>
-          <div className={styles['server-list']} style={isJoinedServersView ? {} : { display: 'none' }}>
+          <div className="flex flex-row flex-wrap gap-[5px] items-center justify-start py-[5px] px-0" style={isJoinedServersView ? {} : { display: 'none' }}>
             {renderServerListContent(
               isJoinedServersHidden,
               'not-public-joined-servers',
@@ -342,7 +368,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
               joinedServers.map((server) => <JoinedServerCard key={server.serverId} target={target} server={server} onServerSelect={handleServerSelect} />),
             )}
           </div>
-          <div className={styles['server-list']} style={isFavoriteServersView ? {} : { display: 'none' }}>
+          <div className="flex flex-row flex-wrap gap-[5px] items-center justify-start py-[5px] px-0" style={isFavoriteServersView ? {} : { display: 'none' }}>
             {renderServerListContent(
               isFavoriteServersHidden,
               'not-public-favorite-servers',
@@ -351,7 +377,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
             )}
           </div>
         </div>
-        <div className={styles['content']} style={isEditTab ? {} : { display: 'none' }}>
+        <div className="flex flex-[2] flex-col justify-start w-full p-[10px] overflow-y-auto" style={isEditTab ? {} : { display: 'none' }}>
           <div className="col">
             <div className="row">
               <div className="input-box col">
@@ -418,7 +444,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
             </div>
             <div className="input-box col">
               <div className="label">{t('signature')}</div>
-              <div className={styles['signature-input']}>
+              <div>
                 <input
                   ref={signatureInputRef}
                   name="signature"
@@ -428,7 +454,7 @@ const UserInfoPopup: React.FC<UserInfoPopupProps> = React.memo(({ id, target: ta
                   onChange={handleSignatureChange}
                   style={{ paddingRight: '28px', width: '100%' }}
                 />
-                <div className={styles['emoji-btn']} onMouseDown={handleEmojiPickerClick} />
+                <div onMouseDown={handleEmojiPickerClick} />
               </div>
             </div>
             <div className="input-box col">

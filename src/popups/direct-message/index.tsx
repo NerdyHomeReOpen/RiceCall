@@ -33,8 +33,6 @@ import UnreadMessageAlert from '@/components/unread-message-alert';
 
 import { toTags } from '@/utils/tag-converter';
 
-import styles from './direct-message.module.css';
-
 type DirectMessagePopupProps = Types.PopupInitialData['directMessage'];
 
 const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ target, event, message }) => {
@@ -350,79 +348,101 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   return (
     <div className="popup-wrapper">
       <input ref={fileInputRef} type="file" accept="image/*" style={{ display: 'none' }} onChange={handleFileInputChange} />
-      <div className={styles['header']}>
-        <div className={styles['user-signature']}>{target.signature}</div>
-        <div className={styles['direct-option-buttons']}>
+      <div className="flex flex-col items-start w-full px-[10px] pb-[5px] text-secondary-color bg-main-color bg-(image:--header-image) bg-no-repeat bg-position-[0_-30px] bg-cover">
+        <div className="min-h-[1.5em] ml-[18px]">{target.signature}</div>
+        <div className="flex gap-[5px] [justify-content:left] ml-[18px] [-webkit-app-region:no-drag]">
           {}
           {!isFriend ? (
-            <div className={styles['apply-friend']} onClick={handleApplyFriendBtnClick} />
+            <div className="inline-block min-w-[30px] min-h-[30px] align-middle cursor-pointer bg-no-repeat bg-center bg-contain bg-[url('/im/AddContact.svg')]" onClick={handleApplyFriendBtnClick} />
           ) : (
             <>
-              {!isBlocked ? <div className={styles['block-user']} onClick={handleBlockUserBtnClick} /> : <div className={styles['un-block-user']} onClick={handleUnblockUserBtnClick} />}
+              {!isBlocked ? (
+                <div className="inline-block min-w-[30px] min-h-[30px] align-middle cursor-pointer bg-no-repeat bg-center bg-contain bg-[url('/im/BlockUser.svg')]" onClick={handleBlockUserBtnClick} />
+              ) : (
+                <div
+                  className="inline-block min-w-[30px] min-h-[30px] align-middle cursor-pointer bg-no-repeat bg-center bg-contain bg-[url('/im/UnblockUser.svg')]"
+                  onClick={handleUnblockUserBtnClick}
+                />
+              )}
               {}
             </>
           )}
-          <div className={styles['report']} onClick={handleReportBtnClick} />
+          <div className="inline-block min-w-[30px] min-h-[30px] align-middle cursor-pointer bg-no-repeat bg-center bg-contain bg-[url('/im/report.svg')]" onClick={handleReportBtnClick} />
         </div>
       </div>
       <div className="popup-body">
-        <div className={styles['sidebar']}>
-          <div className={styles['target-box']}>
-            <div className={`${styles['avatar-picture']} ${isFriend && !isOffline ? '' : styles['offline']}`} onClick={handleTargetAvatarClick}>
+        <div className="flex flex-col items-center justify-between w-fit h-full p-[10px] border-r border-border">
+          <div className="flex flex-col gap-[5px]">
+            <div
+              className={`relative w-[100px] h-[100px] m-[10px] cursor-pointer before:absolute before:-top-[10px] before:-left-[10px] before:z-1 before:min-w-[120px] before:min-h-[120px] before:content-[''] before:bg-[url('/im/logoframe.svg')] before:bg-no-repeat before:bg-center before:bg-cover ${isFriend && !isOffline ? '' : 'grayscale'}`}
+              onClick={handleTargetAvatarClick}
+            >
               <Image src={target.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="target_avatar" width={100} height={100} loading="lazy" draggable="false" />
             </div>
             {hasVip && <div className={`vip-icon-big vip-${target.vip}`} />}
-            <div className={styles['user-state-box']}>
+            <div className="flex flex-nowrap">
               <LevelIcon level={target.level} xp={target.xp} requiredXp={target.requiredXp} showTooltip={false} />
-              {hasBadges ? <div className={styles['user-friend-split']} /> : ''}
+              {hasBadges ? <div className="w-[2px] h-[15px] mx-[10px] bg-[url('/mf_spliter.svg')] bg-cover" /> : ''}
               <BadgeList badges={JSON.parse(target.badges)} position="left-bottom" direction="right-bottom" maxDisplay={13} grid={true} />
             </div>
           </div>
-          <div className={styles['user-box']}>
-            <div className={`${styles['avatar-picture']}`} onClick={handleUserAvatarClick}>
+          <div>
+            <div
+              className="relative w-[100px] h-[100px] m-[10px] cursor-pointer before:absolute before:-top-[10px] before:-left-[10px] before:z-1 before:min-w-[120px] before:min-h-[120px] before:content-[''] before:bg-[url('/im/logoframe.svg')] before:bg-no-repeat before:bg-center before:bg-cover"
+              onClick={handleUserAvatarClick}
+            >
               <Image src={user.avatarUrl || DEFAULT_USER_AVATAR_URL} alt="user_avatar" width={100} height={100} loading="lazy" draggable="false" />
             </div>
           </div>
         </div>
-        <div className={styles['main-content']}>
-          <div className={styles['action-body']}>
+        <div className="flex flex-1 flex-col min-w-0 min-h-0">
+          <div className="relative">
             {isOnlineFriend && targetCurrentServer && (
-              <div className={`${styles['action-area']} ${styles['clickable']}`} onClick={handleServerNameClick}>
-                <div className={`${styles['action-icon']} ${styles['in-server']}`} />
-                <div className={styles['action-title']}>{targetCurrentServer.name}</div>
+              <div
+                className="group flex items-center w-full h-[22px] after:absolute after:-bottom-px after:left-1/2 after:w-full after:h-[22px] after:content-[''] after:bg-[url('/im/serverin_bkg.svg')] after:bg-no-repeat after:bg-center after:bg-contain after:[transform:translateX(-50%)] cursor-pointer"
+                onClick={handleServerNameClick}
+              >
+                <div className="min-w-[14px] min-h-[14px] ml-[10px] bg-no-repeat bg-position-[0_0] bg-contain bg-[url('/im/server_in.svg')]" />
+                <div className="w-full ml-[5px] group-hover:underline">{targetCurrentServer.name}</div>
               </div>
             )}
             {!isOnlineFriend && (
-              <div className={styles['action-area']}>
-                {!isFriend && <div className={styles['action-title']}>{t('non-friend-message')}</div>}
-                {isFriend && isOffline && <div className={styles['action-title']}>{t('non-online-message')}</div>}
+              <div className="flex items-center w-full h-[22px] after:absolute after:-bottom-px after:left-1/2 after:w-full after:h-[22px] after:content-[''] after:bg-[url('/im/serverin_bkg.svg')] after:bg-no-repeat after:bg-center after:bg-contain after:[transform:translateX(-50%)]">
+                {!isFriend && <div className="w-full ml-[5px]">{t('non-friend-message')}</div>}
+                {isFriend && isOffline && <div className="w-full ml-[5px]">{t('non-online-message')}</div>}
               </div>
             )}
             {target.isVerified ? (
-              <div className={styles['action-area']}>
-                <div className={`${styles['action-icon']} ${styles['is-official-icon']}`} />
-                <div className={`${styles['official-title-box']} ${styles['action-title']}`}>
-                  <span className={styles['is-official-title']}>{t('official-title')}</span>
-                  <span className={styles['is-official-text']}>{t('is-official')}</span>
+              <div className="flex items-center w-full h-[22px] after:absolute after:-bottom-px after:left-1/2 after:w-full after:h-[22px] after:content-[''] after:bg-[url('/im/serverin_bkg.svg')] after:bg-no-repeat after:bg-center after:bg-contain after:[transform:translateX(-50%)]">
+                <div className="w-[17px] h-[16px] min-w-[14px] min-h-[14px] ml-[10px] [image-rendering:auto] bg-[url('/official.svg')] bg-no-repeat bg-center bg-cover" />
+                <div className="flex items-center w-full ml-[5px]">
+                  <span className="text-[#636363]">{t('official-title')}</span>
+                  <span className="ml-[10px] text-[#0084e3]">{t('is-official')}</span>
                 </div>
               </div>
             ) : null}
           </div>
-          <div ref={messageAreaRef} onScroll={handleScroll} className={styles['message-area']}>
+          <div ref={messageAreaRef} onScroll={handleScroll} className="flex flex-[5] flex-col pt-[10px] px-[10px] pb-0 overflow-x-hidden overflow-y-scroll">
             <MessageContent messages={directMessages} />
             <div style={{ minHeight: '10px' }} />
             <UnreadMessageAlert unreadMessageCount={unreadMessageCount} onAlertClick={handleUnreadMessageAlertClick} />
           </div>
-          <div className={styles['input-area']}>
-            <div className={styles['top-bar']}>
-              <div className={styles['buttons']}>
+          <div className="flex flex-col w-full h-[150px] overflow-hidden">
+            <div className="flex justify-between min-w-full min-h-[30px] bg-[url('/tool_bkg.svg')] bg-no-repeat bg-position-[0_0] bg-size-[100%] border-y border-border">
+              <div className="flex items-center ml-[5px]">
                 {}
-                <div className={`${styles['button']} ${styles['emoji']}`} onMouseDown={handleEmojiPickerClick} />
-                <div className={`${styles['button']} ${styles['screen-shot']}`} onClick={handleScreenShotBtnClick} />
-                <div className={`${styles['button']} ${styles['nudge']} ${!isFriend || !canShakeWindow ? 'disabled' : ''}`} onClick={handleShakeWindowBtnClick} />
+                <div className="min-w-[18px] min-h-[18px] mr-[10px] cursor-pointer bg-position-[0_0] bg-[url('/FaceButton.svg')]" onMouseDown={handleEmojiPickerClick} />
+                <div className="min-w-[18px] min-h-[18px] mr-[10px] cursor-pointer bg-position-[0_0] bg-[url('/ScreenShot.svg')]" onClick={handleScreenShotBtnClick} />
+                <div
+                  className={`min-w-[18px] min-h-[18px] mr-[10px] cursor-pointer bg-position-[0_0] bg-[url('/im/Nudge.svg')] ${!isFriend || !canShakeWindow ? 'disabled' : ''}`}
+                  onClick={handleShakeWindowBtnClick}
+                />
               </div>
-              <div className={styles['buttons']}>
-                <div className={`${styles['history-message']} disabled`} onClick={handleMessageHistoryBtnClick}>
+              <div className="flex items-center ml-[5px]">
+                <div
+                  className="flex items-center w-auto h-full mr-[15px] cursor-pointer before:min-w-[18px] before:min-h-[18px] before:mr-[3px] before:content-[''] before:bg-[url('/im/history.svg')] before:bg-no-repeat before:bg-position-[0_0] before:bg-contain disabled"
+                  onClick={handleMessageHistoryBtnClick}
+                >
                   {t('message-history')}
                 </div>
               </div>
@@ -430,7 +450,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
             <EditorContent
               editor={editor}
               placeholder={t('input-message')}
-              className={`${styles['input']} markdown-content ${isWarning ? styles['warning'] : ''}`}
+              className={`block flex-1 p-[8px] overflow-auto resize-none [&_div]:h-full markdown-content ${isWarning ? 'border! border-text-warning!' : 'border-none!'}`}
               style={{ wordBreak: 'break-all', border: 'none', borderTop: '1px solid #ccc' }}
               onPaste={handleInputPaste}
               onKeyDown={handleInputKeyDown}

@@ -4,8 +4,6 @@ import { FaGithub, FaDiscord } from 'react-icons/fa';
 
 import type * as Types from '@/types';
 
-import styles from './about.module.css';
-
 interface StaffCardProps {
   staff: Types.Staff;
 }
@@ -14,11 +12,11 @@ const StaffCard: React.FC<StaffCardProps> = React.memo(({ staff }) => {
   const { t } = useTranslation();
 
   const getTitleColorClass = (title: string) => {
-    if (['project-owner'].some((t) => title.includes(t))) return styles['color-1'];
-    if (['official-staff'].some((t) => title.includes(t))) return styles['color-2'];
-    if (['developer', 'technical-support'].some((t) => title.includes(t))) return styles['color-3'];
-    if (['machine-network'].some((t) => title.includes(t))) return styles['color-4'];
-    return styles['color-5'];
+    if (['project-owner'].some((t) => title.includes(t))) return 'bg-[rgb(216_63_63/80%)]';
+    if (['official-staff'].some((t) => title.includes(t))) return 'bg-[rgb(77_173_147/80%)]';
+    if (['developer', 'technical-support'].some((t) => title.includes(t))) return 'bg-[rgb(216_166_63/80%)]';
+    if (['machine-network'].some((t) => title.includes(t))) return 'bg-[rgb(63_166_216/80%)]';
+    return 'bg-[rgb(115_164_213/70%)]';
   };
 
   const handleRiceCallIdClick = () => {
@@ -34,24 +32,26 @@ const StaffCard: React.FC<StaffCardProps> = React.memo(({ staff }) => {
   };
 
   return (
-    <div className={styles['team-member-card']}>
-      <div className={styles['name-wrapper']}>
-        <span className={`${styles['staff-title']} ${getTitleColorClass(staff.title)}`}>{t(staff.title, { ns: 'position' })}</span>
+    <div className="flex items-center justify-between w-full p-[3px] mt-[3px] bg-transparent border border-border rounded-[5px] backdrop-blur-[5px] transition-[background-color] duration-300 ease-[ease] hover:bg-hover">
+      <div className="flex items-center leading-[1.4]">
+        <span className={`inline-block min-w-[80px] py-[4px] px-[8px] mr-[8px] font-bold text-white text-center rounded-[4px] ${getTitleColorClass(staff.title)}`}>
+          {t(staff.title, { ns: 'position' })}
+        </span>
         <span>{staff.contact}</span>
         {staff.ricecall && (
-          <div className={styles['ricecall-id']} title="RiceCall" onClick={handleRiceCallIdClick}>
+          <div className="inline-block mr-[8px] text-text-link text-center select-text" title="RiceCall" onClick={handleRiceCallIdClick}>
             (@{staff.ricecall})
           </div>
         )}
       </div>
-      <div className={styles['icon-wrapper']}>
+      <div className="flex gap-[10px] items-center [&_svg]:align-middle [&_svg]:transition-[color] [&_svg]:duration-300 [&_svg]:ease-[ease]">
         {staff.github && (
-          <div className={styles['github-link']} title="GitHub" onClick={handleGitHubIconClick}>
+          <div className="hover:[&_svg]:text-[rgb(70_70_70)]" title="GitHub" onClick={handleGitHubIconClick}>
             <FaGithub size={20} />
           </div>
         )}
         {staff.discord && (
-          <div className={styles['discord-link']} title="Discord" onClick={handleDiscordIconClick}>
+          <div className="hover:[&_svg]:text-[#7289da]" title="Discord" onClick={handleDiscordIconClick}>
             <FaDiscord size={20} />
           </div>
         )}
