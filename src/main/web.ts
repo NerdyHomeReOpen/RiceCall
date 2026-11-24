@@ -6,7 +6,7 @@ import Env from '@/utils/env';
 
 import { i18nReady } from '@/i18n';
 
-import { LANGUAGES } from '@/constants';
+import { pickLocale } from '@/types/locales';
 
 import { eventEmitter } from '@/main/event';
 import { autoLogin } from '@/main/auth/web';
@@ -143,13 +143,8 @@ export function getSettings(): Types.SystemSettings {
   };
 }
 
-export function getLanguage(): Types.LanguageKey {
-  const language = navigator.language;
-
-  const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
-  if (!match) return 'zh-TW';
-
-  return match.code;
+export function getLanguage(): Types.Locale {
+  return pickLocale(navigator.languages?.length ? navigator.languages : [navigator.language]);
 }
 
 export function exit(): void {

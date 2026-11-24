@@ -2,6 +2,7 @@ import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 
 import type * as Types from '@/types';
+import { DEFAULT_LOCALE, LOCALE_CODES } from '@/types/locales';
 
 import I18nStorage from '@/i18n/storage';
 
@@ -101,9 +102,9 @@ export const i18nReady = I18nStorage.load()
       .use(new HttpBackend())
       .use(initReactI18next)
       .init({
-        lng: 'zh-TW',
-        fallbackLng: 'zh-TW',
-        supportedLngs: ['zh-TW', 'zh-CN', 'en-US', 'fa-IR', 'pt-BR', 'ru-RU', 'es-ES', 'tr-TR'],
+        lng: DEFAULT_LOCALE,
+        fallbackLng: DEFAULT_LOCALE,
+        supportedLngs: [...LOCALE_CODES],
 
         ns: ['app', 'rpc', 'message', 'country', 'badge', 'position', 'system'],
         defaultNS: 'app',
@@ -123,7 +124,7 @@ export function t(key: string, params?: Record<string, string>): string {
   return i18next.t(key, params);
 }
 
-export function changeLanguage(language: Types.LanguageKey): void {
+export function changeLanguage(language: Types.Locale): void {
   if (!i18next.isInitialized) {
     new Logger('I18N').error('i18next is not initialized');
     return;

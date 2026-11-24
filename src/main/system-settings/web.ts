@@ -173,7 +173,7 @@ export function getUpdateChannel(): string {
   return store.get('updateChannel');
 }
 
-export function getLanguage(): Types.LanguageKey {
+export function getLanguage(): Types.Locale {
   return store.get('language');
 }
 

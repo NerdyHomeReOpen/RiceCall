@@ -16,7 +16,7 @@ import Env from '@/utils/env';
 
 import { i18nReady, t } from '@/i18n';
 
-import { LANGUAGES } from '@/constants';
+import { pickLocale } from '@/types/locales';
 
 import { registerAccountHandlers } from '@/main/accounts/electron';
 import { registerApiHandlers } from '@/main/api/electron';
@@ -413,13 +413,8 @@ export function getSettings(): Types.SystemSettings {
   };
 }
 
-export function getLanguage(): Types.LanguageKey {
-  const language = app.getLocale();
-
-  const match = LANGUAGES.find(({ code }) => code.includes(language) || language.includes(code));
-  if (!match) return 'zh-TW';
-
-  return match.code;
+export function getLanguage(): Types.Locale {
+  return pickLocale(app.getPreferredSystemLanguages().length ? app.getPreferredSystemLanguages() : [app.getLocale()]);
 }
 
 export async function createMainWindow(title?: string): Promise<BrowserWindow> {

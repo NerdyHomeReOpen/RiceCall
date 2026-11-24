@@ -531,13 +531,13 @@ export const systemSettings = {
   },
 
   language: {
-    set: (language: Types.LanguageKey): void => {
+    set: (language: Types.Locale): void => {
       modules.default.setLanguage(language);
     },
-    get: (): Types.LanguageKey => {
+    get: (): Types.Locale => {
       return modules.default.getLanguage();
     },
-    onUpdate: (callback: (language: Types.LanguageKey) => void): (() => void) => {
+    onUpdate: (callback: (language: Types.Locale) => void): (() => void) => {
       return modules.default.listen('language', callback);
     },
   },

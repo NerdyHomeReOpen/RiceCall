@@ -70,7 +70,7 @@ const ProvidersComponent = ({ children }: ProvidersProps) => {
   useEffect(() => {
     if (!i18nLoaded) return;
 
-    const changeLang = (language: Types.LanguageKey) => {
+    const changeLang = (language: Types.Locale) => {
       new Logger('LANGUAGE').info(`Language updated: ${language}`);
       if (!language) return;
       changeLanguage(language);

@@ -230,7 +230,7 @@ export default class ContextMenu {
     return this;
   }
 
-  addLanguageSelectOption(params: { languages: { code: Types.LanguageKey; label: string }[] }, onClick: (code: Types.LanguageKey | null) => void): this {
+  addLanguageSelectOption(params: { languages: readonly { code: Types.Locale; label: string }[] }, onClick: (code: Types.Locale | null) => void): this {
     this.options.push({
       id: 'language-select',
       label: 'language-select',

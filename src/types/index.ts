@@ -25,6 +25,7 @@ import {
   table_notifications,
 } from './database';
 import type { PopupOpenRequest } from './popup';
+import type { Locale } from './locales';
 
 export type Announcement = table_announcements;
 
@@ -203,7 +204,7 @@ export type ChannelUIMode = 'classic' | 'three-line' | 'auto';
 
 export type RecordFormat = 'wav' | 'mp3';
 
-export type LanguageKey = 'zh-TW' | 'zh-CN' | 'en-US' | 'fa-IR' | 'pt-BR' | 'ru-RU' | 'es-ES' | 'tr-TR';
+export type { Locale } from './locales';
 
 export type RegionKey = 'zh-TW' | 'zh-CN' | 'en-US';
 
@@ -390,7 +391,7 @@ export type ClientToServerEventsWithAck = {
 
 export type StoreType = {
   accounts: Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>;
-  language: LanguageKey;
+  language: Locale;
   customThemes: Theme[];
   currentTheme: Theme | null;
   isAutoLoginEnabled: boolean;

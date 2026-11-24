@@ -1,16 +1,15 @@
 import { useCallback } from 'react';
 
 import type * as Types from '@/types';
+import { LOCALES } from '@/types/locales';
 
 import { openSystemSetting, openChangeTheme, openAboutUs, openNetworkDiagnosis } from '@/services';
 
 import ContextMenu from '@/utils/context-menu';
 
-import { LANGUAGES } from '@/constants';
-
 interface UseHeaderCtxMenuProps {
   user: Pick<Types.User, 'userId'>;
-  onChangeLanguage: (code: Types.LanguageKey) => void;
+  onChangeLanguage: (code: Types.Locale) => void;
   onLogout: () => void;
   onExit: () => void;
 }
@@ -22,7 +21,7 @@ export const useHeaderCtxMenu = ({ user, onChangeLanguage, onLogout, onExit }: U
         .addSystemSettingOption(() => openSystemSetting(user.userId))
         .addChangeThemeOption(() => openChangeTheme())
         .addFeedbackOption(() => window.open('https://ricecall.com/feedback', '_blank'))
-        .addLanguageSelectOption({ languages: LANGUAGES }, (code) => (code ? onChangeLanguage(code) : null))
+        .addLanguageSelectOption({ languages: LOCALES }, (code) => (code ? onChangeLanguage(code) : null))
         .addHelpCenterOption(
           {
             onFaqClick: () => window.open('https://ricecall.com/#faq', '_blank'),

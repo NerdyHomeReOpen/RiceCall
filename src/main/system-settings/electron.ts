@@ -384,7 +384,7 @@ export function registerSystemHandlers(): void {
     broadcast('update-channel', channel);
   });
 
-  ipcMain.on('set-language', (_, language: Types.LanguageKey = getLanguage()) => {
+  ipcMain.on('set-language', (_, language: Types.Locale = getLanguage()) => {
     store.set('language', language);
     changeLanguage(language);
     setTrayDetail();

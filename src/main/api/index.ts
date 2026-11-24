@@ -87,15 +87,15 @@ export const api = {
     return await modules.default.fetchMemberInvitations(params);
   },
 
-  fetchNotifications: async (params: { region: Types.LanguageKey }): Promise<Types.Notification[]> => {
+  fetchNotifications: async (params: { region: Types.Locale }): Promise<Types.Notification[]> => {
     return await modules.default.fetchNotifications(params);
   },
 
-  fetchAnnouncements: async (params: { region: Types.LanguageKey }): Promise<Types.Announcement[]> => {
+  fetchAnnouncements: async (params: { region: Types.Locale }): Promise<Types.Announcement[]> => {
     return await modules.default.fetchAnnouncements(params);
   },
 
-  fetchRecommendServers: async (params: { region: Types.LanguageKey }): Promise<Types.RecommendServer[]> => {
+  fetchRecommendServers: async (params: { region: Types.Locale }): Promise<Types.RecommendServer[]> => {
     return await modules.default.fetchRecommendServers(params);
   },
 

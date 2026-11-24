@@ -31,7 +31,7 @@ export type IpcRendererHandlers = {
   popupSubmit: (to: string, data?: unknown) => void;
   addAccount: (account: string, data: { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }) => void;
   deleteAccount: (account: string) => void;
-  setLanguage: (language: Types.LanguageKey) => void;
+  setLanguage: (language: Types.Locale) => void;
   addCustomTheme: (theme: Types.Theme) => void;
   deleteCustomTheme: (index: number) => void;
   setCurrentTheme: (theme: Types.Theme | null) => void;
@@ -110,9 +110,9 @@ export type IpcRendererHandlers = {
   fetchMemberApplications: (params: { serverId: string }) => Promise<Types.MemberApplication[]>;
   fetchMemberInvitation: (params: { receiverId: string; serverId: string }) => Promise<Types.MemberInvitation | null>;
   fetchMemberInvitations: (params: { receiverId: string }) => Promise<Types.MemberInvitation[]>;
-  fetchNotifications: (params: { region: Types.LanguageKey }) => Promise<Types.Notification[]>;
-  fetchAnnouncements: (params: { region: Types.LanguageKey }) => Promise<Types.Announcement[]>;
-  fetchRecommendServers: (params: { region: Types.LanguageKey }) => Promise<Types.RecommendServer[]>;
+  fetchNotifications: (params: { region: Types.Locale }) => Promise<Types.Notification[]>;
+  fetchAnnouncements: (params: { region: Types.Locale }) => Promise<Types.Announcement[]>;
+  fetchRecommendServers: (params: { region: Types.Locale }) => Promise<Types.RecommendServer[]>;
   uploadImage: (params: {
     folder: string;
     imageName: string;
@@ -127,7 +127,7 @@ export type IpcRendererHandlers = {
   enableLoopbackAudio: () => Promise<void>;
   disableLoopbackAudio: () => Promise<void>;
   getAccounts: () => Record<string, { isAutoLoginEnabled: boolean; rememberAccount: boolean; password: string }>;
-  getLanguage: () => Types.LanguageKey;
+  getLanguage: () => Types.Locale;
   getCustomThemes: () => Types.Theme[];
   getCurrentTheme: () => Types.Theme | null;
   getFontList: () => string[];

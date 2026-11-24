@@ -78,7 +78,7 @@ const Header: React.FC<HeaderProps> = React.memo(({ selectedTab, onTabSelect }) 
     ipc.exit();
   };
 
-  const changeLanguage = (language: Types.LanguageKey) => {
+  const changeLanguage = (language: Types.Locale) => {
     ipc.systemSettings.language.set(language);
   };
 
