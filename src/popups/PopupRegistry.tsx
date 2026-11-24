@@ -53,7 +53,7 @@ const POPUP_NODES: { [T in Types.PopupType]: (id: string, data: Types.PopupIniti
   channelEvent: () => <ChannelEvent />,
   channelPassword: (id, data) => <ChannelPassword id={id} {...data} />,
   channelSetting: (id, data) => <ChannelSetting id={id} {...data} />,
-  chatHistory: () => <ChatHistory />,
+  chatHistory: (id, data) => <ChatHistory id={id} {...data} />,
   createChannel: (id, data) => <CreateChannel id={id} {...data} />,
   createFriendGroup: (id, data) => <CreateFriendGroup id={id} {...data} />,
   createServer: (id, data) => <CreateServer id={id} {...data} />,

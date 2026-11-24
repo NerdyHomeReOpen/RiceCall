@@ -218,7 +218,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleMessageHistoryBtnClick = () => {
-    openChatHistory();
+    openChatHistory(target.userId);
   };
 
   const handleScreenShotBtnClick = () => {

@@ -78,6 +78,12 @@ export type ChannelMessage = Message & Member & { type: 'general' };
 
 export type DirectMessage = Message & User & { type: 'dm'; user1Id: string; user2Id: string };
 
+// A stored message from GET /direct-messages or /channel-messages; nickname is the sender's nickname in the channel's server.
+export type HistoryMessage = { messageId: number; content: string; createdAt: number; sender: { userId: string; name: string; nickname: string | null; avatarUrl: string | null } };
+
+// Page 1 holds the newest messages; total counts every message that matches the filter.
+export type HistoryPage = { messages: HistoryMessage[]; total: number; page: number; pageSize: number };
+
 export type PromptMessage = Message & { type: 'alert' | 'info' | 'warn' | 'event'; displaySeconds?: number };
 
 export type SystemSettings = {

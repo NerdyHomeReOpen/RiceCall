@@ -97,6 +97,7 @@
   align-items: center;
   height: 25px;
   padding: 5px;
+  cursor: pointer;
   border-radius: 3px;
 }
 
@@ -352,4 +353,18 @@
 .message-text {
   margin-top: 10px;
   color: #006ad1;
+}
+
+.empty {
+  padding: 1rem;
+  color: #888;
+}
+
+.message-item.selected {
+  background: #eaf3ff;
+}
+
+.delete-button-container.disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
 }

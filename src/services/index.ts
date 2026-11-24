@@ -244,8 +244,8 @@ export function openChannelSetting(userId: Types.User['userId'], serverId: Types
   ipc.popup.open('channelSetting', 'channelSetting', { userId, serverId, channelId });
 }
 
-export function openChatHistory(): void {
-  ipc.popup.open('chatHistory', 'chatHistory');
+export function openChatHistory(targetId?: Types.User['userId']): void {
+  ipc.popup.open('chatHistory', 'chatHistory', { targetId });
 }
 
 export function openCreateChannel(userId: Types.User['userId'], serverId: Types.Server['serverId'], channelId?: Types.Channel['channelId']): void {
@@ -619,6 +619,27 @@ type fetchRecommendServersParams = {
 
 export async function fetchRecommendServers(params: fetchRecommendServersParams): Promise<Types.RecommendServer[]> {
   return (await get(`/recommend-servers?${new URLSearchParams(params).toString()}`)) ?? [];
+}
+
+// page 1 is the newest; since is a millisecond time.
+type HistoryFilter = { page: number; since?: number; keyword?: string };
+
+function historySearch(params: Record<string, string | number | undefined>): string {
+  const search = new URLSearchParams();
+  for (const [key, value] of Object.entries(params)) if (value !== undefined && value !== '') search.set(key, String(value));
+  return search.toString();
+}
+
+type fetchDirectMessagesParams = HistoryFilter & { targetId: string };
+
+export async function fetchDirectMessages(params: fetchDirectMessagesParams): Promise<Types.HistoryPage | null> {
+  return await get(`/direct-messages?${historySearch(params)}`);
+}
+
+type fetchChannelMessagesParams = HistoryFilter & { serverId: string; channelId: string };
+
+export async function fetchChannelMessages(params: fetchChannelMessagesParams): Promise<Types.HistoryPage | null> {
+  return await get(`/channel-messages?${historySearch(params)}`);
 }
 
 type uploadImageParams = {

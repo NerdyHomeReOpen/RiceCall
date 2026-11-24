@@ -16,7 +16,7 @@ export type PopupInitialData = {
   changeTheme: NoData;
   channelPassword: NoData;
   channelSetting: { server: Server; channel: Channel; channelMembers: Member[] };
-  chatHistory: NoData;
+  chatHistory: { targetId?: User['userId'] };
   createChannel: { serverId: Server['serverId']; parent: Channel | null };
   createFriendGroup: NoData;
   createServer: NoData;
