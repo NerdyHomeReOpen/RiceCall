@@ -1,6 +1,6 @@
 /*
  * Cascade layers (Tailwind v4). Unlayered CSS beats every layer, so the shared rules below live in layers
- * and Tailwind utilities (layer `utilities`) can override them. CSS Modules stay unlayered until converted.
+ * and Tailwind utilities (layer `utilities`) can override them.
  * Preflight is intentionally not imported: the reset in `@layer base` keeps the current look.
  */
 @layer theme, base, components, utilities;
@@ -268,30 +268,29 @@
   } */
 }
 
+/*
+ * The shared classes below are written with `@apply`; plain declarations are kept where a utility would be worse:
+ * - `border: none` / `outline: none` in the `*` reset: `border-none` / `outline-none` would set --tw-border-style /
+ *   --tw-outline-style to none on every element and break the `border` / `outline` utilities.
+ * - box-shadow and transition values (clearer as written; Tailwind's shadow and transform utilities compose
+ *   other properties, e.g. `scale-*` sets `scale`, which a `transform` transition would not animate).
+ * - background shorthands (`.button*` reset background-image on purpose), background-image URLs and sprite
+ *   background-position values, `content`, `appearance`, `-webkit-*`, scrollbar pseudo-elements.
+ * - `font-weight: unset` (`font-[unset]` would be read as a font family), `hr`'s dashed top border
+ *   (`border-dashed` sets every side's style) and `border*: 0` (`border-0` also sets border-style to solid).
+ * Lengths are px (or rem where the original was rem) arbitrary values, as in the rest of the app.
+ */
 @layer base {
   * {
-    box-sizing: border-box;
-    padding: 0;
-    margin: 0;
+    @apply box-border p-0 m-0;
+
     outline: none;
     border: none;
   }
 
   html,
   body {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    padding: 0;
-    margin: 0;
-    overflow: clip;
-    font-family: arial, sans-serif;
-    font-size: 13px;
-    color: var(--text-color);
-    user-select: none;
-    background-color: var(--background);
+    @apply relative flex flex-col w-full h-full p-0 m-0 overflow-clip font-[arial,sans-serif] text-[13px] text-text-color select-none bg-background;
 
     --font-family: arial, sans-serif;
   }
@@ -325,10 +324,9 @@
 
   input[type='radio'],
   input[type='checkbox'] {
-    min-width: 19px;
-    min-height: 19px;
+    @apply min-w-[19px] min-h-[19px] cursor-pointer;
+
     appearance: none;
-    cursor: pointer;
     background-position: 0 0;
     background-size: inherit;
     border: none;
@@ -356,23 +354,19 @@
   textarea,
   textarea::placeholder,
   button {
-    font-family: var(--font-family);
+    @apply font-app;
   }
 
   *:disabled,
   .disabled {
-    color: var(--text-color-senary) !important;
-    pointer-events: none !important;
-    cursor: not-allowed !important;
-    filter: grayscale(100%) !important;
+    @apply text-text-color-senary! pointer-events-none! cursor-not-allowed! grayscale!;
   }
 
   *[datatype='read-only'] {
-    pointer-events: none;
-    user-select: none;
+    @apply pointer-events-none select-none;
 
     &:hover {
-      cursor: default;
+      @apply cursor-default;
     }
 
     &:focus {
@@ -383,194 +377,218 @@
   input,
   select,
   textarea {
-    color: var(--text-color);
-    background-color: transparent;
+    @apply text-text-color bg-transparent;
   }
 }
 
 @layer components {
   .resize-handle {
-    min-width: 3px;
-    height: 100%;
-    cursor: ew-resize;
-    background-color: var(--border);
+    @apply min-w-[3px] h-full cursor-ew-resize bg-border;
+
     transition: background-color 0.1s ease-in-out;
   }
 
   .resize-handle:active,
   .resize-handle:hover {
-    background-color: var(--border-secondary);
+    @apply bg-border-secondary;
   }
 
   .resize-handle-vertical {
-    width: 100%;
-    min-height: 3px;
-    cursor: ns-resize;
-    background-color: var(--border);
+    @apply w-full min-h-[3px] cursor-ns-resize bg-border;
+
     transition: background-color 0.1s ease-in-out;
   }
 
   .resize-handle-vertical:active,
   .resize-handle-vertical:hover {
-    background-color: var(--border-secondary);
+    @apply bg-border-secondary;
   }
 
   .hover-text {
-    position: absolute;
-    bottom: 100%;
-    left: 0;
-    z-index: 1;
-    display: flex;
-    align-items: center;
-    height: fit-content;
-    padding-right: 3px;
-    padding-left: 3px;
-    color: var(--text-color-quinary);
-    white-space: nowrap;
-    background-color: var(--background);
-    border: 1px solid var(--border);
-    border-radius: 3px;
-    opacity: 0;
+    @apply absolute bottom-full left-0 z-1 flex items-center h-fit px-[3px] text-text-color-quinary whitespace-nowrap bg-background border border-border rounded-[3px] opacity-0;
   }
 
   .has-hover-text {
-    position: relative;
-    cursor: pointer;
+    @apply relative cursor-pointer;
   }
 
   .has-hover-text:hover .hover-text {
-    opacity: 1;
+    @apply opacity-100;
+  }
+
+  /* Tables: `.input-box table` (settings lists) comes before `.markdown-content table`, lowest specificity first. */
+  .input-box {
+    @apply flex w-full;
+  }
+
+  .input-box.row,
+  .input-box.col {
+    @apply gap-0;
+  }
+
+  .input-box table {
+    @apply flex flex-col overflow-y-auto bg-background border border-border;
+  }
+
+  .input-box table thead {
+    @apply sticky top-0 flex w-full min-w-max;
+  }
+
+  .input-box table tbody {
+    @apply flex flex-col w-full min-w-max;
+  }
+
+  .input-box table tr {
+    @apply flex flex-1 flex-row border-b border-b-border;
+  }
+
+  .input-box table thead tr {
+    @apply bg-background-secondary;
+  }
+
+  .input-box table td {
+    @apply flex items-center justify-start w-full p-[5px] overflow-hidden break-all border-r border-r-border;
+  }
+
+  .input-box table tbody tr.selected td {
+    @apply bg-selected;
+  }
+
+  .input-box table tbody tr:not(.selected):hover td {
+    @apply bg-hover;
+  }
+
+  .input-box table td .name {
+    @apply truncate text-text-color-quaternary;
+  }
+
+  .input-box table td .name.highlight {
+    @apply text-text-nickname;
+  }
+
+  .input-box table th {
+    @apply relative flex items-center w-full p-[5px] text-left bg-background-secondary border-r border-r-border;
+
+    font-weight: unset;
+
+    & .resizer {
+      @apply absolute top-0 right-0 self-stretch w-[5px] h-full cursor-col-resize;
+    }
+
+    & .resizer:hover {
+      @apply bg-hover;
+    }
+  }
+
+  .input-box table th:hover {
+    @apply cursor-pointer bg-hover;
+  }
+
+  .input-box table .p1 {
+    @apply truncate;
+  }
+
+  .input-box input[type='text'],
+  .input-box input[type='number'] {
+    @apply relative inline-block w-full h-[2rem] p-[2px] bg-background border border-border;
+
+    &:not([datatype='read-only'], [readOnly]) {
+      box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
+    }
+  }
+
+  .input-box textarea {
+    @apply relative inline-block w-full h-[4rem] p-[2px] resize-none bg-background border border-border;
+
+    &:not([datatype='read-only'], [readOnly]) {
+      box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
+    }
   }
 
   .markdown-content {
-    user-select: text;
+    @apply select-text;
   }
 
   .markdown-content h1 {
-    margin: 16px 0 8px;
-    font-size: 1.5rem;
+    @apply mt-[16px] mb-[8px] text-[1.5rem];
   }
 
   .markdown-content h2 {
-    margin: 16px 0 8px;
-    font-size: 1.25rem;
+    @apply mt-[16px] mb-[8px] text-[1.25rem];
   }
 
   .markdown-content h3 {
-    margin: 16px 0 8px;
-    font-size: 1rem;
+    @apply mt-[16px] mb-[8px] text-[1rem];
   }
 
   .markdown-content p {
-    display: block;
-    align-items: center;
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
+    @apply block items-center wrap-break-word whitespace-pre-wrap;
   }
 
   .markdown-content span {
-    user-select: text;
+    @apply select-text;
   }
 
   .markdown-content a {
-    font-weight: 500;
-    color: var(--text-link);
-    overflow-wrap: break-word;
-    white-space: pre-wrap;
-    text-decoration: none;
-    text-underline-offset: 0.125rem;
-    cursor: pointer;
+    @apply font-medium text-text-link wrap-break-word whitespace-pre-wrap no-underline underline-offset-[0.125rem] cursor-pointer;
 
     &:hover {
-      color: var(--text-link-hover);
-      text-decoration: underline;
+      @apply text-text-link-hover underline;
     }
   }
 
   .markdown-content ul,
   .markdown-content ol {
-    margin: 4px 0 0 16px;
-    list-style-position: outside;
+    @apply mt-[4px] ml-[16px] list-outside;
   }
 
   .markdown-content li {
-    margin-bottom: 4px;
+    @apply mb-[4px];
   }
 
   .markdown-content blockquote {
-    padding: 0 8px 0 12px;
-    margin: 4px 0;
-    color: var(--text-color-quaternary);
-    text-indent: 0;
-    border-left: 4px solid var(--border);
-    border-radius: 0 4px 4px 0;
+    @apply my-[4px] pr-[8px] pl-[12px] text-text-color-quaternary indent-0 border-l-4 border-l-border rounded-r-[4px];
   }
 
   .markdown-content pre {
-    position: relative;
+    @apply relative;
   }
 
   .markdown-content hr {
-    margin: 5px 0;
+    @apply my-[5px];
+
     border: none;
     border-top: 1px dashed var(--border);
   }
 
   .markdown-content table {
-    display: flex;
-    flex-direction: column;
-    height: auto;
-    overflow-y: auto;
-    background-color: var(--background);
-    border: 1px solid var(--border);
+    @apply flex flex-col h-auto overflow-y-auto bg-background border border-border;
   }
 
   .markdown-content table thead {
-    position: sticky;
-    top: 0;
-    display: flex;
-    background-color: var(--background-secondary);
+    @apply sticky top-0 flex bg-background-secondary;
   }
 
   .markdown-content table tr {
-    display: flex;
-    flex: 1;
-    flex-direction: row;
+    @apply flex flex-1 flex-row;
   }
 
   .markdown-content table tr:not(.selected):hover {
-    background-color: var(--hover);
+    @apply bg-hover;
   }
 
   .markdown-content table tr.selected {
-    background-color: var(--selected);
+    @apply bg-selected;
   }
 
   .markdown-content table tr th {
-    display: flex;
-    align-items: center;
-    width: 100%;
-    height: auto;
-    padding: 5px;
+    @apply flex items-center w-full h-auto p-[5px] text-left bg-background-secondary border-r border-b border-r-border border-b-border;
+
     font-weight: unset;
-    text-align: left;
-    background-color: var(--background-secondary);
-    border: 1px solid var(--border);
-    border-top: 0;
-    border-left: 0;
   }
 
   .markdown-content table tr td {
-    display: flex;
-    align-items: flex-start;
-    justify-content: flex-start;
-    width: 100%;
-    height: auto;
-    padding: 5px;
-    overflow: hidden;
-    border: 1px solid var(--border);
-    border-top: 0;
-    border-left: 0;
+    @apply flex items-start justify-start w-full h-auto p-[5px] overflow-hidden border-r border-b border-r-border border-b-border;
   }
 
   .markdown-content table tr th:last-child,
@@ -583,94 +601,62 @@
   }
 
   .markdown-content table tr th:hover {
-    cursor: pointer;
-    background-color: var(--hover);
+    @apply cursor-pointer bg-hover;
   }
 
   .markdown-content table .p1 {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: pre-wrap;
+    @apply overflow-hidden text-ellipsis whitespace-pre-wrap;
   }
 
   .markdown-content img {
-    margin-block-start: 0;
-    margin-inline: 0;
-    cursor: pointer;
-    border-radius: 5px;
+    @apply mt-0 mx-0 cursor-pointer rounded-[5px];
   }
 
   .markdown-content img:not(.markdown-emoji),
   .markdown-content.image-size-small img:not(.markdown-emoji) {
-    max-width: calc(min(90%, 256px));
+    @apply max-w-[min(90%,256px)];
   }
 
   .markdown-content.image-size-medium img:not(.markdown-emoji) {
-    max-width: calc(min(90%, 512px));
+    @apply max-w-[min(90%,512px)];
   }
 
   .markdown-content.image-size-big img:not(.markdown-emoji) {
-    max-width: calc(min(90%, 1024px));
+    @apply max-w-[min(90%,1024px)];
   }
 
   .markdown-container {
-    flex: 1;
-    overflow-x: hidden;
+    @apply flex-1 overflow-x-hidden;
   }
 
   .markdown-table-wrapper {
-    max-width: 100%;
-    overflow-x: auto;
-    background: transparent;
+    @apply max-w-full overflow-x-auto bg-transparent;
   }
 
   .markdown-code-wrapper {
-    padding: 0.5rem;
-    font-family: monospace !important;
-    background-color: var(--background-secondary);
-    border: 1px solid var(--border);
-    border-radius: 4px;
+    @apply p-[0.5rem] font-[monospace]! bg-background-secondary border border-border rounded-[4px];
   }
 
   .editable-markdown-container {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    padding: 2px;
-    overflow: auto;
-    resize: none;
-    background-color: var(--background);
-    border: 1px solid var(--border);
+    @apply relative inline-block w-full h-full p-[2px] overflow-auto resize-none bg-background border border-border;
   }
 
   .markdown-user-name {
-    display: inline-block !important;
-    color: var(--text-username);
-    word-break: break-all !important;
-    white-space: pre-wrap;
-    cursor: pointer;
-    user-select: text;
+    @apply inline-block! text-text-username break-all! whitespace-pre-wrap cursor-pointer select-text;
 
     &:hover {
-      text-decoration: underline;
+      @apply underline;
     }
   }
 
   .markdown-user-icon {
-    display: inline-block !important;
-    vertical-align: text-top;
-    word-break: break-all !important;
-    user-select: text;
+    @apply inline-block! align-text-top break-all! select-text;
   }
 
   .markdown-embed-video {
-    width: 90%;
-    max-width: calc(min(90%, 1024px));
-    aspect-ratio: 16/9;
-    margin: 5px;
+    @apply w-[90%] max-w-[min(90%,1024px)] aspect-video m-[5px] rounded-[5px];
+
     border: 0;
-    border-radius: 5px;
     box-shadow: 0 0 5px 0 #0000003f;
     transition:
       transform 0.3s ease-in-out,
@@ -683,32 +669,21 @@
   }
 
   .markdown-emoji {
-    width: 19px;
-    height: 19px;
+    @apply w-[19px] h-[19px];
   }
 
   .permission-male {
-    width: 14px;
-    min-width: 14px;
-    height: 16px;
-    min-height: 16px;
-    margin-right: 2px;
+    @apply w-[14px] min-w-[14px] h-[16px] min-h-[16px] mr-[2px] bg-no-repeat bg-auto;
+
     background-image: url('/channel/UserIconsMale.svg');
-    background-repeat: no-repeat;
     background-position: 0 0;
-    background-size: auto;
   }
 
   .permission-female {
-    width: 14px;
-    min-width: 14px;
-    height: 16px;
-    min-height: 16px;
-    margin-right: 2px;
+    @apply w-[14px] min-w-[14px] h-[16px] min-h-[16px] mr-[2px] bg-no-repeat bg-auto;
+
     background-image: url('/channel/UserIconsFemale.svg');
-    background-repeat: no-repeat;
     background-position: 0 0;
-    background-size: auto;
   }
 
   .permission-lv-1 {
@@ -744,13 +719,10 @@
   }
 
   .vip-icon {
-    min-width: 14px;
-    min-height: 14px;
-    margin-right: 2px;
+    @apply min-w-[14px] min-h-[14px] mr-[2px] bg-no-repeat bg-auto;
+
     background-image: url('/channel/vip_icons.svg');
-    background-repeat: no-repeat;
     background-position: 0 0;
-    background-size: auto;
   }
 
   .vip-icon.vip-1 {
@@ -774,10 +746,8 @@
   }
 
   .vip-icon-big {
-    min-width: 55px;
-    min-height: 14px;
-    margin-right: 2px;
-    background-repeat: no-repeat;
+    @apply min-w-[55px] min-h-[14px] mr-[2px] bg-no-repeat;
+
     background-position: 0 0;
   }
 
@@ -806,25 +776,15 @@
   }
 
   .col {
-    display: flex !important;
-    flex-direction: column !important;
-    gap: 5px;
-    justify-content: flex-start;
+    @apply flex! flex-col! gap-[5px] justify-start;
   }
 
   .row {
-    display: flex !important;
-    flex-direction: row !important;
-    gap: 5px;
-    align-items: center;
+    @apply flex! flex-row! gap-[5px] items-center;
   }
 
   .popup-wrapper {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
-    overflow: hidden;
-    background-color: var(--popup-background);
+    @apply flex flex-1 flex-col overflow-hidden bg-popup-background;
   }
 
   .popup-wrapper:focus {
@@ -832,174 +792,102 @@
   }
 
   .popup-tabs {
-    display: flex;
-    height: 40px;
-    background-color: var(--sidebar);
+    @apply flex h-[40px] bg-sidebar;
   }
 
   .popup-tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: max-content;
-    min-width: 100px;
-    height: 100%;
-    padding: 0 10px;
-    font-size: 0.9rem;
-    text-align: center;
+    @apply flex items-center justify-center w-max min-w-[100px] h-full px-[10px] text-[0.9rem] text-center;
   }
 
   .popup-tab.active {
-    background-color: #a7c0e9;
+    @apply bg-[#a7c0e9];
   }
 
   .popup-body {
-    display: flex;
-    flex: 1;
-    min-height: 0;
+    @apply flex flex-1 min-h-0;
   }
 
   .popup-sidebar {
-    display: flex;
-    height: 100%;
-    min-height: 0;
+    @apply flex h-full min-h-0 bg-no-repeat bg-cover border-r border-r-[#b4dbec];
+
     background-image: url('/setting_left_bg.svg');
-    background-repeat: no-repeat;
-    background-size: cover;
-    border-right: 1px solid #b4dbec;
   }
 
   .popup-content {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    height: 100%;
-    padding: 15px 30px;
-    overflow: hidden auto;
+    @apply flex flex-col w-full h-full px-[30px] py-[15px] overflow-x-hidden overflow-y-auto;
   }
 
   .popup-footer {
-    display: flex;
-    gap: 10px;
-    align-items: center;
-    justify-content: flex-end;
-    padding: 6px 8px;
-    background-color: var(--footer-background);
-    border-top: 1px solid var(--border);
+    @apply flex gap-[10px] items-center justify-end px-[8px] py-[6px] bg-footer-background border-t border-t-border;
   }
 
   .dialog-content {
-    display: flex;
-    width: 100%;
-    height: fit-content;
-    padding: 20px 30px;
+    @apply flex w-full h-fit px-[30px] py-[20px];
   }
 
   .popup-sidebar-tabs {
-    display: flex;
-    flex-direction: column;
-    width: 145px;
-    height: 100%;
+    @apply flex flex-col w-[145px] h-full;
   }
 
   .popup-sidebar-tab {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: calc(100% + 2px);
-    min-width: 100%;
-    min-height: 28px;
-    padding: 5px 10px;
-    text-align: center;
-    cursor: pointer;
-    border-top: 1px solid #fff0;
-    border-right: 1px solid #fff0;
-    border-bottom: 1px solid #fff0;
+    @apply flex items-center justify-center w-[calc(100%+2px)] min-w-full min-h-[28px] px-[10px] py-[5px] text-center cursor-pointer border-y border-r border-y-[#fff0] border-r-[#fff0];
   }
 
   .popup-sidebar-tab:first-child {
-    margin-top: 15px;
+    @apply mt-[15px];
   }
 
   .popup-sidebar-tab.active {
-    background-color: var(--popup-background);
-    border-top: 1px solid #b4dbec;
-    border-right: 1px solid #fff0;
-    border-bottom: 1px solid #b4dbec;
+    @apply bg-popup-background border-y-[#b4dbec];
   }
 
   .label {
-    display: inline-block;
-    min-width: max-content;
-    padding: 5px 5px 5px 0;
-    line-height: 1rem;
-    overflow-wrap: break-word;
-    white-space: normal;
+    @apply inline-block min-w-max py-[5px] pr-[5px] leading-[1rem] wrap-break-word whitespace-normal;
   }
 
   .label-header {
-    display: flex;
-    align-items: center;
+    @apply flex items-center;
   }
 
   .label-header::after {
-    display: block;
-    align-self: center;
-    width: 100%;
-    height: 1px;
-    margin-left: 5px;
+    @apply block self-center w-full h-px ml-[5px] bg-main-color;
+
     content: '';
-    background-color: var(--main-color);
   }
 
   .label-header .label {
-    min-width: max-content;
+    @apply min-w-max;
   }
 
   .sub-text {
-    color: var(--text-color-quaternary);
+    @apply text-text-color-quaternary;
   }
 
   .hint-text {
-    font-size: 0.9rem;
-    color: var(--text-color-quaternary);
+    @apply text-[0.9rem] text-text-color-quaternary;
   }
 
   .link-text {
-    font-weight: 500;
-    color: var(--text-link);
-    white-space: pre-wrap;
-    cursor: pointer;
+    @apply font-medium text-text-link whitespace-pre-wrap cursor-pointer;
   }
 
   .link-text:hover {
-    color: var(--text-link-hover);
-    text-decoration: underline;
+    @apply text-text-link-hover underline;
   }
 
   .error-text {
-    color: var(--text-warning);
+    @apply text-text-warning;
   }
 
   .note-text {
-    margin-top: 3px;
-    text-align: right;
+    @apply mt-[3px] text-right;
   }
 
+  /* `background` shorthands on purpose: the variants reset the base gradient (background-image). */
   .button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: max-content;
-    min-width: 80px;
-    height: 27px;
-    padding: 0 10px;
-    color: var(--text-color-secondary);
-    text-align: center;
-    cursor: pointer;
+    @apply flex items-center justify-center w-max min-w-[80px] h-[27px] px-[10px] text-text-color-secondary text-center cursor-pointer border border-border rounded-[5px];
+
     background: linear-gradient(#fdfdfd, #ededed);
-    border: 1px solid var(--border);
-    border-radius: 5px;
   }
 
   .button:hover {
@@ -1007,9 +895,9 @@
   }
 
   .button-primary {
-    color: #fff;
+    @apply text-white border border-[#50a1db];
+
     background: #4aabf0;
-    border: 1px solid #50a1db;
   }
 
   .button-primary:hover {
@@ -1021,9 +909,9 @@
   }
 
   .button-success {
-    color: #fff;
+    @apply text-white border border-[#0d9e1b];
+
     background: #0fb11f;
-    border: 1px solid #0d9e1b;
   }
 
   .button-success:hover {
@@ -1034,151 +922,14 @@
     background: #0fac1e;
   }
 
-  .input-box {
-    display: flex;
-    width: 100%;
-  }
-
-  .input-box.row,
-  .input-box.col {
-    gap: 0;
-  }
-
-  .input-box table {
-    display: flex;
-    flex-direction: column;
-    overflow-y: auto;
-    background-color: var(--background);
-    border: 1px solid var(--border);
-  }
-
-  .input-box table thead {
-    position: sticky;
-    top: 0;
-    display: flex;
-    width: 100%;
-    min-width: max-content;
-  }
-
-  .input-box table tbody {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-width: max-content;
-  }
-
-  .input-box table tr {
-    display: flex;
-    flex: 1;
-    flex-direction: row;
-    border-bottom: 1px solid var(--border);
-  }
-
-  .input-box table thead tr {
-    background-color: var(--background-secondary);
-  }
-
-  .input-box table td {
-    display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    width: 100%;
-    padding: 5px;
-    overflow: hidden;
-    word-break: break-all;
-    border-right: 1px solid var(--border);
-  }
-
-  .input-box table tbody tr.selected td {
-    background-color: var(--selected);
-  }
-
-  .input-box table tbody tr:not(.selected):hover td {
-    background-color: var(--hover);
-  }
-
-  .input-box table td .name {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    color: var(--text-color-quaternary);
-    white-space: nowrap;
-  }
-
-  .input-box table td .name.highlight {
-    color: var(--text-nickname);
-  }
-
-  .input-box table th {
-    position: relative;
-    display: flex;
-    align-items: center;
-    width: 100%;
-    padding: 5px;
-    font-weight: unset;
-    text-align: left;
-    background-color: var(--background-secondary);
-    border-right: 1px solid var(--border);
-
-    & .resizer {
-      position: absolute;
-      top: 0;
-      right: 0;
-      align-self: stretch;
-      width: 5px;
-      height: 100%;
-      cursor: col-resize;
-    }
-
-    & .resizer:hover {
-      background-color: var(--hover);
-    }
-  }
-
-  .input-box table th:hover {
-    cursor: pointer;
-    background-color: var(--hover);
-  }
-
-  .input-box table .p1 {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .input-box textarea {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 4rem;
-    padding: 2px;
-    resize: none;
-    background-color: var(--background);
-    border: 1px solid var(--border);
-
-    &:not([datatype='read-only'], [readOnly]) {
-      box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
-    }
-  }
-
   .select-box {
-    position: relative;
-    display: flex;
-    width: 100px;
-    min-width: max-content;
-    max-width: 100%;
+    @apply relative flex w-[100px] min-w-max max-w-full;
   }
 
   .select-box select {
-    position: relative;
-    display: flex;
-    width: 100%;
-    height: 2rem;
-    padding: 2px;
-    padding-right: 25px;
-    text-decoration: none;
+    @apply relative flex w-full h-[2rem] p-[2px] pr-[25px] no-underline bg-background border border-border;
+
     appearance: none;
-    background-color: var(--background);
-    border: 1px solid var(--border);
 
     &:not([datatype='read-only'], [readOnly]) {
       box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
@@ -1186,30 +937,17 @@
   }
 
   .select-box::before {
-    position: absolute;
-    right: 0;
-    bottom: 0;
-    z-index: 1;
-    width: 25px;
-    height: 2rem;
-    pointer-events: none;
+    @apply absolute right-0 bottom-0 z-1 w-[25px] h-[2rem] pointer-events-none bg-no-repeat bg-contain;
+
     content: '';
     background-image: url('/channel/spliter.svg');
-    background-repeat: no-repeat;
-    background-size: contain;
   }
 
   .select-box::after {
-    position: absolute;
-    right: 0;
-    bottom: 8px;
-    width: 26px;
-    height: 12px;
-    pointer-events: none;
+    @apply absolute right-0 bottom-[8px] w-[26px] h-[12px] pointer-events-none bg-no-repeat bg-cover;
+
     content: '';
     background-image: url('/login_combobox_triangle.svg');
-    background-repeat: no-repeat;
-    background-size: cover;
   }
 
   .select-box:hover::after {
@@ -1221,48 +959,33 @@
   }
 
   .search-box {
-    display: flex;
-    align-items: center;
-    width: max-content;
-    background-color: var(--background);
-    border: 1px solid var(--border);
+    @apply flex items-center w-max bg-background border border-border;
   }
 
   .search-icon {
-    min-width: 17px;
-    min-height: 17px;
-    margin: 5px;
+    @apply min-w-[17px] min-h-[17px] m-[5px] bg-cover;
+
     background-image: url('/channel/channel_search.svg');
     background-position: 0 0;
-    background-size: cover;
   }
 
   .search-box:hover:not(:has(.search-prev:hover, .search-next:hover)) .search-icon {
     background-position: -17px 0;
   }
 
+  /* Plain on purpose: `border-none` would set --tw-border-style: none and hide the left border. */
   .search-input {
-    width: 100%;
-    height: 100%;
-    padding: 5px;
+    @apply w-full h-full p-[5px];
+
     border: none !important;
     border-left: 1px solid var(--border) !important;
   }
 
-  .hidden {
-    display: none;
-  }
-
   .dialog-icon {
-    display: inline-block;
-    width: 36px;
-    min-width: 36px;
-    height: 36px;
-    margin-right: 10px;
+    @apply inline-block w-[36px] min-w-[36px] h-[36px] mr-[10px] bg-no-repeat bg-contain;
+
     content: '';
     background-image: url('/pic_alert.svg');
-    background-repeat: no-repeat;
-    background-size: contain;
   }
 
   .dialog-icon.alert {
@@ -1290,18 +1013,14 @@
   }
 
   .dialog-message {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @apply flex items-center justify-center;
   }
 }
 
 /*
- * Kept unlayered on purpose (Tailwind setup must not change visuals):
- * - The code-block rules must keep beating highlight.js `github.css` (imported by components/markdown-content),
- *   which is unlayered: `.markdown-content code` (0,1,1) overrode its `.hljs { background }` by specificity.
- * - `.input-box input[type='text']` (0,2,1) overrides lower-specificity CSS Module rules, e.g. the padding of
- *   `.search-input-box input` in popups/chat-history. Layer these once the overriding modules are converted.
+ * Kept unlayered on purpose: highlight.js `github.css` (imported by components/markdown-content) is unlayered,
+ * so these code-block rules must be unlayered too to keep beating it (`.markdown-content code` (0,1,1) overrode
+ * its `.hljs { background }` by specificity).
  */
 .hljs span {
   font-family: monospace;
@@ -1321,19 +1040,4 @@
   background-color: var(--background-secondary);
   border: 1px solid var(--border);
   border-radius: 4px;
-}
-
-.input-box input[type='text'],
-.input-box input[type='number'] {
-  position: relative;
-  display: inline-block;
-  width: 100%;
-  height: 2rem;
-  padding: 2px;
-  background-color: var(--background);
-  border: 1px solid var(--border);
-
-  &:not([datatype='read-only'], [readOnly]) {
-    box-shadow: 1px 1px 3px rgb(0 0 0 / 10%) inset;
-  }
 }
