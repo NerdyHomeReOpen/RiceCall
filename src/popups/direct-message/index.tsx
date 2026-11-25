@@ -15,7 +15,7 @@ import * as ipc from '@/main/ipc';
 
 import { sendMessage, openApplyFriend, blockUser, unblockUser, openUserInfo, openChatHistory, openAlertDialog } from '@/services';
 
-import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN, DEFAULT_USER_AVATAR_URL } from '@/constants';
+import { MAX_FILE_SIZE, MAX_INPUT_LENGTH, SHAKE_COOLDOWN, DEFAULT_USER_AVATAR_URL, REPORT_BASE_URL } from '@/constants';
 
 import { useContextMenu } from '@/providers/ContextMenu';
 
@@ -206,7 +206,7 @@ const DirectMessagePopup: React.FC<DirectMessagePopupProps> = React.memo(({ targ
   };
 
   const handleReportBtnClick = () => {
-    window.open('https://ricecall.com/report', '_blank');
+    window.open(`${REPORT_BASE_URL}?type=user&id=${encodeURIComponent(target.userId)}`, '_blank');
   };
 
   const handleTargetAvatarClick = () => {

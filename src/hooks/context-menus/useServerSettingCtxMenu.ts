@@ -2,6 +2,8 @@ import { useCallback } from 'react';
 
 import type * as Types from '@/types';
 
+import { REPORT_BASE_URL } from '@/constants';
+
 import { applyMember, openServerSetting, openEditNickname, favoriteServer } from '@/services';
 
 import ContextMenu from '@/utils/context-menu';
@@ -24,7 +26,7 @@ export const useServerSettingCtxMenu = ({ user, currentServer, onLocateMe }: Use
         .addEditNicknameOption({ permissionLevel, isSelf: true, isLowerLevel: false }, () => openEditNickname(user.userId, currentServer.serverId))
         .addLocateMeOption(() => onLocateMe())
         .addSeparator()
-        .addReportOption(() => window.open('https://ricecall.com/report', '_blank'))
+        .addReportOption(() => window.open(`${REPORT_BASE_URL}?type=server&id=${encodeURIComponent(currentServer.serverId)}`, '_blank'))
         .addFavoriteServerOption({ isFavorite: currentServer.isFavorite }, () => favoriteServer(currentServer.serverId))
         .build(),
     [user, currentServer, permissionLevel, onLocateMe],

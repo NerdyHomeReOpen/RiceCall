@@ -155,6 +155,7 @@ export const REGIONS: { code: Types.RegionKey; label: string }[] = [
 
 export const ANNOUNCEMENT_SLIDE_INTERVAL = 8000;
 export const INVITATION_BASE_URL = 'https://ricecall.com/join';
+export const REPORT_BASE_URL = 'https://ricecall.com/report';
 export const SHOW_FRAME_ORIGIN = 'https://show.ricecall.com';
 export const REFRESH_REGION_INFO_INTERVAL = 1000 * 60 * 10;
 export const MESSAGE_VIERER_DEVIATION = 100;
