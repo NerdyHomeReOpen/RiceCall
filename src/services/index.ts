@@ -622,8 +622,8 @@ export async function fetchRecommendServers(params: fetchRecommendServersParams)
   return (await get(`/recommend-servers?${new URLSearchParams(params).toString()}`)) ?? [];
 }
 
-// page 1 is the newest; since is a millisecond time.
-type HistoryFilter = { page: number; since?: number; keyword?: string };
+// page 1 is the newest.
+type HistoryFilter = { page: number; sinceMs?: number; keyword?: string };
 
 function historySearch(params: Record<string, string | number | undefined>): string {
   const search = new URLSearchParams();

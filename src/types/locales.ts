@@ -39,7 +39,6 @@ export function matchLocale(tag: string, countryCode?: string): Locale | null {
   return (language && LOCALE_BY_LANGUAGE[language]) || null;
 }
 
-// The first preferred tag that maps to a supported locale, or the default locale.
 export function pickLocale(tags: readonly string[], countryCode?: string): Locale {
   for (const tag of tags) {
     const locale = matchLocale(tag, countryCode);
@@ -49,7 +48,6 @@ export function pickLocale(tags: readonly string[], countryCode?: string): Local
   return DEFAULT_LOCALE;
 }
 
-// The tags of an Accept-Language header in the order the client listed them.
 export function parseAcceptLanguage(header: string): string[] {
   return header
     .split(',')

@@ -1,11 +1,8 @@
 import type { Channel, DirectMessage, Friend, FriendApplication, FriendGroup, Member, MemberApplication, MemberInvitation, PopupType, Server, SystemSettings, User, UserSetting } from '@/types';
 
-// Popups that take no data besides their id.
 type NoData = Record<never, never>;
-
 type DialogData = { message?: string; parameter?: Record<string, string>; error?: Error };
 
-// What each popup component receives, besides its id.
 export type PopupInitialData = {
   aboutus: NoData;
   applyFriend: { receiver: User; friendApplication: FriendApplication | null };
@@ -52,7 +49,6 @@ export type PopupInitialData = {
   userSetting: { target: User; targetServers: Server[] };
 };
 
-// What callers pass to open a popup whose data is fetched before it opens (see main/popup/initial-data-loader.ts).
 export type PopupRequestData = {
   applyFriend: { senderId: User['userId']; receiverId: User['userId'] };
   applyMember: { userId: User['userId']; serverId: Server['serverId'] };
@@ -83,9 +79,7 @@ export type PopupLoaders = {
   [T in keyof PopupRequestData]?: (data: PopupRequestData[T]) => Promise<Omit<PopupInitialData[T], keyof PopupRequestData[T] | 'systemSettings'>>;
 };
 
-// Popups that need no data can be opened without passing any.
 export type PopupOpenArgs<T extends PopupType> = Record<string, never> extends PopupOpenData<T> ? [initialData?: PopupOpenData<T>, force?: boolean] : [initialData: PopupOpenData<T>, force?: boolean];
-
 export type PopupOpenRequest = { [T in PopupType]: { type: T; id: string; initialData: PopupOpenData<T>; force?: boolean } }[PopupType];
 export type PopupProps<T extends PopupType> = { id: string } & PopupInitialData[T];
 export type PopupData = { [T in PopupType]: { type: T; data: PopupInitialData[T] } }[PopupType];

@@ -42,7 +42,6 @@ import ServerBroadcast from '@/popups/server-broadcast';
 import SystemSetting from '@/popups/system-setting';
 import UserInfo from '@/popups/user-info';
 
-// Every popup type renders its component with the data typed in Types.PopupInitialData.
 const POPUP_NODES: { [T in Types.PopupType]: (id: string, data: Types.PopupInitialData[T]) => React.ReactNode } = {
   aboutus: (id, data) => <About id={id} {...data} />,
   applyFriend: (id, data) => <ApplyFriend id={id} {...data} />,

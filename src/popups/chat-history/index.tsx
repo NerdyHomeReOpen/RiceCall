@@ -28,7 +28,6 @@ const RANGES = [
   { days: 90, labelKey: 'chat-history-last-three-months' },
 ];
 
-// How many page numbers the pagination shows around the current page.
 const PAGE_LINK_COUNT = 5;
 
 const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId: initialTargetId }) => {
@@ -121,7 +120,7 @@ const ChatHistoryPopup: React.FC<ChatHistoryPopupProps> = React.memo(({ targetId
   }, [targetId, friends]);
 
   useEffect(() => {
-    const filter = { page, since: Date.now() - rangeDays * DAY_MILLISECONDS, keyword };
+    const filter = { page, sinceMs: Date.now() - rangeDays * DAY_MILLISECONDS, keyword };
 
     const request =
       source === 'direct'
@@ -289,7 +288,6 @@ interface ContactGroupProps {
 const ContactGroup: React.FC<ContactGroupProps> = React.memo(({ friendGroup, contacts, isBlacklist, selectedUserId, onSelect }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(true);
 
-  // Blocked friends are listed only under the blacklist.
   const groupContacts = useMemo(() => {
     if (isBlacklist) return contacts.filter((f) => f.isBlocked);
     const unblocked = contacts.filter((f) => !f.isBlocked);

@@ -137,7 +137,6 @@ const initialDataLoader: Types.PopupLoaders = {
   },
 };
 
-// Fetches the data a popup needs and merges it with what the caller passed.
 export async function loadPopupData<T extends Types.PopupType>(type: T, data: Types.PopupOpenData<T>, systemSettings: Types.SystemSettings): Promise<Types.PopupInitialData[T]> {
   const loader = (initialDataLoader as Partial<Record<Types.PopupType, (data: unknown) => Promise<object>>>)[type];
   if (!loader) return data as Types.PopupInitialData[T];

@@ -10,10 +10,8 @@ export const initialData = {
 
 export const popup = {
   open: async <T extends Types.PopupType>(type: T, id: string, ...[initialData, force]: Types.PopupOpenArgs<T>): Promise<unknown> => {
-    // Only popups whose data has no required fields may omit it.
     return await modules.default.openPopup(type, id, initialData ?? ({} as Types.PopupOpenData<T>), force);
   },
-  // Opens a popup requested by Main Service over the socket.
   openRequest: async ({ type, id, initialData, force }: Types.PopupOpenRequest): Promise<unknown> => {
     return await modules.default.openPopup(type, id, initialData, force);
   },
