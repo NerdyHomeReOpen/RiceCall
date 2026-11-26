@@ -1,6 +1,6 @@
 # Naming conventions
 
-Identifier, function and general file naming follow `RiceCallEngineeringStandard/docs/code-style.md`. This document lists only the file naming rules specific to the desktop app.
+Identifier, function and general file naming follow `RiceCallBlueprint/docs/code-style.md`. This document lists only the file naming rules specific to the desktop app.
 
 Use lowercase `kebab-case` for source directories and ordinary files in `src/`, `scripts/`, and `build-deb/`, while preserving Next.js route filenames.
 

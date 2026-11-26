@@ -1,4 +1,4 @@
-// Copied from RiceCallEngineeringStandard/shared/locales.ts by scripts/sync-shared.mjs. Do not edit; change the source and run the script.
+// Copied from RiceCallBlueprint/shared/locales.ts by scripts/sync-shared.mjs. Do not edit; change the source and run the script.
 // Interface and mail locales, see docs/naming.md. Translations for each locale live in RiceCallStaticJson.
 
 export const LOCALES = [

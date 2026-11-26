@@ -1,4 +1,4 @@
-// Copied from RiceCallEngineeringStandard/shared/enums.ts by scripts/sync-shared.mjs. Do not edit; change the source and run the script.
+// Copied from RiceCallBlueprint/shared/enums.ts by scripts/sync-shared.mjs. Do not edit; change the source and run the script.
 export enum Permission {
   Guest = 1,
   Member = 2,

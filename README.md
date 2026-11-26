@@ -64,4 +64,4 @@ RiceCall 不是 RaidCall 的延續、重製或官方授權版本，也不提供 
 
 ## 延伸文件
 
-`docs/` 收錄專案文件；程式命名與跨專案詞彙以 RiceCall Engineering Standard 為準。
+`docs/` 收錄專案文件；程式命名與跨專案詞彙以 RiceCall Blueprint 為準。

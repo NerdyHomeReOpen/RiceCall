@@ -64,4 +64,4 @@ Download an installer for your platform from the [official site](https://ricecal
 
 ## Further documentation
 
-See `docs/` for project documentation and RiceCall Engineering Standard for shared naming and vocabulary.
+See `docs/` for project documentation and RiceCall Blueprint for shared naming and vocabulary.
