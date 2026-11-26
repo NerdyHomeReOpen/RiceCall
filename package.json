@@ -10,7 +10,7 @@
   },
   "main": "./build/src/main/electron.js",
   "engines": {
-    "node": ">=22"
+    "node": ">=26"
   },
   "type": "module",
   "scripts": {

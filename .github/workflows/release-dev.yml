@@ -46,10 +46,10 @@ jobs:
 
       - name: Setup Node
         uses: actions/setup-node@v4
-        with: { node-version: 22, cache: yarn }
+        with: { node-version: 26.13.1, cache: yarn }
 
       - name: Enable corepack
-        run: corepack enable
+        run: npm install -g corepack && corepack enable
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
