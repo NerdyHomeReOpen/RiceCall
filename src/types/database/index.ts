@@ -405,6 +405,15 @@ export type table_user_show_stats = {
   createdAt: number;
 };
 
+export type table_user_suspensions = {
+  userId: string;
+  suspendedUntil: number;
+  reason: string;
+  suspendedBy: string;
+  updatedAt: number;
+  createdAt: number;
+};
+
 export type table_users = {
   userId: string;
   name: string;
