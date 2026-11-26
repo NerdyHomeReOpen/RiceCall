@@ -23,7 +23,9 @@ type DialogPopupProps = Types.PopupProps<'dialogInfo'> & { iconType: keyof typeo
 const DialogPopup: React.FC<DialogPopupProps> = React.memo(({ id, iconType, message, parameter, error }) => {
   const { t } = useTranslation();
   const formattedMessageContents = fromTags(t(message ?? error?.message ?? '', parameter));
-  const errorId = error ? crypto.randomUUID().substring(0, 8) : undefined;
+
+  // crypto.randomUUID only exists in secure contexts; getRandomValues also works on plain http.
+  const errorId = error ? Array.from(crypto.getRandomValues(new Uint8Array(4)), (byte) => byte.toString(16).padStart(2, '0')).join('') : undefined;
 
   const handleSubmitBtnClick = () => {
     ipc.popup.submit(id);
